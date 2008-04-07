@@ -156,4 +156,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
         return booleanProp("torque.isUseS2Buri", false);
     }
+    
+    public boolean isUseTeeda() {
+        return booleanProp("torque.isUseTeeda", false);
+    }
 }

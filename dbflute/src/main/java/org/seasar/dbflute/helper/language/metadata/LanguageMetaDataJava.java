@@ -10,6 +10,7 @@ public class LanguageMetaDataJava implements LanguageMetaData {
     protected static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
 
     public Map<String, Object> getJdbcToJavaNativeMap() {
+        // JavaのNativeMapはTypeMapにてべたっと定義されているのでここでは空っぽ
         return DEFAULT_EMPTY_MAP;
     }
 

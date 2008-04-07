@@ -68,7 +68,6 @@ public class ${myClassName} {
 #foreach ($classificationMap in $classificationMapList)
         map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
 #end
-
         CODE_NAME_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
 #end
@@ -83,12 +82,11 @@ public class ${myClassName} {
 #foreach ($classificationMap in $classificationMapList)
         map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
 #end
-
         CODE_ALIAS_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
 #end
 
-
+#if ($database.isMakeClassificationValueLabelList())
     // ===================================================================================
     //                                                       Classification ValueLabelList
     //                                                       =============================
@@ -146,4 +144,5 @@ public class ${myClassName} {
         map.put("label", label);
         ls.add(Collections.unmodifiableMap(map));
     }
+#end
 }

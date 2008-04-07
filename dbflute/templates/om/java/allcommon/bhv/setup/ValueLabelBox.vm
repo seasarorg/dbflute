@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvSetup};
 
 /**
  * The class of Value-Label Box.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glValueLabelBoxName} {

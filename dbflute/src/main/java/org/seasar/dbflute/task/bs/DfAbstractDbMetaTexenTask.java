@@ -32,11 +32,11 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.transform.XmlToAppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfS2JdbcProperties;
 
 /**
- * Abstract DB meta texen task for Torque.
- * 
- * @author mkubo
+ * @author jflute
  */
 public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 

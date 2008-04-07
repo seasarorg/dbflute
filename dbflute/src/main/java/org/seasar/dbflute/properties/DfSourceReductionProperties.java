@@ -45,6 +45,13 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     }
     
     // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    public boolean isMakeClassificationValueLabelList() {
+        return booleanProp("torque.isMakeClassificationValueLabelList", false);
+    }
+    
+    // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
     public boolean isMakeBehaviorLoopUpdate() {

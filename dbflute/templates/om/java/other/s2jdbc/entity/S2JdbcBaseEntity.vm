@@ -1,0 +1,200 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+#set ($myClassName = "${myBaseObjectClassName}")
+
+/**
+ * The entity of ${table.basicInfoDispString}.
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column-property]
+ *     ${table.columnNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [update-date]
+ *     ${table.updateDateColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * </pre>
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+ @javax.persistence.MappedSuperclass
+public abstract class ${myClassName} implements java.io.Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($col in $table.columns)
+#if ($col.isPrimaryKey())
+	@javax.persistence.ID
+#end
+#if ($col.isIdentity())
+	@javax.persistence.GeneratedValue
+#end
+    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
+    public ${col.javaNative} ${col.uncapitalisedJavaName};
+#end
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                       Foreign Table
+    //                                                                       =============
+#set ($foreignKeysIndex = 0)
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
+  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
+    //   ForeignProperty = [${foreignKeys.foreignJavaBeansRulePropertyName}]
+    // * * * * * * * * */
+
+    /** The entity of foreign table. */
+	@javax.persistence.ManyToOne
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+  #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#end
+
+    // ===================================================================================
+    //                                                                      Referrer Table
+    //                                                                      ==============
+#foreach ($referrer in $table.referrers)
+  #set ($referrerTable = $referrer.Table)
+  #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+  #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+  #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+
+  #if (${referrer.isOneToOne()})
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
+    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
+    //   ReferrerProperty = [${referrer.refererJavaBeansRulePropertyNameAsOne}]
+    // * * * * * * * * */
+
+  #else
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
+    //   ReferrerProperty = [${referrer.referrerJavaBeansRulePropertyName}]
+    // * * * * * * * * */
+  #end
+
+    /** The list of referrer table. */
+	@javax.persistence.OneToMany
+    public java.util.List<${referrerEntityLongClassName}> $referrerVariableName;
+#end
+		
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+#if ($table.hasPrimaryKey())
+
+    /**
+     * ${database.OverrideComment}
+     * If the primary-key of the other is same as this one, returns true.
+     * @param other Other entity.
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof $myClassName)) { return false; }
+        final $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.primaryKey)
+        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
+#end
+        return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from primary-key.
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        int result = 0;
+#foreach ($col in $table.primaryKey)
+        if (this.${col.uncapitalisedJavaName} != null) { result = result + ${col.uncapitalisedJavaName}.hashCode(); }
+#end
+        return result;
+    }
+#else
+
+    /**
+     * ${database.OverrideComment}
+     * If the all-column value of the other is same as this one, returns true.
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof $myClassName)) { return false; }
+        final $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.columns)
+        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
+#end
+        return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from all-columns.
+     * @return Hash-code from all-columns.
+     */
+    public int hashCode() {
+        int result = 0;
+#foreach ($col in $table.columns)
+        if (this.${col.uncapitalisedJavaName} != null) { result = result + this.${col.uncapitalisedJavaName}.hashCode(); }
+#end
+        return result;
+    }
+#end
+
+    /**
+     * ${database.OverrideComment}
+     * @return Column-value map-string. (NotNull)
+     */
+    public String toString() {
+        final String delimiter = ",";
+        final StringBuffer sb = new StringBuffer();
+
+#foreach ($col in $table.Columns)
+        sb.append(delimiter).append(${col.uncapitalisedJavaName});
+#end
+
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+}

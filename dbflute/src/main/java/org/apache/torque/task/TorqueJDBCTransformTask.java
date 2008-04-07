@@ -80,11 +80,11 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
@@ -136,7 +136,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
-    protected DfTableNameHandler _tableNameHandler = new DfTableNameHandler();
+    protected DfTableHandler _tableNameHandler = new DfTableHandler();
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
@@ -470,7 +470,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        return _tableNameHandler.getTableNameList(dbMeta, _schema);
+        return _tableNameHandler.getTableList(dbMeta, _schema);
     }
 
     /**

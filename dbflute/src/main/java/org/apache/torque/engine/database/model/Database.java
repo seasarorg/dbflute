@@ -1082,6 +1082,10 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
+    
+    public boolean isMakeClassificationValueLabelList() {
+        return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();
+    }
 
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
@@ -1146,6 +1150,10 @@ public class Database {
 
     public boolean isUseBuri() {
         return getProperties().getLittleAdjustmentProperties().isUseBuri();
+    }
+    
+    public boolean isUseTeeda() {
+        return getProperties().getLittleAdjustmentProperties().isUseTeeda();
     }
 
     public boolean isCompatibleNullEqualFalse() {
@@ -1269,12 +1277,31 @@ public class Database {
         return getProperties().getTransferEntityProperties().hasTransferEntityDefinition();
     }
     
-    public String getTransferEntityBaseEntityOutputDirectory() {
-        return getProperties().getTransferEntityProperties().getBaseEntityOutputDirectory();
+    public String getTransferEntityOutputDirectory() {
+        return getProperties().getTransferEntityProperties().getOutputDirectory();
     }
     
-    public String getTransferEntityExtendedEntityOutputDirectory() {
-        return getProperties().getTransferEntityProperties().getExtendedEntityOutputDirectory();
+    public String getTransferEntityBaseEntityPackage() {
+        return getProperties().getTransferEntityProperties().getBaseEntityPackage();
+    }
+    
+    public String getTransferEntityExtendedEntityPackage() {
+        return getProperties().getTransferEntityProperties().getExtendedEntityPackage();
+    }
+    
+    // ===================================================================================
+    //                                                                       S2JDBC Entity
+    //                                                                       =============
+    public boolean hasS2JdbcDefinition() {
+        return getProperties().getS2JdbcProperties().hasS2JdbcDefinition();
+    }
+    
+    public String getS2JdbcBaseEntityPackage() {
+        return getProperties().getS2JdbcProperties().getBaseEntityPackage();
+    }
+    
+    public String getS2JdbcExtendedEntityPackage() {
+        return getProperties().getS2JdbcProperties().getExtendedEntityPackage();
     }
 
     // **********************************************************************************************

@@ -13,9 +13,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
 
 /**
  * The schema initializer with JDBC.
@@ -45,8 +45,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final List<DfTableMetaInfo> tableMetaInfoList;
             try {
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
-                final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-                tableMetaInfoList = tableNameHandler.getTableNameList(dbMetaData, _schema);
+                final DfTableHandler tableNameHandler = new DfTableHandler();
+                tableMetaInfoList = tableNameHandler.getTableList(dbMetaData, _schema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

@@ -320,10 +320,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             throw new IllegalStateException(msg);
         }
     }
+#if ($database.isUseTeeda())
 
     /**
      * Create value-label list.
-     * 
      * @param <ENTITY> The type of entity.
      * @param cb Condition-bean. (NotNull)
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
@@ -341,6 +341,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
         return valueLabelList;
     }
+#end
 
     // ===================================================================================
     //                                                                            Sequence

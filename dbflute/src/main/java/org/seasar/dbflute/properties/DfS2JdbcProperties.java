@@ -6,63 +6,50 @@ import java.util.Properties;
 /**
  * @author jflute
  */
-public final class DfTransferEntityProperties extends DfAbstractHelperProperties {
+public final class DfS2JdbcProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfTransferEntityProperties(Properties prop) {
+    public DfS2JdbcProperties(Properties prop) {
         super(prop);
     }
 
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> transferEntityDefinitionMap;
-    protected Map<String, Object> getTransferEntityDefinitionMap() {
-        if (transferEntityDefinitionMap == null) {
-            transferEntityDefinitionMap = mapProp("torque.transferEntityDefinitionMap", DEFAULT_EMPTY_MAP);
+    protected Map<String, Object> s2jdbcDefinitionMap;
+
+    protected Map<String, Object> getS2JdbcDefinitionMap() {
+        if (s2jdbcDefinitionMap == null) {
+            s2jdbcDefinitionMap = mapProp("torque.s2jdbcDefinitionMap", DEFAULT_EMPTY_MAP);
         }
-        return transferEntityDefinitionMap;
+        return s2jdbcDefinitionMap;
     }
-    
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean hasTransferEntityDefinition() {
-        return !getTransferEntityDefinitionMap().isEmpty();
+    public boolean hasS2JdbcDefinition() {
+        return !getS2JdbcDefinitionMap().isEmpty();
     }
-    
+
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
-    public String getOutputDirectory() {
-        final String value = (String)getTransferEntityDefinitionMap().get("outputDirectory");
-        if (value == null) {
-            return getBasicProperties().getJavaDir();
-        }
-        // TODO: @jflute -- 調整をすること
-        return getBasicProperties().getJavaDir() + "/" + value;
-    }
-    
     public String getBaseEntityPackage() {
-        final String value = (String)getTransferEntityDefinitionMap().get("baseEntityPackage");
-        
+        final String value = (String) getS2JdbcDefinitionMap().get("baseEntityPackage");
+
         // TODO: @jflute -- 必須チェック
-        
+
         return value;
     }
-    
+
     public String getExtendedEntityPackage() {
-        final String value = (String)getTransferEntityDefinitionMap().get("extendedEntityPackage");
-        
+        final String value = (String) getS2JdbcDefinitionMap().get("extendedEntityPackage");
+
         // TODO: @jflute -- 必須チェック
-        
+
         return value;
-    }
-    
-    public boolean isIndependent() {
-        final String value = (String)getTransferEntityDefinitionMap().get("independent");
-        return value != null && value.trim().equalsIgnoreCase("true");
     }
 }

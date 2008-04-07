@@ -37,6 +37,7 @@ import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
+import org.seasar.dbflute.properties.DfS2JdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
@@ -377,9 +378,6 @@ public final class DfBuildProperties {
         }
     }
 
-    // -----------------------------------------------------
-    //                           jdbcToJavaNative (Internal)
-    //                           ---------------------------
     public DfTypeMappingProperties getTypeMappingProperties() {
         return getHandler().getTypeMappingProperties(getProperties());
     }
@@ -387,77 +385,10 @@ public final class DfBuildProperties {
     public DfTransferEntityProperties getTransferEntityProperties() {
         return getHandler().getTransferEntityProperties(getProperties());
     }
-
-    //    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
-    //        final String property = stringProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP_STRING);
-    //        return removeNewLine(property);
-    //    }
-    //
-    //    protected Map<String, Object> _jdbcToJavaNativeMap;
-    //
-    //    public Map<String, Object> getJdbcToJavaNative() {
-    //        if (_jdbcToJavaNativeMap == null) {
-    //            _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", getLanguageMetaData().getJdbcToJavaNativeMap());
-    //        }
-    //        return _jdbcToJavaNativeMap;
-    //    }
-    //
-    //    protected List<Object> _javaNativeStringList;
-    //
-    //    public List<Object> getJavaNativeStringList() {
-    //        if (_javaNativeStringList == null) {
-    //            _javaNativeStringList = listProp("torque.javaNativeStringList", getLanguageMetaData().getStringList());
-    //        }
-    //        return _javaNativeStringList;
-    //    }
-    //
-    //    protected List<Object> _javaNativeBooleanList;
-    //
-    //    public List<Object> getJavaNativeBooleanList() {
-    //        if (_javaNativeBooleanList == null) {
-    //            _javaNativeBooleanList = listProp("torque.javaNativeBooleanList", getLanguageMetaData().getBooleanList());
-    //        }
-    //        return _javaNativeBooleanList;
-    //    }
-    //
-    //    protected List<Object> _javaNativeNumberList;
-    //
-    //    public List<Object> getJavaNativeNumberList() {
-    //        if (_javaNativeNumberList == null) {
-    //            _javaNativeNumberList = listProp("torque.javaNativeNumberList", getLanguageMetaData().getNumberList());
-    //        }
-    //        return _javaNativeNumberList;
-    //    }
-    //
-    //    protected List<Object> _javaNativeDateList;
-    //
-    //    public List<Object> getJavaNativeDateList() {
-    //        if (_javaNativeDateList == null) {
-    //            _javaNativeDateList = listProp("torque.javaNativeDateList", getLanguageMetaData().getDateList());
-    //        }
-    //        return _javaNativeDateList;
-    //    }
-    //
-    //    protected List<Object> _javaNativeBinaryList;
-    //
-    //    public List<Object> getJavaNativeBinaryList() {
-    //        if (_javaNativeBinaryList == null) {
-    //            _javaNativeBinaryList = listProp("torque.javaNativeBinaryList", getLanguageMetaData().getBinaryList());
-    //        }
-    //        return _javaNativeBinaryList;
-    //
-    //    }
-    //
-    //    protected LanguageMetaData _languageMetaData;
-    //
-    //    protected LanguageMetaData getLanguageMetaData() {
-    //        if (_languageMetaData != null) {
-    //            return _languageMetaData;
-    //        }
-    //        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-    //        _languageMetaData = languageDependencyInfo.createLanguageMetaData();
-    //        return _languageMetaData;
-    //    }
+    
+    public DfS2JdbcProperties getS2JdbcProperties() {
+        return getHandler().getS2JdbcProperties(getProperties());
+    }
 
     // -----------------------------------------------------
     //         ToLowerInGeneratorUnderscoreMethod (Internal)
@@ -485,12 +416,5 @@ public final class DfBuildProperties {
     //                               -----------------------
     public DfSql2EntityProperties getSql2EntityProperties() {
         return getHandler().getSql2EntityProperties(getProperties());
-    }
-
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
-    private String removeNewLine(String str) {
-        return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
 }

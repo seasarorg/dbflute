@@ -56,20 +56,29 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfS2JdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
- * Data-model task for Torque.
- * <p>
- * This is main task in generator.
- * Build data-model(of Java or C#...) from DB-Meta.
- * 
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
-    public static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
+    private static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
 
+    @Override
+    protected void doExecute() {
+        final DfS2JdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2JdbcProperties();
+        if (jdbcProperties.hasS2JdbcDefinition()) {
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process S2JDBC  *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/java/other/s2jdbc/s2jdbc-Control.vm");
+        }
+        super.doExecute();
+    }
+    
     protected boolean isUseDataSource() {
         return false;
     }

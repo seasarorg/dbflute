@@ -28,21 +28,20 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
+ * This class generates an XML schema of an existing database from JDBC meta data.
  * @author jflute
  */
-public class DfTableNameHandler extends DfAbstractMetaDataHandler {
+public class DfTableHandler extends DfAbstractMetaDataHandler {
 
-    private static final Log _log = LogFactory.getLog(DfTableNameHandler.class);
+    private static final Log _log = LogFactory.getLog(DfTableHandler.class);
 
     /**
-     * Get all the table names in the current database that are not
-     * system tables.
-     * @param dbMeta JDBC database metadata.
+     * Get all the table names in the current database that are not system tables.
+     * @param dbMeta JDBC database meta data.
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMetaInfo> getTableNameList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
+    public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
         // /---------------------------------------------------- [My Extension]
         // Get DatabaseTypes from ContextProperties.
         // These are the entity types we want from the database
