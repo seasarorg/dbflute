@@ -83,10 +83,10 @@ import org.seasar.dbflute.properties.DfTypeMappingProperties;
  * DECIMAL       | java.math.BigDecimal | decimal?    |
  * BIT           | java.lang.Boolean    | bool?       |
  * BOOLEAN       | java.lang.Boolean    | bool?       |
- * TINYINT       | java.math.BigDecimal | int?        |
- * SMALLINT      | java.math.BigDecimal | int?        |
- * INTEGER       | java.math.BigDecimal | int?        |
- * BIGINT        | java.math.BigDecimal | long?       |
+ * TINYINT       | java.lang.Integer    | int?        |
+ * SMALLINT      | java.lang.Integer    | int?        |
+ * INTEGER       | java.lang.Integer    | int?        |
+ * BIGINT        | java.lang.Long       | long?       |
  * REAL          | java.math.BigDecimal | decimal?    |
  * FLOAT         | java.math.BigDecimal | decimal?    |
  * DOUBLE        | java.math.BigDecimal | decimal?    |
@@ -139,7 +139,7 @@ public class TypeMap {
     // ===================================================================================
     //                                                                         Native Type
     //                                                                         ===========
-    // This is default native type.
+    // This is default native type(for Java).
     public static final String CHAR_NATIVE_TYPE = "String";
     public static final String VARCHAR_NATIVE_TYPE = "String";
     public static final String LONGVARCHAR_NATIVE_TYPE = "String";
@@ -148,10 +148,10 @@ public class TypeMap {
     public static final String DECIMAL_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String BIT_NATIVE_TYPE = "Boolean";
     public static final String BOOLEAN_NATIVE_TYPE = "Boolean";
-    public static final String TINYINT_NATIVE_TYPE = "java.math.BigDecimal";
-    public static final String SMALLINT_NATIVE_TYPE = "java.math.BigDecimal";
-    public static final String INTEGER_NATIVE_TYPE = "java.math.BigDecimal";
-    public static final String BIGINT_NATIVE_TYPE = "java.math.BigDecimal";
+    public static final String TINYINT_NATIVE_TYPE = "Integer";
+    public static final String SMALLINT_NATIVE_TYPE = "Integer";
+    public static final String INTEGER_NATIVE_TYPE = "Integer";
+    public static final String BIGINT_NATIVE_TYPE = "Long";
     public static final String REAL_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String FLOAT_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String DOUBLE_NATIVE_TYPE = "java.math.BigDecimal";
@@ -188,7 +188,6 @@ public class TypeMap {
 
     /**
      * Get JDBC-to-java-native.
-     * 
      * @param key JDBC type. (NotNull)
      * @param defaultJavaNative Default java-native. (NotNull)
      * @return Java-native. (NotNull: If the key does not have an element, it returns default type.)
@@ -218,6 +217,7 @@ public class TypeMap {
          */
         _torqueTypeToJavaNativeMap = new Hashtable<String, String>();
 
+        // Default types are for Java.
         _torqueTypeToJavaNativeMap.put(CHAR, getJavaNativeByJdbc(CHAR, CHAR_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(VARCHAR, getJavaNativeByJdbc(VARCHAR, VARCHAR_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(LONGVARCHAR, getJavaNativeByJdbc(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE));
@@ -339,7 +339,6 @@ public class TypeMap {
     /**
      * Returns true if the type is boolean in the
      * java object and a String "Y" or "N" in the database.
-     *
      * @param type The type to check.
      * @return true if the type is BOOLEANCHAR
      */
@@ -349,7 +348,6 @@ public class TypeMap {
 
     /**
      * Returns true if values for the type need to be quoted.
-     *
      * @param type The type to check.
      * @return true if values for the type need to be quoted.
      */
