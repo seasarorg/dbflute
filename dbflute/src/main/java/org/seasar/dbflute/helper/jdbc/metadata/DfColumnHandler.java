@@ -111,7 +111,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
             final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
             columnMetaInfo.setColumnName(columnName);
-            columnMetaInfo.setJdbcTypeCode(jdbcTypeCode);
+            columnMetaInfo.setJdbcType(jdbcTypeCode);
             columnMetaInfo.setDbTypeName(dbTypeName);
             columnMetaInfo.setColumnSize(columnSize);
             columnMetaInfo.setDecimalDigits(decimalDigits);
@@ -125,16 +125,16 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
-        if (Types.OTHER != sqlTypeCode) {
+        final int jdbcType = columnMetaInfo.getJdbcType();
+        if (Types.OTHER != jdbcType) {
 
             // For compatible to Oracle's JDBC driver.
-            if (isOracleCompatibleDate(sqlTypeCode, columnMetaInfo.getDbTypeName())) {
+            if (isOracleCompatibleDate(jdbcType, columnMetaInfo.getDbTypeName())) {
                 return getDateTorqueType();
             }
 
             try {
-                return TypeMap.getTorqueType(sqlTypeCode);
+                return TypeMap.getTorqueType(jdbcType);
             } catch (RuntimeException e) {
                 String msg = "Not found the sqlTypeCode in TypeMap: columnMetaInfo=";
                 msg = msg + columnMetaInfo + " message=" + e.getMessage();
@@ -185,7 +185,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                    ================
     public static class DfColumnMetaInfo {
         protected String columnName;
-        protected int jdbcTypeCode;
+        protected int jdbcType;
         protected String dbTypeName;
         protected int columnSize;
         protected int decimalDigits;
@@ -233,12 +233,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             this.required = required;
         }
 
-        public int getJdbcTypeCode() {
-            return jdbcTypeCode;
+        public int getJdbcType() {
+            return jdbcType;
         }
 
-        public void setJdbcTypeCode(int sqlTypeCode) {
-            this.jdbcTypeCode = sqlTypeCode;
+        public void setJdbcType(int jdbcType) {
+            this.jdbcType = jdbcType;
         }
 
         public String getDbTypeName() {
@@ -259,7 +259,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         @Override
         public String toString() {
-            return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcTypeCode
+            return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcType
                     + ", " + required + ", " + defaultValue + "}";
         }
     }

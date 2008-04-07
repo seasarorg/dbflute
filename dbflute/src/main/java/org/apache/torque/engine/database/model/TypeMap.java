@@ -108,8 +108,8 @@ public class TypeMap {
     public static final Log _log = LogFactory.getLog(TypeMap.class);
 
     // ===================================================================================
-    //                                                                         Torque Type
-    //                                                                         ===========
+    //                                                                Torque(DBFlute) Type
+    //                                                                ====================
     public static final String CHAR = "CHAR";
     public static final String VARCHAR = "VARCHAR";
     public static final String LONGVARCHAR = "LONGVARCHAR";
@@ -172,11 +172,6 @@ public class TypeMap {
     private static Hashtable<Integer, String> _jdbcTypeToTorqueTypeMap = null;
 
     // ===================================================================================
-    //                                                                    Initialized Mark
-    //                                                                    ================
-    private static boolean _initialized = false;
-
-    // ===================================================================================
     //                                              Property StringJdbcTypeToJavaNativeMap
     //                                              ======================================
     protected static final Map<String, Object> _propertyTorqueTypeToJavaNativeMap;
@@ -184,6 +179,11 @@ public class TypeMap {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNative();
     }
+    
+    // ===================================================================================
+    //                                                                    Initialized Mark
+    //                                                                    ================
+    private static boolean _initialized = false;
 
     // ===================================================================================
     //                                                                          Initialize
@@ -271,21 +271,21 @@ public class TypeMap {
     // ===================================================================================
     //                                                                  Torque Type Getter
     //                                                                  ==================
-    public static String getTorqueType(Integer torque) {
+    public static String getTorqueType(Integer jdbcType) {
         // Make sure the we are initialized.
         if (!_initialized) {
             initialize();
         }
-        if (java.sql.Types.OTHER == torque) {
-            String msg = "The jdbcType is unsupported: jdbcType=java.sql.Types.OTHER(" + torque + ")";
+        if (java.sql.Types.OTHER == jdbcType) {
+            String msg = "The jdbcType is unsupported: jdbcType=java.sql.Types.OTHER(" + jdbcType + ")";
             throw new UnsupportedOperationException(msg);
         }
-        if (!_jdbcTypeToTorqueTypeMap.containsKey(torque)) {
+        if (!_jdbcTypeToTorqueTypeMap.containsKey(jdbcType)) {
             String msg = "_jdbcIntToTorqueTypeMap doesn't contain the type as key: ";
-            msg = msg + "key=" + torque + " map=" + _jdbcTypeToTorqueTypeMap;
+            msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToTorqueTypeMap;
             throw new IllegalStateException(msg);
         }
-        return _jdbcTypeToTorqueTypeMap.get(torque);
+        return _jdbcTypeToTorqueTypeMap.get(jdbcType);
     }
 
     // ===================================================================================

@@ -264,7 +264,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
                             metaInfo.setSql2EntityTableName(sql2EntityTableName);
                             metaInfo.setColumnName(columnName);
-                            metaInfo.setJdbcTypeCode(columnType);
+                            metaInfo.setJdbcType(columnType);
                             metaInfo.setColumnSize(columnSize);
                             metaInfo.setDecimalDigits(scale);
                             columnJdbcTypeMap.put(columnName, metaInfo);
