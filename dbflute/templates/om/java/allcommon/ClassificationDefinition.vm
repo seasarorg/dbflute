@@ -2,11 +2,13 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 #set ($myClassName = "${glClassificationDefinition}")
 
 import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
+#if ($database.isMakeClassificationValueLabelList())
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
+#end
 
 /**
  * The definition class that has classification.

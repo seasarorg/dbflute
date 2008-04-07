@@ -246,7 +246,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final int jdbcTypeCode = columnMetaInfo.getJdbcTypeCode();
         final String torqueType = TypeMap.getTorqueType(jdbcTypeCode);
-        final Class<?> columnType = TypeMap.getJavaType(torqueType);
+        final Class<?> columnType = TypeMap.findJavaNativeTypeClass(torqueType);
         if (columnType == null) {
             return false;
         }
@@ -272,7 +272,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final int jdbcType = columnMetaInfo.getJdbcTypeCode();
         final String torqueType = TypeMap.getTorqueType(jdbcType);
-        final Class<?> columnType = TypeMap.getJavaType(torqueType);
+        final Class<?> columnType = TypeMap.findJavaNativeTypeClass(torqueType);
         if (columnType == null) {
             return false;
         }

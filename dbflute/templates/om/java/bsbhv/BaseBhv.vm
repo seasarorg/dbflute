@@ -194,7 +194,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                      Various Select
     //                                                                      ==============
-#if ($database.isUseTeeda())
     /**
      * Select the list of value-label.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -204,7 +203,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
-#end
 
 #if ($table.isUseSequence())
     // ===================================================================================
