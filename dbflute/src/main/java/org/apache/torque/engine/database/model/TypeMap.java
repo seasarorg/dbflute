@@ -301,9 +301,7 @@ public class TypeMap {
     //                                                                  Torque Type Getter
     //                                                                  ==================
     /**
-     * Returns Torque type constant corresponding to JDBC type code.
-     * Used but Torque JDBC task.
-     *
+     * Returns Torque type constant corresponding to JDBC type code. Used but Torque JDBC task.
      * @param jdbcType the SQL type
      * @return Torque type constant
      */
@@ -328,9 +326,7 @@ public class TypeMap {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Returns true if the type is boolean in the java
-     * object and a numeric (1 or 0) in the database.
-     *
+     * Returns true if the type is boolean in the java object and a numeric (1 or 0) in the database.
      * @param type The type to check.
      * @return true if the type is BOOLEANINT
      */

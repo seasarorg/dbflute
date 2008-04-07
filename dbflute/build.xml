@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.6.8"/>
+  <property name="version" value="0.6.9"/>
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
@@ -17,6 +17,7 @@
   <property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
   <property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
   <property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
+  <property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
   <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
   <property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
   <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
@@ -116,6 +117,9 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

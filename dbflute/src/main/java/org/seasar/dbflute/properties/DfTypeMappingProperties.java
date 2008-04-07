@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
@@ -29,8 +30,37 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     protected Map<String, Object> _jdbcToJavaNativeMap;
 
     public Map<String, Object> getJdbcToJavaNative() {
-        if (_jdbcToJavaNativeMap == null) {
+        if (_jdbcToJavaNativeMap != null) {
+            return _jdbcToJavaNativeMap;
+        }
+        if (getBasicProperties().isTargetLanguageJava()) {
             _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", getLanguageMetaData().getJdbcToJavaNativeMap());
+            return _jdbcToJavaNativeMap;
+        }
+
+        // * * * * *
+        // Not Java
+        // * * * * *
+
+        final Map<String, Object> metaMap = getLanguageMetaData().getJdbcToJavaNativeMap();
+        if (metaMap.isEmpty()) {
+            String msg = "The jdbcToJavaNamtiveMap should not be null: metaData=" + getLanguageMetaData();
+            throw new IllegalStateException(msg);
+        }
+        
+        _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP);
+        if (_jdbcToJavaNativeMap.isEmpty()) {
+            _jdbcToJavaNativeMap = metaMap;
+            return _jdbcToJavaNativeMap;
+        }
+
+        // Reflect meta map to native map only difference.
+        final Set<String> keySet = metaMap.keySet();
+        for (String key : keySet) {
+            final Object value = metaMap.get(key);
+            if (!_jdbcToJavaNativeMap.containsKey(key)) {
+                _jdbcToJavaNativeMap.put(key, value);
+            }
         }
         return _jdbcToJavaNativeMap;
     }
