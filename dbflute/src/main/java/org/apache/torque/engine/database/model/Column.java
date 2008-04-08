@@ -433,14 +433,14 @@ public class Column {
         }
         plugDelimiterIfNeeds(sb);
         sb.append(getDbType() != null ? getDbType() : "UnknownType");
-        if (getSize() != null) {
+        if (getSize() != null && getSize().trim().length() > 0) {
             sb.append("(" + getSize() + ")");
         }
         if (isNotNull()) {
             plugDelimiterIfNeeds(sb);
             sb.append("NotNull");
         }
-        if (getDefaultValue() != null) {
+        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0) {
             plugDelimiterIfNeeds(sb);
             sb.append("Default=[").append(getDefaultValue() + "]");
         }

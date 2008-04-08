@@ -1273,20 +1273,32 @@ public class Database {
     // ===================================================================================
     //                                                                     Transfer Entity
     //                                                                     ===============
-    public boolean hasTransferEntityDefinition() {
-        return getProperties().getTransferEntityProperties().hasTransferEntityDefinition();
+    public boolean hasDtoDefinition() {
+        return getProperties().getDtoProperties().hasDtoDefinition();
     }
     
-    public String getTransferEntityOutputDirectory() {
-        return getProperties().getTransferEntityProperties().getOutputDirectory();
+    public String getDtoBaseDtoPackage() {
+        return getProperties().getDtoProperties().getBaseDtoPackage();
     }
     
-    public String getTransferEntityBaseEntityPackage() {
-        return getProperties().getTransferEntityProperties().getBaseEntityPackage();
+    public String getDtoExtendedDtoPackage() {
+        return getProperties().getDtoProperties().getExtendedDtoPackage();
     }
     
-    public String getTransferEntityExtendedEntityPackage() {
-        return getProperties().getTransferEntityProperties().getExtendedEntityPackage();
+    public String getDtoBaseDtoPrefix() {
+        return getProperties().getDtoProperties().getBaseDtoPrefix();
+    }
+    
+    public String getDtoBaseDtoSuffix() {
+        return getProperties().getDtoProperties().getBaseDtoSuffix();
+    }
+    
+    public String getDtoExtendedDtoPrefix() {
+        return getProperties().getDtoProperties().getExtendedDtoPrefix();
+    }
+    
+    public String getDtoExtendedDtoSuffix() {
+        return getProperties().getDtoProperties().getExtendedDtoSuffix();
     }
     
     // ===================================================================================

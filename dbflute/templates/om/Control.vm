@@ -2087,32 +2087,42 @@ targetdatabase = $targetDatabase
     $database.debug("}")
 	
     ## ===================================================================================
-    ##                                                                     Transfer Entity
-    ##                                                                     ===============
-	#if ($database.hasTransferEntityDefinition() && $database.isTargetLanguageJava())
-      $database.debug("parseTransferEntity() {")
-      #set ($myBaseEntityPackageName = "${database.transferEntityBaseEntityPackage}")
-      #set ($myExtendedEntityPackageName = "${database.transferEntityExtendedEntityPackage}")
+    ##                                                                                 Dto
+    ##                                                                                 ===
+	#if ($database.hasDtoDefinition() && $database.isTargetLanguageJava())
+      $database.debug("parseDto() {")
+      #set ($myBaseEntityPackageName = "${database.dtoBaseDtoPackage}")
+      #set ($myExtendedEntityPackageName = "${database.dtoExtendedDtoPackage}")
+      #set ($myEntityDtoMapperPackageName = "${database.dtoExtendedDtoPackage}.mapper")
 
 	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
 	  
 	  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
+	  
+	  #set ($path = $strings.getPackageAsPath(${myEntityDtoMapperPackageName}))
+      $database.makeDirectory($path)
 
 	  #foreach ($table in $database.tables)
-        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
-        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+        #set ($myBaseObjectClassName = "${database.dtoBaseDtoPrefix}${table.javaName}${database.dtoBaseDtoSuffix}")
+        #set ($myExtendedObjectClassName = "${database.dtoExtendedDtoPrefix}${table.javaName}${database.dtoExtendedDtoSuffix}")
+        #set ($myEntityDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
+        $database.debug("    parse('${myExtendedObjectClassName}');")
+		
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/bsentity/transfer/TransferBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
+        $generator.parse("om/${glResourceDirectory}/other/dto/DtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+		
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/exentity/transfer/TransferExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+            $generator.parse("om/${glResourceDirectory}/other/dto/DtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
           #end
 		#end
+
+		#set ( $path = "${strings.getPackageAsPath(${myEntityDtoMapperPackageName})}${myEntityDtoMapperClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/other/dto/mapper/EntityDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
 	  #end
       $database.debug("}")
 	#end

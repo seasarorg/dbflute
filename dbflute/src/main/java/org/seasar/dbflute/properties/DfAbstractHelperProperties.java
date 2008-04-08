@@ -357,4 +357,8 @@ public abstract class DfAbstractHelperProperties {
     public String removeNewLine(String str) {
         return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
+    
+    protected boolean processBooleanString(String value) {
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
 }

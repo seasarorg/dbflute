@@ -19,7 +19,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
-import org.seasar.dbflute.properties.DfTransferEntityProperties;
+import org.seasar.dbflute.properties.DfDtoProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -243,15 +243,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                       Transfer Entity
-    //                                       ---------------
-    protected DfTransferEntityProperties _transferEntityProperties;
+    //                                                   Dto
+    //                                                   ---
+    protected DfDtoProperties _dtoProperties;
 
-    public DfTransferEntityProperties getTransferEntityProperties(Properties prop) {
-        if (_transferEntityProperties == null) {
-            _transferEntityProperties = new DfTransferEntityProperties(prop);
+    public DfDtoProperties getDtoProperties(Properties prop) {
+        if (_dtoProperties == null) {
+            _dtoProperties = new DfDtoProperties(prop);
         }
-        return _transferEntityProperties;
+        return _dtoProperties;
     }
     
     // -----------------------------------------------------
