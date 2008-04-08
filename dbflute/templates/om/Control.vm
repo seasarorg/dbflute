@@ -2093,7 +2093,7 @@ targetdatabase = $targetDatabase
       $database.debug("parseDto() {")
       #set ($myBaseEntityPackageName = "${database.dtoBaseDtoPackage}")
       #set ($myExtendedEntityPackageName = "${database.dtoExtendedDtoPackage}")
-      #set ($myEntityDtoMapperPackageName = "${database.dtoExtendedDtoPackage}.mapper")
+      #set ($myDtoMapperPackageName = "${database.dtoExtendedDtoPackage}.mapper")
 
 	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
@@ -2101,7 +2101,7 @@ targetdatabase = $targetDatabase
 	  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
 	  
-	  #set ($path = $strings.getPackageAsPath(${myEntityDtoMapperPackageName}))
+	  #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
       $database.makeDirectory($path)
 
 	  #foreach ($table in $database.tables)
@@ -2121,8 +2121,8 @@ targetdatabase = $targetDatabase
           #end
 		#end
 
-		#set ( $path = "${strings.getPackageAsPath(${myEntityDtoMapperPackageName})}${myEntityDtoMapperClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/other/dto/mapper/EntityDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+		#set ( $path = "${strings.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/other/dto/mapper/DtoMapper.${glTemplateFileExtension}", $path, "table", $table)
 	  #end
       $database.debug("}")
 	#end
