@@ -1273,40 +1273,40 @@ public class Database {
     // ===================================================================================
     //                                                                                 DTO
     //                                                                                 ===
-    public boolean hasDtoDefinition() {
-        return getProperties().getDtoProperties().hasDtoDefinition();
+    public boolean hasSimpleDtoDefinition() {
+        return getProperties().getSimpleDtoProperties().hasSimpleDtoDefinition();
     }
     
-    public String getDtoBaseDtoPackage() {
-        return getProperties().getDtoProperties().getBaseDtoPackage();
+    public String getSimpleDtoBaseDtoPackage() {
+        return getProperties().getSimpleDtoProperties().getBaseDtoPackage();
     }
     
-    public String getDtoExtendedDtoPackage() {
-        return getProperties().getDtoProperties().getExtendedDtoPackage();
+    public String getSimpleDtoExtendedDtoPackage() {
+        return getProperties().getSimpleDtoProperties().getExtendedDtoPackage();
     }
     
-    public String getDtoBaseDtoPrefix() {
-        return getProperties().getDtoProperties().getBaseDtoPrefix();
+    public String getSimpleDtoBaseDtoPrefix() {
+        return getProperties().getSimpleDtoProperties().getBaseDtoPrefix();
     }
     
-    public String getDtoBaseDtoSuffix() {
-        return getProperties().getDtoProperties().getBaseDtoSuffix();
+    public String getSimpleDtoBaseDtoSuffix() {
+        return getProperties().getSimpleDtoProperties().getBaseDtoSuffix();
     }
     
-    public String getDtoExtendedDtoPrefix() {
-        return getProperties().getDtoProperties().getExtendedDtoPrefix();
+    public String getSimpleDtoExtendedDtoPrefix() {
+        return getProperties().getSimpleDtoProperties().getExtendedDtoPrefix();
     }
     
-    public String getDtoExtendedDtoSuffix() {
-        return getProperties().getDtoProperties().getExtendedDtoSuffix();
+    public String getSimpleDtoExtendedDtoSuffix() {
+        return getProperties().getSimpleDtoProperties().getExtendedDtoSuffix();
     }
     
-    public String getDtoDtoMapperPackage() {
-        return getProperties().getDtoProperties().getDtoMapperPackage();
+    public String getSimpleDtoDtoMapperPackage() {
+        return getProperties().getSimpleDtoProperties().getMapperPackage();
     }
     
-    public boolean isDtoUseDtoMapper() {
-        return getProperties().getDtoProperties().isUseDtoMapper();
+    public boolean isSimpleDtoUseDtoMapper() {
+        return getProperties().getSimpleDtoProperties().isUseDtoMapper();
     }
     
     // ===================================================================================

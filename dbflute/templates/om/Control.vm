@@ -2090,7 +2090,7 @@ targetdatabase = $targetDatabase
     ##                                                                                 Dto
     ##                                                                                 ===
 	#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
-      $database.debug("parseDto() {")
+      $database.debug("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
       #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}")
       #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}")
       #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}")
@@ -2109,10 +2109,9 @@ targetdatabase = $targetDatabase
 	  #foreach ($table in $database.tables)
         #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
         #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-        #set ($myEntityDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+        #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-        $database.debug("    // ${table.name}")
-        $database.debug("    parse('${myBaseObjectClassName}');")
+        $database.debug("    parse('${myExtendedObjectClassName}');")
 		
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
@@ -2120,13 +2119,11 @@ targetdatabase = $targetDatabase
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
-            $database.debug("    parse('${myExtendedObjectClassName}');")
             $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
           #end
 		#end
 
 	    #if ($database.isSimpleDtoUseDtoMapper())
-          $database.debug("    parse('${myDtoMapperClassName}');")
 		  #set ( $path = "${strings.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
           $generator.parse("om/${glResourceDirectory}/other/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
 		#end

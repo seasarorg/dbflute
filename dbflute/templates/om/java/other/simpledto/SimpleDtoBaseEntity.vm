@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 /**
- * The entity of ${table.basicInfoDispString}.
+ * The simple DTO of ${table.basicInfoDispString}.
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -58,7 +58,7 @@ public abstract class $myClassName implements java.io.Serializable {
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-#set ($foreignEntityClassName = "${database.dtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.dtoExtendedDtoSuffix}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
     /** The entity of foreign table. */
     protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
 
@@ -85,7 +85,7 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${database.dtoExtendedDtoPrefix}${referrer.table.javaName}${database.dtoExtendedDtoSuffix}")
+#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
     /** The list of referrer table. */

@@ -369,7 +369,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
      * @param entity The entity of referrer-as-one table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityLongClassName} entity) {
+    public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityLongClassName} entity) {
         if (entity == null) { ${referrerVariableName} = null; return; }
         final java.util.List<${referrerEntityLongClassName}> ls = new java.util.ArrayList<${referrerEntityLongClassName}>();
         ls.add(entity);

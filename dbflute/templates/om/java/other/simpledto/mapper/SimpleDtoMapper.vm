@@ -1,11 +1,16 @@
-${database.allClassCopyright}package ${myEntityDtoMapperPackageName};
-#set ($myClassName = "${myEntityDtoMapperClassName}")
+${database.allClassCopyright}package ${myDtoMapperPackageName};
+#set ($myClassName = "${myDtoMapperClassName}")
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import ${glPackageExtendedEntity}.${table.extendedEntityClassName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
- * The data transfer object of ${table.basicInfoDispString}.
+ * The DTO mapper of ${table.basicInfoDispString}.
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -44,29 +49,64 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+	protected Map<String, Object> _relationDtoMap;
+	
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+	public ${myClassName}() {
+	    _relationDtoMap = new HashMap<String, Object>();
+	}
+	
+	public ${myClassName}(Map<String, Object> relationDtoMap) {
+		_relationDtoMap = relationDtoMap;
+	}
+	
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+	public List<${myExtendedObjectClassName}> map(List<${table.extendedEntityClassName}> entityList) {
+		final List<${myExtendedObjectClassName}> dtoList = new ArrayList<${myExtendedObjectClassName}>();
+	    for (${table.extendedEntityClassName} entity : entityList) {
+		    dtoList.add(map(entity));
+		}
+		return dtoList;
+	}
+	
 	public ${myExtendedObjectClassName} map(${table.extendedEntityClassName} entity) {
+	    final String localKey = "${table.name}@" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
+	    final Object localDto = _relationDtoMap.get(localKey);
+	    if (localDto != null) {
+	        return (${myExtendedObjectClassName})localDto;
+	    }
 	    final ${myExtendedObjectClassName} dto = new ${myExtendedObjectClassName}();
 #foreach ($col in $table.columns)
 	    dto.set${col.javaName}(entity.get${col.javaName}());
 #end
+        _relationDtoMap.put(localKey, dto);
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-#set ($foreignEntityClassName = "${database.dtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.dtoExtendedDtoSuffix}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
         if (entity.hasForeignInstance${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}()) {
-		    final ${foreignEntityClassName}Mapper mapper = new ${foreignEntityClassName}Mapper();
-			dto.set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(mapper.map(entity.get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}()));
+			final ${glPackageExtendedEntity}.${foreignKeys.foreignTableExtendedEntityClassName} relationEntity = entity.get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}();
+			final String relationKey = "${foreignKeys.foreignTable.name}@" + relationEntity.getDBMeta().extractPrimaryKeyMapString(relationEntity);
+			final Object cachedDto = _relationDtoMap.get(relationKey);
+			if (cachedDto != null) {
+			    dto.set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}((${myExtendedEntityPackageName}.${foreignEntityClassName})cachedDto);
+			} else {
+		        final ${foreignEntityClassName}Mapper mapper = new ${foreignEntityClassName}Mapper(_relationDtoMap);
+			    dto.set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(mapper.map(relationEntity));
+				_relationDtoMap.put(relationKey, dto.get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
+			}
 		};
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${database.dtoExtendedDtoPrefix}${referrer.table.javaName}${database.dtoExtendedDtoSuffix}")
+#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-#set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
         if (entity.hasReferrerElements${referrer.referrerJavaBeansRulePropertyNameInitCap}()) {
-			final ${referrerEntityClassName}Mapper mapper = new ${referrerEntityClassName}Mapper();
-			for (${glPackageExtendedEntity}.${referrer.refererTableExtendedEntityClassName} element : entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()) {
-                dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().add(mapper.map(element));
-			}
+		    final ${referrerEntityClassName}Mapper mapper = new ${referrerEntityClassName}Mapper(_relationDtoMap);
+		    dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(mapper.map(entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()));
 		};
 #end
         return dto;

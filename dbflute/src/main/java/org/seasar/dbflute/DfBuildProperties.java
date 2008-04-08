@@ -42,7 +42,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
-import org.seasar.dbflute.properties.DfDtoProperties;
+import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -382,8 +382,8 @@ public final class DfBuildProperties {
         return getHandler().getTypeMappingProperties(getProperties());
     }
     
-    public DfDtoProperties getDtoProperties() {
-        return getHandler().getDtoProperties(getProperties());
+    public DfSimpleDtoProperties getSimpleDtoProperties() {
+        return getHandler().getSimpleDtoProperties(getProperties());
     }
     
     public DfS2JdbcProperties getS2JdbcProperties() {
