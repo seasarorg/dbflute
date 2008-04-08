@@ -25,7 +25,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
  * 
- * [column-property]
+ * [column]
  *     ${table.columnNameCommaString}
  * 
  * [foreign-property]
@@ -39,9 +39,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * 
  * [identity]
  *     ${table.identityColumnName}
- * 
- * [update-date]
- *     ${table.updateDateColumnName}
  * 
  * [version-no]
  *     ${table.versionNoColumnName}

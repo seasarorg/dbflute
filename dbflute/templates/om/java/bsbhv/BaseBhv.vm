@@ -35,14 +35,13 @@ import ${glPackageCB}.*;
   #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
 #end
 
-
 /**
  * The behavior of ${table.name}.
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
  * 
- * [column-property]
+ * [column]
  *     ${table.columnNameCommaString}
  * 
  * [foreign-property]
@@ -56,9 +55,6 @@ import ${glPackageCB}.*;
  * 
  * [identity]
  *     ${table.identityColumnName}
- * 
- * [update-date]
- *     ${table.updateDateColumnName}
  * 
  * [version-no]
  *     ${table.versionNoColumnName}
