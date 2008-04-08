@@ -2089,11 +2089,11 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                                 Dto
     ##                                                                                 ===
-	#if ($database.hasDtoDefinition() && $database.isTargetLanguageJava())
+	#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
       $database.debug("parseDto() {")
-      #set ($myBaseEntityPackageName = "${database.dtoBaseDtoPackage}")
-      #set ($myExtendedEntityPackageName = "${database.dtoExtendedDtoPackage}")
-      #set ($myDtoMapperPackageName = "${database.dtoExtendedDtoPackage}.mapper")
+      #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}")
+      #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}")
+      #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}")
 
 	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
@@ -2101,28 +2101,35 @@ targetdatabase = $targetDatabase
 	  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
 	  
-	  #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
-      $database.makeDirectory($path)
+	  #if ($database.isSimpleDtoUseDtoMapper())
+	    #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
+        $database.makeDirectory($path)
+	  #end
 
 	  #foreach ($table in $database.tables)
-        #set ($myBaseObjectClassName = "${database.dtoBaseDtoPrefix}${table.javaName}${database.dtoBaseDtoSuffix}")
-        #set ($myExtendedObjectClassName = "${database.dtoExtendedDtoPrefix}${table.javaName}${database.dtoExtendedDtoSuffix}")
+        #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
+        #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
         #set ($myEntityDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-        $database.debug("    parse('${myExtendedObjectClassName}');")
+        $database.debug("    // ${table.name}")
+        $database.debug("    parse('${myBaseObjectClassName}');")
 		
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/other/dto/DtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+        $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 		
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/other/dto/DtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+            $database.debug("    parse('${myExtendedObjectClassName}');")
+            $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
           #end
 		#end
 
-		#set ( $path = "${strings.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/other/dto/mapper/DtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+	    #if ($database.isSimpleDtoUseDtoMapper())
+          $database.debug("    parse('${myDtoMapperClassName}');")
+		  #set ( $path = "${strings.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/other/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+		#end
 	  #end
       $database.debug("}")
 	#end

@@ -1271,8 +1271,8 @@ public class Database {
     }
     
     // ===================================================================================
-    //                                                                     Transfer Entity
-    //                                                                     ===============
+    //                                                                                 DTO
+    //                                                                                 ===
     public boolean hasDtoDefinition() {
         return getProperties().getDtoProperties().hasDtoDefinition();
     }
@@ -1299,6 +1299,14 @@ public class Database {
     
     public String getDtoExtendedDtoSuffix() {
         return getProperties().getDtoProperties().getExtendedDtoSuffix();
+    }
+    
+    public String getDtoDtoMapperPackage() {
+        return getProperties().getDtoProperties().getDtoMapperPackage();
+    }
+    
+    public boolean isDtoUseDtoMapper() {
+        return getProperties().getDtoProperties().isUseDtoMapper();
     }
     
     // ===================================================================================

@@ -69,9 +69,13 @@ public final class DfDtoProperties extends DfAbstractHelperProperties {
         return getDtoPropertyIfNullEmpty("extendedDtoSuffix");
     }
     
-    public boolean isSuppressAccessor() {
-        final String value = (String)getDtoDefinitionMap().get("suppressAccessor");
-        return processBooleanString(value);
+    public String getDtoMapperPackage() {
+        return getDtoPropertyIfNullEmpty("dtoMapperPackage");
+    }
+    
+    public boolean isUseDtoMapper() {
+        final String dtoMapperPackage = getDtoMapperPackage();
+        return dtoMapperPackage != null && dtoMapperPackage.trim().length() > 0;
     }
     
     protected String getDtoPropertyRequired(String key) {
