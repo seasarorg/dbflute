@@ -5,7 +5,7 @@ import ${glPackageExtendedEntity}.${table.extendedEntityClassName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
- * The entity of ${table.basicInfoDispString}.
+ * The data transfer object of ${table.basicInfoDispString}.
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
