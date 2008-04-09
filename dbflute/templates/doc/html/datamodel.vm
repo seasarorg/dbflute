@@ -2,14 +2,14 @@
 ${database.initializeClassificationDeployment()}
 
 <html>
-<header>
+<head>
   <title>$dataModel.name</title>
   <style>
   .normalFont {
     $docHtmlNormalFont
   }
   </style>
-</header>
+</head>
 
 <body class="normalFont">
   <table border="1" cellspacing="0" cellpadding="0">

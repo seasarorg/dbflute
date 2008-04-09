@@ -1,8 +1,17 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+#foreach ($foreignKeys in $table.ForeignKeys)
+#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+import ${myExtendedEntityPackageName}.${foreignEntityClassName};
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+import ${myExtendedEntityPackageName}.${referrerEntityClassName};
+#end
+
 /**
- * The entity of ${table.basicInfoDispString}.
+ * Entity for ${table.name} table.
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -43,7 +52,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($col in $table.columns)
-    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
+    /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
 	@javax.persistence.Id
 #end
@@ -53,21 +62,15 @@ public abstract class ${myClassName} implements java.io.Serializable {
     public ${col.javaNative} ${col.uncapitalisedJavaName};
 	
 #end
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public ${myClassName}() {
-    }
 
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
-    /** The entity of foreign table. {${foreignKeys.foreignTable.basicInfoDispString}}*/
+    /** Foreign property for ${foreignKeys.foreignTable.name} table. {${foreignKeys.foreignTable.basicInfoDispString}}*/
 	@javax.persistence.ManyToOne
-    public ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
+    public ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
 
 #end
     // ===================================================================================
@@ -76,16 +79,15 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
 #if (${referrer.isOneToOne()})
-	/** The list of referrer table. {${referrer.table.basicInfoDispString}}*/
+	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
 	@javax.persistence.OneToOne
-    public ${referrerEntityLongClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
+    public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
 
 #else
-    /** The list of referrer table. {${referrer.table.basicInfoDispString}}*/
+	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
 	@javax.persistence.OneToMany
-    public java.util.List<${referrerEntityLongClassName}> ${referrer.referrerPropertyName};
+    public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 
 #end
 #end
@@ -94,11 +96,11 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                      ==============
 #if ($table.hasPrimaryKey())
     /**
-     * ${database.OverrideComment}
      * If the primary-key of the other is same as this one, returns true.
-     * @param other Other entity.
+     * @param other Other entity. (Nullable: If null, return false)
      * @return Comparing result.
      */
+	@Override
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
@@ -114,10 +116,9 @@ public abstract class ${myClassName} implements java.io.Serializable {
     }
 
     /**
-     * ${database.OverrideComment}
-     * Calculates hash-code from primary-key.
      * @return Hash-code from primary-keys.
      */
+	@Override
     public int hashCode() {
         int result = 0;
 #foreach ($col in $table.primaryKey)
@@ -125,46 +126,12 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #end
         return result;
     }
-#else
-
-    /**
-     * ${database.OverrideComment}
-     * If the all-column value of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
-     * @return Comparing result. If other is null, returns false.
-     */
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.columns)
-        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
-#end
-        return true;
-    }
-
-    protected boolean helpComparingValue(Object value1, Object value2) {
-        if (value1 == null && value2 == null) { return true; }
-        return value1 != null && value2 != null && value1.equals(value2);
-    }
-
-    /**
-     * ${database.OverrideComment}
-     * Calculates hash-code from all-columns.
-     * @return Hash-code from all-columns.
-     */
-    public int hashCode() {
-        int result = 0;
-#foreach ($col in $table.columns)
-        if (this.${col.uncapitalisedJavaName} != null) { result = result + this.${col.uncapitalisedJavaName}.hashCode(); }
-#end
-        return result;
-    }
 #end
 
     /**
-     * ${database.OverrideComment}
-     * @return Column-value map-string. (NotNull)
+     * @return The expression of columns. (NotNull)
      */
+	@Override
     public String toString() {
         final String delimiter = ",";
         final StringBuffer sb = new StringBuffer();
