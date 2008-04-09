@@ -86,7 +86,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
 
 #else
 	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
-	@javax.persistence.OneToMany
+	@javax.persistence.OneToMany(mappedBy = "${referrer.foreignPropertyName}")
     public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 
 #end

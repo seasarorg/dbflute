@@ -15,7 +15,6 @@ public class DfSqlFileFireMan {
 
     /**
      * Load the sql file and then execute it.
-     *
      * @throws BuildException
      */
     public void execute(DfSqlFileRunner runner, List<File> fileList) throws BuildException {
@@ -37,7 +36,9 @@ public class DfSqlFileFireMan {
                 goodSqlCount = goodSqlCount + runner.getGoodSqlCount();
                 totalSqlCount = totalSqlCount + runner.getTotalSqlCount();
             }
-            _log.debug("[Fired SQL] " + goodSqlCount + " of " + totalSqlCount + " in " + fileList.size() + " files");
+            String msg = "[Fired SQL] success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
+            msg = msg + " (in " + fileList.size() + " files)";
+            _log.debug(msg);
         } catch (Exception e) {
             _log.warn(getClass().getName() + "#execute() threw the exception!", e);
             if (e instanceof RuntimeException) {

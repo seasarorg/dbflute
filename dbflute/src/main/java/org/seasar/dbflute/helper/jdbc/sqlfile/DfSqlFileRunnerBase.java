@@ -119,11 +119,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 reader = null;
             }
         }
-        _log.info("  --> " + _goodSqlCount + " of " + _totalSqlCount + " SQL statements executed successfully.");
+        traceResult(_goodSqlCount, _totalSqlCount);
     }
 
     protected void traceSql(String sql) {
         _log.info(sql);
+    }
+    
+    protected void traceResult(int goodSqlCount, int totalSqlCount) {
+        _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
     }
 
     protected String filterSql(String sql) {

@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -81,10 +82,34 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     }
 
     @Override
+    protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
+        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected void traceSql(String sql) {
+                String msg = getLineSeparator() + "";
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
+                msg = msg + sql + getLineSeparator();
+                msg = msg + "* * * * * * * * * */";
+                _log.info(msg);
+            }
+            
+            @Override
+            protected void traceResult(int goodSqlCount, int totalSqlCount) {
+                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + getLineSeparator());
+            }
+        };
+    }
+    
+    
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+    
+    @Override
     protected String getSqlDirectory() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProp = prop.getBasicProperties();
-        final String javaDir = basicProp.getJavaDir_for_main();
+        final String javaDir = basicProp.getJavaDir();
         return javaDir;
     }
 

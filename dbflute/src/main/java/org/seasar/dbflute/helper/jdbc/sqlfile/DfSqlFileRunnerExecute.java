@@ -19,10 +19,9 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     /**
-     * Exec the sql statement.
-     *
-     * @param statement
-     * @param sql
+     * Execute the SQL statement.
+     * @param statement Statement. (NotNull)
+     * @param sql SQL. (NotNull)
      */
     protected void execSQL(Statement statement, String sql) {
         try {
