@@ -2,11 +2,11 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 #foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.name}${database.s2jdbcExtendedEntitySuffix}")
+#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.javaName}${database.s2jdbcExtendedEntitySuffix}")
 import ${myExtendedEntityPackageName}.${foreignEntityClassName};
 #end
 #foreach ($referrer in $table.referrers)
-#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.name}${database.s2jdbcExtendedEntitySuffix}")
+#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.javaName}${database.s2jdbcExtendedEntitySuffix}")
 import ${myExtendedEntityPackageName}.${referrerEntityClassName};
 #end
 
@@ -67,7 +67,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                       Foreign Table
     //                                                                       =============
 #foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.name}${database.s2jdbcExtendedEntitySuffix}")
+#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.javaName}${database.s2jdbcExtendedEntitySuffix}")
     /** Foreign property for ${foreignKeys.foreignTable.name} table. {${foreignKeys.foreignTable.basicInfoDispString}}*/
 	@javax.persistence.ManyToOne
     public ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
@@ -78,7 +78,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.name}${database.s2jdbcExtendedEntitySuffix}")
+#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.javaName}${database.s2jdbcExtendedEntitySuffix}")
 #if (${referrer.isOneToOne()})
 	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
 	@javax.persistence.OneToOne
