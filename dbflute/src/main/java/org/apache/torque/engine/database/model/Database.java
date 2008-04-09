@@ -1312,17 +1312,34 @@ public class Database {
     // ===================================================================================
     //                                                                       S2JDBC Entity
     //                                                                       =============
-    public boolean hasS2JdbcDefinition() {
-        return getProperties().getS2JdbcProperties().hasS2JdbcDefinition();
+    public boolean hasS2jdbcDefinition() {
+        return getProperties().getS2jdbcProperties().hasS2jdbcDefinition();
     }
     
-    public String getS2JdbcBaseEntityPackage() {
-        return getProperties().getS2JdbcProperties().getBaseEntityPackage();
+    public String getS2jdbcBaseEntityPackage() {
+        return getProperties().getS2jdbcProperties().getBaseEntityPackage();
     }
     
-    public String getS2JdbcExtendedEntityPackage() {
-        return getProperties().getS2JdbcProperties().getExtendedEntityPackage();
+    public String getS2jdbcExtendedEntityPackage() {
+        return getProperties().getS2jdbcProperties().getExtendedEntityPackage();
     }
+    
+    public String getS2jdbcBaseEntityPrefix() {
+        return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
+    }
+    
+    public String getS2jdbcBaseEntitySuffix() {
+        return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
+    }
+    
+    public String getS2jdbcExtendedEntityPrefix() {
+        return getProperties().getS2jdbcProperties().getExtendedEntityPrefix();
+    }
+    
+    public String getS2jdbcExtendedEntitySuffix() {
+        return getProperties().getS2jdbcProperties().getExtendedEntitySuffix();
+    }
+    
 
     // **********************************************************************************************
     //                                                                             Hard code property

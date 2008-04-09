@@ -57,7 +57,7 @@ package org.apache.torque.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfS2JdbcProperties;
+import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
@@ -69,8 +69,8 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
     @Override
     protected void doExecute() {
-        final DfS2JdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2JdbcProperties();
-        if (jdbcProperties.hasS2JdbcDefinition()) {
+        final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
+        if (jdbcProperties.hasS2jdbcDefinition()) {
             _log.info("* * * * * * * * * *");
             _log.info("* Process S2JDBC  *");
             _log.info("* * * * * * * * * *");

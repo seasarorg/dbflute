@@ -534,10 +534,10 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                       S2JDBC Entity
     ##                                                                       =============
-	#if ($database.hasS2JdbcDefinition() && $database.isTargetLanguageJava())
-      $database.debug("parseS2JdbcEntity() {")
-      #set ($myBaseEntityPackageName = "${database.s2JdbcBaseEntityPackage}")
-      #set ($myExtendedEntityPackageName = "${database.s2JdbcExtendedEntityPackage}")
+	#if ($database.hasS2jdbcDefinition() && $database.isTargetLanguageJava())
+      $database.debug("parseS2jdbcEntity() {")
+      #set ($myBaseEntityPackageName = "${database.s2jdbcBaseEntityPackage}")
+      #set ($myExtendedEntityPackageName = "${database.s2jdbcExtendedEntityPackage}")
 
 	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
@@ -546,18 +546,18 @@ targetdatabase = $targetDatabase
       $database.makeDirectory($path)
 
 	  #foreach ($table in $database.tables)
-        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
-        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+        #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.baseEntityClassName}${database.s2jdbcBaseEntitySuffix}")
+        #set ($myExtendedObjectClassName = "${database.s2jdbcExtendedEntityPrefix}${table.extendedEntityClassName}${database.s2jdbcExtendedEntitySuffix}")
 
         $database.debug("    parse('${myExtendedObjectClassName}')")
 		
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2JdbcBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+        $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2JdbcExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+            $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
           #end
 		#end
 

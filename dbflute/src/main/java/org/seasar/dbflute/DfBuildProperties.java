@@ -37,7 +37,7 @@ import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
-import org.seasar.dbflute.properties.DfS2JdbcProperties;
+import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
@@ -386,7 +386,7 @@ public final class DfBuildProperties {
         return getHandler().getSimpleDtoProperties(getProperties());
     }
     
-    public DfS2JdbcProperties getS2JdbcProperties() {
+    public DfS2jdbcProperties getS2jdbcProperties() {
         return getHandler().getS2JdbcProperties(getProperties());
     }
 

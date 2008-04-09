@@ -83,7 +83,7 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         final String value = getDtoProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
-            msg = msg + " dtoDefinitionMap=" + getSimpleDtoDefinitionMap();
+            msg = msg + " simpleDtoDefinitionMap=" + getSimpleDtoDefinitionMap();
             throw new IllegalStateException(msg);
         }
         return value;

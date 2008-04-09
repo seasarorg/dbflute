@@ -33,7 +33,7 @@ import org.apache.torque.engine.database.transform.XmlToAppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfS2JdbcProperties;
+import org.seasar.dbflute.properties.DfS2jdbcProperties;
 
 /**
  * @author jflute
