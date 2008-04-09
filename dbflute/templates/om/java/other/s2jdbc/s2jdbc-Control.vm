@@ -546,8 +546,8 @@ targetdatabase = $targetDatabase
       $database.makeDirectory($path)
 
 	  #foreach ($table in $database.tables)
-        #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.baseEntityClassName}${database.s2jdbcBaseEntitySuffix}")
-        #set ($myExtendedObjectClassName = "${database.s2jdbcExtendedEntityPrefix}${table.extendedEntityClassName}${database.s2jdbcExtendedEntitySuffix}")
+        #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}${database.s2jdbcBaseEntitySuffix}")
+        #set ($myExtendedObjectClassName = "${database.s2jdbcExtendedEntityPrefix}${table.javaName}${database.s2jdbcExtendedEntitySuffix}")
 
         $database.debug("    parse('${myExtendedObjectClassName}')")
 		
