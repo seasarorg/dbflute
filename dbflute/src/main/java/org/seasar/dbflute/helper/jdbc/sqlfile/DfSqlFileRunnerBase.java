@@ -254,8 +254,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     /**
-     * Exec the sql statement.
-     *
+     * Exec the SQL statement.
      * @param statement
      * @param sql
      */
