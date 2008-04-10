@@ -1332,15 +1332,6 @@ public class Database {
         return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
     }
     
-    public String getS2jdbcExtendedEntityPrefix() {
-        return getProperties().getS2jdbcProperties().getExtendedEntityPrefix();
-    }
-    
-    public String getS2jdbcExtendedEntitySuffix() {
-        return getProperties().getS2jdbcProperties().getExtendedEntitySuffix();
-    }
-    
-
     // **********************************************************************************************
     //                                                                             Hard code property
     //                                                                             ******************

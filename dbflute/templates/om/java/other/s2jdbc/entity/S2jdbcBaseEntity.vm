@@ -2,11 +2,11 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 #foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.javaName}${database.s2jdbcExtendedEntitySuffix}")
+#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
 import ${myExtendedEntityPackageName}.${foreignEntityClassName};
 #end
 #foreach ($referrer in $table.referrers)
-#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.javaName}${database.s2jdbcExtendedEntitySuffix}")
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
 import ${myExtendedEntityPackageName}.${referrerEntityClassName};
 #end
 
@@ -81,7 +81,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                       Foreign Table
     //                                                                       =============
 #foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.javaName}${database.s2jdbcExtendedEntitySuffix}")
+#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
     /** Foreign property for ${foreignKeys.foreignTable.name} table. */
 	@javax.persistence.ManyToOne
 #if ($foreignKeys.isSimpleKeyFK())
@@ -95,7 +95,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.javaName}${database.s2jdbcExtendedEntitySuffix}")
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
 #if (${referrer.isOneToOne()})
 	/** Referrer property for ${referrerTable.name} table. */
 	@javax.persistence.OneToOne(mappedBy = "${referrer.foreignPropertyName}")
