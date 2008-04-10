@@ -152,7 +152,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     /**
      * Collect SQL files into the list.
-     * 
      * @return The list of SQL files. (NotNull)
      */
     protected List<File> collectSqlFileIntoList() {
@@ -190,7 +189,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     /**
      * Create SQL file runner.
-     * 
      * @param runInfo Run information. (NotNull)
      * @return SQL file runner. (NotNull)
      */
@@ -421,10 +419,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             @Override
+            protected String replaceCommentQuestionMarkIfNeeds(String line) {
+                if (line.indexOf("--!!") > 0 || line.indexOf("-- !!") > 0) {
+                    // If the line comment is for a property of parameter-bean, 
+                    // it does not replace question mark.
+                    return line;
+                }
+                return super.replaceCommentQuestionMarkIfNeeds(line);
+            }
+
+            @Override
             protected void traceSql(String sql) {
                 log4inner.info("{SQL}" + getLineSeparator() + sql);
             }
-            
+
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return false;
@@ -644,7 +652,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnHandler columnHandler = new DfColumnHandler();
         return columnHandler.getColumnTorqueType(columnMetaInfo);
     }
-    
+
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
             String columnName, final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
