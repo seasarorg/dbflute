@@ -321,21 +321,15 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                               Separated Data
     //                               --------------
     protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath("tsv"));
+        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath("tsv"), "common");
     }
 
     protected void writeDbFromSeparatedFileAsAdditionalData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getEnvironmentType(), typeName));
+        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getEnvironmentType(), typeName),
+                getEnvironmentType());
     }
 
-    protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath) {
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * * * *");
-            _log.info("*                   *");
-            _log.info("* Write DB from " + typeName + " *");
-            _log.info("*                   *");
-            _log.info("* * * * * * * * * * *");
-        }
+    protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath, String location) {
         final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setDataSource(getDataSource());
@@ -346,9 +340,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         handlingInfo.setErrorContinue(true);
         final DfSeparatedDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-        }
     }
 
     protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {
@@ -381,21 +372,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                     Xls Data
     //                                     --------
     protected void writeDbFromXlsAsCommonData() {
-        writeDbFromXls(getCommonDataDirectoryPath("xls"));
+        writeDbFromXls(getCommonDataDirectoryPath("xls"), "common");
     }
 
     protected void writeDbFromXlsAsAdditionalData() {
-        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"));
+        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"), getEnvironmentType());
     }
 
-    protected void writeDbFromXls(String directoryPath) {
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * * * *");
-            _log.info("*                   *");
-            _log.info("* Write DB from xls *");
-            _log.info("*                   *");
-            _log.info("* * * * * * * * * * *");
-        }
+    protected void writeDbFromXls(String directoryPath, String typeName) {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
@@ -406,9 +390,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             xlsDataHandler.writeSeveralDataForSybase(directoryPath, getDataSource());
         } else {
             xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
-        }
-        if (_log.isInfoEnabled()) {
-            _log.info("");
         }
     }
 }

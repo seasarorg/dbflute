@@ -27,6 +27,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.util.DfSqlStringUtil;
 
 /**
  * @author jflute
@@ -85,6 +86,18 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
+            protected String filterSql(String sql) {
+                if (getProperties().getBasicProperties().isDatabaseDerby()) {
+                    sql = removeBeginEndComment(sql);
+                }
+                return super.filterSql(sql);
+            }
+
+            protected String removeBeginEndComment(final String sql) {
+                return DfSqlStringUtil.removeBeginEndComment(sql);
+            }
+
+            @Override
             protected void traceSql(String sql) {
                 String msg = getLineSeparator() + "";
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
@@ -92,19 +105,20 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
                 msg = msg + "* * * * * * * * * */";
                 _log.info(msg);
             }
-            
+
             @Override
             protected void traceResult(int goodSqlCount, int totalSqlCount) {
-                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + getLineSeparator());
+                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount)
+                        + getLineSeparator());
+            }
+
+            @Override
+            protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return false;
             }
         };
     }
-    
-    
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
-    }
-    
+
     @Override
     protected String getSqlDirectory() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();

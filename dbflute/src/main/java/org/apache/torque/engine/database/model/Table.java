@@ -2165,6 +2165,38 @@ public class Table implements IDMethod {
         return getDatabase().getIdentityDefinitionMapColumnName(getName()) != null;
     }
 
+    public String getIdentityColumnName() {
+        final Column column = getIdentityColumn();
+        return column != null ? column.getName() : null;
+    }
+    
+    public String getIdentityPropertyName() {
+        final Column column = getIdentityColumn();
+        return column != null ? getPropertyNameResolvedLanguage(column) : null;
+    }
+    
+    protected Column getIdentityColumn() {
+        if (!isUseIdentity()) {
+            return null;
+        }
+
+        // It gives priority to auto-increment information of JDBC.
+        final Column autoIncrementColumn = getAutoIncrementColumn();
+        if (autoIncrementColumn != null) {
+            return autoIncrementColumn;
+        }
+
+        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
+        final Column column = getColumn(columnName);
+        if (column == null) {
+            String msg = "The columnName does not exist in the table: ";
+            msg = msg + " tableName=" + getName() + " columnName=" + columnName;
+            msg = msg + " columnList=" + getColumnNameCommaString();
+            throw new IllegalStateException(msg);
+        }
+        return column;
+    }
+
     protected boolean hasAutoIncrementColumn() {
         final Column[] columnArray = getColumns();
         for (Column column : columnArray) {
@@ -2183,54 +2215,6 @@ public class Table implements IDMethod {
             }
         }
         return null;
-    }
-
-    public String getIdentityColumnName() {
-        if (!isUseIdentity()) {
-            return "";
-        }
-
-        // It gives priority to auto-increment information of JDBC.
-        final Column[] columnArray = getColumns();
-        for (Column column : columnArray) {
-            if (column.isAutoIncrement()) {
-                return column.getName();
-            }
-        }
-
-        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
-        final Column col = getColumn(columnName);
-        if (col == null) {
-            String msg = "The columnName does not exist in the table: ";
-            msg = msg + " tableName=" + getName() + " columnName=" + columnName;
-            msg = msg + " columnList=" + getColumnNameCommaString();
-            throw new IllegalStateException(msg);
-        }
-        return col.getName();
-    }
-    
-    public String getIdentityPropertyName() {
-        if (!isUseIdentity()) {
-            return "";
-        }
-
-        // It gives priority to auto-increment information of JDBC.
-        final Column[] columnArray = getColumns();
-        for (Column column : columnArray) {
-            if (column.isAutoIncrement()) {
-                return getPropertyNameResolvedLanguage(column);
-            }
-        }
-
-        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
-        final Column col = getColumn(columnName);
-        if (col == null) {
-            String msg = "The columnName does not exist in the table: ";
-            msg = msg + " tableName=" + getName() + " columnName=" + columnName;
-            msg = msg + " columnList=" + getColumnNameCommaString();
-            throw new IllegalStateException(msg);
-        }
-        return getPropertyNameResolvedLanguage(col);
     }
 
     // ===================================================================================

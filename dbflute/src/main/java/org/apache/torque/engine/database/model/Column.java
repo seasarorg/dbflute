@@ -1396,14 +1396,13 @@ public class Column {
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-
     public boolean isIdentity() {
         if (_isAutoIncrement) {
             // It gives priority to auto-increment information of JDBC.
             return true;
         } else {
-            return getTable().isUseIdentity()
-                    && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
+            final String identityPropertyName = getTable().getIdentityPropertyName();
+            return getTable().isUseIdentity() && getJavaName().equalsIgnoreCase(identityPropertyName);
         }
     }
 

@@ -73,7 +73,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     public static final String KEY_identityDefinitionMap = "identityDefinitionMap";
     protected Map<String, Object> _identityDefinitionMap;
 
-    public Map<String, Object> getIdentityDefinitionMap() {
+    protected Map<String, Object> getIdentityDefinitionMap() {
         if (_identityDefinitionMap == null) {
             _identityDefinitionMap = mapProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP);
         }

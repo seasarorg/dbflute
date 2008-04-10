@@ -42,7 +42,6 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.SQLRuntimeException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -218,7 +217,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 //                    }
                 //                }
 
-                return removeBeginEndComment(sql);
+                if (getProperties().getBasicProperties().isDatabaseDerby()) {
+                    sql = removeBeginEndComment(sql);
+                }
+                return super.filterSql(sql);
             }
 
             protected void execSQL(Statement statement, String sql) {
@@ -304,7 +306,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 } catch (SQLException e) {
                     String msg = "Failed to execute: " + sql;
                     if (!_runInfo.isErrorContinue()) {
-                        throw new SQLRuntimeException(msg, e);
+                        throw new RuntimeException(msg, e);
                     }
                     _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + getLineSeparator() + sql);
                 } finally {

@@ -11,13 +11,22 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
 public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSqlFileRunnerExecute.class);
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfSqlFileRunnerExecute(DfRunnerInformation runInfo, DataSource dataSource) {
         super(runInfo, dataSource);
     }
 
+    // ===================================================================================
+    //                                                                         Execute SQL
+    //                                                                         ===========
     /**
      * Execute the SQL statement.
      * @param statement Statement. (NotNull)
@@ -30,29 +39,10 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         } catch (SQLException e) {
             String msg = "Failed to execute: " + sql;
             if (!_runInfo.isErrorContinue()) {
-                throw new SQLRuntimeException(msg, e);
+                throw new RuntimeException(msg, e);
             }
             _log.warn(msg, e);
             _log.warn("" + System.getProperty("line.separator"));
-        }
-    }
-
-    // =========================================================================================
-    //                                                                         Runtime Exception
-    //                                                                         =================
-    public static class SQLRuntimeException extends RuntimeException {
-        public static final long serialVersionUID = -1;
-
-        public SQLRuntimeException(String msg, Throwable e) {
-            super(msg, e);
-        }
-    }
-
-    public static class IORuntimeException extends RuntimeException {
-        public static final long serialVersionUID = -1;
-
-        public IORuntimeException(String msg, Throwable e) {
-            super(msg, e);
         }
     }
 }

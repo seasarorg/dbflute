@@ -51,8 +51,12 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
     @Override
     protected void doExecute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
-        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        final DfSqlFileFireMan fireMan = newSqlFileFireMan();
         fireMan.execute(getSqlFileRunner(runInfo), getSqlFileList());
+    }
+
+    protected DfSqlFileFireMan newSqlFileFireMan() {
+        return new DfSqlFileFireMan();
     }
 
     protected DfRunnerInformation createRunnerInformation() {
@@ -67,7 +71,7 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
         customizeRunnerInformation(runInfo);
         return runInfo;
     }
-    
+
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
         // for Override
     }

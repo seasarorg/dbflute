@@ -57,12 +57,11 @@ public abstract class ${myClassName} implements java.io.Serializable {
 	@javax.persistence.Id
 #end
 #if ($col.isIdentity())
-	@javax.persistence.GeneratedValue
+	@javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
 #end
     public ${col.javaNative} ${col.uncapitalisedJavaName};
 	
 #end
-
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============

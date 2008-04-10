@@ -40,7 +40,6 @@ public class DfSqlFileFireMan {
             msg = msg + " (in " + fileList.size() + " files)";
             _log.debug(msg);
         } catch (Exception e) {
-            _log.warn(getClass().getName() + "#execute() threw the exception!", e);
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {

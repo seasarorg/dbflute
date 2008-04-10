@@ -59,6 +59,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseName().equalsIgnoreCase("oracle");
     }
 
+    public boolean isDatabaseDerby() {
+        return getDatabaseName().equalsIgnoreCase("derby");
+    }
+    
     public boolean isDatabaseDB2() {
         return getDatabaseName().equalsIgnoreCase("db2");
     }
