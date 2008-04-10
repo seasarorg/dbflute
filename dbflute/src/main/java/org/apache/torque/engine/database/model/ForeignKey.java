@@ -330,21 +330,10 @@ public class ForeignKey {
     // -----------------------------------------------------
     //                                         Local Element
     //                                         -------------
-
-    /**
-     * Returns the list of local column names. You should not edit this List.
-     * 
-     * @return the local columns
-     */
     public List<String> getLocalColumns() {
         return _localColumns;
     }
 
-    /**
-     * Returns the list of local column names. You should not edit this List.
-     * 
-     * @return the local columns
-     */
     public List<Column> getLocalColumnList() {
         return getLocalColumnObjectList();
     }
@@ -359,22 +348,12 @@ public class ForeignKey {
         return getLocalColumns().get(0);
     }
 
-    /**
-     * Returns the list of local column names. You should not edit this List.
-     * 
-     * @return the local columns
-     */
     public String getLocalColumnJavaNameAsOne() {
         final String columnName = getLocalColumnNameAsOne();
         final Table localTable = getTable();
         return localTable.getColumn(columnName).getJavaName();
     }
 
-    /**
-     * Returns the list of local column objects. You should not edit this List.
-     * 
-     * @return the local objects
-     */
     public List<Column> getLocalColumnObjectList() {
         final List<String> columnList = getLocalColumns();
         if (columnList == null || columnList.isEmpty()) {

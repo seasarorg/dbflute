@@ -337,7 +337,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
      * @return Determination.
      */
     protected boolean isSqlTrimAndRemoveLineSeparator() {
-        return true;// as Default
+        return false;// as Default
     }
 
     // ===================================================================================

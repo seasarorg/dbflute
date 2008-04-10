@@ -1,0 +1,42 @@
+${database.allClassCopyright}package ${glPackageBaseParameterBean};
+#set ($myClassName = "${myBaseParameterBeanClassName}")
+
+/**
+ * The parameter-bean of ${pmbClassName}.
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+    /** The value of ${propertyName}. */
+    public ${propertyType} ${propertyName};
+
+#end
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+    }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * @return The view of properties. (NotNull)
+     */
+    @Override
+    public String toString() {
+        final String delimiter = ",";
+        final StringBuilder sb = new StringBuilder();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+        sb.append(delimiter).append(${propertyName});
+#end
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+}

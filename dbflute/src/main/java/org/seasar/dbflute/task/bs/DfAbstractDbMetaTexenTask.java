@@ -32,17 +32,21 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.transform.XmlToAppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfS2jdbcProperties;
 
 /**
  * @author jflute
  */
 public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfAbstractDbMetaTexenTask.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _xmlFile;
 
     protected List<FileSet> _filesets;
@@ -135,7 +139,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
             }
             _databaseNames = new Hashtable<String, String>();
             _dataModelDbMap = new Hashtable<String, String>();
-            for (final Iterator ite = _dataModels.iterator(); ite.hasNext();) {
+            for (final Iterator<AppData> ite = _dataModels.iterator(); ite.hasNext();) {
                 final AppData appData = (AppData) ite.next();
                 final Database database = appData.getDatabase();
                 _dataModelDbMap.put(appData.getName(), database.getName());

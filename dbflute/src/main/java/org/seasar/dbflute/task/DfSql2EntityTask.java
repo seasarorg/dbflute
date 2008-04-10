@@ -35,6 +35,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
@@ -46,6 +47,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -71,12 +73,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
     // ===================================================================================
-    //                                                                            Override
-    //                                                                            ========
-    /**
-     * The override. <br />
-     * Using data source.
-     */
+    //                                                                          DataSource
+    //                                                                          ==========
     @Override
     protected boolean isUseDataSource() {
         return true;
@@ -86,10 +84,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                             Execute
     //                                                                             =======
     @Override
-    /**
-     * The override.
-     */
     protected void doExecute() {
+        final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
+        if (jdbcProperties.hasS2jdbcDefinition()) {
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process S2JDBC  *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/java/other/s2jdbc/s2jdbc-sql2entity-Control.vm");
+        }
         setupDataSource();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();
@@ -112,9 +114,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
-    /**
-     * Show method definition candidate.
-     */
     protected void showMethodDefinitionCandidate() {
         _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
         _log.info("                         Method Definition Candidate");
@@ -338,7 +337,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             /**
              * Extract the meta data of parameter bean.
-             * 
              * @param sql Target SQL. (NotNull and NotEmpty)
              * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'Not Found'.)
              */
@@ -425,6 +423,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             @Override
             protected void traceSql(String sql) {
                 log4inner.info("{SQL}" + getLineSeparator() + sql);
+            }
+            
+            @Override
+            protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return false;
             }
         };
     }

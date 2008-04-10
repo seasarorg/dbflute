@@ -59,6 +59,21 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #if ($col.isIdentity())
 	@javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
 #end
+#if ($col.isTorqueTypeDate())
+    @javax.persistence.Temporal(javax.persistence.TemporalType.DATE)
+#end
+#if ($col.isTorqueTypeTime())
+    @javax.persistence.Temporal(javax.persistence.TemporalType.TIME)
+#end
+#if ($col.isTorqueTypeTimestamp())
+    @javax.persistence.Temporal(javax.persistence.TemporalType.TIMESTAMP)
+#end
+#if ($col.isTorqueTypeBlob() && $col.isTorqueTypeClob())
+    @javax.persistence.Lob
+#end
+#if ($table.isUseVersionNo() && $col.isVersionNo())
+	@javax.persistence.Version
+#end
     public ${col.javaNative} ${col.uncapitalisedJavaName};
 	
 #end
@@ -67,8 +82,11 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                       =============
 #foreach ($foreignKeys in $table.ForeignKeys)
 #set ($foreignEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${foreignKeys.foreignTable.javaName}${database.s2jdbcExtendedEntitySuffix}")
-    /** Foreign property for ${foreignKeys.foreignTable.name} table. {${foreignKeys.foreignTable.basicInfoDispString}}*/
+    /** Foreign property for ${foreignKeys.foreignTable.name} table. */
 	@javax.persistence.ManyToOne
+#if ($foreignKeys.isSimpleKeyFK())
+	@javax.persistence.JoinColumn(name="${foreignKeys.localColumnNameAsOne}")
+#end
     public ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
 
 #end
@@ -79,12 +97,12 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${database.s2jdbcExtendedEntityPrefix}${referrer.table.javaName}${database.s2jdbcExtendedEntitySuffix}")
 #if (${referrer.isOneToOne()})
-	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
-	@javax.persistence.OneToOne
+	/** Referrer property for ${referrerTable.name} table. */
+	@javax.persistence.OneToOne(mappedBy = "${referrer.foreignPropertyName}")
     public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
 
 #else
-	/** Referrer property for ${referrerTable.name} table. {${referrer.table.basicInfoDispString}}*/
+	/** Referrer property for ${referrerTable.name} table. */
 	@javax.persistence.OneToMany(mappedBy = "${referrer.foreignPropertyName}")
     public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 

@@ -6,28 +6,24 @@ import java.util.Properties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
- * Build properties for Torque.
- * 
  * @author jflute
  */
 public final class DfSequenceIdentityProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfSequenceIdentityProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                                         Sequence Definition Map
-    //                                                         =======================
-    public static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
+    // ===================================================================================
+    //                                                             Sequence Definition Map
+    //                                                             =======================
+    protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
     protected Map<String, Object> _sequenceDefinitionMap;
 
-    public Map<String, Object> getSequenceDefinitionMap() {
+    protected Map<String, Object> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap == null) {
             _sequenceDefinitionMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
         }
@@ -40,24 +36,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return (String) flmap.get(flexibleTableName);
     }
 
-    // ===============================================================================
-    //                                                              Sequence Injection
-    //                                                              ==================
+    // ===================================================================================
+    //                                                                  Sequence Injection
+    //                                                                  ==================
     public boolean isAvailableBehaviorInsertSequenceInjection() {
         return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", true);
     }
 
-    // ===============================================================================
-    //                                                               Sequence Assigned
-    //                                                               =================
-    // for S2Buri
+    // ===================================================================================
+    //                                                                   Sequence Assigned
+    //                                                                   =================
     public boolean isAvailableSequenceAssignedIdAnnotation() {
         return booleanProp("torque.isAvailableSequenceAssignedIdAnnotation", false);
     }
 
-    // ===============================================================================
-    //                                                            Sequence Return Type
-    //                                                            ====================
+    // ===================================================================================
+    //                                                                Sequence Return Type
+    //                                                                ====================
+    // Deprecated at the future...
     public boolean hasSequenceReturnType() {
         final String value = stringProp("torque.sequenceReturnType", "");
         return value != null && value.trim().length() != 0;
@@ -67,10 +63,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return stringProp("torque.sequenceReturnType", "java.math.BigDecimal");
     }
 
-    // ===============================================================================
-    //                                                         Identity Definition Map
-    //                                                         =======================
-    public static final String KEY_identityDefinitionMap = "identityDefinitionMap";
+    // ===================================================================================
+    //                                                             Identity Definition Map
+    //                                                             =======================
+    protected static final String KEY_identityDefinitionMap = "identityDefinitionMap";
     protected Map<String, Object> _identityDefinitionMap;
 
     protected Map<String, Object> getIdentityDefinitionMap() {

@@ -985,7 +985,46 @@ public class Column {
     // ===================================================================================
     //                                                                  Type Determination
     //                                                                  ==================
+    public boolean isJavaNativeStringObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
+    }
 
+    public boolean isTorqueTypeClob() {// as Pinpoint
+        return "CLOB".equals(getTorqueType());
+    }
+    
+    public boolean isJavaNativeBooleanObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
+    }
+
+    public boolean isJavaNativeNumberObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeNumberList());
+    }
+
+    public boolean isJavaNativeDateObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeDateList());
+    }
+    
+    public boolean isTorqueTypeDate() {// as Pinpoint
+        return "DATE".equals(getTorqueType());
+    }
+    
+    public boolean isTorqueTypeTime() {// as Pinpoint
+        return "TIME".equals(getTorqueType());
+    }
+    
+    public boolean isTorqueTypeTimestamp() {// as Pinpoint
+        return "TIMESTAMP".equals(getTorqueType());
+    }
+
+    public boolean isJavaNativeBinaryObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
+    }
+
+    public boolean isTorqueTypeBlob() {// as Pinpoint
+        return "BLOB".equals(getTorqueType());
+    }
+    
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
         for (Object current : ls) {
             final String currentString = (String) current;
@@ -994,67 +1033,6 @@ public class Column {
             }
         }
         return false;
-    }
-
-    /**
-     * Determine whether java native is 'String' object.
-     * 
-     * @return Determination.
-     */
-    public boolean isJavaNativeStringObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
-    }
-
-    /**
-     * Determine whether java native is 'Boolean' object.
-     * 
-     * @return Determination.
-     */
-    public boolean isJavaNativeBooleanObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
-    }
-
-    /**
-     * Determine whether java native is 'Number' object.
-     * 
-     * @return Determination.
-     */
-    public boolean isJavaNativeNumberObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeNumberList());
-    }
-
-    /**
-     * Determine whether java native is 'Date' object.
-     * 
-     * @return Determination.
-     */
-    public boolean isJavaNativeDateObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeDateList());
-    }
-
-    /**
-     * Determine whether java native is 'Binary' object.
-     * 
-     * @return Determination.
-     */
-    public boolean isJavaNativeBinaryObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
-    }
-
-    /**
-     * Returns true if the column type is boolean in the
-     * java object and a numeric (1 or 0) in the db.
-     */
-    public boolean isBooleanInt() {
-        return TypeMap.isBooleanInt(_torqueType);
-    }
-
-    /**
-     * Returns true if the column type is boolean in the
-     * java object and a String ("Y" or "N") in the db.
-     */
-    public boolean isBooleanChar() {
-        return TypeMap.isBooleanChar(_torqueType);
     }
 
     public boolean isJavaNativeCSharpNullable() {
@@ -1407,6 +1385,14 @@ public class Column {
     }
 
     // ===================================================================================
+    //                                                                          Version No
+    //                                                                          ==========
+    public boolean isVersionNo() {
+        final String versionNoPropertyName = getTable().getVersionNoPropertyName();
+        return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
+    }
+    
+    // ===================================================================================
     //                                                                       Column Helper
     //                                                                       =============
     protected ColumnHelper _columnHelper;
@@ -1427,5 +1413,4 @@ public class Column {
             return getBasicProperties().getLanguageDependencyInfo();
         }
     }
-
 }

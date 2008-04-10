@@ -17,16 +17,13 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     public DfTypeMappingProperties(Properties prop) {
         super(prop);
     }
 
     // ===================================================================================
-    //                                                                         Java Native
-    //                                                                         ===========
+    //                                                                 JDBC to Java Native
+    //                                                                 ===================
     protected Map<String, Object> _jdbcToJavaNativeMap;
 
     public Map<String, Object> getJdbcToJavaNative() {
@@ -112,8 +109,8 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                    LanguageMetaData
-    //                                                                    ================
+    //                                                                  Language Meta Data
+    //                                                                  ==================
     protected LanguageMetaData _languageMetaData;
 
     protected LanguageMetaData getLanguageMetaData() {

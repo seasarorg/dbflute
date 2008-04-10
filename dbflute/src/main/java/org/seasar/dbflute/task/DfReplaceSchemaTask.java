@@ -190,7 +190,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
-        return new DfSqlFileRunnerExecute(runInfo, getDataSource());
+        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return true;
+            }
+        };
     }
 
     protected List<File> getReplaceSchemaSqlFileList() {
