@@ -420,7 +420,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             @Override
             protected String replaceCommentQuestionMarkIfNeeds(String line) {
-                if (line.indexOf("--!!") > 0 || line.indexOf("-- !!") > 0) {
+                if (line.indexOf("--!!") >= 0 || line.indexOf("-- !!") >= 0) {
                     // If the line comment is for a property of parameter-bean, 
                     // it does not replace question mark.
                     return line;
