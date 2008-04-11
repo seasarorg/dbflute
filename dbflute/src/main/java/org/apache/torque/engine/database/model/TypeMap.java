@@ -64,7 +64,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
  * A class that maps JDBC types to their corresponding
