@@ -319,7 +319,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                                   =================
     /**
      * Lump create the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @param entityList Entity list. (NotNull and NotEmpty)
      * @return The array of created count.
      */
     public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
@@ -329,7 +329,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Lump Modify the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @param entityList Entity list. (NotNull and NotEmpty)
      * @return Modified count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
@@ -340,7 +340,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Lump remove the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @param entityList Entity list. (NotNull and NotEmpty)
      * @return Removed count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
@@ -525,7 +525,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * ${database.ImplementComment}
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
     protected int callCreate(${glEntityInterfaceName} entity) {
@@ -535,8 +535,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Process before insert.
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeInsert(${glEntityInterfaceName} entity) {
@@ -554,7 +553,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * ${database.ImplementComment}
      * {modified only}
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Updated count.
      */
     protected int callModify(${glEntityInterfaceName} entity) {
@@ -564,7 +563,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Process before update.
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeUpdate(${glEntityInterfaceName} entity) {
@@ -581,7 +580,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * ${database.ImplementComment}
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
     protected int callRemove(${glEntityInterfaceName} entity) {
@@ -591,7 +590,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Process before delete.
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeDelete(${glEntityInterfaceName} entity) {
@@ -616,18 +615,29 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
-     * Framework filter the entity of insert.
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * {Framework Method} Filter the entity of insert.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
 #if ($database.isAvailableBehaviorInsertSequenceInjection())
         injectSequenceToPrimaryKeyIfNeeds(targetEntity);
 #end
+		setupCommonColumnOfInsertIfNeeds(targetEntity);
+    }
+
+    /**
+     * Set up common columns of insert if it needs.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+	protected void setupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+		if (!entity.isCommonColumnAutoSetupEffective()) {
+		    return;
+		}
         if (_log.isDebugEnabled()) {
             String msg = "...Filtering entity of INSERT about the column columns of " + getTableDbName();
             msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
@@ -659,20 +669,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
-    }
-
+	}
+	
     /**
      * Filter the entity of insert.
-     * 
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
     }
 
     /**
      * Assert the entity of insert.
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      */
     protected void assertEntityOfInsert(${glEntityInterfaceName} entity) {
     }
@@ -682,7 +690,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                    ------------------
     /**
      * Determine execution of update.
-     * 
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
@@ -691,16 +698,26 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
-     * Framework filter the entity of update.
-     * 
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * {Framework Method} Filter the entity of update.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void frameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+	    setupCommonColumnOfUpdateIfNeeds(targetEntity);
+    }
+
+    /**
+     * Set up common columns of update if it needs.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+	protected void setupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+		if (!entity.isCommonColumnAutoSetupEffective()) {
+		    return;
+		}
         if (_log.isDebugEnabled()) {
             String msg = "...Filtering entity of UPDATE about the column columns of " + getTableDbName();
             msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
@@ -732,20 +749,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
-    }
-
+	}
+	
     /**
      * Filter the entity of update.
-     * 
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
     }
 
     /**
      * Assert the entity of update.
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @param entity Entity that the type is entity interface. (NotNull)
      */
     protected void assertEntityOfUpdate(${glEntityInterfaceName} entity) {
     }
@@ -755,7 +770,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                    ------------------
     /**
      * Determine execution of delete.
-     * 
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
@@ -764,18 +778,28 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
-     * Framework filter the entity of delete.
-     * 
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * {Framework Method} Filter the entity of delete.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void frameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+	    setupCommonColumnOfDeleteIfNeeds(targetEntity);
+    }
+
+    /**
+     * Set up common columns of delete if it needs.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+	protected void setupCommonColumnOfDeleteIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+		if (!entity.isCommonColumnAutoSetupEffective()) {
+		    return;
+		}
         if (_log.isDebugEnabled()) {
-            String msg = "[Behavior] ...Filtering entity of DELETE about the column columns of " + getTableDbName();
+            String msg = "...Filtering entity of DELETE about the column columns of " + getTableDbName();
             msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
             _log.debug(msg);
             _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
@@ -805,20 +829,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
-    }
-
+	}
+	
     /**
      * Filter the entity of delete.
-     * 
-     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
     }
 
     /**
-     * Assert the entity of delete
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
+     * Assert the entity of delete.
+     * @param entity Entity that the type is entity interface. (NotNull)
      */
     protected void assertEntityOfDelete(${glEntityInterfaceName} entity) {
     }
@@ -832,8 +854,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
     public ${batchUpdateReturnType} callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
@@ -844,8 +865,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Updated count.
      */
     public ${batchUpdateReturnType} callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
@@ -856,8 +876,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
     public ${batchUpdateReturnType} callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {

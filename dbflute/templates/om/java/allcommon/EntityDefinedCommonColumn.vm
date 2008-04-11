@@ -57,4 +57,6 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
   #end
 #end
 
+    public void ignoreCommonColumnAutoSetup();
+	public boolean isCommonColumnAutoSetupEffective();
 }

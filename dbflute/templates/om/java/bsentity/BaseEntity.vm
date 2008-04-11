@@ -81,14 +81,25 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Entity modified properties. (for S2Dao) */
-    protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
 #foreach ($col in $table.columns)
-
     /** The property for '${col.name}' column. {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
-#end
 
+#end
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /** Entity modified properties. (for S2Dao) */
+    protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
+#if (${table.hasAllCommonColumn()})
+
+    /** Is common column auto set up effective? */
+    protected boolean _commonColumnAutoSetupEffective = true;
+#end
+	
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -445,12 +456,24 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public boolean hasModification() {
         return !_modifiedProperties.isEmpty();
     }
+#if (${table.hasAllCommonColumn()})
+	
+    // ===================================================================================
+    //                                                           Common Column Auto Filter
+    //                                                           =========================
+    public void ignoreCommonColumnAutoSetup() {
+	    _commonColumnAutoSetupEffective = false;
+	}
+	
+	public boolean isCommonColumnAutoSetupEffective() {// for Framework
+	    return _commonColumnAutoSetupEffective;
+	}
+#end
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
 #if ($table.hasPrimaryKey())
-
     /**
      * ${database.OverrideComment}
      * If the primary-key of the other is same as this one, returns true.
@@ -490,7 +513,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return result;
     }
 #else
-
     /**
      * ${database.OverrideComment}
      * If the all-column value of the other is same as this one, returns true.
