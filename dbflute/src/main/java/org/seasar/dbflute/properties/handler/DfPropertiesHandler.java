@@ -12,8 +12,8 @@ import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.properties.DfResourceSynchronizerProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
@@ -244,15 +244,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                 Resource Synchronizer
-    //                                 ---------------------
-    protected DfResourceSynchronizerProperties _resourceSynchronizerProperties;
+    //                                               Refresh
+    //                                               -------
+    protected DfRefreshProperties _refreshProperties;
 
-    public DfResourceSynchronizerProperties getResourceSynchronizerProperties(Properties prop) {
-        if (_resourceSynchronizerProperties == null) {
-            _resourceSynchronizerProperties = new DfResourceSynchronizerProperties(prop);
+    public DfRefreshProperties getRefreshProperties(Properties prop) {
+        if (_refreshProperties == null) {
+            _refreshProperties = new DfRefreshProperties(prop);
         }
-        return _resourceSynchronizerProperties;
+        return _refreshProperties;
     }
 
     // -----------------------------------------------------

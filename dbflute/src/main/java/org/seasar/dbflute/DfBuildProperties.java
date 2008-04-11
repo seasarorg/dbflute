@@ -35,15 +35,15 @@ import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.properties.DfResourceSynchronizerProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
-import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -383,8 +383,8 @@ public final class DfBuildProperties {
         return getHandler().getTypeMappingProperties(getProperties());
     }
 
-    public DfResourceSynchronizerProperties getResourceSynchronizerProperties() {
-        return getHandler().getResourceSynchronizerProperties(getProperties());
+    public DfRefreshProperties getRefreshProperties() {
+        return getHandler().getRefreshProperties(getProperties());
     }
 
     public DfSimpleDtoProperties getSimpleDtoProperties() {

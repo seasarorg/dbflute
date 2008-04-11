@@ -7,65 +7,65 @@ import java.util.Properties;
  * @author jflute
  * @since 0.6.9 (2008/04/11 Friday)
  */
-public final class DfResourceSynchronizerProperties extends DfAbstractHelperProperties {
+public final class DfRefreshProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfResourceSynchronizerProperties(Properties prop) {
+    public DfRefreshProperties(Properties prop) {
         super(prop);
     }
 
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> resourceSynchronizerDefinitionMap;
+    protected Map<String, Object> refreshDefinitionMap;
 
-    protected Map<String, Object> getResourceSynchronizerDefinitionMap() {
-        if (resourceSynchronizerDefinitionMap == null) {
-            resourceSynchronizerDefinitionMap = mapProp("torque.resourceSynchronizerDefinitionMap", DEFAULT_EMPTY_MAP);
+    protected Map<String, Object> getRefreshDefinitionMap() {
+        if (refreshDefinitionMap == null) {
+            refreshDefinitionMap = mapProp("torque.refreshDefinitionMap", DEFAULT_EMPTY_MAP);
         }
-        return resourceSynchronizerDefinitionMap;
+        return refreshDefinitionMap;
     }
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean hasResourceSynchronizerDefinition() {
-        return !getResourceSynchronizerDefinitionMap().isEmpty();
+    public boolean hasRefreshDefinition() {
+        return !getRefreshDefinitionMap().isEmpty();
     }
 
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
     public String getProjectName() {
-        return getResourceSynchronizerPropertyRequired("projectName");
+        return getRefreshPropertyRequired("projectName");
     }
 
     public String getRequestUrl() {
-        return getResourceSynchronizerPropertyRequired("requestUrl");
+        return getRefreshPropertyRequired("requestUrl");
     }
 
-    protected String getResourceSynchronizerPropertyRequired(String key) {
-        final String value = getResourceSynchronizerProperty(key);
+    protected String getRefreshPropertyRequired(String key) {
+        final String value = getRefreshProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
-            msg = msg + " resourceSynchronizerDefinitionMap=" + getResourceSynchronizerDefinitionMap();
+            msg = msg + " refreshDefinitionMap=" + getRefreshDefinitionMap();
             throw new IllegalStateException(msg);
         }
         return value;
     }
 
-    protected String getResourceSynchronizerPropertyIfNullEmpty(String key) {
-        final String value = getResourceSynchronizerProperty(key);
+    protected String getRefreshPropertyIfNullEmpty(String key) {
+        final String value = getRefreshProperty(key);
         if (value == null) {
             return "";
         }
         return value;
     }
 
-    protected String getResourceSynchronizerProperty(String key) {
-        final String value = (String) getResourceSynchronizerDefinitionMap().get(key);
+    protected String getRefreshProperty(String key) {
+        final String value = (String) getRefreshDefinitionMap().get(key);
         return value;
     }
 }

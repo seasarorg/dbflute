@@ -46,7 +46,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfResourceSynchronizerProperties;
+import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
@@ -388,35 +388,34 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     // ===================================================================================
-    //                                                                Synchronize Resource
-    //                                                                ====================
-    protected void synchronizeResources() {
-        if (!isResourceSynchronized()) {
+    //                                                                    Refresh Resource
+    //                                                                    ================
+    protected void refreshResources() {
+        if (!isRefresh()) {
             return;
         }
 
-        final String projectName = getSynchronizedProjectName();
+        final String projectName = getRefreshProjectName();
         final StringBuilder sb = new StringBuilder().append("refresh?");
 
         // Refresh the project!
         sb.append(projectName).append("=INFINITE");
 
-        final URL url = getResourceSynchronizerURL(sb.toString());
+        final URL url = getRefreshRequestURL(sb.toString());
         if (url == null) {
             return;
         }
 
         InputStream is = null;
         try {
-            _log.info("* * * * * * * * * * * * * * * * * *");
-            _log.info("Refresh the project: " + projectName);
-            _log.info("* * * * * * * * * * * * * * * * * *");
+            _log.info("...Refreshing the project: " + projectName);
             URLConnection connection = url.openConnection();
-            connection.setReadTimeout(getResourceSynchronizerReadTimeout());
+            connection.setReadTimeout(getRefreshRequestReadTimeout());
             connection.connect();
             is = connection.getInputStream();
+            _log.info("  --> OK, Look the refreshed project!");
         } catch (IOException ignored) {
-            _log.info(ignored.getMessage() + ": " + url);
+            _log.info("  --> Oh, no! " + ignored.getMessage() + ": " + url);
         } finally {
             if (is != null) {
                 try {
@@ -427,22 +426,22 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
-    protected boolean isResourceSynchronized() {
-        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
-        return prop.hasResourceSynchronizerDefinition();
+    protected boolean isRefresh() {
+        final DfRefreshProperties prop = getProperties().getRefreshProperties();
+        return prop.hasRefreshDefinition();
     }
 
-    protected int getResourceSynchronizerReadTimeout() {
+    protected int getRefreshRequestReadTimeout() {
         return 3 * 1000;
     }
 
-    protected String getSynchronizedProjectName() {
-        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
+    protected String getRefreshProjectName() {
+        final DfRefreshProperties prop = getProperties().getRefreshProperties();
         return prop.getProjectName();
     }
 
-    protected URL getResourceSynchronizerURL(String path) {
-        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
+    protected URL getRefreshRequestURL(String path) {
+        final DfRefreshProperties prop = getProperties().getRefreshProperties();
         String requestUrl = prop.getRequestUrl();
         if (requestUrl.length() > 0) {
             if (!requestUrl.endsWith("/")) {
