@@ -61,6 +61,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
@@ -179,7 +181,7 @@ public class TypeMap {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNative();
     }
-    
+
     // ===================================================================================
     //                                                                    Initialized Mark
     //                                                                    ================
@@ -310,7 +312,11 @@ public class TypeMap {
         final String javaType = getJavaTypeAsString(torqueType);
         if (isAutoMappingTargetType(torqueType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
             if (decimalDigits != null && decimalDigits > 0) {
-                return getDefaultNumericJavaType();
+                if (NUMERIC.equalsIgnoreCase(torqueType)) {
+                    return getDefaultNumericJavaType();
+                } else {// DECIMAL
+                    return getDefaultDecimalJavaType();
+                }
             } else {
                 if (columnSize == null) {
                     return getJavaTypeAsString(TypeMap.BIGINT);
@@ -325,18 +331,33 @@ public class TypeMap {
         return javaType;
     }
 
-    protected static boolean isAutoMappingTargetType(String jdbcType) {
-        return TypeMap.NUMERIC.equals(jdbcType) || TypeMap.DECIMAL.equals(jdbcType);
+    protected static boolean isAutoMappingTargetType(String torqueType) {
+        return TypeMap.NUMERIC.equals(torqueType) || TypeMap.DECIMAL.equals(torqueType);
     }
-    
+
     protected static String getDefaultNumericJavaType() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProperties = prop.getBasicProperties();
         if (basicProperties.isTargetLanguageJava()) {
             return NUMERIC_NATIVE_TYPE;
         } else {
-            final DfTypeMappingProperties typeMappingProperties = prop.getTypeMappingProperties();
-            return (String) typeMappingProperties.getJdbcToJavaNative().get("NUMERIC");
+            final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
+            final LanguageMetaData languageMetaData = languageDependencyInfo.createLanguageMetaData();
+            final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
+            return (String) jdbcToJavaNativeMap.get(NUMERIC);
+        }
+    }
+
+    protected static String getDefaultDecimalJavaType() {
+        final DfBuildProperties prop = DfBuildProperties.getInstance();
+        final DfBasicProperties basicProperties = prop.getBasicProperties();
+        if (basicProperties.isTargetLanguageJava()) {
+            return DECIMAL_NATIVE_TYPE;
+        } else {
+            final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
+            final LanguageMetaData languageMetaData = languageDependencyInfo.createLanguageMetaData();
+            final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
+            return (String) jdbcToJavaNativeMap.get(DECIMAL);
         }
     }
 
