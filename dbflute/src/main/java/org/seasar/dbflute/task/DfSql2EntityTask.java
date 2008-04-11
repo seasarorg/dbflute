@@ -107,7 +107,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireMan.execute(runner, sqlFileList);
 
         fireSuperExecute();
-        showMethodDefinitionCandidate();
         handleException();
         synchronizeResources();
     }
@@ -115,42 +114,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
-    protected void showMethodDefinitionCandidate() {
-        _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-        _log.info("                         Method Definition Candidate");
-        _log.info("                        _/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-        final Set<String> entityNameSet = _entitySqlFileMap.keySet();
-        for (String entityName : entityNameSet) {
-            final File sqlFile = _entitySqlFileMap.get(entityName);
-            final String sqlFileName = sqlFile.getName();
-            try {
-                if (sqlFileName.indexOf("_") < 0) {
-                    continue;
-                }
-                if (sqlFileName.indexOf(".") < 0) {
-                    continue;
-                }
-
-                final String daoName = sqlFileName.substring(0, sqlFileName.indexOf("_"));
-                final String remainderString = sqlFileName.substring(sqlFileName.indexOf("_") + 1);
-                if (remainderString.indexOf(".") < 0) {
-                    continue;
-                }
-                final String methodName;
-                if (remainderString.indexOf("_") < 0) {
-                    methodName = remainderString.substring(0, remainderString.indexOf("."));
-                } else {
-                    methodName = remainderString.substring(0, remainderString.indexOf("_"));
-                }
-                _log.info("[" + daoName + "]");
-                _log.info("public java.util.List<" + entityName + "> " + methodName + "();");
-                _log.info(" ");
-            } catch (Exception e) {
-                _log.warn("showMethodDefinition() threw exception at " + sqlFileName, e);
-            }
-        }
-    }
-
     /**
      * Collect SQL files into the list.
      * @return The list of SQL files. (NotNull)

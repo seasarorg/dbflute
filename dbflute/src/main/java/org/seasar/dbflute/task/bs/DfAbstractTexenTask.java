@@ -408,13 +408,15 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
         InputStream is = null;
         try {
-            _log.info("...Synchronizing resources: projectName=" + projectName);
+            _log.info("* * * * * * * * * * * * * * * * * *");
+            _log.info("Refresh the project: " + projectName);
+            _log.info("* * * * * * * * * * * * * * * * * *");
             URLConnection connection = url.openConnection();
             connection.setReadTimeout(getResourceSynchronizerReadTimeout());
             connection.connect();
             is = connection.getInputStream();
-        } catch (IOException ex) {
-            _log.warn("I/O error occured on a resourceSynchronizing server: " + url, ex);
+        } catch (IOException ignored) {
+            _log.info(ignored.getMessage() + ": " + url);
         } finally {
             if (is != null) {
                 try {
