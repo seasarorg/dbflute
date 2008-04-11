@@ -408,14 +408,19 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
         InputStream is = null;
         try {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("...Refreshing the project: " + projectName);
             URLConnection connection = url.openConnection();
             connection.setReadTimeout(getRefreshRequestReadTimeout());
             connection.connect();
             is = connection.getInputStream();
-            _log.info("  --> OK, Look the refreshed project!");
+            _log.info("");
+            _log.info("    --> OK, Look the refreshed project!");
+            _log.info("- - - - - - - - - -/");
         } catch (IOException ignored) {
-            _log.info("  --> Oh, no! " + ignored.getMessage() + ": " + url);
+            _log.info("");
+            _log.info("    --> Oh, no! " + ignored.getMessage() + ": " + url);
+            _log.info("- - - - - - - - - -/");
         } finally {
             if (is != null) {
                 try {
