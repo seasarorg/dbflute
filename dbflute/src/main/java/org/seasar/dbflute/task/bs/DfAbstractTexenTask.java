@@ -17,6 +17,11 @@ package org.seasar.dbflute.task.bs;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
@@ -41,6 +46,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfResourceSynchronizerProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
@@ -79,7 +85,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     /** Data source creator. (for help) */
     protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
-    
+
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
@@ -160,7 +166,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
         return sb.toString();
     }
-    
+
     protected void fireSuperExecute() {
         // /----------------------------------------------
         // Set up the encoding of templates from property.
@@ -250,7 +256,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     }
                 }
             }
-            
+
             _log.info("generator.parse(\"" + controlTemplate + "\", c);");
             generator.parse(controlTemplate, c);
 
@@ -344,7 +350,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
         }
     }
-    
+
     // -----------------------------------------------------
     //                                    Context Properties
     //                                    ------------------
@@ -382,14 +388,73 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public String getTargetDatabase() {
-        return _targetDatabase;
+    //                                                                Synchronize Resource
+    //                                                                ====================
+    protected void synchronizeResources() {
+        if (!isResourceSynchronized()) {
+            return;
+        }
+
+        final String projectName = getSynchronizedProjectName();
+        final StringBuilder sb = new StringBuilder().append("refresh?");
+
+        // Refresh the project!
+        sb.append(projectName).append("=INFINITE");
+
+        final URL url = getResourceSynchronizerURL(sb.toString());
+        if (url == null) {
+            return;
+        }
+
+        InputStream is = null;
+        try {
+            _log.info("...Synchronizing resources: projectName=" + projectName);
+            URLConnection connection = url.openConnection();
+            connection.setReadTimeout(getResourceSynchronizerReadTimeout());
+            connection.connect();
+            is = connection.getInputStream();
+        } catch (IOException ex) {
+            _log.warn("I/O error occured on a resourceSynchronizing server: " + url, ex);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
-    public void setTargetDatabase(String v) {
-        _targetDatabase = v;
+    protected boolean isResourceSynchronized() {
+        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
+        return prop.hasResourceSynchronizerDefinition();
+    }
+
+    protected int getResourceSynchronizerReadTimeout() {
+        return 3 * 1000;
+    }
+
+    protected String getSynchronizedProjectName() {
+        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
+        return prop.getProjectName();
+    }
+
+    protected URL getResourceSynchronizerURL(String path) {
+        final DfResourceSynchronizerProperties prop = getProperties().getResourceSynchronizerProperties();
+        String requestUrl = prop.getRequestUrl();
+        if (requestUrl.length() > 0) {
+            if (!requestUrl.endsWith("/")) {
+                requestUrl = requestUrl + "/";
+            }
+            try {
+                return new URL(requestUrl + path);
+            } catch (MalformedURLException e) {
+                _log.warn("The URL was invalid: " + requestUrl, e);
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     // ===================================================================================
@@ -402,10 +467,22 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
+
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getTargetDatabase() {
+        return _targetDatabase;
+    }
+
+    public void setTargetDatabase(String v) {
+        _targetDatabase = v;
     }
 }

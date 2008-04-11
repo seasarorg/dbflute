@@ -109,6 +109,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireSuperExecute();
         showMethodDefinitionCandidate();
         handleException();
+        synchronizeResources();
     }
 
     // ===================================================================================

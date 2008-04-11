@@ -13,13 +13,14 @@ import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfResourceSynchronizerProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
-import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -243,7 +244,19 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                            Simple Dto
+    //                                 Resource Synchronizer
+    //                                 ---------------------
+    protected DfResourceSynchronizerProperties _resourceSynchronizerProperties;
+
+    public DfResourceSynchronizerProperties getResourceSynchronizerProperties(Properties prop) {
+        if (_resourceSynchronizerProperties == null) {
+            _resourceSynchronizerProperties = new DfResourceSynchronizerProperties(prop);
+        }
+        return _resourceSynchronizerProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                            Simple DTO
     //                                            ----------
     protected DfSimpleDtoProperties _simpleDtoProperties;
 
@@ -253,12 +266,12 @@ public final class DfPropertiesHandler {
         }
         return _simpleDtoProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                         S2JDBC Entity
     //                                         -------------
     protected DfS2jdbcProperties _s2jdbcProperties;
-    
+
     public DfS2jdbcProperties getS2JdbcProperties(Properties prop) {
         if (_s2jdbcProperties == null) {
             _s2jdbcProperties = new DfS2jdbcProperties(prop);

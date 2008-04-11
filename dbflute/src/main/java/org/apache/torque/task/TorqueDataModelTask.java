@@ -77,8 +77,9 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             setControlTemplate("om/java/other/s2jdbc/s2jdbc-Control.vm");
         }
         super.doExecute();
+        synchronizeResources();
     }
-    
+
     protected boolean isUseDataSource() {
         return false;
     }
