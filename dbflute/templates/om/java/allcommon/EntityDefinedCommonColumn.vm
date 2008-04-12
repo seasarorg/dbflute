@@ -43,20 +43,18 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * @return Determanation.
      */
     public boolean is${javaName}${classificationMap.get('name')}();
-
-    /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
-	 * <p>
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method throws exception!
-	 * </p>
-     * @return Determanation.
-     */
-    public boolean is${javaName}${classificationMap.get('name')}IfNullException();
     #end
   #end
 #end
 
-    public void ignoreCommonColumnAutoSetup();
-	public boolean isCommonColumnAutoSetupEffective();
+    /**
+	 * Disable common column auto set up.
+	 */
+    public void disableCommonColumnAutoSetup();
+	
+    /**
+	 * Can the entity set up common column by auto?
+	 * @return Determination.
+	 */
+	public boolean canCommonColumnAutoSetup();
 }

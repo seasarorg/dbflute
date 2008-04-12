@@ -635,7 +635,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-		if (!entity.isCommonColumnAutoSetupEffective()) {
+		if (!entity.canCommonColumnAutoSetup()) {
 		    return;
 		}
         if (_log.isDebugEnabled()) {
@@ -715,7 +715,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-		if (!entity.isCommonColumnAutoSetupEffective()) {
+		if (!entity.canCommonColumnAutoSetup()) {
 		    return;
 		}
         if (_log.isDebugEnabled()) {
@@ -795,7 +795,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             return;
         }
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-		if (!entity.isCommonColumnAutoSetupEffective()) {
+		if (!entity.canCommonColumnAutoSetup()) {
 		    return;
 		}
         if (_log.isDebugEnabled()) {

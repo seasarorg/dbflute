@@ -97,7 +97,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #if (${table.hasAllCommonColumn()})
 
     /** Is common column auto set up effective? */
-    protected boolean _commonColumnAutoSetupEffective = true;
+    protected boolean _canCommonColumnAutoSetup = true;
 #end
 	
     // ===================================================================================
@@ -238,7 +238,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKeys)};
 
     /** RELKEYS of foreign table for s2dao. */
-    public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
+    public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.relationKeysCommaString";
 
     /** The entity of foreign table. */
     protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
@@ -266,7 +266,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public boolean hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}() {
         return ${foreignVariableName} != null;
     }
-
+#if ($database.isMakeRecentlyDeprecated())
+	
     /**
      * Same as look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(). This method will be deprecated at the future.
      * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
@@ -275,6 +276,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public ${myExtendedEntityPackageName}.${foreignEntityClassName} trace${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}();
     }
+#end
 
     /**
      * Look the foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
@@ -346,6 +348,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public boolean hasReferrerElements${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
         return ${referrerVariableName} != null && !${referrerVariableName}.isEmpty();
     }
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * Has referrer elements of ${referrer.refererJavaBeansRulePropertyNameInitCap}.
@@ -355,6 +358,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public boolean hasRefererElements${referrer.refererJavaBeansRulePropertyNameInitCap}() {
         return ${referrerVariableName} != null && !${referrerVariableName}.isEmpty();
     }
+#end
 
 #if (${referrer.isOneToOne()})
     /**
@@ -383,6 +387,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         ls.add(entity);
         ${referrerVariableName} = ls;
     }
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * Same as look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(). This method will be deprecated at the future.
@@ -392,6 +397,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public ${referrerEntityLongClassName} trace${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         return look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}();
     }
+#end
 
     /**
      * Look the referrer-as-one entity (for read) of ${referrer.refererJavaBeansRulePropertyNameAsOne}.
@@ -461,12 +467,19 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                           Common Column Auto Filter
     //                                                           =========================
-    public void ignoreCommonColumnAutoSetup() {
-	    _commonColumnAutoSetupEffective = false;
+    /**
+	 * Disable common column auto set up.
+	 */
+    public void disableCommonColumnAutoSetup() {
+	    _canCommonColumnAutoSetup = false;
 	}
 	
-	public boolean isCommonColumnAutoSetupEffective() {// for Framework
-	    return _commonColumnAutoSetupEffective;
+    /**
+	 * Can the entity set up common column by auto?
+	 * @return Determination.
+	 */
+	public boolean canCommonColumnAutoSetup() {// for Framework
+	    return _canCommonColumnAutoSetup;
 	}
 #end
 
@@ -576,7 +589,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.columns)
 
     /** Column Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.Name}";
+    public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.name}";
 #if ($col.isJavaNativeOracleStringClob())
 
     /** ValueType Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
