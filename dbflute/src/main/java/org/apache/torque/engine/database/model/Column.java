@@ -972,6 +972,10 @@ public class Column {
     public String getJavaNative() {
         return TypeMap.findJavaNativeTypeString(_torqueType, getColumnSize(), getDecimalDigits());
     }
+    
+    public String getFlexNative() {
+        return TypeMap.findFlexNativeTypeString(getJavaNative());
+    }
 
     // for CSharp
     public String getJavaNativeRemovedCSharpNullable() {

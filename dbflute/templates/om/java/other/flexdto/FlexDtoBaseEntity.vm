@@ -1,0 +1,155 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName} {
+#set ($myClassName = "${myBaseObjectClassName}")
+
+import ${myExtendedEntityPackageName}.*;
+
+/**
+ * The flex DTO of ${table.basicInfoDispString}.
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * </pre>
+ * @author ${database.ClassAuthor}
+ */
+public class $myClassName {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($col in $table.columns)
+    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
+    private var _${col.uncapitalisedJavaName}:${col.flexNative};
+
+#end
+
+    // ===================================================================================
+    //                                                                       Foreign Table
+    //                                                                       =============
+#set ($foreignKeysIndex = 0)
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
+    /** The entity of foreign table. */
+    private var ${foreignVariableName}:${foreignEntityClassName};
+
+    /**
+     * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
+     * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
+     */
+    public function get ${foreignKeys.foreignJavaBeansRulePropertyName}():${foreignEntityClassName} {
+        return ${foreignVariableName};
+    }
+
+    /**
+     * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
+     */
+    public function set ${foreignKeys.foreignJavaBeansRulePropertyName}(${foreignKeys.foreignPropertyName}:${foreignEntityClassName}):void {
+        this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
+    }
+
+#end
+
+    // ===================================================================================
+    //                                                                      Referrer Table
+    //                                                                      ==============
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
+    /** The list of referrer table. */
+    protected java.util.List<${referrerEntityLongClassName}> $referrerVariableName;
+
+    /**
+     * Get the list of referrer table. {without lazy-load} <br />
+     * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     */
+    public java.util.List<${referrerEntityLongClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new java.util.ArrayList<${referrerEntityLongClassName}>(); }
+        return ${referrerVariableName};
+    }
+
+    /**
+     * Set the list of referrer table.
+     * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
+     */
+    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityLongClassName}> ${referrer.referrerPropertyName}) {
+        this.${referrerVariableName} = ${referrer.referrerPropertyName};
+    }
+
+#if (${referrer.isOneToOne()})
+    /**
+     * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazy-load} <br />
+     * @return The entity of referrer-as-one table. (Nullable: If it's not loaded yet, returns null.)
+     * @exception IllegalStateException When the size of the referrer table list is duplicate.
+     */
+    public ${referrerEntityLongClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        final java.util.List<${referrerEntityLongClassName}> ls = get${referrer.ReffererPropertyNameInitCap}();
+        if (ls == null || ls.isEmpty()) { return null; }
+        if (ls.size() > 1) {
+            String msg = "The size of the list must be one because this relation is 'one-to-one'";
+            msg = msg + ": list=" + ls + ": toString()=" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return (${referrerEntityLongClassName})ls.get(0);
+    }
+
+    /**
+     * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
+     * @param entity The entity of referrer-as-one table. (Nullable)
+     */
+    public void set${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityLongClassName} entity) {
+        if (entity == null) { ${referrerVariableName} = null; return; }
+        final java.util.List<${referrerEntityLongClassName}> ls = new java.util.ArrayList<${referrerEntityLongClassName}>();
+        ls.add(entity);
+        ${referrerVariableName} = ls;
+    }
+
+#end
+#end
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($col in $table.columns)
+    /**
+     * Get the value of ${col.uncapitalisedJavaName}. <br />
+     * {${col.columnDefinitionLineDisp}}
+     * @return The value of ${col.uncapitalisedJavaName}. (Nullable)
+     */
+    public function get ${col.uncapitalisedJavaName}():${col.flexNative} {
+        return _${col.uncapitalisedJavaName};
+    }
+
+    /**
+     * Set the value of ${col.uncapitalisedJavaName}. <br />
+     * {${col.columnDefinitionLineDisp}}
+     * @param ${col.uncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public function set ${col.uncapitalisedJavaName}(${col.uncapitalisedJavaName}:${col.javaNative}):void {
+        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+    }
+
+#end
+}
+
+}

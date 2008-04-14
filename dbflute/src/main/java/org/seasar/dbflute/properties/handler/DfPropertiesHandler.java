@@ -6,6 +6,7 @@ import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
+import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
@@ -265,6 +266,18 @@ public final class DfPropertiesHandler {
             _simpleDtoProperties = new DfSimpleDtoProperties(prop);
         }
         return _simpleDtoProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                              Flex DTO
+    //                                              --------
+    protected DfFlexDtoProperties _flexDtoProperties;
+    
+    public DfFlexDtoProperties getFlexDtoProperties(Properties prop) {
+        if (_flexDtoProperties == null) {
+            _flexDtoProperties = new DfFlexDtoProperties(prop);
+        }
+        return _flexDtoProperties;
     }
 
     // -----------------------------------------------------

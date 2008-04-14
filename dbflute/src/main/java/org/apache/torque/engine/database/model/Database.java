@@ -1271,8 +1271,8 @@ public class Database {
     }
     
     // ===================================================================================
-    //                                                                                 DTO
-    //                                                                                 ===
+    //                                                                          Simple DTO
+    //                                                                          ==========
     public boolean hasSimpleDtoDefinition() {
         return getProperties().getSimpleDtoProperties().hasSimpleDtoDefinition();
     }
@@ -1307,6 +1307,37 @@ public class Database {
     
     public boolean isSimpleDtoUseDtoMapper() {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
+    }
+    
+    // ===================================================================================
+    //                                                                          Simple DTO
+    //                                                                          ==========
+    public boolean hasFlexDtoDefinition() {
+        return getProperties().getFlexDtoProperties().hasFlexDtoDefinition();
+    }
+    
+    public String getFlexDtoBaseDtoPackage() {
+        return getProperties().getFlexDtoProperties().getBaseDtoPackage();
+    }
+    
+    public String getFlexDtoExtendedDtoPackage() {
+        return getProperties().getFlexDtoProperties().getExtendedDtoPackage();
+    }
+    
+    public String getFlexDtoBaseDtoPrefix() {
+        return getProperties().getFlexDtoProperties().getBaseDtoPrefix();
+    }
+    
+    public String getFlexDtoBaseDtoSuffix() {
+        return getProperties().getFlexDtoProperties().getBaseDtoSuffix();
+    }
+    
+    public String getFlexDtoExtendedDtoPrefix() {
+        return getProperties().getFlexDtoProperties().getExtendedDtoPrefix();
+    }
+    
+    public String getFlexDtoExtendedDtoSuffix() {
+        return getProperties().getFlexDtoProperties().getExtendedDtoSuffix();
     }
     
     // ===================================================================================
