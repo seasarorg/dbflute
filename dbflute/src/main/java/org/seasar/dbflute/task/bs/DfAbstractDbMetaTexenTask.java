@@ -63,47 +63,17 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     private String _targetPackage;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfAbstractDbMetaTexenTask() {
         _filesets = new ArrayList<FileSet>();
         _dataModels = new ArrayList<AppData>();
     }
 
-    public void setSqlDbMap(String sqldbmap) {
-        this._sqldbmap = project.resolveFile(sqldbmap).toString();
-    }
-
-    public String getSqlDbMap() {
-        return _sqldbmap;
-    }
-
-    public List<AppData> getDataModels() {
-        return _dataModels;
-    }
-
-    public Hashtable<String, String> getDataModelDbMap() {
-        return _dataModelDbMap;
-    }
-
-    public String getXmlFile() {
-        return _xmlFile;
-    }
-
-    public void setXmlFile(String xmlFile) {
-        this._xmlFile = project.resolveFile(xmlFile).toString();
-    }
-
-    public void addFileset(FileSet set) {
-        _filesets.add(set);
-    }
-
-    public String getTargetPackage() {
-        return _targetPackage;
-    }
-
-    public void setTargetPackage(String v) {
-        _targetPackage = v;
-    }
-
+    // ===================================================================================
+    //                                                                  Important Override
+    //                                                                  ==================
     public Context initControlContext() throws Exception {
         if (_xmlFile == null && _filesets.isEmpty()) {
             throw new BuildException("You must specify an XML schema or fileset of XML schemas!");
@@ -171,4 +141,44 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     protected void doExecute() {
         fireSuperExecute();
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setSqlDbMap(String sqldbmap) {
+        this._sqldbmap = project.resolveFile(sqldbmap).toString();
+    }
+
+    public String getSqlDbMap() {
+        return _sqldbmap;
+    }
+
+    public List<AppData> getDataModels() {
+        return _dataModels;
+    }
+
+    public Hashtable<String, String> getDataModelDbMap() {
+        return _dataModelDbMap;
+    }
+
+    public String getXmlFile() {
+        return _xmlFile;
+    }
+
+    public void setXmlFile(String xmlFile) {
+        this._xmlFile = project.resolveFile(xmlFile).toString();
+    }
+
+    public void addFileset(FileSet set) {
+        _filesets.add(set);
+    }
+
+    public String getTargetPackage() {
+        return _targetPackage;
+    }
+
+    public void setTargetPackage(String v) {
+        _targetPackage = v;
+    }
+
 }

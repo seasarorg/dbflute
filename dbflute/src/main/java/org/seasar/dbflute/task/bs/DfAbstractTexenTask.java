@@ -51,7 +51,6 @@ import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
  * The abstract class of texen task.
- * 
  * @author jflute
  */
 public abstract class DfAbstractTexenTask extends TexenTask {
@@ -237,7 +236,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             Context c = initControlContext();
             populateInitialContext(c);
             if (contextProperties != null) {
-                for (Iterator i = contextProperties.getKeys(); i.hasNext();) {
+                for (Iterator<?> i = contextProperties.getKeys(); i.hasNext();) {
                     String property = (String) i.next();
                     String value = contextProperties.getString(property);
                     try {
@@ -362,8 +361,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             // -------/
             super.setContextProperties(file);
             {
-                final Hashtable env = super.getProject().getProperties();
-                for (final Iterator ite = env.keySet().iterator(); ite.hasNext();) {
+                final Hashtable<?, ?> env = super.getProject().getProperties();
+                for (final Iterator<?> ite = env.keySet().iterator(); ite.hasNext();) {
                     final String key = (String) ite.next();
                     if (key.startsWith("torque.")) {
                         String newKey = key.substring("torque.".length());
