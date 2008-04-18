@@ -71,7 +71,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
             public String buildTruncateTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
-                sb.append("TRUNCATE TABLE ").append(metaInfo.getTableName());
+                sb.append("truncate table ").append(metaInfo.getTableName());
                 return sb.toString();
             }
         };
@@ -114,7 +114,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
                 final String localTableName = metaInfo.getLocalTableName();
                 final StringBuilder sb = new StringBuilder();
-                sb.append("ALTER TABLE ").append(localTableName).append(" DROP CONSTRAINT ").append(foreignKeyName);
+                sb.append("alter table ").append(localTableName).append(" drop constraint ").append(foreignKeyName);
                 return sb.toString();
             }
         };
@@ -164,10 +164,15 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
                 if (metaInfo.isTableTypeView()) {
-                    sb.append("DROP VIEW ").append(metaInfo.getTableName());
+                    sb.append("drop view ").append(metaInfo.getTableName());
                 } else {
-                    sb.append("DROP TABLE ").append(metaInfo.getTableName());
+                    sb.append("drop table ").append(metaInfo.getTableName());
                 }
+                return sb.toString();
+            }
+            public String buildDropMaterializedViewSql(DfTableMetaInfo metaInfo) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("drop materialized view ").append(metaInfo.getTableName());
                 return sb.toString();
             }
         };
@@ -176,6 +181,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected static interface DfDropTableByJdbcCallback {
         public String buildDropTableSql(DfTableMetaInfo metaInfo);
+        public String buildDropMaterializedViewSql(DfTableMetaInfo metaInfo);
     }
 
     protected void callbackDropTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
@@ -186,7 +192,19 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
                 _log.info(dropTableSql);
-                statement.execute(dropTableSql);
+                try {
+                    statement.execute(dropTableSql);
+                } catch (SQLException e) {
+                    // = = = = = = = = = = = =
+                    // for materialized view!
+                    // = = = = = = = = = = = =
+                    final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
+                    try {
+                        statement.execute(dropMaterializedViewSql);
+                    } catch (SQLException ignored) {
+                    }
+                    throw e;
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
