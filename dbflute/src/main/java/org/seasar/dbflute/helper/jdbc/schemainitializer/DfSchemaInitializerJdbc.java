@@ -202,6 +202,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     try {
                         statement.execute(dropMaterializedViewSql);
                     } catch (SQLException ignored) {
+                        _log.info(ignored.getMessage());
                     }
                     throw e;
                 }
