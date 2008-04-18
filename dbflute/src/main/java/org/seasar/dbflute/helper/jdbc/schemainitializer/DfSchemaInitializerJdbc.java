@@ -201,10 +201,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
                         statement.execute(dropMaterializedViewSql);
+                        _log.info("  --> " + dropTableSql);
                     } catch (SQLException ignored) {
                         _log.info(ignored.getMessage());
+                        throw e;
                     }
-                    throw e;
                 }
             }
         } catch (SQLException e) {
