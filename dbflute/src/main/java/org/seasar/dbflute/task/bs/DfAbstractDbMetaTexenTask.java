@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     protected String _sqldbmap;
 
-    private String _basePathToDbProps;
-
     private String _targetPackage;
 
     public DfAbstractDbMetaTexenTask() {
@@ -78,11 +76,11 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
         return _sqldbmap;
     }
 
-    public List getDataModels() {
+    public List<AppData> getDataModels() {
         return _dataModels;
     }
 
-    public Hashtable getDataModelDbMap() {
+    public Hashtable<String, String> getDataModelDbMap() {
         return _dataModelDbMap;
     }
 
@@ -104,14 +102,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     public void setTargetPackage(String v) {
         _targetPackage = v;
-    }
-
-    public String getBasePathToDbProps() {
-        return _basePathToDbProps;
-    }
-
-    public void setBasePathToDbProps(String v) {
-        _basePathToDbProps = v;
     }
 
     public Context initControlContext() throws Exception {
@@ -160,7 +150,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     protected XmlToAppData newInstanceXmlToAppData() {
-        return new XmlToAppData(getTargetDatabase(), getTargetPackage(), getBasePathToDbProps());
+        return new XmlToAppData(getTargetDatabase(), getTargetPackage());
     }
 
     protected String grokName(String xmlFile) {

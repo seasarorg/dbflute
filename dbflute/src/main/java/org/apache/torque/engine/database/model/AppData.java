@@ -54,8 +54,6 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,21 +62,18 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.xml.sax.Attributes;
 
 /**
- * A class for holding application data structures.
- *
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class AppData {
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(AppData.class);
-
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /**
      * The list of databases for this application.
      */
@@ -95,11 +90,6 @@ public class AppData {
     private String _databaseType;
 
     /**
-     * The base of the path to the properties file, including trailing slash.
-     */
-    private String _basePropsFilePath;
-
-    /**
      * Name of the database. Only one database definition
      * is allowed in one XML descriptor.
      */
@@ -108,63 +98,66 @@ public class AppData {
     // flag to complete initialization only once.
     private boolean _isInitialized;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Creates a new instance for the specified database type.
-     *
-     * @param databaseType The default type for any databases added to
-     * this application model.
-     * @param basePropsFilePath The base of the path to the properties
-     * file, including trailing slash.
+     * @param databaseType The default type for any databases added to this application model. file, including trailing slash.
      */
-    public AppData(String databaseType, String basePropsFilePath) {
-        this._basePropsFilePath = basePropsFilePath;
+    public AppData(String databaseType) {
         this._databaseType = databaseType;
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Each database has its own list of idiosyncrasies which can be
      * configured by editting its <code>db.props</code> file.
-     *
-     * @param databaseType The type of database to retrieve the
-     * properties of.
+     * @param databaseType The type of database to retrieve the properties of.
      * @return The idiosyncrasies of <code>databaseType</code>.
      * @exception EngineException Couldn't locate properties file.
      */
     protected Properties getIdiosyncrasies(String databaseType) throws EngineException {
         Properties idiosyncrasies = (Properties) _idiosyncrasyTable.get(databaseType);
 
+        // - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Comment out because of deleting _basePropsFilePath.
+        // - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // 
         // If we haven't yet loaded the properties and we have the
         // information to do so, proceed with loading.
-        if (idiosyncrasies == null && _basePropsFilePath != null && databaseType != null) {
-            idiosyncrasies = new Properties();
-            File propsFile = new File(_basePropsFilePath + databaseType, "db.props");
-            if (propsFile.exists()) {
-                try {
-                    idiosyncrasies.load(new FileInputStream(propsFile));
-                } catch (Exception e) {
-                    _log.error(e, e);
-                }
-                _idiosyncrasyTable.put(databaseType, idiosyncrasies);
-            } else {
-                try {
-                    String path = '/' + _basePropsFilePath + databaseType + "/db.props";
-                    idiosyncrasies.load(getClass().getResourceAsStream(path));
-                } catch (Exception e) {
-                    _log.error(e, e);
-                }
-            }
-
-            if (idiosyncrasies.isEmpty()) {
-                throw new EngineException("Database-specific properties " + "file does not exist: "
-                        + propsFile.getAbsolutePath());
-            }
-        }
+        //        if (idiosyncrasies == null && _basePropsFilePath != null && databaseType != null) {
+        //            idiosyncrasies = new Properties();
+        //            File propsFile = new File(_basePropsFilePath + databaseType, "db.props");
+        //            if (propsFile.exists()) {
+        //                try {
+        //                    idiosyncrasies.load(new FileInputStream(propsFile));
+        //                } catch (Exception e) {
+        //                    _log.error(e, e);
+        //                }
+        //                _idiosyncrasyTable.put(databaseType, idiosyncrasies);
+        //            } else {
+        //                try {
+        //                    String path = '/' + _basePropsFilePath + databaseType + "/db.props";
+        //                    idiosyncrasies.load(getClass().getResourceAsStream(path));
+        //                } catch (Exception e) {
+        //                    _log.error(e, e);
+        //                }
+        //            }
+        //
+        //            if (idiosyncrasies.isEmpty()) {
+        //                throw new EngineException("Database-specific properties " + "file does not exist: "
+        //                        + propsFile.getAbsolutePath());
+        //            }
+        //        }
+        
         return idiosyncrasies;
     }
 
     /**
      * Set the name of the database.
-     *
      * @param name of the database.
      */
     public void setName(String name) {
@@ -173,7 +166,6 @@ public class AppData {
 
     /**
      * Get the name of the database.
-     *
      * @return String name
      */
     public String getName() {
@@ -182,7 +174,6 @@ public class AppData {
 
     /**
      * Get the short name of the database (without the '-schema' postfix).
-     *
      * @return String name
      */
     public String getShortName() {
@@ -191,7 +182,6 @@ public class AppData {
 
     /**
      * Get database object.
-     *
      * @return Database database
      */
     public Database getDatabase() throws EngineException {
@@ -201,7 +191,6 @@ public class AppData {
 
     /**
      * Return an array of all databases
-     *
      * @return Array of Database objects
      */
     public Database[] getDatabases() throws EngineException {
@@ -216,7 +205,6 @@ public class AppData {
 
     /**
      * Returns whether this application has multiple databases.
-     *
      * @return true if the application has multiple databases
      */
     public boolean hasMultipleDatabases() {
@@ -225,13 +213,12 @@ public class AppData {
 
     /**
      * Return the database with the specified name.
-     *
      * @param name database name
      * @return A Database object.  If it does not exist it returns null
      */
     public Database getDatabase(String name) throws EngineException {
         doFinalInitialization();
-        for (Iterator i = _dbList.iterator(); i.hasNext();) {
+        for (Iterator<Database> i = _dbList.iterator(); i.hasNext();) {
             Database db = (Database) i.next();
             if (db.getName().equals(name)) {
                 return db;
@@ -242,7 +229,6 @@ public class AppData {
 
     /**
      * An utility method to add a new database from an xml attribute.
-     *
      * @param attrib the xml attributes
      * @return the database
      */
@@ -254,9 +240,7 @@ public class AppData {
     }
 
     /**
-     * Add a database to the list and sets the AppData property to this
-     * AppData
-     *
+     * Add a database to the list and sets the AppData property to this AppData
      * @param db the database to add
      */
     public void addDatabase(Database db) {
@@ -273,7 +257,7 @@ public class AppData {
 
     private void doFinalInitialization() throws EngineException {
         if (!_isInitialized) {
-            Iterator dbs = _dbList.iterator();
+            Iterator<Database> dbs = _dbList.iterator();
             while (dbs.hasNext()) {
                 ((Database) dbs.next()).doFinalInitialization();
             }
@@ -281,10 +265,12 @@ public class AppData {
         }
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
-     * Creats a string representation of this AppData.
+     * Creates a string representation of this AppData.
      * The representation is given in xml format.
-     *
      * @return representation in xml format
      */
     public String toString() {
@@ -293,7 +279,7 @@ public class AppData {
         result.append("<?xml version=\"1.0\"?>\n");
         result.append("<!DOCTYPE database SYSTEM \"" + DTDResolver.WEB_SITE_DTD + "\">\n");
         result.append("<!-- Autogenerated by SQLToXMLSchema! -->\n");
-        for (Iterator i = _dbList.iterator(); i.hasNext();) {
+        for (Iterator<Database> i = _dbList.iterator(); i.hasNext();) {
             result.append(i.next());
         }
         return result.toString();

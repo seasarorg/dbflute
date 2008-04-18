@@ -77,20 +77,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * A Class that is used to parse an input xml schema file and creates an AppData
- * java structure.
- *
- * @author <a href="mailto:leon@opticode.co.za">Leon Messerschmidt</a>
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:mpoeschl@marmot.at">Martin Poeschl</a>
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @version $Id$
+ * A Class that is used to parse an input xml schema file and creates an AppData java structure.
+ * @author Modified by jflute
  */
 public class XmlToAppData extends DefaultHandler {
 
-    // Comment out!
-    /** Logging class from commons.logging */
-    //    private static Log log = LogFactory.getLog(XmlToAppData.class);
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private AppData app;
     private Database currDB;
     private Table currTable;
@@ -118,24 +112,27 @@ public class XmlToAppData extends DefaultHandler {
         saxFactory.setValidating(true);
     }
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Creates a new instance for the specified database type.
-     *
      * @param databaseType The type of database for the application.
      * @param defaultPackage the default java package used for the om
-     * @param basePropsFilePath The base of the path to the properties
      * file, including trailing slash.
      */
-    public XmlToAppData(String databaseType, String defaultPackage, String basePropsFilePath) {
-        app = new AppData(databaseType, basePropsFilePath);
+    public XmlToAppData(String databaseType, String defaultPackage) {
+        app = new AppData(databaseType);
         this.defaultPackage = defaultPackage;
         firstPass = true;
     }
 
+    // ===================================================================================
+    //                                                                               Parse
+    //                                                                               =====
     /**
      * Parses a XML input file and returns a newly created and
      * populated AppData structure.
-     *
      * @param xmlFile The input file to parse.
      * @return AppData populated by <code>xmlFile</code>.
      */
@@ -270,7 +267,6 @@ public class XmlToAppData extends DefaultHandler {
 
     /**
      * Handles closing elements of the xml file.
-     *
      * @param uri
      * @param localName The local name (without prefix), or the empty string if
      *         Namespace processing is not being performed.
@@ -295,7 +291,6 @@ public class XmlToAppData extends DefaultHandler {
         private boolean firstPass;
 
         /**
-         *
          * @param parser
          */
         public ParseStackElement(XmlToAppData parser) {
@@ -311,7 +306,6 @@ public class XmlToAppData extends DefaultHandler {
 
         /**
          * Removes the top element from the stack and activates the stored state
-         *
          * @param parser
          */
         public static void popState(XmlToAppData parser) {
@@ -328,7 +322,6 @@ public class XmlToAppData extends DefaultHandler {
 
         /**
          * Stores the current state on the top of the stack.
-         *
          * @param parser
          */
         public static void pushState(XmlToAppData parser) {

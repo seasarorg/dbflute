@@ -78,10 +78,6 @@
     classpathref="torque-classpath"
     classname="org.apache.torque.task.PackageAsPathTask"/>
   <taskdef
-    name="torque-sql"
-    classpathref="torque-classpath"
-    classname="org.apache.torque.task.TorqueSQLTask"/>
-  <taskdef
     name="torque-replace-schema"
     classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
@@ -136,74 +132,6 @@
     <condition property="torque.internal.runOnlyOnSchemaChange">
       <equals arg1="${torque.runOnlyOnSchemaChange}" arg2="true"/>
     </condition>
-  </target>
-
-  <!-- ================================================================ -->
-  <!-- G E N E R A T E  P R O J E C T  S Q L                            -->
-  <!-- ================================================================ -->
-  <!-- Generate the SQL for your project, These are in addition         -->
-  <!-- to the base Torque tables! The tables you require for your       -->
-  <!-- project should be specified in project-schema.xml.               -->
-  <!-- ================================================================ -->
-
-  <target name="sql-check" depends="check-run-only-on-schema-change" if="torque.internal.runOnlyOnSchemaChange">
-    <uptodate
-      property="torque.internal.sql.uptodate"
-      targetfile="${torque.sql.dir}/${torque.project}-schema.sql">
-      <srcfiles dir="${torque.schema.dir}" includes="**/*-schema.xml" />
-    </uptodate>
-  </target>
-
-  <target name="sql" depends="check-use-classpath, sql-check"
-    unless="torque.internal.sql.uptodate"
-    description="==> generates the SQL for your project">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Generating SQL for YOUR Torque project!  |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
-
-    <antcall target="sql-classpath"/>
-    <antcall target="sql-template"/>
-  </target>
-
-  <target name="sql-classpath" if="torque.internal.useClasspath">
-    <echo message="loading templates from classpath"/>
-    <torque-sql
-      basePathToDbProps="sql/base/"
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.sql}"
-      idTableXMLFile="${torque.idTableXMLFile}"
-      outputDirectory="${torque.sql.dir}"
-      outputFile="report.${torque.project}.sql.generation"
-      sqldbmap="${torque.sql.dir}/sqldb.map"
-      targetDatabase="${torque.database}"
-      useClasspath="${torque.useClasspath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.sql.includes}"
-        excludes="${torque.schema.sql.excludes}"
-      />
-    </torque-sql>
-  </target>
-
-  <target name="sql-template" unless="torque.internal.useClasspath">
-    <echo message="loading templates from ${torque.templatePath}"/>
-    <torque-sql
-      basePathToDbProps="sql/base/"
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.sql}"
-      idTableXMLFile="${torque.idTableXMLFile}"
-      outputDirectory="${torque.sql.dir}"
-      outputFile="report.${torque.project}.sql.generation"
-      sqldbmap="${torque.sql.dir}/sqldb.map"
-      targetDatabase="${torque.database}"
-      templatePath="${torque.templatePath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.sql.includes}"
-        excludes="${torque.schema.sql.excludes}"
-      />
-    </torque-sql>
   </target>
 
   <!-- **************************************************************************************************** -->

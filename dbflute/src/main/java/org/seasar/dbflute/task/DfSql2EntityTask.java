@@ -580,7 +580,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("");
         }
         final String databaseType = getBasicProperties().getDatabaseName();
-        final AppData appData = new AppData(databaseType, null);
+        final AppData appData = new AppData(databaseType);
         appData.addDatabase(db);
 
         VelocityContext context = createVelocityContext(appData);
