@@ -21,7 +21,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * The handler of auto increment. 

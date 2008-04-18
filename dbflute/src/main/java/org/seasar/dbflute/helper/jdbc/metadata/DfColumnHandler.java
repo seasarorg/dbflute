@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * @author jflute

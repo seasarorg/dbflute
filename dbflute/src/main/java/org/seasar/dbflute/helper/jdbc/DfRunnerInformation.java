@@ -1,6 +1,10 @@
 package org.seasar.dbflute.helper.jdbc;
 
 public class DfRunnerInformation {
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _driver;
     protected String _url;
     protected String _user;
@@ -11,6 +15,9 @@ public class DfRunnerInformation {
     protected boolean _isAutoCommit;
     protected boolean _isRollbackOnly;
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getDriver() {
         return _driver;
     }

@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC meta data.
@@ -147,100 +148,5 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      */
     protected boolean isOracle() {
         return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
-    }
-
-    public static class DfTableMetaInfo {
-
-        protected String _tableName;
-
-        protected String _tableType;
-
-        protected String _tableSchema;
-
-        protected String _tableComment;
-
-        protected boolean _existSameNameTable;
-
-        public boolean isTableTypeView() {
-            return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
-        }
-
-        public String selectRealSchemaName(String schemaName) {
-            if (isExistSameNameTable()) {
-                return _tableSchema;
-            } else {
-                return schemaName;
-            }
-        }
-
-        public String buildTableNameWithSchema() {
-            if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-                return _tableSchema + "." + _tableName;
-            } else {
-                return _tableName;
-            }
-        }
-
-        public String getTableName() {
-            return _tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this._tableName = tableName;
-        }
-
-        public String getTableType() {
-            return _tableType;
-        }
-
-        public void setTableType(String tableType) {
-            this._tableType = tableType;
-        }
-
-        public String getTableSchema() {
-            return _tableSchema;
-        }
-
-        public void setTableSchema(String tableSchema) {
-            this._tableSchema = tableSchema;
-        }
-
-        public String getTableComment() {
-            return _tableComment;
-        }
-
-        public void setTableComment(String tableComment) {
-            this._tableComment = tableComment;
-        }
-
-        public boolean isExistSameNameTable() {
-            return _existSameNameTable;
-        }
-
-        public void setExistSameNameTable(boolean existSameNameTable) {
-            this._existSameNameTable = existSameNameTable;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj != null && obj instanceof DfTableMetaInfo) {
-                return getTableName().equals(((DfTableMetaInfo) obj).getTableName());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return getTableName().hashCode();
-        }
-
-        @Override
-        public String toString() {
-            if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-                return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
-            } else {
-                return _tableName + "(" + _tableType + "): " + _tableComment;
-            }
-        }
     }
 }

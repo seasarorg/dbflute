@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * The schema initializer with JDBC.
@@ -163,7 +163,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfDropTableByJdbcCallback callback = new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
-                sb.append("DROP TABLE ").append(metaInfo.getTableName());
+                if (metaInfo.isTableTypeView()) {
+                    sb.append("DROP VIEW ").append(metaInfo.getTableName());
+                } else {
+                    sb.append("DROP TABLE ").append(metaInfo.getTableName());
+                }
                 return sb.toString();
             }
         };

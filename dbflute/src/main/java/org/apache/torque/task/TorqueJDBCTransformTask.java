@@ -84,7 +84,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
