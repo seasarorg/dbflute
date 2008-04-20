@@ -88,7 +88,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 					if (_resultSet.getRow() >= skipStartIndex) {
 					    break;
 					}
-					if (_resultSet.next()) {
+					if (!_resultSet.next()) {
 					    _skipToCursorEnd = true;// [DBFLUTE-243]
 					    break;
 					}
