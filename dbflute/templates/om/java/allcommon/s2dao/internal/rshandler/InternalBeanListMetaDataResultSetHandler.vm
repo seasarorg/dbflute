@@ -112,12 +112,10 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
             ValueType valueType = null;
             String columnName = rpt.getMyKey(i);
             if (columnNames.contains(columnName)) {
-                PropertyType pt = getBeanMetaData()
-                        .getPropertyTypeByColumnName(columnName);
+                PropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
                 valueType = pt.getValueType();
             } else {
-                PropertyType pt = bmd.getPropertyTypeByColumnName(rpt
-                        .getYourKey(i));
+                PropertyType pt = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
                 columnName = pt.getColumnName() + "_" + rpt.getRelationNo();
                 if (columnNames.contains(columnName)) {
                     valueType = pt.getValueType();

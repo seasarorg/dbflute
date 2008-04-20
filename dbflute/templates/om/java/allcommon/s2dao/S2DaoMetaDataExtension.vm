@@ -21,6 +21,7 @@ import org.seasar.dao.BeanMetaDataFactory;
 
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
+import org.seasar.dao.RowCreator;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
 import org.seasar.dao.impl.BeanMetaDataImpl;
@@ -696,7 +697,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 //        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
 //            return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();
 //        }
-//        return new org.seasar.dao.impl.BeanMetaDataResultSetHandler(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
+//        return new org.seasar.dao.impl.BeanMetaDataResultSetHandler(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
 //    }
 
     /**
@@ -710,7 +711,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
             return new InternalObjectListResultSetHandler(valueType);
         }
-        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
+        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
     }
 
     protected class InternalObjectListResultSetHandler implements ResultSetHandler {
@@ -924,7 +925,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
 
         @Override
-        protected org.seasar.dao.RowCreator createRowCreator() {// [DAO-118] (2007/08/25)
+        protected RowCreator createRowCreator() {// [DAO-118] (2007/08/25)
             return new RowCreatorExtension();
         }
 

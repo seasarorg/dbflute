@@ -10,7 +10,6 @@ import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 
 /**
  * The wrapper of fetch-narrowing result-set.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
@@ -19,29 +18,31 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     //                                                                           Attribute
     //                                                                           =========
     /** The real result set. (NotNull) */
-    private ResultSet _resultSet;
+    protected ResultSet _resultSet;
 
     /** The bean of fetch narrowing. (NotNull) */
-    private ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
+    protected ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
 
     /** The counter of fetch. */
-    private long _fetchCounter;
+    protected long _fetchCounter;
 
     /** the counter of request. */
-    private long _requestCounter;
+    protected long _requestCounter;
 
     /** Does it offset by cursor forcedly? */
-    private boolean _offsetByCursorForcedly;
+    protected boolean _offsetByCursorForcedly;
 
     /** Does it limit by cursor forcedly? */
-    private boolean _limitByCursorForcedly;
+    protected boolean _limitByCursorForcedly;
+	
+	/** Does it skip to cursor end? */
+	protected boolean _skipToCursorEnd;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param resultSet Original result set. (NotNull)
      * @param fetchNarrowingBean FetchNarrowing-bean. (NotNull)
      * @param offsetByCursorForcedly Offset by cursor forcedly.
@@ -83,7 +84,14 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
             }
         } else {
             try {
-                while (_resultSet.getRow() < skipStartIndex && _resultSet.next()) {
+                while (true) {
+					if (_resultSet.getRow() >= skipStartIndex) {
+					    break;
+					}
+					if (_resultSet.next()) {
+					    _skipToCursorEnd = true;// [DBFLUTE-243]
+					    break;
+					}
                     ++_fetchCounter;
                 }
             } catch (SQLException e) {
@@ -110,11 +118,15 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     //                                                                                ====
     /**
      * Next.
-     * 
      * @return Does the result set have next record?
      * @throws SQLException
      */
     public boolean next() throws SQLException {
+#if ($database.isDatabaseDB2())
+	    if (_skipToCursorEnd) {// [DBFLUTE-243]
+		    return false;
+		}
+#end
         final boolean hasNext = super.next();
         ++_requestCounter;
         if (!isAvailableLimitLoopCount()) {
@@ -177,7 +189,6 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 
     /**
      * Get safety max result size.
-     * 
      * @return Safety max result size.
      */
     public int getSafetyMaxResultSize() {
@@ -186,7 +197,6 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 
     /**
      * Is cursor used?
-     * 
      * @return Determination.
      */
     protected boolean isCursorUsed() {
@@ -195,7 +205,6 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 
     /**
      * Is cursor supported?
-     * 
      * @param resultSet ResultSet
      * @return Determation.
      */
@@ -217,4 +226,8 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     public boolean isLimitByCursorForcedly() {
         return _limitByCursorForcedly;
     }
+	
+	public boolean isSkipToCursorEnd() {
+	    return _skipToCursorEnd;
+	}
 }
