@@ -57,6 +57,8 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
+import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
@@ -699,7 +701,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     /**
      * Create the handler of result set of specified outside-sql for the list of customize bean.
-     * 
      * @param specifiedBeanMetaData Specified bean meta data. (NotNull)
      * @param customizeEntityType The type of customize entity. (NotNull)
      * @return The handler of result set. (NotNull)
@@ -709,7 +710,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
             return new InternalObjectListResultSetHandler(valueType);
         }
-        return new org.seasar.dao.impl.BeanListMetaDataResultSetHandler(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
+        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
     }
 
     protected class InternalObjectListResultSetHandler implements ResultSetHandler {
@@ -931,6 +932,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
+		
+        @Override
+    	protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData beanMetaData) {
+    		return new ${glInternalBeanListMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+    	}
+		
+        @Override
+    	protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData beanMetaData) {
+    		return new ${glInternalBeanArrayMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+    	}
     }
 
     // ===================================================================================
