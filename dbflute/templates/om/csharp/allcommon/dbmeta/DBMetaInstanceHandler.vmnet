@@ -102,7 +102,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             if (dotLastIndex >= 0) {
                 try {
                     return FindDBMeta(tableFlexibleName.Substring(dotLastIndex + 1));
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException) {
                     // Nothing
                 }
             }
