@@ -27,6 +27,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
+		[System.Obsolete("Use the method 'SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb)'")]
         public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
             IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
             if (ls.Count == 0) {
@@ -38,9 +39,35 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             }
             return ls[0];
         }
+		
+        public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb) {
+            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
+            if (ls.Count == 0) {
+                return default(ENTITY);
+            }
+            if (ls.Count > 1) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+            }
+            return ls[0];
+        }
 
+		[System.Obsolete("Use the method 'SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb)'")]
         public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
             IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
+            if (ls == null || ls.Count == 0) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityAlreadyDeletedException(searchKey4Log);
+            }
+            if (ls.Count > 1) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+            }
+            return ls[0];
+        }
+
+        public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb) {
+            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
             if (ls == null || ls.Count == 0) {
                 String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
                 ThrowEntityAlreadyDeletedException(searchKey4Log);

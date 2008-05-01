@@ -55,8 +55,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
+		[System.Obsolete("Use the method 'SelectList<ENTITY>(String path, Object pmb)'")]
         public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb, Type entityType) {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), entityType);
+        }
+		
+        public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
+            return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
         }
 
         // ===============================================================================
