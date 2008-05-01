@@ -22,7 +22,7 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
 	protected ${glStatementConfig} _defaultStatementConfig;
-	protected boolean _conditionBeanFormatSql;
+	protected boolean _conditionBeanFormatSql = true;
 	protected boolean _internalDebug;
 	protected boolean _locked = true;
 	

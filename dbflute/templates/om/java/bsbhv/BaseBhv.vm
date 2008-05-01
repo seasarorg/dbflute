@@ -345,8 +345,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+#if ($table.hasOptimisticLock())
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+#else
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+#end
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -384,8 +387,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+#if ($table.hasOptimisticLock())
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+#else
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+#end
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -429,8 +435,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+#if ($table.hasOptimisticLock())
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+#else
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+#end
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -498,19 +507,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entities has already been updated.
+#if ($table.hasOptimisticLock())
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+#else
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+#end
      */
     public ${batchUpdateReturnType} batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
 
     /**
      * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
     public ${batchUpdateReturnType} batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
@@ -523,19 +537,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entities has already been updated.
+#if ($table.hasOptimisticLock())
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+#else
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+#end
      */
     public ${batchUpdateReturnType} batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
 
     /**
      * Batch delete the list non-strictly. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
     public ${batchUpdateReturnType} batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});

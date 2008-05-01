@@ -1,5 +1,10 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
+import ${myExtendedEntityPackageName}.${foreignEntityClassName};
+#end
 
 /**
  * The simple DTO of ${table.basicInfoDispString}.
@@ -63,7 +68,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
      * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
      */
-    public ${myExtendedEntityPackageName}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
@@ -71,7 +76,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
+    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
         this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
     }
 

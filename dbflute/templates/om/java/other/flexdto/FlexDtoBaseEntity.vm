@@ -43,7 +43,6 @@ public class $myClassName {
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
@@ -75,16 +74,16 @@ public class $myClassName {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-#set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
+#set ($referrerEntityLongClassName = "${referrerEntityClassName}")
     /** The list of referrer table. */
-    protected java.util.List<${referrerEntityLongClassName}> $referrerVariableName;
+    protected List<${referrerEntityLongClassName}> $referrerVariableName;
 
     /**
      * Get the list of referrer table. {without lazy-load} <br />
      * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public java.util.List<${referrerEntityLongClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new java.util.ArrayList<${referrerEntityLongClassName}>(); }
+    public function get ${referrer.refererJavaBeansRulePropertyName}():List<${referrerEntityLongClassName}> {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityLongClassName}>(); }
         return ${referrerVariableName};
     }
 
@@ -92,7 +91,7 @@ public class $myClassName {
      * Set the list of referrer table.
      * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityLongClassName}> ${referrer.referrerPropertyName}) {
+    public function set ${referrer.refererJavaBeansRulePropertyName}(${referrer.referrerPropertyName}:List<${referrerEntityLongClassName}>):void {
         this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
@@ -102,13 +101,13 @@ public class $myClassName {
      * @return The entity of referrer-as-one table. (Nullable: If it's not loaded yet, returns null.)
      * @exception IllegalStateException When the size of the referrer table list is duplicate.
      */
-    public ${referrerEntityLongClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        final java.util.List<${referrerEntityLongClassName}> ls = get${referrer.ReffererPropertyNameInitCap}();
+    public function get ${referrer.refererJavaBeansRulePropertyNameAsOne}():${referrerEntityLongClassName} {
+        List<${referrerEntityLongClassName}> ls = get${referrer.reffererPropertyNameInitCap}();
         if (ls == null || ls.isEmpty()) { return null; }
         if (ls.size() > 1) {
             String msg = "The size of the list must be one because this relation is 'one-to-one'";
             msg = msg + ": list=" + ls + ": toString()=" + toString();
-            throw new IllegalStateException(msg);
+            throw new Exception(msg);
         }
         return (${referrerEntityLongClassName})ls.get(0);
     }
@@ -117,9 +116,9 @@ public class $myClassName {
      * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
      * @param entity The entity of referrer-as-one table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityLongClassName} entity) {
+    public function set ${referrer.refererJavaBeansRulePropertyNameAsOne}(entity:${referrerEntityLongClassName}):void {
         if (entity == null) { ${referrerVariableName} = null; return; }
-        final java.util.List<${referrerEntityLongClassName}> ls = new java.util.ArrayList<${referrerEntityLongClassName}>();
+        List<${referrerEntityLongClassName}> ls = new List<${referrerEntityLongClassName}>();
         ls.add(entity);
         ${referrerVariableName} = ls;
     }
