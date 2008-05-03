@@ -410,9 +410,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.warn("SQL for sql2entity was Not Found!");
             _log.warn("- - - - - - - - - -");
-            _log.warn("{Found SQL Files}");
+            _log.warn("Found SQL Files: " + sqlFileList.size());
+            int index = 0;
             for (File file : sqlFileList) {
-                _log.warn("  " + file);
+                index++;
+                _log.warn("  " + index + " -- " + file);
             }
             _log.warn("* * * * * * * * * */");
         }
