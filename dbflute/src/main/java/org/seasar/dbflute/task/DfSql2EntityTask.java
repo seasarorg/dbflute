@@ -416,16 +416,18 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void handleNotFoundResult(List<File> sqlFileList) {
         if (_entityInfoMap.isEmpty() && _pmbMetaDataMap.isEmpty()) {
+            _log.warn(" ");
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.warn("SQL for sql2entity was Not Found!");
             _log.warn("- - - - - - - - - -");
-            _log.warn("Found SQL Files: " + sqlFileList.size());
+            _log.warn("SQL Files: " + sqlFileList.size());
             int index = 0;
             for (File file : sqlFileList) {
                 index++;
                 _log.warn("  " + index + " -- " + file);
             }
             _log.warn("* * * * * * * * * */");
+            _log.warn(" ");
         }
     }
 
@@ -443,9 +445,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append("[" + name + "]");
             sb.append(exceptionInfo);
         }
+        _log.warn(" ");
         _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
         _log.warn(sb.toString());
         _log.warn("* * * * * * * * * */");
+        _log.warn(" ");
     }
 
     // ===================================================================================
