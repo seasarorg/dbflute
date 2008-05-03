@@ -134,7 +134,7 @@ public class Table implements IDMethod {
     private String _pkg;
 
     protected DfFlexibleNameMap<String, Column> _columnMap = new DfFlexibleNameMap<String, Column>();
-    
+
     private boolean _isNeedsTransactionInPostgres;
 
     private boolean _isHeavyIndexing;
@@ -1072,11 +1072,15 @@ public class Table implements IDMethod {
     public String getForeignTableNameCommaString() {
         final StringBuffer sb = new StringBuffer();
 
-        final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
+        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final int size = foreignKeyList.size();
         for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
+            final ForeignKey fk = foreignKeyList.get(i);
             sb.append(", ").append(fk.getForeignTableName());
+        }
+        final List<ForeignKey> referrerList = _referrers;
+        for (ForeignKey fk : referrerList) {
+            sb.append(", ").append(fk.getTable().getName());
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -1090,11 +1094,16 @@ public class Table implements IDMethod {
     public String getForeignTableNameCommaStringWithHtmlHref() {
         final StringBuffer sb = new StringBuffer();
 
-        final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
+        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final int size = foreignKeyList.size();
         for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
+            final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+        }
+        final List<ForeignKey> referrerList = _referrers;
+        for (ForeignKey fk : referrerList) {
+            final String name = fk.getTable().getName();
             sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
@@ -1110,10 +1119,14 @@ public class Table implements IDMethod {
         final StringBuffer sb = new StringBuffer();
 
         final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
+        final int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
             sb.append(", ").append(fk.getForeignPropertyName());
+        }
+        final List<ForeignKey> referrerList = _referrers;
+        for (ForeignKey fk : referrerList) {
+            sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -1198,7 +1211,7 @@ public class Table implements IDMethod {
         }
         return false;
     }
-    
+
     protected boolean isSameTableAsFlexible(String tableOne, String tableTwo) {
         if (tableOne.equalsIgnoreCase(tableTwo)) {
             return true;
@@ -1505,68 +1518,51 @@ public class Table implements IDMethod {
      */
     public String getReferrerTableNameCommaString() {
         final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getReferrers();
+        final List<ForeignKey> ls = getReferrerList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getTable().getName());
+            if (!fk.isOneToOne()) {
+                sb.append(", ").append(fk.getTable().getName());
+            }
         }
         sb.delete(0, ", ".length());
         return sb.toString();
     }
 
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Refferer table-name comma string.
-     */
     public String getReferrerTableNameCommaStringWithHtmlHref() {
         final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getReferrers();
+        final List<ForeignKey> ls = getReferrerList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
             final String name = fk.getTable().getName();
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            if (!fk.isOneToOne()) {
+                sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            }
         }
         sb.delete(0, ", ".length());
         return sb.toString();
     }
 
-    /**
-     * Returns an comma string containing all the foreign property name.
-     * 
-     * @return Refferer property comma string.
-     */
     public String getReferrerPropertyNameCommaString() {
         final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getRefererList();
+        final List<ForeignKey> ls = getReferrerList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getRefererPropertyName());
+            if (!fk.isOneToOne()) {
+                sb.append(", ").append(fk.getReferrerPropertyName());
+            }
         }
         sb.delete(0, ", ".length());
         return sb.toString();
     }
 
-    /**
-     * Set whether this table contains a foreign PK
-     *
-     * @param b
-     */
     public void setContainsForeignPK(boolean b) {
         _containsForeignPK = b;
     }
 
-    /**
-     * Determine if this table contains a foreign PK
-     * 
-     * @return Determination.
-     */
     public boolean getContainsForeignPK() {
         return _containsForeignPK;
     }
@@ -2130,7 +2126,7 @@ public class Table implements IDMethod {
         final Column primaryKeyAsOne = getPrimaryKeyAsOne();
         return getPropertyNameResolvedLanguage(primaryKeyAsOne);
     }
-    
+
     protected String getPropertyNameResolvedLanguage(Column col) {
         if (getProperties().getBasicProperties().isTargetLanguageJava()) {
             return col.getJavaBeansRulePropertyName();
@@ -2169,12 +2165,12 @@ public class Table implements IDMethod {
         final Column column = getIdentityColumn();
         return column != null ? column.getName() : null;
     }
-    
+
     public String getIdentityPropertyName() {
         final Column column = getIdentityColumn();
         return column != null ? getPropertyNameResolvedLanguage(column) : null;
     }
-    
+
     protected Column getIdentityColumn() {
         if (!isUseIdentity()) {
             return null;
@@ -2258,7 +2254,7 @@ public class Table implements IDMethod {
             return null;
         }
     }
-    
+
     public String getUpdateDateColumnName() {
         final Column column = getUpdateDateColumn();
         if (column == null) {
@@ -2266,7 +2262,7 @@ public class Table implements IDMethod {
         }
         return column.getName();
     }
-    
+
     public String getUpdateDateJavaName() {
         final Column column = getUpdateDateColumn();
         if (column == null) {
@@ -2278,7 +2274,7 @@ public class Table implements IDMethod {
     public String getUpdateDateUncapitalisedJavaName() {
         return StringUtils.uncapitalise(getUpdateDateJavaName());
     }
-    
+
     public String getUpdateDatePropertyName() {
         final Column column = getUpdateDateColumn();
         if (column == null) {
@@ -2336,7 +2332,7 @@ public class Table implements IDMethod {
             return getColumn(versionNoColumnName);
         }
     }
-    
+
     public String getVersionNoColumnName() {
         final Column column = getVersionNoColumn();
         if (column == null) {
@@ -2344,7 +2340,7 @@ public class Table implements IDMethod {
         }
         return column.getName();
     }
-    
+
     public String getVersionNoJavaName() {
         final Column column = getVersionNoColumn();
         if (column == null) {

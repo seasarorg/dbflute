@@ -1,11 +1,7 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
-#if ($table.hasReferrer())
-import java.util.List;
-import java.util.ArrayList;
-#end
-import java.util.Set;
+import java.util.*;
 	
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
@@ -22,12 +18,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 #else
   #set ($myEntityInterfaceName = ${glEntityInterfaceName})
 #end
-#foreach ($foreignKey in $table.foreignKeys)
-import ${myExtendedEntityPackageName}.${foreignKey.foreignTableExtendedEntityClassName};
-#end
-#foreach ($referrer in $table.referrers)
-import ${myExtendedEntityPackageName}.${referrer.refererTableExtendedEntityClassName};
-#end
+import ${myExtendedEntityPackageName}.*;
 
 /**
  * The entity of ${table.basicInfoDispString}.
@@ -95,7 +86,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                Column
     //                                                ------
 #foreach ($col in $table.columns)
-    /** The property for '${col.name}' column. {${col.columnDefinitionLineDisp}} */
+    /** The attribute of the column '${col.name}'. {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
@@ -231,44 +222,40 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     // ===================================================================================
-    //                                                                       Foreign Table
-    //                                                                       =============
+    //                                                                    Foreign Property
+    //                                                                    ================
 #set ($foreignKeysIndex = 0)
-#foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
-#set ($parentCBClassName = "${foreignKeys.foreignTableExtendedConditionBeanClassName}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
+#set ($parentCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Foreign Table = [${foreignKeys.foreignTable.basicInfoDispString}]
+    //   Foreign Property = [${foreignKey.foreignJavaBeansRulePropertyName}]
     // * * * * * * * * */
-    public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKeys)};
-    public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.relationKeysCommaString";
+    public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
+    public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
 
     /** The entity of foreign table. */
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
+     * Get the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}. {without lazyload}
      * @return The entity of foreign table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
-    public ${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
     /**
-     * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
-     * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
+     * Set the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}.
+     * @param ${foreignKey.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
-        ${foreignVariableName} = ${foreignKeys.foreignPropertyName};
+    public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
+        ${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
 
 #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
-
-    // ===================================================================================
-    //                                                                      Referrer Table
-    //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
@@ -276,7 +263,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #if (${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Referrer-as-one table = [${referrer.table.basicInfoDispString}]
+    //   Foreign Property = [${referrer.refererJavaBeansRulePropertyNameAsOne}]
     // * * * * * * * * */
     public static final int ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($referrer)};
     public static final String ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneRefferer";
@@ -302,9 +289,19 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
 #set ($foreignKeysIndex = $foreignKeysIndex + 1)
-#else
+#end
+#end
+    // ===================================================================================
+    //                                                                   Referrer Property
+    //                                                                   =================
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#if (!${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Referrer Table = [${referrer.table.basicInfoDispString}]
+    //   Referrer Property = [${referrer.refererJavaBeansRulePropertyName}]
     // * * * * * * * * */
 
     /** The list of referrer table '${referrer.table.name}'. */

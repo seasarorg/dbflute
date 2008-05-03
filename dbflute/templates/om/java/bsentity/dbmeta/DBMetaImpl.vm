@@ -11,9 +11,7 @@ import java.util.Collections;
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.*;
 
 /**
  * The dbmeta of ${table.Name}. (Singleton)
@@ -82,7 +80,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                        Column DB Name
     //                                        --------------
 #foreach ($col in $table.columns)
-    /** DB name of ${col.name}. ${col.columnDefinitionLineDisp} */
+    /** DB name of ${col.name}. {${col.columnDefinitionLineDisp}} */
     public static final String DB_NAME_${col.name} = "$col.name";
 
 #end
@@ -91,7 +89,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                  (JavaBeansRule)
     //                                  --------------------
 #foreach ($col in $table.columns)
-    /** Property name(JavaBeansRule) of ${col.javaBeansRulePropertyName}. ${col.columnDefinitionLineDisp} */
+    /** Property name(JavaBeansRule) of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
     public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
 
 #end
@@ -291,8 +289,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                       ---------------
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
-        final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+    public ${glForeignInfoName} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+        final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
         foreignInfo.setForeignPropertyName("${foreignKeys.foreignJavaBeansRulePropertyName}");
         foreignInfo.setLocalDBMeta(${table.DBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${foreignKeys.foreignTableDBMetaClassName}.getInstance());
@@ -311,8 +309,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($referrer in $table.referrers)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #if (${referrer.isOneToOne()})
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-        final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+    public ${glForeignInfoName} foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
         foreignInfo.setForeignPropertyName("${referrer.refererJavaBeansRulePropertyNameAsOne}");
         foreignInfo.setLocalDBMeta(${referrer.foreignTableDBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${referrer.referrerTableDBMetaClassName}.getInstance());
@@ -335,9 +333,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($referrer in $table.referrers)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #set ($referrerTable = $referrer.table)
-
+#if (!${referrer.isOneToOne()})
     public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
-        final ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrerInfo = new ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName}();
+        final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
         referrerInfo.setReferrerPropertyName("${referrer.referrerJavaBeansRulePropertyName}");
         referrerInfo.setLocalDBMeta(${referrer.foreignTableDBMetaClassName}.getInstance());
         referrerInfo.setReferrerDBMeta(${referrer.referrerTableDBMetaClassName}.getInstance());
@@ -349,6 +347,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         referrerInfo.setOneToOne(${referrer.isOneToOne()});
         return referrerInfo;
     }
+
+#end
 #end
 
     // -----------------------------------------------------
@@ -380,28 +380,28 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         public ${table.relationTraceClassName}RelationTrace(List<${glRelationInfoName}> relationList, List<AbstractRelationTrace> relationTraceList) {
             super(relationList, relationTraceList);
         }
-#foreach ($foreignKeys in $table.foreignKeys)
 
+#foreach ($foreignKeys in $table.foreignKeys)
         public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.relationTraceClassName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
             return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
 #foreach ($referrer in $table.referrers)
-  #if (${referrer.isOneToOne()})
-
+#if (${referrer.isOneToOne()})
         public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
             return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
-  #end
+#end
 #end
 #foreach ($referrer in $table.referrers)
-
+#if (!${referrer.isOneToOne()})
         public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
+#end
 #end
 
 #foreach ($col in $table.columns)
