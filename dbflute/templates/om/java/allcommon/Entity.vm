@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import java.util.Set;
+import java.util.LinkedHashSet;
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
@@ -41,18 +43,6 @@ public interface ${glEntityInterfaceName} {
      */
     public boolean hasPrimaryKeyValue();
 
-    /**
-     * Has the value of version-no?
-     * @return Determination.
-     */
-    public boolean hasVersionNoValue();
-
-    /**
-     * Has the value of update-date?
-     * @return Determination.
-     */
-    public boolean hasUpdateDateValue();
-
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
@@ -60,7 +50,7 @@ public interface ${glEntityInterfaceName} {
      * Get modified property names. (JavaBeansRule)
      * @return Modified property names. (NotNull)
      */
-    public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames();
+    public Set<String> getModifiedPropertyNames();
 
     /**
      * Clear modified property names.
@@ -76,7 +66,7 @@ public interface ${glEntityInterfaceName} {
         private static final long serialVersionUID = 1L;
 
         /** Set of properties. */
-        protected java.util.Set<String> _propertiesSet = new java.util.LinkedHashSet<String>();
+        protected Set<String> _propertiesSet = new LinkedHashSet<String>();
 
         /**
          * Add property name. (JavaBeansRule)
@@ -105,7 +95,7 @@ public interface ${glEntityInterfaceName} {
          * Get the set of properties.
          * @return The set of properties. (NotNull)
          */
-        public java.util.Set<String> getPropertyNames() {
+        public Set<String> getPropertyNames() {
             return _propertiesSet;
         }
 

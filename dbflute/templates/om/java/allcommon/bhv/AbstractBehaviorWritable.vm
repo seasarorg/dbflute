@@ -889,7 +889,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (!getDBMeta().hasVersionNo()) {
             return;
         }
-        if (entity.hasVersionNoValue()) {
+        if (hasVersionNoValue(entity)) {
             return;
         }
         String msg = "Look! Read the message below." + getLineSeparator();
@@ -911,7 +911,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (!getDBMeta().hasUpdateDate()) {
             return;
         }
-        if (entity.hasUpdateDateValue()) {
+        if (hasUpdateDateValue(entity)) {
             return;
         }
         String msg = "Look! Read the message below." + getLineSeparator();

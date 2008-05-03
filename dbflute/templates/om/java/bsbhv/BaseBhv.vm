@@ -216,15 +216,16 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
-  #foreach ($referrer in $table.refererList)
-    #set ($referrerTable = $referrer.Table)
-    #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-    #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
-    #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-    #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.RefrererPropertyNameInitCap}")
-    #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
-    #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
+#foreach ($referrer in $table.refererList)
+#set ($referrerTable = $referrer.Table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
+#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.RefrererPropertyNameInitCap}")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
+#if (!${referrer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   ReferrerTable    = [${referrer.table.name}]
@@ -288,7 +289,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.set${referrer.foreignPropertyNameInitCap}(baseEntity); }
         } );
     }
-  #end
+#end
+#end
 #end
 
     // ===================================================================================
@@ -744,6 +746,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                          ==========
     public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
         public void setup(${myConditionBeanClassName} cb);
+    }
+	
+    // ===================================================================================
+    //                                                                Optimistic Lock Info
+    //                                                                ====================
+	@Override
+	protected boolean hasVersionNoValue(${glEntityInterfaceName} entity) {
+#if ($table.isUseVersionNo())
+        return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
+#else
+        return false;
+#end
+    }
+
+	@Override
+    protected boolean hasUpdateDateValue(${glEntityInterfaceName} entity) {
+#if ($table.isUseUpdateDate())
+        return downcast(entity).get${table.updateDateJavaName}() != null;
+#else
+        return false;
+#end
     }
 
     // ===================================================================================

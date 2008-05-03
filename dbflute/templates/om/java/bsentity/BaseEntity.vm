@@ -1,8 +1,12 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+#if ($table.hasReferrer())
+import java.util.List;
+import java.util.ArrayList;
+#end
 import java.util.Set;
-
+	
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 #else
@@ -17,6 +21,12 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
 #else
   #set ($myEntityInterfaceName = ${glEntityInterfaceName})
+#end
+#foreach ($foreignKey in $table.foreignKeys)
+import ${myExtendedEntityPackageName}.${foreignKey.foreignTableExtendedEntityClassName};
+#end
+#foreach ($referrer in $table.referrers)
+import ${myExtendedEntityPackageName}.${referrer.refererTableExtendedEntityClassName};
 #end
 
 /**
@@ -225,29 +235,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                       =============
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
-  #set ($parentCBClassName = "${foreignKeys.foreignTableExtendedConditionBeanClassName}")
-
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
+#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+#set ($parentCBClassName = "${foreignKeys.foreignTableExtendedConditionBeanClassName}")
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
-    //   ForeignProperty = [${foreignKeys.foreignJavaBeansRulePropertyName}]
+    //   Foreign Table = [${foreignKeys.foreignTable.basicInfoDispString}]
     // * * * * * * * * */
-
-    /** RELNO of foreign table for s2dao. */
     public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKeys)};
-
-    /** RELKEYS of foreign table for s2dao. */
     public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.relationKeysCommaString";
 
     /** The entity of foreign table. */
-    protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
+    protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
      * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
-     * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
+     * @return The entity of foreign table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
-    public ${myExtendedEntityPackageName}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
@@ -255,80 +259,64 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
-        this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
+    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
+        ${foreignVariableName} = ${foreignKeys.foreignPropertyName};
     }
 
-    /**
-     * Has foreign instance of ${foreignKeys.foreignJavaBeansRulePropertyName}.
-     * @return Determination.
-     */
-    public boolean hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}() {
-        return ${foreignVariableName} != null;
-    }
-#if ($database.isMakeRecentlyDeprecated())
-	
-    /**
-     * Same as look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(). This method will be deprecated at the future.
-     * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
-	 * @deprecated look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}().
-     */
-    public ${myExtendedEntityPackageName}.${foreignEntityClassName} trace${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
-        return look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}();
-    }
-#end
-
-    /**
-     * Look the foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
-     * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
-     */
-    public ${myExtendedEntityPackageName}.${foreignEntityClassName} look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
-        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${myExtendedEntityPackageName}.${foreignEntityClassName}();
-    }
-  #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
     // ===================================================================================
     //                                                                      Referrer Table
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
-  #set ($referrerTable = $referrer.table)
-  #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-  #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
-  #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-  #set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
-
-  #if (${referrer.isOneToOne()})
-
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
-    //   ReferrerProperty = [${referrer.refererJavaBeansRulePropertyNameAsOne}]
-    // * * * * * * * * */
-
-    /** RELNO of foreign table for s2dao. */
-    public static final int ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($referrer)};
-
-    /** RELKEYS of foreign table for s2dao. */
-    public static final String ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneRefferer";
-    #set ($foreignKeysIndex = $foreignKeysIndex + 1)
-  #else
-
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#if (${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
-    //   ReferrerProperty = [${referrer.referrerJavaBeansRulePropertyName}]
+    //   Referrer-as-one table = [${referrer.table.basicInfoDispString}]
     // * * * * * * * * */
-  #end
+    public static final int ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($referrer)};
+    public static final String ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneRefferer";
+	
+    /** The entity of referrer-as-one table. */
+    protected ${referrerEntityClassName} ${referrerVariableName};
+
+	/**
+     * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazy-load} <br />
+     * @return The entity of referrer-as-one table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * @exception IllegalStateException When the size of the referrer table list is duplicate.
+     */
+    public ${referrerEntityClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+	    return ${referrerVariableName};
+    }
+
+    /**
+     * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
+     * @param entity The entity of referrer-as-one table. (Nullable)
+     */
+    public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
+	    ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+    }
+
+#set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#else
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    //   Referrer Table = [${referrer.table.basicInfoDispString}]
+    // * * * * * * * * */
 
     /** The list of referrer table '${referrer.table.name}'. */
-    protected java.util.List<${referrerEntityLongClassName}> $referrerVariableName;
+    protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
      * Get the list of referrer table. {without lazyload} <br />
      * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public java.util.List<${referrerEntityLongClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
+    public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new java.util.ArrayList<${referrerEntityLongClassName}>(); }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
 #end
         return ${referrerVariableName};
     }
@@ -337,82 +325,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Set the list of referrer table.
      * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityLongClassName}> ${referrer.referrerPropertyName}) {
-        this.${referrerVariableName} = ${referrer.referrerPropertyName};
-    }
-
-    /**
-     * Has referrer elements of ${referrer.referrerJavaBeansRulePropertyNameInitCap}.
-     * @return Determination.
-     */
-    public boolean hasReferrerElements${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
-        return ${referrerVariableName} != null && !${referrerVariableName}.isEmpty();
-    }
-#if ($database.isMakeRecentlyDeprecated())
-
-    /**
-     * Has referrer elements of ${referrer.refererJavaBeansRulePropertyNameInitCap}.
-     * @return Determination.
-	 * @deprecated Please use hasReferrerElements${referrer.referrerJavaBeansRulePropertyNameInitCap}().
-     */
-    public boolean hasRefererElements${referrer.refererJavaBeansRulePropertyNameInitCap}() {
-        return ${referrerVariableName} != null && !${referrerVariableName}.isEmpty();
-    }
-#end
-
-#if (${referrer.isOneToOne()})
-    /**
-     * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazyload} <br />
-     * @return The entity of referrer-as-one table. (Nullable: If it's not loaded yet, returns null.)
-     * @exception IllegalStateException When the size of the referrer table list is duplicate.
-     */
-    public ${referrerEntityLongClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        final java.util.List<${referrerEntityLongClassName}> ls = get${referrer.ReffererPropertyNameInitCap}();
-        if (ls == null || ls.isEmpty()) { return null; }
-        if (ls.size() > 1) {
-            String msg = "The size of the list must be one because this relation is 'one-to-one'";
-            msg = msg + ": list=" + ls + ": toString()=" + toString();
-            throw new IllegalStateException(msg);
-        }
-        return (${referrerEntityLongClassName})ls.get(0);
-    }
-
-    /**
-     * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
-     * @param entity The entity of referrer-as-one table. (Nullable)
-     */
-    public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityLongClassName} entity) {
-        if (entity == null) { ${referrerVariableName} = null; return; }
-        final java.util.List<${referrerEntityLongClassName}> ls = new java.util.ArrayList<${referrerEntityLongClassName}>();
-        ls.add(entity);
-        ${referrerVariableName} = ls;
-    }
-#if ($database.isMakeRecentlyDeprecated())
-
-    /**
-     * Same as look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(). This method will be deprecated at the future.
-     * @return The entity of referrer-as-one table. (NotNull: If the object is null, it returns new empty entity as read-only.)
-	 * @deprecated Please use look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}().
-     */
-    public ${referrerEntityLongClassName} trace${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}();
-    }
-#end
-
-    /**
-     * Look the referrer-as-one entity (for read) of ${referrer.refererJavaBeansRulePropertyNameAsOne}.
-     * @return The entity of referrer-as-one table. (NotNull: If the object is null, it returns new empty entity as read-only.)
-     */
-    public ${referrerEntityLongClassName} look${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null ? get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() : new ${referrerEntityLongClassName}();
-    }
-
-    /**
-     * Has foreign instance of ${referrer.referrerPropertyNameAsOne}.
-     * @return Determination.
-     */
-    public boolean hasForeignInstance${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return get${referrer.referrerPropertyNameInitCapAsOne}() != null;
+    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+        ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
 #end
@@ -426,22 +340,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         if (_${col.uncapitalisedJavaName} == null) { return false; }
 #end
         return true;
-    }
-
-    public boolean hasVersionNoValue() {
-#if ($table.isUseVersionNo())
-        return !(get${table.versionNoJavaName}() + "").equals("null");// For primitive type
-#else
-        return false;
-#end
-    }
-
-    public boolean hasUpdateDateValue() {
-#if ($table.isUseUpdateDate())
-        return get${table.updateDateJavaName}() != null;
-#else
-        return false;
-#end
     }
 
     // ===================================================================================
