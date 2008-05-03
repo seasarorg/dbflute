@@ -109,7 +109,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireMan.execute(runner, sqlFileList);
 
         fireSuperExecute();
-        
+
         handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
@@ -396,6 +396,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             @Override
             protected void traceSql(String sql) {
                 log4inner.info("{SQL}" + getLineSeparator() + sql);
+            }
+
+            @Override
+            protected void traceResult(int goodSqlCount, int totalSqlCount) {
+                if (totalSqlCount > 0) {
+                    _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
+                } else {
+                    _log.info("  --> SQL for sql2entity was Not Found in the SQL file!");
+                }
             }
 
             @Override
