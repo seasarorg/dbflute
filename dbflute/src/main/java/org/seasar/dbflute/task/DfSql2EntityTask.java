@@ -53,16 +53,18 @@ import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
- * 
  * @author jflute
  */
 public class DfSql2EntityTask extends DfAbstractTexenTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
     // ===================================================================================
-    //                                                                           Meta Info
+    //                                                                           Attribute
     //                                                                           =========
     protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = new LinkedHashMap<String, Map<String, DfColumnMetaInfo>>();
     protected final Map<String, Object> _cursorInfoMap = new LinkedHashMap<String, Object>();
@@ -107,6 +109,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireMan.execute(runner, sqlFileList);
 
         fireSuperExecute();
+        
+        handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
     }
@@ -185,10 +189,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             protected void execSQL(Statement statement, String sql) {
-                if (!isTargetSql(sql)) {
-                    return;
-                }
-
                 ResultSet rs = null;
                 try {
                     if (isTargetEntityMakingSql(sql)) {
@@ -279,12 +279,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
                     }
                 }
-            }
-
-            protected boolean isTargetSql(String sql) {
-                final String entityName = getEntityName(sql);
-                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
-                return entityName != null || parameterBeanClassDefinition != null;
             }
 
             protected boolean isTargetEntityMakingSql(String sql) {
@@ -393,6 +387,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             @Override
+            protected boolean isTargetSql(String sql) {
+                final String entityName = getEntityName(sql);
+                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
+                return entityName != null || parameterBeanClassDefinition != null;
+            }
+
+            @Override
             protected void traceSql(String sql) {
                 log4inner.info("{SQL}" + getLineSeparator() + sql);
             }
@@ -404,9 +405,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         };
     }
 
-    /**
-     * Handle exceptions in exception info map.
-     */
+    protected void handleNotFoundResult(List<File> sqlFileList) {
+        if (_entityInfoMap.isEmpty() && _pmbMetaDataMap.isEmpty()) {
+            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+            _log.warn("SQL for sql2entity was Not Found!");
+            _log.warn("- - - - - - - - - -");
+            _log.warn("{Found SQL Files}");
+            for (File file : sqlFileList) {
+                _log.warn("  " + file);
+            }
+            _log.warn("* * * * * * * * * */");
+        }
+    }
+
     protected void handleException() {
         if (_exceptionInfoMap.isEmpty()) {
             return;
@@ -421,7 +432,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append("[" + name + "]");
             sb.append(exceptionInfo);
         }
+        _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
         _log.warn(sb.toString());
+        _log.warn("* * * * * * * * * */");
     }
 
     // ===================================================================================

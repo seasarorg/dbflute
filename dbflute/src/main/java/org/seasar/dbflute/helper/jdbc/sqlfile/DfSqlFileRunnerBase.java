@@ -81,6 +81,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             connection = getConnection();
             statement = newStatement(connection);
             for (String sql : sqlList) {
+                if (!isTargetSql(sql)) {
+                    continue;
+                }
                 _totalSqlCount++;
                 final String realSql = filterSql(sql);
                 traceSql(realSql);
@@ -134,6 +137,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         traceResult(_goodSqlCount, _totalSqlCount);
     }
 
+    protected boolean isTargetSql(String sql) {
+        return true;
+    }
+    
     protected void traceSql(String sql) {
         _log.info(sql);
     }
