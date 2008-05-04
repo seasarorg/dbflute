@@ -768,29 +768,29 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         }
     }
 	
-	public void addNullsFirstToPreviousOrderBy() {
+	public virtual void addNullsFirstToPreviousOrderBy() {
 	    _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
 	}
 	
-	public void addNullsLastToPreviousOrderBy() {
+	public virtual void addNullsLastToPreviousOrderBy() {
 	    _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
 	}
 	
-	protected OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
-	    return new OrderByNullsSetupperByFormal();
+	protected virtual OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
+	    return new OrderByNullsSetupperBySupported();
 	}
 	
-	protected class OrderByNullsSetupperByFormal {
+	protected class OrderByNullsSetupperBySupported : OrderByNullsSetupper {
 	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
 		    return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
 		}
 	}
 	
-	protected OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
+	protected virtual OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
 	    return new OrderByNullsSetupperByCaseWhen();
 	}
 
-	protected class OrderByNullsSetupperByCaseWhen {
+	protected class OrderByNullsSetupperByCaseWhen : OrderByNullsSetupper {
 	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
     	    String thenNumber = nullsFirst ? "1" : "0";
     	    String elseNumber = nullsFirst ? "0" : "1";
