@@ -469,7 +469,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
     protected String extractInvocationExpression(Method method) {
         final Class<?> declaringClass = method.getDeclaringClass();
-	    return buildEntityExpressionFromDaoName(declaringClass.getName());
+	    return buildEntityExpressionFromDaoName(declaringClass.getSimpleName());
 		
 		// Commented out because of still thinking. 
         // final Field field;

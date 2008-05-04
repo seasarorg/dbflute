@@ -27,6 +27,22 @@ public class ${myClassName} {
             element.reverse();
         }
     }
+	
+	public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
+	    if (_orderByList.isEmpty()) {
+		    return;
+		}
+		${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		last.setOrderByNullsSetupper(filter, true);
+	}
+	
+	public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
+	    if (_orderByList.isEmpty()) {
+		    return;
+		}
+		${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		last.setOrderByNullsSetupper(filter, false);
+	}
 
     public List<${glOrderByElementName}> getOrderByList() {
         return _orderByList;
@@ -173,4 +189,9 @@ public class ${myClassName} {
         return _orderByList.toString();
     }
 }
+
+public interface OrderByNullsSetupper {
+    String setup(String columnName, String orderByElementClause, bool nullsFirst);
+}
+
 }

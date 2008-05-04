@@ -767,6 +767,37 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             throw new RuntimeException(msg, e);
         }
     }
+	
+	public void addNullsFirstToPreviousOrderBy() {
+	    _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
+	}
+	
+	public void addNullsLastToPreviousOrderBy() {
+	    _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
+	}
+	
+	protected OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
+	    return new OrderByNullsSetupperByFormal();
+	}
+	
+	protected class OrderByNullsSetupperByFormal {
+	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
+		    return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
+		}
+	}
+	
+	protected OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
+	    return new OrderByNullsSetupperByCaseWhen();
+	}
+
+	protected class OrderByNullsSetupperByCaseWhen {
+	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
+    	    String thenNumber = nullsFirst ? "1" : "0";
+    	    String elseNumber = nullsFirst ? "0" : "1";
+    	    String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
+			return caseWhen + ", " + orderByElementClause;
+		}
+	}
 
     // ===================================================================================
     //                                                                          UnionQuery

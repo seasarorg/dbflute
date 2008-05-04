@@ -105,6 +105,9 @@ public interface ${glSqlClauseInterfaceName} {
      */
     void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
 
+	void addNullsFirstToPreviousOrderBy();
+	void addNullsLastToPreviousOrderBy();
+	
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

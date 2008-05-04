@@ -429,6 +429,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
+	public void WithNullsFirst() {// is User Public!
+	    getSqlClause().addNullsFirstToPreviousOrderBy();
+	}
+	
+	public void WithNullsLast() {// is User Public!
+	    getSqlClause().addNullsLastToPreviousOrderBy();
+	}
+	
     public void registerOrderBy(String columnName, bool ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
     }
