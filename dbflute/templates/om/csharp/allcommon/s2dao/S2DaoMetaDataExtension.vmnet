@@ -195,8 +195,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             public InternalUpdateAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
                 : base(dataSource, commandFactory, beanMetaData, propertyNames) {
             }
-            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-                return new InternalUpdateAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalUpdateAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
             }
 		}
 
@@ -257,8 +257,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             public InternalDeleteAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
                 : base(dataSource, commandFactory, beanMetaData, propertyNames) {
             }
-            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-                return new InternalDeleteAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalDeleteAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
             }
 		}
 		

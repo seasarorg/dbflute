@@ -22,9 +22,6 @@ using ${glPackageBaseCommonUtil};
 namespace ${glPackageBaseCommonS2Dao} {
 
     /**
-     * My-SelectDynamicCommand.
-     * Overrides original class 'SelectDynamicCommand'.
-     * 
      * @author ${database.ClassAuthor}
      */
     public class ${glSelectDynamicCommand} : Seasar.Dao.Impl.SelectDynamicCommand {
@@ -329,13 +326,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new InternalBasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
 		
-		protected class InternalBasicSelectHandler {
+		protected class InternalBasicSelectHandler : BasicSelectHandler {
             public InternalBasicSelectHandler(IDataSource dataSource
 			                                , String sql
 											, IDataReaderHandler dataReaderHandler
 											, ICommandFactory commandFactory
 											, IDataReaderFactory dataReaderFactory)
-                : base(dataSource, sql, commandFactory, dataReaderHandler, dataReaderFactory) {
+                : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
             }
 		    public override Object Execute(object[] args, Type[] argTypes) {
                 if (${glQLog}.IsQueryLogLevelInfo()) {
