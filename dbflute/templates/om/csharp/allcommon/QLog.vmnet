@@ -1,0 +1,29 @@
+
+using System;
+
+namespace ${glPackageBaseCommon} {
+
+public class ${glQLog} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
+	public static void Log(String sql) {// Very Internal
+		if (IsQueryLogLevelInfo()) {
+	        _log.Info(sql);
+		} else {
+	        _log.Debug(sql);
+		}
+	}
+	
+	protected static bool IsQueryLogLevelInfo() {
+	    return ${glDBFluteConfig}.GetInstance().IsQueryLogLevelInfo;
+	}
+}
+
+}

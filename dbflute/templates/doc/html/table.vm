@@ -20,18 +20,18 @@ $!table.Description
   </tr>
 #foreach ($col in $table.Columns)
   <tr>
-    <td class="normalFont"><center> #if ($col.isPrimaryKey()==true)o#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isAutoIncrement()==true)o#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isUnique()==true)o#else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isPrimaryKey())o#else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isAutoIncrement())o#else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isUnique())o#else &nbsp;#end </center></td>
     <td class="normalFont" id="${table.name}${col.name}">${col.name}</td>
-    <td class="normalFont">$col.dbType</td>
-    <td class="normalFont">#if ($col.printSize() && $col.printSize().length() > 0) $col.printSize() #else &nbsp;#end</td>
-    <td class="normalFont"><center> #if ($col.isNotNull()==true)o#else &nbsp;#end </center></td>
-    <td class="normalFont">#if ($col.DefaultValue) $col.defaultValue#else &nbsp;#end</td>
+    <td class="normalFont">${col.dbType}</td>
+    <td class="normalFont"><center>#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isNotNull())o#else &nbsp;#end </center></td>
+    <td class="normalFont">#if ($col.hasDefaultValue() && !$col.isAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
     <td class="normalFont"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
     <td class="normalFont">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-    <td class="normalFont">$col.javaBeansRulePropertyName</td>
-    <td class="normalFont">$col.javaNative</td>
+    <td class="normalFont">${col.javaBeansRulePropertyName}</td>
+    <td class="normalFont">${col.javaNative}</td>
     <td class="normalFont">#if ($col.hasClassification()==true)${col.classificationName}#else &nbsp;#end</td>
   </tr>
 #end

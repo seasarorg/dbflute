@@ -113,7 +113,7 @@ public class Column {
 
     private Object _columnType;
 
-    private String _size;
+    private String _columnSize;
 
     // ........................
     //               Constraint
@@ -230,7 +230,7 @@ public class Column {
         //Default column value.
         _defaultValue = attrib.getValue("default");
 
-        _size = attrib.getValue("size");
+        _columnSize = attrib.getValue("size");
 
         setTorqueType(attrib.getValue("type"));
         setDbType(attrib.getValue("dbType"));
@@ -434,8 +434,8 @@ public class Column {
         }
         plugDelimiterIfNeeds(sb);
         sb.append(getDbType() != null ? getDbType() : "UnknownType");
-        if (getSize() != null && getSize().trim().length() > 0) {
-            sb.append("(" + getSize() + ")");
+        if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
+            sb.append("(" + getColumnSize() + ")");
         }
         if (isNotNull()) {
             plugDelimiterIfNeeds(sb);
@@ -549,31 +549,27 @@ public class Column {
     // -----------------------------------------------------
     //                                           Column Size
     //                                           -----------
-    /**
-     * Returns the size of the column
-     */
-    public String getSize() {
-        return _size;
+    public String getColumnSize() {
+        return _columnSize;
     }
 
-    /**
-     * Set the size of the column.
-     * 
-     * @param size The size of the column. (NotNull)
-     */
-    public void setSize(String size) {
-        _size = size;
+    public void setColumnSize(String columnSize) {
+        _columnSize = columnSize;
     }
 
-    protected Integer getColumnSize() {
-        if (_size == null) {
+    public boolean hasColumnSize() {
+        return _columnSize != null && _columnSize.trim().length() > 0;
+    }
+
+    protected Integer getIntegerColumnSize() {// Without Decimal Digits!
+        if (_columnSize == null) {
             return null;
         }
         final String realSize;
-        if (_size.contains(",")) {
-            realSize = _size.split(",")[0];
+        if (_columnSize.contains(",")) {
+            realSize = _columnSize.split(",")[0];
         } else {
-            realSize = _size;
+            realSize = _columnSize;
         }
         try {
             return Integer.parseInt(realSize);
@@ -583,21 +579,17 @@ public class Column {
     }
 
     protected Integer getDecimalDigits() {
-        if (_size == null) {
+        if (_columnSize == null) {
             return null;
         }
-        if (!_size.contains(",")) {
+        if (!_columnSize.contains(",")) {
             return 0;
         }
-        return Integer.parseInt(_size.split(",")[1].trim());
-    }
-
-    public String printSize() {
-        return (_size == null ? "" : '(' + _size + ')');
+        return Integer.parseInt(_columnSize.split(",")[1].trim());
     }
 
     public String getColumnSizeSettingExpression() {
-        final Integer columnSize = getColumnSize();
+        final Integer columnSize = getIntegerColumnSize();
         if (columnSize == null) {
             return "null";
         }
@@ -826,10 +818,11 @@ public class Column {
                         .equals("CHAR"));
     }
 
+    // ===================================================================================
+    //                                                                       Default Value
+    //                                                                       =============
     /**
      * Return a string that will give this column a default value.
-     * <p>
-     * TODO: Properly SQL-escape text values.
      */
     public String getDefaultSetting() {
         StringBuffer dflt = new StringBuffer(0);
@@ -845,20 +838,21 @@ public class Column {
         return dflt.toString();
     }
 
-    /**
-     * Set a string that will give this column a default value.
-     */
     public void setDefaultValue(String def) {
         _defaultValue = def;
     }
 
-    /**
-     * Get a string that will give this column a default value.
-     */
+    public boolean hasDefaultValue() {
+        return _defaultValue != null && _defaultValue.trim().length() > 0;
+    }
+
     public String getDefaultValue() {
         return _defaultValue;
     }
 
+    // ===================================================================================
+    //                                                                    Sql2Entity Table
+    //                                                                    ================
     public String getSql2EntityTableName() {
         return _sql2EntityTableName;
     }
@@ -910,8 +904,8 @@ public class Column {
 
         result.append(" type=\"").append(_torqueType).append('"');
 
-        if (_size != null) {
-            result.append(" size=\"").append(_size).append('"');
+        if (_columnSize != null) {
+            result.append(" size=\"").append(_columnSize).append('"');
         }
 
         if (_defaultValue != null) {
@@ -937,7 +931,7 @@ public class Column {
         setTorqueType(tn);
 
         if (size != null) {
-            this._size = size;
+            this._columnSize = size;
         }
 
         if (tn.indexOf("CHAR") != -1) {
@@ -976,9 +970,9 @@ public class Column {
      * @return Java native type used by torque. (NotNull)
      */
     public String getJavaNative() {
-        return TypeMap.findJavaNativeTypeString(_torqueType, getColumnSize(), getDecimalDigits());
+        return TypeMap.findJavaNativeTypeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
     }
-    
+
     public String getFlexNative() {
         return TypeMap.findFlexNativeTypeString(getJavaNative());
     }
@@ -1002,7 +996,7 @@ public class Column {
     public boolean isTorqueTypeClob() {// as Pinpoint
         return "CLOB".equals(getTorqueType());
     }
-    
+
     public boolean isJavaNativeBooleanObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
     }
@@ -1014,15 +1008,15 @@ public class Column {
     public boolean isJavaNativeDateObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeDateList());
     }
-    
+
     public boolean isTorqueTypeDate() {// as Pinpoint
         return "DATE".equals(getTorqueType());
     }
-    
+
     public boolean isTorqueTypeTime() {// as Pinpoint
         return "TIME".equals(getTorqueType());
     }
-    
+
     public boolean isTorqueTypeTimestamp() {// as Pinpoint
         return "TIMESTAMP".equals(getTorqueType());
     }
@@ -1034,7 +1028,7 @@ public class Column {
     public boolean isTorqueTypeBlob() {// as Pinpoint
         return "BLOB".equals(getTorqueType());
     }
-    
+
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
         for (Object current : ls) {
             final String currentString = (String) current;
@@ -1401,7 +1395,7 @@ public class Column {
         final String versionNoPropertyName = getTable().getVersionNoPropertyName();
         return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
     }
-    
+
     // ===================================================================================
     //                                                                       Column Helper
     //                                                                       =============

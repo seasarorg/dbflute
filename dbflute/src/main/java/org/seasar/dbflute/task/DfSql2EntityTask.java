@@ -650,7 +650,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();
-        col.setSize(columnSize + "," + decimalDigits);
+        col.setColumnSize(columnSize + "," + decimalDigits);
     }
 
     protected void setupSql2EntitySecondTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,

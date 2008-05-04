@@ -1,0 +1,162 @@
+
+using System;
+
+namespace ${glPackageBaseCommon} {
+
+#set ($myClassName = "${glDBFluteConfig}")
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    private static readonly ${myClassName} _instance = new ${myClassName}();
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+	// protected ${glStatementConfig} _defaultStatementConfig;
+	protected bool _conditionBeanFormatSql = true;
+	protected bool _queryLogLevelInfo;
+	protected bool _traceLogLevelInfo;
+	protected bool _internalDebug;
+	protected bool _locked = true;
+	
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    private ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
+    /**
+     * Get instance.
+     * @return Singleton instance. (NotNull)
+     */
+    public static ${myClassName} GetInstance() {
+        return _instance;
+    }
+
+    // ===================================================================================
+    //                                                            Default Statement Config
+    //                                                            ========================
+    // public ${glStatementConfig} getDefaultStatementConfig() {
+    //     return _defaultStatementConfig;
+    // }
+	// 
+    // public void setDefaultStatementConfig(${glStatementConfig} defaultStatementConfig) {
+	//     assertNotLocked();
+	//     if (_log.isInfoEnabled()) {
+	// 	    _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
+	// }
+    //     _defaultStatementConfig = defaultStatementConfig;
+    // }
+	
+    // ===================================================================================
+    //                                                            ConditionBean Format Sql
+    //                                                            ========================
+	public bool IsConditionBeanFormatSql {
+	    get {
+	        return _conditionBeanFormatSql;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting conditionBeanFormatSql: " + value);
+		    }
+	        _conditionBeanFormatSql = value;
+		}
+	}
+	
+    // ===================================================================================
+    //                                                                Query Log Level Info
+    //                                                                ====================
+	public bool IsQueryLogLevelInfo {
+	    get {
+	        return _queryLogLevelInfo;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting queryLogLevelInfo: " + value);
+		    }
+	        _queryLogLevelInfo = value;
+		}
+	}
+	
+    // ===================================================================================
+    //                                                                Trace Log Level Info
+    //                                                                ====================
+	public bool IsTraceLogLevelInfo {
+	    get {
+	        return _traceLogLevelInfo;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting traceLogLevelInfo: " + value);
+		    }
+	        _traceLogLevelInfo = value;
+		}
+	}
+	
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+	public bool IsInternalDebug {
+	    get {
+	        return _internalDebug;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting internalDebug: " + value);
+		    }
+	        _internalDebug = value;
+		}
+	}
+	
+    // ===================================================================================
+    //                                                                         Config Lock
+    //                                                                         ===========
+	public bool isLocked {
+	    get {
+	        return _locked;
+		}
+	}
+	
+	public void Lock() {
+		if (_log.isInfoEnabled) {
+		    _log.Info("...Locking the config of dbflute!");
+		}
+	    _locked = true;
+	}
+	
+	public void Unlock() {
+		if (_log.IsInfoEnabled() {
+		    _log.Info("...Unlocking the config of dbflute!");
+		}
+	    _locked = false;
+	}
+	
+	protected void AssertNotLocked() {
+	    if (!IsLocked) {
+		    return;
+		}
+		String msg = "The config of dbflute is locked! Don't access at this timing!";
+		throw new SystemException(msg);
+	}
+	
+    // ===================================================================================
+    //                                                                        Config Clear
+    //                                                                        ============
+	public void Clear() {
+	    // _defaultStatementConfig = null;
+		_internalDebug = false;
+	}
+}
+
+}
