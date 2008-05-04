@@ -177,16 +177,11 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                        Setup Select
     //                                                                        ============
-#foreach ($foreignKeys in $table.foreignKeys)
-  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
-  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-  #set ($nestSelectSetuppperClassName = "${foreignKeys.foreignTableNestSelectSetupperClassName}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+#set ($nestSelectSetuppperClassName = "${foreignKey.foreignTableNestSelectSetupperClassName}")
 
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.name}]
-    //   ForeignProperty = [${tmpPropertyName}]
-    // * * * * * * * * */
-    
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
@@ -208,15 +203,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 #end
 #foreach ($referrer in $table.referrers)
-  #if (${referrer.isOneToOne()})
-    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
-    #set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
-    #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
-
-    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReferrerTable    = [${referrer.table.name}]
-    //   ReferrerProperty = [${tmpPropertyName}]
-    // * * * * * * * * */
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
+#set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
@@ -237,7 +227,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }
-  #end
+#end
 #end
 
 }

@@ -14,32 +14,34 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 import ${glPackageBaseCommonDBMetaInfo}.*;
 
 /**
- * The dbmeta of ${table.Name}. (Singleton)
+ * The DB meta of ${table.Name}. (Singleton)
  * <pre>
  * [primary-key]
- *     ${table.PrimaryKeyNameCommaString}
+ *     ${table.primaryKeyNameCommaString}
  * 
- * [column-property]
- *     ${table.ColumnNameCommaString}
- * 
- * [foreign-property]
- *     ${table.ForeignPropertyNameCommaString}
- * 
- * [referrer-property]
- *     ${table.ReferrerPropertyNameCommaString}
+ * [column]
+ *     ${table.columnNameCommaString}
  * 
  * [sequence]
- *     ${table.DefinedSequenceName}
+ *     ${table.definedSequenceName}
  * 
  * [identity]
- *     ${table.IdentityPropertyName}
- * 
- * [update-date]
- *     ${table.UpdateDateJavaName}
+ *     ${table.identityColumnName}
  * 
  * [version-no]
- *     ${table.VersionNoJavaName}
+ *     ${table.versionNoColumnName}
  * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
  * </pre>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -101,13 +103,22 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignJavaBeansRulePropertyName} = "$foreignKeys.foreignJavaBeansRulePropertyName";
 
 #end
+#foreach ($referrer in $table.referrers)
+#if ($referrer.isOneToOne())
+    /** The foreign property name(JavaBeansRule) of ${referrer.referrerJavaBeansRulePropertyNameAsOne}. */
+    public static final String FOREIGN_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyNameAsOne} = "$referrer.referrerJavaBeansRulePropertyNameAsOne";
+
+#end
+#end
     // -----------------------------------------------------
     //                                         Referrer Name
     //                                         -------------
 #foreach ($referrer in $table.referrers)
+#if (!$referrer.isOneToOne())
     /** The referrer property name(JavaBeansRule) of ${referrer.referrerJavaBeansRulePropertyName}. */
     public static final String REFERRER_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyName} = "$referrer.referrerJavaBeansRulePropertyName";
 
+#end
 #end
     // -----------------------------------------------------
     //                                              Name Map
@@ -285,8 +296,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                       Relation Info
     //                                                                       =============
     // -----------------------------------------------------
-    //                                       Foreign Element
-    //                                       ---------------
+    //                                      Foreign Property
+    //                                      ----------------
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
     public ${glForeignInfoName} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
@@ -328,8 +339,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // -----------------------------------------------------
-    //                                      Referrer Element
-    //                                      ----------------
+    //                                     Referrer Property
+    //                                     -----------------
 #foreach ($referrer in $table.referrers)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #set ($referrerTable = $referrer.table)

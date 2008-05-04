@@ -25,28 +25,31 @@ namespace ${myExtendedEntityPackageName} {
     /// The entity of ${table.name}. (partial class for auto-generation)
     /// <![CDATA[
     /// [primary-key]
-    ///     ${table.PrimaryKeyNameCommaString}
+    ///     ${table.primaryKeyNameCommaString}
     /// 
-    /// [all-columns]
-    ///     ${table.ColumnNameCommaString}
-    /// 
-    /// [foreign-table]
-    ///     ${table.ForeignPropertyNameCommaString}
-    /// 
-    /// [referrer-table]
-    ///     ${table.ReferrerPropertyNameCommaString}
+    /// [column]
+    ///     ${table.columnNameCommaString}
     /// 
     /// [sequence]
-    ///     ${table.DefinedSequenceName}
+    ///     ${table.definedSequenceName}
     /// 
     /// [identity]
     ///     ${table.identityColumnName}
     /// 
-    /// [update-date]
-    ///     ${table.updateDateColumnName}
-    /// 
     /// [version-no]
     ///     ${table.versionNoColumnName}
+	/// 
+    /// [foreign-table]
+    ///     ${table.foreignTableNameCommaString}
+    /// 
+    /// [referrer-table]
+    ///     ${table.referrerTableNameCommaString}
+    /// 
+	/// [foreign-property]
+    ///     ${table.foreignPropertyNameCommaString}
+    /// 
+    /// [referrer-property]
+    ///     ${table.referrerPropertyNameCommaString}
     /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>

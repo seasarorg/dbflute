@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 /**
- * The paging-result-bean of ${myClassName}.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
@@ -36,7 +34,6 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                              ========
     /**
      * Add order-by element.
-     * 
      * @param orderByElement Order-by element. (NotNull)
      */
     public void addOrderByElement(${glOrderByElementName} orderByElement) {
@@ -45,7 +42,6 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Insert first order-by element .
-     * 
      * @param orderByElement Order-by element. (NotNull)
      */
     public void insertFirstOrderByElement(${glOrderByElementName} orderByElement) {
@@ -53,9 +49,8 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     public void reverseAll() {
-        for (final java.util.Iterator ite = _orderByList.iterator(); ite.hasNext(); ) {
-            final ${glOrderByElementName} element = (${glOrderByElementName})ite.next();
-            element.reverse();
+        for (final java.util.Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            ite.next().reverse();
         }
     }
 
@@ -67,6 +62,14 @@ public class ${myClassName} implements java.io.Serializable {
             _orderByList.set(_orderByList.size() - 1, first);
         }
     }
+	
+	public void addNullsFirstToLastElement() {
+	
+	}
+	
+	public void addNullsLastToLastElement() {
+	
+	}
 
     public List<${glOrderByElementName}> getOrderByList() {
         return _orderByList;

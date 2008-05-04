@@ -896,7 +896,7 @@ public class Table implements IDMethod {
      * Returns an Array containing all the columns in the table
      */
     public String getColumnNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         final List<Column> ls = _columnList;
         int size = ls.size();
@@ -916,7 +916,7 @@ public class Table implements IDMethod {
      * @return Insert clause values with sql comment.
      */
     public String getInsertClauseValuesAsSqlComment() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         final List<Column> ls = _columnList;
         int size = ls.size();
@@ -936,7 +936,7 @@ public class Table implements IDMethod {
      * @return Insert clause values with sql comment.
      */
     public String getInsertClauseValuesAsQuetionMark() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         final List<Column> ls = _columnList;
         int size = ls.size();
@@ -1070,40 +1070,36 @@ public class Table implements IDMethod {
      * @return Foreign table as comma string.
      */
     public String getForeignTableNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> foreignKeyList = _foreignKeys;
-        final int size = foreignKeyList.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = foreignKeyList.get(i);
-            sb.append(", ").append(fk.getForeignTableName());
-        }
-        final List<ForeignKey> referrerList = _referrers;
-        for (ForeignKey fk : referrerList) {
-            sb.append(", ").append(fk.getTable().getName());
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Foreign table as comma string.
-     */
-    public String getForeignTableNameCommaStringWithHtmlHref() {
-        final StringBuffer sb = new StringBuffer();
-
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(fk.getForeignTableName());
         }
-        final List<ForeignKey> referrerList = _referrers;
-        for (ForeignKey fk : referrerList) {
-            final String name = fk.getTable().getName();
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public String getForeignTableNameCommaStringWithHtmlHref() {// For SchemaHTML
+        final StringBuilder sb = new StringBuilder();
+
+        final Set<String> tableSet = new HashSet<String>();
+        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final int size = foreignKeyList.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = foreignKeyList.get(i);
+            final String name = fk.getForeignTableName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
             sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
@@ -1116,7 +1112,7 @@ public class Table implements IDMethod {
      * @return Foreign property-name as comma string.
      */
     public String getForeignPropertyNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         final List<ForeignKey> ls = _foreignKeys;
         final int size = ls.size();
@@ -1126,7 +1122,9 @@ public class Table implements IDMethod {
         }
         final List<ForeignKey> referrerList = _referrers;
         for (ForeignKey fk : referrerList) {
-            sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
+            if (fk.isOneToOne()) {
+                sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
+            }
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -1460,6 +1458,19 @@ public class Table implements IDMethod {
     public boolean hasReferrer() {
         return (getReferrerList() != null && !getReferrerList().isEmpty());
     }
+    
+    public boolean hasReferrerAsMany() {
+        final List<ForeignKey> referrers = getReferrerList();
+        if (referrers == null || referrers.isEmpty()) {
+            return false;
+        }
+        for (ForeignKey key : referrers) {
+            if (!key.isOneToOne()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     protected boolean hasReferrerAsOne() {
         final List<ForeignKey> referrers = getReferrerList();
@@ -1479,20 +1490,10 @@ public class Table implements IDMethod {
     //                                               -------
     protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
 
-    /**
-     * Adds the foreign key from another table that refers to this column.
-     * 
-     * @return Determination.
-     */
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
     }
 
-    /**
-     * Get list of references to this column.
-     * 
-     * @return Single key refferer list.
-     */
     public List<ForeignKey> getSingleKeyReferrers() {
         if (_singleKeyRefferrers != null) {
             return _singleKeyRefferrers;
@@ -1511,42 +1512,44 @@ public class Table implements IDMethod {
         return _singleKeyRefferrers;
     }
 
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Refferer table-name comma string.
-     */
     public String getReferrerTableNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-        final List<ForeignKey> ls = getReferrerList();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            if (!fk.isOneToOne()) {
-                sb.append(", ").append(fk.getTable().getName());
-            }
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    public String getReferrerTableNameCommaStringWithHtmlHref() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> ls = getReferrerList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
             final String name = fk.getTable().getName();
-            if (!fk.isOneToOne()) {
-                sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            if (tableSet.contains(name)) {
+                continue;
             }
+            tableSet.add(name);
+            sb.append(", ").append(name);
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public String getReferrerTableNameCommaStringWithHtmlHref() {// For SchemaHTML
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
+        final List<ForeignKey> referrerList = getReferrerList();
+        final int size = referrerList.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = referrerList.get(i);
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
         return sb.toString();
     }
 
     public String getReferrerPropertyNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final List<ForeignKey> ls = getReferrerList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
@@ -1739,7 +1742,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyWhereStringWithSqlComment() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final List<Column> pk = getPrimaryKey();
         for (Column column : pk) {
             sb.append(" and ");
@@ -1966,7 +1969,7 @@ public class Table implements IDMethod {
      * @return A CSV list.
      */
     private String printList(List<Column> list) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         boolean comma = false;
         for (Iterator<Column> iter = list.iterator(); iter.hasNext();) {
             Column col = (Column) iter.next();
@@ -2500,7 +2503,7 @@ public class Table implements IDMethod {
      * @return XML representation of this table
      */
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append("<table name=\"").append(getName()).append('\"');
 

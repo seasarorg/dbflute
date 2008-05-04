@@ -20,32 +20,34 @@ using ${glPackageCB};
 namespace ${myDBMetaPackageName} {
 
     /// <summary>
-    /// The dbmeta of ${table.Name}.
+    /// The DB meta of ${table.name}.
     /// <![CDATA[
     /// [primary-key]
-    ///     ${table.PrimaryKeyNameCommaString}
+    ///     ${table.primaryKeyNameCommaString}
     /// 
-    /// [all-columns]
-    ///     ${table.ColumnNameCommaString}
-    /// 
-    /// [foreign-table]
-    ///     ${table.ForeignPropertyNameCommaString}
-    /// 
-    /// [referrer-table]
-    ///     ${table.ReferrerPropertyNameCommaString}
+    /// [column]
+    ///     ${table.columnNameCommaString}
     /// 
     /// [sequence]
-    ///     ${table.DefinedSequenceName}
+    ///     ${table.definedSequenceName}
     /// 
     /// [identity]
-    ///     ${table.IdentityPropertyName}
-    /// 
-    /// [update-date]
-    ///     ${table.UpdateDateJavaName}
+    ///     ${table.identityColumnName}
     /// 
     /// [version-no]
-    ///     ${table.VersionNoJavaName}
+    ///     ${table.versionNoColumnName}
+	/// 
+    /// [foreign-table]
+    ///     ${table.foreignTableNameCommaString}
     /// 
+    /// [referrer-table]
+    ///     ${table.referrerTableNameCommaString}
+    /// 
+	/// [foreign-property]
+    ///     ${table.foreignPropertyNameCommaString}
+    /// 
+    /// [referrer-property]
+    ///     ${table.referrerPropertyNameCommaString}
     /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
@@ -91,12 +93,18 @@ namespace ${myDBMetaPackageName} {
 #foreach ($foreignKeys in $table.foreignKeys)
         public static readonly String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
 #end
-
+#foreach ($referrer in $table.referrers)
+#if ($referrer.isOneToOne())
+        public static readonly String FOREIGN_PROPERTY_NAME_${referrer.referrerPropertyNameInitCapAsOne} = "$foreignKeys.foreignPropertyNameInitCap";
+#end
+#end
         // -------------------------------------------------
         //                                     Referrer Name
         //                                     -------------
 #foreach ($referrer in $table.referrers)
+#if (!$referrer.isOneToOne())
         public static readonly String REFERRER_PROPERTY_NAME_${referrer.referrerPropertyNameInitCap} = "$referrer.referrerPropertyNameInitCap";
+#end
 #end
 
         // -------------------------------------------------

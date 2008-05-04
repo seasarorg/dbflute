@@ -57,6 +57,7 @@ package org.apache.torque.engine.database.model;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -769,14 +770,19 @@ public class Column {
         return sb.toString();
     }
 
-    public String getReferrerCommaStringWithHtmlHref() {
+    public String getReferrerTableCommaStringWithHtmlHref() {// For SchemaHTML
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
+        final Set<String> tableSet = new HashSet<String>();
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrers) {
             final Table reffererTable = fk.getTable();
             final String name = reffererTable.getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
             sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());

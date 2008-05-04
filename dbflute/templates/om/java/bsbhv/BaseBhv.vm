@@ -5,6 +5,9 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 
 import ${glPackageBaseCommon}.*;
+#if ($table.hasReferrerAsMany())
+import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
+#end
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
@@ -18,7 +21,7 @@ import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 #if (${table.hasOnlyOnePrimaryKey()})
-#if (${table.hasReferrer()})
+#if ($table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end
 #end
@@ -44,12 +47,6 @@ import ${glPackageCB}.*;
  * [column]
  *     ${table.columnNameCommaString}
  * 
- * [foreign-property]
- *     ${table.foreignPropertyNameCommaString}
- * 
- * [referrer-property]
- *     ${table.referrerPropertyNameCommaString}
- * 
  * [sequence]
  *     ${table.definedSequenceName}
  * 
@@ -58,6 +55,18 @@ import ${glPackageCB}.*;
  * 
  * [version-no]
  *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
  * </pre>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -259,7 +268,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${referrerCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
 
     /**
@@ -273,7 +282,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption the option of load-referrer. (NotNull)
      */
-    public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadReferrerOption<${referrerEntityClassName}, ${referrerCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }

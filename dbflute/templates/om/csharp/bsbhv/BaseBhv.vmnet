@@ -25,6 +25,38 @@ using ${glPackageCB};
 
 namespace ${glPackageExtendedBhv} {
 
+    /// <summary>
+    /// The behavior of ${table.name}. (partial class for auto-generation)
+    /// <![CDATA[
+    /// [primary-key]
+    ///     ${table.primaryKeyNameCommaString}
+    /// 
+    /// [column]
+    ///     ${table.columnNameCommaString}
+    /// 
+    /// [sequence]
+    ///     ${table.definedSequenceName}
+    /// 
+    /// [identity]
+    ///     ${table.identityColumnName}
+    /// 
+    /// [version-no]
+    ///     ${table.versionNoColumnName}
+	/// 
+    /// [foreign-table]
+    ///     ${table.foreignTableNameCommaString}
+    /// 
+    /// [referrer-table]
+    ///     ${table.referrerTableNameCommaString}
+    /// 
+	/// [foreign-property]
+    ///     ${table.foreignPropertyNameCommaString}
+    /// 
+    /// [referrer-property]
+    ///     ${table.referrerPropertyNameCommaString}
+    /// ]]>
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
     [Implementation]
     public partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
