@@ -9,15 +9,20 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-scope as select-hint. */
     protected String _fetchScopeSelectHint = "";
 
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {

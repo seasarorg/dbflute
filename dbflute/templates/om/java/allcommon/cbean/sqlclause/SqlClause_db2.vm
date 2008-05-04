@@ -4,26 +4,41 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 /**
  * SqlClause for DB2.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-first as sql-suffix. */
     protected String _fetchFirstSqlSuffix = "";
 
     /** String of lock as from-hint. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {
         super(tableName);
     }
 
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	@Override
+    protected ${glOrderByClauseName}.OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return createOrderByNullsSetupperByCaseWhen();
+	}
+
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * ${database.ImplementComment}
      */

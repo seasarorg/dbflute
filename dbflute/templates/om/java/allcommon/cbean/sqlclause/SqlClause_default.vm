@@ -8,6 +8,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * @param tableName Table name. (NotNull)
      **/
