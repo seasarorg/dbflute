@@ -89,7 +89,7 @@ public class ${glInternalBasicHandler} {
     }
 
     protected void logSql(Object[] args, Class[] argTypes) {
-        if (_log.isDebugEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+        if (${glQLog}.isQueryLogLevelInfo() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
 			if (isConditionBeanFormatSqlEffective()) {
                 ${glQLog}.log(getLineSeparator() + completeSql);

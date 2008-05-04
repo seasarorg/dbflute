@@ -24,7 +24,7 @@ public class ${glQLog} {
 		}
 	}
 	
-	protected static boolean isQueryLogLevelInfo() {
+	public static boolean isQueryLogLevelInfo() {
 	    return ${glDBFluteConfig}.getInstance().isQueryLogLevelInfo();
 	}
 }

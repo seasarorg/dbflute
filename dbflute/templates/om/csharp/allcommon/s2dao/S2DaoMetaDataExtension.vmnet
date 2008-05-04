@@ -16,6 +16,7 @@ using Seasar.Extension.ADO.Types;
 using Seasar.Framework.Beans;
 using Seasar.Framework.Util;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonAnnotation};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
@@ -397,9 +398,31 @@ namespace ${glPackageBaseCommonS2Dao} {
                     throw new SystemException(msg);
                 }
                 Object arg = args[1];
+				
+				ICommandContext ctx = Apply(args);
+                IUpdateHandler handler = new InternalBasicUpdateHandler(DataSource, ctx.Sql, CommandFactory);
+                return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+			
                 return base.Execute(new Object[] { arg });
             }
         }
+		
+		protected class InternalBasicUpdateHandler {
+            public BasicUpdateHandler(IDataSource dataSource, string sql, ICommandFactory commandFactory)
+                : base(dataSource, sql, commandFactory) {
+            }
+            public override int Execute(object[] args, Type[] argTypes) {
+                if (${glQLog}.IsQueryLogLevelInfo()) {
+                    ${glQLog}.Log(GetCompleteSql(args));
+                }
+                IDbConnection con = Connection;
+                try {
+                    return Execute(con, args, argTypes);
+                } finally {
+                    DataSource.CloseConnection(con);
+                }
+            }
+		}
 
         // -------------------------------------------------
         //                              Common of OutsideSql

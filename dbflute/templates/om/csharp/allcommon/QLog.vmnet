@@ -21,7 +21,7 @@ public class ${glQLog} {
 		}
 	}
 	
-	protected static bool IsQueryLogLevelInfo() {
+	public static bool IsQueryLogLevelInfo() {
 	    return ${glDBFluteConfig}.GetInstance().IsQueryLogLevelInfo;
 	}
 }

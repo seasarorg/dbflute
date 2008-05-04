@@ -1,5 +1,6 @@
 
 using System;
+using System.Data;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -10,6 +11,7 @@ using Seasar.Dao;
 using Seasar.Dao.Node;
 using Seasar.Dao.Parser;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
@@ -324,8 +326,29 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected BasicSelectHandler CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
-            return new BasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
+            return new InternalBasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
+		
+		protected class InternalBasicSelectHandler {
+            public InternalBasicSelectHandler(IDataSource dataSource
+			                                , String sql
+											, IDataReaderHandler dataReaderHandler
+											, ICommandFactory commandFactory
+											, IDataReaderFactory dataReaderFactory)
+                : base(dataSource, sql, commandFactory, dataReaderHandler, dataReaderFactory) {
+            }
+		    public override Object Execute(object[] args, Type[] argTypes) {
+                if (${glQLog}.IsQueryLogLevelInfo()) {
+                    ${glQLog}.Log(GetCompleteSql(args));
+                }
+                IDbConnection conn = Connection;
+                try {
+                    return Execute(conn, args, argTypes);
+                } finally {
+                    DataSource.CloseConnection(conn);
+                }
+            }
+		}
 
         // ===============================================================================
         //                                                                   Assist Helper
