@@ -18,7 +18,8 @@ import ${glPackageCB}.${myConditionBeanClassName};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} extends ${InterfaceName} {
 
-    public Class BEAN = ${glPackageExtendedEntity}.${myExtendedObjectClassName}.class;
+    public String TABLE = "${table.name}";// For DBFlute(Logging)
+    public Class BEAN = ${myExtendedObjectClassName}.class;// For S2Dao
 
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
     public int getCountAll();
