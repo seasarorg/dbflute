@@ -34,6 +34,17 @@ namespace ${glPackageBaseCommonS2Dao} {
         public ${glDaoInterceptor}(IDaoMetaDataFactory daoMetaDataFactory) {
             daoMetaDataFactory_ = daoMetaDataFactory;
         }
+		
+        // ===============================================================================
+        //                                                                         Logging
+        //                                                                         =======
+        protected void Log(String msg) {
+            ${glXLog}.Log(msg);
+    	}
+    	
+        protected bool IsLogEnabled() {
+    	    return ${glXLog}.IsLogEnabled();
+    	}
 
         // ===============================================================================
         //                                                                          Invoke
@@ -53,12 +64,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return invocation.Proceed();
             }
 
-            if (_log.IsDebugEnabled) {
-                TraceMethod(invocation);
+            if (IsLogEnabled()) {
+                TraceInvocation(invocation);
             }
 
             DateTime? before = null;
-            if (_log.IsDebugEnabled) {
+            if (IsLogEnabled()) {
                 before = DateTime.Now; // for performance view
             }
 
@@ -77,7 +88,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     beforeCmd = DateTime.Now;
                 }
 				cmd = FindSqlCommand(invocation);
-                if (_log.IsDebugEnabled && beforeCmd != null) {
+                if (IsLogEnabled() && beforeCmd != null) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {
                         TraceSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
@@ -99,7 +110,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             } catch (NotSingleRowUpdatedRuntimeException e) {
                 throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(e);
             } catch (Exception e) {
-                if (_log.IsDebugEnabled) {
+                if (IsLogEnabled()) {
                     Type targetType = GetComponentDef(invocation).ComponentType;
                     StringBuilder sb = new StringBuilder();
                     sb.Append(targetType.Name + " was interrupted by " + e.GetType().Name).Append(GetLineSeparator());
@@ -107,7 +118,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     sb.Append("  dao    = " + targetType.Name).Append(GetLineSeparator());
                     sb.Append("  method = " + invocation.Method).Append(GetLineSeparator());
                     sb.Append("  args   = " + ${glTraceViewUtilName}.ConvertObjectArrayToStringView(invocation.Arguments));
-                    _log.Debug(sb);
+                    Log(sb.ToString());
                 }
                 throw;
             } finally {
@@ -120,7 +131,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             Type retType = ((MethodInfo) method).ReturnType;
             ret = Seasar.Framework.Util.ConversionUtil.ConvertTargetType(ret, retType);
 
-            if (_log.IsDebugEnabled && before != null) {
+            if (IsLogEnabled() && before != null) {
                 DateTime after = DateTime.Now; // for performance view
                 TraceReturn(invocation, retType, ret, before.Value, after);
             }
@@ -157,70 +168,78 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                    Trace Method
         //                                                                    ============
-        protected void TraceMethod(IMethodInvocation invocation) {
-            if (!_log.IsDebugEnabled) {
-                return;
-            }
+        protected void TraceInvocation(IMethodInvocation invocation) {
             MethodBase method = invocation.Method;
-            String invokeName = method.DeclaringType.Name + "." + method.Name;
+            String invokeName = BuildEntityExpressionFromDaoName(method.DeclaringType.Name) + ":" + method.Name;
             int length = invokeName.Length;
             StringBuilder sb = new StringBuilder();
             for (int i=0; i < length; i++) {
                 sb.Append("=");
             }
-            _log.Debug("/=====================================================" + sb.ToString() + "==");
-            _log.Debug("                                                      " + invokeName + "()");
-            _log.Debug("                                                      " + sb.ToString() + "=/");
+            Log("/=====================================================" + sb.ToString() + "==");
+            Log("                                                      " + invokeName + "()");
+            Log("                                                      " + sb.ToString() + "=/");
         }
 
+        protected String BuildEntityExpressionFromDaoName(String name) {
+    	    if (name.EndsWith("Dao")) {
+    		    name = name.Substring(0, name.Length - 3);
+    		}
+            if (!name.StartsWith("${glProjectPrefix}${glBasePrefix}")) {
+                return name;
+            }
+            int prefixLength = "${glProjectPrefix}${glBasePrefix}".Length;
+            // if (!Character.isUpperCase(name.substring(prefixLength).charAt(0))) {
+            //     return name;
+            // }
+            if (name.Length <= prefixLength) {
+                return name;
+            }
+            return "${glProjectPrefix}" + name.Substring(prefixLength);
+        }
+	
         // ===============================================================================
         //                                                                Trace SqlCommand
         //                                                                ================
         protected void TraceSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
-            if (!_log.IsDebugEnabled) {
-                return;
-            }
-            _log.Debug("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
+            Log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
         }
 
         // ===============================================================================
         //                                                                    Trace Return
         //                                                                    ============
         protected void TraceReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
-            if (!_log.IsDebugEnabled) {
-                return;
-            }
             MethodBase method = invocation.Method;
             try {
                 String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + " - ";
                 if (typeof(System.Collections.IList).IsAssignableFrom(retType) || (ret != null && ret is System.Collections.IList)) {
                     if (ret == null) {
-                        _log.Debug(daoResultPrefix + "Selected list: null]");
+                        Log(daoResultPrefix + "Selected list: null]");
                     } else {
 					    System.Collections.IList ls = (System.Collections.IList)ret;
                         if (ls.Count == 0) {
-                            _log.Debug(daoResultPrefix + "Selected list: 0]");
+                            Log(daoResultPrefix + "Selected list: 0]");
                         } else if (ls.Count == 1 && ls[0] is int) {
-                            _log.Debug(daoResultPrefix + "Selected count: " + ls[0] + "]");
+                            Log(daoResultPrefix + "Selected count: " + ls[0] + "]");
                         } else {
-                            _log.Debug(daoResultPrefix + "Selected list: " + ls.Count + " first=" + ls[0] + "]");
+                            Log(daoResultPrefix + "Selected list: " + ls.Count + " first=" + ls[0] + "]");
                         }
                     }
                 } else if (typeof(${glEntityInterfaceName}).IsAssignableFrom(retType)) {
                     if (ret == null) {
-                        _log.Debug(daoResultPrefix + "Selected entity: null" + "]");
+                        Log(daoResultPrefix + "Selected entity: null" + "]");
                     } else {
                         ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ret;
-                        _log.Debug(daoResultPrefix + "Selected entity: " + entity + "]");
+                        Log(daoResultPrefix + "Selected entity: " + entity + "]");
                     }
                 } else {
                     if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                        _log.Debug(daoResultPrefix + "Selected count: " + ret + "]");
+                        Log(daoResultPrefix + "Selected count: " + ret + "]");
                     } else {
-                        _log.Debug(daoResultPrefix + "Result: " + ret + "]");
+                        Log(daoResultPrefix + "Result: " + ret + "]");
                     }
                 }
-                _log.Debug(" ");
+                Log(" ");
             } catch (Exception e) {
                 String msg = "Result object debug threw the exception: methodName=" + method.Name + " retType=" + retType;
                 msg = msg + " ret=" + ret;

@@ -19,7 +19,7 @@ import ${glPackageCB}.${myConditionBeanClassName};
 public interface ${myClassName} extends ${InterfaceName} {
 
     public Class BEAN = ${glPackageExtendedEntity}.${myExtendedObjectClassName}.class;
-	
+
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
     public int getCountAll();
     
@@ -35,116 +35,48 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseBuri())
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
-    List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);
+    List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);// For the Framework 'Buri'
 #end
 
-    /**
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected count.
-     */
     public int selectCount(${myConditionBeanClassName} cb);
-
-    /**
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected entity. If the select result is zero, it returns null. (Nullable)
-     */
     public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb);
-
-    /**
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
-     */
     public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
 #if ($table.isWritable())
 
-    /**
-     * @param entity The entity of insert target. (NotNull)
-     * @return The count of insert.
-     */
     public int insert(${myExtendedObjectClassName} entity);
-
-    /**
-     * @param entity The entity of update target. (NotNull)
-     * @return The count of Update.
-     */
     public int updateModifiedOnly(${myExtendedObjectClassName} entity);
-
 #if ($table.hasOptimisticLock())
-    /**
-     * @param entity The entity of update target. (NotNull)
-     * @return The count of Update.
-     */
     public int updateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
-
-    /**
-     * @param entity The entity of delete target. (NotNull)
-     * @return The count of delete.
-     */
     public int delete(${myExtendedObjectClassName} entity);
-
 #if ($table.hasOptimisticLock())
-    /**
-     * @param entity The entity of delete target. (NotNull)
-     * @return The count of delete.
-     */
     public int deleteNonstrict(${myExtendedObjectClassName} entity);
 #end
 
 #set ($batchUpdateReturnType = "")
 #if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
+#set ($batchUpdateReturnType = "int[]")
 #else
-  #set ($batchUpdateReturnType = "int")
+#set ($batchUpdateReturnType = "int")
 #end
-
-    /**
-     * @param entityList The list of entity. (NotNull)
-     * @return The array of inserted count.
-     */
     public ${batchUpdateReturnType} insertList(List<${myExtendedObjectClassName}> entityList);
-
-    /**
-     * @param entityList The list of entity. (NotNull)
-     * @return The array of updated count.
-     */
     public ${batchUpdateReturnType} updateList(List<${myExtendedObjectClassName}> entityList);
-
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
-    /**
-     * @param the entityList The list of entity. (NotNull)
-     * @return The array of updated count.
-     */
+#if ($table.hasOptimisticLock())
     public ${batchUpdateReturnType} updateListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
-
-    /**
-     * @param entityList The list of entity. (NotNull)
-     * @return The array of deleted count.
-     */
     public ${batchUpdateReturnType} deleteList(List<${myExtendedObjectClassName}> entityList);
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
-
-	/**
-     * @param entityList The list of entity. (NotNull)
-     * @return The array of deleted count.
-     */
+#if ($table.hasOptimisticLock())
     public ${batchUpdateReturnType} deleteListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
-
-    /**
-     * @param cb Condition-bean. (NotNull)
-     * @return The deleted count.
-     */
     public int deleteByQuery(${myConditionBeanClassName} cb);
 #end
 #else
-  #if ($table.isAvailableNonPrimaryKeyWritable())
 
+#if ($table.isAvailableNonPrimaryKeyWritable())
     public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesAsSqlComment})";
     public int insert(${myExtendedObjectClassName} entity);
-  #end
+#end
 #end
 #if ($table.isUseSequence())
 

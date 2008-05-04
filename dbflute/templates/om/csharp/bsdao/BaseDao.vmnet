@@ -35,22 +35,17 @@ namespace ${myExtendedDaoPackageName} {
 #end
         
 		int SelectCount(${myAttachedCBArgsString});
-        
 		${myExtendedObjectClassName} SelectEntity(${myAttachedCBArgsString});
-        
 		IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
 
 #if ($table.hasPrimaryKey())
         int Insert(${myExtendedObjectClassName} entity);
-        
 		int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-        
 		int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
         int Delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-        
 		int DeleteNonstrict(${myExtendedObjectClassName} entity);
 #end
 
@@ -61,8 +56,6 @@ namespace ${myExtendedDaoPackageName} {
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int DeleteList(IList<${myExtendedObjectClassName}> entityList);
 
-		[Sql("delete from ${table.Name}")]
-        int RemoveAll();
 #end
 #if ($table.isUseSequence())
 
