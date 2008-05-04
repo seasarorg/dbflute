@@ -7,7 +7,6 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 
 /**
  * The dao of outside-sql.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
@@ -19,6 +18,9 @@ public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
 
     <ENTITY> Object selectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     int execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
 
     // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);

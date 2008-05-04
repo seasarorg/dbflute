@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.util.Arrays;
 import java.util.List;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
@@ -10,7 +11,6 @@ import org.seasar.dao.DaoMetaData;
 import org.seasar.dao.DaoMetaDataFactory;
 import org.seasar.dao.SqlCommand;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -238,13 +238,12 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                      ==============
     protected void logInvocation(MethodInvocation invocation) {
         final Method method = invocation.getMethod();
-        final String name = method.getDeclaringClass().getSimpleName();
-        final String invokeNameWithoutKakko = extractTableExpression(method)  + ":" + method.getName();
-        final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
-        final String daoInvokeName = invokeNameWithoutKakko + "()";
+        final String invocationExpressionWithoutKakko = extractInvocationExpression(method)  + "." + method.getName();
+        final String equalBorder = buildFitBorder("", "=", invocationExpressionWithoutKakko, false);
+        final String invocationExpression = invocationExpressionWithoutKakko + "()";
 
         log("/=====================================================" + equalBorder + "==");
-        log("                                                      " + daoInvokeName);
+        log("                                                      " + invocationExpression);
         log("                                                      " + equalBorder + "=/");
 
         logPath();
@@ -468,22 +467,26 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    protected String extractTableExpression(Method method) {
+    protected String extractInvocationExpression(Method method) {
         final Class<?> declaringClass = method.getDeclaringClass();
-        final Field field;
-        try {
-            field = declaringClass.getField("TABLE_EXPRESSION");
-            final String tableExpression = (String)field.get(null);
-            return tableExpression;
-        } catch (Exception ignored) {
-            return buildEntityExpressionFromDaoName(declaringClass.getName());
-        }
+	    return buildEntityExpressionFromDaoName(declaringClass.getName());
+		
+		// Commented out because of still thinking. 
+        // final Field field;
+        // try {
+        //     field = declaringClass.getField("INVOCATION_NAME");
+        //     final String invocationExpression = (String)field.get(null);
+        //     return invocationExpression;
+        // } catch (Exception ignored) {
+        //     return buildEntityExpressionFromDaoName(declaringClass.getName());
+        // }
     }
 	
     protected String buildEntityExpressionFromDaoName(String daoName) {
-        if (daoName.endsWith("Dao")) {
-            daoName = name.substring(0, daoName.length() - "Dao".length());
-        }
+	    // Commented out because of still thinking.
+        // if (daoName.endsWith("Dao")) {
+        //     daoName = daoName.substring(0, daoName.length() - "Dao".length());
+        // }
 		return removeBasePrefixFromSimpleClassName(daoName);
     }
 
