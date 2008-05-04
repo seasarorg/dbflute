@@ -49,26 +49,38 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     public void reverseAll() {
-        for (final java.util.Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+        for (Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
             ite.next().reverse();
         }
     }
 
     public void exchangeFirstOrderByElementForLastOne() {
         if (_orderByList.size() > 1) {
-            final ${glOrderByElementName} first = (${glOrderByElementName})_orderByList.get(0);
-            final ${glOrderByElementName} last = (${glOrderByElementName})_orderByList.get(_orderByList.size() - 1);
+            final ${glOrderByElementName} first = _orderByList.get(0);
+            final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
             _orderByList.set(0, last);
             _orderByList.set(_orderByList.size() - 1, first);
         }
     }
 	
-	public void addNullsFirstToLastElement() {
-	
+	public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
+	    if (_orderByList.isEmpty()) {
+		    return;
+		}
+		final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		last.setOrderByNullsSetupper(filter, true);
 	}
 	
-	public void addNullsLastToLastElement() {
+	public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
+	    if (_orderByList.isEmpty()) {
+		    return;
+		}
+		final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		last.setOrderByNullsSetupper(filter, false);
+	}
 	
+	public static interface OrderByNullsSetupper {
+        public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
 	}
 
     public List<${glOrderByElementName}> getOrderByList() {

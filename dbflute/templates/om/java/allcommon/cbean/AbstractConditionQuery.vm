@@ -689,7 +689,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
-    public void registerOrderBy(String columnName, boolean ascOrDesc) {
+	public void withNullsFirst() {// is User Public!
+	    getSqlClause().addNullsFirstToPreviousOrderBy();
+	}
+	
+	public void withNullsLast() {// is User Public!
+	    getSqlClause().addNullsLastToPreviousOrderBy();
+	}
+	
+    protected void registerOrderBy(String columnName, boolean ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
     }
 	
@@ -698,7 +706,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                       =============
     /**
      * Resolve join alias name.
-     * 
      * @param relationPath Relation path. (NotNull)
      * @param nestLevel Nest level.
      * @return Resolved join alias name. (NotNull)

@@ -251,6 +251,9 @@ public interface ${myClassName} {
      */
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 
+	public void addNullsFirstToPreviousOrderBy();
+	public void addNullsLastToPreviousOrderBy();
+	
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

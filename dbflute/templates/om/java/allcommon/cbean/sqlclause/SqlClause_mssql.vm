@@ -4,26 +4,41 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 /**
  * SqlClause for MSSQL.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-first as select-hint. */
     protected String _fetchFirstSelectHint = "";
 
     /** String of lock as from-hint. */
     protected String _lockFromHint = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {
         super(tableName);
     }
 
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	@Override
+    protected ${glOrderByClauseName}.OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return createOrderByNullsSetupperByCaseWhen();
+	}
+
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * ${database.ImplementComment}
      */
@@ -54,17 +69,17 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     }
 
     /**
-     * ${database.OverrideComment}
-     * 
      * @return Determination.
      */
     public boolean isFetchStartIndexSupported() {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * ${database.ImplementComment} {Implement}
-     * 
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} lockForUpdate() {
@@ -72,9 +87,11 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
-     * 
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {

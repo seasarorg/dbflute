@@ -211,13 +211,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #if (!${col.isNotNull()})
     #end
 
-    public ${myClassName} addOrderBy_${tmpJavaName}_Asc() {
-	    registerOrderBy("${col.name}", true);return this;
-    }
-
-    public ${myClassName} addOrderBy_${tmpJavaName}_Desc() {
-        registerOrderBy("${col.name}", false);return this;
-    }
+    public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true); return this; }
+    public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false); return this; }
   #end
 
     // ===================================================================================

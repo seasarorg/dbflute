@@ -6,16 +6,6 @@ import java.util.Map;
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
- * The paging-result-bean of ${myClassName}.
- * <pre>
- *   For example, if you make order-by 'order BOOK.BOOK_ID asc', the way is as follows:
- *       /-----------------------------------------------------
- *       ${myClassName} orderByElement = new ${myClassName}();
- *       orderByElement.AliasName = "BOOK";
- *       orderByElement.ColumnName = "BOOK_ID";
- *       orderByElement.SetupAsc();
- *       -------------/
- * </pre>
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
@@ -40,10 +30,16 @@ public class ${myClassName} implements java.io.Serializable {
 
     /** The value of ascDesc. */
     protected String _ascDesc = "asc";
+	
+	/** The setupper of order-by nulls. */
+	protected ${glOrderByClauseName}.OrderByNullsSetupper _orderByNullsSetupper;
+	
+	/** Is nulls ordered first? */
+	protected boolean _nullsFirst;
 
     // =====================================================================================
-    //                                                                          GetterSetter
-    //                                                                          ============
+    //                                                                              Accessor
+    //                                                                              ========
     public String getAliasName() {
         return _aliasName;
     }
@@ -73,6 +69,10 @@ public class ${myClassName} implements java.io.Serializable {
     }
     public void setAscDesc(String value) {
         _ascDesc = value;
+    }
+    public void setOrderByNullsSetupper(${glOrderByClauseName}.OrderByNullsSetupper value, boolean nullsFirst) {
+        _orderByNullsSetupper = value;
+		_nullsFirst = nullsFirst;
     }
 
     // =====================================================================================
@@ -136,7 +136,11 @@ public class ${myClassName} implements java.io.Serializable {
         }
         final StringBuilder sb = new StringBuilder();
         sb.append(getColumnFullName()).append(" ").append(_ascDesc);
-        return sb.toString();
+		if (_orderByNullsSetupper != null) {
+		    return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
+		} else {
+            return sb.toString();
+		}
     }
 
     public String getElementClause(Map<String, String> selectClauseRealColumnAliasMap) {
@@ -154,7 +158,11 @@ public class ${myClassName} implements java.io.Serializable {
 		    throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
         }
         sb.append(columnAlias).append(" ").append(_ascDesc);
-        return sb.toString();
+		if (_orderByNullsSetupper != null) {
+		    return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
+		} else {
+            return sb.toString();
+		}
     }
 
     protected void throwOrderByColumnNotFoundException(String columnName, Map<String, String> selectClauseRealColumnAliasMap) {

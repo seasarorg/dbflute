@@ -4,19 +4,24 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 /**
  * SqlClause for Default.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
-     * Constructor.
-     * <p>
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {
         super(tableName);
     }
+
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	@Override
+    protected ${glOrderByClauseName}.OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return createOrderByNullsSetupperByCaseWhen();
+	}
 
     /**
      * ${database.ImplementComment}

@@ -9,18 +9,34 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * <p>
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {
         super(tableName);
     }
 
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	@Override
+    protected ${glOrderByClauseName}.OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return createOrderByNullsSetupperByCaseWhen();
+	}
+
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * ${database.ImplementComment}
      */
