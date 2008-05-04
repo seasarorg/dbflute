@@ -25,7 +25,11 @@ public class ${glQLog} {
 	}
 	
 	public static boolean isLogEnabled() {
-	    return isQueryLogLevelInfo();
+		if (isQueryLogLevelInfo()) {
+	        return _log.isInfoEnabled();
+		} else {
+	        return _log.isDebugEnabled();
+		}
 	}
 	
 	protected static boolean isQueryLogLevelInfo() {

@@ -22,7 +22,11 @@ public class ${glQLog} {
 	}
 	
 	public static bool IsLogEnabled() {
-	    return IsQueryLogLevelInfo();
+		if (IsQueryLogLevelInfo()) {
+	        return _log.IsInfoEnabled;
+		} else {
+	        return _log.IsDebugEnabled;
+		}
 	}
 	
 	protected static bool IsQueryLogLevelInfo() {

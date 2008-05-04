@@ -335,7 +335,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
             }
 		    public override Object Execute(object[] args, Type[] argTypes) {
-                if (${glQLog}.IsQueryLogLevelInfo()) {
+                if (${glQLog}.IsLogEnabled()) {
                     ${glQLog}.Log(GetCompleteSql(args));
                 }
                 IDbConnection conn = Connection;

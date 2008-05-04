@@ -234,12 +234,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 PreUpdateBean(bean);
                 SetupBindVariables(bean);
                 if (${glQLog}.IsLogEnabled()) {
-				    ${glQLog}.Log(GetCompleteSql(_bindVariables));
+				    ${glQLog}.Log(GetCompleteSql(BindVariables));
 				}
                 IDbCommand cmd = Command(connection);
                 int ret = -1;
                 try {
-                    BindArgs(cmd, _bindVariables, _bindVariableTypes);
+                    BindArgs(cmd, BindVariables, BindVariableTypes);
                     ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
                 } finally {
                     CommandUtil.Close(cmd);
@@ -270,12 +270,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 PreUpdateBean(bean);
                 SetupBindVariables(bean);
                 if (${glQLog}.IsLogEnabled()) {
-				    ${glQLog}.Log(GetCompleteSql(_bindVariables));
+				    ${glQLog}.Log(GetCompleteSql(BindVariables));
 				}
                 IDbCommand cmd = Command(connection);
                 int ret = -1;
                 try {
-                    BindArgs(cmd, _bindVariables, _bindVariableTypes);
+                    BindArgs(cmd, BindVariables, BindVariableTypes);
                     ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
                 } finally {
                     CommandUtil.Close(cmd);
@@ -488,8 +488,6 @@ namespace ${glPackageBaseCommonS2Dao} {
 				ICommandContext ctx = Apply(args);
                 IUpdateHandler handler = new InternalBasicUpdateHandler(DataSource, ctx.Sql, CommandFactory);
                 return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
-			
-                return base.Execute(new Object[] { arg });
             }
         }
 		
@@ -498,7 +496,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 : base(dataSource, sql, commandFactory) {
             }
             public override int Execute(object[] args, Type[] argTypes) {
-                if (${glQLog}.IsQueryLogLevelInfo()) {
+                if (${glQLog}.IsLogEnabled()) {
                     ${glQLog}.Log(GetCompleteSql(args));
                 }
                 IDbConnection con = Connection;
