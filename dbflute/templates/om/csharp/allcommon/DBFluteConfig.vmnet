@@ -9,7 +9,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     private static readonly ${myClassName} _instance = new ${myClassName}();
 
@@ -122,7 +122,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                         Config Lock
     //                                                                         ===========
-	public bool isLocked {
+	public bool IsLocked {
 	    get {
 	        return _locked;
 		}
@@ -136,7 +136,7 @@ public class ${myClassName} {
 	}
 	
 	public void Unlock() {
-		if (_log.IsInfoEnabled() {
+		if (_log.IsInfoEnabled) {
 		    _log.Info("...Unlocking the config of dbflute!");
 		}
 	    _locked = false;

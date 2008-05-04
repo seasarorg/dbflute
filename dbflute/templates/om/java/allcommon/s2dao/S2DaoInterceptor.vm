@@ -239,7 +239,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected void logInvocation(MethodInvocation invocation) {
         final Method method = invocation.getMethod();
         final String name = method.getDeclaringClass().getSimpleName();
-        final String invokeNameWithoutKakko = buildEntityExpressionFromDaoName(name)  + ":" + method.getName();
+        final String invokeNameWithoutKakko = extractTableExpression(method)  + ":" + method.getName();
         final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
         final String daoInvokeName = invokeNameWithoutKakko + "()";
 
@@ -347,7 +347,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return isClassNameEndsWith(className, suffixList);
             }
             public String filterSimpleClassName(String simpleClassName) {
-                return buildEntityExpressionFromDaoName(simpleClassName);
+                return removeBasePrefixFromSimpleClassName(simpleClassName);
             }
             public boolean isUseAdditionalInfo() {
                 return false;
@@ -468,21 +468,37 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    protected String buildEntityExpressionFromDaoName(String name) {
-	    if (name.endsWith("Dao")) {
-		    name = name.substring(0, name.length() - 3);
-		}
-        if (!name.startsWith("${glProjectPrefix}${glBasePrefix}")) {
-            return name;
+    protected String extractTableExpression(Method method) {
+        final Class<?> declaringClass = method.getDeclaringClass();
+        final Field field;
+        try {
+            field = declaringClass.getField("TABLE_EXPRESSION");
+            final String tableExpression = (String)field.get(null);
+            return tableExpression;
+        } catch (Exception ignored) {
+            return buildEntityExpressionFromDaoName(declaringClass.getName());
+        }
+    }
+	
+    protected String buildEntityExpressionFromDaoName(String daoName) {
+        if (daoName.endsWith("Dao")) {
+            daoName = name.substring(0, daoName.length() - "Dao".length());
+        }
+		return removeBasePrefixFromSimpleClassName(daoName);
+    }
+
+    protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
+        if (!simpleClassName.startsWith("${glProjectPrefix}${glBasePrefix}")) {
+            return simpleClassName;
         }
         final int prefixLength = "${glProjectPrefix}${glBasePrefix}".length();
-        if (!Character.isUpperCase(name.substring(prefixLength).charAt(0))) {
-            return name;
+        if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
+            return simpleClassName;
         }
-        if (name.length() <= prefixLength) {
-            return name;
+        if (simpleClassName.length() <= prefixLength) {
+            return simpleClassName;
         }
-        return "${glProjectPrefix}" + name.substring(prefixLength);
+        return "${glProjectPrefix}" + simpleClassName.substring(prefixLength);
     }
 
     // ===================================================================================

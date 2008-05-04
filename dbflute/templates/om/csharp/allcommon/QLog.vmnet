@@ -8,7 +8,7 @@ public class ${glQLog} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     // ===================================================================================
     //                                                                             Logging
