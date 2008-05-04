@@ -184,21 +184,103 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                              Update and Delete By Auto Override
         //                                              ==================================
         protected override AbstractSqlCommand CreateUpdateAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new UpdateAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new InternalUpdateAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
+		
+		protected class InternalUpdateAutoStaticCommand : UpdateAutoStaticCommand {
+            public InternalUpdateAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
+                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            }
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalUpdateAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+            }
+		}
 
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new UpdateModifiedOnlyCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new InternalUpdateModifiedOnlyCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
+		
+		protected class InternalUpdateModifiedOnlyCommand : UpdateModifiedOnlyCommand {
+            public InternalUpdateModifiedOnlyCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
+                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            }
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalUpdateAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+            }
+		}
 
         protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new UpdateAutoDynamicCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new InternalUpdateAutoDynamicCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 
+		protected class InternalUpdateAutoDynamicCommand : UpdateAutoDynamicCommand {
+            public InternalUpdateAutoDynamicCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
+                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            }
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalUpdateAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+            }
+		}
+		
+		protected class InternalUpdateAutoHandler : UpdateAutoHandler {
+            public InternalUpdateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
+                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
+            }
+            protected int Execute(IDbConnection connection, object bean) {
+                PreUpdateBean(bean);
+                SetupBindVariables(bean);
+                if (${glQLog}.IsLogEnabled()) {
+				    ${glQLog}.Log(GetCompleteSql(_bindVariables));
+				}
+                IDbCommand cmd = Command(connection);
+                int ret = -1;
+                try {
+                    BindArgs(cmd, _bindVariables, _bindVariableTypes);
+                    ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
+                } finally {
+                    CommandUtil.Close(cmd);
+                }
+                PostUpdateBean(bean);
+                return ret;
+            }
+		}
+		
         protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new DeleteAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new InternalDeleteAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 
+		protected class InternalDeleteAutoStaticCommand : DeleteAutoStaticCommand {
+            public InternalDeleteAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
+                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            }
+            protected override AbstractAutoHandler CreateAutoHandler() {
+                return new InternalDeleteAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+            }
+		}
+		
+		protected class InternalDeleteAutoHandler : DeleteAutoHandler {
+            public InternalDeleteAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
+                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
+            }
+            protected int Execute(IDbConnection connection, object bean) {
+                PreUpdateBean(bean);
+                SetupBindVariables(bean);
+                if (${glQLog}.IsLogEnabled()) {
+				    ${glQLog}.Log(GetCompleteSql(_bindVariables));
+				}
+                IDbCommand cmd = Command(connection);
+                int ret = -1;
+                try {
+                    BindArgs(cmd, _bindVariables, _bindVariableTypes);
+                    ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
+                } finally {
+                    CommandUtil.Close(cmd);
+                }
+                PostUpdateBean(bean);
+                return ret;
+            }
+		}
+		
         protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(MethodInfo method) {
             if (method.Name.Contains("Nonstrict")) {
                 BeanMetaDataForUpdateNonConcurrency bmdNonConcurrency = new BeanMetaDataForUpdateNonConcurrency(_beanType, _annotationReaderFactory, false);
