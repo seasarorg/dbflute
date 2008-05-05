@@ -17,7 +17,7 @@ public class ${glXLog} {
     //                                                                             Logging
     //                                                                             =======
 	public static void log(String msg) {// Very Internal
-		if (isTraceLogLevelInfo()) {
+		if (isExecuteLogLevelInfo()) {
 	        _log.info(msg);
 		} else {
 	        _log.debug(msg);
@@ -25,14 +25,14 @@ public class ${glXLog} {
 	}
 	
     public static boolean isLogEnabled() {// Very Internal
-		if (isTraceLogLevelInfo()) {
+		if (isExecuteLogLevelInfo()) {
 	        return _log.isInfoEnabled();
 		} else {
 	        return _log.isDebugEnabled();
 		}
 	}
 	
-	protected static boolean isTraceLogLevelInfo() {
-	    return ${glDBFluteConfig}.getInstance().isTraceLogLevelInfo();
+	protected static boolean isExecuteLogLevelInfo() {
+	    return ${glDBFluteConfig}.getInstance().isExecuteLogLevelInfo();
 	}
 }

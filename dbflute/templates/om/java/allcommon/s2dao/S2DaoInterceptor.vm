@@ -56,8 +56,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     // ===================================================================================
-    //                                                                             Logging
-    //                                                                             =======
+    //                                                                         Execute Log
+    //                                                                         ===========
     protected void log(String msg) {
         ${glXLog}.log(msg);
 	}

@@ -36,8 +36,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 		
         // ===============================================================================
-        //                                                                         Logging
-        //                                                                         =======
+        //                                                                     Execute Log
+        //                                                                     ===========
         protected void Log(String msg) {
             ${glXLog}.Log(msg);
     	}
@@ -65,7 +65,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             if (IsLogEnabled()) {
-                TraceInvocation(invocation);
+                LogInvocation(invocation);
             }
 
             DateTime? before = null;
@@ -91,7 +91,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (IsLogEnabled() && beforeCmd != null) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {
-                        TraceSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
+                        LogSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
                     }
                 }
             }
@@ -133,7 +133,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             if (IsLogEnabled() && before != null) {
                 DateTime after = DateTime.Now; // for performance view
-                TraceReturn(invocation, retType, ret, before.Value, after);
+                LogReturn(invocation, retType, ret, before.Value, after);
             }
             return ret;
         }
@@ -168,7 +168,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                    Trace Method
         //                                                                    ============
-        protected void TraceInvocation(IMethodInvocation invocation) {
+        protected void LogInvocation(IMethodInvocation invocation) {
             MethodBase method = invocation.Method;
             String invokeName = BuildEntityExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
             int length = invokeName.Length;
@@ -203,14 +203,14 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                Trace SqlCommand
         //                                                                ================
-        protected void TraceSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
+        protected void LogSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
             Log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
         }
 
         // ===============================================================================
         //                                                                    Trace Return
         //                                                                    ============
-        protected void TraceReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
+        protected void LogReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
             MethodBase method = invocation.Method;
             try {
                 String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + " - ";
