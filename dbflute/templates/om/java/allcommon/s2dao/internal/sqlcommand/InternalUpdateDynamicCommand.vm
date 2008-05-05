@@ -1,0 +1,28 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+import org.seasar.dao.CommandContext;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.impl.BasicUpdateHandler;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glInternalUpdateDynamicCommand} extends ${glInternalAbstractDynamicCommand} {
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+	public ${glInternalUpdateDynamicCommand}(DataSource dataSource, StatementFactory statementFactory) {
+		super(dataSource, statementFactory);
+	}
+
+	// ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+	public Object execute(Object args[]) {
+		final CommandContext ctx = apply(args);
+		final BasicUpdateHandler updateHandler = new BasicUpdateHandler(getDataSource(), ctx.getSql(), getStatementFactory());
+		return new Integer(updateHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes()));
+	}
+}

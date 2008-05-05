@@ -28,7 +28,6 @@ import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
-import org.seasar.dao.impl.UpdateDynamicCommand;
 
 import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
@@ -67,6 +66,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynam
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoStaticCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 
 /**
@@ -764,7 +764,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
 
-        final UpdateDynamicCommand cmd = new UpdateDynamicCommand(dataSource, statementFactory) {
+        final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory) {
             @Override
             public Object execute(Object[] args) {
                 if (args.length != 3) {
@@ -862,7 +862,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.sqlCommands.put(sqlCommandKey, cmd);
     }
 
-    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, UpdateDynamicCommand cmd) {
+    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, ${glInternalUpdateDynamicCommand} cmd) {
         cmd.setSql(sql);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);

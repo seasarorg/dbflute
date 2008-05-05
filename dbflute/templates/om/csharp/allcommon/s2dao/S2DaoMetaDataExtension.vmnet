@@ -188,10 +188,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
 		
-        protected override AbstractSqlCommand CreateUpdateAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new ${glInternalUpdateAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        }
-		
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
@@ -393,7 +389,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             RegisterSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
         }
 
-        protected class InternalSpecifiedOusideSqlUpdateDynamicCommand : UpdateDynamicCommand {
+        protected class InternalSpecifiedOusideSqlUpdateDynamicCommand : ${glInternalUpdateDynamicCommand} {
             public InternalSpecifiedOusideSqlUpdateDynamicCommand(IDataSource dataSource, ICommandFactory factory)
                 : base(dataSource, factory) {
             }
@@ -403,10 +399,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     throw new SystemException(msg);
                 }
                 Object arg = args[1];
-				
-				ICommandContext ctx = Apply(args);
-                IUpdateHandler handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
-                return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+				return base.Execute(new Object[]{arg});
             }
         }
 		
