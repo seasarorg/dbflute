@@ -482,6 +482,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+      #set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.S2Dao.Internal.SqlHandler")
       #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
       #set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
       #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
@@ -1874,6 +1875,13 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
     #end
     #if ($database.isTargetLanguageCSharp())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parse('InternalAbstractAutoHandler');")      
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalAbstractAutoHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalAbstractAutoHandler.${glTemplateFileExtension}",$path,"", "")
+	  
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser}))
       $database.makeDirectory($path)
       

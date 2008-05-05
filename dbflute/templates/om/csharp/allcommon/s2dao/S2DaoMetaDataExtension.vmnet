@@ -23,6 +23,7 @@ using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -187,6 +188,38 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new InsertAutoDynamicCommand(dataSource, commandFactory, beanMetaData, propertyNames);
         }
 		
+		protected class InternalInsertAutoDynamicCommand : InsertAutoDynamicCommand {
+            public InternalInsertAutoDynamicCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
+                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            }
+            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
+                return new InternalInsertAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
+            }
+		}
+		
+		protected class InternalInsertAutoHandler : ${glInternalAbstractAutoHandler} {
+            public InternalInsertAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
+                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
+            }
+            protected override void SetupBindVariables(object bean) {
+                SetupInsertBindVariables(bean);
+            }
+    
+            protected override void PreUpdateBean(object bean) {
+                IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
+                if (generator.IsSelfGenerate)
+                    generator.SetIdentifier(bean, DataSource);
+            }
+    
+            protected override void PostUpdateBean(object bean) {
+                IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
+                if (!generator.IsSelfGenerate)
+                    generator.SetIdentifier(bean, DataSource);
+                UpdateVersionNoIfNeed(bean);
+                UpdateTimestampIfNeed(bean);
+            }
+		}
+		
         protected override AbstractSqlCommand CreateUpdateAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new InternalUpdateAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
@@ -226,26 +259,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 		}
 		
-		protected class InternalUpdateAutoHandler : UpdateAutoHandler {
+		protected class InternalUpdateAutoHandler : ${glInternalAbstractAutoHandler} {
             public InternalUpdateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
                 : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
             }
-            protected int Execute(IDbConnection connection, object bean) {
-                PreUpdateBean(bean);
-                SetupBindVariables(bean);
-                if (${glQLog}.IsLogEnabled()) {
-				    ${glQLog}.Log(GetCompleteSql(BindVariables));
-				}
-                IDbCommand cmd = Command(connection);
-                int ret = -1;
-                try {
-                    BindArgs(cmd, BindVariables, BindVariableTypes);
-                    ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
-                } finally {
-                    CommandUtil.Close(cmd);
-                }
-                PostUpdateBean(bean);
-                return ret;
+            protected override void SetupBindVariables(object bean) {
+                SetupUpdateBindVariables(bean);
+            }
+            protected override void PostUpdateBean(object bean) {
+                UpdateVersionNoIfNeed(bean);
+                UpdateTimestampIfNeed(bean);
             }
 		}
 		
@@ -262,26 +285,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 		}
 		
-		protected class InternalDeleteAutoHandler : DeleteAutoHandler {
+		protected class InternalDeleteAutoHandler : ${glInternalAbstractAutoHandler} {
             public InternalDeleteAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
                 : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
             }
-            protected int Execute(IDbConnection connection, object bean) {
-                PreUpdateBean(bean);
-                SetupBindVariables(bean);
-                if (${glQLog}.IsLogEnabled()) {
-				    ${glQLog}.Log(GetCompleteSql(BindVariables));
-				}
-                IDbCommand cmd = Command(connection);
-                int ret = -1;
-                try {
-                    BindArgs(cmd, BindVariables, BindVariableTypes);
-                    ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
-                } finally {
-                    CommandUtil.Close(cmd);
-                }
-                PostUpdateBean(bean);
-                return ret;
+            protected override void SetupBindVariables(object bean) {
+                SetupDeleteBindVariables(bean);
             }
 		}
 		
