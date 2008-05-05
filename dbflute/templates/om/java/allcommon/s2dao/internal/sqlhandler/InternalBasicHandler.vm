@@ -45,6 +45,12 @@ public class ${glInternalBasicHandler} {
         setStatementFactory(statementFactory);
     }
 
+    public ${glInternalBasicHandler}(DataSource ds, String sql, StatementFactory statementFactory) {
+        setDataSource(ds);
+		setSql(sql);
+        setStatementFactory(statementFactory);
+    }
+
 	// ===================================================================================
     //                                                           Basic Method for SubClass
     //                                                           =========================
