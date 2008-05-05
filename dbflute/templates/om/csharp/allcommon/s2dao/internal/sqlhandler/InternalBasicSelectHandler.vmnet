@@ -1,0 +1,106 @@
+
+using System;
+using System.Data;
+using Seasar.Extension.ADO;
+using Seasar.Framework.Log;
+using Seasar.Framework.Util;
+
+using ${glPackageBaseCommon};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
+
+    public class ${glInternalBasicSelectHandler} : BasicHandler, IUpdateHandler {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected IDataReaderFactory _dataReaderFactory = BasicDataReaderFactory.INSTANCE;
+        protected IDataReaderHandler _dataReaderHandler;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalBasicUpdateHandler}(IDataSource dataSource
+			                                 , String sql
+										     , IDataReaderHandler dataReaderHandler
+											 , ICommandFactory commandFactory
+											 , IDataReaderFactory dataReaderFactory)
+			: base(dataSource, sql, commandFactory) {
+            DataReaderHandler = dataReaderHandler;
+            DataReaderFactory = dataReaderFactory;
+        }
+		
+
+        public IDataReaderFactory DataReaderFactory {
+            get { return _dataReaderFactory; }
+            set { _dataReaderFactory = value; }
+        }
+
+        public IDataReaderHandler DataReaderHandler {
+            get { return _dataReaderHandler; }
+            set { _dataReaderHandler = value; }
+        }
+
+        public virtual object Execute(object[] args) {
+            return Execute(args, GetArgTypes(args));
+        }
+
+        public virtual object Execute(object[] args, Type[] argTypes) {
+            if (${glQLog}.IsLogEnabled()) {
+                ${glQLog}.Log(GetCompleteSql(args));
+            }
+            IDbConnection con = Connection;
+            try {
+                return Execute(con, args, argTypes);
+            } finally {
+                DataSource.CloseConnection(con);
+            }
+        }
+
+        public virtual object Execute(object[] args, Type[] argTypes, string[] argNames) {
+            return Execute(args, argTypes);
+        }
+
+        protected virtual object Execute(IDbConnection connection, object[] args, Type[] argTypes) {
+            IDbCommand cmd = null;
+            try {
+                cmd = Command(connection);
+                BindArgs(cmd, args, argTypes);
+                return Execute(cmd);
+            } finally {
+                CommandUtil.Close(cmd);
+            }
+        }
+
+        protected virtual object Execute(IDbCommand cmd) {
+            if (_dataReaderHandler == null)
+            {
+                throw new EmptyRuntimeException("dataReaderHandler");
+            }
+            IDataReader dataReader = null;
+            try
+            {
+                if (_dataReaderHandler is ObjectDataReaderHandler)
+                {
+                    return CommandFactory.ExecuteScalar(DataSource, cmd);
+                }
+                else
+                {
+                    dataReader = CreateDataReader(cmd);
+                    return _dataReaderHandler.Handle(dataReader);
+                }
+            } finally {
+                DataReaderUtil.Close(dataReader);
+            }
+        }
+
+        protected virtual IDataReader CreateDataReader(IDbCommand cmd) {
+            return _dataReaderFactory.CreateDataReader(DataSource, cmd);
+        }
+    }
+}

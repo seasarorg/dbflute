@@ -1,0 +1,83 @@
+
+using System.Text;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+using Seasar.Dao.Impl;
+
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+    public abstract class ${glInternalUpdateAutoDynamicCommand} : AbstractSqlCommand {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalUpdateAutoDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory,
+            IBeanMetaData beanMetaData, string[] propertyNames)
+            : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+        }
+
+        protected override ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+            IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
+            return new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
+        }
+
+        protected override string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes)
+        {
+            StringBuilder builder = new StringBuilder(100);
+            builder.Append("UPDATE ");
+            builder.Append(bmd.TableName);
+            builder.Append(" SET ");
+            for (int i = 0; i < propertyTypes.Length; ++i) {
+                IPropertyType pt = propertyTypes[i];
+                string columnName = pt.ColumnName;
+                if (i > 0) {
+                    builder.Append(", ");
+                }
+                builder.Append(columnName);
+                builder.Append(" = ?");
+            }
+
+            builder.Append(" WHERE ");
+            const string ADD_AND = " AND ";
+            for (int i = 0; i < bmd.PrimaryKeySize; ++i) {
+                builder.Append(bmd.GetPrimaryKey(i));
+                builder.Append(" = ?");
+                builder.Append(ADD_AND);
+            }
+            builder.Length = builder.Length - ADD_AND.Length;
+            if (bmd.HasVersionNoPropertyType) {
+                IPropertyType pt = bmd.VersionNoPropertyType;
+                builder.Append(ADD_AND);
+                builder.Append(pt.ColumnName);
+                builder.Append(" = ?");
+            }
+            if (bmd.HasTimestampPropertyType) {
+                IPropertyType pt = bmd.TimestampPropertyType;
+                builder.Append(ADD_AND);
+                builder.Append(pt.ColumnName);
+                builder.Append(" = ?");
+            }
+            return builder.ToString();
+        }
+
+        protected override bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean)
+        {
+            if (pt.IsPrimaryKey)
+            {
+                return false;
+            }
+            return base.IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean);
+        }
+
+        protected override bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames)
+        {
+            if ( propertyTypes.Length == 0 )
+            {
+                throw new NoUpdatePropertyTypeRuntimeException();
+            }
+            return true;
+        }
+	}
+}

@@ -16,6 +16,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 using ${glPackageBaseCommonS2DaoInternalSqlParser};
 using ${glPackageBaseCommonUtil};
 
@@ -124,7 +125,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
             }
 		
-            BasicSelectHandler selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
+            ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
             bindVariableList.CopyTo(bindVariableArray, 0);
             Type[] bindVariableTypeArray = new Type[bindVariableTypeList.Count];
@@ -149,7 +150,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             Object[] filteredArgs = FilterArgumentsForDataReaderHandler(args);
 
             ICommandContext ctx = Apply(filteredArgs);
-            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
             return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
         }
 
@@ -174,7 +175,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             ICommandContext ctx = Apply(filteredArgs);
-            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
             return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
         }
 
@@ -226,7 +227,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
             IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
             AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
-            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
             bindVariableList.CopyTo(bindVariableArray, 0);
             Type[] bindVariableTypeArray = new Type[bindVariableTypeList.Count];
@@ -322,31 +323,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             return realSelectCountClause;
         }
 
-        protected BasicSelectHandler CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
-            return new InternalBasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
+        protected ${glInternalBasicSelectHandler} CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
+            return new ${glInternalBasicSelectHandler}(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
 		
-		protected class InternalBasicSelectHandler : BasicSelectHandler {
-            public InternalBasicSelectHandler(IDataSource dataSource
-			                                , String sql
-											, IDataReaderHandler dataReaderHandler
-											, ICommandFactory commandFactory
-											, IDataReaderFactory dataReaderFactory)
-                : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
-            }
-		    public override Object Execute(object[] args, Type[] argTypes) {
-                if (${glQLog}.IsLogEnabled()) {
-                    ${glQLog}.Log(GetCompleteSql(args));
-                }
-                IDbConnection conn = Connection;
-                try {
-                    return Execute(conn, args, argTypes);
-                } finally {
-                    DataSource.CloseConnection(conn);
-                }
-            }
-		}
-
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============

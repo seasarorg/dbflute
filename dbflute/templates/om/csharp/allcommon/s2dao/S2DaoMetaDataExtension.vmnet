@@ -185,114 +185,24 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                   Insert and Update and Delete By Auto Override
         //                                   =============================================
         protected override AbstractSqlCommand CreateInsertAutoDynamicCommand(MethodInfo methodInfo, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new InsertAutoDynamicCommand(dataSource, commandFactory, beanMetaData, propertyNames);
+            return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
-		
-		protected class InternalInsertAutoDynamicCommand : InsertAutoDynamicCommand {
-            public InternalInsertAutoDynamicCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
-                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
-            }
-            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-                return new InternalInsertAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
-            }
-		}
-		
-		protected class InternalInsertAutoHandler : ${glInternalAbstractAutoHandler} {
-            public InternalInsertAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
-                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
-            }
-            protected override void SetupBindVariables(object bean) {
-                SetupInsertBindVariables(bean);
-            }
-    
-            protected override void PreUpdateBean(object bean) {
-                IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
-                if (generator.IsSelfGenerate)
-                    generator.SetIdentifier(bean, DataSource);
-            }
-    
-            protected override void PostUpdateBean(object bean) {
-                IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
-                if (!generator.IsSelfGenerate)
-                    generator.SetIdentifier(bean, DataSource);
-                UpdateVersionNoIfNeed(bean);
-                UpdateTimestampIfNeed(bean);
-            }
-		}
 		
         protected override AbstractSqlCommand CreateUpdateAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new InternalUpdateAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new ${glInternalUpdateAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 		
-		protected class InternalUpdateAutoStaticCommand : UpdateAutoStaticCommand {
-            public InternalUpdateAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
-                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
-            }
-            protected override AbstractAutoHandler CreateAutoHandler() {
-                return new InternalUpdateAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
-            }
-		}
-
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new InternalUpdateModifiedOnlyCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 		
-		protected class InternalUpdateModifiedOnlyCommand : UpdateModifiedOnlyCommand {
-            public InternalUpdateModifiedOnlyCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
-                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
-            }
-            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-                return new InternalUpdateAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
-            }
-		}
-
         protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new InternalUpdateAutoDynamicCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 
-		protected class InternalUpdateAutoDynamicCommand : UpdateAutoDynamicCommand {
-            public InternalUpdateAutoDynamicCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
-                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
-            }
-            protected override AbstractAutoHandler CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-                return new InternalUpdateAutoHandler(dataSource, commandFactory, beanMetaData, propertyTypes);
-            }
-		}
-		
-		protected class InternalUpdateAutoHandler : ${glInternalAbstractAutoHandler} {
-            public InternalUpdateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
-                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
-            }
-            protected override void SetupBindVariables(object bean) {
-                SetupUpdateBindVariables(bean);
-            }
-            protected override void PostUpdateBean(object bean) {
-                UpdateVersionNoIfNeed(bean);
-                UpdateTimestampIfNeed(bean);
-            }
-		}
-		
         protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new InternalDeleteAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            return new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
-
-		protected class InternalDeleteAutoStaticCommand : DeleteAutoStaticCommand {
-            public InternalDeleteAutoStaticCommand(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames)
-                : base(dataSource, commandFactory, beanMetaData, propertyNames) {
-            }
-            protected override AbstractAutoHandler CreateAutoHandler() {
-                return new InternalDeleteAutoHandler(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
-            }
-		}
-		
-		protected class InternalDeleteAutoHandler : ${glInternalAbstractAutoHandler} {
-            public InternalDeleteAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
-                : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
-            }
-            protected override void SetupBindVariables(object bean) {
-                SetupDeleteBindVariables(bean);
-            }
-		}
 		
         protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(MethodInfo method) {
             if (method.Name.Contains("Nonstrict")) {
@@ -495,28 +405,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Object arg = args[1];
 				
 				ICommandContext ctx = Apply(args);
-                IUpdateHandler handler = new InternalBasicUpdateHandler(DataSource, ctx.Sql, CommandFactory);
+                IUpdateHandler handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
                 return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
             }
         }
 		
-		protected class InternalBasicUpdateHandler : BasicUpdateHandler {
-            public InternalBasicUpdateHandler(IDataSource dataSource, string sql, ICommandFactory commandFactory)
-                : base(dataSource, sql, commandFactory) {
-            }
-            public override int Execute(object[] args, Type[] argTypes) {
-                if (${glQLog}.IsLogEnabled()) {
-                    ${glQLog}.Log(GetCompleteSql(args));
-                }
-                IDbConnection con = Connection;
-                try {
-                    return Execute(con, args, argTypes);
-                } finally {
-                    DataSource.CloseConnection(con);
-                }
-            }
-		}
-
         // -------------------------------------------------
         //                              Common of OutsideSql
         //                              --------------------

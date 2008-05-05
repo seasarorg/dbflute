@@ -8,12 +8,13 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
 using Seasar.Framework.Log;
 using Seasar.Framework.Util;
+using Seasar.Dao;
 
 using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-    public class ${glInternalAbstractAutoHandler} : BasicHandler, IUpdateHandler {
+    public abstract class ${glInternalAbstractAutoHandler} : BasicHandler, IUpdateHandler {
 
         // ===============================================================================
         //                                                                      Definition
@@ -33,9 +34,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public AbstractAutoHandler(IDataSource dataSource, ICommandFactory commandFactory,
-            IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
-        {
+        public ${glInternalAbstractAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory,
+            IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             DataSource = dataSource;
             CommandFactory = commandFactory;
             _beanMetaData = beanMetaData;
@@ -175,7 +175,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             {
                 IPropertyType pt = bmd.VersionNoPropertyType;
                 PropertyInfo pi = pt.PropertyInfo;
-                Logger.Debug(pi.Name);
+                _log.Debug(pi.Name);
                 varList.Add(pi.GetValue(bean, null));
                 varTypeList.Add(pi.PropertyType);
             }
@@ -281,11 +281,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         public IBeanMetaData BeanMetaData
         {
             get { return _beanMetaData; }
-        }
-
-        protected static Logger Logger
-        {
-            get { return _logger; }
         }
 
         protected object[] BindVariables

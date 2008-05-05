@@ -1,0 +1,43 @@
+
+using System;
+using System.Collections;
+using System.Data;
+using System.Data.SqlTypes;
+using System.Reflection;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
+
+    public abstract class ${glInternalInsertAutoHandler} : ${glInternalAbstractAutoHandler} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalInsertAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
+            : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
+        }
+		
+        // ===============================================================================
+        //                                                                        Override
+        //                                                                        ========
+        protected override void SetupBindVariables(object bean) {
+            SetupInsertBindVariables(bean);
+        }
+
+        protected override void PreUpdateBean(object bean) {
+            IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
+            if (generator.IsSelfGenerate)
+                generator.SetIdentifier(bean, DataSource);
+        }
+
+        protected override void PostUpdateBean(object bean) {
+            IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
+            if (!generator.IsSelfGenerate)
+                generator.SetIdentifier(bean, DataSource);
+            UpdateVersionNoIfNeed(bean);
+            UpdateTimestampIfNeed(bean);
+        }
+    }
+}
