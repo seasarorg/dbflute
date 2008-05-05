@@ -434,7 +434,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _sqlCommands.Add(sqlCommandKey, cmd);
         }
 
-        protected void RegisterSqlCommand(String sqlCommandKey, MethodInfo method, String sql, String[] argNames, Type[] argTypes, UpdateDynamicCommand cmd) {
+        protected void RegisterSqlCommand(String sqlCommandKey, MethodInfo method, String sql, String[] argNames, Type[] argTypes, ${glInternalUpdateDynamicCommand} cmd) {
             cmd.Sql = sql;
             cmd.ArgNames = argNames;
             cmd.ArgTypes = argTypes;

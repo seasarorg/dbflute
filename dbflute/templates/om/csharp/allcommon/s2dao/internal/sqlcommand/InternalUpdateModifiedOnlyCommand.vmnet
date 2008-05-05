@@ -9,7 +9,7 @@ using Seasar.Dao.Impl;
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
-    public abstract class ${glInternalUpdateModifiedOnlyCommand} : ${glInternalUpdateAutoDynamicCommand} {
+    public class ${glInternalUpdateModifiedOnlyCommand} : ${glInternalUpdateAutoDynamicCommand} {
 
         // ===============================================================================
         //                                                                      Definition

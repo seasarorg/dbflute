@@ -4,12 +4,12 @@ import javax.sql.DataSource;
 import org.seasar.dao.CommandContext;
 import org.seasar.extension.jdbc.StatementFactory;
 
-import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalBasicUpdateHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicUpdateHandler};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glInternalUpdateDynamicCommand} extends ${glInternalAbstractDynamicCommand} {
+public class ${glInternalUpdateDynamicCommand} extends ${glInternalAbstractDynamicCommand} {
 
 	// ===================================================================================
     //                                                                         Constructor

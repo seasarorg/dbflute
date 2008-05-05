@@ -1,5 +1,9 @@
 
+using System;
+using System.Collections;
+using System.Data.SqlTypes;
 using System.Text;
+using Seasar.Framework.Exceptions;
 using Seasar.Extension.ADO;
 using Seasar.Dao;
 using Seasar.Dao.Impl;
@@ -8,7 +12,7 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
-    public abstract class ${glInternalInsertAutoDynamicCommand} : AbstractSqlCommand {
+    public class ${glInternalInsertAutoDynamicCommand} : AbstractSqlCommand {
 		
         // ===============================================================================
         //                                                                       Attribute

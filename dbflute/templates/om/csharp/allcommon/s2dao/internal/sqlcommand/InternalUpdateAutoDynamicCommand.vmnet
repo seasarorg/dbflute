@@ -11,6 +11,17 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
     public class ${glInternalUpdateAutoDynamicCommand} : AbstractSqlCommand {
 
         // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+	    protected const int NO_UPDATE = 0;
+	
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected readonly IBeanMetaData _beanMetaData;
+        protected readonly string[] _propertyNames;
+
+        // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalUpdateAutoDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory,
@@ -27,11 +38,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             {
                 return NO_UPDATE;
             }
-            AbstractAutoHandler handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
+            ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
             handler.Sql = SetupSql(bmd, propertyTypes);
             int i = handler.Execute(args);
-            if (i < 1)
-            {
+            if (i < 1) {
                 throw new NotSingleRowUpdatedRuntimeException(args[0], i);
             }
             return i;
@@ -129,6 +139,19 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                 throw new NoUpdatePropertyTypeRuntimeException();
             }
             return true;
+        }
+		
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IBeanMetaData BeanMetaData
+        {
+            get { return _beanMetaData; }
+        }
+
+        public string[] PropertyNames
+        {
+            get { return _propertyNames; }
         }
 	}
 }
