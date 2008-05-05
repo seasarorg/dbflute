@@ -23,6 +23,7 @@ using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2DaoInternalSqlCommand};
 using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {

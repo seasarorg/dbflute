@@ -4,6 +4,8 @@ using Seasar.Extension.ADO;
 using Seasar.Dao;
 using Seasar.Dao.Impl;
 
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
     public abstract class ${glInternalDeleteAutoStaticCommand} : ${glInternalAbstractAutoStaticCommand} {

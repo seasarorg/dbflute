@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
 using Seasar.Framework.Log;
 using Seasar.Framework.Util;
 
@@ -25,7 +26,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glInternalBasicUpdateHandler}(IDataSource dataSource
+        public ${glInternalBasicSelectHandler}(IDataSource dataSource
 			                                 , String sql
 										     , IDataReaderHandler dataReaderHandler
 											 , ICommandFactory commandFactory

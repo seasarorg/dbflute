@@ -9,21 +9,51 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
     public abstract class ${glInternalInsertAutoDynamicCommand} : AbstractSqlCommand {
+		
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        private const int NO_UPDATE = 0;
+        private readonly IBeanMetaData _beanMetaData;
+        private readonly string[] _propertyNames;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalInsertAutoDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory,
             IBeanMetaData beanMetaData, string[] propertyNames)
-            : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            : base(dataSource, commandFactory) {
+            _beanMetaData = beanMetaData;
+            _propertyNames = propertyNames;
         }
 
-        protected override ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public override object Execute(object[] args)
+        {
+            object bean = args[0];
+            IBeanMetaData bmd = BeanMetaData;
+            string[] propertyNames = PropertyNames;
+            IPropertyType[] propertyTypes = CreateTargetPropertyTypes(bmd, bean, propertyNames);
+            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false) {
+                return NO_UPDATE;
+            }
+            ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
+            handler.Sql = SetupSql(bmd, propertyTypes);
+            int i = handler.Execute(args);
+            if (i < 1) {
+                throw new NotSingleRowUpdatedRuntimeException(args[0], i);
+            }
+            return i;
+        }
+
+        protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             return new ${glInternalInsertAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
         }
 
-        protected override string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes) {
+        protected virtual string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes) {
             StringBuilder buf = new StringBuilder(100);
             buf.Append("INSERT INTO ");
             buf.Append(bmd.TableName);
@@ -48,19 +78,69 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return buf.ToString();
         }
 
-        protected override bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean) {
+        protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean) {
             IIdentifierGenerator identifierGenerator = BeanMetaData.IdentifierGenerator;
             if (pt.IsPrimaryKey) {
                 return identifierGenerator.IsSelfGenerate;
             }
-            return base.IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean);
+            string propertyName = pt.PropertyName;
+            if (propertyName.Equals(timestampPropertyName, StringComparison.CurrentCultureIgnoreCase)
+                        || propertyName.Equals(versionNoPropertyName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            object value = pt.PropertyInfo.GetValue(bean, null);
+
+            //  for normal type include Nullable<T>
+            if (value == null)
+            {
+                return false;
+            }
+            //  for Sytem.Data.SqlTypes.INullable
+            if (value is INullable && ((INullable)value).IsNull)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        protected override bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames) {
+        protected virtual bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames)
+        {
             if (propertyTypes.Length == 0) {
                 throw new SRuntimeException("EDAO0014");
             }
             return true;
+        }
+
+        protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames)
+        {
+            IList types = new ArrayList();
+            string timestampPropertyName = bmd.TimestampPropertyName;
+            string versionNoPropertyName = bmd.VersionNoPropertyName;
+            for (int i = 0; i < propertyNames.Length; ++i)
+            {
+                IPropertyType pt = bmd.GetPropertyType(propertyNames[i]);
+                if (IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean))
+                {
+                    types.Add(pt);
+                }
+            }
+
+            IPropertyType[] propertyTypes = new IPropertyType[types.Count];
+            types.CopyTo(propertyTypes, 0);
+            return propertyTypes;
+        }
+
+        public IBeanMetaData BeanMetaData
+        {
+            get { return _beanMetaData; }
+        }
+
+        public string[] PropertyNames
+        {
+            get { return _propertyNames; }
         }
 	}
 }

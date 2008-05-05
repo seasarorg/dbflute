@@ -54,7 +54,7 @@ public class ${glInternalBasicHandler} {
 	// ===================================================================================
     //                                                           Basic Method for SubClass
     //                                                           =========================
-    protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
+    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
         if (args == null) {
             return;
         }
@@ -90,11 +90,11 @@ public class ${glInternalBasicHandler} {
         return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
     }
 
-    protected ValueType getValueType(Class clazz) {
+    protected ValueType getValueType(Class<?> clazz) {
         return ValueTypes.getValueType(clazz);
     }
 
-    protected void logSql(Object[] args, Class[] argTypes) {
+    protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (${glQLog}.isLogEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
 			if (isConditionBeanFormatSqlEffective()) {
