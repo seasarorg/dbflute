@@ -490,18 +490,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     /**
-     * Get the value of the column property '${col.name}'. <br />
+     * Get the value of the column '${col.name}'. <br />
      * {${col.columnDefinitionLineDisp}}
-     * @return The value of the column property '${col.name}'. (Nullable)
+     * @return The value of the column '${col.name}'. (Nullable)
      */
     public ${col.JavaNative} get${col.javaName}() {
         return _${col.uncapitalisedJavaName};
     }
 
     /**
-     * Set the value of the column property '${col.name}'. <br />
+     * Set the value of the column '${col.name}'. <br />
      * {${col.columnDefinitionLineDisp}}
-     * @param ${col.UncapitalisedJavaName} The value of the column property '${col.name}'. (Nullable)
+     * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
 #if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
@@ -524,16 +524,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
     /**
-     * Get the value of the column property '${uncapitalisedJavaName}'. <br />
-     * @return The value of the column property '${uncapitalisedJavaName}'. (Nullable)
+     * Get the value of the column '${uncapitalisedJavaName}'. <br />
+     * @return The value of the column '${uncapitalisedJavaName}'. (Nullable)
      */
     public ${javaNative} get${javaName}() {
         return get${targetJavaName}();
     }
 
     /**
-     * Set the value of the column property '${uncapitalisedJavaName}'. <br />
-     * @param ${uncapitalisedJavaName} The value of the column property '${uncapitalisedJavaName}'. (Nullable)
+     * Set the value of the column '${uncapitalisedJavaName}'. <br />
+     * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (Nullable)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
