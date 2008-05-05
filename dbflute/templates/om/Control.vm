@@ -2176,6 +2176,7 @@ targetdatabase = $targetDatabase
     ##                                                                          ==========
 	#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
       $database.debug("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+      #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}")
       #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}")
       #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}")
       #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}")
@@ -2248,6 +2249,7 @@ targetdatabase = $targetDatabase
 	  #end
       $database.debug("}")
 	#end
+
   #end
 #end
 

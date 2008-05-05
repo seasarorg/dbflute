@@ -249,5 +249,84 @@ targetdatabase = $targetDatabase
     $database.debug("}")
     #end
 
+    ## ===================================================================================
+    ##                                                                          Simple Dto
+    ##                                                                          ==========
+	#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
+      $database.debug("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+	  #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
+      #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
+      #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
+      #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}.customize")
+
+	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+      $database.makeDirectory($path)
+	  
+	  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+      $database.makeDirectory($path)
+	  
+	  #if ($database.isSimpleDtoUseDtoMapper())
+	    #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
+        $database.makeDirectory($path)
+	  #end
+
+	  #foreach ($table in $database.tables)
+        #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
+        #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+        #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+
+        $database.debug("    parse('${myExtendedObjectClassName}');")
+		
+        #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+		
+        #if (!$database.isStopGenerateExtendedEntity())
+          #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+          #end
+		#end
+
+	    #if ($database.isSimpleDtoUseDtoMapper())
+		  #set ( $path = "${strings.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/other/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+		#end
+	  #end
+      $database.debug("}")
+	#end
+	
+    ## ===================================================================================
+    ##                                                                            Flex Dto
+    ##                                                                            ========
+	#if ($database.hasFlexDtoDefinition() && $database.isTargetLanguageJava())
+      $database.debug("parseFlexDto() {")
+      #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
+      #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
+
+	  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+      $database.makeDirectory($path)
+	  
+	  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+      $database.makeDirectory($path)
+	  
+	  #foreach ($table in $database.tables)
+        #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
+        #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
+
+        $database.debug("    parse('${myExtendedObjectClassName}');")
+		
+        #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
+        $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+		
+        #if (!$database.isStopGenerateExtendedEntity())
+          #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+          #end
+		#end
+	  #end
+      $database.debug("}")
+	#end
+	
   #end
 #end

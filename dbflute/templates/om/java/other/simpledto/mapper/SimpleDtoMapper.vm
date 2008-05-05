@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-import ${glPackageExtendedEntity}.${table.extendedEntityClassName};
+import ${myDomainEntityPackageName}.${table.extendedEntityClassName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
@@ -65,29 +65,29 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-	public List<${myExtendedObjectClassName}> map(List<${table.extendedEntityClassName}> entityList) {
+	public List<${myExtendedObjectClassName}> map(List<${table.extendedEntityClassName}> ${table.uncapitalisedJavaName}List) {
 		final List<${myExtendedObjectClassName}> dtoList = new ArrayList<${myExtendedObjectClassName}>();
-	    for (${table.extendedEntityClassName} entity : entityList) {
-		    dtoList.add(map(entity));
+	    for (${table.extendedEntityClassName} ${table.uncapitalisedJavaName} : ${table.uncapitalisedJavaName}List) {
+		    dtoList.add(map(${table.uncapitalisedJavaName}));
 		}
 		return dtoList;
 	}
 	
-	public ${myExtendedObjectClassName} map(${table.extendedEntityClassName} entity) {
-	    final String localKey = "${table.name}@" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
+	public ${myExtendedObjectClassName} map(${table.extendedEntityClassName} ${table.uncapitalisedJavaName}) {
+	    final String localKey = "${table.name}@" + ${table.uncapitalisedJavaName}.getDBMeta().extractPrimaryKeyMapString(${table.uncapitalisedJavaName});
 	    final Object localDto = _relationDtoMap.get(localKey);
 	    if (localDto != null) {
 	        return (${myExtendedObjectClassName})localDto;
 	    }
 	    final ${myExtendedObjectClassName} dto = new ${myExtendedObjectClassName}();
 #foreach ($col in $table.columns)
-	    dto.set${col.javaName}(entity.get${col.javaName}());
+	    dto.set${col.javaName}(${table.uncapitalisedJavaName}.get${col.javaName}());
 #end
         _relationDtoMap.put(localKey, dto);
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKey.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
-        if (entity.get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() != null) {
-			final ${glPackageExtendedEntity}.${foreignKey.foreignTableExtendedEntityClassName} relationEntity = entity.get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}();
+        if (${table.uncapitalisedJavaName}.get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() != null) {
+			final ${glPackageExtendedEntity}.${foreignKey.foreignTableExtendedEntityClassName} relationEntity = ${table.uncapitalisedJavaName}.get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}();
 			final String relationKey = "${foreignKey.foreignTable.name}@" + relationEntity.getDBMeta().extractPrimaryKeyMapString(relationEntity);
 			final Object cachedDto = _relationDtoMap.get(relationKey);
 			if (cachedDto != null) {
@@ -100,13 +100,12 @@ public class ${myClassName} {
 		};
 #end
 #foreach ($referrer in $table.referrers)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #if (${referrer.isOneToOne()})
-        if (entity.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null) {
-			final ${glPackageExtendedEntity}.${referrer.referrerTableExtendedEntityClassName} relationEntity = entity.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}();
+        if (${table.uncapitalisedJavaName}.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null) {
+			final ${glPackageExtendedEntity}.${referrer.referrerTableExtendedEntityClassName} relationEntity = ${table.uncapitalisedJavaName}.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}();
 			final String relationKey = "${foreignKey.foreignTable.name}@" + relationEntity.getDBMeta().extractPrimaryKeyMapString(relationEntity);
 			final Object cachedDto = _relationDtoMap.get(relationKey);
 			if (cachedDto != null) {
@@ -118,9 +117,9 @@ public class ${myClassName} {
 			}
 		};
 #else
-        if (!entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
+        if (!${table.uncapitalisedJavaName}.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
 		    final ${referrerEntityClassName}Mapper mapper = new ${referrerEntityClassName}Mapper(_relationDtoMap);
-		    dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(mapper.map(entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()));
+		    dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(mapper.map(${table.uncapitalisedJavaName}.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()));
 		};
 #end
 #end

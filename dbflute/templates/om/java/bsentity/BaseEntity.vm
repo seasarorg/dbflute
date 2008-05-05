@@ -99,7 +99,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------
-    /** Entity modified properties. (for S2Dao) */
+    /** The attribute of entity modified properties. (for S2Dao) */
     protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
 #if (${table.hasAllCommonColumn()})
 
@@ -143,7 +143,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                          Classification Classifying
     //                                                          ==========================
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.classificationMapList)
 
@@ -167,13 +167,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * ${database.getMapValue($classificationMap, 'comment')} <br />
+     * Is the value of the column '${col.UncapitalisedJavaName}' '${classificationMap.get('name')}'? <br />
+     * ${database.getMapValue($classificationMap, 'comment')}
      * <pre>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
      * </pre>
-     * @return Determanation.
+     * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
         return helpEqualingIgnoreCaseClassification(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
@@ -199,8 +199,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
       #set ($isUseHelpGettingFromClassificationMap = true)
 
     /**
-     * Get the value of ${col.uncapitalisedJavaName} as classification-name.
-     * @return The value of ${col.uncapitalisedJavaName} as classification-name. (Nullable)
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification-name.
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification-name. (Nullable)
      */
     public String get${col.JavaName}Name() {
         return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName});
@@ -210,8 +210,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
       #set ($isUseHelpGettingFromClassificationMap = true)
 
     /**
-     * Get the value of ${col.UncapitalisedJavaName} as classification-alias.
-     * @return The value of ${col.UncapitalisedJavaName} as classification-alias. (Nullable)
+     * Get the value of the column '${col.UncapitalisedJavaName}' as classification-alias.
+     * @return The value of the column '${col.UncapitalisedJavaName}' as classification-alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
         return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName});
@@ -241,20 +241,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
     public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
 
-    /** The entity of foreign table. */
+    /** The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. */
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * Get the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}. {without lazyload}
-     * @return The entity of foreign table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * Get the entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. {without lazy-load}
+     * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
     /**
-     * Set the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}.
-     * @param ${foreignKey.foreignPropertyName} The entity of foreign table. (Nullable)
+     * Set the entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'.
+     * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
         ${foreignVariableName} = ${foreignKey.foreignPropertyName};
@@ -263,7 +263,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 #foreach ($referrer in $table.referrers)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
@@ -274,21 +273,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final int ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($referrer)};
     public static final String ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneRefferer";
 	
-    /** The entity of referrer-as-one table. */
+    /** the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
 	/**
-     * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazy-load} <br />
-     * @return The entity of referrer-as-one table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
-     * @exception IllegalStateException When the size of the referrer table list is duplicate.
+     * Get the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
+     * @return the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
 	    return ${referrerVariableName};
     }
 
     /**
-     * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
-     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of referrer-as-one table. (Nullable)
+     * Set the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'.
+     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
 	    ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
@@ -301,7 +299,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                   Referrer Property
     //                                                                   =================
 #foreach ($referrer in $table.referrers)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
@@ -310,12 +307,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //   Referrer Property = [${referrer.refererJavaBeansRulePropertyName}]
     // * * * * * * * * */
 
-    /** The list of referrer table '${referrer.table.name}'. */
+    /** The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
-     * Get the list of referrer table. {without lazyload} <br />
-     * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     * Get the list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. {without lazy-load} <br />
+     * @return The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
     public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
@@ -325,8 +322,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the list of referrer table.
-     * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
+     * Set the list of referrer property '${referrer.refererJavaBeansRulePropertyName}'.
+     * @param ${referrer.referrerPropertyName} The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
@@ -369,7 +366,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                           Common Column Auto Filter
     //                                                           =========================
     /**
-	 * Disable common column auto set up.
+	 * Disables auto set-up of common columns.
 	 */
     public void disableCommonColumnAutoSetup() {
 	    _canCommonColumnAutoSetup = false;
@@ -389,7 +386,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                      ==============
 #if ($table.hasPrimaryKey())
     /**
-     * ${database.OverrideComment}
      * If the primary-key of the other is same as this one, returns true.
      * @param other Other entity.
      * @return Comparing result.
@@ -415,7 +411,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * ${database.OverrideComment}
      * Calculates hash-code from primary-key.
      * @return Hash-code from primary-keys.
      */
@@ -428,7 +423,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #else
     /**
-     * ${database.OverrideComment}
      * If the all-column value of the other is same as this one, returns true.
      * @param other Other entity. (Nullable)
      * @return Comparing result. If other is null, returns false.
@@ -454,29 +448,27 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * ${database.OverrideComment}
-     * Calculates hash-code from all-columns.
+     * Calculates hash-code from all columns.
      * @return Hash-code from all-columns.
      */
     public int hashCode() {
         int result = 0;
 #foreach ($col in $table.columns)
-        if (this.get${col.JavaName}() != null) { result = result + this.get${col.JavaName}().hashCode(); }
+        if (this.get${col.javaName}() != null) { result = result + this.get${col.javaName}().hashCode(); }
 #end
         return result;
     }
 #end
 
     /**
-     * ${database.OverrideComment}
-     * @return Column-value map-string. (NotNull)
+     * @return The view string of columns. (NotNull)
      */
     public String toString() {
         final String delimiter = ",";
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
-#foreach ($col in $table.Columns)
-        sb.append(delimiter).append(get${col.JavaName}());
+#foreach ($col in $table.columns)
+        sb.append(delimiter).append(get${col.javaName}());
 #end
 
         sb.delete(0, delimiter.length());
@@ -489,27 +481,27 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                            ========
 #foreach ($col in $table.columns)
 
-    /** Column Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
+    /** The column annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.name}";
 #if ($col.isJavaNativeOracleStringClob())
 
-    /** ValueType Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
+    /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteStringClobType";
 #end
 
     /**
-     * Get the value of ${col.javaBeansRulePropertyName}. <br />
+     * Get the value of the column property '${col.name}'. <br />
      * {${col.columnDefinitionLineDisp}}
-     * @return The value of ${col.javaBeansRulePropertyName}. (Nullable)
+     * @return The value of the column property '${col.name}'. (Nullable)
      */
     public ${col.JavaNative} get${col.javaName}() {
         return _${col.uncapitalisedJavaName};
     }
 
     /**
-     * Set the value of ${col.javaBeansRulePropertyName}. <br />
+     * Set the value of the column property '${col.name}'. <br />
      * {${col.columnDefinitionLineDisp}}
-     * @param ${col.UncapitalisedJavaName} The value of ${col.javaBeansRulePropertyName}. (Nullable)
+     * @param ${col.UncapitalisedJavaName} The value of the column property '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
 #if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
@@ -532,16 +524,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
     /**
-     * Get the value of ${uncapitalisedJavaName}. <br />
-     * @return The value of ${uncapitalisedJavaName}. (Nullable)
+     * Get the value of the column property '${uncapitalisedJavaName}'. <br />
+     * @return The value of the column property '${uncapitalisedJavaName}'. (Nullable)
      */
     public ${javaNative} get${javaName}() {
         return get${targetJavaName}();
     }
 
     /**
-     * Set the value of ${uncapitalisedJavaName}. <br />
-     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (Nullable)
+     * Set the value of the column property '${uncapitalisedJavaName}'. <br />
+     * @param ${uncapitalisedJavaName} The value of the column property '${uncapitalisedJavaName}'. (Nullable)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
