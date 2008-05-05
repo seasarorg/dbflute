@@ -36,8 +36,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 		
         // ===============================================================================
-        //                                                                     Execute Log
-        //                                                                     ===========
+        //                                                              Execute Status Log
+        //                                                              ==================
         protected void Log(String msg) {
             ${glXLog}.Log(msg);
     	}

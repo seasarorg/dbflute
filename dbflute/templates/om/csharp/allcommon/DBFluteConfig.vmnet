@@ -19,7 +19,7 @@ public class ${myClassName} {
 	// protected ${glStatementConfig} _defaultStatementConfig;
 	protected bool _conditionBeanFormatSql = true;
 	protected bool _queryLogLevelInfo;
-	protected bool _executeLogLevelInfo;
+	protected bool _executeStatusLogLevelInfo;
 	protected bool _internalDebug;
 	protected bool _locked = true;
 	
@@ -90,16 +90,16 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                              Execute Log Level Info
     //                                                              ======================
-	public bool IsExecuteLogLevelInfo {
+	public bool IsExecuteStatusLogLevelInfo {
 	    get {
-	        return _executeLogLevelInfo;
+	        return _executeStatusLogLevelInfo;
 		}
 		set {
 	        AssertNotLocked();
 		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting executeLogLevelInfo: " + value);
+		        _log.Info("...Setting executeStatusLogLevelInfo: " + value);
 		    }
-	        _executeLogLevelInfo = value;
+	        _executeStatusLogLevelInfo = value;
 		}
 	}
 	

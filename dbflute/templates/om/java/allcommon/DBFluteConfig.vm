@@ -24,7 +24,7 @@ public class ${myClassName} {
 	protected ${glStatementConfig} _defaultStatementConfig;
 	protected boolean _conditionBeanFormatSql = true;
 	protected boolean _queryLogLevelInfo;
-	protected boolean _executeLogLevelInfo;
+	protected boolean _executeStatusLogLevelInfo;
 	protected boolean _internalDebug;
 	protected boolean _locked = true;
 	
@@ -94,18 +94,18 @@ public class ${myClassName} {
 	}
 	
     // ===================================================================================
-    //                                                              Execute Log Level Info
-    //                                                              ======================
-	public boolean isExecuteLogLevelInfo() {
-	    return _executeLogLevelInfo;
+    //                                                       Execute Status Log Level Info
+    //                                                       =============================
+	public boolean isExecuteStatusLogLevelInfo() {
+	    return _executeStatusLogLevelInfo;
 	}
 	
-	public void setExecuteLogLevelInfo(boolean executeLogLevelInfo) {
+	public void setExecuteStatusLogLevelInfo(boolean executeStatusLogLevelInfo) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting executeLogLevelInfo: " + executeLogLevelInfo);
+		    _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
 		}
-	    _executeLogLevelInfo = executeLogLevelInfo;
+	    _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
 	}
 	
     // ===================================================================================
