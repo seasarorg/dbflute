@@ -28,21 +28,13 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
 #end
 
 	// ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalUpdateModifiedOnlyCommand}.class);
-    
-	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private DataSource dataSource;
-    private StatementFactory statementFactory;
-    private BeanMetaData beanMetaData;
-    private String[] propertyNames;
-    private Class notSingleRowUpdatedExceptionClass;
-    private Class daoClass;
-    private boolean checkSingleRowUpdate = true;
+    protected DataSource dataSource;
+    protected StatementFactory statementFactory;
+    protected BeanMetaData beanMetaData;
+    protected String[] propertyNames;
+    protected boolean checkSingleRowUpdate = true;
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -56,26 +48,15 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
     public Object execute(Object[] args) {
         final Object bean = args[0];
         final BeanMetaData bmd = getBeanMetaData();
-        final PropertyType[] propertyTypes = createInsertPropertyTypes(bmd,
-                bean, getPropertyNames());
+        final PropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
         final String sql = createInsertSql(bmd, propertyTypes);
-
-        ${glInternalInsertAutoHandler} handler = new ${glInternalInsertAutoHandler}(getDataSource(),
-                getStatementFactory(), bmd, propertyTypes);
-				
-		// It is unnecessary!
-        // injectDaoClass(handler);
+        final ${glInternalInsertAutoHandler} handler = new ${glInternalInsertAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setSql(sql);
-		
-        int rows = handler.execute(args);
+        final int rows = handler.execute(args);
         if (isCheckSingleRowUpdate() && rows != 1) {
             throw new NotSingleRowUpdatedRuntimeException(args[0], rows);
         }
         return new Integer(rows);
-    }
-
-    public void setDaoClass(Class clazz) {
-        daoClass = clazz;
     }
 
     protected String createInsertSql(BeanMetaData bmd,
@@ -154,14 +135,6 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    protected Class getNotSingleRowUpdatedExceptionClass() {
-        return notSingleRowUpdatedExceptionClass;
-    }
-
-    public void setNotSingleRowUpdatedExceptionClass(Class notSingleRowUpdatedExceptionClass) {
-        this.notSingleRowUpdatedExceptionClass = notSingleRowUpdatedExceptionClass;
     }
 
     protected StatementFactory getStatementFactory() {

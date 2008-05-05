@@ -8,7 +8,7 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
-    public abstract class ${glInternalUpdateAutoStaticCommand} : ${glInternalAbstractAutoStaticCommand} {
+    public class ${glInternalUpdateAutoStaticCommand} : ${glInternalAbstractAutoStaticCommand} {
 
         // ===============================================================================
         //                                                                     Constructor

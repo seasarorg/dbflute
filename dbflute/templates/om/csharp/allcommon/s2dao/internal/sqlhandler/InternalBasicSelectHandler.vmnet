@@ -10,7 +10,7 @@ using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-    public class ${glInternalBasicSelectHandler} : BasicHandler, IUpdateHandler {
+    public class ${glInternalBasicSelectHandler} : BasicHandler, ISelectHandler {
 
         // ===============================================================================
         //                                                                      Definition

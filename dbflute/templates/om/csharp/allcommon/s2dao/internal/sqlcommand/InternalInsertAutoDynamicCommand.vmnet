@@ -48,6 +48,23 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return i;
         }
 
+        protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames) {
+            IList types = new ArrayList();
+            string timestampPropertyName = bmd.TimestampPropertyName;
+            string versionNoPropertyName = bmd.VersionNoPropertyName;
+            for (int i = 0; i < propertyNames.Length; ++i)
+            {
+                IPropertyType pt = bmd.GetPropertyType(propertyNames[i]);
+                if (IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean)) {
+                    types.Add(pt);
+                }
+            }
+
+            IPropertyType[] propertyTypes = new IPropertyType[types.Count];
+            types.CopyTo(propertyTypes, 0);
+            return propertyTypes;
+        }
+		
         protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             return new ${glInternalInsertAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
@@ -102,7 +119,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             {
                 return false;
             }
-
             return true;
         }
 
@@ -114,24 +130,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return true;
         }
 
-        protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames)
-        {
-            IList types = new ArrayList();
-            string timestampPropertyName = bmd.TimestampPropertyName;
-            string versionNoPropertyName = bmd.VersionNoPropertyName;
-            for (int i = 0; i < propertyNames.Length; ++i)
-            {
-                IPropertyType pt = bmd.GetPropertyType(propertyNames[i]);
-                if (IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean))
-                {
-                    types.Add(pt);
-                }
-            }
-
-            IPropertyType[] propertyTypes = new IPropertyType[types.Count];
-            types.CopyTo(propertyTypes, 0);
-            return propertyTypes;
-        }
 
         public IBeanMetaData BeanMetaData
         {

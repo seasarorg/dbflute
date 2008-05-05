@@ -10,7 +10,7 @@ using Seasar.Dao;
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-    public abstract class ${glInternalInsertAutoHandler} : ${glInternalAbstractAutoHandler} {
+    public class ${glInternalInsertAutoHandler} : ${glInternalAbstractAutoHandler} {
 
         // ===============================================================================
         //                                                                     Constructor

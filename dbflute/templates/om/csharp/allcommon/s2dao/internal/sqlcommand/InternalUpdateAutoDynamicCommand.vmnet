@@ -8,7 +8,7 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
-    public abstract class ${glInternalUpdateAutoDynamicCommand} : AbstractSqlCommand {
+    public class ${glInternalUpdateAutoDynamicCommand} : AbstractSqlCommand {
 
         // ===============================================================================
         //                                                                     Constructor
@@ -18,13 +18,48 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             : base(dataSource, commandFactory, beanMetaData, propertyNames) {
         }
 
-        protected override ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+        public override object Execute(object[] args) {
+            object bean = args[0];
+            IBeanMetaData bmd = BeanMetaData;
+            string[] propertyNames = PropertyNames;
+            IPropertyType[] propertyTypes = CreateTargetPropertyTypes(bmd, bean, propertyNames);
+            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false)
+            {
+                return NO_UPDATE;
+            }
+            AbstractAutoHandler handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
+            handler.Sql = SetupSql(bmd, propertyTypes);
+            int i = handler.Execute(args);
+            if (i < 1)
+            {
+                throw new NotSingleRowUpdatedRuntimeException(args[0], i);
+            }
+            return i;
+        }
+		
+        protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames) {
+            IList types = new ArrayList();
+            string timestampPropertyName = bmd.TimestampPropertyName;
+            string versionNoPropertyName = bmd.VersionNoPropertyName;
+            for (int i = 0; i < propertyNames.Length; ++i)
+            {
+                IPropertyType pt = bmd.GetPropertyType(propertyNames[i]);
+                if (IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean)) {
+                    types.Add(pt);
+                }
+            }
+
+            IPropertyType[] propertyTypes = new IPropertyType[types.Count];
+            types.CopyTo(propertyTypes, 0);
+            return propertyTypes;
+        }
+		
+        protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             return new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
         }
 
-        protected override string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes)
-        {
+        protected virtual string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes) {
             StringBuilder builder = new StringBuilder(100);
             builder.Append("UPDATE ");
             builder.Append(bmd.TableName);
@@ -62,19 +97,35 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return builder.ToString();
         }
 
-        protected override bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean)
+        protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean)
         {
             if (pt.IsPrimaryKey)
             {
                 return false;
             }
-            return base.IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean);
+            string propertyName = pt.PropertyName;
+            if (propertyName.Equals(timestampPropertyName, StringComparison.CurrentCultureIgnoreCase)
+                        || propertyName.Equals(versionNoPropertyName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            object value = pt.PropertyInfo.GetValue(bean, null);
+
+            //  for normal type include Nullable<T>
+            if (value == null)
+            {
+                return false;
+            }
+            //  for System.Data.SqlTypes.INullable
+            if (value is INullable && ((INullable)value).IsNull) {
+                return false;
+            }
+			return true;
         }
 
-        protected override bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames)
-        {
-            if ( propertyTypes.Length == 0 )
-            {
+        protected virtual bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames) {
+            if ( propertyTypes.Length == 0 ) {
                 throw new NoUpdatePropertyTypeRuntimeException();
             }
             return true;
