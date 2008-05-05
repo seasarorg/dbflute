@@ -307,12 +307,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //   Referrer Property = [${referrer.refererJavaBeansRulePropertyName}]
     // * * * * * * * * */
 
-    /** The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. */
+    /** The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
-     * Get the list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. {without lazy-load} <br />
-     * @return The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     * Get the entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. {without lazy-load} <br />
+     * @return The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
     public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
@@ -322,8 +322,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the list of referrer property '${referrer.refererJavaBeansRulePropertyName}'.
-     * @param ${referrer.referrerPropertyName} The list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (Nullable)
+     * Set the entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'.
+     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
