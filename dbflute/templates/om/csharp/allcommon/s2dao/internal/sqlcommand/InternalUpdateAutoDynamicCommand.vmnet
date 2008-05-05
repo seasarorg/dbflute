@@ -1,4 +1,7 @@
 
+using System;
+using System.Collections;
+using System.Data.SqlTypes;
 using System.Text;
 using Seasar.Extension.ADO;
 using Seasar.Dao;
@@ -26,7 +29,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                     ===========
         public ${glInternalUpdateAutoDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory,
             IBeanMetaData beanMetaData, string[] propertyNames)
-            : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+            : base(dataSource, commandFactory) {
+            _beanMetaData = beanMetaData;
+            _propertyNames = propertyNames;
         }
 
         public override object Execute(object[] args) {
@@ -34,8 +39,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             IBeanMetaData bmd = BeanMetaData;
             string[] propertyNames = PropertyNames;
             IPropertyType[] propertyTypes = CreateTargetPropertyTypes(bmd, bean, propertyNames);
-            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false)
-            {
+            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false) {
                 return NO_UPDATE;
             }
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
@@ -107,10 +111,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return builder.ToString();
         }
 
-        protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean)
-        {
-            if (pt.IsPrimaryKey)
-            {
+        protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean) {
+            if (pt.IsPrimaryKey) {
                 return false;
             }
             string propertyName = pt.PropertyName;
@@ -123,8 +125,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             object value = pt.PropertyInfo.GetValue(bean, null);
 
             //  for normal type include Nullable<T>
-            if (value == null)
-            {
+            if (value == null) {
                 return false;
             }
             //  for System.Data.SqlTypes.INullable
