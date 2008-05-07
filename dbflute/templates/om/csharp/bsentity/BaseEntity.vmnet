@@ -238,9 +238,7 @@ namespace ${myExtendedEntityPackageName} {
             get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }
         }
-        public bool HasReferrerElements${referrer.referrerPropertyNameInitCap} {
-            get { return ${referrerVariableName} != null && ${referrerVariableName}.Count > 0; }
-        }
+
 #end
 
         #endregion
