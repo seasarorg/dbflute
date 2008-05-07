@@ -107,7 +107,11 @@ public class OldTableClassDeletor {
     }
 
     public void setClassExtension(String classExtension) {
-        this._classExtension = classExtension;
+        if (classExtension != null && !classExtension.startsWith(".")) {
+            this._classExtension = "." + classExtension;
+        } else {
+            this._classExtension = classExtension;
+        }
     }
 
     public Set<String> getNotDeleteClassNameSet() {

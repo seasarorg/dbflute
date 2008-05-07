@@ -1422,6 +1422,10 @@ public class Database {
     // ===============================================================================
     //                                                                         Logging
     //                                                                         =======
+    public void info(String msg) {
+        _log.info(msg);
+    }
+    
     public void debug(String msg) {
         _log.debug(msg);
     }
@@ -1696,7 +1700,7 @@ public class Database {
         for (String baseClassName : _deletedOldTableBaseBehaviorList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
             final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
                 _log.info("deleteOldTableFile('" + extendedClassName + "');");
@@ -1714,7 +1718,7 @@ public class Database {
         for (String baseClassName : _deletedOldTableBaseDaoList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
             final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
                 _log.info("deleteOldTableFile('" + extendedClassName + "');");
@@ -1732,7 +1736,7 @@ public class Database {
         for (String baseClassName : _deletedOldTableBaseEntityList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
             final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
                 _log.info("deleteOldTableFile('" + extendedClassName + "');");
