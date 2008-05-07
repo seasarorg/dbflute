@@ -1425,7 +1425,7 @@ public class Database {
     public void info(String msg) {
         _log.info(msg);
     }
-    
+
     public void debug(String msg) {
         _log.debug(msg);
     }
@@ -1561,6 +1561,29 @@ public class Database {
     // ===============================================================================
     //                                                          Delete Old Table Class
     //                                                          ======================
+    public void deleteOldTableClass() {
+        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            return;
+        }
+        info("// /- - - - - - - - - - - - -");
+        info("// Delete old table classes!");
+        info("// - - - - - - - - - -/");
+        deleteOldTableClass_for_BaseBehavior();
+        deleteOldTableClass_for_BaseDao();
+        deleteOldTableClass_for_BaseEntity();
+        deleteOldTableClass_for_BaseConditionBean();
+        deleteOldTableClass_for_AbstractBaseConditionQuery();
+        deleteOldTableClass_for_BaseConditionQuery();
+        deleteOldTableClass_for_NestSelectSetupper();
+        deleteOldTableClass_for_ExtendedConditionBean();
+        deleteOldTableClass_for_ExtendedConditionQuery();
+        deleteOldTableClass_for_ExtendedConditionInlineQuery();
+        deleteOldTableClass_for_ExtendedBehavior();
+        deleteOldTableClass_for_ExtendedDao();
+        deleteOldTableClass_for_ExtendedEntity();
+        info(" ");
+    }
+
     protected List<String> _deletedOldTableBaseBehaviorList;
 
     public void deleteOldTableClass_for_BaseBehavior() {
@@ -1752,14 +1775,6 @@ public class Database {
 
     protected OldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
             String classSuffix, NotDeleteClassNameSetupper notDeleteClassNameSetupper) {
-        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
-            return new OldTableClassDeletor() {// It's Null Object!
-                @Override
-                public List<String> deleteOldTableClass() {
-                    return new ArrayList<String>();
-                }
-            };
-        }
         final OldTableClassDeletor deletor = new OldTableClassDeletor();
         deletor.setPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);

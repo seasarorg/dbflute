@@ -2001,23 +2001,7 @@ targetdatabase = $targetDatabase
     ##
     ## Delete old table classes.
     ##
-    $database.info("// /= = = = = = = = = = = = =")
-    $database.info("// Delete old table classes!")
-    $database.info("// = = = = = = = = = =/")
-    $database.deleteOldTableClass_for_BaseBehavior()
-    $database.deleteOldTableClass_for_BaseDao()
-    $database.deleteOldTableClass_for_BaseEntity()
-    $database.deleteOldTableClass_for_BaseConditionBean()
-    $database.deleteOldTableClass_for_AbstractBaseConditionQuery()
-    $database.deleteOldTableClass_for_BaseConditionQuery()
-    $database.deleteOldTableClass_for_NestSelectSetupper()
-    $database.deleteOldTableClass_for_ExtendedConditionBean()
-    $database.deleteOldTableClass_for_ExtendedConditionQuery()
-    $database.deleteOldTableClass_for_ExtendedConditionInlineQuery()
-    $database.deleteOldTableClass_for_ExtendedBehavior()
-    $database.deleteOldTableClass_for_ExtendedDao()
-    $database.deleteOldTableClass_for_ExtendedEntity()
-    $database.info(" ")
+    $database.deleteOldTableClass()
     
     ##
     ## Loop by tables.
