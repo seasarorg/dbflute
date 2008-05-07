@@ -36,14 +36,14 @@ namespace ${myDBMetaPackageName} {
     /// 
     /// [version-no]
     ///     ${table.versionNoColumnName}
-	/// 
+    /// 
     /// [foreign-table]
     ///     ${table.foreignTableNameCommaString}
     /// 
     /// [referrer-table]
     ///     ${table.referrerTableNameCommaString}
     /// 
-	/// [foreign-property]
+    /// [foreign-property]
     ///     ${table.foreignPropertyNameCommaString}
     /// 
     /// [referrer-property]
@@ -197,14 +197,14 @@ namespace ${myDBMetaPackageName} {
         //                                                                     Column Info
         //                                                                     ===========
         public override List<${glColumnInfoName}> ColumnInfoList {
-			get {
+            get {
                 List<${glColumnInfoName}> columnInfoList = new ArrayList<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
                 columnInfoList.add(Column${col.javaName});
 #end
                 return columnInfoList;
             }
-		}
+        }
 
 #foreach ($col in $table.columns)
         public ${glColumnInfoName} Column${col.javaName} { get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}); } }
@@ -214,7 +214,7 @@ namespace ${myDBMetaPackageName} {
         //                                                                     Unique Info
         //                                                                     ===========
         public override ${glUniqueInfoName} PrimaryUniqueInfo {
-		    get {
+            get {
 #if ($table.hasPrimaryKey())
                 ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
                 uniqueInfo.DBMeta = this;
@@ -224,10 +224,10 @@ namespace ${myDBMetaPackageName} {
                 uniqueInfo.IsPrimary = true;
                 return uniqueInfo;
 #else
-		        throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
+                throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
 #end
             }
-		}
+        }
 
         // -------------------------------------------------
         //                                   Primary Element
@@ -250,13 +250,13 @@ namespace ${myDBMetaPackageName} {
             foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.GetInstance();
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
-		    map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             foreignInfo.LocalForeignColumnInfoMap = map;
             foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
             foreignInfo.IsOneToOne = ${foreignKeys.isOneToOne()};
             return foreignInfo;
-		}}
+        }}
 #end
 
 #foreach ($referrer in $table.referrers)
@@ -325,24 +325,24 @@ namespace ${myDBMetaPackageName} {
         //                                                           =====================
         protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new LinkedHashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
 
-		protected void InitializeEntityPropertySetupper() {
+        protected void InitializeEntityPropertySetupper() {
 #foreach ($column in $table.columns)
-	        RegisterEntityPropertySetupper("$column.name", "$column.javaName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
+            RegisterEntityPropertySetupper("$column.name", "$column.javaName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
 #end
-		}
-		
-	    public override bool HasEntityPropertySetupper(String propertyName) {
-		    if (_entityPropertySetupperMap.isEmpty()) {
-			    InitializeEntityPropertySetupper();
-			}
-		    return _entityPropertySetupperMap.containsKey(propertyName);
-		}
+        }
+        
+        public override bool HasEntityPropertySetupper(String propertyName) {
+            if (_entityPropertySetupperMap.isEmpty()) {
+                InitializeEntityPropertySetupper();
+            }
+            return _entityPropertySetupperMap.containsKey(propertyName);
+        }
 
         public override void SetupEntityProperty(String propertyName, Object entity, Object value) {
             if (!_entityPropertySetupperMap.containsKey(propertyName)) {
-		        String msg = "The propertyName was Not Found in the map of setupper of entity property:";
-			    msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.size()=" + _entityPropertySetupperMap.size();
-		        throw new SystemException(msg);
+                String msg = "The propertyName was Not Found in the map of setupper of entity property:";
+                msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.size()=" + _entityPropertySetupperMap.size();
+                throw new SystemException(msg);
             }
             EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
             callback.Setup((${myExtendedObjectClassName})entity, value);

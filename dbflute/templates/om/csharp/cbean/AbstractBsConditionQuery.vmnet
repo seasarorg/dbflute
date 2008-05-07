@@ -90,16 +90,16 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
             register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
         }
-	#end
+    #end
     #if (${col.isAvailableStringLikeSearch()})
 
         public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-		    if (value == null || value.Length == 0) { return; }
-		    if (likeSearchOption.IsLikeContain) {
-			    Set${tmpJavaName}_PrefixSearch("%" + value);
-			} else {
+            if (value == null || value.Length == 0) { return; }
+            if (likeSearchOption.IsLikeContain) {
+                Set${tmpJavaName}_PrefixSearch("%" + value);
+            } else {
                 throw new NotSupportedException("Now only LikeContain() has been supported. Sorry...");
-			}
+            }
         }
     #end
     #if (${col.isAvailableStringInScope()})
@@ -119,11 +119,11 @@ namespace ${glPackageBaseCQ} {
       #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
       #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-	    public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-	        assertObjectNotNull("subQuery", subQuery);
-	        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-	        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
-	    }
+        public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            assertObjectNotNull("subQuery", subQuery);
+            keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+            registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+        }
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
     #end
@@ -223,11 +223,11 @@ namespace ${glPackageBaseCQ} {
       #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
       #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-	    public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-	        assertObjectNotNull("subQuery", subQuery);
-	        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-	        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
-	    }
+        public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            assertObjectNotNull("subQuery", subQuery);
+            keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+            registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+        }
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
     #end

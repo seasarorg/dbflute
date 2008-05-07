@@ -42,14 +42,14 @@ namespace ${glPackageExtendedBhv} {
     /// 
     /// [version-no]
     ///     ${table.versionNoColumnName}
-	/// 
+    /// 
     /// [foreign-table]
     ///     ${table.foreignTableNameCommaString}
     /// 
     /// [referrer-table]
     ///     ${table.referrerTableNameCommaString}
     /// 
-	/// [foreign-property]
+    /// [foreign-property]
     ///     ${table.foreignPropertyNameCommaString}
     /// 
     /// [referrer-property]
@@ -68,10 +68,10 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-		public ${myClassName}() {
-		    QuillInjector.GetInstance().Inject(this);
-		}
-		
+        public ${myClassName}() {
+            QuillInjector.GetInstance().Inject(this);
+        }
+        
         // ===============================================================================
         //                                                                Initialized Mark
         //                                                                ================

@@ -27,11 +27,11 @@ namespace ${glPackageNss} {
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
         public ${foreignKeys.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
-    		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
-    		String localRelationPath = _query.getRelationPath();
-    		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-    		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-			return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
+            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
+            String localRelationPath = _query.getRelationPath();
+            _query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+            return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end
@@ -41,11 +41,11 @@ namespace ${glPackageNss} {
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
-    		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
-    		String localRelationPath = _query.getRelationPath();
-    		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-    		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-    		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
+            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
+            String localRelationPath = _query.getRelationPath();
+            _query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+            return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end

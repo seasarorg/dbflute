@@ -35,15 +35,15 @@ namespace ${glPackageBaseCQ} {
             if (_inlineQuery == null) {
                 _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
             }
-			_inlineQuery.xsetOnClauseInline(false);
+            _inlineQuery.xsetOnClauseInline(false);
             return _inlineQuery;
         }
-		
+        
         public ${myConditionInlineQueryClassName} On() {
-    	    if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
-    	    ${myConditionInlineQueryClassName} inlineQuery = Inline();
-    		inlineQuery.xsetOnClauseInline(true);
-    		return inlineQuery;
+            if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
+            ${myConditionInlineQueryClassName} inlineQuery = Inline();
+            inlineQuery.xsetOnClauseInline(true);
+            return inlineQuery;
         }
 
         // ===============================================================================
@@ -149,7 +149,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
-		public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
             ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
             ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
@@ -167,9 +167,9 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 
-    	}
+        }
 
-	
+    
         // ===============================================================================
         //                                                                   Foreign Query
         //                                                                   =============
@@ -202,19 +202,19 @@ namespace ${glPackageBaseCQ} {
 #if ($foreignKeys.hasFixedCondition())
             joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName()));
 #end
-	        getSqlClause().registerOuterJoin(ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getTableSqlName(), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName(), joinOnMap);
+            getSqlClause().registerOuterJoin(ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getTableSqlName(), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName(), joinOnMap);
         }
         protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
-    	    String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
+            String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
             String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
             ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
             cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}");
             cq.xsetRelationPath(nextRelationPath);
             return cq;
         }
-    	protected String resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}() {
-    	    return resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
-    	}
+        protected String resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}() {
+            return resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
+        }
         public bool hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
             return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap} != null;
         }
@@ -260,9 +260,9 @@ namespace ${glPackageBaseCQ} {
             cq.xsetRelationPath(nextRelationPath);
             return cq;
         }
-    	protected String resolveNextRelationPath${referrer.ReffererPropertyNameInitCapAsOne}() {
-    	    return resolveNextRelationPath("${table.name}", "${referrer.reffererPropertyNameAsOne}");
-    	}
+        protected String resolveNextRelationPath${referrer.ReffererPropertyNameInitCapAsOne}() {
+            return resolveNextRelationPath("${table.name}", "${referrer.reffererPropertyNameAsOne}");
+        }
         public bool hasConditionQuery${referrer.ReffererPropertyNameInitCapAsOne}() {
             return _conditionQuery${referrer.ReffererPropertyNameInitCapAsOne} != null;
         }

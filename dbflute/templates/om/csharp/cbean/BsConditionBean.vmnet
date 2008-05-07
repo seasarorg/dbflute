@@ -88,7 +88,7 @@ namespace ${glPackageBaseCB} {
         public override bool HasUnionQueryOrUnionAllQuery() {
             return Query().hasUnionQueryOrUnionAllQuery();
         }
-	
+    
         // ===============================================================================
         //                                                                    Setup Select
         //                                                                    ============
@@ -113,9 +113,9 @@ namespace ${glPackageBaseCB} {
         }
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
             String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}().getRealAliasName();
-    		String localRelationPath = Query().getRelationPath();
-    		this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-    		this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+            String localRelationPath = Query().getRelationPath();
+            this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+            this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
                 _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }
@@ -145,9 +145,9 @@ namespace ${glPackageBaseCB} {
         }
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
             String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}().getRealAliasName();
-    		String localRelationPath = Query().getRelationPath();
-    		this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-    		this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+            String localRelationPath = Query().getRelationPath();
+            this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+            this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
                 _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }

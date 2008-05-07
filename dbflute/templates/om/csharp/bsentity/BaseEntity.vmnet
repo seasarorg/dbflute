@@ -39,14 +39,14 @@ namespace ${myExtendedEntityPackageName} {
     /// 
     /// [version-no]
     ///     ${table.versionNoColumnName}
-	/// 
+    /// 
     /// [foreign-table]
     ///     ${table.foreignTableNameCommaString}
     /// 
     /// [referrer-table]
     ///     ${table.referrerTableNameCommaString}
     /// 
-	/// [foreign-property]
+    /// [foreign-property]
     ///     ${table.foreignPropertyNameCommaString}
     /// 
     /// [referrer-property]
