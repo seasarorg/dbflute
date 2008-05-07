@@ -106,68 +106,8 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                        Aspect Point
-    //                                                                        ============
-    /**
-     * @deprecated
-     * @return Aspect Point.
-     */
-    public String getCommonColumnSetupInterceptorAspectPoint() {
-        return stringProp("torque.commonColumnSetupInterceptorAspectPoint", "behavior");
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        final DfLittleAdjustmentProperties littleProp = getPropertiesHandler().getLittleAdjustmentProperties(
-                getProperties());
-        if (littleProp.isCommonColumnInterceptingOnBehaviorFilter()) {
-            return false;
-        }
-
-        if (!isExistCommonColumnSetupElement()) {
-            return false;
-        }
-        final boolean oldProp = booleanProp("torque.isAvailableCommonColumnSetupInterceptorToBehavior", false);
-        if (oldProp) {
-            return true;
-        }
-        return isCommonColumnSetupInterceptorAspectPointBehavior();
-    }
-
-    public boolean isCommonColumnSetupInterceptorAspectPointBehavior() {
-        final String aspectPoint = getCommonColumnSetupInterceptorAspectPoint();
-        if (aspectPoint.equalsIgnoreCase("behavior")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        final DfLittleAdjustmentProperties littleProp = getPropertiesHandler().getLittleAdjustmentProperties(
-                getProperties());
-        if (littleProp.isCommonColumnInterceptingOnBehaviorFilter()) {
-            return false;
-        }
-
-        if (!isExistCommonColumnSetupElement()) {
-            return false;
-        }
-        final boolean oldProp = booleanProp("torque.isAvailableCommonColumnSetupInterceptorToDao", false);
-        if (oldProp) {
-            return true;
-        }
-        return isCommonColumnSetupInterceptorAspectPointDao();
-    }
-
-    public boolean isCommonColumnSetupInterceptorAspectPointDao() {
-        final String aspectPoint = getCommonColumnSetupInterceptorAspectPoint();
-        if (aspectPoint.equalsIgnoreCase("dao")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    //                                                                 Common Column Setup
+    //                                                                 ===================
     public boolean isExistCommonColumnSetupElement() {
         final Map<String, Object> insertElementMap = getBeforeInsertMap();
         final Map<String, Object> updateElementMap = getBeforeUpdateMap();

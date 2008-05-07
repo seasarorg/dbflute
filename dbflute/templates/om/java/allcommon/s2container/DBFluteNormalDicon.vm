@@ -20,14 +20,12 @@
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
     <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
-#if ($database.isVersionAfter1040())
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
 #if ($database.isVersionAfter1047())
     <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
 #else
     <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
-#end
 #end
 #if ($database.isVersionAfter1047())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
@@ -45,15 +43,7 @@
 #if ($database.isVersionAfter1046())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
 #end
-
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
-#if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
-
-    <!-- Common column setup interceptor. -->
-    <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>
-    <component name="commonColumnSetupBeforeUpdateInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeUpdateInterceptor}"/>
-    <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
-#end
 
     <!-- The selector of behavior. -->
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
@@ -73,27 +63,10 @@
 #foreach ($table in $database.tables)
 
     <!-- ${table.name} -->
-#if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
-    <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
-        <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
-        <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
-        <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
-        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
-    </component>
-#else
     <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
-#end
-#if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
-    <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
-        <aspect pointcut="${database.columnSetupBeforeInsertInterceptorToBehaviorPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
-        <aspect pointcut="${database.columnSetupBeforeUpdateInterceptorToBehaviorPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
-        <aspect pointcut="${database.columnSetupBeforeDeleteInterceptorToBehaviorPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
-    </component>
-#else
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
-#end
 #end
 
 </components>

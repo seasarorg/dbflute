@@ -20,39 +20,31 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                              Delete Old Table Class
+    //                                                              ======================
+    public boolean isDeleteOldTableClass() {
+        return booleanProp("torque.isDeleteOldTableClass", false);
+    }
+
+    // ===================================================================================
     //                                                             Non PrimaryKey Writable
     //                                                             =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
         return booleanProp("torque.isAvailableNonPrimaryKeyWritable", false);
     }
 
-    // ===============================================================================
-    //                                                 Adding Schema to Table Sql-Name
-    //                                                 ===============================
+    // ===================================================================================
+    //                                                     Adding Schema to Table Sql-Name
+    //                                                     ===============================
     public boolean isAvailableAddingSchemaToTableSqlName() {
         return booleanProp("torque.isAvailableAddingSchemaToTableSqlName", false);
     }
 
-    // ===============================================================================
-    //                                                 Adding Schema to Table Sql-Name
-    //                                                 ===============================
+    // ===================================================================================
+    //                                                   ModifiedPropertiesAddLogicIfNeeds
+    //                                                   =================================
     public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
         return booleanProp("torque.isAvailableEntityModifiedPropertiesAddLogicIfNeeds", false);
-    }
-
-    // ===============================================================================
-    //                                   Common Column Intercepting On Behavior Filter
-    //                                   =============================================
-    public boolean isCommonColumnInterceptingOnBehaviorFilter() {
-        final DfCommonColumnProperties commonColumnProp = getPropertiesHandler().getCommonColumnProperties(
-                getProperties());
-        if (!commonColumnProp.isExistCommonColumnSetupElement()) {
-            return false;
-        }
-        if (commonColumnProp.isCommonColumnSetupInterceptorAspectPointDao()) {
-            return false;
-        }
-        return booleanProp("torque.isCommonColumnInterceptingOnBehaviorFilter", true);
     }
 
     // ===============================================================================
@@ -61,7 +53,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isOneToManyReturnNullIfNonSelect() {
         return booleanProp("torque.isOneToManyReturnNullIfNonSelect", false);
     }
-    
+
     // ===============================================================================
     //                                                                      Compatible
     //                                                                      ==========
@@ -72,7 +64,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleOldReferrerNotDeprecated() {
         return booleanProp("torque.isCompatibleOldReferrerNotDeprecated", false);
     }
-    
+
     // ===============================================================================
     //                                                         Disable As-One-Relation
     //                                                         =======================
@@ -92,7 +84,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
         return _disableAsOneRelationTableMap;
     }
-    
+
     public boolean isDisableAsOneRelation(String tableName) {
         return getDisableAsOneRelationTableMap().containsKey(tableName.toLowerCase());
     }
@@ -148,7 +140,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
                 foreignKeyMap);
         return foreignKeyFxMap;
     }
-    
+
     public boolean isUseBuri() {
         final boolean isUseBuri = booleanProp("torque.isUseBuri", false);
         if (isUseBuri) {
@@ -156,7 +148,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
         return booleanProp("torque.isUseS2Buri", false);
     }
-    
+
     public boolean isUseTeeda() {
         return booleanProp("torque.isUseTeeda", false);
     }

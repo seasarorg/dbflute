@@ -27,7 +27,7 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
 
     /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
@@ -630,7 +630,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
 	protected void setupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
@@ -710,7 +710,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
 	protected void setupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
@@ -724,7 +724,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug(msg);
             _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
@@ -790,7 +790,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
 	protected void setupCommonColumnOfDeleteIfNeeds(${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
         }
@@ -804,7 +804,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug(msg);
             _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})

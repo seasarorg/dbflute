@@ -54,8 +54,10 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.io.filedelete.OldTableClassDeletor;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
@@ -81,6 +84,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupR
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -104,7 +108,7 @@ public class Database {
 
     protected String _name;
 
-    protected String _pkg;
+    protected String _pkg;// TODO: @jflute -- Unused?
 
     protected String _defaultIdMethod;
 
@@ -130,7 +134,7 @@ public class Database {
      */
     public void loadFromXML(Attributes attrib) {
         setName(attrib.getValue("name"));
-        _pkg = attrib.getValue("package");
+        _pkg = attrib.getValue("package");// TODO: @jflute -- Unused?
         _defaultJavaType = attrib.getValue("defaultJavaType");
         _defaultIdMethod = attrib.getValue("defaultIdMethod");
         _defaultJavaNamingMethod = attrib.getValue("defaultJavaNamingMethod");
@@ -545,7 +549,7 @@ public class Database {
     public boolean isDatabaseOracle() {
         return getBasicProperties().isDatabaseOracle();
     }
-    
+
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
@@ -876,20 +880,8 @@ public class Database {
         return !getProperties().getCommonColumnProperties().getCommonColumnNameList().isEmpty();
     }
 
-    /**
-     * @deprecated
-     * @return Determination.
-     */
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
-    }
-
-    /**
-     * @deprecated
-     * @return Determination.
-     */
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToDao();
+    public boolean isExistCommonColumnSetupElement() {
+        return getProperties().getCommonColumnProperties().isExistCommonColumnSetupElement();
     }
 
     public boolean hasCommonColumnConvertion(String commonColumnName) {
@@ -1086,7 +1078,7 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
-    
+
     public boolean isMakeClassificationValueLabelList() {
         return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();
     }
@@ -1094,7 +1086,7 @@ public class Database {
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
-    
+
     // -----------------------------------------------------
     //                                      S2Dao Adjustment
     //                                      ----------------
@@ -1133,29 +1125,18 @@ public class Database {
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
-    public boolean isCommonColumnInterceptingOnBehaviorFilter() {
-        return getProperties().getLittleAdjustmentProperties().isCommonColumnInterceptingOnBehaviorFilter();
-    }
-
     public boolean isOneToManyReturnNullIfNonSelect() {
         return getProperties().getLittleAdjustmentProperties().isOneToManyReturnNullIfNonSelect();
     }
 
     public String getBehaviorDelegateModifier() {
-        final String protectedString = "protected";
-        if (isCommonColumnInterceptingOnBehaviorFilter()) {
-            return protectedString;
-        }
-        return "public";
-
-        // TODO: @jflute -- 0.6.0で有効にする。
-        // return isAvailableCommonColumnSetupInterceptorToBehavior() ? "public" : protectedString;
+        return "protected";
     }
 
     public boolean isUseBuri() {
         return getProperties().getLittleAdjustmentProperties().isUseBuri();
     }
-    
+
     public boolean isUseTeeda() {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
     }
@@ -1273,117 +1254,98 @@ public class Database {
             return targetName;
         }
     }
-    
+
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public boolean hasSimpleDtoDefinition() {
         return getProperties().getSimpleDtoProperties().hasSimpleDtoDefinition();
     }
-    
+
     public String getSimpleDtoBaseDtoPackage() {
         return getProperties().getSimpleDtoProperties().getBaseDtoPackage();
     }
-    
+
     public String getSimpleDtoExtendedDtoPackage() {
         return getProperties().getSimpleDtoProperties().getExtendedDtoPackage();
     }
-    
+
     public String getSimpleDtoBaseDtoPrefix() {
         return getProperties().getSimpleDtoProperties().getBaseDtoPrefix();
     }
-    
+
     public String getSimpleDtoBaseDtoSuffix() {
         return getProperties().getSimpleDtoProperties().getBaseDtoSuffix();
     }
-    
+
     public String getSimpleDtoExtendedDtoPrefix() {
         return getProperties().getSimpleDtoProperties().getExtendedDtoPrefix();
     }
-    
+
     public String getSimpleDtoExtendedDtoSuffix() {
         return getProperties().getSimpleDtoProperties().getExtendedDtoSuffix();
     }
-    
+
     public String getSimpleDtoDtoMapperPackage() {
         return getProperties().getSimpleDtoProperties().getMapperPackage();
     }
-    
+
     public boolean isSimpleDtoUseDtoMapper() {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
     }
-    
+
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public boolean hasFlexDtoDefinition() {
         return getProperties().getFlexDtoProperties().hasFlexDtoDefinition();
     }
-    
+
     public String getFlexDtoBaseDtoPackage() {
         return getProperties().getFlexDtoProperties().getBaseDtoPackage();
     }
-    
+
     public String getFlexDtoExtendedDtoPackage() {
         return getProperties().getFlexDtoProperties().getExtendedDtoPackage();
     }
-    
+
     public String getFlexDtoBaseDtoPrefix() {
         return getProperties().getFlexDtoProperties().getBaseDtoPrefix();
     }
-    
+
     public String getFlexDtoBaseDtoSuffix() {
         return getProperties().getFlexDtoProperties().getBaseDtoSuffix();
     }
-    
+
     public String getFlexDtoExtendedDtoPrefix() {
         return getProperties().getFlexDtoProperties().getExtendedDtoPrefix();
     }
-    
+
     public String getFlexDtoExtendedDtoSuffix() {
         return getProperties().getFlexDtoProperties().getExtendedDtoSuffix();
     }
-    
+
     // ===================================================================================
     //                                                                       S2JDBC Entity
     //                                                                       =============
     public boolean hasS2jdbcDefinition() {
         return getProperties().getS2jdbcProperties().hasS2jdbcDefinition();
     }
-    
+
     public String getS2jdbcBaseEntityPackage() {
         return getProperties().getS2jdbcProperties().getBaseEntityPackage();
     }
-    
+
     public String getS2jdbcExtendedEntityPackage() {
         return getProperties().getS2jdbcProperties().getExtendedEntityPackage();
     }
-    
+
     public String getS2jdbcBaseEntityPrefix() {
         return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
     }
-    
+
     public String getS2jdbcBaseEntitySuffix() {
         return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
-    }
-    
-    // **********************************************************************************************
-    //                                                                             Hard code property
-    //                                                                             ******************
-    public String getDaoSelectorComponentName() {
-        return filterProjectSuffixForComponentName("daoSelector");
-    }
-
-    public String getBehaviorSelectorComponentName() {
-        return filterProjectSuffixForComponentName("behaviorSelector");
-    }
-    
-    public String getSharp() {
-        return "#";
-    }
-    
-    public String getDollar() {
-        return "$";
     }
 
     //====================================================================================
@@ -1406,7 +1368,7 @@ public class Database {
         }
         return _databaseInfoMap;
     }
-    
+
     protected Map<String, Map<String, String>> getDatabaseDefinitionMap() {
         final DfDatabaseConfig config = new DfDatabaseConfig();
         return config.analyzeDatabaseBaseInfo();
@@ -1442,84 +1404,23 @@ public class Database {
         return sequenceNextSql;
     }
 
-    public String getColumnSetupBeforeInsertInterceptorPointcut() {
-        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
-            return getColumnSetupBeforeInsertInterceptorToBehaviorPointcut();
-        } else {
-            return getColumnSetupBeforeInsertInterceptorToDaoPointcut();
-        }
+    // ===================================================================================
+    //                                                                           Hard Code
+    //                                                                           =========
+    public String getDaoSelectorComponentName() {
+        return filterProjectSuffixForComponentName("daoSelector");
     }
 
-    public String getColumnSetupBeforeUpdateInterceptorPointcut() {
-        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
-            return getColumnSetupBeforeUpdateInterceptorToBehaviorPointcut();
-        } else {
-            return getColumnSetupBeforeUpdateInterceptorToDaoPointcut();
-        }
+    public String getBehaviorSelectorComponentName() {
+        return filterProjectSuffixForComponentName("behaviorSelector");
     }
 
-    public String getColumnSetupBeforeDeleteInterceptorPointcut() {
-        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
-            return getColumnSetupBeforeDeleteInterceptorToBehaviorPointcut();
-        } else {
-            return getColumnSetupBeforeDeleteInterceptorToDaoPointcut();
-        }
+    public String getSharp() {
+        return "#";
     }
 
-    public String getColumnSetupBeforeInsertInterceptorToBehaviorPointcut() {
-        return "delegateInsert.*, delegateCreate.*, delegateAdd.*, callInsert.*, callCreate.*, callAdd.*";
-    }
-
-    public String getColumnSetupBeforeUpdateInterceptorToBehaviorPointcut() {
-        return "delegateUpdate.*, delegateModify.*, delegateStore.*, callUpdate.*, callModify.*, callStore.*";
-    }
-
-    public String getColumnSetupBeforeDeleteInterceptorToBehaviorPointcut() {
-        return "delegateDelete.*, delegateRemove.*, callDeletee.*, callRemove";
-    }
-
-    public String getColumnSetupBeforeInsertInterceptorToDaoPointcut() {
-        return "insert.*, create.*, add.*";
-    }
-
-    public String getColumnSetupBeforeUpdateInterceptorToDaoPointcut() {
-        return "update.*, modify.*, store.*";
-    }
-
-    public String getColumnSetupBeforeDeleteInterceptorToDaoPointcut() {
-        return "delete.*, remove.*";
-    }
-
-    public String getColumnSetupBeforeInsertInterceptorToBehaviorPointcutInitCap() {
-        return "DelegateInsert.*, DelegateCreate.*, DelegateAdd.*";
-    }
-
-    public String getColumnSetupBeforeUpdateInterceptorToBehaviorPointcutInitCap() {
-        return "DelegateUpdate.*, DelegateModify.*, DelegateStore.*";
-    }
-
-    public String getColumnSetupBeforeDeleteInterceptorToBehaviorPointcutInitCap() {
-        return "DelegateDelete.*, DelegateRemove.*";
-    }
-
-    public String getColumnSetupBeforeInsertInterceptorToDaoPointcutInitCap() {
-        return "Insert.*, Create.*, Add.*";
-    }
-
-    public String getColumnSetupBeforeUpdateInterceptorToDaoPointcutInitCap() {
-        return "Update.*, Modify.*, Store.*";
-    }
-
-    public String getColumnSetupBeforeDeleteInterceptorToDaoPointcutInitCap() {
-        return "Delete.*, Remove.*";
-    }
-
-    public String getRequiredTransactionToBehaviorPointcut() {
-        return ".*Tx";
-    }
-
-    public String getRequiresNewTransactionToBehaviorPointcut() {
-        return ".*NewTx";
+    public String getDollar() {
+        return "$";
     }
 
     public String getOverrideComment() {
@@ -1530,9 +1431,6 @@ public class Database {
         return "The implementation.";
     }
 
-    // **********************************************************************************************
-    //                                                                                     Helper
-    //                                                                                     **********
     // ===============================================================================
     //                                                                         Logging
     //                                                                         =======
@@ -1669,73 +1567,264 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                                         JavaDir
-    //                                                                         =======
+    //                                                          Delete Old Table Class
+    //                                                          ======================
+    protected List<String> _deletedOldTableBaseBehaviorList;
+
+    public void deleteOldTableClass_for_BaseBehavior() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseBehaviorClassName();
+            }
+        };
+        final String packagePath = getBaseBehaviorPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Bhv", setupper);
+        _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
+    }
+
+    protected List<String> _deletedOldTableBaseDaoList;
+
+    public void deleteOldTableClass_for_BaseDao() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseDaoClassName();
+            }
+        };
+        final String packagePath = getBaseDaoPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dao", setupper);
+        _deletedOldTableBaseDaoList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseDaoList);
+    }
+
+    protected List<String> _deletedOldTableBaseEntityList;
+
+    public void deleteOldTableClass_for_BaseEntity() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseEntityClassName();
+            }
+        };
+        final String packagePath = getBaseEntityPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, null, setupper);
+        _deletedOldTableBaseEntityList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseEntityList);
+    }
+
+    public void deleteOldTableClass_for_BaseConditionBean() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseConditionBeanClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".bs";
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getAbstractBaseConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";
+        final String classPrefix = getProjectPrefix() + "Abstract" + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_BaseConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_NestSelectSetupper() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getNestSelectSetupperClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".nss";
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionBean() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionBeanClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq";
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionInlineQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.ciq";
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedBehavior() {
+        if (_deletedOldTableBaseBehaviorList == null || _deletedOldTableBaseBehaviorList.isEmpty()) {
+            return;
+        }
+        final String outputPath = Generator.getInstance().getOutputPath();
+        final String packagePath = getExtendedBehaviorPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseBehaviorList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName);
+            if (file.exists()) {
+                file.delete();
+                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldTableClass_for_ExtendedDao() {
+        if (_deletedOldTableBaseDaoList == null || _deletedOldTableBaseDaoList.isEmpty()) {
+            return;
+        }
+        final String outputPath = Generator.getInstance().getOutputPath();
+        final String packagePath = getExtendedDaoPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseDaoList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName);
+            if (file.exists()) {
+                file.delete();
+                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldTableClass_for_ExtendedEntity() {
+        if (_deletedOldTableBaseEntityList == null || _deletedOldTableBaseEntityList.isEmpty()) {
+            return;
+        }
+        final String outputPath = Generator.getInstance().getOutputPath();
+        final String packagePath = getExtendedEntityPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseEntityList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName);
+            if (file.exists()) {
+                file.delete();
+                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
+        for (String className : deletedClassNameList) {
+            _log.info("    deleteOldTableFile('" + className + "');");
+        }
+    }
+
+    protected OldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
+            String classSuffix, NotDeleteClassNameSetupper notDeleteClassNameSetupper) {
+        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            return new OldTableClassDeletor() {// It's Null Object!
+                @Override
+                public List<String> deleteOldTableClass() {
+                    return new ArrayList<String>();
+                }
+            };
+        }
+        final OldTableClassDeletor deletor = new OldTableClassDeletor();
+        deletor.setPackagePath(packagePath);
+        deletor.setClassPrefix(classPrefix);
+        deletor.setClassSuffix(classSuffix);
+        deletor.setClassExtension(getClassFileExtension());
+        final Set<String> notDeleteClassNameSet = new HashSet<String>();
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            final String baseBehaviorClassName = notDeleteClassNameSetupper.setup(table);
+            notDeleteClassNameSet.add(baseBehaviorClassName);
+        }
+        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
+        return deletor;
+    }
+
+    protected static interface NotDeleteClassNameSetupper {
+        public String setup(Table table);
+    }
+
+    // ===================================================================================
+    //                                                                 JavaDir(OutputPath)
+    //                                                                 ===================
     public void setupJavaDir_for_generate() {
         Generator.getInstance().setOutputPath(getProperties().getBasicProperties().getJavaDir());
     }
-    
+
     public void setupJavaDir_for_sql2entity() {
         Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * Get the name of the Database.
-     * @return Name of the Database.
-     */
     public String getName() {
         return _name;
     }
 
-    /**
-     * Set the name of the Database.
-     *
-     * @param name Name of the Database.
-     */
     public void setName(String name) {
         this._name = (name == null ? "default" : name);
     }
 
-    /**
-     * Get the value of package.
-     * @return value of package.
-     */
     public String getPackage() {
         return _pkg;
     }
 
-    /**
-     * Set the value of package.
-     * @param v  Value to assign to package.
-     */
     public void setPackage(String v) {
         this._pkg = v;
     }
 
-    /**
-     * Get the value of defaultIdMethod.
-     * @return value of defaultIdMethod.
-     */
     public String getDefaultIdMethod() {
         return _defaultIdMethod;
     }
 
-    /**
-     * Set the value of defaultIdMethod.
-     * @param v Value to assign to defaultIdMethod.
-     */
     public void setDefaultIdMethod(String v) {
         this._defaultIdMethod = v;
     }
 
-    /**
-     * Get type to use in Java sources (primitive || object)
-     *
-     * @return the type to use
-     */
     public String getDefaultJavaType() {
         return _defaultJavaType;
     }

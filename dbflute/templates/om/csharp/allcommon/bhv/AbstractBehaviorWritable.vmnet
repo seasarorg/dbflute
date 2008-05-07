@@ -82,7 +82,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected virtual void FilterEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
@@ -90,7 +90,7 @@ namespace ${glPackageBaseCommonBhv} {
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of INSERT about the column columns of " + this.TableDbName);
             }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
@@ -134,7 +134,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
@@ -142,7 +142,7 @@ namespace ${glPackageBaseCommonBhv} {
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of UPDATE about the column columns of " + this.TableDbName);
             }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
@@ -186,7 +186,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected virtual void FilterEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
-#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+#if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
@@ -194,7 +194,7 @@ namespace ${glPackageBaseCommonBhv} {
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of DELETE about the column columns of " + this.TableDbName);
             }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
