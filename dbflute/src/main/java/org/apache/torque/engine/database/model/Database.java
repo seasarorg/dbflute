@@ -1685,7 +1685,7 @@ public class Database {
             }
         };
         final String packagePath = getConditionBeanPackage() + ".nss";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final String classPrefix = getProjectPrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
@@ -1697,7 +1697,7 @@ public class Database {
             }
         };
         final String packagePath = getConditionBeanPackage();
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final String classPrefix = getProjectPrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
@@ -1709,7 +1709,7 @@ public class Database {
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final String classPrefix = getProjectPrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
@@ -1721,7 +1721,7 @@ public class Database {
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq.ciq";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final String classPrefix = getProjectPrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
