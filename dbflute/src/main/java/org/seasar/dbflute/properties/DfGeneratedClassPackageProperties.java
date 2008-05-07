@@ -43,6 +43,10 @@ public final class DfGeneratedClassPackageProperties extends DfAbstractHelperPro
     public String getBaseEntityPackage() {
         return filterBase(stringProp("torque.baseEntityPackage", getPackageInfo().getBaseEntityPackage()));
     }
+    
+    public String getDBMetaPackage() {
+        return getBaseEntityPackage() + "." + getPackageInfo().getDBMetaSimplePackageName();
+    }
 
     public String getConditionBeanPackage() {
         return filterBase(stringProp("torque.conditionBeanPackage", getPackageInfo().getConditionBeanPackage()));

@@ -17,6 +17,10 @@ public class DfGeneratedClassPackageDefaultJava implements DfGeneratedClassPacka
     public String getBaseEntityPackage() {
         return "bsentity";
     }
+    
+    public String getDBMetaSimplePackageName() {
+        return "dbmeta";
+    }
 
     public String getConditionBeanPackage() {
         return "cbean";

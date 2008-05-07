@@ -8,6 +8,8 @@ public interface DfGeneratedClassPackageDefault {
     public String getBaseDaoPackage();
 
     public String getBaseEntityPackage();
+    
+    public String getDBMetaSimplePackageName();
 
     public String getConditionBeanPackage();
 

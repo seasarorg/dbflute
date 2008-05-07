@@ -16,6 +16,10 @@ public class DfGeneratedClassPackageDefaultCSharp implements DfGeneratedClassPac
     public String getBaseEntityPackage() {
         return "BsEntity";
     }
+    
+    public String getDBMetaSimplePackageName() {
+        return "Dbm";
+    }
 
     public String getConditionBeanPackage() {
         return "CBean";

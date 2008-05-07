@@ -578,10 +578,6 @@ public class Database {
         return getBasicProperties().isTargetLanguageCSharp();
     }
 
-    public boolean isTargetLanguageCSharpOld() {
-        return getBasicProperties().isTargetLanguageCSharpOld();
-    }
-
     public boolean isJavaVersionGreaterEqualTiger() {
         return getBasicProperties().isJavaVersionGreaterEqualTiger();
     }
@@ -801,6 +797,10 @@ public class Database {
 
     public String getBaseEntityPackage() {
         return getProperties().getGeneratedClassPackageProperties().getBaseEntityPackage();
+    }
+
+    public String getDBMetaPackage() {
+        return getProperties().getGeneratedClassPackageProperties().getDBMetaPackage();
     }
 
     public String getConditionBeanPackage() {
@@ -1629,13 +1629,25 @@ public class Database {
         showDeleteOldTableFile(_deletedOldTableBaseEntityList);
     }
 
+    public void deleteOldTableClass_for_DBMeta() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getDBMetaClassName();
+            }
+        };
+        final String packagePath = getDBMetaPackage();
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dbm", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
     public void deleteOldTableClass_for_BaseConditionBean() {
         final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
             public String setup(Table table) {
                 return table.getBaseConditionBeanClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".bs";
+        final String packagePath = getConditionBeanPackage() + ".bs";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
@@ -1647,7 +1659,7 @@ public class Database {
                 return table.getAbstractBaseConditionQueryClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".cq.bs";
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + "Abstract" + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
@@ -1659,7 +1671,7 @@ public class Database {
                 return table.getBaseConditionQueryClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".cq.bs";
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
@@ -1671,7 +1683,7 @@ public class Database {
                 return table.getNestSelectSetupperClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".nss";
+        final String packagePath = getConditionBeanPackage() + ".nss";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
@@ -1695,7 +1707,7 @@ public class Database {
                 return table.getExtendedConditionQueryClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".cq";
+        final String packagePath = getConditionBeanPackage() + ".cq";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
@@ -1707,7 +1719,7 @@ public class Database {
                 return table.getExtendedConditionInlineQueryClassName();
             }
         };
-        final String packagePath = getConditionBeanPackage() + ".cq.ciq";
+        final String packagePath = getConditionBeanPackage() + ".cq.ciq";// TODO: @jflute -- Resolve language
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
