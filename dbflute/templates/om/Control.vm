@@ -2001,7 +2001,9 @@ targetdatabase = $targetDatabase
     ##
     ## Delete old table classes.
     ##
-    $database.debug("public void deleteOldTableClasses() {")
+    $database.debug("// /= = = = = = = = = = = = =")
+    $database.debug("// Delete old table classes!")
+    $database.debug("// = = = = = = = = = =/")
     $database.deleteOldTableClass_for_BaseBehavior()
     $database.deleteOldTableClass_for_BaseDao()
     $database.deleteOldTableClass_for_BaseEntity()
@@ -2015,6 +2017,7 @@ targetdatabase = $targetDatabase
     $database.deleteOldTableClass_for_ExtendedBehavior()
     $database.deleteOldTableClass_for_ExtendedDao()
     $database.deleteOldTableClass_for_ExtendedEntity()
+    $database.debug(" ")
     
     ##
     ## Loop by tables.

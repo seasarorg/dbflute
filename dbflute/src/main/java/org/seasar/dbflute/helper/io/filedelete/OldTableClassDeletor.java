@@ -69,7 +69,7 @@ public class OldTableClassDeletor {
                 if (classSuffix != null && classSuffix.trim().length() > 0 && !nameWithoutExt.endsWith(classSuffix)) {
                     return false;
                 }
-                return false;
+                return true;
             }
         };
         return Arrays.asList(dir.listFiles(filter));

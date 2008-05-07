@@ -1699,7 +1699,7 @@ public class Database {
             final File file = new File(dirPath + "/" + extendedClassName);
             if (file.exists()) {
                 file.delete();
-                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+                _log.info("deleteOldTableFile('" + extendedClassName + "');");
             }
         }
     }
@@ -1717,7 +1717,7 @@ public class Database {
             final File file = new File(dirPath + "/" + extendedClassName);
             if (file.exists()) {
                 file.delete();
-                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+                _log.info("deleteOldTableFile('" + extendedClassName + "');");
             }
         }
     }
@@ -1735,14 +1735,14 @@ public class Database {
             final File file = new File(dirPath + "/" + extendedClassName);
             if (file.exists()) {
                 file.delete();
-                _log.info("    deleteOldTableFile('" + extendedClassName + "');");
+                _log.info("deleteOldTableFile('" + extendedClassName + "');");
             }
         }
     }
 
     protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
         for (String className : deletedClassNameList) {
-            _log.info("    deleteOldTableFile('" + className + "');");
+            _log.info("deleteOldTableFile('" + className + "');");
         }
     }
 
