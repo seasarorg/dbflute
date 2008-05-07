@@ -162,13 +162,7 @@ public abstract class $myClassName implements java.io.Serializable {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
-#if ($database.isCompatibleNullEqualFalse())
-        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
-            return false;
-        }
-#else
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
 #end
         return true;
     }
@@ -202,13 +196,7 @@ public abstract class $myClassName implements java.io.Serializable {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.columns)
-#if ($database.isCompatibleNullEqualFalse())
-        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
-            return false;
-        }
-#else
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
 #end
         return true;
     }

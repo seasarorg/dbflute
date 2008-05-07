@@ -1,9 +1,7 @@
 package org.seasar.dbflute.properties;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
@@ -41,52 +39,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                   ModifiedPropertiesAddLogicIfNeeds
-    //                                                   =================================
-    public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
-        return booleanProp("torque.isAvailableEntityModifiedPropertiesAddLogicIfNeeds", false);
-    }
-
-    // ===============================================================================
-    //                                        Is one to many return null If non select
-    //                                        ========================================
-    public boolean isOneToManyReturnNullIfNonSelect() {
-        return booleanProp("torque.isOneToManyReturnNullIfNonSelect", false);
-    }
-
-    // ===============================================================================
-    //                                                                      Compatible
-    //                                                                      ==========
-    public boolean isCompatibleNullEqualFalse() {
-        return booleanProp("torque.isCompatibleNullEqualFalse", false);
-    }
-
-    public boolean isCompatibleOldReferrerNotDeprecated() {
-        return booleanProp("torque.isCompatibleOldReferrerNotDeprecated", false);
-    }
-
-    // ===============================================================================
-    //                                                         Disable As-One-Relation
-    //                                                         =======================
-    public static final String KEY_disableAsOneRelationTableMap = "disableAsOneRelationTableMap";
-    protected Map<String, String> _disableAsOneRelationTableMap;
-
-    @SuppressWarnings("unchecked")
-    protected Map<String, String> getDisableAsOneRelationTableMap() {
-        if (_disableAsOneRelationTableMap == null) {
-            _disableAsOneRelationTableMap = new HashMap<String, String>();
-            final Map<String, Object> map = mapProp("torque." + KEY_disableAsOneRelationTableMap, DEFAULT_EMPTY_MAP);
-            final Set<String> keySet = map.keySet();
-            for (String key : keySet) {
-                final String value = (String) map.get(key);
-                _disableAsOneRelationTableMap.put(key.toLowerCase(), value != null ? value.toLowerCase() : null);
-            }
+    //                                                                  Friendly Framework 
+    //                                                                  ==================
+    public boolean isUseBuri() {
+        final boolean isUseBuri = booleanProp("torque.isUseBuri", false);
+        if (isUseBuri) {
+            return true;
         }
-        return _disableAsOneRelationTableMap;
+        return booleanProp("torque.isUseS2Buri", false);
     }
 
-    public boolean isDisableAsOneRelation(String tableName) {
-        return getDisableAsOneRelationTableMap().containsKey(tableName.toLowerCase());
+    public boolean isUseTeeda() {
+        return booleanProp("torque.isUseTeeda", false);
     }
 
     // ===============================================================================
@@ -139,17 +103,5 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         final DfFlexibleNameMap<String, Map<String, String>> foreignKeyFxMap = new DfFlexibleNameMap<String, Map<String, String>>(
                 foreignKeyMap);
         return foreignKeyFxMap;
-    }
-
-    public boolean isUseBuri() {
-        final boolean isUseBuri = booleanProp("torque.isUseBuri", false);
-        if (isUseBuri) {
-            return true;
-        }
-        return booleanProp("torque.isUseS2Buri", false);
-    }
-
-    public boolean isUseTeeda() {
-        return booleanProp("torque.isUseTeeda", false);
     }
 }

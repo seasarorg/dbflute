@@ -63,15 +63,6 @@ namespace ${glPackageBaseCommon} {
             _propertiesSet.Add(propertyName, null);
         }
 
-        public void AddPropertyNameIfNeeds(String propertyName, Object before, Object after) {
-            if (_propertiesSet.ContainsKey(propertyName)) {
-                return;
-            }
-            if (before == null || !before.Equals(after)) {
-                AddPropertyName(propertyName);
-            }
-        }
-
         // ===============================================================================
         //                                                                           Other
         //                                                                           =====

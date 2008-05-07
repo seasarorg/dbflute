@@ -1231,29 +1231,8 @@ public class Table implements IDMethod {
         return new DfFlexibleNameMap<ELEMENT_TYPE, Object>(map);
     }
 
-    /**
-     * Has foreign key?
-     * 
-     * @return Determination.
-     */
     public boolean hasForeignKey() {
         return (getForeignKeys().length != 0);
-    }
-
-    /**
-     * Is disable as-one-relation?
-     * 
-     * @return Determination.
-     */
-    public boolean isDisableAsOneRelation() {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        if (prop.isDisableAsOneRelation(getName())) {
-            return true;
-        }
-        if (prop.isDisableAsOneRelation(getJavaName())) {
-            return true;
-        }
-        return false;
     }
 
     // ===================================================================================
@@ -1458,7 +1437,7 @@ public class Table implements IDMethod {
     public boolean hasReferrer() {
         return (getReferrerList() != null && !getReferrerList().isEmpty());
     }
-    
+
     public boolean hasReferrerAsMany() {
         final List<ForeignKey> referrers = getReferrerList();
         if (referrers == null || referrers.isEmpty()) {
@@ -2488,10 +2467,6 @@ public class Table implements IDMethod {
     //                                                 ===============================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
-    }
-
-    public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableEntityModifiedPropertiesAddLogicIfNeeds();
     }
 
     // ===================================================================================

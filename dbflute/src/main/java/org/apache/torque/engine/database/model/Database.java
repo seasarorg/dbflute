@@ -1125,10 +1125,6 @@ public class Database {
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
-    public boolean isOneToManyReturnNullIfNonSelect() {
-        return getProperties().getLittleAdjustmentProperties().isOneToManyReturnNullIfNonSelect();
-    }
-
     public String getBehaviorDelegateModifier() {
         return "protected";
     }
@@ -1139,14 +1135,6 @@ public class Database {
 
     public boolean isUseTeeda() {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
-    }
-
-    public boolean isCompatibleNullEqualFalse() {
-        return getProperties().getLittleAdjustmentProperties().isCompatibleNullEqualFalse();
-    }
-
-    public boolean isCompatibleOldReferrerNotDeprecated() {
-        return getProperties().getLittleAdjustmentProperties().isCompatibleOldReferrerNotDeprecated();
     }
 
     // -----------------------------------------------------

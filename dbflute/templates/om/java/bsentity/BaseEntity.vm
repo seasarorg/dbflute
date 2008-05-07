@@ -230,11 +230,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                                    Foreign Property
     //                                                                    ================
-#set ($foreignKeysIndex = 0)
+#set ($foreignKeyIndex = 0)
 #foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
-#set ($parentCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     //   Foreign Property = [${foreignKey.foreignJavaBeansRulePropertyName}]
     // * * * * * * * * */
@@ -260,39 +259,38 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         ${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
 
-#set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Foreign Property = [${referrer.refererJavaBeansRulePropertyNameAsOne}]
+    //   Foreign Property = [${referrer.referrerJavaBeansRulePropertyNameAsOne}]
     // * * * * * * * * */
-    public static final int ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($referrer)};
-    public static final String ${referrer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneRefferer";
+    public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
+    public static final String ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneReferrer";
 	
-    /** the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. */
+    /** the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
 	/**
-     * Get the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
-     * @return the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * Get the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
-    public ${referrerEntityClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+    public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 	    return ${referrerVariableName};
     }
 
     /**
-     * Set the entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'.
-     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.refererJavaBeansRulePropertyNameAsOne}'. (Nullable)
+     * Set the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
 	    ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 
-#set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #end
     // ===================================================================================
@@ -300,32 +298,29 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                   =================
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #if (!${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Referrer Property = [${referrer.refererJavaBeansRulePropertyName}]
+    //   Referrer Property = [${referrer.referrerJavaBeansRulePropertyName}]
     // * * * * * * * * */
 
-    /** The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. */
+    /** The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
-     * Get the entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. {without lazy-load} <br />
-     * @return The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     * Get the entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. {without lazy-load} <br />
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
-#if (!$database.isOneToManyReturnNullIfNonSelect())
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
         if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
-#end
         return ${referrerVariableName};
     }
 
     /**
-     * Set the entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'.
-     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.refererJavaBeansRulePropertyName}'. (Nullable)
+     * Set the entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'.
+     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
@@ -394,13 +389,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
-#if ($database.isCompatibleNullEqualFalse())
-        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
-            return false;
-        }
-#else
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
 #end
         return true;
     }
@@ -431,13 +420,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.columns)
-#if ($database.isCompatibleNullEqualFalse())
-        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
-            return false;
-        }
-#else
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
 #end
         return true;
     }
@@ -504,24 +487,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
-#if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
-        _modifiedProperties.addPropertyNameIfNeeds("${col.javaBeansRulePropertyName}", this._${col.UncapitalisedJavaName}, ${col.UncapitalisedJavaName});
-#else
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-#end
         this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #end
 
 #if ($table.hasAllCommonColumn())
-  #foreach ($columnName in ${database.commonColumnNameConvertionList})
-    #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
-    #set ($commonColumnMap = ${database.commonColumnMap})
-    #set ($columnType = ${commonColumnMap.get(${columnName})})
-    #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-    #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-    #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-    #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
+#foreach ($columnName in ${database.commonColumnNameConvertionList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($commonColumnMap = ${database.commonColumnMap})
+#set ($columnType = ${commonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
     /**
      * Get the value of the column '${uncapitalisedJavaName}'. <br />
@@ -538,7 +517,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
     }
-  #end
+#end
 #end
 
 }

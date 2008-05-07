@@ -88,7 +88,7 @@ public class ForeignKey {
 
     private List<String> _localColumns = new ArrayList<String>(3);
     private List<String> _foreignColumns = new ArrayList<String>(3);
-    
+
     protected DfFlexibleNameMap<String, String> _localForeignMap = new DfFlexibleNameMap<String, String>();
     protected DfFlexibleNameMap<String, String> _foreignLocalMap = new DfFlexibleNameMap<String, String>();
 
@@ -227,7 +227,7 @@ public class ForeignKey {
     public String getForeignTableNestSelectSetupperClassName() {
         return getForeignTable().getNestSelectSetupperClassName();
     }
-    
+
     public String getForeignTableNestSelectSetupperTerminalClassName() {
         return getForeignTable().getNestSelectSetupperTerminalClassName();
     }
@@ -258,11 +258,11 @@ public class ForeignKey {
     public String getReferrerTableNestSelectSetupperClassName() {
         return getTable().getNestSelectSetupperClassName();
     }
-    
+
     public String getReferrerTableNestSelectSetupperTerminalClassName() {
         return getTable().getNestSelectSetupperTerminalClassName();
     }
-    
+
     public String getRefererTableExtendedEntityClassName() {
         return getReferrerTableExtendedEntityClassName();
     }
@@ -296,11 +296,6 @@ public class ForeignKey {
      * @return Determination.
      */
     public boolean isOneToOne() {
-        // If the relation is disable, returns false!
-        if (getForeignTable().isDisableAsOneRelation()) {
-            return false;
-        }
-
         final List<Column> localColumnList = getLocalColumnObjectList();
         final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
         if (localColumnList.equals(localPrimaryColumnList)) {
@@ -457,22 +452,22 @@ public class ForeignKey {
 
     public DfFlexibleNameMap<String, String> getLocalForeignMapping() {
         return _localForeignMap;
-// This comment-out for FlexibleMap 
-//        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-//        for (int i = 0; i < _localColumns.size(); i++) {
-//            resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
-//        }
-//        return resultHash;
+        // This comment-out for FlexibleMap 
+        //        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
+        //        for (int i = 0; i < _localColumns.size(); i++) {
+        //            resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
+        //        }
+        //        return resultHash;
     }
 
     public DfFlexibleNameMap<String, String> getForeignLocalMapping() {
         return _foreignLocalMap;
-     // This comment-out for FlexibleMap 
-//        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-//        for (int i = 0; i < _localColumns.size(); i++) {
-//            resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
-//        }
-//        return resultHash;
+        // This comment-out for FlexibleMap 
+        //        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
+        //        for (int i = 0; i < _localColumns.size(); i++) {
+        //            resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
+        //        }
+        //        return resultHash;
     }
 
     /**
@@ -652,9 +647,11 @@ public class ForeignKey {
     public String getReferrerPropertyName() {
         return getReferrerPropertyName(false);
     }
+
     public String getRefererPropertyName() {
         return getReferrerPropertyName();
     }
+
     public String getReffererPropertyName() {
         return getReferrerPropertyName();
     }
@@ -662,9 +659,11 @@ public class ForeignKey {
     public String getReferrerJavaBeansRulePropertyName() {
         return getReferrerPropertyName(true);
     }
+
     public String getReffererJavaBeansRulePropertyName() {
         return getReferrerJavaBeansRulePropertyName();
     }
+
     public String getRefererJavaBeansRulePropertyName() {
         return getReferrerJavaBeansRulePropertyName();
     }
@@ -673,6 +672,7 @@ public class ForeignKey {
         final String referrerPropertyName = getReferrerPropertyName(true);
         return initCap(referrerPropertyName);
     }
+
     public String getRefererJavaBeansRulePropertyNameInitCap() {
         return getReferrerJavaBeansRulePropertyNameInitCap();
     }
@@ -718,9 +718,11 @@ public class ForeignKey {
             return getTable().getUncapitalisedJavaName() + result + "List";
         }
     }
+
     public String getRefererPropertyName(boolean isJavaBeansRule) {
         return getReferrerPropertyName(isJavaBeansRule);
     }
+
     public String getReffererPropertyName(boolean isJavaBeansRule) {
         return getReferrerPropertyName(isJavaBeansRule);
     }
@@ -728,6 +730,7 @@ public class ForeignKey {
     public String getReferrerPropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(false);
     }
+
     public String getReffererPropertyNameAsOne() {
         return getReferrerPropertyNameAsOne();
     }
@@ -735,9 +738,11 @@ public class ForeignKey {
     public String getReferrerJavaBeansRulePropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(true);
     }
+
     public String getReffererJavaBeansRulePropertyNameAsOne() {
         return getReferrerJavaBeansRulePropertyNameAsOne();
     }
+
     public String getRefererJavaBeansRulePropertyNameAsOne() {
         return getReferrerJavaBeansRulePropertyNameAsOne();
     }
@@ -745,6 +750,7 @@ public class ForeignKey {
     public String getRefererJavaBeansRulePropertyNameAsOneInitCap() {
         return initCap(getReffererPropertyNameAsOne(true));
     }
+
     public String getReferrerJavaBeansRulePropertyNameAsOneInitCap() {
         return initCap(getReferrerPropertyNameAsOne(true));
     }
@@ -772,7 +778,7 @@ public class ForeignKey {
             return getTable().getUncapitalisedJavaName() + result + "AsOne";
         }
     }
-    
+
     protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
         return getReferrerPropertyNameAsOne(isJavaBeansRule);
     }
@@ -786,9 +792,11 @@ public class ForeignKey {
         final String reffererPropertyName = getRefererPropertyName();
         return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
     }
+
     public String getReffererPropertyNameInitCap() {
         return getReferrerPropertyNameInitCap();
     }
+
     public String getRefererPropertyNameInitCap() {
         return getReferrerPropertyNameInitCap();
     }
@@ -797,9 +805,11 @@ public class ForeignKey {
         final String referrerPropertyName = getReferrerPropertyNameAsOne();
         return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
     }
+
     public String getReffererPropertyNameInitCapAsOne() {
         return getReferrerPropertyNameInitCapAsOne();
     }
+
     public String getRefererPropertyNameInitCapAsOne() {
         return getReferrerPropertyNameInitCapAsOne();
     }
@@ -824,7 +834,7 @@ public class ForeignKey {
         }
         return getTable().getUncapitalisedJavaName() + result;
     }
-    
+
     /**
      * Returns comma-string for local column name.
      * @return Generated string.
@@ -937,12 +947,33 @@ public class ForeignKey {
     }
 
     /**
-     * Returns RelationKeysCommaString for OneToOneRefferer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
-     * (for s2dao)
-     * 
-     * @return Generated string.
+     * @return String.
+     * @deprecated
      */
     public String getRelationKeysCommaStringForOneToOneRefferer() {
+        final List<Column> foreignColumnList = getForeignColumnObjectList();
+        String result = "";
+        for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
+            final Column foreignCol = (Column) ite.next();
+            final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
+            final String foreignName = foreignCol.getName();
+            final String localName = localCol.getName();
+
+            if ("".equals(result)) {
+                result = foreignName + ":" + localName;
+            } else {
+                result = result + ", " + foreignName + ":" + localName;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns RelationKeysCommaString for OneToOneReferrer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
+     * (for s2dao)
+     * @return Generated string.
+     */
+    public String getRelationKeysCommaStringForOneToOneReferrer() {
         final List<Column> foreignColumnList = getForeignColumnObjectList();
         String result = "";
         for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {

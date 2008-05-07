@@ -23,14 +23,14 @@ public interface ${glEntityInterfaceName} {
     //                                                                          Table Name
     //                                                                          ==========
     /**
-     * Get table DB-name.
-     * @return Table DB-name. (NotNull)
+     * Get table DB name.
+     * @return Table DB name. (NotNull)
      */
     public String getTableDbName();
 
     /**
-     * Get table property-name.
-     * @return Table property-name. (NotNull)
+     * Get table property name.
+     * @return Table property name. (NotNull)
      */
     public String getTablePropertyName();
 
@@ -74,21 +74,6 @@ public interface ${glEntityInterfaceName} {
          */
         public void addPropertyName(String propertyName) {
             _propertiesSet.add(propertyName);
-        }
-
-        /**
-         * Add property name. (JavaBeansRule)
-         * @param propertyName Property name. (NotNull)
-         * @param before Before value. (Nullable)
-         * @param after After value. (Nullable)
-         */
-        public void addPropertyNameIfNeeds(String propertyName, Object before, Object after) {
-            if (_propertiesSet.contains(propertyName)) {
-                return;
-            }
-            if (before == null || !before.equals(after)) {
-                addPropertyName(propertyName);
-            }
         }
 
         /**
