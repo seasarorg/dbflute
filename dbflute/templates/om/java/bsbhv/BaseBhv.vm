@@ -373,7 +373,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         update((${myExtendedObjectClassName})entity);
     }
 #if ($table.hasOptimisticLock())
-	
+    
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
@@ -756,12 +756,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
         public void setup(${myConditionBeanClassName} cb);
     }
-	
+    
     // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================
-	@Override
-	protected boolean hasVersionNoValue(${glEntityInterfaceName} entity) {
+    @Override
+    protected boolean hasVersionNoValue(${glEntityInterfaceName} entity) {
 #if ($table.isUseVersionNo())
         return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
 #else
@@ -769,7 +769,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
-	@Override
+    @Override
     protected boolean hasUpdateDateValue(${glEntityInterfaceName} entity) {
 #if ($table.isUseUpdateDate())
         return downcast(entity).get${table.updateDateJavaName}() != null;

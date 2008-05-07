@@ -27,7 +27,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                         ===========
     public ${myClassName}() {
     }
-	
+    
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
@@ -117,7 +117,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
     /**
      * Set the value of ${propertyName} as ${classificationMap.get('name')}. <br />
-	 * ${database.getMapValue($classificationMap, 'comment')}
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
         _${propertyName} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};

@@ -95,13 +95,13 @@ public abstract class $myClassName implements java.io.Serializable {
     /** The entity of referrer-as-one table. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
-	/**
+    /**
      * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazy-load} <br />
      * @return The entity of referrer-as-one table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      * @exception IllegalStateException When the size of the referrer table list is duplicate.
      */
     public ${referrerEntityClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-	    return ${referrerVariableName};
+        return ${referrerVariableName};
     }
 
     /**
@@ -109,7 +109,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of referrer-as-one table. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
-	    ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 
 #set ($foreignKeysIndex = $foreignKeysIndex + 1)

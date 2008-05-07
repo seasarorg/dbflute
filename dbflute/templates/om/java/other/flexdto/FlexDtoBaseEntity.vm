@@ -69,7 +69,7 @@ public class $myClassName {
     private var ${referrerVariableName}:${referrerEntityClassName};
 
     public function get ${referrer.refererJavaBeansRulePropertyNameAsOne}():${referrerEntityClassName} {
-	    return ${referrerVariableName};
+        return ${referrerVariableName};
     }
 
     public function set ${referrer.refererJavaBeansRulePropertyNameAsOne}(${referrer.refererJavaBeansRulePropertyNameAsOne}:${referrerEntityClassName}):void {

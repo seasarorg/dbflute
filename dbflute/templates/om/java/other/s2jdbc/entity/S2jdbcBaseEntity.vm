@@ -54,10 +54,10 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #foreach ($col in $table.columns)
     /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
-	@javax.persistence.Id
+    @javax.persistence.Id
 #end
 #if ($col.isIdentity())
-	@javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+    @javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
 #end
 #if ($col.isTorqueTypeDate())
     @javax.persistence.Temporal(javax.persistence.TemporalType.DATE)
@@ -72,10 +72,10 @@ public abstract class ${myClassName} implements java.io.Serializable {
     @javax.persistence.Lob
 #end
 #if ($table.isUseVersionNo() && $col.isVersionNo())
-	@javax.persistence.Version
+    @javax.persistence.Version
 #end
     public ${col.javaNative} ${col.uncapitalisedJavaName};
-	
+    
 #end
     // ===================================================================================
     //                                                                       Foreign Table
@@ -83,9 +83,9 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #foreach ($foreignKeys in $table.ForeignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
     /** Foreign property for ${foreignKeys.foreignTable.name} table. */
-	@javax.persistence.ManyToOne
+    @javax.persistence.ManyToOne
 #if ($foreignKeys.isSimpleKeyFK())
-	@javax.persistence.JoinColumn(name="${foreignKeys.localColumnNameAsOne}")
+    @javax.persistence.JoinColumn(name="${foreignKeys.localColumnNameAsOne}")
 #end
     public ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
 
@@ -97,13 +97,13 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.table.javaName}")
 #if (${referrer.isOneToOne()})
-	/** Referrer property for ${referrerTable.name} table. */
-	@javax.persistence.OneToOne(mappedBy = "${referrer.foreignPropertyName}")
+    /** Referrer property for ${referrerTable.name} table. */
+    @javax.persistence.OneToOne(mappedBy = "${referrer.foreignPropertyName}")
     public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
 
 #else
-	/** Referrer property for ${referrerTable.name} table. */
-	@javax.persistence.OneToMany(mappedBy = "${referrer.foreignPropertyName}")
+    /** Referrer property for ${referrerTable.name} table. */
+    @javax.persistence.OneToMany(mappedBy = "${referrer.foreignPropertyName}")
     public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 
 #end
@@ -117,7 +117,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
      * @param other Other entity. (Nullable: If null, return false)
      * @return Comparing result.
      */
-	@Override
+    @Override
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
@@ -135,7 +135,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     /**
      * @return Hash-code from primary-keys.
      */
-	@Override
+    @Override
     public int hashCode() {
         int result = 0;
 #foreach ($col in $table.primaryKey)
@@ -148,7 +148,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     /**
      * @return The expression of columns. (NotNull)
      */
-	@Override
+    @Override
     public String toString() {
         final String delimiter = ",";
         final StringBuffer sb = new StringBuffer();

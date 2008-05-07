@@ -21,7 +21,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                         ===========
     public ${myClassName}() {
     }
-	
+    
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

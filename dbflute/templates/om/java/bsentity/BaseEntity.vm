@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 import java.util.*;
-	
+    
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 #else
@@ -106,7 +106,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /** Is common column auto set up effective? */
     protected boolean _canCommonColumnAutoSetup = true;
 #end
-	
+    
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -270,16 +270,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // * * * * * * * * */
     public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
     public static final String ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneReferrer";
-	
+    
     /** the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
-	/**
+    /**
      * Get the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-	    return ${referrerVariableName};
+        return ${referrerVariableName};
     }
 
     /**
@@ -287,7 +287,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
-	    ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
@@ -356,24 +356,24 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return !_modifiedProperties.isEmpty();
     }
 #if (${table.hasAllCommonColumn()})
-	
+    
     // ===================================================================================
     //                                                           Common Column Auto Filter
     //                                                           =========================
     /**
-	 * Disables auto set-up of common columns.
-	 */
+     * Disables auto set-up of common columns.
+     */
     public void disableCommonColumnAutoSetup() {
-	    _canCommonColumnAutoSetup = false;
-	}
-	
+        _canCommonColumnAutoSetup = false;
+    }
+    
     /**
-	 * Can the entity set up common column by auto?
-	 * @return Determination.
-	 */
-	public boolean canCommonColumnAutoSetup() {// for Framework
-	    return _canCommonColumnAutoSetup;
-	}
+     * Can the entity set up common column by auto?
+     * @return Determination.
+     */
+    public boolean canCommonColumnAutoSetup() {// for Framework
+        return _canCommonColumnAutoSetup;
+    }
 #end
 
     // ===================================================================================

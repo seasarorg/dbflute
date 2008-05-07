@@ -33,37 +33,37 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                             Override about Register
     //                                                             =======================
-	@Override
+    @Override
     protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
         throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
     }
 
-	@Override
+    @Override
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
     }
 
-	@Override
+    @Override
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 
-	@Override
+    @Override
     protected void registerWhereClause(String whereClause) {
         registerInlineWhereClause(whereClause);
     }
 
-	@Override
+    @Override
     protected String getInScopeSubQueryRealColumnName(String columnName) {
-	    if (_onClauseInline) {
-		    throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
-		}
+        if (_onClauseInline) {
+            throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
+        }
         return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
     }
 
-	@Override
+    @Override
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");

@@ -190,7 +190,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _nss${tmpPropertyNameInitCap};
     }
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-	    assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
+        assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
         final String localRelationPath = query().getRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
@@ -216,7 +216,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _nss${tmpPropertyNameInitCap};
     }
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-	    assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
+        assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
         final String localRelationPath = query().getRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);

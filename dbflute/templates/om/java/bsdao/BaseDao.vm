@@ -23,9 +23,9 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
     public int getCountAll();
     
-	public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
+    public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
     public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} getListAll();
-	
+    
 #if ($table.isWritable())
     public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
