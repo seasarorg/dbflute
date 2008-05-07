@@ -1571,6 +1571,7 @@ public class Database {
         deleteOldTableClass_for_BaseBehavior();
         deleteOldTableClass_for_BaseDao();
         deleteOldTableClass_for_BaseEntity();
+        deleteOldTableClass_for_DBMeta();
         deleteOldTableClass_for_BaseConditionBean();
         deleteOldTableClass_for_AbstractBaseConditionQuery();
         deleteOldTableClass_for_BaseConditionQuery();
