@@ -676,14 +676,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         if (columnName.indexOf("_") < 0) {
             final char[] columnCharArray = columnName.toCharArray();
-            for (char c : columnCharArray) {
-                if (!Character.isUpperCase(c)) {
+            for (char ch : columnCharArray) {
+                // If the character is not number and not upper case...
+                if (!Character.isDigit(ch) && !Character.isUpperCase(ch)) {
                     return false;
                 }
             }
-            return true;
+            return true;// All characters are upper case!
         } else {
-            return true;
+            return true;// Contains connector character!
         }
     }
 }
