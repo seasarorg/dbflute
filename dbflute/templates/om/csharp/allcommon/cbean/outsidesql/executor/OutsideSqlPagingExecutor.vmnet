@@ -75,11 +75,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             }
             public int Count() {
                 _pmb.XSetPaging(false);
-                return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb, typeof(int));
+                return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb);
             }
             public IList<ENTITY> Paging() {
                 _pmb.XSetPaging(true);
-                return _pagingExecutor.SelectList<ENTITY>(_path, _pmb, _entityType);
+                return _pagingExecutor.SelectList<ENTITY>(_path, _pmb);
             }
         }
 
