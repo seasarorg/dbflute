@@ -102,6 +102,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected Object _resultTypeSpecification;
 
         protected String _methodName;
+		
+        protected String _tableDbName;
 
         // ===============================================================================
         //                                                                        Read SQL
@@ -174,11 +176,24 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         // ===============================================================================
+        //                                                                     Set up Path
+        //                                                                     ===========
+	    public void SetupBehaviorSqlPath() {
+	        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
+	        String behaviorSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath;
+		    _outsideSqlPath = behaviorSqlPath;
+	    }
+
+        // ===============================================================================
         //                                                                   Determination
         //                                                                   =============
         public bool IsSpecifiedOutsideSql {
             get { return _outsideSqlPath != null; }
         }
+		
+		public bool IsBehaviorSqlPathEnabled {
+		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && _tableDbName != null; }
+		}
 
         // ===============================================================================
         //                                                                  General Helper
@@ -237,6 +252,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public String MethodName {
             get { return _methodName; }
             set { this._methodName = value; }
+        }
+
+        public String TableDbName {
+            get { return _tableDbName; }
+            set { this._tableDbName = value; }
         }
     }
 }

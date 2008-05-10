@@ -94,7 +94,6 @@ public class ${glOutsideSqlPagingExecutorName} {
      * # ...
      * o It's S2Dao's restriction...Sorry
      * </pre>
-     * 
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)
      * @param pagingPath The path of paging SQL. (NotNull)

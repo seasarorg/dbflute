@@ -6,50 +6,21 @@ using ${glPackageBaseCommonCBeanOutsidesql};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
-    /// <summary>
-    /// The executor of outside-sql.
-    /// <![CDATA[
-    /// {Basic}
-    ///   o SelectList()
-    /// 
-    /// {Entity}
-    ///   o EntityHandling().SelectEntity()
-    ///   o EntityHandling().SelectEntityWithDeletedCheck()
-    /// 
-    /// {Cursor}
-    ///   o CursorHandling().SelectCursor()
-    /// 
-    /// {Paging}
-    ///   o AutoPaging().SelectList()
-    ///   o AutoPaging().SelectPage()
-    ///   o ManualPaging().SelectList()
-    ///   o ManualPaging().SelectPage()
-    /// 
-    /// {Option -- Dynamic}
-    ///   o DynamicBinding().SelectList()
-    /// ]]>
-    /// Author: ${database.classAuthor}
-    /// </summary>
     public class ${glOutsideSqlBasicExecutorName} {
 
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        /** The dao of outsideSql. (NotNull) */
         protected ${glOutsideSqlDaoName} _outsideSqlDao;
-
-        /** Table db name. (NotNull) */
         protected String _tableDbName;
-
-        /** Is it dynamic binding? */
         protected bool _dynamicBinding;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
-            this._outsideSqlDao = outsideSqlDao;
-            this._tableDbName = tableDbName;
+            _outsideSqlDao = outsideSqlDao;
+            _tableDbName = tableDbName;
         }
 
         // ===============================================================================
@@ -113,6 +84,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             if (_dynamicBinding) {
                 option.DynamicBinding();
             }
+			option.TableDbName = _tableDbName;
             return option;
         }
     }

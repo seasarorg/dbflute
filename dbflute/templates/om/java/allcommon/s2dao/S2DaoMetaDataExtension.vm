@@ -50,6 +50,7 @@ import org.seasar.framework.beans.PropertyDesc;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -105,6 +106,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                     DBFlute Extension
     //                                     -----------------
+	/** The selector of behavior. {Since DBFlute-0.7.1} */
+	protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
+	
     /** The config of dbflute. {Since DBFlute-0.6.2} */
     protected ${glStatementConfig} _defaultStatementConfig;
     
@@ -643,7 +647,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -
-        final String sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
+		String sql;
+		try {
+            sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
+		} catch (${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} e) {
+		    if (outsideSqlContext.isBehaviorSqlPathEnabled()) {
+			    outsideSqlContext.setupBehaviorSqlPath();
+		        sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
+			} else {
+			    throw e;
+			}
+		}
         final Object pmb = outsideSqlContext.getParameterBean();
         final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
 
@@ -1358,6 +1372,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                     DBFlute Extension
     //                                     -----------------
+    public ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
+        return _behaviorSelector;
+    }
+
+    public void setBehaviorSelector(final ${glBehaviorSelectorInterfaceName} behaviorSelector) {
+        this._behaviorSelector = behaviorSelector;
+    }
+	
     public ${glStatementConfig} getDefaultStatementConfig() {
         return _defaultStatementConfig;
     }

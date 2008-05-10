@@ -279,7 +279,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             // - - - - - - - - - - - - - - - - - - - - - - -
             // The attribute of Specified-OutsideSqlContext.
             // - - - - - - - - - - - - - - - - - - - - - - -
-            String sql = outsideSqlContext.ReadFilteredOutsideSql(this.SqlFileEncoding, _dbms.Suffix);
+			String sql;
+			try {
+                sql = outsideSqlContext.ReadFilteredOutsideSql(this.SqlFileEncoding, _dbms.Suffix);
+			} catch (${glPackageBaseCommonException}.${glOutsideSqlNotFoundException}) {
+		        if (outsideSqlContext.IsBehaviorSqlPathEnabled) {
+			        outsideSqlContext.SetupBehaviorSqlPath();
+		            sql = outsideSqlContext.ReadFilteredOutsideSql(this.SqlFileEncoding, _dbms.Suffix);
+			    } else {
+			        throw;
+			    }
+			}
+			
             Object pmb = outsideSqlContext.ParameterBean;
             Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
 

@@ -3,8 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
- * The option of outside-sql.
- * 
+ * The option of outside-SQL. It contains various information about execution.
  * @author ${database.ClassAuthor}
  */
 public class ${glOutsideSqlOptionName} {
@@ -12,12 +11,21 @@ public class ${glOutsideSqlOptionName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected String _pagingRequestType = "non";
 
     protected boolean _dynamicBinding;
 
-	/** The config of statement. (Nullable) */
+	/** The configuration of statement. (Nullable) */
 	protected ${glStatementConfig} _statementConfig;
+	
+    // -----------------------------------------------------
+    //                                           Information
+    //                                           -----------
+	/** The DB name of table. It is not related with the options of outside-SQL. */
+    protected String _tableDbName;
 	
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -63,6 +71,9 @@ public class ${glOutsideSqlOptionName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     public boolean isAutoPaging() {
         return "auto".equals(_pagingRequestType);
     }
@@ -80,6 +91,17 @@ public class ${glOutsideSqlOptionName} {
     }
 
     public void setStatementConfig(${glStatementConfig} statementConfig) {
-        this._statementConfig = statementConfig;
+        _statementConfig = statementConfig;
+    }
+	
+    // -----------------------------------------------------
+    //                                           Information
+    //                                           -----------
+    public String getTableDbName() {
+        return _tableDbName;
+    }
+
+    public void setTableDbName(String tableDbName) {
+        _tableDbName = tableDbName;
     }
 }

@@ -3,7 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.util.Arrays;
 import java.util.List;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
@@ -41,18 +40,18 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The factory of dao meta data. */
-    private DaoMetaDataFactory daoMetaDataFactory_;
-
+    /** The factory of DAO meta data. */
+    protected DaoMetaDataFactory _daoMetaDataFactory;
+	
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * Constructor.
-     * @param daoMetaDataFactory The factory of dao meta data. (NotNull)
+     * @param daoMetaDataFactory The factory of DAO meta data. (NotNull)
      */
     public ${glDaoInterceptor}(DaoMetaDataFactory daoMetaDataFactory) {
-        daoMetaDataFactory_ = daoMetaDataFactory;
+        _daoMetaDataFactory = daoMetaDataFactory;
     }
 
     // ===================================================================================
@@ -96,28 +95,31 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return invocation.proceed();
         }
 		
+        // - - - - - - - - - - - - -
+        // Initialize DAO meta data
+        // - - - - - - - - - - - - -
         if (method.getName().equals("initializeDaoMetaData")) {
             initializeSqlCommand(invocation);
-            return null;
+            return null;// The end! (Initilization Only)
         }
+
+        // - - - - - - - - - - - -
+        // Preprocess outside-SQL
+        // - - - - - - - - - - - -
+        preprocessOutsideSql(invocation);
+
+        // - - - - - - - - - - - - -
+        // Preprocess condition-bean
+        // - - - - - - - - - - - - -
+        final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(invocation);
 
         if (isLogEnabled()) {
             logInvocation(invocation);
         }
 
-        long before = 0;
-        if (isLogEnabled()) {
-            before = System.currentTimeMillis();
-        }
-
-        // - - - - - - - - - - -
-        // Preprocess outsideSql
-        // - - - - - - - - - - -
-        preprocessOutsideSql(invocation);
-
-        // - - - - - - - - -
-        // Set up sqlCommand
-        // - - - - - - - - -
+        // - - - - - - - - - -
+        // Set up SQL-command
+        // - - - - - - - - - -
         final SqlCommand cmd;
         {
             long beforeCmd = 0;
@@ -133,13 +135,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             }
         }
 
-        // - - - - - - - - - - - - -
-        // Preprocess conditionBean
-        // - - - - - - - - - - - - -
-        final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(invocation, cmd);
+        long before = 0;
+        if (isLogEnabled()) {
+            before = System.currentTimeMillis();
+        }
 
         // - - - - - - - - - -
-        // Execute sqlCommand!
+        // Execute SQL-command
         // - - - - - - - - - -
         Object ret = null;
         try {
@@ -186,7 +188,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                          ==========
     protected void initializeSqlCommand(MethodInvocation invocation) {
         final Class<?> targetType = getTargetClass(invocation);
-        final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetType);
+        final DaoMetaData dmd = _daoMetaDataFactory.getDaoMetaData(targetType);
         if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
             return;// Do nothing!
         } else {
@@ -212,7 +214,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected SqlCommand findSqlCommand(MethodInvocation invocation) {
         final SqlCommand cmd;
         final Class<?> targetType = getTargetClass(invocation);
-        final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetType);
+        final DaoMetaData dmd = _daoMetaDataFactory.getDaoMetaData(targetType);
         if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
             cmd = dmd.getSqlCommand(generateSpecifiedOutsideSqlUniqueKey(invocation));
         } else {
@@ -237,8 +239,20 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                      Log Invocation
     //                                                                      ==============
     protected void logInvocation(MethodInvocation invocation) {
-        final Method method = invocation.getMethod();
-        final String invocationExpressionWithoutKakko = extractInvocationExpression(method)  + "." + method.getName();
+        final StackTraceElement[] stackTrace = new Exception().getStackTrace();
+		final InvokeNameExtractingResult behaviorResult = extractBehaviorInvokeName(stackTrace);
+
+		final String invokeClassName;
+		final String invokeMethodName;
+		if (behaviorResult.getSimpleClassName() != null) {
+		    invokeClassName = behaviorResult.getSimpleClassName();
+			invokeMethodName = behaviorResult.getMethodName();
+		} else {
+            final Method method = invocation.getMethod();
+		    invokeClassName = extractInvocationExpression(method);
+			invokeMethodName = method.getName();
+		}
+        final String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
         final String equalBorder = buildFitBorder("", "=", invocationExpressionWithoutKakko, false);
         final String invocationExpression = invocationExpressionWithoutKakko + "()";
 
@@ -246,20 +260,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         log("                                                      " + invocationExpression);
         log("                                                      " + equalBorder + "=/");
 
-        logPath();
+        logPath(invocation, stackTrace, behaviorResult);
 
         // Specified OutsideSql
-        if (${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation))) {
+        if (isSpecifiedOutsideSql(invocation)) {
             Object[] args = invocation.getArguments();
-            if (args != null && args.length != 0 && args[0] instanceof String) {
-                log("OutsideSql: " + args[0]);
-            }
+            log("path   : " + getOutsideSqlPath(args));
+            log("option : " + getOutsideSqlOption(args));
         }
     }
 
-    protected void logPath() {
-        final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final InvokeNameExtractingResult behaviorResult = extractBehaviorInvokeName(stackTrace);
+    protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, InvokeNameExtractingResult behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
         final InvokeNameExtractingResult clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
@@ -268,15 +279,12 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
         final String behaviorInvokeName = behaviorResult.getInvokeName();
-        if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0 && behaviorInvokeName.trim().length() == 0) {
+        if (clientInvokeName.trim().length() == 0
+		        && byPassInvokeName.trim().length() == 0
+				&& behaviorInvokeName.trim().length() == 0) {
             return;
         }
-        final String path = clientInvokeName + byPassInvokeName + behaviorInvokeName + "...";
-        // *I will delete this at the future.
-        // final String hyphenBorder = buildFitBorder("/", "-", path, true);
-        // log(hyphenBorder);
-        log(path);
-        // log("- - - - - - - - - -/");
+        log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
     }
 
     protected String buildFitBorder(String prefix, String element, String lengthTargetString, boolean space) {
@@ -340,10 +348,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "Bhv$", "BehaviorReadable", "BehaviorWritable"});
+        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable"});
+        final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, suffixList);
+                return isClassNameEndsWith(className, suffixList) || isClassNameContains(className, keywordList);
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixFromSimpleClassName(simpleClassName);
@@ -369,9 +378,19 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
         return false;
     }
+	
+    
+    protected boolean isClassNameContains(String className, List<String> keywordList) {
+        for (String keyword : keywordList) {
+            if (className.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
-     * @param callback Callback. (NotNull)
+     * @param callback the call-back for invoke-name-extracting. (NotNull)
      * @param stackTrace Stack log. (NotNull)
      * @return Invoke name. (NotNull: If not found, returns empty string.)
      */
@@ -379,8 +398,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         String targetSimpleClassName = null;
         String targetMethodName = null;
         int lineNumber = 0;
-        int foundIndex = -1;// The minus one means 'not found'.
-        int foundFirstIndex = -1;// The minus one means 'not found'.
+        int foundIndex = -1;// The minus one means 'Not Found'.
+        int foundFirstIndex = -1;// The minus one means 'Not Found'.
         boolean onTarget = false;
         for (int i=callback.getStartIndex(); i < stackTrace.length; i++) {
             final StackTraceElement element = stackTrace[i];
@@ -417,13 +436,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
         final InvokeNameExtractingResult result = new InvokeNameExtractingResult();
         if (targetSimpleClassName == null) {
-            result.setInvokeName("");
+            result.setInvokeName("");// Not Found! It sets empty string as default.
             return result;
         }
+		final String filteredClassName = callback.filterSimpleClassName(targetSimpleClassName);
+		result.setSimpleClassName(callback.filterSimpleClassName(targetSimpleClassName));
+		result.setMethodName(targetMethodName);
         if (lineNumber > 0) {
-            result.setInvokeName(callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "():" + lineNumber + " --> ");
+            result.setInvokeName(filteredClassName + "." + targetMethodName + "():" + lineNumber + " --> ");
         } else {
-            result.setInvokeName(callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "() --> ");
+            result.setInvokeName(filteredClassName + "." + targetMethodName + "() --> ");
         }
         result.setFoundIndex(foundIndex);
         result.setFoundFirstIndex(foundFirstIndex);
@@ -439,6 +461,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected static class InvokeNameExtractingResult {
+        protected String _simpleClassName;
+        protected String _methodName;
         protected String _invokeName;
         protected int _foundIndex;
         protected int _foundFirstIndex;
@@ -447,49 +471,51 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return _foundIndex + 1;
         }
 
+        public String getSimpleClassName() {
+            return _simpleClassName;
+        }
+        public void setSimpleClassName(String simpleClassName) {
+            _simpleClassName = simpleClassName;
+        }
+        public String getMethodName() {
+            return _methodName;
+        }
+        public void setMethodName(String methodName) {
+            _methodName = methodName;
+        }
         public String getInvokeName() {
             return _invokeName;
         }
         public void setInvokeName(String invokeName) {
-            this._invokeName = invokeName;
+            _invokeName = invokeName;
         }
         public int getFoundIndex() {
             return _foundIndex;
         }
         public void setFoundIndex(int foundIndex) {
-            this._foundIndex = foundIndex;
+            _foundIndex = foundIndex;
         }
         public int getFoundFirstIndex() {
             return _foundFirstIndex;
         }
         public void setFoundFirstIndex(int foundFirstIndex) {
-            this._foundFirstIndex = foundFirstIndex;
+            _foundFirstIndex = foundFirstIndex;
         }
     }
 
+	/**
+	 * @param method The invoked method. (NotNull)
+	 * @return The expression of invocation. (NotNull)
+	 */
     protected String extractInvocationExpression(Method method) {
         final Class<?> declaringClass = method.getDeclaringClass();
-	    return buildEntityExpressionFromDaoName(declaringClass.getSimpleName());
-		
-		// Commented out because of still thinking. 
-        // final Field field;
-        // try {
-        //     field = declaringClass.getField("INVOCATION_NAME");
-        //     final String invocationExpression = (String)field.get(null);
-        //     return invocationExpression;
-        // } catch (Exception ignored) {
-        //     return buildEntityExpressionFromDaoName(declaringClass.getName());
-        // }
+	    return removeBasePrefixFromSimpleClassName(declaringClass.getSimpleName());
     }
 	
-    protected String buildEntityExpressionFromDaoName(String daoName) {
-	    // Commented out because of still thinking.
-        // if (daoName.endsWith("Dao")) {
-        //     daoName = daoName.substring(0, daoName.length() - "Dao".length());
-        // }
-		return removeBasePrefixFromSimpleClassName(daoName);
-    }
-
+	/**
+	 * @param simpleClassName The simple class name. (NotNull)
+	 * @return The simple class name removed the base prefix. (NotNull)
+	 */
     protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
         if (!simpleClassName.startsWith("${glProjectPrefix}${glBasePrefix}")) {
             return simpleClassName;
@@ -639,7 +665,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
 
         // Specified OutsideSql
-        if (${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation))) {
+        if (isSpecifiedOutsideSql(invocation)) {
             if (isOutsideSqlDaoMethodSelect(invocation)) {
                 setupOutsideSqlContextSelect(invocation);
             } else {
@@ -648,6 +674,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return;
         }
     }
+	
+	protected boolean isSpecifiedOutsideSql(MethodInvocation invocation) {
+	    return ${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation));
+	}
 
     // - - - - - - - - - - - -
     //                  Select
@@ -662,9 +692,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             String msg = "Internal Error! OutsideSqlDao.selectXxx() should have 4 arguements: args.length=" + args.length;
             throw new IllegalStateException(msg);
         }
-        final String path = (String)args[0];
-        final Object pmb = args[1];
-        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+        final String path = getOutsideSqlPath(args);
+        final Object pmb = getOutsideSqlParameterBean(args);
+        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
         final Object resultTypeSpecification = args[3];
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
@@ -675,6 +705,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
 		outsideSqlContext.setStatementConfig(option.getStatementConfig());
+		outsideSqlContext.setTableDbName(option.getTableDbName());
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
 
         // Set up fetchNarrowingBean.
@@ -690,9 +721,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.length=" + args.length;
             throw new IllegalStateException(msg);
         }
-        final String path = (String)args[0];
-        final Object pmb = args[1];
-        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+        final String path = getOutsideSqlPath(args);
+        final Object pmb = getOutsideSqlParameterBean(args);
+        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
@@ -701,6 +732,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
 		outsideSqlContext.setStatementConfig(option.getStatementConfig());
+		outsideSqlContext.setTableDbName(option.getTableDbName());
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
 
         // Set up fetchNarrowingBean.
@@ -710,6 +742,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // - - - - - - - - - - - -
     //                  Common
     //                   - - -
+	protected String getOutsideSqlPath(Object[] args) {
+        return (String)args[0];
+	}
+	protected Object getOutsideSqlParameterBean(Object[] args) {
+        return args[1];
+	}
+	protected ${glOutsideSqlOptionName} getOutsideSqlOption(Object[] args) {
+        return (${glOutsideSqlOptionName})args[2];
+	}
+
     protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
         if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
             return;
@@ -730,14 +772,14 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * If this method is condition bean select target, make dynamic SQL.
      * Else nothing.
      * @param invocation Method invocation. (NotNull)
-     * @param cmd SqlCommand. (NotNull)
      * @return ConditionBean. (Nullable)
      */
-    protected ${glConditionBeanInterfaceName} preprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
+    protected ${glConditionBeanInterfaceName} preprocessConditionBean(MethodInvocation invocation) {
         final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
         if (outsideSqlContext != null) {
             return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
         }
+		
         final ${glConditionBeanInterfaceName} cb;
         {
             final Object[] args = invocation.getArguments();
@@ -758,11 +800,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             cb = (${glConditionBeanInterfaceName})arg0;
         }
 
-        if (!(cmd instanceof ${glSelectDynamicCommand})) {// The argument is condition-bean, but this method use outer-sql-file...
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-            return null;
-        }
-
         if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
             cb.xsetupSelectCountIgnoreFetchScope();
         } else {
@@ -778,7 +815,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param invocation Method invocation. (NotNull)
      * @param cb Condition-bean. (Nullable)
      */
-    protected void postprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, ${glConditionBeanInterfaceName} cb) {
+    protected void postprocessConditionBean(MethodInvocation invocation, ${glConditionBeanInterfaceName} cb) {
         if (cb == null) {
             return;
         }
@@ -833,7 +870,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param invocation Method invocation. (NotNull)
      * @return Determination.
      */
-    protected boolean isSelectCountIgnoreFetchScopeMethod(org.aopalliance.intercept.MethodInvocation invocation) {
+    protected boolean isSelectCountIgnoreFetchScopeMethod(MethodInvocation invocation) {
         final String name = invocation.getMethod().getName();
         return name.startsWith("readCount") || name.startsWith("selectCount");
     }
