@@ -113,10 +113,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         // - - - - - - - - - - - - -
         final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(invocation);
 
-        if (isLogEnabled()) {
-            logInvocation(invocation);
-        }
-
         // - - - - - - - - - -
         // Set up SQL-command
         // - - - - - - - - - -
@@ -133,6 +129,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     logSqlCommand(invocation, cmd, beforeCmd, afterCmd);
                 }
             }
+        }
+
+        if (isLogEnabled()) {
+            logInvocation(invocation);
         }
 
         long before = 0;
@@ -537,7 +537,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected void logSqlCommand(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
+    protected void logSqlCommand(MethodInvocation invocation, SqlCommand cmd, long beforeCmd, long afterCmd) {
         log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 

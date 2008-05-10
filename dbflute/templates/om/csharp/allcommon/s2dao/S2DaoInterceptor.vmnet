@@ -64,10 +64,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return invocation.Proceed();
             }
 
-            if (IsLogEnabled()) {
-                LogInvocation(invocation);
-            }
-
             // - - - - - - - - - - -
             // Preprocess outsideSql
             // - - - - - - - - - - -
@@ -94,6 +90,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                         LogSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
                     }
                 }
+            }
+			
+            if (IsLogEnabled()) {
+                LogInvocation(invocation);
             }
 
             DateTime? before = null;

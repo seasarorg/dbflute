@@ -265,7 +265,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             }
             // [F]
             if (_log.isDebugEnabled()) {
-                _log.debug("...Creating daoMetaData.");
+                _log.debug("...Creating daoMetaData for " + daoClass.getSimpleName() + ".");
             }
             final DaoMetaData dmdi = createDaoMetaData(daoClass);
             putSynchronizedDaoMetaDataCache(key, dmdi);
