@@ -691,7 +691,7 @@ public class Database {
     }
 
     public String getBasePrefix() {
-        return "Bs";
+        return getBasicProperties().getBasePrefix();
     }
 
     public String getBaseSuffixForEntity() {

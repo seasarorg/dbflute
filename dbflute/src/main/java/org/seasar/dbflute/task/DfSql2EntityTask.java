@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,21 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +40,6 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
@@ -70,6 +74,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, Object> _cursorInfoMap = new LinkedHashMap<String, Object>();
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
+    protected final Map<String, Map<String, String>> _behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
@@ -87,7 +92,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
+        final DfS2jdbcProperties jdbcProperties = getProperties().getS2jdbcProperties();
         if (jdbcProperties.hasS2jdbcDefinition()) {
             _log.info("* * * * * * * * * *");
             _log.info("* Process S2JDBC  *");
@@ -108,11 +113,131 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<File> sqlFileList = collectSqlFileIntoList();
         fireMan.execute(runner, sqlFileList);
 
+        setupBehaviorQueryPath(sqlFileList);
+
         fireSuperExecute();
 
         handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
+    }
+
+    protected void setupBehaviorQueryPath(List<File> sqlFileList) {
+        final String exbhvName;
+        {
+            final DfGeneratedClassPackageProperties prop = getProperties().getGeneratedClassPackageProperties();
+            String exbhvPackage = prop.getExtendedBehaviorPackage();
+            if (exbhvPackage.contains(".")) {
+                exbhvPackage = exbhvPackage.substring(exbhvPackage.lastIndexOf(".") + ".".length());
+            }
+            exbhvName = exbhvPackage;
+        }
+        setupBehaviorQueryPath(_behaviorQueryPathMap, sqlFileList, exbhvName);
+        reflectBehaviorQueryPath(_behaviorQueryPathMap);
+    }
+
+    protected void setupBehaviorQueryPath(Map<String, Map<String, String>> behaviorQueryPathMap,
+            List<File> sqlFileList, String exbhvName) {
+        final String exbhvMark = "/" + exbhvName + "/";
+        final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+Bhv_.+.sql$");
+        for (File sqlFile : sqlFileList) {
+            final String path = DfStringUtil.replace(sqlFile.getPath(), File.separator, "/");
+            final Matcher matcher = behaviorQueryPathPattern.matcher(path);
+            if (!matcher.matches()) {
+                continue;
+            }
+            final String simpleFileName = path.substring(path.lastIndexOf(exbhvMark) + exbhvMark.length());
+            System.out.println("simpleFileName=" + simpleFileName);
+            if (simpleFileName.contains("/")) {
+                // TODO: @jflute -- Implementation
+                throw new UnsupportedOperationException();
+            } else {
+                final int behaviorNameMarkIndex = simpleFileName.indexOf("Bhv_");
+                final int behaviorNameEndIndex = behaviorNameMarkIndex + "Bhv".length();
+                final int behaviorQueryPathStartIndex = behaviorNameMarkIndex + "Bhv_".length();
+                final int behaviorQueryPathEndIndex = simpleFileName.lastIndexOf(".sql");
+                final String entityName = simpleFileName.substring(0, behaviorNameMarkIndex);
+                final String behaviorName = simpleFileName.substring(0, behaviorNameEndIndex);
+                final String behaviorQueryPath = simpleFileName.substring(behaviorQueryPathStartIndex,
+                        behaviorQueryPathEndIndex);
+                final Map<String, String> behaviorQueryElement = new LinkedHashMap<String, String>();
+                behaviorQueryElement.put("entityName", entityName);
+                behaviorQueryElement.put("behaviorName", behaviorName);
+                behaviorQueryElement.put("behaviorQueryPath", behaviorQueryPath);
+                behaviorQueryPathMap.put(path, behaviorQueryElement);
+            }
+        }
+    }
+
+    protected void reflectBehaviorQueryPath(Map<String, Map<String, String>> behaviorQueryPathMap) {
+        String outputDir = getBasicProperties().getJavaDir();
+        if (outputDir.endsWith("/")) {
+            outputDir = outputDir.substring(0, outputDir.length() - "/".length());
+        }
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String basePrefix = getBasicProperties().getBasePrefix();
+        final DfGeneratedClassPackageProperties prop = getProperties().getGeneratedClassPackageProperties();
+        final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
+                .getClassFileExtension();
+        final String bsbhvPackage = prop.getBaseBehaviorPackage();
+        final String bsbhvPathBase = outputDir + "/" + DfStringUtil.replace(bsbhvPackage, ".", "/");
+        final File bsbhvDir = new File(bsbhvPathBase);
+        final FileFilter filefilter = new FileFilter() {
+            public boolean accept(File file) {
+                final String path = file.getPath();
+                return path.endsWith("Bhv." + classFileExtension);
+            }
+        };
+        System.out.println("bsbhvDir=" + bsbhvDir);
+        System.out.println("bsbhvDir.exists()=" + bsbhvDir.exists());
+        if (!bsbhvDir.exists()) {
+            // TODO: @jflute -- Warn
+            return;
+        }
+        final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
+        final Map<String, File> bsbhvFileMap = new HashMap<String, File>();
+        for (File bsbhvFile : bsbhvFileList) {
+            String path = bsbhvFile.getPath();
+            path = path.substring(0, path.lastIndexOf("." + classFileExtension));
+            final String bsbhvSimpleName;
+            if (path.contains("/")) {
+                bsbhvSimpleName = path.substring(path.lastIndexOf("/") + "/".length());
+            } else {
+                bsbhvSimpleName = path;
+            }
+            final String behaviorName = removeBasePrefix(bsbhvSimpleName, projectPrefix, basePrefix);
+            bsbhvFileMap.put(behaviorName, bsbhvFile);
+        }
+
+        final Set<String> keySet = behaviorQueryPathMap.keySet();
+        for (String key : keySet) {
+            final Map<String, String> behaviorQueryElement = behaviorQueryPathMap.get(key);
+            final String behaviorName = behaviorQueryElement.get("behaviorName");
+            final File bsbhvFile = bsbhvFileMap.get(behaviorName);
+            if (bsbhvFile == null) {
+                // TODO: @jflute -- Exception!
+            }
+            System.out.println("behaviorName=" + behaviorName + ", bsbhvFile=" + bsbhvFile);
+        }
+    }
+
+    /**
+     * @param simpleClassName The simple class name. (NotNull)
+     * @return The simple class name removed the base prefix. (NotNull)
+     */
+    protected String removeBasePrefix(String simpleClassName, String projectPrefix, String basePrefix) {
+        final String prefix = projectPrefix + basePrefix;
+        if (!simpleClassName.startsWith(prefix)) {
+            return simpleClassName;
+        }
+        final int prefixLength = prefix.length();
+        if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
+            return simpleClassName;
+        }
+        if (simpleClassName.length() <= prefixLength) {
+            return simpleClassName;
+        }
+        return projectPrefix + simpleClassName.substring(prefixLength);
     }
 
     // ===================================================================================
