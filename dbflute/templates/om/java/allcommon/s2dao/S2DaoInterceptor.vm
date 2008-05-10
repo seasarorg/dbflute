@@ -346,11 +346,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable"});
+        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker"});
         final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, suffixList) || isClassNameContains(className, keywordList);
+			    if (isClassNameEndsWith(className, suffixList)) {
+				    return true;
+				}
+				if (isClassNameContains(className, keywordList)) {
+				    return true;
+				}
+				return false;
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixFromSimpleClassName(simpleClassName);

@@ -166,8 +166,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         // ===============================================================================
-        //                                                                    Trace Method
-        //                                                                    ============
+        //                                                                  Log Invocation
+        //                                                                  ==============
         protected void LogInvocation(IMethodInvocation invocation) {
             MethodBase method = invocation.Method;
             String invokeName = BuildEntityExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
@@ -179,6 +179,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             Log("/=====================================================" + sb.ToString() + "==");
             Log("                                                      " + invokeName + "()");
             Log("                                                      " + sb.ToString() + "=/");
+			
+            // Specified OutsideSql
+            if (IsSpecifiedOutsideSql(invocation)) {
+                Object[] args = invocation.Arguments;
+                Log("path   : " + GetOutsideSqlPath(args));
+                Log("option : " + GetOutsideSqlOption(args));
+            }
         }
 
         protected String BuildEntityExpressionFromDaoName(String name) {
@@ -201,15 +208,15 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 	
         // ===============================================================================
-        //                                                                Trace SqlCommand
-        //                                                                ================
+        //                                                                  Log SqlCommand
+        //                                                                  ==============
         protected void LogSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
             Log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
         }
 
         // ===============================================================================
-        //                                                                    Trace Return
-        //                                                                    ============
+        //                                                                      Log Return
+        //                                                                      ==========
         protected void LogReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
             MethodBase method = invocation.Method;
             try {
@@ -258,7 +265,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                        ----------
         protected void PreprocessOutsideSql(IMethodInvocation invocation) {
             // Specified OutsideSql
-            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(GetComponentDef(invocation).ComponentType)) {
+            if (IsSpecifiedOutsideSql(invocation)) {
                 if (IsOutsideSqlDaoMethodSelect(invocation)) {
                     SetupOutsideSqlContextSelect(invocation);
                 } else {
@@ -267,7 +274,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
         }
-
+	
+    	protected bool IsSpecifiedOutsideSql(IMethodInvocation invocation) {
+    	    return typeof(${glOutsideSqlDaoName}).IsAssignableFrom(GetComponentDef(invocation).ComponentType);
+    	}
+		
         // - - - - - - - - - -
         //              Select
         //               - - -
@@ -281,9 +292,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String msg = "Internal Error! OutsideSqlDao.selectXxx() should have 4 arguements: args.Length=" + args.Length;
                 throw new SystemException(msg);
             }
-            String path = (String)args[0];
-            Object pmb = args[1];
-            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            String path = GetOutsideSqlPath(args);
+            Object pmb = GetOutsideSqlParameterBean(args);
+            ${glOutsideSqlOptionName} option = GetOutsideSqlOption(args);
             Object resultTypeSpecification = args[3];
             ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
             outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
@@ -308,9 +319,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.Length=" + args.Length;
                 throw new SystemException(msg);
             }
-            String path = (String)args[0];
-            Object pmb = args[1];
-            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            String path = GetOutsideSqlPath(args);
+            Object pmb = GetOutsideSqlParameterBean(args);
+            ${glOutsideSqlOptionName} option = GetOutsideSqlOption(args);
             ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
             outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
             outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
@@ -327,6 +338,16 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - -
         //              Common
         //               - - -
+    	protected String GetOutsideSqlPath(Object[] args) {
+            return (String)args[0];
+    	}
+    	protected Object GetOutsideSqlParameterBean(Object[] args) {
+            return args[1];
+    	}
+    	protected ${glOutsideSqlOptionName} GetOutsideSqlOption(Object[] args) {
+            return (${glOutsideSqlOptionName})args[2];
+    	}
+	
         protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
             if (pmb == null || !${glFetchNarrowingBeanContextName}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
                 return;
