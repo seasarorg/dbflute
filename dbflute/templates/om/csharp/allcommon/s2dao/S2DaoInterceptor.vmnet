@@ -183,8 +183,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             // Specified OutsideSql
             if (IsSpecifiedOutsideSql(invocation)) {
                 Object[] args = invocation.Arguments;
-                Log("path   : " + GetOutsideSqlPath(args));
-                Log("option : " + GetOutsideSqlOption(args));
+                ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                if (outsideSqlContext != null) {
+                    Log("path: " + outsideSqlContext.OutsideSqlPath);
+                } else {
+                    Log("path: " + GetOutsideSqlPath(args));
+				}
+                Log("option: " + GetOutsideSqlOption(args));
             }
         }
 

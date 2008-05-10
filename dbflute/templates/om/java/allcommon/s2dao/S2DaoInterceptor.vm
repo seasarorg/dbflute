@@ -264,9 +264,14 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
         // Specified OutsideSql
         if (isSpecifiedOutsideSql(invocation)) {
+		    final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
             Object[] args = invocation.getArguments();
-            log("path   : " + getOutsideSqlPath(args));
-            log("option : " + getOutsideSqlOption(args));
+            if (outsideSqlContext != null) {
+				log("path: " + outsideSqlContext.getOutsideSqlPath());
+            } else {
+                log("path: " + getOutsideSqlPath(args));
+			}
+            log("option: " + getOutsideSqlOption(args));
         }
     }
 
