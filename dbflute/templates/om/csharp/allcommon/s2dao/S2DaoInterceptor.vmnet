@@ -304,6 +304,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
             outsideSqlContext.MethodName = invocation.Method.Name;
+			outsideSqlContext.SetupBehaviorSqlPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
@@ -329,6 +330,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.MethodName = invocation.Method.Name;
+			outsideSqlContext.SetupBehaviorSqlPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
