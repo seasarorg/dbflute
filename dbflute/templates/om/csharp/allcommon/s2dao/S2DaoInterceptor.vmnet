@@ -68,15 +68,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                 LogInvocation(invocation);
             }
 
-            DateTime? before = null;
-            if (IsLogEnabled()) {
-                before = DateTime.Now; // for performance view
-            }
-
             // - - - - - - - - - - -
             // Preprocess outsideSql
             // - - - - - - - - - - -
             PreprocessOutsideSql(invocation);
+
+            // - - - - - - - - - - - - -
+            // Preprocess conditionBean
+            // - - - - - - - - - - - - -
+            ${glConditionBeanInterfaceName} cb = PreprocessConditionBean(invocation);
 
             // - - - - - - - - -
             // Set up sqlCommand
@@ -96,10 +96,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
             }
 
-            // - - - - - - - - - - - - -
-            // Preprocess conditionBean
-            // - - - - - - - - - - - - -
-            ${glConditionBeanInterfaceName} cb = PreprocessConditionBean(invocation, cmd);
+            DateTime? before = null;
+            if (IsLogEnabled()) {
+                before = DateTime.Now; // for performance view
+            }
 
             // - - - - - - - - - -
             // Execute sqlCommand!
@@ -341,11 +341,12 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                     ConditionBean
         //                                     -------------
-        protected ${glConditionBeanInterfaceName} PreprocessConditionBean(IMethodInvocation invocation, ISqlCommand cmd) {
+        protected ${glConditionBeanInterfaceName} PreprocessConditionBean(IMethodInvocation invocation) {
             ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
             if (outsideSqlContext != null) {
                 return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
             }
+			
             ${glConditionBeanInterfaceName} cb = null;
             {
                 Object[] args = invocation.Arguments;
@@ -365,10 +366,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return null;
                 }
 
-                if (!(cmd is ${glSelectDynamicCommand})) {// The argument is condition-bean, but this method using outer-file-sql...
-                    ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
-                    return null;
-                }
                 cb = (${glConditionBeanInterfaceName})arg0;
             }
 

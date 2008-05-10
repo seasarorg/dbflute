@@ -279,9 +279,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
         final String behaviorInvokeName = behaviorResult.getInvokeName();
-        if (clientInvokeName.trim().length() == 0
-		        && byPassInvokeName.trim().length() == 0
-				&& behaviorInvokeName.trim().length() == 0) {
+        if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
             return;
         }
         log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
