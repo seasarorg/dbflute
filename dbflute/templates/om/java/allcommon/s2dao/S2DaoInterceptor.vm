@@ -117,7 +117,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         // Set up SQL-command
         // - - - - - - - - - -
         final SqlCommand cmd;
-        {
+        try {
             long beforeCmd = 0;
             if (isLogEnabled()) {
                 beforeCmd = System.currentTimeMillis();
@@ -129,10 +129,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     logSqlCommand(invocation, cmd, beforeCmd, afterCmd);
                 }
             }
-        }
-
-        if (isLogEnabled()) {
-            logInvocation(invocation);
+        } finally {
+            if (isLogEnabled()) {
+                logInvocation(invocation);
+            }
         }
 
         long before = 0;

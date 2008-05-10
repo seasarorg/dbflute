@@ -78,7 +78,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // Set up sqlCommand
             // - - - - - - - - -
             ISqlCommand cmd = null;
-            {
+            try {
                 DateTime? beforeCmd = null;
                 if (_log.IsDebugEnabled) {
                     beforeCmd = DateTime.Now;
@@ -90,11 +90,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                         LogSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
                     }
                 }
-            }
-			
-            if (IsLogEnabled()) {
-                LogInvocation(invocation);
-            }
+            } finally {
+                if (IsLogEnabled()) {
+                    LogInvocation(invocation);
+                }
+			}
 
             DateTime? before = null;
             if (IsLogEnabled()) {
@@ -304,6 +304,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
             outsideSqlContext.MethodName = invocation.Method.Name;
+			outsideSqlContext.TableDbName = option.TableDbName;
 			outsideSqlContext.SetupBehaviorSqlPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
@@ -330,6 +331,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.MethodName = invocation.Method.Name;
+			outsideSqlContext.TableDbName = option.TableDbName;
 			outsideSqlContext.SetupBehaviorSqlPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
