@@ -111,7 +111,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     protected boolean useDaoClassForLog;
 
     protected String sqlFileEncoding;
-	
+    
     protected BeanEnhancer beanEnhancer;
 
     // -----------------------------------------------------
@@ -168,7 +168,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
         }
         _log.info(sb);
-		
+        
         ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
@@ -323,7 +323,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         daoMetaData.initialize();
         return daoMetaData;
     }
-	
+    
     protected ${glDaoMetaDataExtension} createDaoMetaDataExtension() {// Override!
         final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(beanEnhancer);
@@ -359,7 +359,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     protected static String getLineSeparator() {
         return System.getProperty("line.separator");
     }
-	
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -421,7 +421,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     public void setPagingSQLRewriter(final PagingSqlRewriter pagingSqlRewriter) {
         this.pagingSqlRewriter = pagingSqlRewriter;
     }
-	
+    
     public String getSqlFileEncoding() {
         return sqlFileEncoding;
     }
@@ -429,7 +429,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     public void setSqlFileEncoding(final String encoding) {
         sqlFileEncoding = encoding;
     }
-	
+    
     public BeanEnhancer getBeanEnhancer() {
         return beanEnhancer;
     }

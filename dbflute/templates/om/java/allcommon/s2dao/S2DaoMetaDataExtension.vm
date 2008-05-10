@@ -106,9 +106,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                     DBFlute Extension
     //                                     -----------------
-	/** The selector of behavior. {Since DBFlute-0.7.1} */
-	protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
-	
+    /** The selector of behavior. {Since DBFlute-0.7.1} */
+    protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
+    
     /** The config of dbflute. {Since DBFlute-0.6.2} */
     protected ${glStatementConfig} _defaultStatementConfig;
     
@@ -117,7 +117,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     
     /** The determination of internal debug. {Since DBFlute-0.6.2} */
     protected boolean _internalDebug;
-	
+    
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -458,7 +458,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-		cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
+        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
         
         // It is unnecessary for DBFlute!
         // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
@@ -474,7 +474,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = newInternalUpdateModifiedOnlyCommand(dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-		cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
+        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
         
         // It is unnecessary for DBFlute!
         // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
@@ -509,11 +509,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                     if (args.length <= index) {
                         return;// for Safety!
                     }
-					if (isNonstrictMethod(method)) {
+                    if (isNonstrictMethod(method)) {
                         throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}("The entity=" + args[index]);
-					} else {
+                    } else {
                         throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(args[index], updatedCount);
-					}
+                    }
                 }
             }
         }
@@ -546,8 +546,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
         final ${glInternalDeleteAutoStaticCommand} cmd = new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-		cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
-		return cmd;
+        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
+        return cmd;
     }
 
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
@@ -571,10 +571,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return getBeanMetaData();
         }
     }
-	
-	protected boolean isNonstrictMethod(Method method) {
-	    return method.getName().contains("Nonstrict");
-	}
+    
+    protected boolean isNonstrictMethod(Method method) {
+        return method.getName().contains("Nonstrict");
+    }
 
     protected BeanMetaDataFactory createNonConcurrencyBmdFactory() {
         final ${glS2BeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glS2BeanMetaDataFactoryImpl}() {
@@ -647,17 +647,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -
-		String sql;
-		try {
+        String sql;
+        try {
             sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-		} catch (${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} e) {
-		    if (outsideSqlContext.isBehaviorSqlPathEnabled()) {
-			    outsideSqlContext.setupBehaviorSqlPath();
-		        sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-			} else {
-			    throw e;
-			}
-		}
+        } catch (${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} e) {
+            if (outsideSqlContext.isBehaviorSqlPathEnabled()) {
+                outsideSqlContext.setupBehaviorSqlPath();
+                sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
+            } else {
+                throw e;
+            }
+        }
         final Object pmb = outsideSqlContext.getParameterBean();
         final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
 
@@ -820,7 +820,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected static class OutsideSqlCustomizeBeanMetaDataImpl extends BeanMetaDataImpl {
-	    // Though nothing to override, it uses original class just in case.
+        // Though nothing to override, it uses original class just in case.
     }
 
     protected PropertyTypeFactoryBuilderImpl newOutsideSqlPropertyTypeFactoryBuilderImpl() {
@@ -959,16 +959,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
-		
+        
         @Override
-    	protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData beanMetaData) {
-    		return new ${glInternalBeanListMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
-    	}
-		
+        protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData beanMetaData) {
+            return new ${glInternalBeanListMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+        }
+        
         @Override
-    	protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData beanMetaData) {
-    		return new ${glInternalBeanArrayMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
-    	}
+        protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData beanMetaData) {
+            return new ${glInternalBeanArrayMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+        }
     }
 
     // ===================================================================================
@@ -1065,7 +1065,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             setupRelationAllValue(res);
             return res.getRow();
         }
-	
+    
         @Override
         protected void setupRelationKeyValue(RelationRowCreationResource res) {
             final RelationPropertyType rpt = res.getRelationPropertyType();
@@ -1094,7 +1094,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 continue;
             }
         }
-	
+    
         @Override
         protected void setupRelationAllValue(RelationRowCreationResource res) throws SQLException {
             final Map propertyCacheElement = res.extractPropertyCacheElement();
@@ -1229,7 +1229,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             res.setCreateDeadLink(isCreateDeadLink());
             return res;
         }
-	
+    
         @Override
         protected RelationRowCreationResource createResourceForPropertyCache(RelationPropertyType rpt, Set columnNames,
                 Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
@@ -1379,7 +1379,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public void setBehaviorSelector(final ${glBehaviorSelectorInterfaceName} behaviorSelector) {
         this._behaviorSelector = behaviorSelector;
     }
-	
+    
     public ${glStatementConfig} getDefaultStatementConfig() {
         return _defaultStatementConfig;
     }

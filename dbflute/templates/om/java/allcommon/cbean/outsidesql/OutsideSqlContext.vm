@@ -20,7 +20,7 @@ public class ${glOutsideSqlContextName} {
 
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glOutsideSqlContextName}.class);
-	
+    
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
@@ -67,8 +67,8 @@ public class ${glOutsideSqlContextName} {
     //                                                                          Unique Key
     //                                                                          ==========
     public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
-	    final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
-		final String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
+        final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
+        final String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
         return methodName + "():" + path + ":" + pmbKey + ":" + option.generateUniqueKey() + resultKey;
     }
 
@@ -112,26 +112,26 @@ public class ${glOutsideSqlContextName} {
     protected Object _resultTypeSpecification;
 
     protected String _methodName;
-	
-	/** The config of statement. (Nullable) */
-	protected ${glStatementConfig} _statementConfig;
-	
-	/** The DB name of table for using behavior-SQL-path. (Nullable) */
-	protected String _tableDbName;
+    
+    /** The config of statement. (Nullable) */
+    protected ${glStatementConfig} _statementConfig;
+    
+    /** The DB name of table for using behavior-SQL-path. (Nullable) */
+    protected String _tableDbName;
 
     // ===================================================================================
     //                                                                            Read SQL
     //                                                                            ========
-	/**
-	 * @param sqlFileEncoding The encoding of SQL file. (NotNull)
-	 * @param dbmsSuffix The suffix of DBMS. (NotNull)
-	 * @return The filtered outside-SQL. (NotNull)
-	 * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the SQL is not found.
-	 */
-	public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-	    final String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
-		return replaceOutsideSqlBindCharacterOnLineComment(sql);
-	}
+    /**
+     * @param sqlFileEncoding The encoding of SQL file. (NotNull)
+     * @param dbmsSuffix The suffix of DBMS. (NotNull)
+     * @return The filtered outside-SQL. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the SQL is not found.
+     */
+    public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+        final String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
+        return replaceOutsideSqlBindCharacterOnLineComment(sql);
+    }
 
     protected String replaceOutsideSqlBindCharacterOnLineComment(String sql) {
         final String bindCharacter = "?";
@@ -159,7 +159,7 @@ public class ${glOutsideSqlContextName} {
                 sb.append(line).append(lineSeparator);
                 continue;
             }
-			
+            
             if (_log.isDebugEnabled()) {
                 _log.debug("...Replacing bind character on line comment: " + lineComment);
             }
@@ -168,7 +168,7 @@ public class ${glOutsideSqlContextName} {
         }
         return sb.toString();
     }
-	
+    
     /**
      * Read outside-sql path. Required attribute is 'outsideSqlPath'.
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
@@ -213,22 +213,22 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                         Set up Path
     //                                                                         ===========
-	public void setupBehaviorSqlPath() {
-	    final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
-	    final String behaviorSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath;
-		_outsideSqlPath = behaviorSqlPath;
-	}
-	
+    public void setupBehaviorSqlPath() {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+        final String behaviorSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath;
+        _outsideSqlPath = behaviorSqlPath;
+    }
+    
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean isSpecifiedOutsideSql() {
         return _outsideSqlPath != null;
     }
-	
-	public boolean isBehaviorSqlPathEnabled() {
-	    return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && _tableDbName != null;
-	}
+    
+    public boolean isBehaviorSqlPathEnabled() {
+        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && _tableDbName != null;
+    }
 
     // ===================================================================================
     //                                                                      General Helper
@@ -246,7 +246,7 @@ public class ${glOutsideSqlContextName} {
     protected static String replaceString(String text, String fromText, String toText) {
         return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
-	
+    
     protected static String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
@@ -315,7 +315,7 @@ public class ${glOutsideSqlContextName} {
     public void setMethodName(String methodName) {
         this._methodName = methodName;
     }
-	
+    
     public ${glStatementConfig} getStatementConfig() {
         return _statementConfig;
     }
