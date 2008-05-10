@@ -8,6 +8,7 @@ using System.Threading;
 
 using Seasar.Framework.Util;
 
+using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
