@@ -45,6 +45,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             if (IsDynamicBinding) {
                 copyOption.DynamicBinding();
             }
+			copyOption.TableDbName = _tableDbName;
             return copyOption;
         }
 

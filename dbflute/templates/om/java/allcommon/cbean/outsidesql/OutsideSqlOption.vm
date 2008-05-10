@@ -57,6 +57,7 @@ public class ${glOutsideSqlOptionName} {
         if (isDynamicBinding()) {
             copyOption.dynamicBinding();
         }
+		copyOption.setTableDbName(_tableDbName);
         return copyOption;
     }
 

@@ -647,17 +647,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -
-        String sql;
-        try {
-            sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-        } catch (${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} e) {
-            if (outsideSqlContext.isBehaviorSqlPathEnabled()) {
-                outsideSqlContext.setupBehaviorSqlPath();
-                sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-            } else {
-                throw e;
-            }
-        }
+        final String sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
         final Object pmb = outsideSqlContext.getParameterBean();
         final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
 

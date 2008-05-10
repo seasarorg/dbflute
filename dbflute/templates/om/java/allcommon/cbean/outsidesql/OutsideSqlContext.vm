@@ -213,9 +213,12 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                         Set up Path
     //                                                                         ===========
-    public void setupBehaviorSqlPath() {
+    public void setupBehaviorSqlPathIfNeeds() {
+	    if (!isBehaviorSqlPathEnabled()) {
+		    return;
+		}
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
-        final String behaviorSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath;
+        final String behaviorSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
         _outsideSqlPath = behaviorSqlPath;
     }
     
@@ -227,7 +230,7 @@ public class ${glOutsideSqlContextName} {
     }
     
     public boolean isBehaviorSqlPathEnabled() {
-        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && _tableDbName != null;
+        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
     }
 
     // ===================================================================================

@@ -179,9 +179,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                     Set up Path
         //                                                                     ===========
-	    public void SetupBehaviorSqlPath() {
+	    public void SetupBehaviorSqlPathIfNeeds() {
+		    if (!IsBehaviorSqlPathEnabled) {
+			    return;
+			}
 	        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
-	        String behaviorSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath;
+	        String behaviorSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath + ".sql";
 		    _outsideSqlPath = behaviorSqlPath;
 	    }
 
@@ -193,7 +196,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 		
 		public bool IsBehaviorSqlPathEnabled {
-		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && _tableDbName != null; }
+		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
 		}
 
         // ===============================================================================
