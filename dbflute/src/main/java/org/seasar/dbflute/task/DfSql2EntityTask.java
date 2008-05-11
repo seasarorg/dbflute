@@ -619,7 +619,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String exbhvMark = "/" + exbhvName + "/";
         final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+Bhv_.+.sql$");
         for (File sqlFile : sqlFileList) {
-            final String path = DfStringUtil.replace(sqlFile.getPath(), File.separator, "/");
+            final String path = getSlashPath(sqlFile);
             final Matcher matcher = behaviorQueryPathPattern.matcher(path);
             if (!matcher.matches()) {
                 continue;
@@ -678,7 +678,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
         final Map<String, File> bsbhvFileMap = new HashMap<String, File>();
         for (File bsbhvFile : bsbhvFileList) {
-            String path = bsbhvFile.getPath();
+            String path = getSlashPath(bsbhvFile);
             path = path.substring(0, path.lastIndexOf("." + classFileExtension));
             final String bsbhvSimpleName;
             if (path.contains("/")) {
@@ -771,7 +771,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             String msg = "The file of base behavior was Not Found: bsbhvFile=" + bsbhvFile;
             throw new IllegalStateException(msg, e);
         }
-        final String path = bsbhvFile.getPath();
+        final String path = getSlashPath(bsbhvFile);
         if (path.contains("/")) {
             _log.info(path.substring(path.lastIndexOf("/") + "/".length()));
         } else {
@@ -999,5 +999,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         } else {
             return true;// Contains connector character!
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    public String replaceString(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
+    }
+
+    public String getSlashPath(File file) {
+        return replaceString(file.getPath(), getFileSeparator(), "/");
+    }
+
+    public String getFileSeparator() {
+        return File.separator;
     }
 }
