@@ -790,7 +790,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     for (String behaviorQueryPath : behaviorQueryPathSet) {
                         final Map<String, String> behaviorQueryElementMap = resourceElementMap.get(behaviorQueryPath);
                         final StringBuilder definitionLineSb = new StringBuilder();
-                        definitionLineSb.append("    ");
+                        definitionLineSb.append(lineString.substring(0, lineString.indexOf(behaviorQueryPathMark)));
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
                         if (subDirectoryPath != null) {

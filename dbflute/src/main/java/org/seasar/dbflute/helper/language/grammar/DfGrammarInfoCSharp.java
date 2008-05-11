@@ -9,6 +9,10 @@ public class DfGrammarInfoCSharp implements DfGrammarInfo {
         return "cs";
     }
     
+    public String getPublicDefinition() {
+        return "public readonly";
+    }
+    
     public String getPublicStaticDefinition() {
         return "public static readonly";
     }

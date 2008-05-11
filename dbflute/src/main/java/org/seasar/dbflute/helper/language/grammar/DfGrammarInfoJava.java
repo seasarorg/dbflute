@@ -9,6 +9,10 @@ public class DfGrammarInfoJava implements DfGrammarInfo {
         return "java";
     }
     
+    public String getPublicDefinition() {
+        return "public final";
+    }
+    
     public String getPublicStaticDefinition() {
         return "public static final";
     }
