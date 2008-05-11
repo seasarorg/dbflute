@@ -724,6 +724,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         msg = msg + "And confirm your SQL file name." + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Not Found Behavior]" + getLineSeparator() + behaviorName + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[Your SQL File]" + getLineSeparator() + path + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new BehaviorNotFoundException(msg);
@@ -784,6 +785,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             while (true) {
                 lineString = bufferedReader.readLine();
                 if (lineString == null) {
+                    if (targetArea) {
+                        String msg = "The end mark of behavior query path was Not Found: bsbhvFile=" + bsbhvFile;
+                        throw new IllegalStateException(msg);
+                    }
                     break;
                 }
                 if (targetArea) {
