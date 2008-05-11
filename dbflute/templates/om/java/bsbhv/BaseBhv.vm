@@ -75,7 +75,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    ${database.behaviorQueryPathMark}
+    ${database.behaviorQueryPathBeginMark}
+    ${database.behaviorQueryPathEndMark}
 
     // ===================================================================================
     //                                                                           Attribute

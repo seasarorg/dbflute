@@ -223,7 +223,7 @@ public class ${glOutsideSqlContextName} {
 		    final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
 			final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
 			final String behaviorClassPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/");
-			final String behaviorPackagePath = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/"));
+			final String behaviorPackagePath = behaviorClassPath.substring(0, behaviorClassPath.lastIndexOf("/"));
 			final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/") + "/".length());
             _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
 		} else {

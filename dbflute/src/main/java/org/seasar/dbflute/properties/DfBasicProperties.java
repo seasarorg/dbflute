@@ -349,8 +349,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                 Behavior Query Path
     //                                                                 ===================
-    public String getBehaviorQueryPathMark() {
-        return "// df:BehaviorQueryPath";
+    public String getBehaviorQueryPathBeginMark() {
+        return "/*df:BehaviorQueryPathBegin*/";
+    }
+    
+    public String getBehaviorQueryPathEndMark() {
+        return "/*df:BehaviorQueryPathEnd*/";
     }
 
     // ===================================================================================

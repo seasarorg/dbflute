@@ -701,8 +701,12 @@ public class Database {
     // ===============================================================================
     //                                                Properties - Behavior Query Path
     //                                                ================================
-    public String getBehaviorQueryPathMark() {
-        return getBasicProperties().getBehaviorQueryPathMark();
+    public String getBehaviorQueryPathBeginMark() {
+        return getBasicProperties().getBehaviorQueryPathBeginMark();
+    }
+    
+    public String getBehaviorQueryPathEndMark() {
+        return getBasicProperties().getBehaviorQueryPathEndMark();
     }
 
     // ===============================================================================

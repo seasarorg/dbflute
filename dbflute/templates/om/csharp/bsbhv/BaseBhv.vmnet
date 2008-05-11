@@ -63,7 +63,8 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        ${database.behaviorQueryPathMark}
+        ${database.behaviorQueryPathBeginMark}
+        ${database.behaviorQueryPathEndMark}
 
         // ===============================================================================
         //                                                                       Attribute

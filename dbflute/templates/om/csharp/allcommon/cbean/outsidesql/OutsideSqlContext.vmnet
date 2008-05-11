@@ -179,14 +179,28 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                     Set up Path
         //                                                                     ===========
-	    public void SetupBehaviorSqlPathIfNeeds() {
-		    if (!IsBehaviorSqlPathEnabled) {
+	    public void SetupBehaviorQueryPathIfNeeds() {
+		    if (!IsBehaviorQueryPathEnabled) {
 			    return;
 			}
 	        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
-	        String behaviorSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath + ".sql";
-		    _outsideSqlPath = behaviorSqlPath;
+    		if (_outsideSqlPath.Contains(":")) {
+    		    String subDirectoryValue = _outsideSqlPath.Substring(0, _outsideSqlPath.LastIndexOf(":"));
+    		    String subDirectoryPath = subDirectoryValue.Replace(":", "/");
+    			String behaviorQueryPath = _outsideSqlPath.Substring(_outsideSqlPath.LastIndexOf(":") + ":".Length);
+    			String behaviorClassPath = dbmeta.BehaviorTypeName.Replace(".", "/");
+				String behaviorPackagePath = behaviorClassPath.Substring(0, behaviorClassPath.LastIndexOf("/"));
+    			String behaviorClassName = behaviorClassPath.Substring(behaviorClassPath.LastIndexOf("/") + "/".Length);
+                _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
+				_outsideSqlPath = _outsideSqlPath.Replace("/", ".");
+			} else {
+		        _outsideSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath + ".sql";
+			}
 	    }
+		
+		protected bool IsBehaviorQueryPathEnabled {
+		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
+		}
 
         // ===============================================================================
         //                                                                   Determination
@@ -194,10 +208,6 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public bool IsSpecifiedOutsideSql {
             get { return _outsideSqlPath != null; }
         }
-		
-		public bool IsBehaviorSqlPathEnabled {
-		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
-		}
 
         // ===============================================================================
         //                                                                  General Helper

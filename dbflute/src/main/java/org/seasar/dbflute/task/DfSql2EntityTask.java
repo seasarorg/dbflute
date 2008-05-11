@@ -774,23 +774,34 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info(path);
         }
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        final String behaviorQueryPathMark = getBasicProperties().getBehaviorQueryPathMark();
+        final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
+        final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
         String lineString = null;
         final StringBuilder sb = new StringBuilder();
         try {
+            boolean targetArea = false;
             boolean done = false;
             while (true) {
                 lineString = bufferedReader.readLine();
                 if (lineString == null) {
                     break;
                 }
+                if (targetArea) {
+                    if (lineString.contains(behaviorQueryPathEndMark)) {
+                        targetArea = false;
+                    } else {
+                        continue;
+                    }
+                }
                 sb.append(lineString).append("\n");
-                if (lineString.contains(behaviorQueryPathMark)) {
+                if (!done && lineString.contains(behaviorQueryPathBeginMark)) {
+                    targetArea = true;
                     final Set<String> behaviorQueryPathSet = resourceElementMap.keySet();
                     for (String behaviorQueryPath : behaviorQueryPathSet) {
                         final Map<String, String> behaviorQueryElementMap = resourceElementMap.get(behaviorQueryPath);
                         final StringBuilder definitionLineSb = new StringBuilder();
-                        definitionLineSb.append(lineString.substring(0, lineString.indexOf(behaviorQueryPathMark)));
+                        definitionLineSb
+                                .append(lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark)));
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
                         if (subDirectoryPath != null) {
