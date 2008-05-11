@@ -795,9 +795,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
                         if (subDirectoryPath != null) {
                             final String subDirectoryName = DfStringUtil.replace(subDirectoryPath, "/", "_");
+                            final String subDirectoryValue = DfStringUtil.replace(subDirectoryPath, "/", ":");
                             definitionLineSb.append(" String PATH_");
                             definitionLineSb.append(subDirectoryName).append("_").append(behaviorQueryPath);
-                            definitionLineSb.append(" = \"").append(behaviorQueryPath).append("\";");
+                            definitionLineSb.append(" = \"");
+                            definitionLineSb.append(subDirectoryValue).append(":").append(behaviorQueryPath);
+                            definitionLineSb.append("\";");
                         } else {
                             definitionLineSb.append(" String PATH_").append(behaviorQueryPath);
                             definitionLineSb.append(" = \"").append(behaviorQueryPath).append("\";");

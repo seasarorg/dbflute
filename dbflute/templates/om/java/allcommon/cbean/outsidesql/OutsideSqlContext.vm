@@ -211,26 +211,35 @@ public class ${glOutsideSqlContextName} {
     }
 
     // ===================================================================================
-    //                                                                         Set up Path
-    //                                                                         ===========
-    public void setupBehaviorSqlPathIfNeeds() {
-	    if (!isBehaviorSqlPathEnabled()) {
+    //                                                                 Behavior Query Path
+    //                                                                 ===================
+    public void setupBehaviorQueryPathIfNeeds() {
+	    if (!isBehaviorQueryPathEnabled()) {
 		    return;
 		}
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
-        final String behaviorSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
-        _outsideSqlPath = behaviorSqlPath;
+		if (_outsideSqlPath.contains(":")) {
+		    final String subDirectoryValue = _outsideSqlPath.substring(0, _outsideSqlPath.lastIndexOf(":"));
+		    final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
+			final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
+			final String behaviorClassPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/");
+			final String behaviorPackagePath = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/"));
+			final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/") + "/".length());
+            _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
+		} else {
+            _outsideSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
+		}
     }
-    
+
+    protected boolean isBehaviorQueryPathEnabled() {
+        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
+    }
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean isSpecifiedOutsideSql() {
         return _outsideSqlPath != null;
-    }
-    
-    public boolean isBehaviorSqlPathEnabled() {
-        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
     }
 
     // ===================================================================================

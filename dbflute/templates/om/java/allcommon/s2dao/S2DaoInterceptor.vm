@@ -715,7 +715,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorSqlPathIfNeeds();
+		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
 
         // Set up fetchNarrowingBean.
@@ -743,7 +743,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorSqlPathIfNeeds();
+		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
 
         // Set up fetchNarrowingBean.
