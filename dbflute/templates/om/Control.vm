@@ -1672,7 +1672,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoMetaDataFactoryImpl-s4546.${glTemplateFileExtension}",$path,"", "")
     #end
     
-    #if ($database.isTargetLanguageJava() && $database.isVersionAfter1040())
+    #if ($database.isTargetLanguageJava())
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glS2BeanMetaDataFactoryImpl}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2BeanMetaDataFactoryImpl.${glTemplateFileExtension}",$path,"", "")
     #end

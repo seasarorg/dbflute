@@ -119,7 +119,7 @@
 </node>
 </node>
 <node CREATED="1202978597820" ID="Freemind_Link_881677653" MODIFIED="1202978598686" TEXT="IDE">
-<node CREATED="1186894862265" FOLDED="true" ID="Freemind_Link_1811408348" MODIFIED="1186894864828" TEXT="Eclipse">
+<node CREATED="1186894862265" ID="Freemind_Link_1811408348" MODIFIED="1186894864828" TEXT="Eclipse">
 <node CREATED="1186894865593" FOLDED="true" ID="Freemind_Link_269208490" MODIFIED="1186894867781" TEXT="Plugin">
 <node CREATED="1199705905421" FOLDED="true" ID="Freemind_Link_609685317" MODIFIED="1200032132064" TEXT="for Plug-in User">
 <node CREATED="1194938320781" FOLDED="true" ID="Freemind_Link_606292027" MODIFIED="1194938323171" TEXT="Subversion">
@@ -278,6 +278,11 @@
 <node CREATED="1200578221689" FOLDED="true" ID="Freemind_Link_1319628354" MODIFIED="1200578222852" TEXT="*tips">
 <node CREATED="1200578226337" FOLDED="true" ID="Freemind_Link_772252565" MODIFIED="1200578236502" TEXT="Remove Unnecessary Package">
 <node CREATED="1200578208686" ID="Freemind_Link_110620955" MODIFIED="1200578293876" TEXT="Preferences-Java-Appearance-Type Filters"/>
+</node>
+<node CREATED="1210489591770" FOLDED="true" ID="Freemind_Link_181866422" MODIFIED="1210489606792" TEXT="Improve Code Assist">
+<node CREATED="1210489608441" ID="Freemind_Link_1042297697" MODIFIED="1210489646959" TEXT="Preferences - Java - Appearance - Type Filters">
+<node CREATED="1210489647503" ID="Freemind_Link_1862970563" MODIFIED="1210489655859" TEXT="com.ibm.*;com.sun.*;sun.*;sunw.*;java.applet.*;java.awt.*;javax.swing.*;org.omg.*;"/>
+</node>
 </node>
 </node>
 </node>

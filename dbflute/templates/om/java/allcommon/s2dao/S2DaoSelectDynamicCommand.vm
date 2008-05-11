@@ -42,7 +42,6 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param dataSource Data source.
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
@@ -73,10 +72,8 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     //                                           Top Execute
     //                                           -----------
     /**
-     * The override for extension.
-     * 
      * @param args The array of argument. (Nullable)
-     * @return Result. (Nullable)
+     * @return The object of execution result. (Nullable)
      */
     public Object execute(Object[] args) {
         // - - - - - - - - - - - -
@@ -135,7 +132,6 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     //                                       ---------------
     /**
      * Execute default.
-     * 
      * @param args The array of argument. (Nullable)
      * @return Result. (Nullable)
      */
