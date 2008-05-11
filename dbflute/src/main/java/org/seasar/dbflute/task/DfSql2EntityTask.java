@@ -698,7 +698,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
             final File bsbhvFile = bsbhvFileMap.get(behaviorName);
             if (bsbhvFile == null) {
-                throwBehaviorNotFoundException(behaviorQueryElementMap);
+                throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap);
             }
             Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
             if (resourceElementMap == null) {
@@ -712,7 +712,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         handleReflectResource(reflectResourceMap);
     }
 
-    protected void throwBehaviorNotFoundException(Map<String, String> behaviorQueryElementMap) {
+    protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
+            Map<String, String> behaviorQueryElementMap) {
         final String path = behaviorQueryElementMap.get("path");
         final String behaviorName = behaviorQueryElementMap.get("behaviorName");
         String msg = "Look! Read the message below." + getLineSeparator();
@@ -726,6 +727,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         msg = msg + "[Not Found Behavior]" + getLineSeparator() + behaviorName + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Your SQL File]" + getLineSeparator() + path + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Behavior List]" + getLineSeparator() + bsbhvFileMap.keySet() + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new BehaviorNotFoundException(msg);
     }
