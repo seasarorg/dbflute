@@ -652,6 +652,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
      */
     protected void reflectBehaviorQueryPath(Map<String, Map<String, String>> behaviorQueryPathMap) {
+        if (behaviorQueryPathMap.isEmpty()) {
+            return;
+        }
         String outputDir = getBasicProperties().getJavaDir();
         if (outputDir.endsWith("/")) {
             outputDir = outputDir.substring(0, outputDir.length() - "/".length());
