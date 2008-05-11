@@ -61,6 +61,11 @@ namespace ${glPackageExtendedBhv} {
     public partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
         // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        ${database.behaviorQueryPathMark}
+
+        // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
         protected ${myExtendedDaoClassName} _dao;

@@ -73,6 +73,11 @@ import ${glPackageCB}.*;
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    ${database.behaviorQueryPathMark}
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected ${myExtendedDaoClassName} _dao;

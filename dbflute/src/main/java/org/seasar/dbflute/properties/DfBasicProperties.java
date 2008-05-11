@@ -61,7 +61,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseDerby() {
         return getDatabaseName().equalsIgnoreCase("derby");
     }
-    
+
     public boolean isDatabaseDB2() {
         return getDatabaseName().equalsIgnoreCase("db2");
     }
@@ -323,7 +323,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getProjectPrefix() {
         return stringProp("torque.projectPrefix", "");
     }
-    
+
     public String getBasePrefix() {
         return "Bs";
     }
@@ -344,6 +344,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           =========
     public String getAllClassCopyright() {
         return stringProp("torque.allClassCopyright", "");
+    }
+
+    // ===================================================================================
+    //                                                                 Behavior Query Path
+    //                                                                 ===================
+    public String getBehaviorQueryPathMark() {
+        return "// df:BehaviorQueryPath";
     }
 
     // ===================================================================================
