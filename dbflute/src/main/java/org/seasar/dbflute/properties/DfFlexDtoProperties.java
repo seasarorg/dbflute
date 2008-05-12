@@ -37,14 +37,13 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
-    // Unsupported yet
-    //    public String getOutputDirectory() {
-    //        final String value = (String)getDtoDefinitionMap().get("outputDirectory");
-    //        if (value == null) {
-    //            return getBasicProperties().getJavaDir();
-    //        }
-    //        return getBasicProperties().getJavaDir() + "/" + value;
-    //    }
+    public String getOutputDirectory() {
+        final String value = (String) getFlexDtoDefinitionMap().get("outputDirectory");
+        if (value == null) {
+            return getBasicProperties().getOutputDirectory();
+        }
+        return getBasicProperties().getOutputDirectory() + "/" + value;
+    }
 
     public String getBaseDtoPackage() {
         return getDtoPropertyRequired("baseDtoPackage");

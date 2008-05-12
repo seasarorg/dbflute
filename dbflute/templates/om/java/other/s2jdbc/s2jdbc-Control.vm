@@ -11,15 +11,15 @@ targetdatabase = $targetDatabase
   ## Loop by database.
   ##
   #foreach ($database in $dataModel.Databases)
-    ${database.setupJavaDir_for_generate()}
+    $database.enableGenerateOutputDirectory()
     
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     ## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    ${database.initializeCustomizeDao()}
-    ${database.initializeAdditionalForeignKey()}
-    ${database.initializeClassificationDeployment()}
-    ${database.initializeIncludeQuery()}
+    $database.initializeCustomizeDao()
+    $database.initializeAdditionalForeignKey()
+    $database.initializeClassificationDeployment()
+    $database.initializeIncludeQuery()
 
     ## *****************************************************************************************************************
     ##                                                                                                   Global Paramter

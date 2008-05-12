@@ -116,8 +116,8 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                 Parse cutomize entity
     ##                                                                                 ---------------------
-    ## Setup java directory.
-    $database.setupJavaDir_for_sql2entity()
+    ## Setup output directory.
+    $database.enableSql2EntityOutputDirectory()
 
     ## for Sql2Entity
     #set ($isSql2Entity = true)

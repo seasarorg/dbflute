@@ -540,7 +540,7 @@ public class Database {
     //                                               JavaDir
     //                                               -------
     public String getJavaDir() {
-        return getBasicProperties().getJavaDir();
+        return getBasicProperties().getOutputDirectory();
     }
 
     // -----------------------------------------------------
@@ -704,7 +704,7 @@ public class Database {
     public String getBehaviorQueryPathBeginMark() {
         return getBasicProperties().getBehaviorQueryPathBeginMark();
     }
-    
+
     public String getBehaviorQueryPathEndMark() {
         return getBasicProperties().getBehaviorQueryPathEndMark();
     }
@@ -1819,14 +1819,18 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                 JavaDir(OutputPath)
-    //                                                                 ===================
-    public void setupJavaDir_for_generate() {
-        Generator.getInstance().setOutputPath(getProperties().getBasicProperties().getJavaDir());
+    //                                                                    Output Directory
+    //                                                                    ================
+    public void enableGenerateOutputDirectory() {
+        Generator.getInstance().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
     }
 
-    public void setupJavaDir_for_sql2entity() {
+    public void enableSql2EntityOutputDirectory() {
         Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
+    }
+
+    public void enableFlexDtoOutputDirectory() {
+        Generator.getInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
 
     // ===================================================================================

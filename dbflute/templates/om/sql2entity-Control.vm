@@ -116,8 +116,8 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                 Parse cutomize entity
     ##                                                                                 ---------------------
-    ## Setup java directory.
-    $database.setupJavaDir_for_sql2entity()
+    ## Setup output directory.
+    $database.enableSql2EntityOutputDirectory()
 
     ## for Sql2Entity
     #set ($isSql2Entity = true)
@@ -301,6 +301,7 @@ targetdatabase = $targetDatabase
     ##                                                                            Flex Dto
     ##                                                                            ========
     #if ($database.hasFlexDtoDefinition() && $database.isTargetLanguageJava())
+      $database.enableFlexDtoOutputDirectory()
       $database.debug("parseFlexDto() {")
       #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
       #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
@@ -330,6 +331,7 @@ targetdatabase = $targetDatabase
         #end
       #end
       $database.debug("}")
+	  $database.enableSql2EntityOutputDirectory()
     #end
     
   #end

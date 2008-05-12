@@ -123,7 +123,7 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     protected String getSqlDirectory() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProp = prop.getBasicProperties();
-        final String javaDir = basicProp.getJavaDir();
+        final String javaDir = basicProp.getOutputDirectory();
         return javaDir;
     }
 

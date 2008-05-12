@@ -25,7 +25,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param prop Properties. (NotNull)
      */
     public DfBasicProperties(Properties prop) {
@@ -75,70 +74,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                             JavaDir
-    //                                                                             =======
-    public String getJavaDir() {
+    //                                                                    Output Directory
+    //                                                                    ================
+    public String getOutputDirectory() {
         final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return stringProp("torque.java.dir", defaultSourceDirectory);
-    }
-
-    /** @deprecated */
-    public String getJavaLocation_for_gen() {
-        return stringProp("torque.java.location.for.gen", "");
-    }
-
-    /** @deprecated */
-    public String getJavaLocation_for_main() {
-        return stringProp("torque.java.location.for.main", "");
-    }
-
-    /** @deprecated */
-    public String getJavaDir_for_gen() {
-        final String fileSeparator = "/";
-        final String javaDirBase = getJavaDir();
-        final String javaLocation = getJavaLocation_for_gen();
-        String outputPath = "";
-        if (javaDirBase != null && javaDirBase.endsWith(fileSeparator)) {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = javaDirBase + javaLocation.substring(fileSeparator.length());
-            } else {
-                outputPath = javaDirBase + javaLocation;
-            }
-        } else {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = javaDirBase + javaLocation;
-            } else {
-                outputPath = javaDirBase + fileSeparator + javaLocation;
-            }
-        }
-        return outputPath;
-    }
-
-    /** @deprecated */
-    public String getJavaDir_for_main() {
-        final String fileSeparator = "/";
-        final String javaDirBase = getJavaDir();
-        final String javaLocation = getJavaLocation_for_main();
-        String outputPath = "";
-        if (javaDirBase != null && javaDirBase.endsWith(fileSeparator)) {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = javaDirBase + javaLocation.substring(fileSeparator.length());
-            } else {
-                outputPath = javaDirBase + javaLocation;
-            }
-        } else {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = javaDirBase + javaLocation;
-            } else {
-                outputPath = javaDirBase + fileSeparator + javaLocation;
-            }
-        }
-        return outputPath;
-    }
-
-    /** @deprecated */
-    public boolean isJavaDirOnlyOne() {
-        return getJavaDir_for_gen().equals(getJavaDir_for_main());
+        return stringProp("torque.java.dir", defaultSourceDirectory);// 'java.dir' is legacy of Apache Torque.
     }
 
     // ===================================================================================
@@ -352,7 +292,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getBehaviorQueryPathBeginMark() {
         return "/*df:BehaviorQueryPathBegin*/";
     }
-    
+
     public String getBehaviorQueryPathEndMark() {
         return "/*df:BehaviorQueryPathEnd*/";
     }

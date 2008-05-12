@@ -33,7 +33,7 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     }
 
     protected String getDefaultSqlDirectory() {
-        return getBasicProperties().getJavaDir();
+        return getBasicProperties().getOutputDirectory();
     }
 
     protected boolean isDefaultPlainEntity() {
@@ -70,7 +70,7 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     public String getOutputDirectory() {
         final String value = (String) getSql2EntityDefinitionMap().get("outputDirectory");
         if (value == null || value.trim().length() == 0) {
-            return getBasicProperties().getJavaDir();
+            return getBasicProperties().getOutputDirectory();
         } else {
             return value;
         }

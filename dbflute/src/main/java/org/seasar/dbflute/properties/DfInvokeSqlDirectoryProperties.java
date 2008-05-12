@@ -33,9 +33,9 @@ public final class DfInvokeSqlDirectoryProperties extends DfAbstractHelperProper
         if (sqlDirectory != null) {
             return sqlDirectory;
         } else {
-            final String javaDir = getBasicProperties().getJavaDir_for_main();
+            final String outputDirectory = getBasicProperties().getOutputDirectory();
             final String extendedDaoPackage = getGeneratedClassPackageProperties().getExtendedDaoPackage();
-            return javaDir + "/" + extendedDaoPackage.replace('.', '/');
+            return outputDirectory + "/" + extendedDaoPackage.replace('.', '/');
         }
     }
 
