@@ -646,13 +646,13 @@ public class ${glInternalSqlParser} {
             try {
                 return pd.getValue(beanValue);
             } catch (RuntimeException e) {
-                throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind);
+                throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind, e);
 				return null;// Unreachable!
             }
 		}
 		
         protected void throwPropertyHandlingFailureException(Class<?> beanType, Object beanValue, String currentName,
-                String expression, String specifiedSql, boolean bind) {
+                String expression, String specifiedSql, boolean bind, Exception e) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The handlig of the property was failed!" + getLineSeparator();
@@ -671,7 +671,7 @@ public class ${glInternalSqlParser} {
             msg = msg + getLineSeparator();
 			msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(msg, e);
         }
 
         protected String initCap(String name) {

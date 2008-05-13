@@ -7,7 +7,6 @@ import ${glPackageBaseCommonHelperCharacterImpl}.${glJapaneseCharacterImplName};
 
 /**
  * The class of condition-option-parts-agent.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} {
@@ -41,9 +40,8 @@ public class ${myClassName} {
     //                                                                            Real Value
     //                                                                            ==========
     public String generateRealValue(String value) {
-        if (value == null || value.trim().length() == 0) {
-            String msg = "The argument[value] should not be null.";
-            throw new IllegalArgumentException(msg);
+        if (value == null) {
+            return value;
         }
 
         // To Double Byte

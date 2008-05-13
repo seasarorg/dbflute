@@ -39,7 +39,7 @@ public class ${glJapaneseCharacterImplName} implements ${glJapaneseCharacterName
     protected static final String DEF_DOUBLE_BYTE_SEMI_VOICED_SOUND_KATAKANA = "\u30d1\u30d4\u30d7\u30da\u30dd";
 
     public String toDoubleByteKatakana(String target) {
-        if (target == null || target.trim().length() == 0) {
+        if (target == null) {
             return target;
         }
 

@@ -56,7 +56,7 @@ public class ${myClassName} {
     //                                                                            Real Value
     //                                                                            ==========
     public String[] generateSplitValueArray(String value) {
-        if (value == null || value.trim().length() == 0) {
+        if (value == null) {
             String msg = "The argument[value] should not be null of empty: " + value;
             throw new IllegalArgumentException(msg);
         }
@@ -85,7 +85,7 @@ public class ${myClassName} {
     }
 
     protected String repalceContainedDelimiterToRealDelimiter(String value) {
-        if (value == null || value.trim().length() == 0) {
+        if (value == null) {
             return value;
         }
         if (_splitContainedDelimiter == null) {
@@ -98,7 +98,7 @@ public class ${myClassName} {
     }
 
     protected String[] removeInvalidValue(String[] values) {
-        final java.util.List${database.filterGenericsString('String')} ls = new java.util.ArrayList${database.filterGenericsString('String')}();
+        final java.util.List<String> ls = new java.util.ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
             final String value = values[i];
             if (value == null || value.equals("")) {// Don't trim!!!

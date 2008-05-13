@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${myExtendedEntityPackageName};
 #set ($myClassName = "${myExtendedObjectClassName}")
 
+import ${myBaseEntityPackageName}.${myBaseObjectClassName};
+
 /**
  * The entity of ${table.name}.
  * <p>
@@ -8,9 +10,6 @@ ${database.allClassCopyright}package ${myExtendedEntityPackageName};
  * This class is NOT overrided when re-generating.
  * </p>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
-public class $myClassName extends ${myBaseEntityPackageName}.${myBaseObjectClassName} {
-
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+ */
+public class $myClassName extends ${myBaseObjectClassName} {
 }

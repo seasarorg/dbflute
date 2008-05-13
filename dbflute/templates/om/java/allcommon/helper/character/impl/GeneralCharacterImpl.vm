@@ -4,13 +4,12 @@ import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
 
 /**
  * The implementation of general character.
- *
  * @author ${database.ClassAuthor}
  */
 public class ${glGeneralCharacterImplName} implements ${glGeneralCharacterName} {
 
     public String toSingleByteAlphabet(String target) {
-        if (target == null || target.trim().length() == 0) {
+        if (target == null) {
             return target;
         }
         final StringBuffer sb = new StringBuffer();
@@ -29,7 +28,7 @@ public class ${glGeneralCharacterImplName} implements ${glGeneralCharacterName} 
     }
 
     public String toSingleByteNumber(String target) {
-        if (target == null || target.trim().length() == 0) {
+        if (target == null) {
             return target;
         }
         final StringBuffer sb = new StringBuffer();
@@ -45,7 +44,7 @@ public class ${glGeneralCharacterImplName} implements ${glGeneralCharacterName} 
     }
 
     public String toSingleByteAlphabetNumber(String target) {
-        if (target == null || target.trim().length() == 0) {
+        if (target == null) {
             return target;
         }
         final StringBuffer sb = new StringBuffer();
@@ -66,7 +65,7 @@ public class ${glGeneralCharacterImplName} implements ${glGeneralCharacterName} 
     }
 
     public String toSingleByteAlphabetNumberMark(String target) {
-        if (target == null || target.trim().length() == 0) {
+        if (target == null) {
             return target;
         }
         final StringBuffer sb = new StringBuffer(target.length());
