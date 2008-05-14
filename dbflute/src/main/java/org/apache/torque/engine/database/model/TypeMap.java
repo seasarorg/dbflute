@@ -171,7 +171,7 @@ public class TypeMap {
     //                                                                            ========
     private static Hashtable<String, String> _torqueTypeToJavaNativeMap = null;
     private static Hashtable<Integer, String> _jdbcTypeToTorqueTypeMap = null;
-    private static Hashtable<String, String> _javaNativeToFlexNativeMap = null;
+    private static Hashtable<String, String> _torqueTypeToFlexNativeMap = null;
 
     // ===================================================================================
     //                                              Property StringJdbcTypeToJavaNativeMap
@@ -254,29 +254,29 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
 
-        _javaNativeToFlexNativeMap = new Hashtable<String, String>();
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(CHAR), "String");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(VARCHAR), "String");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(LONGVARCHAR), "String");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(CLOB), "String");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(NUMERIC), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(DECIMAL), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(BIT), "Boolean");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(BOOLEAN), "Boolean");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(TINYINT), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(SMALLINT), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(INTEGER), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(BIGINT), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(REAL), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(FLOAT), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(DOUBLE), "Number");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(BINARY), "Object");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(VARBINARY), "Object");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(LONGVARBINARY), "Object");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(BLOB), "Object");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(DATE), "Date");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(TIME), "Date");
-        _javaNativeToFlexNativeMap.put(_torqueTypeToJavaNativeMap.get(TIMESTAMP), "Date");
+        _torqueTypeToFlexNativeMap = new Hashtable<String, String>();
+        _torqueTypeToFlexNativeMap.put(CHAR, "String");
+        _torqueTypeToFlexNativeMap.put(VARCHAR, "String");
+        _torqueTypeToFlexNativeMap.put(LONGVARCHAR, "String");
+        _torqueTypeToFlexNativeMap.put(CLOB, "String");
+        _torqueTypeToFlexNativeMap.put(NUMERIC, "Number");
+        _torqueTypeToFlexNativeMap.put(DECIMAL, "Number");
+        _torqueTypeToFlexNativeMap.put(BIT, "Boolean");
+        _torqueTypeToFlexNativeMap.put(BOOLEAN, "Boolean");
+        _torqueTypeToFlexNativeMap.put(TINYINT, "Number");
+        _torqueTypeToFlexNativeMap.put(SMALLINT, "Number");
+        _torqueTypeToFlexNativeMap.put(INTEGER, "Number");
+        _torqueTypeToFlexNativeMap.put(BIGINT, "Number");
+        _torqueTypeToFlexNativeMap.put(REAL, "Number");
+        _torqueTypeToFlexNativeMap.put(FLOAT, "Number");
+        _torqueTypeToFlexNativeMap.put(DOUBLE, "Number");
+        _torqueTypeToFlexNativeMap.put(BINARY, "Object");
+        _torqueTypeToFlexNativeMap.put(VARBINARY, "Object");
+        _torqueTypeToFlexNativeMap.put(LONGVARBINARY, "Object");
+        _torqueTypeToFlexNativeMap.put(BLOB, "Object");
+        _torqueTypeToFlexNativeMap.put(DATE, "Date");
+        _torqueTypeToFlexNativeMap.put(TIME, "Date");
+        _torqueTypeToFlexNativeMap.put(TIMESTAMP, "Date");
 
         _initialized = true;
     }
@@ -355,8 +355,8 @@ public class TypeMap {
         return javaType;
     }
     
-    public static String findFlexNativeTypeString(String javaNative) {
-        return _javaNativeToFlexNativeMap.get(javaNative);
+    public static String findFlexNativeTypeString(String torqueType) {
+        return _torqueTypeToFlexNativeMap.get(torqueType);
     }
 
     protected static boolean isAutoMappingTargetType(String torqueType) {

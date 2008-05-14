@@ -973,10 +973,6 @@ public class Column {
         return TypeMap.findJavaNativeTypeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
     }
 
-    public String getFlexNative() {
-        return TypeMap.findFlexNativeTypeString(getJavaNative());
-    }
-
     // for CSharp
     public String getJavaNativeRemovedCSharpNullable() {
         final String javaNative = getJavaNative();
@@ -984,6 +980,13 @@ public class Column {
             return javaNative.substring(0, javaNative.length() - "?".length());
         }
         return javaNative;
+    }
+
+    // ===================================================================================
+    //                                                                         Flex Native
+    //                                                                         ===========
+    public String getFlexNative() {
+        return TypeMap.findFlexNativeTypeString(_torqueType);
     }
 
     // ===================================================================================
