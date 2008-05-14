@@ -105,7 +105,7 @@ public class $myClassName {
         return _${col.uncapitalisedJavaName};
     }
 
-    public function set ${col.uncapitalisedJavaName}(${col.uncapitalisedJavaName}:${col.javaNative}):void {
+    public function set ${col.uncapitalisedJavaName}(${col.uncapitalisedJavaName}:${col.flexNative}):void {
         this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 
