@@ -263,9 +263,9 @@ public class TypeMap {
         _torqueTypeToFlexNativeMap.put(DECIMAL, "Number");
         _torqueTypeToFlexNativeMap.put(BIT, "Boolean");
         _torqueTypeToFlexNativeMap.put(BOOLEAN, "Boolean");
-        _torqueTypeToFlexNativeMap.put(TINYINT, "Number");
-        _torqueTypeToFlexNativeMap.put(SMALLINT, "Number");
-        _torqueTypeToFlexNativeMap.put(INTEGER, "Number");
+        _torqueTypeToFlexNativeMap.put(TINYINT, "int");
+        _torqueTypeToFlexNativeMap.put(SMALLINT, "int");
+        _torqueTypeToFlexNativeMap.put(INTEGER, "int");
         _torqueTypeToFlexNativeMap.put(BIGINT, "Number");
         _torqueTypeToFlexNativeMap.put(REAL, "Number");
         _torqueTypeToFlexNativeMap.put(FLOAT, "Number");
