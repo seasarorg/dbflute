@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${myExtendedEntityPackageName};
+${database.allClassCopyright}package ${myExtendedEntityPackageName} {
 #set ($myClassName = "${myExtendedObjectClassName}")
 
 import ${myBaseEntityPackageName}.${myBaseObjectClassName};
@@ -12,4 +12,6 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * @author ${database.ClassAuthor}
  */
 public class $myClassName extends ${myBaseObjectClassName} {
+}
+
 }
