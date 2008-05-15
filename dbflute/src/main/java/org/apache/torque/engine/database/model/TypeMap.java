@@ -74,30 +74,30 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  * These don't quite correspond to the way the peer
  * system works so we'll have to make some adjustments.
  * <pre>
- * ----------------------------------------------------
- * JDBC Type    | Java Type            | CSharp Type |
- * ----------------------------------------------------
- * CHAR          | java.lang.String     | String      |
- * VARCHAR       | java.lang.String     | String      |
- * LONGVARCHAR   | java.lang.String     | String      |
- * NUMERIC       | java.math.BigDecimal | decimal?    |
- * DECIMAL       | java.math.BigDecimal | decimal?    |
- * BIT           | java.lang.Boolean    | bool?       |
- * BOOLEAN       | java.lang.Boolean    | bool?       |
- * TINYINT       | java.lang.Integer    | int?        |
- * SMALLINT      | java.lang.Integer    | int?        |
- * INTEGER       | java.lang.Integer    | int?        |
- * BIGINT        | java.lang.Long       | long?       |
- * REAL          | java.math.BigDecimal | decimal?    |
- * FLOAT         | java.math.BigDecimal | decimal?    |
- * DOUBLE        | java.math.BigDecimal | decimal?    |
- * BINARY        | byte[]               | byte[]      |
- * VARBINARY     | byte[]               | byte[]      |
- * LONGVARBINARY | byte[]               | byte[]      |
- * DATE          | java.util.Date       | DateTime?   |
- * TIME          | java.sql.Time        | DateTime?   |
- * TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
- * ----------------------------------------------------
+ * ------------------------------------------------------
+ * Torque Type   | Java Native          | CSharp Native |
+ * ------------------------------------------------------
+ * CHAR          | java.lang.String     | String        |
+ * VARCHAR       | java.lang.String     | String        |
+ * LONGVARCHAR   | java.lang.String     | String        |
+ * NUMERIC       | java.math.BigDecimal | decimal?      |
+ * DECIMAL       | java.math.BigDecimal | decimal?      |
+ * BIT           | java.lang.Boolean    | bool?         |
+ * BOOLEAN       | java.lang.Boolean    | bool?         |
+ * TINYINT       | java.lang.Integer    | int?          |
+ * SMALLINT      | java.lang.Integer    | int?          |
+ * INTEGER       | java.lang.Integer    | int?          |
+ * BIGINT        | java.lang.Long       | long?         |
+ * REAL          | java.math.BigDecimal | decimal?      |
+ * FLOAT         | java.math.BigDecimal | decimal?      |
+ * DOUBLE        | java.math.BigDecimal | decimal?      |
+ * BINARY        | byte[]               | byte[]        |
+ * VARBINARY     | byte[]               | byte[]        |
+ * LONGVARBINARY | byte[]               | byte[]        |
+ * DATE          | java.util.Date       | DateTime?     |
+ * TIME          | java.sql.Time        | DateTime?     |
+ * TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
+ * ------------------------------------------------------
  * </pre>
  */
 public class TypeMap {
@@ -171,15 +171,15 @@ public class TypeMap {
     //                                                                            ========
     private static Hashtable<String, String> _torqueTypeToJavaNativeMap = null;
     private static Hashtable<Integer, String> _jdbcTypeToTorqueTypeMap = null;
-    private static Hashtable<String, String> _torqueTypeToFlexNativeMap = null;
+    private static Hashtable<String, String> _javaNativeToFlexNativeMap = null;
 
     // ===================================================================================
-    //                                              Property StringJdbcTypeToJavaNativeMap
-    //                                              ======================================
+    //                                                        Property jdbcToJavaNativeMap
+    //                                                        ============================
     protected static final Map<String, Object> _propertyTorqueTypeToJavaNativeMap;
     static {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
-        _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNative();
+        _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNativeMap();
     }
 
     // ===================================================================================
@@ -205,30 +205,30 @@ public class TypeMap {
         _torqueTypeToJavaNativeMap = new Hashtable<String, String>();
 
         // Default types are for Java.
-        _torqueTypeToJavaNativeMap.put(CHAR, findJavaNative(CHAR, CHAR_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(VARCHAR, findJavaNative(VARCHAR, VARCHAR_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(LONGVARCHAR, findJavaNative(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(CLOB, findJavaNative(CLOB, CLOB_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(NUMERIC, findJavaNative(NUMERIC, getDefaultNumericJavaType()));
-        _torqueTypeToJavaNativeMap.put(DECIMAL, findJavaNative(DECIMAL, DECIMAL_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BIT, findJavaNative(BIT, BIT_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BOOLEAN, findJavaNative(BOOLEAN, BOOLEAN_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(TINYINT, findJavaNative(TINYINT, TINYINT_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(SMALLINT, findJavaNative(SMALLINT, SMALLINT_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(INTEGER, findJavaNative(INTEGER, INTEGER_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BIGINT, findJavaNative(BIGINT, BIGINT_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(REAL, findJavaNative(REAL, REAL_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(FLOAT, findJavaNative(FLOAT, FLOAT_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(DOUBLE, findJavaNative(DOUBLE, DOUBLE_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BINARY, findJavaNative(BINARY, BINARY_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(VARBINARY, findJavaNative(VARBINARY, VARBINARY_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(LONGVARBINARY, findJavaNative(LONGVARBINARY, LONGVARBINARY_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BLOB, findJavaNative(BLOB, BLOB_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(DATE, findJavaNative(DATE, DATE_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(TIME, findJavaNative(TIME, TIME_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(TIMESTAMP, findJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BOOLEANCHAR, findJavaNative(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
-        _torqueTypeToJavaNativeMap.put(BOOLEANINT, findJavaNative(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(CHAR, initializeJavaNative(CHAR, CHAR_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(VARCHAR, initializeJavaNative(VARCHAR, VARCHAR_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(LONGVARCHAR, initializeJavaNative(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(CLOB, initializeJavaNative(CLOB, CLOB_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(NUMERIC, initializeJavaNative(NUMERIC, getDefaultNumericJavaNativeType()));
+        _torqueTypeToJavaNativeMap.put(DECIMAL, initializeJavaNative(DECIMAL, getDefaultDecimalJavaNativeType()));
+        _torqueTypeToJavaNativeMap.put(BIT, initializeJavaNative(BIT, BIT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BOOLEAN, initializeJavaNative(BOOLEAN, BOOLEAN_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(TINYINT, initializeJavaNative(TINYINT, TINYINT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(SMALLINT, initializeJavaNative(SMALLINT, SMALLINT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(INTEGER, initializeJavaNative(INTEGER, INTEGER_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BIGINT, initializeJavaNative(BIGINT, BIGINT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(REAL, initializeJavaNative(REAL, REAL_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(FLOAT, initializeJavaNative(FLOAT, FLOAT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(DOUBLE, initializeJavaNative(DOUBLE, DOUBLE_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BINARY, initializeJavaNative(BINARY, BINARY_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(VARBINARY, initializeJavaNative(VARBINARY, VARBINARY_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(LONGVARBINARY, initializeJavaNative(LONGVARBINARY, LONGVARBINARY_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BLOB, initializeJavaNative(BLOB, BLOB_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(DATE, initializeJavaNative(DATE, DATE_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(TIME, initializeJavaNative(TIME, TIME_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(TIMESTAMP, initializeJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BOOLEANCHAR, initializeJavaNative(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BOOLEANINT, initializeJavaNative(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
 
         _jdbcTypeToTorqueTypeMap = new Hashtable<Integer, String>();
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.CHAR), CHAR);
@@ -254,39 +254,31 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
 
-        _torqueTypeToFlexNativeMap = new Hashtable<String, String>();
-        _torqueTypeToFlexNativeMap.put(CHAR, "String");
-        _torqueTypeToFlexNativeMap.put(VARCHAR, "String");
-        _torqueTypeToFlexNativeMap.put(LONGVARCHAR, "String");
-        _torqueTypeToFlexNativeMap.put(CLOB, "String");
-        _torqueTypeToFlexNativeMap.put(NUMERIC, "Number");
-        _torqueTypeToFlexNativeMap.put(DECIMAL, "Number");
-        _torqueTypeToFlexNativeMap.put(BIT, "Boolean");
-        _torqueTypeToFlexNativeMap.put(BOOLEAN, "Boolean");
-        _torqueTypeToFlexNativeMap.put(TINYINT, "int");
-        _torqueTypeToFlexNativeMap.put(SMALLINT, "int");
-        _torqueTypeToFlexNativeMap.put(INTEGER, "int");
-        _torqueTypeToFlexNativeMap.put(BIGINT, "Number");
-        _torqueTypeToFlexNativeMap.put(REAL, "Number");
-        _torqueTypeToFlexNativeMap.put(FLOAT, "Number");
-        _torqueTypeToFlexNativeMap.put(DOUBLE, "Number");
-        _torqueTypeToFlexNativeMap.put(BINARY, "Object");
-        _torqueTypeToFlexNativeMap.put(VARBINARY, "Object");
-        _torqueTypeToFlexNativeMap.put(LONGVARBINARY, "Object");
-        _torqueTypeToFlexNativeMap.put(BLOB, "Object");
-        _torqueTypeToFlexNativeMap.put(DATE, "Date");
-        _torqueTypeToFlexNativeMap.put(TIME, "Date");
-        _torqueTypeToFlexNativeMap.put(TIMESTAMP, "Date");
+        // TODO: @jflute -- Resolve mapping as language dependency! 
+        _javaNativeToFlexNativeMap = new Hashtable<String, String>();
+        _javaNativeToFlexNativeMap.put("String", "String");
+        _javaNativeToFlexNativeMap.put("Short", "int");
+        _javaNativeToFlexNativeMap.put("Integer", "int");
+        _javaNativeToFlexNativeMap.put("Long", "Number");
+        _javaNativeToFlexNativeMap.put("Float", "Number");
+        _javaNativeToFlexNativeMap.put("Double", "Number");
+        _javaNativeToFlexNativeMap.put("Number", "Number");
+        _javaNativeToFlexNativeMap.put("java.math.BigDecimal", "Number");
+        _javaNativeToFlexNativeMap.put("java.util.Date", "Date");
+        _javaNativeToFlexNativeMap.put("java.sql.Time", "Date");
+        _javaNativeToFlexNativeMap.put("java.sql.Timestamp", "Date");
+        _javaNativeToFlexNativeMap.put("byte[]", "Object");
+        _javaNativeToFlexNativeMap.put("Object", "Object");
 
         _initialized = true;
     }
 
     /**
-     * @param torqueType String JDBC type. (NotNull)
-     * @param defaultJavaNative Default java-native. (NotNull)
+     * @param torqueType The type as string for torque native. (NotNull)
+     * @param defaultJavaNative The default type as string for java native. (NotNull)
      * @return Java-native. (NotNull: If the key does not have an element, it returns default type.)
      */
-    protected static String findJavaNative(String torqueType, String defaultJavaNative) {
+    protected static String initializeJavaNative(String torqueType, String defaultJavaNative) {
         final String javaNative = (String) _propertyTorqueTypeToJavaNativeMap.get(torqueType);
         if (javaNative == null) {
             return defaultJavaNative;
@@ -315,10 +307,13 @@ public class TypeMap {
     }
 
     // ===================================================================================
-    //                                                                    Java Type Getter
-    //                                                                    ================
-    public static Class<?> findJavaNativeTypeClass(String torqueType) {
-        final String javaTypeString = getJavaTypeAsString(torqueType);
+    //                                                                         Native Type
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Java Native
+    //                                           -----------
+    public static Class<?> findJavaNativeClass(String torqueType) {
+        final String javaTypeString = getJavaNativeString(torqueType);
         Class<?> clazz = null;
         try {
             clazz = Class.forName(javaTypeString);
@@ -332,38 +327,44 @@ public class TypeMap {
         return clazz;
     }
 
-    public static String findJavaNativeTypeString(String torqueType, Integer columnSize, Integer decimalDigits) {
-        final String javaType = getJavaTypeAsString(torqueType);
+    public static String findJavaNativeString(String torqueType, Integer columnSize, Integer decimalDigits) {
+        final String javaType = getJavaNativeString(torqueType);
         if (isAutoMappingTargetType(torqueType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
             if (decimalDigits != null && decimalDigits > 0) {
                 if (NUMERIC.equalsIgnoreCase(torqueType)) {
-                    return getDefaultNumericJavaType();
+                    return getDefaultNumericJavaNativeType();
                 } else {// DECIMAL
-                    return getDefaultDecimalJavaType();
+                    return getDefaultDecimalJavaNativeType();
                 }
             } else {
                 if (columnSize == null) {
-                    return getJavaTypeAsString(TypeMap.BIGINT);
+                    return getJavaNativeString(BIGINT);
                 }
                 if (columnSize > 9) {
-                    return getJavaTypeAsString(TypeMap.BIGINT);
+                    return getJavaNativeString(BIGINT);
                 } else {
-                    return getJavaTypeAsString(TypeMap.INTEGER);
+                    return getJavaNativeString(INTEGER);
                 }
             }
         }
         return javaType;
     }
-    
-    public static String findFlexNativeTypeString(String torqueType) {
-        return _torqueTypeToFlexNativeMap.get(torqueType);
+
+    // -----------------------------------------------------
+    //                                           Flex Native
+    //                                           -----------
+    public static String findFlexNativeString(String javaNative) {
+        return getFlexNativeString(javaNative);
     }
 
+    // -----------------------------------------------------
+    //                                                Helper
+    //                                                ------
     protected static boolean isAutoMappingTargetType(String torqueType) {
-        return TypeMap.NUMERIC.equals(torqueType) || TypeMap.DECIMAL.equals(torqueType);
+        return NUMERIC.equals(torqueType) || DECIMAL.equals(torqueType);
     }
 
-    protected static String getDefaultNumericJavaType() {
+    protected static String getDefaultNumericJavaNativeType() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProperties = prop.getBasicProperties();
         if (basicProperties.isTargetLanguageJava()) {
@@ -376,7 +377,7 @@ public class TypeMap {
         }
     }
 
-    protected static String getDefaultDecimalJavaType() {
+    protected static String getDefaultDecimalJavaNativeType() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProperties = prop.getBasicProperties();
         if (basicProperties.isTargetLanguageJava()) {
@@ -389,7 +390,7 @@ public class TypeMap {
         }
     }
 
-    protected static String getJavaTypeAsString(String torqueType) {
+    protected static String getJavaNativeString(String torqueType) {
         // Make sure the we are initialized.
         if (!_initialized) {
             initialize();
@@ -401,6 +402,20 @@ public class TypeMap {
             throw new IllegalStateException(msg);
         }
         return _torqueTypeToJavaNativeMap.get(torqueType);
+    }
+
+    protected static String getFlexNativeString(String javaNative) {
+        // Make sure the we are initialized.
+        if (!_initialized) {
+            initialize();
+        }
+        if (!_javaNativeToFlexNativeMap.containsKey(javaNative)) {
+            String msg = "_javaNativeToFlexNativeMap doesn't contain the type as key: ";
+            msg = msg + "key=" + javaNative + " map=" + _javaNativeToFlexNativeMap;
+            _log.warn(msg);
+            throw new IllegalStateException(msg);
+        }
+        return _javaNativeToFlexNativeMap.get(javaNative);
     }
 
     // ===================================================================================

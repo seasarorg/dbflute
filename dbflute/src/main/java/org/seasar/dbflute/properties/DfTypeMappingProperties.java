@@ -26,7 +26,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                                                 ===================
     protected Map<String, Object> _jdbcToJavaNativeMap;
 
-    public Map<String, Object> getJdbcToJavaNative() {
+    public Map<String, Object> getJdbcToJavaNativeMap() {
         if (_jdbcToJavaNativeMap != null) {
             return _jdbcToJavaNativeMap;
         }

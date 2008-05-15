@@ -358,7 +358,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         final String jdbcType = getColumnTorqueType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        final String javaNative = TypeMap.findJavaNativeTypeString(jdbcType, columnSize > 0 ? columnSize : null,
+        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
                 decimalDigits > 0 ? decimalDigits : null);
         columnElement.setAttribute("javaType", javaNative);
     }

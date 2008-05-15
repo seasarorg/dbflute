@@ -966,11 +966,10 @@ public class Column {
      * to the JDBC type of this column. Use in the generation of Base objects.
      * This method is used by torque, so it returns Key types for primaryKey and
      * foreignKey columns
-     *
      * @return Java native type used by torque. (NotNull)
      */
     public String getJavaNative() {
-        return TypeMap.findJavaNativeTypeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
+        return TypeMap.findJavaNativeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
     }
 
     // for CSharp
@@ -986,7 +985,7 @@ public class Column {
     //                                                                         Flex Native
     //                                                                         ===========
     public String getFlexNative() {
-        return TypeMap.findFlexNativeTypeString(_torqueType);
+        return TypeMap.findFlexNativeString(getJavaNative());
     }
 
     // ===================================================================================

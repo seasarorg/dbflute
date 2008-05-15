@@ -1501,7 +1501,7 @@ public class Database {
     //                                                                         =======
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
-            return TypeMap.findJavaNativeTypeString(jdbcType, null, null);
+            return TypeMap.findJavaNativeString(jdbcType, null, null);
         } catch (RuntimeException e) {
             _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType="
                     + jdbcType, e);
