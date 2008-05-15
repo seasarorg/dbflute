@@ -350,12 +350,12 @@ namespace ${glPackageBaseCQ} {
         //                                                                     ===========
 	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
-		    ${myConditionQueryClassName} cq = cb.Query(); XSetUnionQuery(cq);
+		    ${myConditionQueryClassName} cq = cb.Query(); xsetUnionQuery(cq);
         }
 
 	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
-		    ${myConditionQueryClassName} cq = cb.Query(); XSetUnionAllQuery(cq);
+		    ${myConditionQueryClassName} cq = cb.Query(); xsetUnionAllQuery(cq);
 	    }
     }
 }
