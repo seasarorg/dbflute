@@ -4,5 +4,5 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public delegate void ${glUnionQuery}<UNION_QUERY_CB>(UNION_CB unionCB) where UNION_CB : ${glConditionBeanInterfaceName};
+    public delegate void ${glUnionQuery}<UNION_CB>(UNION_CB unionCB) where UNION_CB : ${glConditionBeanInterfaceName};
 }

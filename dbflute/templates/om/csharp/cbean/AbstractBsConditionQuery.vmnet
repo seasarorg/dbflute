@@ -157,7 +157,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void Exists${referrer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Query(cb);
+			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             Set${subQueryPropertyNameInitCap}(cb.Query());
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -266,7 +266,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void Exists${referrer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Query(cb);
+			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             Set${subQueryPropertyNameInitCap}(cb.Query());
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -349,12 +349,12 @@ namespace ${glPackageBaseCQ} {
         //                                                                     Union Query
         //                                                                     ===========
 	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Query(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); XSetUnionQuery(cq);
         }
 
 	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Query(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); XSetUnionAllQuery(cq);
 	    }
     }
