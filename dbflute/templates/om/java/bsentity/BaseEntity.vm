@@ -103,7 +103,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                              --------
     /** The attribute of entity modified properties. (for S2Dao) */
     protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
-#if (${table.hasAllCommonColumn()})
+#if ($table.hasAllCommonColumn())
 
     /** Is common column auto set up effective? */
     protected boolean _canCommonColumnAutoSetup = true;

@@ -68,12 +68,14 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                       Attribute
         //                                                                       =========
         #region Attribute
-        /// <summary>The modified properties of entity. (for S2Dao)</summary>
-        protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
 #foreach ($col in $table.columns)
 
         /// <summary>The value of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
         protected ${col.JavaNative} _${col.uncapitalisedJavaName};
+#end
+        protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
+#if ($table.hasAllCommonColumn())
+        protected bool _canCommonColumnAutoSetup = true;
 #end
         #endregion
 
