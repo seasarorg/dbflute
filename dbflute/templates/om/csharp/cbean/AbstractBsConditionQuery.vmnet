@@ -155,7 +155,7 @@ namespace ${glPackageBaseCQ} {
 			keep${subQueryPropertyNameInitCap}(subQuery);
             registerExistsSubQuery(subQuery, "${col.Name}", "${referrer.firstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
-        public void Exists${referrer.reffererPropertyNameInitCap}(${SubQuery}<${relatedCBClassName}> subQuery) {
+        public void Exists${referrer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Query(cb);
             Set${subQueryPropertyNameInitCap}(cb.Query());
@@ -264,7 +264,7 @@ namespace ${glPackageBaseCQ} {
             keep${subQueryPropertyNameInitCap}(subQuery);
             registerExistsSubQuery(subQuery, "${col.Name}", "${referrer.firstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
-        public void Exists${referrer.reffererPropertyNameInitCap}(${SubQuery}<${relatedCBClassName}> subQuery) {
+        public void Exists${referrer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Query(cb);
             Set${subQueryPropertyNameInitCap}(cb.Query());
