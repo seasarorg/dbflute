@@ -87,6 +87,9 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (!entity.CanCommonColumnAutoSetup()) {
+                return;
+            }
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of INSERT about the column columns of " + this.TableDbName);
             }
@@ -139,6 +142,9 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (!entity.CanCommonColumnAutoSetup()) {
+                return;
+            }
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of UPDATE about the column columns of " + this.TableDbName);
             }
@@ -191,6 +197,9 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (!entity.CanCommonColumnAutoSetup()) {
+                return;
+            }
             if (_log.IsDebugEnabled) {
                 _log.Debug("...Filtering entity of DELETE about the column columns of " + this.TableDbName);
             }

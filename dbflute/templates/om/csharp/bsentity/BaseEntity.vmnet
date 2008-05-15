@@ -265,6 +265,19 @@ namespace ${myExtendedEntityPackageName} {
         public virtual void ClearModifiedPropertyNames() {
             _modifiedProperties.Clear();
         }
+#if (${table.hasAllCommonColumn()})
+
+        // ===============================================================================
+        //                                                       Common Column Auto Filter
+        //                                                       =========================
+        public virtual void DisableCommonColumnAutoSetup() {
+            _canCommonColumnAutoSetup = false;
+        }
+    
+        public virtual bool CanCommonColumnAutoSetup() {// for Framework
+            return _canCommonColumnAutoSetup;
+        }
+#end
 
         // ===============================================================================
         //                                                                  Basic Override
