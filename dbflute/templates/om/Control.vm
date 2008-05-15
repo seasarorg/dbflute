@@ -150,6 +150,7 @@ targetdatabase = $targetDatabase
     #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
+    #set ($glSubQuery = "${glProjectPrefix}SubQuery")
 
     ## [Allcommon-ConditionBean-Option]
     #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
@@ -734,6 +735,10 @@ targetdatabase = $targetDatabase
     $database.info("    parseSelectResource()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SelectResource.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('SubQuery')")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSubQuery}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SubQuery.${glTemplateFileExtension}",$path ,"", "")
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBean}))
     $database.makeDirectory($path)
@@ -2006,13 +2011,10 @@ targetdatabase = $targetDatabase
     ##
     ## Loop by tables.
     ##
-    $database.info("public void parseTableList() {")
-    $database.info("    final List<Table> tableList = getTableList();")
-    $database.info("    for (Table tbl : tableList) {")
     #foreach ($table in $database.tables)
       #if (!$table.isForReferenceOnly())
 
-        $database.info("        parseTable(tbl); // ${table.Name} : ${table.JavaName}")
+        $database.info("parseTable('${table.Name}');")
         ##
         ## The name of objects
         ##
@@ -2144,8 +2146,6 @@ targetdatabase = $targetDatabase
         #end
       #end
     #end
-    $database.info("    }")
-    $database.info("}")
     
     ## ===================================================================================
     ##                                                                          Simple Dto

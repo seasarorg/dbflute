@@ -4,7 +4,6 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 
 /**
  * The interface of condition-bean setupper.
- * 
  * ${database.filterGenericsParamOutput('<CONDITION_BEAN>', 'The type of condition-bean.')}
  * @author ${database.ClassAuthor}
  */
@@ -12,7 +11,6 @@ public interface ${glConditionBeanSetupperName}<CONDITION_BEAN extends ${glCondi
 
     /**
      * Set up condition.
-     * 
      * @param cb Condition-bean. (NotNull)
      */
     public void setup(CONDITION_BEAN cb);

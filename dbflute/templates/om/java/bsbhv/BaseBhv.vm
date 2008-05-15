@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 
 import ${glPackageBaseCommon}.*;
-#if ($table.hasReferrerAsMany())
+#if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 #end
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
@@ -20,12 +20,9 @@ import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-#if (${table.hasOnlyOnePrimaryKey()})
-#if ($table.hasReferrerAsMany())
+#if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end
-#end
-
 import ${glPackageExtendedDao}.*;
 import ${glPackageExtendedEntity}.*;
 import ${myDBMetaPackageName}.*;

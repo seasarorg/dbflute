@@ -211,12 +211,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * InScopeSubQuery{in (select xxx.${refferer.firstLocalColumnName} from ${refferer.Table.Name} where ...)}.
      * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CBquery", ${refferer.table.uncapitalisedJavaName}CBquery);
         final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${refferer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
-    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -227,19 +227,24 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /**
-     * ExistsSubQuery{exists (select xxx.${refferer.FirstLocalColumnName} from ${refferer.table.name} where ...)}.
-     * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
+     * Set up 'exists' sub-query. {exists (select ${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}
+     * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CBquery", ${refferer.table.uncapitalisedJavaName}CBquery);
         final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerExistsSubQuery(${refferer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
-    public void exists${refferer.reffererPropertyNameInitCap}(${glPackageCB}.${relatedCBClassName} ${refferer.table.uncapitalisedJavaName}CB) {
-        assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CB", ${refferer.table.uncapitalisedJavaName}CB);
-        set${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CB.query());
+    /**
+     * Set up 'exists' sub-query. {exists (select ${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    public void exists${refferer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        final ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        set${subQueryPropertyNameInitCap}(cb.query());
     }
-    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #end
@@ -357,12 +362,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * InScopeSubQuery{in (select xxx.${col.foreignKey.firstForeignColumnName} from ${col.foreignKey.foreignTable.Name} where ...)}.
      * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery", ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);
         final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
     }
-    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($refferer in $col.SingleKeyReferrers)
@@ -374,12 +379,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * InScopeSubQuery{in (select xxx.${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}.
      * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CBquery", ${refferer.table.uncapitalisedJavaName}CBquery);
         final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${refferer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
-    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -390,19 +395,24 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /**
-     * ExistsSubQuery{exists (select xxx.${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}.
-     * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
+     * Set up 'exists' sub-query. {exists (select ${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}
+     * @param ${refferer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${refferer.table.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CBquery", ${refferer.table.uncapitalisedJavaName}CBquery);
         final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerExistsSubQuery(${refferer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
-    public void exists${refferer.reffererPropertyNameInitCap}(${glPackageCB}.${relatedCBClassName} ${refferer.table.uncapitalisedJavaName}CB) {
-        assertObjectNotNull("${refferer.table.uncapitalisedJavaName}CB", ${refferer.table.uncapitalisedJavaName}CB);
-        set${subQueryPropertyNameInitCap}(${refferer.table.uncapitalisedJavaName}CB.query());
+    /**
+     * Set up 'exists' sub-query. {exists (select ${refferer.firstLocalColumnName} from ${refferer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    public void exists${refferer.reffererPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        final ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        set${subQueryPropertyNameInitCap}(cb.query());
     }
-    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #end
@@ -526,4 +536,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
     abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
 #end
+
+    // For suppressing warning about 'Not Use Import'. 
+    protected Class<${myConditionBeanClassName}> internalExtendedConditionBeanType() { return ${myConditionBeanClassName}.class; }
+    protected Class<${myConditionQueryClassName}> internalExtendedConditionQueryType() { return ${myConditionQueryClassName}.class; }
 }

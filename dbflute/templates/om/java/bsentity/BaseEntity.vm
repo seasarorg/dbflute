@@ -12,13 +12,15 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 #if (!$isSql2Entity)
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 #end
+#if ($table.hasRelation())
+import ${myExtendedEntityPackageName}.*;
+#end
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
 #else
   #set ($myEntityInterfaceName = ${glEntityInterfaceName})
 #end
-import ${myExtendedEntityPackageName}.*;
 
 /**
  * The entity of ${table.basicInfoDispString}.
@@ -519,5 +521,4 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 #end
-
 }
