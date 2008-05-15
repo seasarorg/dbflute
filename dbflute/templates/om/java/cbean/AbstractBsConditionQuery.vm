@@ -537,7 +537,16 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
 #end
 
-    // For suppressing warning about 'Not Use Import'. 
-    protected Class<${myConditionBeanClassName}> internalExtendedConditionBeanType() { return ${myConditionBeanClassName}.class; }
-    protected Class<${myConditionQueryClassName}> internalExtendedConditionQueryType() { return ${myConditionQueryClassName}.class; }
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
+	public void union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
+		final ${myConditionQueryClassName} cq = cb.query(); xsetUnionQuery(cq);
+	}
+
+	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
+		final ${myConditionQueryClassName} cq = cb.query(); xsetUnionAllQuery(cq);
+	}
 }

@@ -151,6 +151,7 @@ targetdatabase = $targetDatabase
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
     #set ($glSubQuery = "${glProjectPrefix}SubQuery")
+    #set ($glUnionQuery = "${glProjectPrefix}UnionQuery")
 
     ## [Allcommon-ConditionBean-Option]
     #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
@@ -739,6 +740,10 @@ targetdatabase = $targetDatabase
     $database.info("    parse('SubQuery')")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSubQuery}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SubQuery.${glTemplateFileExtension}",$path ,"", "")
+
+	$database.info("    parse('UnionQuery')")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glUnionQuery}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/UnionQuery.${glTemplateFileExtension}",$path ,"", "")
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBean}))
     $database.makeDirectory($path)
