@@ -4,6 +4,8 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
+import ${glPackageBaseCommonCBean}.${glUnionQuery};
+import ${glPackageCB}.${myConditionBeanClassName};
 import ${glPackageCQ}.*;
 
 /**
@@ -187,9 +189,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 	 *     }
 	 * });
 	 * </pre>
-	 * @param unionQuery The query of 'union all'. (NotNull)
+	 * @param unionAllQuery The query of 'union all'. (NotNull)
 	 */
-	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionAllQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
 		final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
 	}
@@ -203,8 +205,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
 	/**
-	 * @param unionQuery The query of 'union'. (NotNull)
-	 * @deprecated Sorry! Please use union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery).
+	 * @param unionAllQuery The query of 'union all'. (NotNull)
+	 * @deprecated Sorry! Please use unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionAllQuery).
 	 */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
         query().xsetUnionAllQuery(unionAllQuery);

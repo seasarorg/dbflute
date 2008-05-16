@@ -536,4 +536,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
     abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
 #end
+
+    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
+    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
 }
