@@ -12,6 +12,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalCommandContextHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * @author ${database.ClassAuthor}
@@ -83,10 +84,15 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
 		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
 		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
 		
+        final String subQuery = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
         final StringBuilder sb = new StringBuilder();
-        sb.append("delete from ").append(tableSqlName);
+		String ln = "";
+        if (cb.getSqlClause().isFormatClauseEffective()) {
+            ln = getLineSeparator();
+		}
+        sb.append("delete from ").append(tableSqlName).append(ln);
         sb.append(" where ").append(primaryKeyName);
-        sb.append(" in (").append(selectClause).append(" ").append(fromWhereClause).append(")");
+        sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
         return sb.toString();
     }
     
@@ -102,19 +108,21 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
         return context;
     }
 	
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
+        if (text == null || fromText == null || toText == null)
             return null;
         StringBuffer buf = new StringBuffer(100);
         int pos = 0;
         int pos2 = 0;
         do {
             pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
+            if (pos == 0) {
                 buf.append(toText);
                 pos2 = fromText.length();
-            } else
-            if(pos > 0) {
+            } else if (pos > 0) {
                 buf.append(text.substring(pos2, pos));
                 buf.append(toText);
                 pos2 = pos + fromText.length();
@@ -122,6 +130,10 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
                 buf.append(text.substring(pos2));
                 return buf.toString();
             }
-        } while(true);
+        } while (true);
+    }
+
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 }

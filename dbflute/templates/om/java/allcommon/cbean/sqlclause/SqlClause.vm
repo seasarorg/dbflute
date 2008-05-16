@@ -17,6 +17,9 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                                Clause
     //                                                                                ======
+    // -----------------------------------------------------
+    //                                       Complete Clause
+    //                                       ---------------
     /**
      * Get the clause of all parts.
      * <pre>
@@ -43,6 +46,9 @@ public interface ${myClassName} {
      */
 	public String getClausePKOnly();
 
+    // -----------------------------------------------------
+    //                                       Fragment Clause
+    //                                       ---------------
     /**
      * Get from-where clause without select and orderBy and sqlSuffix. 
 	 * For subQuery and selectCount.
@@ -441,4 +447,11 @@ public interface ${myClassName} {
     //                                                                       =============
 	public boolean isFormatClauseEffective();
     public void makeFormatClauseEffective();
+	
+    // ===================================================================================
+    //                                                                    Sub Query Indent
+    //                                                                    ================
+    public String resolveSubQueryBeginMark(String subQueryIdentity);
+    public String resolveSubQueryEndMark(String subQueryIdentity);
+    public String filterSubQueryIndent(String sql);
 }

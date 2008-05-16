@@ -130,12 +130,16 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                              Clause
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Complete Clause
+    //                                       ---------------
     public String getClause() {
         final StringBuilder sb = new StringBuilder(512);
 		sb.append(getSelectClause());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(false));
-        return sb.toString();
+        String sql = sb.toString();
+        return filterSubQueryIndent(sql);
     }
 	
 	public String getClausePKOnly() {
@@ -143,7 +147,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		sb.append(getSelectClausePKOnly());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(true));
-        return sb.toString();
+        String sql = sb.toString();
+        return filterSubQueryIndent(sql);
 	}
 	
 	protected String buildClauseWithoutMainSelect(boolean pkonly) {
@@ -168,6 +173,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
 	}
 	
+    // -----------------------------------------------------
+    //                                       Fragment Clause
+    //                                       ---------------
     public String getClauseFromWhereWithUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(false);
     }
@@ -1162,6 +1170,135 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	public void makeFormatClauseEffective() {
 	    _formatClause = true;
 	}
+
+    // ===================================================================================
+    //                                                                    Sub Query Indent
+    //                                                                    ================
+    public String resolveSubQueryBeginMark(String subQueryIdentity) {
+        return getSubQueryBeginMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    public String resolveSubQueryEndMark(String subQueryIdentity) {
+        return getSubQueryEndMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    protected String getSubQueryBeginMarkPrefix() {
+        return "--df:SubQueryBegin#";
+    }
+
+    protected String getSubQueryEndMarkPrefix() {
+        return "--df:SubQueryEnd#";
+    }
+    
+    protected String getSubQueryIdentityTerminal() {
+        return "#IdentityTerminal#";
+    }
+
+    public String filterSubQueryIndent(String sql) {
+        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "") : sql;
+    }
+
+    protected String filterSubQueryIndent(String sql, String preIndent) {
+        if (!isFormatClauseEffective()) {
+            return sql;
+        }
+        final String lineSeparator = getLineSeparator();
+        if (!sql.contains(getSubQueryBeginMarkPrefix())) {
+            return sql;
+        }
+        final String[] lines = sql.split(lineSeparator);
+        final String beginMarkPrefix = getSubQueryBeginMarkPrefix();
+        final String endMarkPrefix = getSubQueryEndMarkPrefix();
+        final String identityTerminal = getSubQueryIdentityTerminal();
+        final int terminalLength = identityTerminal.length();
+        StringBuilder mainSb = new StringBuilder();
+        StringBuilder subSb = null;
+        boolean throughBegin = false;
+        boolean throughBeginFirst = false;
+        String subQueryIdentity = null;
+        String indent = null;
+        for (String line : lines) {
+            if (!throughBegin) {
+                if (line.contains(beginMarkPrefix)) {
+                    throughBegin = true;
+                    subSb = new StringBuilder();
+                    final int markIndex = line.indexOf(beginMarkPrefix);
+                    final int terminalIndex = line.indexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
+                    subQueryIdentity = line.substring(markIndex + beginMarkPrefix.length(), terminalIndex);
+                    subSb.append(clause);
+                    indent = buildSpaceBar(markIndex - preIndent.length());
+                } else {
+                    mainSb.append(line).append(getLineSeparator());
+                }
+            } else {
+                // - - - - - - - -
+                // In begin to end
+                // - - - - - - - -
+                if (line.contains(endMarkPrefix + subQueryIdentity)) {// The end
+                    final int markIndex = line.indexOf(endMarkPrefix);
+                    final int terminalIndex = line.indexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
+                    subSb.append(clause).append(getLineSeparator());
+                    final String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent);
+                    mainSb.append(currentSql);
+                    throughBegin = false;
+                    throughBeginFirst = false;
+                } else {
+                    if (!throughBeginFirst) {
+                        subSb.append(line.trim()).append(getLineSeparator());
+                        throughBeginFirst = true;
+                    } else {
+                        subSb.append(indent).append(line).append(getLineSeparator());
+                    }
+                }
+            }
+        }
+        final String filteredSql = mainSb.toString();
+        
+        if (throughBegin) {
+            String msg = "End Mark Not Found!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
+            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        if (filteredSql.contains(beginMarkPrefix)) {
+            String msg = "Any begin marks are not filtered!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
+            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        return filteredSql;
+    }
+	
+	protected String buildSpaceBar(int size) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(" ");
+        }
+		return sb.toString();
+	}
+    
+    public static class SubQueryIndentFailureException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public SubQueryIndentFailureException(String msg) {
+            super(msg);
+        }
+    }
 
     // ===================================================================================
     //                                                                              Helper

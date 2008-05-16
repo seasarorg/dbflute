@@ -315,9 +315,10 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
             fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
             fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
             fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
-        
-            selectCountCommand.setSql(selectClause + " " + fromWhereClause);
-        
+
+            final String sql = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            selectCountCommand.setSql(sql);
+
             final CommandContext ctx = selectCountCommand.apply(args);
             realSelectCountClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);

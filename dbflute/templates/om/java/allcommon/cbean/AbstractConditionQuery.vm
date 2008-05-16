@@ -565,11 +565,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                  , String columnName, String relatedColumnName, String propertyName) {
         final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
-    }
-
-    protected String getInScopeSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+		final String clause;
+        if (getSqlClause().isFormatClauseEffective()) {
+		    final String ln = getLineSeparator();
+            final int subQueryLevel = subQuery.getSubQueryLevel();
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final String endIndent = "       ";
+			clause = realColumnName + " in (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
+        } else {
+		    clause = realColumnName + " in (" + subQueryClause + ")";
+        }
+        registerWhereClause(clause);
     }
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
@@ -586,6 +594,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return selectClause + " " + fromWhereClause;
     }
 
+    protected String getInScopeSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+    
     // -----------------------------------------------------
     //                                        ExistsSubQuery
     //                                        --------------
@@ -593,11 +605,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                  , String columnName, String relatedColumnName, String propertyName) {
         final String realColumnName = getExistsSubQueryRealColumnName(columnName);
         final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        registerWhereClause("exists (" + subQueryClause + ")");
-    }
-
-    protected String getExistsSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+		final String clause;
+        if (getSqlClause().isFormatClauseEffective()) {
+		    final String ln = getLineSeparator();
+            final int subQueryLevel = subQuery.getSubQueryLevel();
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final String endIndent = "       ";
+			clause = "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
+        } else {
+		    clause = "exists (" + subQueryClause + ")";
+        }
+		registerWhereClause(clause);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -617,15 +637,23 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
 		
         final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
-		
+        String firstConditionAfter = " and ";
+        if (getSqlClause().isFormatClauseEffective()) {
+            firstConditionAfter = getLineSeparator() + "   and ";
+        }
+        
 		// Replace template marks. These are very important!
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
-		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + " and ");
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
-		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + " and ");
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
 		
 		return selectClause + " " + fromWhereClause;
+    }
+
+    protected String getExistsSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
     }
 
     // -----------------------------------------------------

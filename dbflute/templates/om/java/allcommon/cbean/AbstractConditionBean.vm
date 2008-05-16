@@ -275,14 +275,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     }
 
     /**
-     * Get where clause.
-     * @return Where clause. (NotNull)
-     */
-    public String getWhereClause() {
-        return getSqlClause().getWhereClause();
-    }
-
-    /**
      * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
      * @return Sql-suffix.  (NotNull)
      */
