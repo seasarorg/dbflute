@@ -77,14 +77,26 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
+	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
+		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionQuery(cq);
+        }
+
+	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
+		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionAllQuery(cq);
+	    }
+
+		[System.Obsolete("Use the method 'Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery")]
         public void Union(${myConditionQueryClassName} unionQuery) {
             Query().xsetUnionQuery(unionQuery);
         }
-    
+
+		[System.Obsolete("Use the method 'UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery")]
         public void UnionAll(${myConditionQueryClassName} unionAllQuery) {
             Query().xsetUnionAllQuery(unionAllQuery);
         }
-    
+
         public override bool HasUnionQueryOrUnionAllQuery() {
             return Query().hasUnionQueryOrUnionAllQuery();
         }

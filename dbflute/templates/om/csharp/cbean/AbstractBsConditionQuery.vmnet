@@ -343,19 +343,5 @@ namespace ${glPackageBaseCQ} {
         //                                                                  Basic Override
         //                                                                  ==============
         public override String ToString() { return getSqlClause().getClause(); }
-		
-
-        // ===============================================================================
-        //                                                                     Union Query
-        //                                                                     ===========
-	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
-		    ${myConditionQueryClassName} cq = cb.Query(); xsetUnionQuery(cq);
-        }
-
-	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
-		    ${myConditionQueryClassName} cq = cb.Query(); xsetUnionAllQuery(cq);
-	    }
     }
 }

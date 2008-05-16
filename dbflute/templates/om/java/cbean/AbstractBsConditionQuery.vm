@@ -536,17 +536,4 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
     abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
 #end
-
-    // ===================================================================================
-    //                                                                         Union Query
-    //                                                                         ===========
-	public void union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
-		final ${myConditionQueryClassName} cq = cb.query(); xsetUnionQuery(cq);
-	}
-
-	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
-		final ${myConditionQueryClassName} cq = cb.query(); xsetUnionAllQuery(cq);
-	}
 }

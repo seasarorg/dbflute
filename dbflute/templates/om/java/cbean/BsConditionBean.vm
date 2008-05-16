@@ -160,12 +160,52 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                         Union Query
-    //                                                                         ===========
+    //                                                                               Union
+    //                                                                               =====
+	/**
+	 * Set up 'union'.
+	 * <pre>
+	 * cb.query().union(new ${glUnionQuery}&lt;${myConditionBeanClassName}&gt;() {
+	 *     public void query(${myConditionBeanClassName} unionCB) {
+	 *         unionCB.query().setXxx...
+	 *     }
+	 * });
+	 * </pre>
+	 * @param unionQuery The query of 'union'. (NotNull)
+	 */
+	public void union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
+		final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionQuery(cq);
+	}
+
+	/**
+	 * Set up 'union all'.
+	 * <pre>
+	 * cb.query().unionAll(new ${glUnionQuery}&lt;${myConditionBeanClassName}&gt;() {
+	 *     public void query(${myConditionBeanClassName} unionCB) {
+	 *         unionCB.query().setXxx...
+	 *     }
+	 * });
+	 * </pre>
+	 * @param unionQuery The query of 'union all'. (NotNull)
+	 */
+	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
+		final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
+	}
+	
+	/**
+	 * @param unionQuery The query of 'union'. (NotNull)
+	 * @deprecated Sorry! Please use union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery).
+	 */
     public void union(${myConditionQueryClassName} unionQuery) {
         query().xsetUnionQuery(unionQuery);
     }
 
+	/**
+	 * @param unionQuery The query of 'union'. (NotNull)
+	 * @deprecated Sorry! Please use union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery).
+	 */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
         query().xsetUnionAllQuery(unionAllQuery);
     }
