@@ -189,9 +189,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 	 *     }
 	 * });
 	 * </pre>
-	 * @param unionAllQuery The query of 'union all'. (NotNull)
+	 * @param unionQuery The query of 'union'. (NotNull)
 	 */
-	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionAllQuery) {
+	public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.query(cb);
 		final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
 	}
@@ -205,11 +205,11 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
 	/**
-	 * @param unionAllQuery The query of 'union all'. (NotNull)
-	 * @deprecated Sorry! Please use unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionAllQuery).
+	 * @param unionQuery The query of 'union'. (NotNull)
+	 * @deprecated Sorry! Please use unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery).
 	 */
-    public void unionAll(${myConditionQueryClassName} unionAllQuery) {
-        query().xsetUnionAllQuery(unionAllQuery);
+    public void unionAll(${myConditionQueryClassName} unionQuery) {
+        query().xsetUnionAllQuery(unionQuery);
     }
 
     public boolean hasUnionQueryOrUnionAllQuery() {

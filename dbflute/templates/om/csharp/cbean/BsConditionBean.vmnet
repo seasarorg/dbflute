@@ -94,8 +94,8 @@ namespace ${glPackageBaseCB} {
         }
 
 		[System.Obsolete("Use the method 'UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery")]
-        public void UnionAll(${myConditionQueryClassName} unionAllQuery) {
-            Query().xsetUnionAllQuery(unionAllQuery);
+        public void UnionAll(${myConditionQueryClassName} unionQuery) {
+            Query().xsetUnionAllQuery(unionQuery);
         }
 
         public override bool HasUnionQueryOrUnionAllQuery() {
