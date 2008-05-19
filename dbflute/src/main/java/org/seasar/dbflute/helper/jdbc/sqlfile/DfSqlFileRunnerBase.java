@@ -140,7 +140,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected boolean isTargetSql(String sql) {
         return true;
     }
-    
+
     protected void traceSql(String sql) {
         _log.info(sql);
     }
@@ -207,7 +207,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     line = removeUTF8BomIfNeeds(line);
                     isAlreadyProcessUTF8Bom = true;
                 }
-                if (isSqlTrimAndRemoveLineSeparator()) {
+                if (!inGroup && isSqlTrimAndRemoveLineSeparator()) {
                     line = line.trim();
                 }
 
@@ -218,10 +218,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     // * * * * * * * * * * *
                     // Line for Line Comment
                     // * * * * * * * * * * *
-                    
+
                     // Group Specification
+                    // /- - - - - - - - - - - - - - - -
                     if (line.trim().contains("#df:begin#")) {
                         inGroup = true;
+                        sql = "";
                         continue;
                     } else if (line.trim().contains("#df:end#")) {
                         inGroup = false;
@@ -229,16 +231,28 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         sql = "";
                         continue;
                     }
-                    
+                    // - - - - - - - - - -/
+
                     // Real Line Comment
                     line = replaceCommentQuestionMarkIfNeeds(line);
+
+                    if (inGroup) {
+                        sql = sql + line + getLineSeparator();
+                        continue;
+                    }
                     sql = sql + line + getLineSeparator();
                 } else {
                     // * * * * * * * * * *
                     // Line for SQL Clause
                     // * * * * * * * * * *
+
+                    if (inGroup) {
+                        sql = sql + line + getLineSeparator();
+                        continue;
+                    }
+
                     final String lineConnect = isSqlTrimAndRemoveLineSeparator() ? " " : "";
-                    if (line.indexOf("--") >= 0) {// If this line contains both sql and comment, ...
+                    if (line.indexOf("--") >= 0) {// If this line contains both SQL and comment, ...
                         // With Line Comment
                         line = replaceCommentQuestionMarkIfNeeds(line);
                         sql = sql + lineConnect + line + getLineSeparator();
@@ -249,10 +263,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     }
                 }
 
-                if (inGroup) {
-                    sql = sql + getLineSeparator();
-                    continue;
-                }
                 if (sql.trim().endsWith(_runInfo.getDelimiter())) {
                     // * * * * * * * *
                     // End of the SQL
@@ -289,7 +299,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         return sqlList;
     }
-    
+
     public DelimiterChanger newDelimterChanger() {
         final String databaseName = DfBuildProperties.getInstance().getBasicProperties().getDatabaseName();
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
@@ -339,7 +349,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
      * @param sql SQL. (NotNull)
      */
     abstract protected void execSQL(Statement statement, String sql);
-    
+
     /**
      * @return Determination.
      */
