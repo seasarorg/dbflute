@@ -1,7 +1,9 @@
 package org.seasar.dbflute.properties;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author jflute
@@ -43,6 +45,20 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
             return getBasicProperties().getOutputDirectory();
         }
         return getBasicProperties().getOutputDirectory() + "/" + value;
+    }
+
+    public Map<String, String> getJavaToFlexNativeMap() {
+        final Map<String, Object> map = getDtoPropertyMap("javaToFlexNativeMap");
+        if (map == null) {
+            return new LinkedHashMap<String, String>();
+        }
+        final Set<String> keySet = map.keySet();
+        final LinkedHashMap<String, String> resultMap = new LinkedHashMap<String, String>();
+        for (String key : keySet) {
+            String value = (String) map.get(key);
+            resultMap.put(key, value);
+        }
+        return resultMap;
     }
 
     public String getBaseDtoPackage() {
@@ -90,5 +106,10 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     protected String getDtoProperty(String key) {
         final String value = (String) getFlexDtoDefinitionMap().get(key);
         return value;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getDtoPropertyMap(String key) {
+        return (Map<String, Object>) getFlexDtoDefinitionMap().get(key);
     }
 }

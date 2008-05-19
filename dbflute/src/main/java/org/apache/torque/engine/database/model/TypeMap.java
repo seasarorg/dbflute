@@ -177,9 +177,11 @@ public class TypeMap {
     //                                                        Property jdbcToJavaNativeMap
     //                                                        ============================
     protected static final Map<String, Object> _propertyTorqueTypeToJavaNativeMap;
+    protected static final Map<String, String> _propertyJavaNativeToFlexNativeMap;
     static {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNativeMap();
+        _propertyJavaNativeToFlexNativeMap = prop.getFlexDtoProperties().getJavaToFlexNativeMap();
     }
 
     // ===================================================================================
@@ -256,19 +258,19 @@ public class TypeMap {
 
         // TODO: @jflute -- Resolve mapping as language dependency! 
         _javaNativeToFlexNativeMap = new Hashtable<String, String>();
-        _javaNativeToFlexNativeMap.put("String", "String");
-        _javaNativeToFlexNativeMap.put("Short", "int");
-        _javaNativeToFlexNativeMap.put("Integer", "int");
-        _javaNativeToFlexNativeMap.put("Long", "Number");
-        _javaNativeToFlexNativeMap.put("Float", "Number");
-        _javaNativeToFlexNativeMap.put("Double", "Number");
-        _javaNativeToFlexNativeMap.put("Number", "Number");
-        _javaNativeToFlexNativeMap.put("java.math.BigDecimal", "Number");
-        _javaNativeToFlexNativeMap.put("java.util.Date", "Date");
-        _javaNativeToFlexNativeMap.put("java.sql.Time", "Date");
-        _javaNativeToFlexNativeMap.put("java.sql.Timestamp", "Date");
-        _javaNativeToFlexNativeMap.put("byte[]", "Object");
-        _javaNativeToFlexNativeMap.put("Object", "Object");
+        _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
+        _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));
+        _javaNativeToFlexNativeMap.put("Integer", initializeFlexNative("Integer", "int"));
+        _javaNativeToFlexNativeMap.put("Long", initializeFlexNative("Long", "Number"));
+        _javaNativeToFlexNativeMap.put("Float", initializeFlexNative("Float", "Number"));
+        _javaNativeToFlexNativeMap.put("Double", initializeFlexNative("Double", "Number"));
+        _javaNativeToFlexNativeMap.put("Number", initializeFlexNative("Number", "Number"));
+        _javaNativeToFlexNativeMap.put("java.math.BigDecimal", initializeFlexNative("java.math.BigDecimal", "Number"));
+        _javaNativeToFlexNativeMap.put("java.util.Date", initializeFlexNative("java.util.Date", "Date"));
+        _javaNativeToFlexNativeMap.put("java.sql.Time", initializeFlexNative("java.sql.Time", "Date"));
+        _javaNativeToFlexNativeMap.put("java.sql.Timestamp", initializeFlexNative("java.sql.Timestamp", "Date"));
+        _javaNativeToFlexNativeMap.put("byte[]", initializeFlexNative("byte[]", "Object"));
+        _javaNativeToFlexNativeMap.put("Object", initializeFlexNative("Object", "Object"));
 
         _initialized = true;
     }
@@ -284,6 +286,19 @@ public class TypeMap {
             return defaultJavaNative;
         }
         return javaNative;
+    }
+    
+    /**
+     * @param javaNative The type as string for java native. (NotNull)
+     * @param defaultFlexNative The default type as string for flex native. (NotNull)
+     * @return Java-native. (NotNull: If the key does not have an element, it returns default type.)
+     */
+    protected static String initializeFlexNative(String javaNative, String defaultFlexNative) {
+        final String flexNative = (String) _propertyJavaNativeToFlexNativeMap.get(javaNative);
+        if (flexNative == null) {
+            return defaultFlexNative;
+        }
+        return flexNative;
     }
 
     // ===================================================================================
