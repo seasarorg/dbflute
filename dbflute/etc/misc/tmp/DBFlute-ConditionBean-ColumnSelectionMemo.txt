@@ -1,0 +1,94 @@
+// ＜A＞
+// 関連を気にせずColumnInfoをただ指定してフィルタ：
+
+MemberCB cb = new MemberCB();
+cb.setupSelect_MemberStatus();
+List<ColumnInfo> selectionList = new ArrayList<ColumnInfo>();
+selectionList.add(MemberDbm.columnMemberName());
+selectionList.add(MemberDbm.columnMemberBirthday());
+cb.limitSelect_Selection(selectionList);
+
+// ※setupSelect_Xxx()とは併用
+// ※全然関係のないカラムも指定できちゃう(無視する！？)
+
+
+// ＜B＞
+// 関連もふまえて指定して独立的に指定：
+
+MemberCB cb = new MemberCB();
+cb.selection().columnMemberAccount();
+cb.selection().columnMemberBirthDay();
+cb.selection().selectionMemberStatus().columnMemberName();
+
+// ※setupSelect_Xxx()とは排他的
+// ※PKやFKは自動選択されるとかなので混乱するかな！？
+
+
+// ＜C＞
+// 関連もふまえて指定するけどフィルタ：
+
+MemberCB cb = new MemberCB();
+cb.setupSelect_MemberStatus();
+cb.includes().columnMemberAccount();
+cb.includes().columnMemberBirthDay();
+cb.includes().selectionMemberStatus().columnMemberStatusName();
+
+// ※自テーブルは全部で、関連テーブルは名称だけってのがやりやすい
+// 　　cb.setupSelect_MemberStatus();
+// 　　cb.includes().foreignMemberStatus().columnMemberStatusName();
+// ※既存のsetupSelect_Xxx()とつじつまが合う。
+// ※関連はするけど、取得対象じゃない関連テーブルのカラムも指定できちゃう(無視する！？)
+
+
+// ＜D＞ ※Bの派生
+// 関連もふまえて指定して独立的に指定だが全カラムも指定可能：
+
+MemberCB cb = new MemberCB();
+cb.selection().columnMemberAccount();
+cb.selection().columnMemberBirthDay();
+cb.selection().selectionMemberStatus() // ★全部
+
+// ※全てがまかなえるので実装はしやすいかも
+// ※setupSelectが不要になる
+// 　　→ 今更それを変えるもはなしでしょ！？
+// ※query().queryXxx()と対比的できれい！？
+
+
+
+// 共通的な課題：
+// 
+// 「除外カラム」って概念もやはり必要になるだろうか！？
+// これとこれだけは除外したいって。
+
+
+
+// とりあえず「C」かなと考えている
+// 但し、メソッド名
+
+MemberCB cb = new MemberCB();
+cb.setupSelect_MemberStatus();
+cb.filterSelect().columnMemberAccount();
+cb.filterSelect().columnMemberBirthDay();
+cb.filterSelect().foreignMemberStatus().columnMemberStatusName();
+
+
+// 自テーブルは全部欲しい、関連テーブルは名称だけ
+MemberCB cb = new MemberCB();
+cb.setupSelect_MemberStatus();
+cb.filterSelect().foreignMemberStatus().columnMemberStatusName();
+
+
+
+cb.setupSelect_MemberStatus().includes().columnMemberStatusNameA();
+cb.setupSelect_MemberStatus().includes().columnMemberStatusNameB();
+cb.setupSelect_MemberStatus().includes().columnMemberStatusNameC();
+
+or 
+
+cb.setupSelect_MemberStatus().includes().columnMemberStatusName().columnXxx().columnYyy()...;
+
+
+MemberStatusSelectBean memberStatusSb = new MemberStatusSelectBean();
+memberStatusSb.columnMemberStatusName();
+cb.setupSelect_MemberStatus(selectBean).withOyaNoOya(selectBean);
+
