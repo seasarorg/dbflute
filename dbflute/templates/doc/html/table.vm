@@ -1,5 +1,6 @@
-<a name="$table.Name"/>
-<h2>$table.Name</h2>
+
+<a name="$table.name"/>
+<h2>$table.name</h2>
 $!table.Description
 <p/>
 <table border="1" cellspacing="0">
@@ -18,7 +19,7 @@ $!table.Description
     <th class="normalFont" bgcolor="#CCCCCC">${table.database.targetLanguageInitCap}Type</th>
     <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
   </tr>
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
   <tr>
     <td class="normalFont"><center> #if ($col.isPrimaryKey())o#else &nbsp;#end </center></td>
     <td class="normalFont"><center> #if ($col.isAutoIncrement())o#else &nbsp;#end </center></td>
@@ -32,12 +33,12 @@ $!table.Description
     <td class="normalFont">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
     <td class="normalFont">${col.javaBeansRulePropertyName}</td>
     <td class="normalFont">${col.javaNative}</td>
-    <td class="normalFont">#if ($col.hasClassification()==true)${col.classificationName}#else &nbsp;#end</td>
+    <td class="normalFont">#if ($col.hasClassification()==true)<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
   </tr>
 #end
 </table>
 <script>
-#foreach ($foreignKey in $table.ForeignKeys)
+#foreach ($foreignKey in $table.foreignKeys)
 if(document.getElementById) {
 #foreach ($columnName in $foreignKey.localColumns)
     var col = document.getElementById("${table.name}${columnName}");

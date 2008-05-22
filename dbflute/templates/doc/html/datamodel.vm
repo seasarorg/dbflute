@@ -35,5 +35,51 @@ ${database.initializeClassificationDeployment()}
     $generator.parse("doc/html/table.vm",$outFile,"table",$tbl)
   #end
 
+#if ($database.hasClassificationDefinitionMap())
+  <p/>
+  <p/>
+  <h2>Classification Definition</h2>
+  <p/>
+  <table border="1" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#CCCCCC">
+      <th class="normalFont">Classification</th>
+      <th class="normalFont">Top Comment</th>
+      <th class="normalFont">Definition</th>
+    </tr>
+#foreach ($classificationName in $database.classificationNameList)
+  #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+  #set ($existTop = false)
+  #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+    #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+    #set ($existTop = true)
+  #else
+    #set ($existTop = false)
+  #end
+
+    <a name="$classificationName"/>
+    <tr>
+      <td class="normalFont">$classificationName</td>
+      <td class="normalFont">#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
+      <td class="normalFont">
+	    <table border="1">
+          <tr bgcolor="#EEEEEE">
+            <th class="normalFont">Code</th>
+            <th class="normalFont">Name</th>
+            <th class="normalFont">Comment</th>
+          </tr>
+#foreach ($classificationMap in $classificationMapList)
+          <tr>
+            <td>$classificationMap.get('code')</td>
+            <td>${classificationMap.get('name')}</td>
+            <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
+          </tr>
+#end
+        </table>
+	  </td>
+    </tr>
+#end
+  </table>
+#end
+
 </body>
 </html>
