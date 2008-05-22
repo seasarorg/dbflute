@@ -28,6 +28,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfSqlStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -40,9 +41,23 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
+    protected int _nonTargetSqlCount;
+
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
+    @Override
+    protected void doExecute() {
+        super.doExecute();
+        if (_nonTargetSqlCount > 0) {
+            _log.info(" ");
+            _log.info("/* * * * * * * * * * * * *");
+            _log.info("Non target SQL count = " + _nonTargetSqlCount);
+            _log.info("* * * * * * * * * */");
+            _log.info(" ");
+        }
+    }
+
     @Override
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
         runInfo.setEncoding(getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding());
@@ -98,6 +113,16 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
             }
 
             @Override
+            protected boolean isTargetSql(String sql) {
+                final String entityName = getEntityName(sql);
+                if (entityName != null && "df:x".equalsIgnoreCase(entityName)) {// Non target SQL!
+                    ++_nonTargetSqlCount;
+                    return false;
+                }
+                return super.isTargetSql(sql);
+            }
+
+            @Override
             protected void traceSql(String sql) {
                 String msg = getLineSeparator() + "";
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
@@ -115,6 +140,33 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return false;
+            }
+
+            protected String getEntityName(final String sql) {
+                return getTargetString(sql, "#");
+            }
+
+            protected String getTargetString(final String sql, final String mark) {
+                final List<String> targetList = getTargetList(sql, mark);
+                return !targetList.isEmpty() ? targetList.get(0) : null;
+            }
+
+            protected List<String> getTargetList(final String sql, final String mark) {
+                if (sql == null || sql.trim().length() == 0) {
+                    String msg = "The sql is invalid: " + sql;
+                    throw new IllegalArgumentException(msg);
+                }
+                final List<String> betweenBeginEndMarkList = getListBetweenBeginEndMark(sql, "--" + mark, mark);
+                if (!betweenBeginEndMarkList.isEmpty()) {
+                    return betweenBeginEndMarkList;
+                } else {
+                    // for MySQL. 
+                    return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
+                }
+            }
+
+            protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
+                return DfStringUtil.getListBetweenBeginEndMark(targetStr, beginMark, endMark);
             }
         };
     }

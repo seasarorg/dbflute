@@ -193,9 +193,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             protected void execSQL(Statement statement, String sql) {
                 ResultSet rs = null;
                 try {
+                    boolean alreadyIncrementGoodSqlCount = false;
                     if (isTargetEntityMakingSql(sql)) {
                         rs = statement.executeQuery(sql);
+
                         _goodSqlCount++;
+                        alreadyIncrementGoodSqlCount = true;
 
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
@@ -247,6 +250,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
                     }
                     if (isTargetParameterBeanMakingSql(sql)) {
+                        if (!alreadyIncrementGoodSqlCount) {
+                            _goodSqlCount++;
+                        }
+
                         // for Parameter Bean
                         final DfParameterBeanMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
                         if (parameterBeanMetaData != null) {
@@ -285,7 +292,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             protected boolean isTargetEntityMakingSql(String sql) {
                 final String entityName = getEntityName(sql);
-                return entityName != null;
+                if (entityName == null) {
+                    return false;
+                }
+                if ("df:x".equalsIgnoreCase(entityName)) {// Non Target Making SQL!
+                    return false;
+                }
+                return true;
             }
 
             protected boolean isTargetParameterBeanMakingSql(String sql) {
@@ -392,6 +405,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             protected boolean isTargetSql(String sql) {
                 final String entityName = getEntityName(sql);
                 final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
+
+                // No Pmb and Non Target Entity --> Non Target
+                if (parameterBeanClassDefinition == null && entityName != null && "df:x".equalsIgnoreCase(entityName)) {
+                    return false;
+                }
+
                 return entityName != null || parameterBeanClassDefinition != null;
             }
 
