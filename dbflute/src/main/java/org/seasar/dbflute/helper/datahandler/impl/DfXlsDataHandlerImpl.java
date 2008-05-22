@@ -136,6 +136,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         // ColumnValue and ColumnObject
                         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
                         final Map<String, String> columnValueMap = columnContainer.getColumnValueMap();
+                        if (columnValueMap.isEmpty()) {
+                            String msg = "The table was Not Found in the file:";
+                            msg = msg + " tableName=" + tableName + " file=" + file;
+                            throw new TableNotFoundException(msg);
+                        }
                         if (_loggingInsertSql) {
                             final List<String> valueList = new ArrayList<String>(columnValueMap.values());
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
@@ -518,6 +523,15 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //        return valueList;
     //    }
 
+    protected String getSql4Log(String tableName, List<String> columnNameList,
+            final List<? extends Object> bindParameters) {
+        String columnNameString = columnNameList.toString();
+        columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
+        String bindParameterString = bindParameters.toString();
+        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
+        return tableName + ":{" + bindParameterString + "}";
+    }
+
     protected ColumnContainer createColumnContainer(final DataTable dataTable, final DataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
         for (int k = 0; k < dataTable.getColumnSize(); k++) {
@@ -554,16 +568,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
     }
 
-    protected String getSql4Log(String tableName, List<String> columnNameList,
-            final List<? extends Object> bindParameters) {
-        String columnNameString = columnNameList.toString();
-        columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
-        String bindParameterString = bindParameters.toString();
-        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return tableName + ":{" + bindParameterString + "}";
-    }
-
-    public static class MyCreatedState {
+    protected static class MyCreatedState {
         public String buildPreparedSql(final DataRow row) {
             final CreatedState createdState = new CreatedState() {
                 public String toString() {
@@ -572,6 +577,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
             };
             return createdState.toString();
+        }
+    }
+
+    protected static class TableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public TableNotFoundException(String msg) {
+            super(msg);
         }
     }
 

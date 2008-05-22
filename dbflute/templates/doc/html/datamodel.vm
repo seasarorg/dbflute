@@ -4,6 +4,7 @@ ${database.initializeClassificationDeployment()}
 <html>
 <head>
   <title>$dataModel.name</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <style>
   .normalFont {
     $docHtmlNormalFont
@@ -56,7 +57,6 @@ ${database.initializeClassificationDeployment()}
     #set ($existTop = false)
   #end
 
-    <a name="$classificationName"/>
     <tr>
       <td class="normalFont">$classificationName</td>
       <td class="normalFont">#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
@@ -69,7 +69,7 @@ ${database.initializeClassificationDeployment()}
           </tr>
 #foreach ($classificationMap in $classificationMapList)
           <tr>
-            <td>$classificationMap.get('code')</td>
+            <td><a name="$classificationName"/>$classificationMap.get('code')</td>
             <td>${classificationMap.get('name')}</td>
             <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
           </tr>
