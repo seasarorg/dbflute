@@ -2145,12 +2145,12 @@ public class Table implements IDMethod {
 
     public String getIdentityColumnName() {
         final Column column = getIdentityColumn();
-        return column != null ? column.getName() : null;
+        return column != null ? column.getName() : "";
     }
 
     public String getIdentityPropertyName() {
         final Column column = getIdentityColumn();
-        return column != null ? getPropertyNameResolvedLanguage(column) : null;
+        return column != null ? getPropertyNameResolvedLanguage(column) : "";
     }
 
     protected Column getIdentityColumn() {

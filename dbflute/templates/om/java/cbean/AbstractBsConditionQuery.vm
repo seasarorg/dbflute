@@ -66,7 +66,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Equal(=). As ${classificationMap.get('name')}. And NullOrEmptyIgnored, OnceRegistered.<br />
-     * ${classificationMap.get('comment')}
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
@@ -87,7 +87,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * NotEqual(=). As ${classificationMap.get('name')}. And NullOrEmptyIgnored, OnceRegistered.<br />
-     * ${classificationMap.get('comment')}
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
@@ -262,7 +262,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnceRegistered.<br />
-     * ${classificationMap.get('comment')}
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
@@ -284,7 +284,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnceRegistered.<br />
-     * ${classificationMap.get('comment')}
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
         final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};

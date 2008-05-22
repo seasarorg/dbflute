@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
@@ -12,7 +13,6 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The paging executor of outsideSql.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glOutsideSqlPagingExecutorName} {
@@ -42,6 +42,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     //                                                                              Select
     //                                                                              ======
     public <ENTITY> List<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
+        setupScrollableCursorIfNeeds();
         return _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
     }
 
@@ -116,13 +117,33 @@ public class ${glOutsideSqlPagingExecutorName} {
             }
             public java.util.List<ENTITY> paging() {
                 pmb.xsetPaging(true);
+				setupScrollableCursorIfNeeds();
                 return selectList(path, pmb, entityType);
             }
         };
         final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
         return invoker.invokePaging(handler);
     }
-
+    
+    protected void setupScrollableCursorIfNeeds() {
+        if (!_outsideSqlOption.isAutoPaging()) {
+            return;
+        }
+        ${glStatementConfig} statementConfig = _outsideSqlOption.getStatementConfig();
+        if (statementConfig != null && statementConfig.getResultSetType() != null) {
+            return;
+        }
+        ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+        if (defaultStatementConfig != null && defaultStatementConfig.hasResultSetType()) {
+            return;
+        }
+        if (statementConfig == null) {
+            statementConfig = new ${glStatementConfig}();
+            configure(statementConfig);
+        }
+        statementConfig.typeScrollInsensitive();
+    }
+	
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======

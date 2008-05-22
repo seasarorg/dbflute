@@ -19,8 +19,8 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                 Classification Code
     //                                                                 ===================
-#foreach ($classificationName in $database.ClassificationNameList)
-  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+#foreach ($classificationName in $database.classificationNameList)
+  #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
   #set ($existTop = false)
   #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
     #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
@@ -40,7 +40,7 @@ public class ${myClassName} {
     /**
      * The classification TOP code of ${classificationName}. <br />
 #if ($classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment') <br />
+     * $classificationTopMap.get('topComment')
 #end
      */
     public static final String ${database.classificationTopCodeVariableNamePrefix}${classificationName} = "$classificationTopMap.get('topCode')";
@@ -50,7 +50,7 @@ public class ${myClassName} {
     /**
      * The classification code of ${classificationMap.get('name')} on ${classificationName}. <br />
 #if ($classificationMap.containsKey('comment'))
-     * ${classificationMap.get('comment')} <br />
+     * ${classificationMap.get('comment')}
 #end
      */
     public static final String ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";

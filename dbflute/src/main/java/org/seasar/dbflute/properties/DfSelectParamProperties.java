@@ -12,7 +12,7 @@ public final class DfSelectParamProperties extends DfAbstractHelperProperties {
     }
 
     public String getStatementResultSetType() {
-        final String value = stringProp("torque.statementResultSetType", "ResultSet.TYPE_SCROLL_INSENSITIVE");
+        final String value = stringProp("torque.statementResultSetType", "ResultSet.TYPE_FORWARD_ONLY");
         if (value.startsWith("ResultSet.")) {
             return "java.sql." + value;
         }

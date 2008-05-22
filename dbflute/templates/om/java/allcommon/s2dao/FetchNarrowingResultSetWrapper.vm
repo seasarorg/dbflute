@@ -9,7 +9,7 @@ import org.seasar.framework.exception.SQLRuntimeException;
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 
 /**
- * The wrapper of fetch-narrowing result-set.
+ * The wrapper of fetch narrowing result set.
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
@@ -44,7 +44,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     /**
      * Constructor.
      * @param resultSet Original result set. (NotNull)
-     * @param fetchNarrowingBean FetchNarrowing-bean. (NotNull)
+     * @param fetchNarrowingBean Fetch-narrowing-bean. (NotNull)
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
@@ -71,7 +71,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
             return;
         }
         final int skipStartIndex = getFetchNarrowingSkipStartIndex();
-        if (isCursorUsed()) {
+        if (isScrollableCursor()) {
             try {
                 if (0 == skipStartIndex) {
                     _resultSet.beforeFirst();
@@ -85,7 +85,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         } else {
             try {
                 while (true) {
-					if (_resultSet.getRow() >= skipStartIndex) {
+					if (_fetchCounter >= skipStartIndex) {
 					    break;
 					}
 					if (!_resultSet.next()) {
@@ -187,30 +187,13 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         return _fetchNarrowingBean.getFetchNarrowingLoopCount();
     }
 
-    /**
-     * Get safety max result size.
-     * @return Safety max result size.
-     */
     public int getSafetyMaxResultSize() {
         return _fetchNarrowingBean.getSafetyMaxResultSize();
     }
 
-    /**
-     * Is cursor used?
-     * @return Determination.
-     */
-    protected boolean isCursorUsed() {
-        return isCursorSupported(_resultSet);
-    }
-
-    /**
-     * Is cursor supported?
-     * @param resultSet ResultSet
-     * @return Determation.
-     */
-    public static boolean isCursorSupported(ResultSet resultSet) {
+    protected boolean isScrollableCursor() {
         try {
-            return !(resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
+            return !(_resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
