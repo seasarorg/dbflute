@@ -35,13 +35,16 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     public boolean isMakeConditionQueryClassificationRestriction() {
         return booleanProp("torque.isMakeConditionQueryClassificationRestriction", false);
     }
-    
-    /**
-     * @return Determination
-     * @deprecated
-     */
-    public boolean isMakeConditionQueryNumericArgumentLong() {
-        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", false);
+
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+    public boolean isMakeEntityTraceRelation() {
+        return booleanProp("torque.isMakeEntityTraceRelation", false);
+    }
+
+    public boolean isMakeBehaviorLoopUpdate() {
+        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
     }
     
     // ===================================================================================
@@ -51,29 +54,6 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
         return booleanProp("torque.isMakeClassificationValueLabelList", false);
     }
     
-    // ===================================================================================
-    //                                                                            Behavior
-    //                                                                            ========
-    public boolean isMakeBehaviorLoopUpdate() {
-        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
-    }
-    
-    /**
-     * @return Determination
-     * @deprecated
-     */
-    public boolean isMakeBehaviorCopyInsert() {
-        return booleanProp("torque.isMakeBehaviorCopyInsert", false);
-    }
-
-    /**
-     * @return Determination
-     * @deprecated
-     */
-    public boolean isMakeBehaviorForUpdate() {
-        return booleanProp("torque.isMakeBehaviorForUpdate", false);
-    }
-
     // ===================================================================================
     //                                                                           Traceable
     //                                                                           =========

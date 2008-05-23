@@ -260,6 +260,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
         ${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
+#if ($database.isMakeEntityTraceRelation())
+
+    public ${foreignEntityClassName} trace${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
+        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
+    }
+#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
@@ -291,6 +297,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
         ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
+#if ($database.isMakeEntityTraceRelation())
+
+    public ${referrerEntityClassName} trace${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
+    }
+#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end

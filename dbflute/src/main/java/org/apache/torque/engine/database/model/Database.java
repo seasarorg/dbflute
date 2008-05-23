@@ -1089,13 +1089,17 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
+    
+    public boolean isMakeBehaviorLoopUpdate() {
+        return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
+    }
+    
+    public boolean isMakeEntityTraceRelation() {
+        return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
+    }
 
     public boolean isMakeClassificationValueLabelList() {
         return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();
-    }
-
-    public boolean isMakeBehaviorLoopUpdate() {
-        return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
 
     // -----------------------------------------------------
