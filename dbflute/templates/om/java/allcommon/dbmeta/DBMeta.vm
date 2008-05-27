@@ -64,7 +64,6 @@ public interface ${myClassName} {
     //                                                                       =============
     /**
      * Has object of flexible name? {Target objects are TABLE and COLUMN}
-     * 
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Determination.
      */
@@ -72,7 +71,6 @@ public interface ${myClassName} {
 
     /**
      * Find db name by flexible name. {Target objects are TABLE and COLUMN}
-     * 
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Db name. (NotNull and NotEmpty)
      */
@@ -80,7 +78,6 @@ public interface ${myClassName} {
 
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
-     * 
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Db name. (NotNull and NotEmpty)
      */
@@ -91,14 +88,12 @@ public interface ${myClassName} {
     //                                                                            ========
     /**
      * Get the key-to-lower map of DB name(lower) and property name.
-     * 
      * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
      */
     public Map<String, String> getDbNamePropertyNameKeyToLowerMap();
 
     /**
      * Get the key-to-lower map of property name(lower) and db name.
-     * 
      * @return The key-to-lower map of property name(lower) and db name. (NotNull)
      */
     public Map<String, String> getPropertyNameDbNameKeyToLowerMap();
@@ -108,28 +103,24 @@ public interface ${myClassName} {
     //                                                                           =========
     /**
      * Get the type-name of entity.
-     * 
      * @return The type-name of entity. (NotNull)
      */ 
     public String getEntityTypeName();
 
     /**
      * Get the type-name of condition-bean.
-     * 
      * @return The type-name of condition-bean. (Nullable: If the condition-bean does not exist)
      */ 
     public String getConditionBeanTypeName();
 
     /**
      * Get the type-name of dao.
-     * 
      * @return The type-name of dao. (Nullable: If the dao does not exist)
      */ 
     public String getDaoTypeName();
 
     /**
      * Get the type-name of behavior.
-     * 
      * @return The type-name of behavior. (Nullable: If the behavior does not exist)
      */ 
     public String getBehaviorTypeName();
@@ -139,7 +130,6 @@ public interface ${myClassName} {
     //                                                                         ===========
     /**
      * Get the type of entity.
-     * 
      * @return The type of entity. (NotNull)
      */ 
     public Class<? extends ${glEntityInterfaceName}> getEntityType();
@@ -149,7 +139,6 @@ public interface ${myClassName} {
     //                                                                     ===============
     /**
      * New the instance of entity.
-     * 
      * @return The instance of entity. (NotNull)
      */ 
     public ${glEntityInterfaceName} newEntity();
@@ -158,15 +147,12 @@ public interface ${myClassName} {
     //                                                                         Column Info
     //                                                                         ===========
     /**
-     * ${database.ImplementComment}
-     * 
      * @return The list of DB name of column. (NotNull and NotEmpty)
      */
     public List<${glColumnInfoName}> getColumnInfoList();
 
     /**
      * Has column?
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return Determination.
      */
@@ -216,7 +202,6 @@ public interface ${myClassName} {
     //                                      ----------------
     /**
      * Find relation info.
-     * 
      * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
      * @return Relation info. (NotNull)
      */ 
@@ -227,7 +212,6 @@ public interface ${myClassName} {
     //                                       ---------------
     /**
      * Has foreign?
-     * 
      * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
@@ -235,7 +219,6 @@ public interface ${myClassName} {
 
     /**
      * Find foreign dbmeta.
-     * 
      * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
@@ -243,7 +226,6 @@ public interface ${myClassName} {
 
     /**
      * Find foreign info.
-     * 
      * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign info. (NotNull)
      */ 
@@ -252,35 +234,8 @@ public interface ${myClassName} {
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
-#if ($database.isMakeDeprecated())
     /**
      * Has referrer?
-     * 
-     * @param referrerPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Determination. (NotNull)
-     */ 
-    public boolean hasReferer(String referrerPropertyName);
-
-    /**
-     * Find referrer dbmeta.
-     * 
-     * @param referrerPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Referrer DBMeta. (NotNull)
-     */ 
-    public ${myClassName} findRefererDBMeta(String referrerPropertyName);
-
-    /**
-     * Find referrer information.
-     * 
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
-     * @return Referrer information. (NotNull)
-     */ 
-    public ${glReferrerInfoName} findRefererInfo(String referrerPropertyName);
-#end
-
-    /**
-     * Has referrer?
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
@@ -288,7 +243,6 @@ public interface ${myClassName} {
 
     /**
      * Find referrer dbmeta.
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */ 
@@ -296,7 +250,6 @@ public interface ${myClassName} {
 
     /**
      * Find referrer information.
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer information. (NotNull)
      */ 

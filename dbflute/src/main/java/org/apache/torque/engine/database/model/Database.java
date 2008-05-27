@@ -1090,12 +1090,16 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
     
+    public boolean isMakeEntityTraceRelation() {
+        return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
+    }
+    
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
     
-    public boolean isMakeEntityTraceRelation() {
-        return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
+    public boolean isMakeFlatExpansion() {
+        return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }
 
     public boolean isMakeClassificationValueLabelList() {

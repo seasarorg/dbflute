@@ -47,6 +47,10 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
         return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
     }
     
+    public boolean isMakeFlatExpansion() {
+        return booleanProp("torque.isMakeFlatExpansion", false);
+    }
+    
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============

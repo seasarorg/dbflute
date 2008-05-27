@@ -1,9 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaAbstractName}")
-import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -140,8 +141,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                                       Relation Info
     //                                                                       =============
     /**
-     * ${database.ImplementComment}
-     * 
      * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
      * @return The information of relation. (NotNull)
      */ 
@@ -154,8 +153,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                       Foreign Element
     //                                       ---------------
     /**
-     * ${database.ImplementComment}
-     * 
      * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
@@ -166,8 +163,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     /**
-     * ${database.ImplementComment}
-     * 
      * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
@@ -176,8 +171,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     /**
-     * Get foreign information.
-     * 
      * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign information. (NotNull)
      */ 
@@ -200,42 +193,25 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             throw new RuntimeException(e.getCause());
         }
     }
-
+    
+    protected ${glForeignInfoName} craeteForeignInfo(String propName
+	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+												   , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+												   , int relNo, boolean oneToOne) {
+        final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
+        foreignInfo.setForeignPropertyName(propName);
+        foreignInfo.setLocalDBMeta(localDbm);
+        foreignInfo.setForeignDBMeta(foreignDbm);
+        foreignInfo.setLocalForeignColumnInfoMap(localForeignColumnInfoMap);
+        foreignInfo.setRelationNo(relNo);
+        foreignInfo.setOneToOne(oneToOne);
+        return foreignInfo;
+    }
+	
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
-#if ($database.isMakeDeprecated())
     /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
-     * @return Determination. (NotNull)
-     * @deprecated Please use hasReferrer().
-     */ 
-    public boolean hasReferer(String referrerPropertyName) {
-        return hasReferrer(referrerPropertyName);
-    }
-
-    /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
-     * @return Referrer DBMeta. (NotNull)
-     * @deprecated Please use findReferrerDBMeta().
-     */ 
-    public ${glDBMetaInterfaceName} findRefererDBMeta(String referrerPropertyName) {
-        return findReferrerDBMeta(referrerPropertyName);
-    }
-
-    /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
-     * @return Referrer information. (NotNull)
-     * @deprecated Please use findReferrerInfo().
-     */ 
-    public ${glReferrerInfoName} findRefererInfo(String referrerPropertyName) {
-        return findReferrerInfo(referrerPropertyName);
-    }
-#end
-
-    /**
-     * ${database.ImplementComment}
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
@@ -246,8 +222,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     /**
-     * ${database.ImplementComment}
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */ 
@@ -257,8 +231,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     /**
-     * ${database.ImplementComment}
-     * 
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer information. (NotNull)
      */ 
@@ -285,7 +257,21 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
         return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
     }
-
+    
+    protected ${glReferrerInfoName} craeteReferrerInfo(String propName
+	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+												   , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+												   , boolean oneToOne) {
+        final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
+        referrerInfo.setReferrerPropertyName(propName);
+        referrerInfo.setLocalDBMeta(localDbm);
+        referrerInfo.setReferrerDBMeta(referrerDbm);
+        referrerInfo.setLocalReferrerColumnInfoMap(localReferrerColumnInfoMap);
+        referrerInfo.setOneToOne(oneToOne);
+        return referrerInfo;
+		
+    }
+	
     // -----------------------------------------------------
     //                                        Relation Trace
     //                                        --------------
@@ -774,6 +760,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                  Collection Generator
+    //                                  --------------------
+	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
+    }
+	
     // -----------------------------------------------------
     //                                   Reflection Handling
     //                                   -------------------

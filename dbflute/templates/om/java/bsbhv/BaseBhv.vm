@@ -10,9 +10,11 @@ import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 #end
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
+#if ($database.isMakeFlatExpansion())
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
+#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
@@ -728,6 +730,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 #end
+#if ($database.isMakeFlatExpansion())
 
     // ===================================================================================
     //                                                                           Hierarchy
@@ -752,6 +755,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
         return new ${glHierarchyArrangerName}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
     }
+#end
 
     // ===================================================================================
     //                                                                          CBSetupper
