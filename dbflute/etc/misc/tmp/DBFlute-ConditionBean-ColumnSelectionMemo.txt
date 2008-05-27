@@ -33,10 +33,18 @@ PKや取得する関連テーブルへのFKは自動取得とする(これは確
 // (但し、PKと関連するFKは取得される)
 MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
-cb.columnChoise().$MemberAccount();
 cb.specifyColumn().$MemberAccount();
 cb.specifyColumn().$MemberBirthDay();
-cb.specifyColumn().foreign_MemberStatus().$MemberStatusName();
+cb.specifyColumn().foreignMemberStatus().$MemberStatusName();
+- - - - - - - - - -/
+/- - - - - - - - - - - - - - - - - - - - - - - - - - 
+// 会員アカウント、生年月日、会員ステータス名称
+// (但し、PKと関連するFKは取得される)
+MemberCB cb = new MemberCB();
+cb.setupSelect_MemberStatus();
+cb.specifyColumn().columnMemberAccount();
+cb.specifyColumn().columnMemberBirthDay();
+cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // 自テーブルは全部、会員ステータスは名称だけ
