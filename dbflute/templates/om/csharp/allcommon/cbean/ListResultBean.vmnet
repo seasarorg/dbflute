@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [System.Serializable]
-    public class ${myClassName}<ENTITY> : System.Collections.Generic.IList<ENTITY> {
+    public class ${myClassName}<ENTITY> : System.Collections.Generic.IList<ENTITY>, System.Collections.IList {
 
         // =====================================================================================
         //                                                                             Attribute
@@ -182,6 +182,59 @@ namespace ${glPackageBaseCommonCBean} {
             set {
                 _selectedList[index] = value;
             }
+        }
+		
+        // =====================================================================================
+        //                                                             Non Generic List Elements
+        //                                                             =========================
+        public int Add(object value) {
+            _selectedList.Add((ENTITY)value);
+            return 1;
+        }
+
+        public bool Contains(object value) {
+            return _selectedList.Contains((ENTITY)value);
+        }
+
+        public int IndexOf(object value) {
+            return _selectedList.IndexOf((ENTITY)value);
+        }
+
+        public void Insert(int index, object value) {
+            _selectedList.Insert(index, (ENTITY)value);
+        }
+
+        public bool IsFixedSize {
+            get { return _selectedList.IsReadOnly; }
+        }
+
+        public void Remove(object value) {
+            _selectedList.Remove((ENTITY)value);
+        }
+
+        object System.Collections.IList.this[int index] {
+            get {
+                return _selectedList[index];
+            }
+            set {
+                _selectedList[index] = (ENTITY)value;
+            }
+        }
+
+        public void CopyTo(Array array, int index) {
+            System.Collections.IList nonGenericList = new System.Collections.ArrayList();
+            foreach (ENTITY entity in _selectedList) {
+                nonGenericList.Add(entity);
+            }
+            nonGenericList.CopyTo(array, index);
+        }
+
+        public bool IsSynchronized {
+            get { return false; }
+        }
+
+        public object SyncRoot {
+            get { throw new NotImplementedException("SyncRoot is unsupported: " + ToString()); }
         }
     }
 }
