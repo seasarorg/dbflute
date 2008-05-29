@@ -15,12 +15,6 @@ import ${glPackageCQ}.*;
 public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     // ===================================================================================
-    //                                                                          Annotation
-    //                                                                          ==========
-    /** @Deprecated */
-    public static final String TABLE = "$table.name";
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected ${myConditionQueryClassName} _conditionQuery;

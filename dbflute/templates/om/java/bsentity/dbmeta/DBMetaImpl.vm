@@ -108,9 +108,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // -----------------------------------------------------
-    //                                 Referrer Prperty Name
-    //                                 (JavaBeansRule)
-    //                                 ---------------------
+    //                                Referrer Property Name
+    //                                (JavaBeansRule)
+    //                                ----------------------
 #foreach ($referrer in $table.referrers)
 #if (!$referrer.isOneToOne())
     public static final String REFERRER_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyName} = "$referrer.referrerJavaBeansRulePropertyName";
@@ -122,34 +122,26 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                              --------
     /** The map of {DB name : property name} key-to-lower. */
     private static Map<String, String> _dbNamePropertyNameKeyToLowerMap;
-    protected static Map<String, String> createDbNamePropertyNameKeyToLowerMap() {
+    protected Map<String, String> createDbNamePropertyNameKeyToLowerMap() {
         if (_dbNamePropertyNameKeyToLowerMap != null) {
             return _dbNamePropertyNameKeyToLowerMap;
         }
         final Map<String, String> map = new LinkedHashMap<String, String>();
         map.put(TABLE_DB_NAME.toLowerCase(), TABLE_PROPERTY_NAME);
-
-#foreach ($col in $table.columns)
-        map.put(DB_NAME_${col.name}.toLowerCase(), PROPERTY_NAME_${col.javaBeansRulePropertyName});
-#end
-
+        setupKeyToLowerMap(map, true);
         _dbNamePropertyNameKeyToLowerMap = Collections.unmodifiableMap(map);
         return _dbNamePropertyNameKeyToLowerMap;
     }
 
     /** The map of {property name : DB name} key-to-lower. */
     private static Map<String, String> _propertyNameDbNameKeyToLowerMap;
-    protected static Map<String, String> createPropertyNameDbNameKeyToLowerMap() {
+    protected Map<String, String> createPropertyNameDbNameKeyToLowerMap() {
         if (_propertyNameDbNameKeyToLowerMap != null) {
             return _propertyNameDbNameKeyToLowerMap;
         }
         final Map<String, String> map = new LinkedHashMap<String, String>();
         map.put(TABLE_PROPERTY_NAME.toLowerCase(), TABLE_DB_NAME);
-
-#foreach ($col in $table.columns)
-        map.put(PROPERTY_NAME_${col.javaBeansRulePropertyName}.toLowerCase(), DB_NAME_${col.name});
-#end
-
+        setupKeyToLowerMap(map, false);
         _propertyNameDbNameKeyToLowerMap = Collections.unmodifiableMap(map);
         return _propertyNameDbNameKeyToLowerMap;
     }
@@ -644,21 +636,4 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         public void setup(${myExtendedObjectClassName} entity, Object value) { entity.set${column.javaName}((${column.javaNative})value); }
     }
 #end
-
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected ${myExtendedObjectClassName} downcast(${glEntityInterfaceName} entity) {
-        assertObjectNotNull("entity", entity);
-        try {
-            return (${myExtendedObjectClassName})entity;
-        } catch (ClassCastException e) {
-            String msg = "The entity should be ${myExtendedObjectClassName} but it was: " + entity.getClass();
-            throw new RuntimeException(msg, e);
-        }
-    }
-
-    protected void checkDowncast(${glEntityInterfaceName} entity) {
-        downcast(entity);
-    }
 }

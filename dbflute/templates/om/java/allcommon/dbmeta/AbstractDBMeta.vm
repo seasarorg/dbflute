@@ -4,8 +4,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.lang.reflect.Field;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -18,6 +20,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The abstract class of dbmeta.
@@ -31,7 +34,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                                         =============
     /**
      * ${database.ImplementComment}
-     * 
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
      * @return Determination.
      */
@@ -48,7 +50,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
      * @return DB name. (NotNull and NotEmpty)
      */
@@ -69,7 +70,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
      * @return DB name. (NotNull and NotEmpty)
      */
@@ -93,7 +93,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                                         ===========
     /**
      * ${database.ImplementComment}
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return Determination.
      */
@@ -107,7 +106,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The information of the column. (NotNull)
      */ 
@@ -737,7 +735,21 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    abstract protected void checkDowncast(${glEntityInterfaceName} entity);
+	protected <ENTITY> ENTITY downcast(${glEntityInterfaceName} entity) {
+		checkDowncast(entity);
+		return (ENTITY)entity;
+	}
+
+    protected void checkDowncast(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        Class<? extends ${glEntityInterfaceName}> entityType = getEntityType();
+        Class<? extends ${glEntityInterfaceName}> targetType = entity.getClass();
+        if (!entityType.isAssignableFrom(targetType)) {
+            String name = entityType.getSimpleName();
+            String msg = "The entity should be " + name + " but it was: " + targetType;
+            throw new IllegalStateException(msg);
+        }
+    }
 
     protected String helpGettingColumnStringValue(Object value) {
         if (value instanceof java.sql.Timestamp) {
@@ -757,15 +769,74 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return MapStringUtil.formatTimestamp(timestamp);
     }
 
+    protected void setupKeyToLowerMap(Map<String, String> map, boolean dbNameKey) {
+        Field[] fields = this.getClass().getFields();
+        Map<String, Field> dbNameFieldMap = newHashMap();
+        List<Field> propertyNameFieldList = newArrayList();
+        String dbNamePrefix = "DB_NAME_";
+        String propertyNamePrefix = "PROPERTY_NAME_";
+        for (Field field : fields) {
+            String name = field.getName();
+            if (!name.startsWith(dbNamePrefix)) {
+                if (name.startsWith(propertyNamePrefix)) {
+                    propertyNameFieldList.add(field);
+                }
+                continue;
+            }
+            String key = name.substring(dbNamePrefix.length()).toLowerCase();
+            key = replaceString(key, "_", "");
+            dbNameFieldMap.put(key, field);
+        }
+        try {
+            for (Field propertyNameField : propertyNameFieldList) {
+                String name = propertyNameField.getName();
+                String key = name.substring(propertyNamePrefix.length()).toLowerCase();
+                key = replaceString(key, "_", "");
+                Field dbNameField = dbNameFieldMap.get(key);
+                String dbName = (String)dbNameField.get(this);
+                String propertyName = (String)propertyNameField.get(this);
+                if (dbNameKey) {
+                    map.put(dbName.toLowerCase(), propertyName);
+                } else {
+                    map.put(propertyName.toLowerCase(), dbName);                    
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     // -----------------------------------------------------
+    //                                       String Handling
+    //                                       ---------------
+    protected final String replaceString(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
+    }
+
+    protected String initCap(String str) {
+	    return ${glSimpleStringUtil}.initCap(str);
+    }
+
+    protected String getLineSeparator() {
+	    return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+		
+    // -----------------------------------------------------
     //                                  Collection Generator
     //                                  --------------------
+	protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
+    }
+	
 	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
+	
+	protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
+	    return new ArrayList<ELEMENT>();
+	}
 	
     // -----------------------------------------------------
     //                                   Reflection Handling
@@ -781,18 +852,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 	
     // -----------------------------------------------------
-    //                                       String Handling
-    //                                       ---------------
-    protected String initCap(String str) {
-        return ${glSimpleStringUtil}.initCap(str);
-    }
-
-    // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
     /**
      * Assert that the argument is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param arg Argument. (NotNull)
      */
@@ -805,7 +868,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                         -------------
     /**
      * Assert that the string is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */
