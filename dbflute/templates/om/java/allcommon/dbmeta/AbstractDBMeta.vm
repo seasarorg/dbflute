@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -133,6 +134,28 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         } catch (java.lang.reflect.InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
+    }
+	
+    /**
+	 * ${database.ImplementComment}
+     * @return The list of columns. (NotNull and NotEmpty)
+     */
+    public List<${glColumnInfoName}> getColumnInfoList() {
+        Method[] methods = this.getClass().getMethods();
+        List<${glColumnInfoName}> resultList = newArrayList();
+        String prefix = "column";
+        Class<${glColumnInfoName}> returnType = ${glColumnInfoName}.class;
+		Object[] args = new Object[]{};
+        try {
+            for (Method method : methods) {
+                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                    resultList.add((${glColumnInfoName})method.invoke(this, args));
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        return resultList;
     }
 
     // ===================================================================================

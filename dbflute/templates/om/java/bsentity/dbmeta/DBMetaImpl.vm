@@ -229,17 +229,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    /**
-     * @return The list of DB name of columns. (NotNull and NotEmpty)
-     */
-    public List<${glColumnInfoName}> getColumnInfoList() {
-        final List<${glColumnInfoName}> columnInfoList = new ArrayList<${glColumnInfoName}>();
-#foreach ($col in $table.columns)
-        columnInfoList.add(column${col.javaBeansRulePropertyNameInitCap}());
-#end
-        return columnInfoList;
-    }
-
 #foreach ($col in $table.columns)
     public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() {
         return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
