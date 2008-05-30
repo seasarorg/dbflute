@@ -75,6 +75,7 @@ import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.filedelete.OldTableClassDeletor;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -486,40 +487,14 @@ public class Database {
     //                                                                    IncludeQuery
     //                                                                    ============
     public void initializeIncludeQuery() {
-        _log.debug("/=============================");
-        _log.debug("...Initializing customize dao.");
-        final Map<String, Map<String, Map<String, List<String>>>> map = getProperties().getIncludeQueryProperties()
-                .getIncludeQueryMap();
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            _log.debug(key);
-            final Map<String, Map<String, List<String>>> queryElementMap = map.get(key);
-            final Set<String> queryElementKeySet = queryElementMap.keySet();
-            for (String queryElementKey : queryElementKeySet) {
-                _log.debug("    " + queryElementKey);
-                final Map<String, List<String>> tableElementMap = queryElementMap.get(queryElementKey);
-                final Set<String> tableElementKeySet = tableElementMap.keySet();
-                for (String tableName : tableElementKeySet) {
-                    _log.debug("        " + tableName);
-                    final Table targetTable = getTable(tableName);
-                    if (targetTable == null) {
-                        String msg = "The table[" + tableName + "] of includeQueryMap was not found: " + map;
-                        throw new IllegalStateException(msg);
-                    }
-                    final List<String> columnNameList = tableElementMap.get(tableName);
-                    for (String columnName : columnNameList) {
-                        _log.debug("            " + columnName);
-                        final Column targetColumn = targetTable.getColumn(columnName);
-                        if (targetColumn == null) {
-                            String msg = "The column[" + targetColumn
-                                    + "] of includeQueryMap was not found in the table[" + tableName + "]";
-                            throw new IllegalStateException(msg);
-                        }
-                    }
-                }
+        IncludeQueryInitializer initializer = new IncludeQueryInitializer();
+        initializer.setIncludeQueryProperties(getProperties().getIncludeQueryProperties());
+        initializer.setTableFinder(new IncludeQueryInitializer.TableFinder() {
+            public Table findTable(String name) {
+                return getTable(name);
             }
-        }
-        _log.debug("========/");
+        });
+        initializer.initializeIncludeQuery();
     }
 
     // ===============================================================================
@@ -1089,15 +1064,15 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
-    
+
     public boolean isMakeEntityTraceRelation() {
         return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
     }
-    
+
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
-    
+
     public boolean isMakeFlatExpansion() {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }

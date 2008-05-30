@@ -172,14 +172,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         // -----/
         setInputEncoding(getBasicProperties().getTemplateFileEncoding());
         setOutputEncoding(getBasicProperties().getSourceFileEncoding());
-
-        try {
-            doExecuteAlmostSameAsSuper();
-        } catch (Exception e) {
-            _log.info("/ * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.error("super#execute() threw the exception!", e);
-            _log.info("/ * * * * * * * * * /");
-        }
+        doExecuteAlmostSameAsSuper();
     }
 
     // -----------------------------------

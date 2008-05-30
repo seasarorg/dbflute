@@ -129,12 +129,59 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     private void setupRow(DataTable table, HSSFRow row) {
         DataRow dataRow = table.addRow();
-        for (int i = 0; i < table.getColumnSize(); ++i) {
-            HSSFCell cell = row.getCell((short) i);
-            Object value = getValue(cell, table);
-            dataRow.setValue(i, value);
+        // /----------------------------------------------------------------- Modification
+        // Add try-catch
+        HSSFCell cell = null;
+        Object value = null;
+        try {
+            for (int i = 0; i < table.getColumnSize(); ++i) {
+                cell = row.getCell((short) i);
+                value = getValue(cell, table);
+                dataRow.setValue(i, value);
+            }
+        } catch (RuntimeException e) {
+            throwCellValueHandlingException(cell, value, e);
         }
+        // --------------------/
     }
+
+    // /----------------------------------------------------------------- Modification
+    // Add
+    protected void throwCellValueHandlingException(HSSFCell cell, Object value, RuntimeException e) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The handling of the cell value was failed!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Cell Object]" + getLineSeparator() + cell + getLineSeparator();
+        msg = msg + getLineSeparator();
+        if (cell != null) {
+            switch (cell.getCellType()) {
+            case HSSFCell.CELL_TYPE_NUMERIC:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_NUMERIC" + getLineSeparator();
+            case HSSFCell.CELL_TYPE_STRING:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_STRING" + getLineSeparator();
+            case HSSFCell.CELL_TYPE_FORMULA:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_FORMULA" + getLineSeparator();
+            case HSSFCell.CELL_TYPE_BLANK:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BLANK" + getLineSeparator();
+            case HSSFCell.CELL_TYPE_BOOLEAN:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BOOLEAN" + getLineSeparator();
+            case HSSFCell.CELL_TYPE_ERROR:
+                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_ERROR" + getLineSeparator();
+            default:
+                msg = msg + "[Cell Type]" + getLineSeparator() + cell.getCellType() + getLineSeparator();
+            }
+        }
+        msg = msg + getLineSeparator();
+        msg = msg + "[Cell Value]" + getLineSeparator() + value + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new IllegalStateException(msg, e);
+    }
+
+    public String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+    // --------------------/
 
     public boolean isCellBase64Formatted(HSSFCell cell) {
         HSSFCellStyle cs = cell.getCellStyle();
@@ -213,6 +260,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
         return false;
     }
+
     // --------------------/
 
     protected ColumnType getColumnType(HSSFCell cell) {
