@@ -23,7 +23,7 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
 
     protected REFERRER_CONDITION_BEAN _referrerConditionBean;
 
-    protected boolean _toLastKeyCondtion;
+    protected boolean _toLastKeyCondition;
 
     protected boolean _stopOrderByKey;
 
@@ -46,7 +46,7 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
         this._conditionBeanSetupper = option._conditionBeanSetupper;
         this._entityListSetupper = option._entityListSetupper;
         this._referrerConditionBean = option._referrerConditionBean;
-        this._toLastKeyCondtion = option._toLastKeyCondtion;
+        this._toLastKeyCondition = option._toLastKeyCondition;
         this._stopOrderByKey = option._stopOrderByKey;
     }
 
@@ -59,8 +59,8 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
      * 
      * @return this. (NotNull)
      */
-    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondtion() {
-        _toLastKeyCondtion = true;
+    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondition() {
+        _toLastKeyCondition = true;
         return this;
     }
 
@@ -76,7 +76,7 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
     }
 
     public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
-        if (!_toLastKeyCondtion) {
+        if (!_toLastKeyCondition) {
             cb.getSqlClause().exchangeFirstWhereClauseForLastOne();
         }
     }
@@ -120,8 +120,8 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
         this._referrerConditionBean = referrerConditionBean;
     }
 
-    public boolean isToLastKeyCondtion() {
-        return _toLastKeyCondtion;
+    public boolean isToLastKeyCondition() {
+        return _toLastKeyCondition;
     }
 
     public boolean isStopOrderByKey() {
