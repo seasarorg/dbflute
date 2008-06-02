@@ -361,7 +361,11 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        // (DBFLUTE-264)-{Java/C#}: ReplaceSchemaでOracleのストアドをCreateするとInvalid状態
+        // System.getProperty("line.separator")だとOracleのストアドがInvalid状態になるので、
+        // 固定で"\n"にすることにした。
+        // return System.getProperty("line.separator");
+        return "\n";
     }
 
     // ===================================================================================
