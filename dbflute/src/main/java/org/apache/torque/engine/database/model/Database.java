@@ -1076,6 +1076,14 @@ public class Database {
     public boolean isMakeFlatExpansion() {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }
+    
+    public boolean isMakeDBMetaJDBCSupport() {
+        return getProperties().getSourceReductionProperties().isMakeDBMetaJDBCSupport();
+    }
+    
+    public boolean isMakeDBMetaCommonColumnHandling() {
+        return getProperties().getSourceReductionProperties().isMakeDBMetaCommonColumnHandling();
+    }
 
     public boolean isMakeClassificationValueLabelList() {
         return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();

@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaAbstractName}")
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -19,6 +20,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -156,6 +158,16 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             throw new IllegalStateException(e);
         }
         return resultList;
+    }
+
+    // ===================================================================================
+    //                                                                         Unique Info
+    //                                                                         ===========
+    protected ${glUniqueInfoName} createPrimaryUniqueInfo() {
+        ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+        uniqueInfo.setDBMeta(this);
+        uniqueInfo.setPrimary(true);
+        return uniqueInfo;
     }
 
     // ===================================================================================
@@ -340,7 +352,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
         /**
          * ${database.ImplementComment}
-         * 
          * @return The trace of relation as the list of relation info. (NotNull)
          */
         public List<${glRelationInfoName}> getTraceRelation() {
@@ -349,7 +360,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
         /**
          * ${database.ImplementComment}
-         * 
          * @return The trace of column as column info. (Nullable)
          */
         public ${glColumnInfoName} getTraceColumn() {
@@ -395,13 +405,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             }
         }
     }
+#if ($database.isMakeDBMetaJDBCSupport())
 
     // ===================================================================================
     //                                                                        JDBC Support
     //                                                                        ============
     /**
      * ${database.ImplementComment}
-     * 
      * @param conn Connection. (NotNull)
      * @param entity Entity. (NotNull)
      * @return Prepared insert clause. (NotNull and NotEmpty)
@@ -412,7 +422,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param conn Connection. (NotNull)
      * @param entity Entity. (NotNull)
      * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
@@ -448,13 +457,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             }
         }
     }
+#end
 
     // ===================================================================================
     //                                                                          Map String
     //                                                                          ==========
     /**
      * ${database.ImplementComment}
-     * 
      * @return Map list string that is prepared. (NotNull)
      */
     public ${glMapListStringName} createMapListString() {
@@ -463,7 +472,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Map string builder that is prepared. (NotNull)
      */
     public ${glMapStringBuilderName} createMapStringBuilder() {
@@ -475,10 +483,159 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return MapStringUtil.createMapStringBuilder(columnDbNameList);
     }
 
+    // ===================================================================================
+    //                                                                     Entity Handling
+    //                                                                     ===============  
+    // -----------------------------------------------------
+    //                                                Accept
+    //                                                ------
+    protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptPrimaryKeyMap(ENTITY entity
+            , Map<String, ? extends Object> columnValueMap
+            , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
+        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
+        List<${glColumnInfoName}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        for (${glColumnInfoName} columnInfo : columnInfoList) {
+            String columnName = columnInfo.getColumnDbName();
+            String propertyName = columnInfo.getPropertyName();
+            String uncapPropName = initUncap(propertyName);
+            Class<?> propertyType = columnInfo.getPropertyType();
+            if (analyzer.init(columnName, uncapPropName, propertyName)) {
+                final Object value;
+                if (String.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeString(propertyType);
+                } else if (Number.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeNumber(propertyType);
+                } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeDate(propertyType);
+                } else {
+                    value = analyzer.analyzeOther(propertyType);
+                }
+                findEntityPropertySetupper(entityPropertySetupperMap, propertyName).setup(entity, value);
+            }
+        }
+    }
+
+    protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptColumnValueMap(ENTITY entity
+            , Map<String, ? extends Object> columnValueMap
+            , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
+        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
+        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+        for (${glColumnInfoName} columnInfo : columnInfoList) {
+            String columnName = columnInfo.getColumnDbName();
+            String propertyName = columnInfo.getPropertyName();
+            String uncapPropName = initUncap(propertyName);
+            Class<?> propertyType = columnInfo.getPropertyType();
+            if (analyzer.init(columnName, uncapPropName, propertyName)) {
+                final Object value;
+                if (String.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeString(propertyType);
+                } else if (Number.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeNumber(propertyType);
+                } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeDate(propertyType);
+                } else {
+                    value = analyzer.analyzeOther(propertyType);
+                }
+                findEntityPropertySetupper(entityPropertySetupperMap, propertyName).setup(entity, value);
+            }
+        }
+    }
+
+    protected String doExtractPrimaryKeyMapString(${glEntityInterfaceName} entity
+                                                , String startBrace
+                                                , String endBrace
+                                                , String delimiter
+                                                , String equal) {
+        String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+        StringBuilder sb = new StringBuilder();
+        List<${glColumnInfoName}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+		try {
+            for (${glColumnInfoName} columnInfo : columnInfoList) {
+                String columnName = columnInfo.getColumnDbName();
+                Method getterMethod = columnInfo.findGetter();
+				Object value = getterMethod.invoke(entity, (Object[])null);
+                helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
+            }
+		} catch (Exception e) {
+		    throw new IllegalStateException(e);
+		}
+		sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+		return sb.toString();
+	}
+
+    protected String doExtractColumnValueMapString(${glEntityInterfaceName} entity
+                                                 , String startBrace
+                                                 , String endBrace
+                                                 , String delimiter
+                                                 , String equal) {
+        String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+        StringBuilder sb = new StringBuilder();
+        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+		try {
+            for (${glColumnInfoName} columnInfo : columnInfoList) {
+                String columnName = columnInfo.getColumnDbName();
+                Method getterMethod = columnInfo.findGetter();
+				Object value = getterMethod.invoke(entity, (Object[])null);
+                helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
+            }
+		} catch (Exception e) {
+		    throw new IllegalStateException(e);
+		}
+		sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+		return sb.toString();
+	}
+
+    // -----------------------------------------------------
+    //                                               Convert
+    //                                               -------
+    protected Map<String, Object> doConvertToColumnValueMap(${glEntityInterfaceName} entity) {
+        Map<String, Object> valueMap = newLinkedHashMap();
+		try {
+            List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+            for (${glColumnInfoName} columnInfo : columnInfoList) {
+                String columnName = columnInfo.getColumnDbName();
+                Method getterMethod = columnInfo.findGetter();
+                Object value = getterMethod.invoke(entity, (Object[])null);
+                valueMap.put(columnName, value);
+            }
+		} catch (Exception e) {
+		    throw new IllegalStateException(e);
+		}
+        return valueMap;
+    }
+	
+    protected Map<String, String> doConvertToColumnStringValueMap(${glEntityInterfaceName} entity) {
+        Map<String, String> valueMap = newLinkedHashMap();
+		try {
+            List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+            for (${glColumnInfoName} columnInfo : columnInfoList) {
+                String columnName = columnInfo.getColumnDbName();
+                Method getterMethod = columnInfo.findGetter();
+                Object value = getterMethod.invoke(entity, (Object[])null);
+                valueMap.put(columnName, helpGettingColumnStringValue(value));
+            }
+		} catch (Exception e) {
+		    throw new IllegalStateException(e);
+		}
+        return valueMap;
+    }
+	
 	// ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
 	// It's very INTERNAL!
+    protected <ENTITY extends ${glEntityInterfaceName}> void setupEntityPropertySetupper(Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+        for (${glColumnInfoName} columnInfo : columnInfoList) {
+            String columnName = columnInfo.getColumnDbName();
+            String propertyName = columnInfo.getPropertyName();
+            EntityPropertySetupper<ENTITY> setupper = newEntityPropertySetupper(columnInfo);
+            registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
+        }
+    }
+
 	protected <ENTITY extends ${glEntityInterfaceName}> void registerEntityPropertySetupper(
 		                                          String columnName
 												, String propertyName
@@ -490,6 +647,26 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 		entityPropertySetupperMap.put(propertyName.toLowerCase(), setupper);
 	}
 	
+    protected <ENTITY extends ${glEntityInterfaceName}> EntityPropertySetupper<ENTITY> newEntityPropertySetupper(${glColumnInfoName} columnInfo) {
+        String name = "EntityProperty" + initCap(columnInfo.getPropertyName()) + "Setupper";
+        try {
+            Class<?> clazz = Class.forName(this.getClass().getName() + "$" + name);
+            return (EntityPropertySetupper<ENTITY>)clazz.newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    protected <ENTITY extends ${glEntityInterfaceName}> EntityPropertySetupper<ENTITY> findEntityPropertySetupper(Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap, String propertyName) {
+        EntityPropertySetupper<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
+        if (setupper == null) {
+            String msg = "The propertyName was Not Found in the map of setupper of entity property:";
+            msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + entityPropertySetupperMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        return setupper;
+    }
+	
     // ===================================================================================
     //                                                                          Util Class
     //                                                                          ==========
@@ -497,6 +674,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * This class is for Internal. Don't use this!
      */
     protected static class MapStringUtil {
+
         public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntityInterfaceName} entity) {
             if (primaryKeyMapString == null) {
                 String msg = "The argument[primaryKeyMapString] should not be null.";
@@ -774,6 +952,11 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
+    protected void helpAppendingColumnValueString(StringBuilder sb, String delimiter, String equal, String colName, Object value) {
+        sb.append(delimiter).append(colName).append(equal);
+        sb.append(helpGettingColumnStringValue(value));
+    }
+
     protected String helpGettingColumnStringValue(Object value) {
         if (value instanceof java.sql.Timestamp) {
             return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
@@ -828,6 +1011,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             throw new IllegalStateException(e);
         }
     }
+	
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -840,6 +1024,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.initCap(str);
+    }
+
+    protected String initUncap(String str) {
+	    return ${glSimpleStringUtil}.initUncap(str);
     }
 
     protected String getLineSeparator() {
@@ -857,8 +1045,18 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return new LinkedHashMap<KEY, VALUE>();
     }
 	
+	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
+		LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+		map.put(key, value);
+        return map;
+    }
+	
 	protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
 	    return new ArrayList<ELEMENT>();
+	}
+	
+	protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
+	    return new ArrayList<ELEMENT>(collection);
 	}
 	
     // -----------------------------------------------------

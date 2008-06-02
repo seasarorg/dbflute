@@ -37,6 +37,11 @@ public class ${glSimpleStringUtil} {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 	
+    public static String initUncap(String str) {
+	    assertObjectNotNull("str", str);
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+	
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

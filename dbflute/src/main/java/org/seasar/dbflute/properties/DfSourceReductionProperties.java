@@ -51,6 +51,18 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
         return booleanProp("torque.isMakeFlatExpansion", false);
     }
     
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    public boolean isMakeDBMetaJDBCSupport() {
+        return booleanProp("torque.isMakeDBMetaJDBCSupport", false);
+    }
+    
+    public boolean isMakeDBMetaCommonColumnHandling() {
+        return booleanProp("torque.isMakeDBMetaCommonColumnHandling", false);
+    }
+    
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============

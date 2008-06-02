@@ -15,8 +15,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
 /**
- * The interface of dbmeta.
- * 
+ * The interface of DB meta.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} {
@@ -47,14 +46,12 @@ public interface ${myClassName} {
     //                                                                          ==========
     /**
      * Get table db-name.
-     * 
      * @return Table db-name. (NotNull)
      */
     public String getTableDbName();
 
     /**
      * Get table prop-name(JavaBeansRule).
-     * 
      * @return Table property-name(JavaBeansRule). (NotNull)
      */
     public String getTablePropertyName();
@@ -298,14 +295,12 @@ public interface ${myClassName} {
     //                                                                ====================
     /**
      * Has version no?
-     * 
      * @return Determination.
      */
     public boolean hasVersionNo();
 
     /**
      * Has update date?
-     * 
      * @return Determination.
      */
     public boolean hasUpdateDate();
@@ -315,7 +310,6 @@ public interface ${myClassName} {
     //                                                                  ==================
     /**
      * Has common column?
-     * 
      * @return Determination.
      */
     public boolean hasCommonColumn();
@@ -328,10 +322,8 @@ public interface ${myClassName} {
     //                                                ------
     /**
      * Accept primary-key map.
-     * 
      * The column that column-value map-string doesn't have the value of is reflected as null.
      * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * 
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
@@ -339,10 +331,8 @@ public interface ${myClassName} {
 
     /**
      * Accept primary-key map-string.
-     * 
      * The column that column-value map-string doesn't have the value of is reflected as null.
      * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * 
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      */
@@ -350,10 +340,8 @@ public interface ${myClassName} {
 
     /**
      * Accept column-value map.
-     * 
      * The column that column-value map-string doesn't have the value of is reflected as null.
      * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * 
      * @param entity Target entity. (NotNull)
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      */
@@ -361,10 +349,8 @@ public interface ${myClassName} {
 
     /**
      * Accept column-value map-string.
-     * 
      * The column that column-value map-string doesn't have the value of is reflected as null.
      * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * 
      * @param entity Target entity. (NotNull)
      * @param columnValueMapString Column-value map-string. (NotNull)
      */
@@ -390,7 +376,6 @@ public interface ${myClassName} {
 
     /**
      * Extract primary-key map-string.
-     * 
      * @param entity Target entity. (NotNull)
      * @param startBrace Start-brace. (NotNull)
      * @param endBrace End-brace. (NotNull)
@@ -402,7 +387,6 @@ public interface ${myClassName} {
 
     /**
      * Extract column-value map-string. Delimiter is at-mark and semicolon.
-     * 
      * @param entity Target entity. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
@@ -410,7 +394,6 @@ public interface ${myClassName} {
 
     /**
      * Extract column-value map-string.
-     * 
      * @param entity Target entity. (NotNull)
      * @param startBrace Start-brace. (NotNull)
      * @param endBrace End-brace. (NotNull)
@@ -419,10 +402,10 @@ public interface ${myClassName} {
      * @return Column-value map-string. (NotNull)
      */
     public String extractColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
+#if ($database.isMakeDBMetaCommonColumnHandling())
 
     /**
      * Extract common-column-value map-string.
-     * 
      * @param entity Target entity. (NotNull)
      * @return Common-column-value map-string. (NotNull)
      */
@@ -430,7 +413,6 @@ public interface ${myClassName} {
 
     /**
      * Extract common-column-value map-string.
-     * 
      * @param entity Target entity. (NotNull)
      * @param startBrace Start-brace. (NotNull)
      * @param endBrace End-brace. (NotNull)
@@ -439,13 +421,13 @@ public interface ${myClassName} {
      * @return Common-column-value map-string. (NotNull)
      */
     public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
+#end
 
     // -----------------------------------------------------
     //                                               Convert
     //                                               -------
     /**
      * Convert entity to column value as list.
-     * 
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
@@ -453,7 +435,6 @@ public interface ${myClassName} {
 
     /**
      * Convert entity to column value as map.
-     * 
      * @param entity Target entity. (NotNull)
      * @return The map of column value. (NotNull)
      */
@@ -461,7 +442,6 @@ public interface ${myClassName} {
 
     /**
      * Convert entity to column string-value as list.
-     * 
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
@@ -469,18 +449,17 @@ public interface ${myClassName} {
 
     /**
      * Convert entity to column string-value as map.
-     * 
      * @param entity Target entity. (NotNull)
      * @return The map of column string-value. (NotNull)
      */
     public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity);
+#if ($database.isMakeDBMetaJDBCSupport())
 
     // ===================================================================================
     //                                                                        JDBC Support
     //                                                                        ============
     /**
      * Insert entity using specified connection.
-     * 
      * @param conn Connection. (NotNull)
      * @param entity Entity. (NotNull)
      * @return Prepared insert clause. (NotNull and NotEmpty)
@@ -489,7 +468,6 @@ public interface ${myClassName} {
 
     /**
      * Insert entity using specified connection.
-     * 
      * @param conn Connection. (NotNull)
      * @param entity Entity. (NotNull)
      * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
@@ -499,14 +477,12 @@ public interface ${myClassName} {
 
     /**
      * Get prepared insert clause.
-     * 
      * @return Prepared insert clause. (NotNull and NotEmpty)
      */
     public String getPreparedInsertClause();
 
     /**
      * Get prepared insert clause.
-     * 
      * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
      * @return Prepared insert clause. (NotNull and NotEmpty)
      */
@@ -538,6 +514,7 @@ public interface ${myClassName} {
             this._tablePrefix = tablePrefix;
         }
     }
+#end
 
     // ===================================================================================
     //                                                                          Map String
