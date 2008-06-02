@@ -55,6 +55,10 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
+    public boolean isMakeDBMetaStaticDefinition() {
+        return booleanProp("torque.isMakeDBMetaStaticDefinition", false);
+    }
+    
     public boolean isMakeDBMetaJDBCSupport() {
         return booleanProp("torque.isMakeDBMetaJDBCSupport", false);
     }

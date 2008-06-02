@@ -2,13 +2,13 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaAbstractName}")
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -26,70 +26,10 @@ import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
- * The abstract class of dbmeta.
- * 
+ * The abstract class of DB meta.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
-
-    // =====================================================================================
-    //                                                                         Name Handling
-    //                                                                         =============
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return Determination.
-     */
-    public boolean hasFlexibleName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            return true;
-        }
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return DB name. (NotNull and NotEmpty)
-     */
-    public String findDbName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            return (String)getPropertyNameDbNameKeyToLowerMap().get(key);
-        }
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
-                return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
-            }
-        }
-        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalStateException(msg);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return DB name. (NotNull and NotEmpty)
-     */
-    public String findPropertyName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            return (String)getDbNamePropertyNameKeyToLowerMap().get(key);
-        }
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
-                return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
-            }
-        }
-        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalStateException(msg);
-    }
 
     // ===================================================================================
     //                                                                         Column Info
@@ -160,6 +100,65 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return resultList;
     }
 
+    // =====================================================================================
+    //                                                                         Name Handling
+    //                                                                         =============
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return Determination.
+     */
+    public boolean hasFlexibleName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            return true;
+        }
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return DB name. (NotNull and NotEmpty)
+     */
+    public String findDbName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            return (String)getPropertyNameDbNameKeyToLowerMap().get(key);
+        }
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
+                return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
+            }
+        }
+        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return DB name. (NotNull and NotEmpty)
+     */
+    public String findPropertyName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            return (String)getDbNamePropertyNameKeyToLowerMap().get(key);
+        }
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
+                return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
+            }
+        }
+        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalStateException(msg);
+    }
+
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
@@ -167,6 +166,14 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
         uniqueInfo.setDBMeta(this);
         uniqueInfo.setPrimary(true);
+        return uniqueInfo;
+    }
+
+    protected ${glUniqueInfoName} createPrimaryUniqueInfo(${glColumnInfoName} uniqueColumnInfo) {
+        ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+        uniqueInfo.setDBMeta(this);
+        uniqueInfo.setPrimary(true);
+		uniqueInfo.addUniqueColumnList(uniqueColumnInfo);
         return uniqueInfo;
     }
 
@@ -975,38 +982,31 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return MapStringUtil.formatTimestamp(timestamp);
     }
 
-    protected void setupKeyToLowerMap(Map<String, String> map, boolean dbNameKey) {
-        Field[] fields = this.getClass().getFields();
-        Map<String, Field> dbNameFieldMap = newHashMap();
-        List<Field> propertyNameFieldList = newArrayList();
-        String dbNamePrefix = "DB_NAME_";
-        String propertyNamePrefix = "PROPERTY_NAME_";
-        for (Field field : fields) {
-            String name = field.getName();
-            if (!name.startsWith(dbNamePrefix)) {
-                if (name.startsWith(propertyNamePrefix)) {
-                    propertyNameFieldList.add(field);
-                }
-                continue;
-            }
-            String key = name.substring(dbNamePrefix.length()).toLowerCase();
-            key = replaceString(key, "_", "");
-            dbNameFieldMap.put(key, field);
-        }
+    protected Map<String, String> setupKeyToLowerMap(boolean dbNameKey) {
+        final Map<String, String> map;
+		if (dbNameKey) {
+		    map = newLinkedHashMap(getTableDbName().toLowerCase(), getTablePropertyName());
+		} else {
+		    map = newLinkedHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
+		}
+        Method[] methods = this.getClass().getMethods();
+        String columnInfoMethodPrefix = "column";
         try {
-            for (Field propertyNameField : propertyNameFieldList) {
-                String name = propertyNameField.getName();
-                String key = name.substring(propertyNamePrefix.length()).toLowerCase();
-                key = replaceString(key, "_", "");
-                Field dbNameField = dbNameFieldMap.get(key);
-                String dbName = (String)dbNameField.get(this);
-                String propertyName = (String)propertyNameField.get(this);
+            for (Method method : methods) {
+                String name = method.getName();
+                if (!name.startsWith(columnInfoMethodPrefix)) {
+                    continue;
+                }
+                ${glColumnInfoName} columnInfo = (${glColumnInfoName})method.invoke(this);
+                String dbName = columnInfo.getColumnDbName();
+                String propertyName = columnInfo.getPropertyName();
                 if (dbNameKey) {
                     map.put(dbName.toLowerCase(), propertyName);
                 } else {
                     map.put(propertyName.toLowerCase(), dbName);                    
                 }
             }
+			return Collections.unmodifiableMap(map);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

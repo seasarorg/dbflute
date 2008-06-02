@@ -292,7 +292,6 @@ public class ForeignKey {
     //                                                                              =============
     /**
      * Is this relation 'one-to-one'?
-     * 
      * @return Determination.
      */
     public boolean isOneToOne() {
@@ -331,6 +330,11 @@ public class ForeignKey {
 
     public List<Column> getLocalColumnList() {
         return getLocalColumnObjectList();
+    }
+    
+    public Column getLocalColumnAsOne() {
+        String localColumnNameAsOne = getLocalColumnNameAsOne();
+        return getTable().getColumn(localColumnNameAsOne);
     }
 
     public String getLocalColumnNameAsOne() {
@@ -377,19 +381,22 @@ public class ForeignKey {
     // -----------------------------------------------------
     //                                       Foreign Element
     //                                       ---------------
-    /**
-     * Returns the list of foreign column names. You should not edit this List.
-     * 
-     * @return the foreign columns
-     */
-    public List<String> getForeignColumns() {
-        return _foreignColumns;
-    }
-
     public List<Column> getForeignColumnList() {
         return getForeignColumnObjectList();
     }
+    
+    public List<String> getForeignColumnNameList() {
+        return _foreignColumns;
+    }
+    
+    public List<String> getForeignColumns() {// Old Style Name
+        return _foreignColumns;
+    }
 
+    public Column getForeignColumnAsOne() {
+        return getForeignTable().getColumn(getForeignColumnNameAsOne());
+    }
+    
     public String getForeignColumnNameAsOne() {
         if (getForeignColumns().size() != 1) {
             String msg = "This method is for only-one foreign-key: getForeignColumns().size()="

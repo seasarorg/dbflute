@@ -1077,6 +1077,10 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }
     
+    public boolean isMakeDBMetaStaticDefinition() {
+        return getProperties().getSourceReductionProperties().isMakeDBMetaStaticDefinition();
+    }
+    
     public boolean isMakeDBMetaJDBCSupport() {
         return getProperties().getSourceReductionProperties().isMakeDBMetaJDBCSupport();
     }
