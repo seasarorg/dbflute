@@ -16,20 +16,9 @@ import ${glPackageBaseCommonDBMetaInfo}.*;
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${glDBMetaAbstractName} {
 
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
     protected static final Class<${myExtendedObjectClassName}> ENTITY_TYPE = ${myExtendedObjectClassName}.class;
     private static final ${myClassName} _instance = new ${myClassName}();
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
     private ${myClassName}() {}
-
-    // ===================================================================================
-    //                                                                           Singleton
-    //                                                                           =========
     public static ${myClassName} getInstance() { return _instance; }
 
     // ===================================================================================
@@ -54,30 +43,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                  --------------------
 #foreach ($col in $table.columns)
     public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
-#end
-
-    // -----------------------------------------------------
-    //                                 Foreign Property Name
-    //                                 (JavaBeansRule)
-    //                                 ---------------------
-#foreach ($foreignKeys in $table.foreignKeys)
-    public static final String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignJavaBeansRulePropertyName} = "$foreignKeys.foreignJavaBeansRulePropertyName";
-#end
-
-#foreach ($referrer in $table.referrers)
-#if ($referrer.isOneToOne())
-    public static final String FOREIGN_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyNameAsOne} = "$referrer.referrerJavaBeansRulePropertyNameAsOne";
-#end
-#end
-
-    // -----------------------------------------------------
-    //                                Referrer Property Name
-    //                                (JavaBeansRule)
-    //                                ----------------------
-#foreach ($referrer in $table.referrers)
-#if (!$referrer.isOneToOne())
-    public static final String REFERRER_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyName} = "$referrer.referrerJavaBeansRulePropertyName";
-#end
 #end
 
     // -----------------------------------------------------
