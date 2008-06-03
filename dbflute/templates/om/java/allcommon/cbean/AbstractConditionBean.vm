@@ -8,6 +8,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
@@ -528,6 +529,25 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	// ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
+        if (primaryKeyMap == null) {
+            String msg = "The argument[primaryKeyMap] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (primaryKeyMap.isEmpty()) {
+            String msg = "The argument[primaryKeyMap] must not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        List<${glColumnInfoName}> columnInfoList = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName()).getPrimaryUniqueInfo().getUniqueColumnList();
+        for (${glColumnInfoName} columnInfo : columnInfoList) {
+            String columnDbName = columnInfo.getColumnDbName();
+            if (!primaryKeyMap.containsKey(columnDbName)) {
+                String msg = "The primaryKeyMap must have the value of " + columnDbName;
+                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            }
+        }
+    }
+
     protected void assertSetupSelectBeforeUnion(String methodName) {
         if (hasUnionQueryOrUnionAllQuery()) {
             throwSetupSelectAfterUnionException(this.getClass().getSimpleName(), methodName);

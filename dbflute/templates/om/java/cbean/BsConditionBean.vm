@@ -34,34 +34,23 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                      PrimaryKey Map
     //                                                                      ==============
     public void acceptPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap) {
-        if (primaryKeyMap == null) {
-            String msg = "The argument[primaryKeyMap] must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (primaryKeyMap.isEmpty()) {
-            String msg = "The argument[primaryKeyMap] must not be empty.";
-            throw new IllegalArgumentException(msg);
-        }
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.primaryKey)
+        assertPrimaryKeyMap(primaryKeyMap);
+#foreach ($col in $table.primaryKey)
 
-        if (!primaryKeyMap.containsKey("${col.Name}")) {
-            String msg = "The primaryKeyMap must have the value of ${col.Name}";
-            throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
-        }
         {
             Object obj = primaryKeyMap.get("${col.Name}");
             if (obj instanceof ${col.JavaNative}) {
                 query().set${col.JavaName}_Equal((${col.JavaNative})obj);
             } else {
-    #if ($col.isJavaNativeStringObject())
+  #if ($col.isJavaNativeStringObject())
 
                 checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
                 query().set${col.JavaName}_Equal((String)obj);
             }
         }
-    #else
-      #if ($col.isJavaNativeDateObject())
+  #else
+    #if ($col.isJavaNativeDateObject())
 
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
@@ -70,8 +59,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 }
             }
         }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
 
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
@@ -80,7 +69,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 }
             }
         }
-        #else
+      #else
 
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
@@ -94,10 +83,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 }
             }
         }
-        #end
       #end
     #end
   #end
+#end
 #else
 
         String msg = "This table has no primary-keys: " + getTableDbName();
@@ -111,29 +100,25 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                     ===============
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
-#foreach ($col in $table.PrimaryKey)
+#foreach ($col in $table.primaryKey)
         query().addOrderBy_${col.JavaName}_Asc();
 #end
         return this;
 #else
-#foreach ($col in $table.Columns)
-        query().addOrderBy_${col.JavaName}_Asc();
-#end
-        return this;
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
 #end
     }
 
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
-#foreach ($col in $table.PrimaryKey)
+#foreach ($col in $table.primaryKey)
         query().addOrderBy_${col.JavaName}_Desc();
 #end
         return this;
 #else
-#foreach ($col in $table.Columns)
-        query().addOrderBy_${col.JavaName}_Desc();
-#end
-        return this;
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
 #end
     }
 
