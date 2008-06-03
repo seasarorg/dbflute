@@ -36,15 +36,9 @@ public class ${myClassName} {
 #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
-#if ($database.isVersionAfter1047())
     public ${foreignKeys.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-#else
-    public void with${tmpPropertyNameInitCap}() {
-#end
         assertConditionQuery();
-		final String foreignTableAliasName = _query.query${tmpPropertyNameInitCap}().getRealAliasName();
-		final String localRelationPath = _query.getRelationPath();
-		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+		_query.getSqlClause().registerSelectedSelectColumn(_query.query${tmpPropertyNameInitCap}().getRealAliasName(), "${table.name}", "${tmpPropertyName}", _query.getRelationPath());
 		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
 #if ($database.isVersionAfter1047())
 		return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
@@ -60,15 +54,9 @@ public class ${myClassName} {
 #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
 
-#if ($database.isVersionAfter1047())
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-#else
-	public void with${tmpPropertyNameInitCap}() {
-#end
         assertConditionQuery();
-		final String foreignTableAliasName = _query.query${tmpPropertyNameInitCap}().getRealAliasName();
-		final String localRelationPath = _query.getRelationPath();
-		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+		_query.getSqlClause().registerSelectedSelectColumn(_query.query${tmpPropertyNameInitCap}().getRealAliasName(), "${table.name}", "${tmpPropertyName}", _query.getRelationPath());
 		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
 #if ($database.isVersionAfter1047())
 		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
