@@ -7,6 +7,7 @@ import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
 import ${glPackageBaseCommonCBean}.${glUnionQuery};
 import ${glPackageCB}.${myConditionBeanClassName};
 import ${glPackageCQ}.*;
+import ${glPackageNss}.*;
 
 /**
  * The base condition-bean of ${table.name}.
@@ -205,47 +206,29 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
-        if (_nss${tmpPropertyNameInitCap} == null) {
-            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
-        }
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
-        final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
-        final String localRelationPath = query().getRelationPath();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
-            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
-        }
-        limitSelect_Off();
+        doSetupSelect(new SetupSelectCallback() { public ${glConditionQueryInterfaceName} queryForeignProperty() { return query().query${tmpPropertyNameInitCap}(); } });
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
-#set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
-#set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
-    protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
-        if (_nss${tmpPropertyNameInitCap} == null) {
-            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
-        }
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
-    public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        assertSetupSelectBeforeUnion("setupSelect_${tmpPropertyNameInitCap}()");
-        final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
-        final String localRelationPath = query().getRelationPath();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
-            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
-        }
-        limitSelect_Off();
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        doSetupSelect(new SetupSelectCallback() { public ${glConditionQueryInterfaceName} queryForeignProperty() { return query().query${tmpPropertyNameInitCap}(); } });
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end

@@ -86,6 +86,12 @@ public interface ${glConditionQueryInterfaceName} {
      */
     public String getForeignPropertyName();
 
+    /**
+     * Get the path of foreign relation.
+     * @return The path of foreign relation. (NotNull)
+     */
+    public String getRelationPath();
+
     // ===================================================================================
     //                                                                              Invoke
     //                                                                              ======

@@ -13,6 +13,7 @@ import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName}
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -530,6 +531,23 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	}
 	
 	// ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected void doSetupSelect(SetupSelectCallback callback) {
+        String foreignPropertyName = callback.queryForeignProperty().getForeignPropertyName();
+        assertSetupSelectBeforeUnion(foreignPropertyName);
+        limitSelect_Off();
+        String foreignTableAliasName = callback.queryForeignProperty().getRealAliasName();
+        String localRelationPath = localCQ().getRelationPath();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath);
+        getSqlClause().registerSelectedForeignInfo(callback.queryForeignProperty().getRelationPath(), foreignPropertyName);
+    }
+    
+    protected static interface SetupSelectCallback {
+        public ${glConditionQueryInterfaceName} queryForeignProperty();
+    }
+    
+	// ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
@@ -551,13 +569,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
     }
 
-    protected void assertSetupSelectBeforeUnion(String methodName) {
+    protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
         if (hasUnionQueryOrUnionAllQuery()) {
-            throwSetupSelectAfterUnionException(this.getClass().getSimpleName(), methodName);
+            throwSetupSelectAfterUnionException(this.getClass().getSimpleName(), foreignPropertyName);
         }
     }
     
-    protected void throwSetupSelectAfterUnionException(String className, String methodName) {
+    protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
+        String methodName = "setupSelect_" + initCap(foreignPropertyName) + "()";
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "You should NOT call " + methodName + " after calling union()!" + getLineSeparator();
@@ -588,6 +607,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected String initCap(String str) {
+	    return ${glSimpleStringUtil}.initCap(str);
+    }
+    
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
