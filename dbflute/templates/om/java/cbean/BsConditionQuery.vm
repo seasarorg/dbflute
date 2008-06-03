@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
-#set ($relationCQPackagePrefix = "${glPackageCQ}.")
 #set ($myClassName = "${myBaseConditionQueryClassName}")
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageCIQ}.*;
+import ${glPackageCQ}.*;
 
 /**
  * The base condition-query of ${table.name}.
@@ -63,7 +63,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //   Your aliasName should not contain comma.
     // 
 #foreach ($col in $table.columns)
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /** @deprecated Please Use includeAsMine_${col.JavaName}(String aliasName).*/
     public void includeAsMine_${col.JavaName}() { registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}")); }
 #end
@@ -79,18 +79,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
     public ${glConditionValueName} get${tmpJavaName}() {
-        if (_${tmpUncapitalisedJavaName} == null) {
-            _${tmpUncapitalisedJavaName} = new ${glConditionValueName}();
-        }
+        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValueName}(); }
         return _${tmpUncapitalisedJavaName};
     }
-    protected ${glConditionValueName} getCValue${tmpJavaName}() {
-        return get${tmpJavaName}();
-    }
+    protected ${glConditionValueName} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
 
     #if (${col.isJavaNativeStringObject()})
       #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${relationCQPackagePrefix}${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -108,7 +104,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${relationCQPackagePrefix}${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -127,7 +123,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${relationCQPackagePrefix}${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -147,7 +143,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #end
     #if (${col.isJavaNativeNumberObject()})
       #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${relationCQPackagePrefix}${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -165,7 +161,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${relationCQPackagePrefix}${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -183,8 +179,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${relationCQPackagePrefix}${refferer.refererTableExtendedConditionQueryClassName}")
+        #foreach ($refferer in $col.singleKeyReferrers)
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -220,8 +216,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                         ===========
     protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
-        final ${relationCQPackagePrefix}${myConditionQueryClassName} baseQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})baseQueryAsSuper;
-        final ${relationCQPackagePrefix}${myConditionQueryClassName} unionQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})unionQueryAsSuper;
+        ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
+        ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
 #end
 #foreach ($foreignKeys in $table.foreignKeys)
         if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
@@ -242,17 +238,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                       Foreign Query
     //                                                                       =============
 #foreach ($foreignKeys in $table.foreignKeys)
-#set ($foreignCQClassName = "${relationCQPackagePrefix}${foreignKeys.foreignTableExtendedConditionQueryClassName}")
+#set ($foreignCQClassName = "${foreignKeys.foreignTableExtendedConditionQueryClassName}")
     
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
-    //   ForeignProperty = [${foreignKeys.foreignJavaBeansRulePropertyName}]
-    // * * * * * * * * */
-
-    /**
-     * Query for ${foreignKeys.foreignJavaBeansRulePropertyName}.
-     * @return Instance of ${foreignCQClassName} as ${foreignKeys.ForeignPropertyName}. (NotNull)
-     */
     public ${foreignCQClassName} query${foreignKeys.ForeignPropertyNameInitCap}() {
         return getConditionQuery${foreignKeys.ForeignPropertyNameInitCap}();
     }
@@ -265,7 +252,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _conditionQuery${foreignKeys.foreignPropertyNameInitCap};
     }
     protected void setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}() {
-        final java.util.Map<String, String> joinOnMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        java.util.Map<String, String> joinOnMap = newLinkedHashMap();
 #foreach ($columnName in $foreignKeys.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
@@ -277,9 +264,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         getSqlClause().registerOuterJoin(getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getTableSqlName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
     }
     protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
-        final String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
-        final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-        final ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+        String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
+        String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
         cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}");
         cq.xsetRelationPath(nextRelationPath);
         return cq;
@@ -293,18 +280,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
 #foreach ($referrer in $table.referrers)
-#set ($relatedCQClassName = "${relationCQPackagePrefix}${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #if (${referrer.isOneToOne()})
 
-    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
-    //   ReferrerProperty = [${referrer.referrerJavaBeansRulePropertyNameAsOne}]
-    // * * * * * * * * */
-
-    /**
-     * Query for ${referrer.referrerJavaBeansRulePropertyNameAsOne}.
-     * @return Instance of ${relatedCQClassName} as ${referrer.ReffererPropertyNameAsOne}. (NotNull)
-     */
     public ${relatedCQClassName} query${referrer.referrerPropertyNameInitCapAsOne}() {
         return getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
     }
@@ -317,7 +295,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne};
     }
     protected void setupOuterJoin_${referrer.referrerPropertyNameInitCapAsOne}() {
-        final java.util.Map<String, String> joinOnMap = new java.util.LinkedHashMap<String, String>();
+        java.util.Map<String, String> joinOnMap = newLinkedHashMap();
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
@@ -329,9 +307,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         getSqlClause().registerOuterJoin(getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getTableSqlName(), getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
     }
     protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
-        final String nextRelationPath = resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}();
-        final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-        final ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+        String nextRelationPath = resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}();
+        String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
         cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
         cq.xsetRelationPath(nextRelationPath);
         return cq;
@@ -344,4 +322,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 #end
+
+    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
 }

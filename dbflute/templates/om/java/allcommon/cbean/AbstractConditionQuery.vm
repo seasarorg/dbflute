@@ -959,6 +959,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 		
     // -----------------------------------------------------
+    //                                  Collection Generator
+    //                                  --------------------
+	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
+    }
+
+    // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
     /**
