@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
+import java.util.Map;
+
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
@@ -34,7 +36,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                      PrimaryKey Map
     //                                                                      ==============
-    public void acceptPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap) {
+    public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
 #if ($table.hasPrimaryKey())
         assertPrimaryKeyMap(primaryKeyMap);
 #foreach ($col in $table.primaryKey)
