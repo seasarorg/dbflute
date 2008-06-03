@@ -11,7 +11,7 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * </p>
  * @author ${database.ClassAuthor}
  */
-[RemoteClass(alias="${database.simpleDtoExtendedDtoPackage}.${myExtendedObjectClassName}")]
+[RemoteClass(alias="${myRemoteSimpleDtoClassName}")]
 public class $myClassName extends ${myBaseObjectClassName} {
 }
 

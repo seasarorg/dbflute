@@ -261,10 +261,10 @@ targetdatabase = $targetDatabase
 
       #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
-      
+
       #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
-      
+
       #if ($database.isSimpleDtoUseDtoMapper())
         #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
         $database.makeDirectory($path)
@@ -277,10 +277,10 @@ targetdatabase = $targetDatabase
         #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
         $database.debug("    parse('${myExtendedObjectClassName}');")
-        
+
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-        
+
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
@@ -296,7 +296,7 @@ targetdatabase = $targetDatabase
       #end
       $database.debug("}")
     #end
-    
+
     ## ===================================================================================
     ##                                                                            Flex Dto
     ##                                                                            ========
@@ -308,20 +308,21 @@ targetdatabase = $targetDatabase
 
       #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
-      
+
       #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
-      
+
       #foreach ($table in $database.tables)
         #if (!$table.isSql2EntityTypeSafeCursor())
         #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
         #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
+        #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
 
         $database.debug("    parse('${myExtendedObjectClassName}');")
-        
+
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
         $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-        
+
         #if (!$database.isStopGenerateExtendedEntity())
           #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
           #if (!$files.file(${generator.OutputPath},$path).exists())
@@ -333,6 +334,6 @@ targetdatabase = $targetDatabase
       $database.debug("}")
 	  $database.enableSql2EntityOutputDirectory()
     #end
-    
+
   #end
 #end
