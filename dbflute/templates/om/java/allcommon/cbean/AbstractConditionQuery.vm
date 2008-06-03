@@ -932,6 +932,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return newList;
     }
 	
+    public void doNss(NssCall callback) {// Very Internal
+        String foreignPropertyName = callback.qf().getForeignPropertyName();
+        String foreignTableAliasName = callback.qf().getRealAliasName();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
+        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
+    }
+    
+    public static interface NssCall {// Very Internal
+        public ${glConditionQueryInterfaceName} qf();
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

@@ -1,7 +1,9 @@
 ${database.allClassCopyright}package ${glPackageNss};
-
 #set ($myClassName = "${myNestSelectSetupperClassName}")
-#set ($myNestSelectSetupperTerminalClassName = "${myNestSelectSetupperClassName}t")
+
+#if ($table.hasForeignKeyOrReferrerAsOne())
+import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
+#end
 import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
@@ -10,24 +12,9 @@ import ${glPackageCQ}.${myConditionQueryClassName};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
     protected ${myConditionQueryClassName} _query;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public ${myClassName}(${myConditionQueryClassName} query) {
-        _query = query;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean hasConditionQuery() {
-        return _query != null;
-    }
+    public ${myClassName}(${myConditionQueryClassName} query) { _query = query; }
+    public boolean hasConditionQuery() { return _query != null; }
 
     // ===================================================================================
     //                                                           With Nested Foreign Table
@@ -35,14 +22,9 @@ public class ${myClassName} {
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-
     public ${foreignKeys.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-        assertConditionQuery();
-		_query.getSqlClause().registerSelectedSelectColumn(_query.query${tmpPropertyNameInitCap}().getRealAliasName(), "${table.name}", "${tmpPropertyName}", _query.getRelationPath());
-		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-#if ($database.isVersionAfter1047())
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(); }});
 		return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
-#end
     }
 #end
 
@@ -53,24 +35,10 @@ public class ${myClassName} {
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
-
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-        assertConditionQuery();
-		_query.getSqlClause().registerSelectedSelectColumn(_query.query${tmpPropertyNameInitCap}().getRealAliasName(), "${table.name}", "${tmpPropertyName}", _query.getRelationPath());
-		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-#if ($database.isVersionAfter1047())
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(); }});
 		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
-#end
     }
 #end
 #end
-
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected void assertConditionQuery() {
-        if (!hasConditionQuery()) {
-            throw new IllegalStateException("The query should not be null.");
-        }
-    }
 }

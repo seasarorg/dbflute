@@ -9,7 +9,9 @@ import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
 import ${glPackageBaseCommonCBean}.${glUnionQuery};
 import ${glPackageCB}.${myConditionBeanClassName};
 import ${glPackageCQ}.*;
+#if ($table.hasForeignKeyOrReferrerAsOne())
 import ${glPackageNss}.*;
+#end
 
 /**
  * The base condition-bean of ${table.name}.
@@ -40,55 +42,33 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #if ($table.hasPrimaryKey())
         assertPrimaryKeyMap(primaryKeyMap);
 #foreach ($col in $table.primaryKey)
-
         {
-            Object obj = primaryKeyMap.get("${col.Name}");
-            if (obj instanceof ${col.JavaNative}) {
-                query().set${col.JavaName}_Equal((${col.JavaNative})obj);
+            Object obj = primaryKeyMap.get("${col.name}");
+            if (obj instanceof ${col.javaNative}) {
+                query().set${col.javaName}_Equal((${col.javaNative})obj);
             } else {
-  #if ($col.isJavaNativeStringObject())
-
-                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                query().set${col.JavaName}_Equal((String)obj);
+#if ($col.isJavaNativeStringObject())
+                checkTypeString(obj, "${col.uncapitalisedJavaName}", "${col.javaNative}");
+                query().set${col.javaName}_Equal((String)obj);
             }
         }
-  #else
-    #if ($col.isJavaNativeDateObject())
-
-                if (obj instanceof ${col.JavaNative}) {
-                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
-                } else {
-                    query().set${col.JavaName}_Equal(new ${col.JavaNative}(parseDateStringAsMillis(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
-                }
+#else
+#if ($col.isJavaNativeDateObject())
+                query().set${col.javaName}_Equal(new ${col.javaNative}(parseDateStringAsMillis(obj, "${col.uncapitalisedJavaName}", "${col.JavaNative}")));
             }
         }
-    #else
-      #if (${col.isJavaNativeBinaryObject()})
-
-                if (obj instanceof ${col.JavaNative}) {
-                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
-                } else {
-                    query().set${col.JavaName}_Equal(null);// Binary as String is out of target.
-                }
+#else
+#if (${col.isJavaNativeBinaryObject()})
+                query().set${col.javaName}_Equal(null);// Binary as String is out of target.
             }
         }
-      #else
-
-                if (obj instanceof ${col.JavaNative}) {
-                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
-                } else {
-                    try {
-                        query().set${col.JavaName}_Equal(new ${col.JavaNative}((String)obj));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
-                    }
-                }
+#else
+                query().set${col.javaName}_Equal(new ${col.javaNative}((String)obj));
             }
         }
-      #end
-    #end
-  #end
+#end
+#end
+#end
 #end
 #else
 
@@ -206,13 +186,13 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
 #set ($nestSelectSetuppperClassName = "${foreignKey.foreignTableNestSelectSetupperClassName}")
 
-    protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-    public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
-    public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        doSetupSelect(new SetupSelectCallback() { public ${glConditionQueryInterfaceName} queryForeignProperty() { return query().query${tmpPropertyNameInitCap}(); } });
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -224,16 +204,15 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
     protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-    public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        doSetupSelect(new SetupSelectCallback() { public ${glConditionQueryInterfaceName} queryForeignProperty() { return query().query${tmpPropertyNameInitCap}(); } });
+        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end
 #end
-
 }

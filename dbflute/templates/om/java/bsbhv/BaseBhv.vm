@@ -247,7 +247,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glConditionBeanSetupperName}<${referrerCBClassName}>() {
-            public void setup(${referrerCBClassName} cb) {});
+            public void setup(${referrerCBClassName} cb) {}});
     }
 
     /**

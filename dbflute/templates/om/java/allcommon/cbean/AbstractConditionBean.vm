@@ -533,18 +533,18 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	// ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected void doSetupSelect(SetupSelectCallback callback) {
-        String foreignPropertyName = callback.queryForeignProperty().getForeignPropertyName();
+    protected void doSetupSelect(SsCall callback) {
+        String foreignPropertyName = callback.qf().getForeignPropertyName();
         assertSetupSelectBeforeUnion(foreignPropertyName);
         limitSelect_Off();
-        String foreignTableAliasName = callback.queryForeignProperty().getRealAliasName();
+        String foreignTableAliasName = callback.qf().getRealAliasName();
         String localRelationPath = localCQ().getRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(callback.queryForeignProperty().getRelationPath(), foreignPropertyName);
+        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
     }
     
-    protected static interface SetupSelectCallback {
-        public ${glConditionQueryInterfaceName} queryForeignProperty();
+    protected static interface SsCall {
+        public ${glConditionQueryInterfaceName} qf();
     }
     
 	// ===================================================================================
