@@ -241,21 +241,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
 #if (!${referrer.isOneToOne()})
 
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ReferrerTable    = [${referrer.table.name}]
-    //   ReferrerProperty = [${referrer.referrerPropertyName}]
-    // * * * * * * * * */
-
     /**
-     * Load referrer of ${referrer.referrerPropertyName}. <br />
-     * About internal policy, the value of primary key(and others too) is treated as case-insensitive.
+     * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        final ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${referrerCBClassName}>() {
-            public void setup(${referrerCBClassName} cb) {}
-        };
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glConditionBeanSetupperName}<${referrerCBClassName}>() {
+            public void setup(${referrerCBClassName} cb) {});
     }
 
     /**
@@ -277,14 +269,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the option of load-referrer. <br />
-     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
-     * The conditionBean that the setupper provides have settings before you touch it. It is as follows:
-     * <pre>
-     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
-     * </pre>
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param loadReferrerOption the option of load-referrer. (NotNull)
      */
     public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
@@ -760,6 +745,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                          CBSetupper
     //                                                                          ==========
+    /** @deprecated */ 
     public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
         public void setup(${myConditionBeanClassName} cb);
     }
