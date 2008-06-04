@@ -48,6 +48,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback);
     }
 
+	/** @deprecated */
     public static abstract class DefaultLikeAsOrCallback implements LikeAsOrCallback {
         public String filterValue(String currentValue) {
             return currentValue;
@@ -225,7 +226,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         deepCopy._like = _like;
         deepCopy._escape = _escape;
 		if (hasLikeAsOrCallback()) {
-            for (Iterator ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
+            for (Iterator<LikeAsOrCallback> ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
                 deepCopy.addLikeAsOrCallback((LikeAsOrCallback)ite.next());
             }
 		}
