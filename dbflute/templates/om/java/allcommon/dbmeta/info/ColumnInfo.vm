@@ -6,7 +6,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
  * The information of column.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {

@@ -41,6 +41,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                                AsOr
     //                                                                                ====
+    /** @deprecated */
     public static interface LikeAsOrCallback {
         public String getAdditionalTargetPropertyName();
         public String filterValue(String currentValue);
@@ -67,6 +68,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return _likeAsOrCallbackList;
     }
 
+	/** @deprecated */
     public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
         getLikeAsOrCallbackList().add(likeAsOrCallback);
     }
