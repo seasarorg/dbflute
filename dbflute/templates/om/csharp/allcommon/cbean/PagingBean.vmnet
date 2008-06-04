@@ -16,7 +16,7 @@ namespace ${glPackageBaseCommonCBean} {
         // * * * * * * * *
         // For SQL Comment
         // * * * * * * * *
-        bool Paging { get; }
+        bool IsPaging { get; }
 
         // ===============================================================================
         //                                                                  Paging Setting

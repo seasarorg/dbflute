@@ -32,7 +32,7 @@ namespace ${glPackageBaseCommonCBean} {
         // * * * * * * * *
         // For SQL Comment
         // * * * * * * * *
-        public bool Paging { get { return _paging; } }
+        public bool IsPaging { get { return _paging; } }
 
         // -------------------------------------------------
         //                                    Paging Setting
@@ -48,7 +48,7 @@ namespace ${glPackageBaseCommonCBean} {
 
 		public void Paging(int pageSize, int pageNumber) {
 		    FetchFirst(pageSize);
-		    FetchPage(pageNumber);
+		    FetchPage(pageNumber)
 		}
 
         // -------------------------------------------------
