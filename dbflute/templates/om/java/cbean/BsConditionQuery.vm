@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCQ};
-
 #set ($myClassName = "${myBaseConditionQueryClassName}")
+
+import java.util.Map;
+
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
@@ -54,11 +56,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                       IncludeAsMine
     //                                                                       =============
-    // public void includeAsMine_Xxx()
-    //   Include select-column of Xxx as mine.
-    //   Alias name is property name of this column.
-    //   Be careful to whether your table have the same column.
-    // 
     // public void includeAsMine_Xxx(String aliasName) {
     //   Your aliasName should not contain comma.
     // 
@@ -83,7 +80,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _${tmpUncapitalisedJavaName};
     }
     protected ${glConditionValueName} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
-
     #if (${col.isJavaNativeStringObject()})
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
@@ -91,13 +87,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -109,13 +105,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -128,13 +124,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -148,13 +144,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -166,13 +162,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -185,13 +181,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
-    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
-    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+    protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+    public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName}Map;
     }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
-        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
@@ -231,7 +227,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         }
 #end
 #end
-
     }
 
     // ===================================================================================
@@ -246,13 +241,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected ${foreignCQClassName} _conditionQuery${foreignKeys.ForeignPropertyNameInitCap};
     public ${foreignCQClassName} getConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
         if (_conditionQuery${foreignKeys.foreignPropertyNameInitCap} == null) {
-            _conditionQuery${foreignKeys.foreignPropertyNameInitCap} = createQuery${foreignKeys.ForeignPropertyNameInitCap}();
+            _conditionQuery${foreignKeys.foreignPropertyNameInitCap} = createQuery${foreignKeys.foreignPropertyNameInitCap}();
             setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}();
         }
         return _conditionQuery${foreignKeys.foreignPropertyNameInitCap};
     }
     protected void setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}() {
-        java.util.Map<String, String> joinOnMap = newLinkedHashMap();
+        Map<String, String> joinOnMap = newLinkedHashMap();
 #foreach ($columnName in $foreignKeys.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
@@ -261,9 +256,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($foreignKeys.hasFixedCondition())
         joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName()));
 #end
-        getSqlClause().registerOuterJoin(getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getTableSqlName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
+        registerOuterJoin(getConditionQuery${foreignKeys.foreignPropertyNameInitCap}(), joinOnMap);
     }
-    protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+    protected ${foreignCQClassName} createQuery${foreignKeys.foreignPropertyNameInitCap}() {
         String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
         String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
         ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
@@ -295,7 +290,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne};
     }
     protected void setupOuterJoin_${referrer.referrerPropertyNameInitCapAsOne}() {
-        java.util.Map<String, String> joinOnMap = newLinkedHashMap();
+        Map<String, String> joinOnMap = newLinkedHashMap();
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
@@ -304,7 +299,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($referrer.hasFixedCondition())
         joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referrer.fixedCondition}", getRealAliasName(), getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName()));
 #end
-        getSqlClause().registerOuterJoin(getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getTableSqlName(), getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
+        registerOuterJoin(getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(), joinOnMap);
     }
     protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         String nextRelationPath = resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}();
@@ -324,4 +319,5 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
+    protected String getMapClassNameInternally() { return Map.class.getName(); }
 }

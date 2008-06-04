@@ -28,6 +28,22 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 public abstract class ${myClassName} implements ${glConditionQueryInterfaceName} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final ${glConditionKeyName} CK_EQUAL = ${glConditionKeyName}.CK_EQUAL;
+    protected static final ${glConditionKeyName} CK_NOT_EQUAL = ${glConditionKeyName}.CK_NOT_EQUAL;
+    protected static final ${glConditionKeyName} CK_GREATER_EQUAL = ${glConditionKeyName}.CK_GREATER_EQUAL;
+    protected static final ${glConditionKeyName} CK_GREATER_THAN = ${glConditionKeyName}.CK_GREATER_THAN;
+    protected static final ${glConditionKeyName} CK_LESS_EQUAL = ${glConditionKeyName}.CK_LESS_EQUAL;
+    protected static final ${glConditionKeyName} CK_LESS_THAN = ${glConditionKeyName}.CK_LESS_THAN;
+    protected static final ${glConditionKeyName} CK_PREFIX_SEARCH = ${glConditionKeyName}.CK_PREFIX_SEARCH;
+    protected static final ${glConditionKeyName} CK_LIKE_SEARCH = ${glConditionKeyName}.CK_LIKE_SEARCH;
+    protected static final ${glConditionKeyName} CK_IN_SCOPE = ${glConditionKeyName}.CK_IN_SCOPE;
+    protected static final ${glConditionKeyName} CK_NOT_IN_SCOPE = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
+    protected static final ${glConditionKeyName} CK_IS_NULL = ${glConditionKeyName}.CK_IS_NULL;
+    protected static final ${glConditionKeyName} CK_IS_NOT_NULL = ${glConditionKeyName}.CK_IS_NOT_NULL;
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** Condition value for DUMMY. */
@@ -563,6 +579,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                       ---------------
     protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
+        assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
 		final String clause;
@@ -603,6 +620,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                        --------------
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
+        assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
         final String realColumnName = getExistsSubQueryRealColumnName(columnName);
         final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
 		final String clause;
@@ -896,6 +914,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String filterRemoveEmptyString(String value) {
         return ((value != null && !"".equals(value)) ? value : null);
     }
+
+    /**
+     * @param value Query-value-string. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected String filterRES(String value) {
+        return filterRemoveEmptyString(value);
+    }
 	
     /**
      * @param col Target collection. (Nullable)
@@ -943,6 +969,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         public ${glConditionQueryInterfaceName} qf();
     }
 
+    protected void registerOuterJoin(${glConditionQueryInterfaceName} cq, Map<String, String> joinOnMap) {
+        getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
+    }
+	
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
