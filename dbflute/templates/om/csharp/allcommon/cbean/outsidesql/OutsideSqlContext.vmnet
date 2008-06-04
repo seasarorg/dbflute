@@ -113,8 +113,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                        ========
     	public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
     	    String sql = ReadOutsideSql(sqlFileEncoding, dbmsSuffix);
-    		return ReplaceOutsideSqlBindCharacterOnLineComment(sql);
+			sql = ReplaceOutsideSqlBindCharacterOnLineComment(sql);
+    		return ReplaceOldStypePagingDeterminationForCompatible(sql);
     	}
+		
+		protected String ReplaceOldStypePagingDeterminationForCompatible(String sql) {
+		    return sql.Replace("/*IF pmb.Paging*/", "/*IF pmb.IsPaging*/");
+		}
     
         protected String ReplaceOutsideSqlBindCharacterOnLineComment(String sql) {
             String bindCharacter = "?";
