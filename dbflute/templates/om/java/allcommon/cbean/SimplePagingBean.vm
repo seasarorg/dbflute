@@ -47,16 +47,27 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     // * * * * * * * *
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determination.
      */
     public boolean isPaging() {
         return _paging;
     }
 
+    // -----------------------------------------------------
+    //                                        Paging Setting
+    //                                        --------------
+    /**
+     * ${database.ImplementComment}
+	 * @param pageSize The page size per one page. (NotMinus & NotZero)
+	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
+     */
+    public void paging(int pageSize, int pageNumber) {
+        fetchFirst(pageSize);
+        fetchPage(pageNumber);
+    }
+
     /**
      * ${database.ImplementComment} {INTERNAL METHOD: Don't Invoke This!}
-     * 
      * @param paging Determination.
      */
     public void xsetPaging(boolean paging) {
@@ -118,7 +129,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                        --------------
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
@@ -127,7 +137,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-size.
      */
     public int getFetchSize() {
@@ -136,7 +145,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
@@ -145,7 +153,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
@@ -154,7 +161,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
@@ -184,7 +190,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
-     * 
      * @return from-base-table-hint. (NotNull)
      */
     public String getFromBaseTableHint() {
@@ -193,7 +198,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Get from-hint. {select * from table [from-hint] where ...}
-     * 
      * @return From-hint. (NotNull)
      */
     public String getFromHint() {
@@ -202,7 +206,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * 
      * @return Sql-suffix. (NotNull)
      */
     public String getSqlSuffix() {
@@ -214,7 +217,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                                ====================================
     /**
      * Get fetch-narrowing start-index.
-     * 
      * @return Fetch-narrowing start-index.
      */
     public int getFetchNarrowingSkipStartIndex() {
@@ -223,7 +225,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Get fetch-narrowing size.
-     * 
      * @return Fetch-narrowing size.
      */
     public int getFetchNarrowingLoopCount() {
@@ -232,7 +233,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Is fetch start index supported?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingSkipStartIndexEffective() {
@@ -241,7 +241,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Is fetch size supported?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingLoopCountEffective() {
@@ -250,7 +249,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Is fetch-narrowing effective?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {

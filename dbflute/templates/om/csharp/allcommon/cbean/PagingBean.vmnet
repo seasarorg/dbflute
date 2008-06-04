@@ -17,7 +17,12 @@ namespace ${glPackageBaseCommonCBean} {
         // For SQL Comment
         // * * * * * * * *
         bool Paging { get; }
-        void XSetPaging(bool paging);
+
+        // ===============================================================================
+        //                                                                  Paging Setting
+        //                                                                  ==============
+        void XSetPaging(bool paging);// Very Internal!
+		void Paging(int pageSize, int pageNumber);
 
         // ===============================================================================
         //                                                                   Fetch Setting

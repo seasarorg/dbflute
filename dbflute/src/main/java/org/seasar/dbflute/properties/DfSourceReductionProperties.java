@@ -37,10 +37,17 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     }
 
     // ===================================================================================
-    //                                                                            Behavior
-    //                                                                            ========
+    //                                                                              Entity
+    //                                                                              ======
     public boolean isMakeEntityTraceRelation() {
         return booleanProp("torque.isMakeEntityTraceRelation", false);
+    }
+    
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+    public boolean isMakeBehaviorNoConditionLoadReferrer() {
+        return booleanProp("torque.isMakeBehaviorNoConditionLoadReferrer", false);
     }
 
     public boolean isMakeBehaviorLoopUpdate() {

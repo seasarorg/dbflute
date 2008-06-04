@@ -56,9 +56,17 @@ namespace ${glPackageBaseCommonCBean} {
         // For SQL Comment
         // * * * * * * * *
         public bool Paging { get { throw new UnsupportedOperationException("This method is unsupported on ConditionBean!"); } }
-        public void XSetPaging(bool paging) {
+
+        // -------------------------------------------------
+        //                                    Paging Setting
+        //                                    --------------
+        public void XSetPaging(bool paging) {// Very Internal!
             throw new UnsupportedOperationException("This method is unsupported on ConditionBean!");
         }
+		public void Paging(int pageSize, int pageNumber) {
+		    FetchFirst(pageSize);
+		    FetchPage(pageNumber);
+		}
 
         // -------------------------------------------------
         //                                     Fetch Setting

@@ -33,7 +33,11 @@ namespace ${glPackageBaseCommonCBean} {
         // For SQL Comment
         // * * * * * * * *
         public bool Paging { get { return _paging; } }
-        public void XSetPaging(bool paging) {
+
+        // -------------------------------------------------
+        //                                    Paging Setting
+        //                                    --------------
+        public void XSetPaging(bool paging) {// Very Internal!
             if (paging) {
                 this.SqlClause.makeFetchScopeEffective();
             } else {
@@ -41,6 +45,11 @@ namespace ${glPackageBaseCommonCBean} {
             }
             this._paging = paging;
         }
+
+		public void Paging(int pageSize, int pageNumber) {
+		    FetchFirst(pageSize);
+		    FetchPage(pageNumber);
+		}
 
         // -------------------------------------------------
         //                                     Fetch Setting

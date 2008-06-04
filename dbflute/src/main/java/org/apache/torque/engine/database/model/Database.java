@@ -1068,6 +1068,10 @@ public class Database {
     public boolean isMakeEntityTraceRelation() {
         return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
     }
+    
+    public boolean isMakeBehaviorNoConditionLoadReferrer() {
+        return getProperties().getSourceReductionProperties().isMakeBehaviorNoConditionLoadReferrer();
+    }
 
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();

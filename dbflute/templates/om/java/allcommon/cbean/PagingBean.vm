@@ -15,14 +15,22 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     // * * * * * * * *
     /**
      * Is the execution for paging(NOT count)?
-     * 
      * @return Determination.
      */
     public boolean isPaging();
 
+    // ===================================================================================
+    //                                                                      Paging Setting
+    //                                                                      ==============
+    /**
+     * Set up paging resources.
+	 * @param pageSize The page size per one page. (NotMinus & NotZero)
+	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
+     */
+    public void paging(int pageSize, int pageNumber);
+
     /**
      * Set whether the execution for paging(NOT count). {INTERNAL METHOD}
-     * 
      * @param paging Determination.
      */
     public void xsetPaging(boolean paging);
