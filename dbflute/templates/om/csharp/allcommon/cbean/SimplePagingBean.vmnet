@@ -48,7 +48,7 @@ namespace ${glPackageBaseCommonCBean} {
 
 		public void Paging(int pageSize, int pageNumber) {
 		    FetchFirst(pageSize);
-		    FetchPage(pageNumber)
+		    FetchPage(pageNumber);
 		}
 
         // -------------------------------------------------
