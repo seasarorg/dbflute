@@ -269,6 +269,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption the option of load-referrer. (NotNull)
      */
     public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
