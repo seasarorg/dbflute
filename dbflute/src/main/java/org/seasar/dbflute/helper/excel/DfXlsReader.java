@@ -31,6 +31,9 @@ import org.seasar.framework.util.FileInputStreamUtil;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.TimestampConversionUtil;
 
+/**
+ * @author jflute 
+ */
 public class DfXlsReader implements DataReader, DataSetConstants {
 
     // ===================================================================================
@@ -42,15 +45,15 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private org.seasar.extension.dataset.DataSet dataSet_;
+    protected org.seasar.extension.dataset.DataSet _dataSet;
 
-    private HSSFWorkbook workbook_;
+    protected HSSFWorkbook _workbook;
 
-    private HSSFDataFormat dataFormat_;
+    protected HSSFDataFormat _dataFormat;
 
-    private DfFlexibleNameMap<String, String> tableNameMap;
+    protected DfFlexibleNameMap<String, String> _tableNameMap;
 
-    protected DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap;
+    protected DfFlexibleNameMap<String, List<String>> _notTrimTableColumnMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -62,45 +65,35 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap,
             DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
-        this.tableNameMap = tableNameMap;
-        this.notTrimTableColumnMap = notTrimTableColumnMap;
+        this._tableNameMap = tableNameMap;
+        this._notTrimTableColumnMap = notTrimTableColumnMap;
         try {
-            workbook_ = new HSSFWorkbook(in);
+            _workbook = new HSSFWorkbook(in);
         } catch (IOException ex) {
             throw new IORuntimeException(ex);
         }
-        dataFormat_ = workbook_.createDataFormat();
-        dataSet_ = new DataSetImpl();
-        for (int i = 0; i < workbook_.getNumberOfSheets(); ++i) {
-            createTable(workbook_.getSheetName(i), workbook_.getSheetAt(i));
+        _dataFormat = _workbook.createDataFormat();
+        _dataSet = new DataSetImpl();
+        for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
+            createTable(_workbook.getSheetName(i), _workbook.getSheetAt(i));
         }
-    }
-
-    // ===================================================================================
-    //                                                                                Read
-    //                                                                                ====
-    /**
-     * @see org.seasar.extension.dataset.DataReader#read()
-     */
-    public DataSet read() {
-        return dataSet_;
     }
 
     protected DataTable createTable(String sheetName, HSSFSheet sheet) {
         // /----------------------------------------------------------------- Modification
         String tableName = sheetName;
-        if (tableNameMap != null && !tableNameMap.isEmpty() && sheetName.startsWith("$")) {
-            String realTableName = tableNameMap.get(sheetName);
+        if (_tableNameMap != null && !_tableNameMap.isEmpty() && sheetName.startsWith("$")) {
+            String realTableName = _tableNameMap.get(sheetName);
             if (realTableName == null) {
-                realTableName = tableNameMap.get(sheetName.substring("$".length()));
+                realTableName = _tableNameMap.get(sheetName.substring("$".length()));
                 if (realTableName == null) {
-                    String msg = "The sheetName[" + sheetName + "] was not found in the tableNameMap: " + tableNameMap;
+                    String msg = "The sheetName[" + sheetName + "] was not found in the tableNameMap: " + _tableNameMap;
                     throw new IllegalStateException(msg);
                 }
             }
             tableName = realTableName;
         }
-        final DataTable table = dataSet_.addTable(tableName);
+        final DataTable table = _dataSet.addTable(tableName);
         // --------------------/
 
         int rowCount = sheet.getLastRowNum();
@@ -218,26 +211,13 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
     }
-
     // --------------------/
 
-    public boolean isCellBase64Formatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
-        short dfNum = cs.getDataFormat();
-        return BASE64_FORMAT.equals(dataFormat_.getFormat(dfNum));
-    }
-
-    public boolean isCellDateFormatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
-        short dfNum = cs.getDataFormat();
-        String format = dataFormat_.getFormat(dfNum);
-        if (StringUtil.isEmpty(format)) {
-            return false;
-        }
-        if (format.indexOf('/') > 0 || format.indexOf('y') > 0 || format.indexOf('m') > 0 || format.indexOf('d') > 0) {
-            return true;
-        }
-        return false;
+    // ===================================================================================
+    //                                                                                Read
+    //                                                                                ====
+    public DataSet read() {
+        return _dataSet;
     }
 
     // ===================================================================================
@@ -288,10 +268,10 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     // /----------------------------------------------------------------- Modification
     public boolean isNotTrimTarget(HSSFCell cell, DataTable table) {
         final String tableName = table.getTableName();
-        if (!notTrimTableColumnMap.containsKey(tableName)) {
+        if (!_notTrimTableColumnMap.containsKey(tableName)) {
             return false;
         }
-        final List<String> notTrimTargetColumnList = notTrimTableColumnMap.get(tableName);
+        final List<String> notTrimTargetColumnList = _notTrimTableColumnMap.get(tableName);
         final DataColumn column = table.getColumn(cell.getCellNum());
         final String targetColumnName = column.getColumnName();
         for (String currentColumnName : notTrimTargetColumnList) {
@@ -301,7 +281,6 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
         return false;
     }
-
     // --------------------/
 
     protected ColumnType getColumnType(HSSFCell cell) {
@@ -323,7 +302,29 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
     }
 
-    private boolean isInt(final double numericCellValue) {
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isCellBase64Formatted(HSSFCell cell) {
+        HSSFCellStyle cs = cell.getCellStyle();
+        short dfNum = cs.getDataFormat();
+        return BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
+    }
+
+    public boolean isCellDateFormatted(HSSFCell cell) {
+        HSSFCellStyle cs = cell.getCellStyle();
+        short dfNum = cs.getDataFormat();
+        String format = _dataFormat.getFormat(dfNum);
+        if (StringUtil.isEmpty(format)) {
+            return false;
+        }
+        if (format.indexOf('/') > 0 || format.indexOf('y') > 0 || format.indexOf('m') > 0 || format.indexOf('d') > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean isInt(final double numericCellValue) {
         return ((int) numericCellValue) == numericCellValue;
     }
 }

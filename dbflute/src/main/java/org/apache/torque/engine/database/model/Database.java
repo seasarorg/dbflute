@@ -1068,7 +1068,7 @@ public class Database {
     public boolean isMakeEntityTraceRelation() {
         return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
     }
-    
+
     public boolean isMakeBehaviorNoConditionLoadReferrer() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorNoConditionLoadReferrer();
     }
@@ -1080,15 +1080,15 @@ public class Database {
     public boolean isMakeFlatExpansion() {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }
-    
+
     public boolean isMakeDBMetaStaticDefinition() {
         return getProperties().getSourceReductionProperties().isMakeDBMetaStaticDefinition();
     }
-    
+
     public boolean isMakeDBMetaJDBCSupport() {
         return getProperties().getSourceReductionProperties().isMakeDBMetaJDBCSupport();
     }
-    
+
     public boolean isMakeDBMetaCommonColumnHandling() {
         return getProperties().getSourceReductionProperties().isMakeDBMetaCommonColumnHandling();
     }
@@ -1293,10 +1293,14 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                          Simple DTO
-    //                                                                          ==========
+    //                                                                            Flex DTO
+    //                                                                            ========
     public boolean hasFlexDtoDefinition() {
         return getProperties().getFlexDtoProperties().hasFlexDtoDefinition();
+    }
+
+    public boolean isFlexDtoOverrideExtended() {
+        return getProperties().getFlexDtoProperties().isOverrideExtended();
     }
 
     public String getFlexDtoBaseDtoPackage() {

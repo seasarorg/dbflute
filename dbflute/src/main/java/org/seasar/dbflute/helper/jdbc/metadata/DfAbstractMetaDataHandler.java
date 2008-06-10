@@ -16,10 +16,10 @@
 package org.seasar.dbflute.helper.jdbc.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * @author jflute
@@ -68,10 +68,9 @@ public class DfAbstractMetaDataHandler {
 
     //========================================================================================
     //                                                                           Determination
-    //                                                                           =======-=====
+    //                                                                           =============
     /**
      * Is the table name out of sight?
-     * 
      * @param tableName Table name. (NotNull)
      * @return Determination.
      */
@@ -91,7 +90,6 @@ public class DfAbstractMetaDataHandler {
 
     /**
      * Is the column name out of sight?
-     * 
      * @param columnName Column name. (NotNull)
      * @return Determination.
      */
@@ -105,53 +103,6 @@ public class DfAbstractMetaDataHandler {
     }
 
     protected boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
-        if (!targetList.isEmpty()) {
-            for (final Iterator ite = targetList.iterator(); ite.hasNext();) {
-                final String targetTableHint = (String) ite.next();
-                if (isHintMatchTheName(name, targetTableHint)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
-            final String tableHint = (String) ite.next();
-            if (isHintMatchTheName(name, tableHint)) {
-                return true;
-            }
-        }
-        return false;
+        return DfNameHintUtil.isExceptByHint(name, targetList, exceptList);
     }
-
-    /**
-     * Does the hint match the name?
-     * 
-     * @param name Target name. (NotNull)
-     * @param hint Hint-string that contains prefix-mark or suffix-mark. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isHintMatchTheName(String name, String hint) {
-        // TODO: I want to refactor this judgement logic for hint someday.
-        final String prefixMark = "prefix:";
-        final String suffixMark = "suffix:";
-
-        if (hint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-            final String pureTableHint = hint.substring(prefixMark.length(), hint.length());
-            if (name.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else if (hint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-            final String pureTableHint = hint.substring(suffixMark.length(), hint.length());
-            if (name.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else {
-            if (name.equalsIgnoreCase(hint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

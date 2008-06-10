@@ -35,6 +35,9 @@ import ${myExtendedEntityPackageName}.*;
  * </pre>
  * @author ${database.ClassAuthor}
  */
+#if ($table.isFlexDtoBindable())
+[Bindable]
+#end
 public class $myClassName {
 
     // ===================================================================================

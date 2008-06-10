@@ -1,9 +1,13 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * @author jflute
@@ -36,6 +40,28 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         return !getFlexDtoDefinitionMap().isEmpty();
     }
 
+    public boolean isOverrideExtended() {
+        return isDtoProperty("overrideExtended");
+    }
+
+    public boolean isBindable(String tableName) {
+        return isDtoProperty("bindable") && !isBindableTableExcept(tableName);
+    }
+
+    protected boolean isBindableTableExcept(final String tableName) {
+        final List<String> targetList = getBindableTableTargetList();
+        final List<String> exceptList = getBindableTableExceptList();
+        return isExceptByHint(tableName, targetList, exceptList);
+    }
+
+    protected boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
+        return DfNameHintUtil.isExceptByHint(name, targetList, exceptList);
+    }
+
+    protected boolean isHintMatchTheName(String name, String hint) {
+        return DfNameHintUtil.isHitByTheHint(name, hint);
+    }
+
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
@@ -59,6 +85,22 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
             resultMap.put(key, value);
         }
         return resultMap;
+    }
+
+    public List<String> getBindableTableTargetList() {
+        final List<String> ls = getDtoPropertyList("bindableTableTargetList");
+        if (ls == null) {
+            return new ArrayList<String>();
+        }
+        return ls;
+    }
+
+    public List<String> getBindableTableExceptList() {
+        final List<String> ls = getDtoPropertyList("bindableTableExceptList");
+        if (ls == null) {
+            return new ArrayList<String>();
+        }
+        return ls;
     }
 
     public String getBaseDtoPackage() {
@@ -85,6 +127,9 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         return getDtoPropertyIfNullEmpty("extendedDtoSuffix");
     }
 
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
     protected String getDtoPropertyRequired(String key) {
         final String value = getDtoProperty(key);
         if (value == null || value.trim().length() == 0) {
@@ -108,8 +153,18 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         return value;
     }
 
+    protected boolean isDtoProperty(String key) {
+        final String value = (String) getFlexDtoDefinitionMap().get(key);
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getDtoPropertyMap(String key) {
         return (Map<String, Object>) getFlexDtoDefinitionMap().get(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getDtoPropertyList(String key) {
+        return (List<String>) getFlexDtoDefinitionMap().get(key);
     }
 }

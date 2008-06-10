@@ -2470,6 +2470,13 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
+    //                                                                            Flex DTO
+    //                                                                            ========
+    public boolean isFlexDtoBindable() {
+        return getProperties().getFlexDtoProperties().isBindable(getName());
+    }
+    
+    // ===================================================================================
     //                                                                            toString
     //                                                                            ========
     /**
