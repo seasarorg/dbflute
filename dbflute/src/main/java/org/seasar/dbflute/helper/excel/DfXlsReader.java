@@ -6,12 +6,15 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataColumn;
@@ -30,6 +33,15 @@ import org.seasar.framework.util.TimestampConversionUtil;
 
 public class DfXlsReader implements DataReader, DataSetConstants {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private org.seasar.extension.dataset.DataSet dataSet_;
 
     private HSSFWorkbook workbook_;
@@ -40,6 +52,9 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     protected DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap,
             DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
         this(FileInputStreamUtil.create(file), tableNameMap, notTrimTableColumnMap);
@@ -61,6 +76,9 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
     }
 
+    // ===================================================================================
+    //                                                                                Read
+    //                                                                                ====
     /**
      * @see org.seasar.extension.dataset.DataReader#read()
      */
@@ -68,7 +86,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         return dataSet_;
     }
 
-    private DataTable createTable(String sheetName, HSSFSheet sheet) {
+    protected DataTable createTable(String sheetName, HSSFSheet sheet) {
         // /----------------------------------------------------------------- Modification
         String tableName = sheetName;
         if (tableNameMap != null && !tableNameMap.isEmpty() && sheetName.startsWith("$")) {
@@ -95,7 +113,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         return table;
     }
 
-    private void setupColumns(DataTable table, HSSFRow nameRow, HSSFRow valueRow) {
+    protected void setupColumns(DataTable table, HSSFRow nameRow, HSSFRow valueRow) {
         for (int i = 0;; ++i) {
             HSSFCell nameCell = nameRow.getCell((short) i);
             if (nameCell == null) {
@@ -117,7 +135,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
     }
 
-    private void setupRows(DataTable table, HSSFSheet sheet) {
+    protected void setupRows(DataTable table, HSSFSheet sheet) {
         for (int i = 1;; ++i) {
             HSSFRow row = sheet.getRow((short) i);
             if (row == null) {
@@ -127,7 +145,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
     }
 
-    private void setupRow(DataTable table, HSSFRow row) {
+    protected void setupRow(DataTable table, HSSFRow row) {
         DataRow dataRow = table.addRow();
         // /----------------------------------------------------------------- Modification
         // Add try-catch
@@ -137,7 +155,19 @@ public class DfXlsReader implements DataReader, DataSetConstants {
             for (int i = 0; i < table.getColumnSize(); ++i) {
                 cell = row.getCell((short) i);
                 value = getValue(cell, table);
-                dataRow.setValue(i, value);
+                try {
+                    dataRow.setValue(i, value);
+                } catch (NumberFormatException e) {
+                    if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
+                        throw e;
+                    }
+                    DataColumn column = table.getColumn(i);
+                    String msg = "...Changing the column type to STRING type:";
+                    msg = msg + " name=" + column.getColumnName() + " value=" + value;
+                    _log.info(msg);
+                    column.setColumnType(ColumnTypes.STRING);
+                    dataRow.setValue(i, value);
+                }
             }
         } catch (RuntimeException e) {
             throwCellValueHandlingException(cell, value, e);
@@ -158,18 +188,25 @@ public class DfXlsReader implements DataReader, DataSetConstants {
             switch (cell.getCellType()) {
             case HSSFCell.CELL_TYPE_NUMERIC:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_NUMERIC" + getLineSeparator();
+                break;
             case HSSFCell.CELL_TYPE_STRING:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_STRING" + getLineSeparator();
+                break;
             case HSSFCell.CELL_TYPE_FORMULA:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_FORMULA" + getLineSeparator();
+                break;
             case HSSFCell.CELL_TYPE_BLANK:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BLANK" + getLineSeparator();
+                break;
             case HSSFCell.CELL_TYPE_BOOLEAN:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BOOLEAN" + getLineSeparator();
+                break;
             case HSSFCell.CELL_TYPE_ERROR:
                 msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_ERROR" + getLineSeparator();
+                break;
             default:
                 msg = msg + "[Cell Type]" + getLineSeparator() + cell.getCellType() + getLineSeparator();
+                break;
             }
         }
         msg = msg + getLineSeparator();
@@ -178,9 +215,10 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         throw new IllegalStateException(msg, e);
     }
 
-    public String getLineSeparator() {
+    protected String getLineSeparator() {
         return System.getProperty("line.separator");
     }
+
     // --------------------/
 
     public boolean isCellBase64Formatted(HSSFCell cell) {
@@ -202,6 +240,9 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                      Value Handling
+    //                                                                      ==============
     public Object getValue(HSSFCell cell, DataTable table) {
         if (cell == null) {
             return null;
