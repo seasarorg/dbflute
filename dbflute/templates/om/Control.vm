@@ -20,6 +20,7 @@ targetdatabase = $targetDatabase
     $database.initializeAdditionalForeignKey()
     $database.initializeClassificationDeployment()
     $database.initializeIncludeQuery()
+    $database.checkProperties()
 
     ## *****************************************************************************************************************
     ##                                                                                                   Global Paramter

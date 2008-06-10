@@ -1,7 +1,10 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
@@ -34,6 +37,54 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final DfFlexibleNameMap<String, Object> flmap = new DfFlexibleNameMap<String, Object>(
                 getSequenceDefinitionMap());
         return (String) flmap.get(flexibleTableName);
+    }
+
+    /**
+     * @param checker The checker for call-back. (NotNull)
+     */
+    public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
+        final Map<String, Object> sequenceDefinitionMap = getSequenceDefinitionMap();
+        final Set<String> keySet = sequenceDefinitionMap.keySet();
+        final List<String> notFoundTableNameList = new ArrayList<String>();
+        for (String tableName : keySet) {
+            if (!checker.hasTable(tableName)) {
+                notFoundTableNameList.add(tableName);
+            }
+        }
+        if (!notFoundTableNameList.isEmpty()) {
+            throwSequenceDefinitionMapNotFoundTableException(notFoundTableNameList);
+        }
+    }
+
+    protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The table name was Not Found in the map of sequence definition!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Not Found Table]" + getLineSeparator();
+        for (String tableName : notFoundTableNameList) {
+            msg = msg + tableName + getLineSeparator();
+        }
+        msg = msg + getLineSeparator();
+        msg = msg + "[Sequence Definition]" + getLineSeparator() + _sequenceDefinitionMap + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new SequenceDefinitionMapTableNotFoundException(msg);
+    }
+
+    public static interface SequenceDefinitionMapChecker {
+        public boolean hasTable(String tableName);
+    }
+
+    public static class SequenceDefinitionMapTableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public SequenceDefinitionMapTableNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 
     // ===================================================================================

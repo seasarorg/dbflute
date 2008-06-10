@@ -82,6 +82,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -333,6 +334,17 @@ public class Database {
 
         result.append("</database>");
         return result.toString();
+    }
+
+    // ===================================================================================
+    //                                                                    Check Properties
+    //                                                                    ================
+    public void checkProperties() {
+        getProperties().getSequenceIdentityProperties().checkSequenceDefinitionMap(new SequenceDefinitionMapChecker() {
+            public boolean hasTable(String tableName) {
+                return getTable(tableName) != null;
+            }
+        });
     }
 
     // ===================================================================================

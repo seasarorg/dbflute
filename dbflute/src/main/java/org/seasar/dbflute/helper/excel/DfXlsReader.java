@@ -204,7 +204,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
         msg = msg + getLineSeparator();
         msg = msg + "[Cell Value]" + getLineSeparator() + value + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg, e);
     }
 
