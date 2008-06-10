@@ -1,0 +1,89 @@
+
+#
+# ConditionBeanのInScopeSubQuery機能検討メモ
+#
+
+【目的】
+existsと同様により良いインターフェースを実現する。
+
+
+【動機】
+ExistsとInScopeは状況によって、使い分ける必要がありそう。
+子テーブルの存在を条件とするExistsとInScopeは結果はまったく同じになるが、
+SQL実行計画は別物になるため、状況によって速い遅いが変化する。
+
+通常は、Existsの方が圧倒的に速いことが多い。
+InScopeだとサブクエリが単独で評価されるため、サブクエリ自体の処理と
+基点テーブルとサブクエリの結果のマージがコストになりやすい。
+
+一方、Existsは基点テーブルドリブンでサブクエリを評価するため、
+評価は繰り返すものの一つ一つの評価は常に基点テーブルのIDで絞られるため、
+インデックスさえしっかり張っておけばコストは非常に少ない。
+
+しかし、基点テーブルの件数が他の条件であまり絞られずに膨大になる場合に限り、
+Existsの処理は非常に高いコストに変化してしまう。
+
+
+【インターフェース案】
+＜A＞
+existsと同じようなメソッドを定義する。
+
+/- - - - - - - - - - - - - - - - - - - - - - - - - - 
+MemberCB cb = new MemberCB();
+cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {
+    public void query(...) {}
+});
+
+　↓
+
+MemberCB cb = new MemberCB();
+cb.query().inPurchaseList(new SubQuery<PurchaseCB>() {
+    public void query(...) {}
+});
+
+ or
+ 
+MemberCB cb = new MemberCB();
+cb.query().inScopePurchaseList(new SubQuery<PurchaseCB>() {
+    public void query(...) {}
+});
+- - - - - - - - - -/
+
+メリット：
+　・わかりやすい(existsと同じ)
+
+デメリット：
+　・メソッドが増える
+
+【補足】
+
+inXxx にするのか、inScopeXxx にするのか迷う！
+
+
+＜B＞
+existsを利用してCBの指定でexistsSubQueryかinScopeSubQueryか選択する。
+この場合のexistsXxxList()は「存在を条件」とする論理的なものとし、
+その実現が「existsSubQueryかinScopeSubQueryか」という扱い。
+
+/- - - - - - - - - - - - - - - - - - - - - - - - - - 
+MemberCB cb = new MemberCB();
+cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {
+    public void query(PurchaseCB subCB) {
+        ...
+    }
+});
+
+　↓
+
+MemberCB cb = new MemberCB();
+cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {
+    public void query(PurchaseCB subCB) {
+        subCB.subQueryAsInScope();
+        ...
+    }
+});
+- - - - - - - - - -/
+
+
+いいや、ダメだなこっちは。
+以下省略。
