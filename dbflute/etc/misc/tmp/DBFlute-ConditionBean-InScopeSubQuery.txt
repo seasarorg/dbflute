@@ -37,13 +37,6 @@ cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {
 　↓
 
 MemberCB cb = new MemberCB();
-cb.query().inPurchaseList(new SubQuery<PurchaseCB>() {
-    public void query(...) {}
-});
-
- or
- 
-MemberCB cb = new MemberCB();
 cb.query().inScopePurchaseList(new SubQuery<PurchaseCB>() {
     public void query(...) {}
 });

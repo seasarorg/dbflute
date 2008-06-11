@@ -1,0 +1,78 @@
+
+#
+# ConditionBeanの子テーブル関数機能検討メモ
+#
+
+【目的】
+子テーブルのSUMやMAXなどを取得できるインターフェースを実現する。
+
+
+【動機】
+子テーブルのSUMやMAXやしょっちゅう欲しい。
+結合条件の相関サブクエリ(FixedCondition利用)でできるけど、
+PostgreSQLやMySQLでしか動かない。
+やはり、Select句で相関サブクエリしかない！
+
+
+【インターフェース案】
+＜A＞
+existsSubQueryと同じようなやり方。
+Entityのプロパティは手動で作成する。
+
+/- - - - - - - - - - - - - - - - - - - - - - - - - - 
+[Java]
+MemberCB cb = new MemberCB();
+cb.query().derivePurchaseList(new FuncMax<PurchaseCB>() {
+    public void query(PurchaseCB subCB) {
+    	subCB.specifyColumn().$PurchaseDatetime();
+        subCB.query().setLogicalDeleteFlg_NotEqual_True();
+    }
+}, "latestPurchaseDatetime");
+
+[SQLのイメージ]
+select dflocal.*
+     , (select max(PURCHASE_DATETIME) 
+          from PURCHASE
+         where PURCHASE.MEMBER_ID = dflocal.MEMBER_ID
+       ) as latestPurchaseDatetime
+  from MEMBER dflocal
+ where ...
+- - - - - - - - - -/
+
+/- - - - - - - - - - - - - - - - - - - - - - - - - -
+[C#] 
+MemberCB cb = new MemberCB();
+cb.Query().DerivePurchaseList(delegate(PurchaseCB subCB) {
+	subCB.SpecifyColumn().$PurchaseDatetime();
+    subCB.Query().SetLogicalDeleteFlg_NotEqual_True();
+}, "latestPurchaseDatetime");
+
+TODO: C#の場合どこでSumとかMaxを表現する！？
+
+[SQLのイメージ]
+select dflocal.*
+     , (select max(PURCHASE_DATETIME) 
+          from PURCHASE
+         where PURCHASE.MEMBER_ID = dflocal.MEMBER_ID
+       ) as latestPurchaseDatetime
+  from MEMBER dflocal
+ where ...
+- - - - - - - - - -/
+
+メリット：
+　・自動生成し直し無しで実装が可能
+
+デメリット：
+　・手動でプロパティを定義する。
+
+
+＜B＞
+Entityのプロパティは手動で作成する。(これは「A」と同じ)
+ビルドプロパティに定義して、該当テーブル・カラムの集計をするメソッドを生成し、
+Entityのプロパティも自動生成。
+
+メリット：
+　・安全
+
+デメリット：
+　・実装に自動生成が必要でフットワーク重い
