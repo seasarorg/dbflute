@@ -19,6 +19,13 @@ PostgreSQLやMySQLでしか動かない。
 existsSubQueryと同じようなやり方。
 Entityのプロパティは手動で作成する。
 
+メリット：
+　・自動生成し直しせずに実装が可能
+
+デメリット：
+　・手動でプロパティを定義する。
+　・コード量が増える。
+
 /- - - - - - - - - - - - - - - - - - - - - - - - - - 
 [Java]
 MemberCB cb = new MemberCB();
@@ -48,8 +55,14 @@ cb.query().maxPurchaseList(new SubQuery<PurchaseCB>() {
 cb.query().derivePurchaseList().max(new SubQuery<PurchaseCB>() {
     ...
 });
-
 ってもあり！？
+
+cb.derivePurchaseList().max(new SubQuery<PurchaseCB>() {
+    ...
+});
+ってもあり！？
+結合先テーブルの子テーブルを集計することはない？
+C#への移植性が高い。
 
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 [C#] 
@@ -58,24 +71,12 @@ cb.Query().DerivePurchaseList(delegate(PurchaseCB subCB) {
 	subCB.SpecifyColumn().ColumnPurchaseDatetime();
     subCB.Query().SetLogicalDeleteFlg_NotEqual_True();
 }, "latestPurchaseDatetime");
-
-TODO: C#の場合どこでSumとかMaxを表現する！？
-
-[SQLのイメージ]
-select dflocal.*
-     , (select max(PURCHASE_DATETIME) 
-          from PURCHASE
-         where PURCHASE.MEMBER_ID = dflocal.MEMBER_ID
-       ) as latestPurchaseDatetime
-  from MEMBER dflocal
- where ...
 - - - - - - - - - -/
 
-メリット：
-　・自動生成し直し無しで実装が可能
-
-デメリット：
-　・手動でプロパティを定義する。
+TODO: C#の場合どこでSumとかMaxを表現する！？
+cb.Query().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {
+    ...
+}, "latestPurchaseDatetime");
 
 
 ＜B＞
@@ -85,9 +86,10 @@ Entityのプロパティも自動生成。
 
 メリット：
 　・安全
+　・コード量が最小限
 
 デメリット：
-　・実装に自動生成が必要でフットワーク重い
+　・実装するのに自動生成が必要でフットワーク重い
 
 
 /- - - - - - - - - - - - - - - - - - - - - - - - - - 
