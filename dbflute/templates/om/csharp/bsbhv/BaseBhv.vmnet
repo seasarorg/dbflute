@@ -75,7 +75,6 @@ namespace ${glPackageExtendedBhv} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${myClassName}() {
-            QuillInjector.GetInstance().Inject(this);
         }
         
         // ===============================================================================
