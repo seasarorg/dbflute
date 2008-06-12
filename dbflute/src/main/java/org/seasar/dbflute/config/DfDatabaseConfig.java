@@ -34,7 +34,7 @@ public class DfDatabaseConfig {
     {
         _databaseBaseInfo = "map:{"
                 + "; derby      = map:{daoGenDbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; h2         = map:{daoGenDbName = H2         ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; h2         = map:{daoGenDbName = H2         ; wildCard = % ; sequenceNextSql = select next value for $$sequenceName$$}"
                 + "; firebird   = map:{daoGenDbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
                 + "; oracle     = map:{daoGenDbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}"
                 + "; mysql      = map:{daoGenDbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}"
