@@ -33,15 +33,15 @@ PKや取得する関連テーブルへのFKは自動取得とする(これは確
 // (但し、PKと関連するFKは取得される)
 MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
-cb.specifyColumn().$MemberAccount();
-cb.specifyColumn().$MemberBirthDay();
-cb.specifyColumn().foreignMemberStatus().$MemberStatusName();
+cb.specifyColumn().columnMemberAccount();
+cb.specifyColumn().columnMemberBirthDay();
+cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // 自テーブルは全部、会員ステータスは名称だけ
 MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
-cb.filterSelect().foreignMemberStatus().columnMemberStatusName();
+cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // もうちょい関連テーブルが多い場合の例
@@ -54,8 +54,8 @@ MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
 cb.setupSelect_MemberSecurityAsOne();
 cb.setupSelect_MemberWithdrawalAsOne().withWithdrawalReason();
-cb.filterSelect().foreignMemberStatus().$MemberStatusName();
-cb.filterSelect().foreignMemberWithdrawalAsOne().foreignWithdrawalReason().$ReasonText();
+cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
+cb.specifyColumn().foreignMemberWithdrawalAsOne().foreignWithdrawalReason().columnReasonText();
 - - - - - - - - - -/
 
 
@@ -81,14 +81,14 @@ cb.filterSelect().foreignMemberWithdrawalAsOne().foreignWithdrawalReason().$Reas
 // 会員アカウント、生年月日、会員ステータス名称
 // (但し、PKと関連するFKは取得される)
 MemberCB cb = new MemberCB();
-cb.select().$MemberAccount();
-cb.select().$MemberBirthDay();
-cb.select().selectMemberStatus().$MemberStatusName();
+cb.select().columnMemberAccount();
+cb.select().columnMemberBirthDay();
+cb.select().selectMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // 自テーブルは全部、会員ステータスは名称だけ
 MemberCB cb = new MemberCB();
-cb.select().selectMemberStatus().$MemberStatusName();
+cb.select().selectMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // もうちょい関連テーブルが多い場合の例
@@ -98,17 +98,17 @@ cb.select().selectMemberStatus().$MemberStatusName();
 // 会員退会情報：全部
 // 退会理由：理由テキストだけ
 MemberCB cb = new MemberCB();
-cb.select().selectMemberStatus().$MemberStatusName();
+cb.select().selectMemberStatus().columnMemberStatusName();
 cb.select().selectMemberSecurityAsOne();
-cb.select().selectMemberWithdrawalAsOne().selectWithdrawalReason().$ReasonText();
+cb.select().selectMemberWithdrawalAsOne().selectWithdrawalReason().columnReasonText();
 
 // これで会員退会情報も絞るとなるこうなる
 // MemberCB cb = new MemberCB();
-// cb.select().selectMemberStatus().$MemberStatusName();
+// cb.select().selectMemberStatus().columnMemberStatusName();
 // cb.select().selectMemberSecurityAsOne();
-// cb.select().selectMemberWithdrawalAsOne().$WithdrawaoInputText();
-// cb.select().selectMemberWithdrawalAsOne().$WithdrawaoInputName();
-// cb.select().selectMemberWithdrawalAsOne().selectWithdrawalReason().$ReasonText();
+// cb.select().selectMemberWithdrawalAsOne().columnWithdrawaoInputText();
+// cb.select().selectMemberWithdrawalAsOne().columnWithdrawaoInputName();
+// cb.select().selectMemberWithdrawalAsOne().selectWithdrawalReason().columnReasonText();
 - - - - - - - - - -/
 
 

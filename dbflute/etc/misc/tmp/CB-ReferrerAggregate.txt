@@ -1,6 +1,6 @@
 
 #
-# ConditionBeanの子テーブル関数機能検討メモ
+# ConditionBeanの「子テーブル集計」機能検討メモ
 #
 
 【目的】
@@ -8,7 +8,7 @@
 
 
 【動機】
-子テーブルのSUMやMAXやしょっちゅう欲しい。
+子テーブルのSUMやMAXなど、しょっちゅう欲しくなる。
 結合条件の相関サブクエリ(FixedCondition利用)でできるけど、
 PostgreSQLやMySQLでしか動かない。
 やはり、Select句で相関サブクエリしかない！
@@ -22,9 +22,9 @@ Entityのプロパティは手動で作成する。
 /- - - - - - - - - - - - - - - - - - - - - - - - - - 
 [Java]
 MemberCB cb = new MemberCB();
-cb.query().derivePurchaseList(new FuncMax<PurchaseCB>() {
+cb.query().derivePurchaseList(new Max<PurchaseCB>() {
     public void query(PurchaseCB subCB) {
-    	subCB.specifyColumn().$PurchaseDatetime();
+    	subCB.specifyColumn().columnPurchaseDatetime();
         subCB.query().setLogicalDeleteFlg_NotEqual_True();
     }
 }, "latestPurchaseDatetime");
@@ -39,11 +39,23 @@ select dflocal.*
  where ...
 - - - - - - - - - -/
 
+TODO: MaxなのかSumなのかを識別する方法をどうする？
+cb.query().maxPurchaseList(new SubQuery<PurchaseCB>() {
+    ...
+});
+ってもあり！？
+
+cb.query().derivePurchaseList().max(new SubQuery<PurchaseCB>() {
+    ...
+});
+
+ってもあり！？
+
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 [C#] 
 MemberCB cb = new MemberCB();
 cb.Query().DerivePurchaseList(delegate(PurchaseCB subCB) {
-	subCB.SpecifyColumn().$PurchaseDatetime();
+	subCB.SpecifyColumn().ColumnPurchaseDatetime();
     subCB.Query().SetLogicalDeleteFlg_NotEqual_True();
 }, "latestPurchaseDatetime");
 
@@ -76,3 +88,23 @@ Entityのプロパティも自動生成。
 
 デメリット：
 　・実装に自動生成が必要でフットワーク重い
+
+
+/- - - - - - - - - - - - - - - - - - - - - - - - - - 
+[Java]
+MemberCB cb = new MemberCB();
+cb.query().derivePurchaseList_Max_PurchaseDatetime(new SubQuery<PurchaseCB>() {
+    public void query(PurchaseCB subCB) {
+        subCB.query().setLogicalDeleteFlg_NotEqual_True();
+    }
+});
+
+[SQLのイメージ]
+select dflocal.*
+     , (select max(PURCHASE_DATETIME) 
+          from PURCHASE
+         where PURCHASE.MEMBER_ID = dflocal.MEMBER_ID
+       ) as latestPurchaseDatetime
+  from MEMBER dflocal
+ where ...
+- - - - - - - - - -/
