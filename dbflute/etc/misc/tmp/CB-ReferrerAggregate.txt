@@ -56,13 +56,14 @@ cb.query().derivePurchaseList().max(new SubQuery<PurchaseCB>() {
     ...
 });
 ってもあり！？
+C#への移植性が高い。
 
 cb.derivePurchaseList().max(new SubQuery<PurchaseCB>() {
     ...
 });
 ってもあり！？
 結合先テーブルの子テーブルを集計することはない？
-C#への移植性が高い。
+
 
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 [C#] 
