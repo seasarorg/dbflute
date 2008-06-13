@@ -29,16 +29,16 @@ Entityのプロパティは手動で作成する。
 /- - - - - - - - - - - - - - - - - - - - - - - - - - 
 [Java]
 MemberCB cb = new MemberCB();
-cb.query().derivePurchaseList(new Max<PurchaseCB>() {
+cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {
     public void query(PurchaseCB subCB) {
-    	subCB.specifyColumn().columnPurchaseDatetime();
+    	subCB.specify().columnPurchaseDatetime();
         subCB.query().setLogicalDeleteFlg_NotEqual_True();
     }
 }, "latestPurchaseDatetime");
 
 [SQLのイメージ]
 select dflocal.*
-     , (select max(PURCHASE_DATETIME) 
+     , (select max(PURCHASE_DATETIME)
           from PURCHASE
          where PURCHASE.MEMBER_ID = dflocal.MEMBER_ID
        ) as latestPurchaseDatetime
@@ -46,38 +46,20 @@ select dflocal.*
  where ...
 - - - - - - - - - -/
 
-TODO: MaxなのかSumなのかを識別する方法をどうする？
-cb.query().maxPurchaseList(new SubQuery<PurchaseCB>() {
-    ...
-});
-ってもあり！？
-
-cb.query().derivePurchaseList().max(new SubQuery<PurchaseCB>() {
-    ...
-});
-ってもあり！？
-C#への移植性が高い。
-
-cb.derivePurchaseList().max(new SubQuery<PurchaseCB>() {
-    ...
-});
-ってもあり！？
-結合先テーブルの子テーブルを集計することはない？
-
+#
+# specify()が実装難しそう。
+# query()なら簡単なのだが、できればspecify()の方が...
+#
 
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 [C#] 
 MemberCB cb = new MemberCB();
-cb.Query().DerivePurchaseList(delegate(PurchaseCB subCB) {
-	subCB.SpecifyColumn().ColumnPurchaseDatetime();
+cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {
+	subCB.Specify().ColumnPurchaseDatetime();
     subCB.Query().SetLogicalDeleteFlg_NotEqual_True();
 }, "latestPurchaseDatetime");
 - - - - - - - - - -/
 
-TODO: C#の場合どこでSumとかMaxを表現する！？
-cb.Query().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {
-    ...
-}, "latestPurchaseDatetime");
 
 
 ＜B＞
@@ -92,6 +74,7 @@ Entityのプロパティも自動生成。
 デメリット：
 　・実装するのに自動生成が必要でフットワーク重い
 
+# まあぁ、「A」かなやっぱり
 
 /- - - - - - - - - - - - - - - - - - - - - - - - - - 
 [Java]

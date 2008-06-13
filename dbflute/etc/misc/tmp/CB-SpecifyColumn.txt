@@ -33,15 +33,15 @@ PKや取得する関連テーブルへのFKは自動取得とする(これは確
 // (但し、PKと関連するFKは取得される)
 MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
-cb.specifyColumn().columnMemberAccount();
-cb.specifyColumn().columnMemberBirthDay();
-cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
+cb.specify().columnMemberAccount();
+cb.specify().columnMemberBirthDay();
+cb.specify().foreignMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // 自テーブルは全部、会員ステータスは名称だけ
 MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
-cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
+cb.specify().foreignMemberStatus().columnMemberStatusName();
 - - - - - - - - - -/
 /- - - - - - - - - - - - - - - - - - - - - - - - - -
 // もうちょい関連テーブルが多い場合の例
@@ -54,8 +54,8 @@ MemberCB cb = new MemberCB();
 cb.setupSelect_MemberStatus();
 cb.setupSelect_MemberSecurityAsOne();
 cb.setupSelect_MemberWithdrawalAsOne().withWithdrawalReason();
-cb.specifyColumn().foreignMemberStatus().columnMemberStatusName();
-cb.specifyColumn().foreignMemberWithdrawalAsOne().foreignWithdrawalReason().columnReasonText();
+cb.specify().foreignMemberStatus().columnMemberStatusName();
+cb.specify().foreignMemberWithdrawalAsOne().foreignWithdrawalReason().columnReasonText();
 - - - - - - - - - -/
 
 
