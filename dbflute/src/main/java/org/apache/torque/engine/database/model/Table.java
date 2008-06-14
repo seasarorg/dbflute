@@ -1467,28 +1467,56 @@ public class Table implements IDMethod {
     // -----------------------------------------------------
     //                                               Arrange
     //                                               -------
-    protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
+    protected java.util.List<ForeignKey> _singleKeyReferrers = null;
 
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
     }
 
     public List<ForeignKey> getSingleKeyReferrers() {
-        if (_singleKeyRefferrers != null) {
-            return _singleKeyRefferrers;
+        if (_singleKeyReferrers != null) {
+            return _singleKeyReferrers;
         }
-        _singleKeyRefferrers = new ArrayList<ForeignKey>(5);
+        _singleKeyReferrers = new ArrayList<ForeignKey>(5);
         if (!hasReferrer()) {
-            return _singleKeyRefferrers;
+            return _singleKeyReferrers;
         }
-        final List<ForeignKey> reffererList = getReferrers();
-        for (ForeignKey refferer : reffererList) {
-            if (!refferer.isSimpleKeyFK()) {
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isSimpleKeyFK()) {
                 continue;
             }
-            _singleKeyRefferrers.add(refferer);
+            _singleKeyReferrers.add(referrer);
         }
-        return _singleKeyRefferrers;
+        return _singleKeyReferrers;
+    }
+    
+    protected java.util.List<ForeignKey> _singleKeyStringOrIntegerReferrers = null;
+
+    public boolean hasSingleKeyStringOrIntegerReferrer() {
+        return !getSingleKeyStringOrIntegerReferrers().isEmpty();
+    }
+
+    public List<ForeignKey> getSingleKeyStringOrIntegerReferrers() {
+        if (_singleKeyStringOrIntegerReferrers != null) {
+            return _singleKeyStringOrIntegerReferrers;
+        }
+        _singleKeyStringOrIntegerReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _singleKeyStringOrIntegerReferrers;
+        }
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isSimpleKeyFK()) {
+                continue;
+            }
+            Column localColumn = referrer.getLocalColumnAsOne();
+            if (!(localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())) {
+                continue;
+            }
+            _singleKeyStringOrIntegerReferrers.add(referrer);
+        }
+        return _singleKeyStringOrIntegerReferrers;
     }
 
     public String getReferrerTableNameCommaString() {

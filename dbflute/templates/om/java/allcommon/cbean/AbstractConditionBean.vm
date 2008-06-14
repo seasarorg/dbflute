@@ -39,8 +39,11 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /** The config of statement. (Nullable) */
 	protected ${glStatementConfig} _statementConfig;
 
+    // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
 	protected boolean _forDeriveReferrer;
 	protected boolean _forUnion;
+	protected boolean _forExistsSubQuery;
+	protected boolean _forInScopeSubQuery;
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -522,31 +525,39 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected static abstract class AbstractSpecification {
+    protected static abstract class AbstractSpecification<CQ extends ${glConditionQueryInterfaceName}> {
         protected ${glConditionBeanInterfaceName} _baseCB;
-    	protected ${glConditionQueryInterfaceName} _query;
+    	protected SpQyCall<CQ> _qyCall;
+        protected CQ _query;
         protected boolean _forDeriveReferrer;
         protected boolean alreadySpecifyRequiredColumn;
 		/**
 		 * @param baseCB The condition-bean of base level. (NotNull)
 		 * @param query The condition-query of current level. (Nullable: if it's null, this instance is for deriving only.)
 		 */
-		protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, ${glConditionQueryInterfaceName} query, boolean forDeriveReferrer) {
+		protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, boolean forDeriveReferrer) {
             _baseCB = baseCB;
-            _query = query;
+            _qyCall = qyCall;
             _forDeriveReferrer = forDeriveReferrer;
 		}
 		protected void doColumn(String columnName) {
 		    assertColumn(columnName);
+		    if (_query == null) { _query = _qyCall.qy(); }
             if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
                 alreadySpecifyRequiredColumn = true;
 			    doSpecifyRequiredColumn();
 			}
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
-			_baseCB.getSqlClause().specifySelectColumn(columnName, relationPath, columnName + relationPath);
+			final String tableAliasName;
+			if (_query.isBaseQuery(_query)) {
+			    tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
+			} else {
+			    tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.getNestLevel());
+			}
+			_baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName);
 		}
 		protected void assertColumn(String columnName) {
-		    if (_query == null) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+		    if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
 		}
 		protected void assertForeign(String foreignPropertyName) {
 		    if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
@@ -619,6 +630,11 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
 	}
+	
+    protected static interface SpQyCall<CQ extends ${glConditionQueryInterfaceName}> {
+        public boolean has(); 
+        public CQ qy(); 
+    }
 	
     public static class SpecifyColumnNotSetupSelectColumnException extends RuntimeException {
 	    private static final long serialVersionUID = 1L;
@@ -906,15 +922,24 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	    return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
 	}
 	
+    // [DBFlute-0.7.4]
     // ===================================================================================
-    //                                                                          Constraint
-    //                                                                          ==========
+    //                                                                        Purpose Type
+    //                                                                        ============
     public void xsetupForDeriveReferrer() {
         _forDeriveReferrer = true;
     }
 
     public void xsetupForUnion() {
         _forUnion = true;
+    }
+
+    public void xsetupForExistsSubQuery() {
+        _forExistsSubQuery = true;
+    }
+
+    public void xsetupForInScopeSubQuery() {
+        _forInScopeSubQuery = true;
     }
 
     // ===================================================================================

@@ -459,7 +459,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    public void specifySelectColumn(String columnName, String relationPath, String columnKey);
+    public void specifySelectColumn(String tableAliasName, String columnName);
     public void specifyDeriveSubQuery(String deriveSubQuery);
     public String getSpecifiedColumnNameAsOne();
     public void clearSpecifiedSelectColumn();

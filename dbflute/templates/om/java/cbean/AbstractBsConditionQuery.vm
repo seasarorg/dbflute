@@ -220,7 +220,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
     public void inScope${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -250,7 +250,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void exists${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -414,7 +414,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
     public void inScope${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -443,7 +443,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void exists${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
