@@ -62,10 +62,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #foreach ($col in $table.columns)
 #if ($database.isMakeDeprecated())
     /** @deprecated */
-    public void includeAsMine_${col.JavaName}() { registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}")); }
-#end
-#if ($database.isMakeRecentlyDeprecated())
-    /** @deprecated */
     public void includeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
 #end
 #end

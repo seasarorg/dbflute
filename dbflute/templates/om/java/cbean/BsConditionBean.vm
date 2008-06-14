@@ -281,7 +281,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derive${tmpPropertyNameInitCap}() {
-            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_myQuery, new RAQSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() { public void setup(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } });
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQuery, new RAQSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() { public void setup(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } });
         }
 #end
 #end

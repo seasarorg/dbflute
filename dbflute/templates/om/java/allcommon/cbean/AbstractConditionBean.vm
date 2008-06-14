@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glConditionBeanAbstractName}")
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Method;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -10,6 +11,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
@@ -521,7 +523,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                                             Specify
     //                                                                             =======
     protected static abstract class AbstractSpecification {
-    	protected ${glConditionBeanInterfaceName} _baseCB;
+        protected ${glConditionBeanInterfaceName} _baseCB;
     	protected ${glConditionQueryInterfaceName} _query;
         protected boolean _forDeriveReferrer;
         protected boolean alreadySpecifyRequiredColumn;
@@ -558,7 +560,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "You specified the column that had Not been Set up!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + " You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
+            msg = msg + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
@@ -586,7 +588,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + " You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
@@ -633,9 +635,11 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     }
 
 	public static class RAFunction<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+        protected ${glConditionBeanInterfaceName} _baseCB;
 		protected LOCAL_CQ _localCQ;
 		protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
-	    public RAFunction(LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+	    public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+		    _baseCB = baseCB;
 		    _localCQ = localCQ;
 		    _querySetupper = querySetupper;
 		}
@@ -664,6 +668,22 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             if (aliasName == null || aliasName.trim().length() == 0) {
                 throwDeriveReferrerInvalidAliasNameException();
             }
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_baseCB.getTableDbName());
+            Method[] methods = dbmeta.getEntityType().getMethods();
+            String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
+            boolean existsSetterMethod = false;
+            for (Method method : methods) {
+                if (!method.getName().startsWith("set")) {
+                    continue;
+                }
+                if (targetMethodName.equals(method.getName().toLowerCase())) {
+                    existsSetterMethod = true;
+                    break;
+                }
+            }
+            if (!existsSetterMethod) {
+		        throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+		    }
 		}
         protected void throwDeriveReferrerInvalidAliasNameException() {
             String msg = "Look! Read the message below." + getLineSeparator();
@@ -671,7 +691,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "The alias name for derive-sub-query was Invalid!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + " You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
+            msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
@@ -698,6 +718,47 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "* * * * * * * * * */";
             throw new DeriveReferrerInvalidAliasNameException(msg);
         }
+        protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "A property for derive-sub-query was Not Found in the entity!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();
+            msg = msg + "Or you should confirm whether the alias name has typo or not." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [ConditionBean Invoking]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Extended Entity]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    // At the entity of Purchase..." + getLineSeparator();
+            msg = msg + "    protected Date _latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    public Date getLatestPurchaseDatetime() {" + getLineSeparator();
+            msg = msg + "        return _latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    }" + getLineSeparator();
+            msg = msg + "    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {" + getLineSeparator();
+            msg = msg + "        _latestPurchaseDatetime = latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    }" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerEntityPropertyNotFoundException(msg);
+        }
+        protected String replaceString(String text, String fromText, String toText) {
+	        return ${glSimpleStringUtil}.replace(text, fromText, toText);
+        }
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
@@ -710,6 +771,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public static class DeriveReferrerInvalidAliasNameException extends RuntimeException {
 	    private static final long serialVersionUID = 1L;
 	    public DeriveReferrerInvalidAliasNameException(String msg) {
+            super(msg);
+        }
+    }
+	
+    public static class DeriveReferrerEntityPropertyNotFoundException extends RuntimeException {
+	    private static final long serialVersionUID = 1L;
+	    public DeriveReferrerEntityPropertyNotFoundException(String msg) {
             super(msg);
         }
     }
