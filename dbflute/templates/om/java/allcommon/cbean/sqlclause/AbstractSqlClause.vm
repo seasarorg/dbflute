@@ -1377,7 +1377,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
-            return elementMap.get(elementMap.keySet().iterator().next());
+            if (elementMap != null && elementMap.size() == 1) {
+                return elementMap.keySet().iterator().next();
+            }
         }
         return null;
     }
