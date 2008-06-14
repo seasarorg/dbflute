@@ -1,8 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glConditionBeanAbstractName}")
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -18,7 +18,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The condition-bean as abstract.
- * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} {
@@ -38,12 +37,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /** The config of statement. (Nullable) */
 	protected ${glStatementConfig} _statementConfig;
 
+	protected boolean _forDeriveReferrer;
+	protected boolean _forUnion;
+
     // ===================================================================================
     //                                                                           SqlClause
     //                                                                           =========
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql clause. (NotNull)
      */
     public ${glSqlClauseName} getSqlClause() {
@@ -515,6 +516,204 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         return _isSelectCountIgnoreFetchScope;
     }
 	
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    protected static abstract class AbstractSpecification {
+    	protected ${glConditionBeanInterfaceName} _baseCB;
+    	protected ${glConditionQueryInterfaceName} _query;
+        protected boolean _forDeriveReferrer;
+        protected boolean alreadySpecifyRequiredColumn;
+		/**
+		 * @param baseCB The condition-bean of base level. (NotNull)
+		 * @param query The condition-query of current level. (Nullable: if it's null, this instance is for deriving only.)
+		 */
+		protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, ${glConditionQueryInterfaceName} query, boolean forDeriveReferrer) {
+            _baseCB = baseCB;
+            _query = query;
+            _forDeriveReferrer = forDeriveReferrer;
+		}
+		protected void doColumn(String columnName) {
+		    assertColumn(columnName);
+            if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
+                alreadySpecifyRequiredColumn = true;
+			    doSpecifyRequiredColumn();
+			}
+            String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
+			_baseCB.getSqlClause().specifySelectColumn(columnName, relationPath, columnName + relationPath);
+		}
+		protected void assertColumn(String columnName) {
+		    if (_query == null) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+		}
+		protected void assertForeign(String foreignPropertyName) {
+		    if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+		}
+        protected abstract void doSpecifyRequiredColumn();
+        protected abstract String getTableDbName();
+        
+        protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified the column that had Not been Set up!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + " You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName(); // *No!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.setupSelect_MemberStatus(); // *Point!" + getLineSeparator();
+            msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName();" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.getClass().getName() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Column]" + getLineSeparator() + getTableDbName() + "." + columnName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new SpecifyColumnNotSetupSelectColumnException(msg);
+        }
+        protected void throwDeriveReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + " You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerInvalidForeignSpecificationException(msg);
+        }
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.getLineSeparator();
+        }
+	}
+	
+    public static class SpecifyColumnNotSetupSelectColumnException extends RuntimeException {
+	    private static final long serialVersionUID = 1L;
+	    public SpecifyColumnNotSetupSelectColumnException(String msg) {
+            super(msg);
+        }
+    }
+	
+    public static class DeriveReferrerInvalidForeignSpecificationException extends RuntimeException {
+	    private static final long serialVersionUID = 1L;
+	    public DeriveReferrerInvalidForeignSpecificationException(String msg) {
+            super(msg);
+        }
+    }
+
+	public static class RAFunction<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+		protected LOCAL_CQ _localCQ;
+		protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+	    public RAFunction(LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+		    _localCQ = localCQ;
+		    _querySetupper = querySetupper;
+		}
+		public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
+		}
+		public void min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
+		}
+		public void sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
+		}
+		public void avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
+		}
+		public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+			assertAliasName(aliasName);
+            _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
+		}
+
+		protected void assertAliasName(String aliasName) {
+            if (aliasName == null || aliasName.trim().length() == 0) {
+                throwDeriveReferrerInvalidAliasNameException();
+            }
+		}
+        protected void throwDeriveReferrerInvalidAliasNameException() {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The alias name for derive-sub-query was Invalid!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + " You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\"); // *Point!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerInvalidAliasNameException(msg);
+        }
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.getLineSeparator();
+        }
+	}
+
+	public static interface RAQSetupper<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+	    public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+	}
+	
+    public static class DeriveReferrerInvalidAliasNameException extends RuntimeException {
+	    private static final long serialVersionUID = 1L;
+	    public DeriveReferrerInvalidAliasNameException(String msg) {
+            super(msg);
+        }
+    }
+
     // =====================================================================================
     //                                                                      Statement Config
     //                                                                      ================
@@ -542,7 +741,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isFormatSql() {
 	    return getSqlClause().isFormatClauseEffective();
 	}
-	
+
 	// ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
@@ -627,7 +826,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
-    
+
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
@@ -639,6 +838,17 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	    return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
 	}
 	
+    // ===================================================================================
+    //                                                                          Constraint
+    //                                                                          ==========
+    public void xsetupForDeriveReferrer() {
+        _forDeriveReferrer = true;
+    }
+
+    public void xsetupForUnion() {
+        _forUnion = true;
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

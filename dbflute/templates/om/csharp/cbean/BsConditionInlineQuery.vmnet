@@ -87,7 +87,8 @@ namespace ${glPackageCIQ} {
         }
       #end
       #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
+        #foreach ($refferer in $col.singleKeyReferrers)
+		#if (${referrer.isOneToOne()})
           #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
@@ -96,9 +97,11 @@ namespace ${glPackageCIQ} {
             _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
         #end
+        #end
       #end
       #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
+        #foreach ($refferer in $col.singleKeyReferrers)
+		#if (${referrer.isOneToOne()})
           #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
@@ -107,6 +110,7 @@ namespace ${glPackageCIQ} {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
+        #end
         #end
       #end
     #end
@@ -121,7 +125,8 @@ namespace ${glPackageCIQ} {
         }
       #end
       #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
+        #foreach ($refferer in $col.singleKeyReferrers)
+		#if (${referrer.isOneToOne()})
           #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
@@ -130,9 +135,11 @@ namespace ${glPackageCIQ} {
             _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
         #end
+        #end
       #end
       #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
+        #foreach ($refferer in $col.singleKeyReferrers)
+		#if (${referrer.isOneToOne()})
           #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
@@ -141,6 +148,7 @@ namespace ${glPackageCIQ} {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
+        #end
         #end
       #end
     #end

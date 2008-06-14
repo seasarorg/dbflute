@@ -454,4 +454,13 @@ public interface ${myClassName} {
     public String resolveSubQueryBeginMark(String subQueryIdentity);
     public String resolveSubQueryEndMark(String subQueryIdentity);
     public String filterSubQueryIndent(String sql);
+	
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                       Specification
+    //                                                                       =============
+    public void specifySelectColumn(String columnName, String relationPath, String columnKey);
+    public void specifyDeriveSubQuery(String deriveSubQuery);
+    public String getSpecifiedColumnNameAsOne();
+    public void clearSpecifiedSelectColumn();
 }

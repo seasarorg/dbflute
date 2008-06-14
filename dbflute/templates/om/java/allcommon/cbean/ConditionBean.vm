@@ -50,7 +50,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                           =========
     /**
      * Get SQL-clause instance.
-     * 
      * @return SQL-clause. (NotNull)
      */
     public ${glSqlClauseName} getSqlClause();

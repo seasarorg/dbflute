@@ -26,7 +26,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The abstract class of SqlClause.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
@@ -51,6 +50,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	/** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}}*/
     protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
     
+    /** Specified select column map. */
+    protected Map<String, Map<String, String>> _specifiedSelectColumnMap;// [DBFlute-0.7.4]
+    
+    /** Specified derive sub-query map. */
+    protected Map<String, String> _specifiedDeriveSubQueryMap;// [DBFlute-0.7.4]
+
     /** Included select column map. */
     protected Map<String, String> _includedSelectColumnMap = new LinkedHashMap<String, String>();
 
@@ -193,7 +198,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append(buildUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
 	}
-	
+
     protected String buildUnionClause(String selectClause) {
         final StringBuilder sb = new StringBuilder();
         for (final Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
@@ -219,8 +224,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	    final StringBuilder sb = new StringBuilder();
 		final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
 		final List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
+
+        // [DBFlute-0.7.4]
+        final boolean existsSpecified = _specifiedSelectColumnMap != null && !_specifiedSelectColumnMap.isEmpty();
+
 		for (${glColumnInfoName} columnInfo : columnInfoList) {
 		    final String columnName = columnInfo.getColumnDbName();
+			
+            // [DBFlute-0.7.4]
+            if (existsSpecified && !_specifiedSelectColumnMap.containsKey(columnName)) {
+                continue;
+            }
+
 			if (sb.length() > 0) {
 			    sb.append(", ");
 			} else {
@@ -236,6 +251,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 			final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
 			for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
 			    final String realColumnName = selectColumnInfo.buildRealColumnName();
+
+                // [DBFlute-0.7.4]
+                if (existsSpecified && !_specifiedSelectColumnMap.containsKey(selectColumnInfo.getColumnAliasName())) {
+                    continue;
+                }
+
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
 				_selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
 			}
@@ -243,6 +264,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
 		    sb.append(getIncludedSelectColumnClause());
 		}
+		
+        // [DBFlute-0.7.4]
+		if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
+            final Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            for (String deriveSubQuery : deriveSubQuerySet) {
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator()).append("     ");
+                }
+                sb.append(", ").append(deriveSubQuery);
+            }
+		}
+
 		return sb.toString();
 	}
 	
@@ -265,6 +298,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
 		    sb.append(getIncludedSelectColumnClause());
 		}
+
+        // [DBFlute-0.7.4]
+		if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
+            final Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            for (String deriveSubQuery : deriveSubQuerySet) {
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator()).append("     ");
+                }
+                sb.append(", ").append(deriveSubQuery);
+            }
+		}
+
 		return sb.toString();
 	}
 	
@@ -1298,6 +1343,38 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         public SubQueryIndentFailureException(String msg) {
             super(msg);
         }
+    }
+
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                       Specification
+    //                                                                       =============
+    public void specifySelectColumn(String columnName, String relationPath, String columnKey) {
+        if (_specifiedSelectColumnMap == null) {
+            _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>();
+        }
+        Map<String, String> elementMap = new HashMap<String, String>();
+        elementMap.put("columnName", columnName);
+        elementMap.put("relationPath", relationPath);
+        _specifiedSelectColumnMap.put(columnKey, elementMap);// The value is dummy for extension at the future.
+    }
+
+    public void specifyDeriveSubQuery(String deriveSubQuery) {
+        if (_specifiedDeriveSubQueryMap == null) {
+            _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
+        }
+        _specifiedDeriveSubQueryMap.put(deriveSubQuery, null);// The value is dummy for extension at the future.
+    }
+	
+    public String getSpecifiedColumnNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            return _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next()).get("columnName");
+        }
+        return null;
+    }
+
+    public void clearSpecifiedSelectColumn() {
+        if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
     }
 
     // ===================================================================================

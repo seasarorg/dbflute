@@ -8,6 +8,7 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCQ}.*;
+import ${glPackageCQ}.*;
 
 /**
  * The condition-inline-query of ${table.name}.
@@ -83,28 +84,45 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         return _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         return _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
 #end
 #end
+#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
     }
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+    }
+#end
 #end
 #end
 #end
@@ -113,30 +131,49 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         return _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         return _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
 #end
 #end
+#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
     }
 #end
 #end
 #end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+    }
 #end
+#end
+#end
+#end
+#end
+
+    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
 }

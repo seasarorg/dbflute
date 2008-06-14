@@ -129,7 +129,8 @@ namespace ${glPackageBaseCQ} {
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
     #end
     #if (${col.hasSingleKeyReferrer()})
-      #foreach ($referrer in $col.SingleKeyReferrers)
+      #foreach ($referrer in $col.singleKeyReferrers)
+	  #if (${referrer.isOneToOne()})
         #set ($relatedCQClassName = "${glProjectPrefix}${referrer.Table.JavaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
@@ -142,9 +143,11 @@ namespace ${glPackageBaseCQ} {
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
       #end
+      #end
     #end
     #if (${col.hasSingleKeyReferrer()})
-      #foreach ($referrer in $col.SingleKeyReferrers)
+      #foreach ($referrer in $col.singleKeyReferrers)
+	  #if (${referrer.isOneToOne()})
         #set ($relatedCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
         #set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
@@ -161,6 +164,7 @@ namespace ${glPackageBaseCQ} {
             Set${subQueryPropertyNameInitCap}(cb.Query());
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+      #end
       #end
     #end
   #end
@@ -239,6 +243,7 @@ namespace ${glPackageBaseCQ} {
     #end
     #if (${col.hasSingleKeyReferrer()})
       #foreach ($referrer in $col.SingleKeyReferrers)
+	  #if (${referrer.isOneToOne()})
         #set ($relatedCQClassName = "${glProjectPrefix}${referrer.Table.JavaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
@@ -251,9 +256,11 @@ namespace ${glPackageBaseCQ} {
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
       #end
+      #end
     #end
     #if (${col.hasSingleKeyReferrer()})
       #foreach ($referrer in $col.singleKeyReferrers)
+	  #if (${referrer.isOneToOne()})
         #set ($relatedCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
         #set ($relatedCQClassName = "${glProjectPrefix}${referrer.Table.JavaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
@@ -270,6 +277,7 @@ namespace ${glPackageBaseCQ} {
             Set${subQueryPropertyNameInitCap}(cb.Query());
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+      #end
       #end
     #end
   #end

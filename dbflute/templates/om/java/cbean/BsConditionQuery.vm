@@ -61,18 +61,21 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // 
 #foreach ($col in $table.columns)
 #if ($database.isMakeDeprecated())
-    /** @deprecated Please Use includeAsMine_${col.JavaName}(String aliasName).*/
+    /** @deprecated */
     public void includeAsMine_${col.JavaName}() { registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}")); }
 #end
+#if ($database.isMakeRecentlyDeprecated())
+    /** @deprecated */
     public void includeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
+#end
 #end
 
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-  #foreach ($col in $table.columns)
-    #set ($tmpJavaName = "${col.JavaName}")
-    #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+#foreach ($col in $table.columns)
+#set ($tmpJavaName = "${col.JavaName}")
+#set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
     protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
     public ${glConditionValueName} get${tmpJavaName}() {
@@ -80,12 +83,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _${tmpUncapitalisedJavaName};
     }
     protected ${glConditionValueName} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
-    #if (${col.isJavaNativeStringObject()})
-      #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
-        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#if (${col.isJavaNativeStringObject()})
+#if (${col.isSingleKeyForeignKey()})
+#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
     public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
@@ -97,13 +100,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
-      #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
     public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
@@ -115,14 +119,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
-        #end
-      #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
     public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
@@ -134,9 +140,32 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
-        #end
-      #end
-    #end
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
+    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+#end
+#end
+#end
+#end
     #if (${col.isJavaNativeNumberObject()})
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
@@ -155,12 +184,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return "${subQueryPropertyName}." + key;
     }
       #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReffererPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
     public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
@@ -172,14 +202,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
-        #end
-      #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.singleKeyReferrers)
-          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#end
+#end
+#end
+  #if (${col.hasSingleKeyReferrer()})
+    #foreach ($referrer in $col.singleKeyReferrers)
+	#if (!${referrer.isOneToOne()})
+      #set ($relatedCQClassName = "${referrer.refererTableExtendedConditionQueryClassName}")
+      #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
+      #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.ReffererPropertyNameInitCap}")
+      #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
     public Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
@@ -191,8 +223,31 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _${subQueryPropertyName}Map.put(key, subQuery);
         return "${subQueryPropertyName}." + key;
     }
-        #end
-      #end
+    #end
+    #end
+  #end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
+    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+#end
+#end
+#end
     #end
     #if (${col.isJavaNativeDateObject()})
     #end
