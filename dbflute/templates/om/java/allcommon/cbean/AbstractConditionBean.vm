@@ -35,15 +35,15 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
-	
+    
     /** The config of statement. (Nullable) */
-	protected ${glStatementConfig} _statementConfig;
+    protected ${glStatementConfig} _statementConfig;
 
     // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
-	protected boolean _forDeriveReferrer;
-	protected boolean _forUnion;
-	protected boolean _forExistsSubQuery;
-	protected boolean _forInScopeSubQuery;
+    protected boolean _forDeriveReferrer;
+    protected boolean _forUnion;
+    protected boolean _forExistsSubQuery;
+    protected boolean _forInScopeSubQuery;
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -169,14 +169,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                        --------------
     /**
      * ${database.ImplementComment}
-	 * @param pageSize The page size per one page. (NotMinus & NotZero)
-	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
+     * @param pageSize The page size per one page. (NotMinus & NotZero)
+     * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      */
     public void paging(int pageSize, int pageNumber) {
         fetchFirst(pageSize);
         fetchPage(pageNumber);
     }
-	
+    
     /**
      * ${database.ImplementComment}
      * @param paging Determination.
@@ -469,7 +469,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         getSqlClause().lockForUpdate();
         return this;
     }
-	
+    
     // ===================================================================================
     //                                                                        Select Count
     //                                                                        ============
@@ -520,48 +520,48 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
     }
-	
+    
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
     protected static abstract class AbstractSpecification<CQ extends ${glConditionQueryInterfaceName}> {
         protected ${glConditionBeanInterfaceName} _baseCB;
-    	protected SpQyCall<CQ> _qyCall;
+        protected SpQyCall<CQ> _qyCall;
         protected CQ _query;
         protected boolean _forDeriveReferrer;
         protected boolean alreadySpecifyRequiredColumn;
-		/**
-		 * @param baseCB The condition-bean of base level. (NotNull)
-		 * @param query The condition-query of current level. (Nullable: if it's null, this instance is for deriving only.)
-		 */
-		protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, boolean forDeriveReferrer) {
+        /**
+         * @param baseCB The condition-bean of base level. (NotNull)
+         * @param query The condition-query of current level. (Nullable: if it's null, this instance is for deriving only.)
+         */
+        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, boolean forDeriveReferrer) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDeriveReferrer = forDeriveReferrer;
-		}
-		protected void doColumn(String columnName) {
-		    assertColumn(columnName);
-		    if (_query == null) { _query = _qyCall.qy(); }
+        }
+        protected void doColumn(String columnName) {
+            assertColumn(columnName);
+            if (_query == null) { _query = _qyCall.qy(); }
             if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
                 alreadySpecifyRequiredColumn = true;
-			    doSpecifyRequiredColumn();
-			}
+                doSpecifyRequiredColumn();
+            }
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
-			final String tableAliasName;
-			if (_query.isBaseQuery(_query)) {
-			    tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
-			} else {
-			    tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.getNestLevel());
-			}
-			_baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName);
-		}
-		protected void assertColumn(String columnName) {
-		    if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
-		}
-		protected void assertForeign(String foreignPropertyName) {
-		    if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
-		}
+            final String tableAliasName;
+            if (_query.isBaseQuery(_query)) {
+                tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
+            } else {
+                tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.getNestLevel());
+            }
+            _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName);
+        }
+        protected void assertColumn(String columnName) {
+            if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+        }
+        protected void assertForeign(String foreignPropertyName) {
+            if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+        }
         protected abstract void doSpecifyRequiredColumn();
         protected abstract String getTableDbName();
         
@@ -629,58 +629,58 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
-	}
-	
+    }
+    
     protected static interface SpQyCall<CQ extends ${glConditionQueryInterfaceName}> {
         public boolean has(); 
         public CQ qy(); 
     }
-	
+    
     public static class SpecifyColumnNotSetupSelectColumnException extends RuntimeException {
-	    private static final long serialVersionUID = 1L;
-	    public SpecifyColumnNotSetupSelectColumnException(String msg) {
+        private static final long serialVersionUID = 1L;
+        public SpecifyColumnNotSetupSelectColumnException(String msg) {
             super(msg);
         }
     }
-	
+    
     public static class DeriveReferrerInvalidForeignSpecificationException extends RuntimeException {
-	    private static final long serialVersionUID = 1L;
-	    public DeriveReferrerInvalidForeignSpecificationException(String msg) {
+        private static final long serialVersionUID = 1L;
+        public DeriveReferrerInvalidForeignSpecificationException(String msg) {
             super(msg);
         }
     }
 
-	public static class RAFunction<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+    public static class RAFunction<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
         protected ${glConditionBeanInterfaceName} _baseCB;
-		protected LOCAL_CQ _localCQ;
-		protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
-	    public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
-		    _baseCB = baseCB;
-		    _localCQ = localCQ;
-		    _querySetupper = querySetupper;
-		}
-		public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+        protected LOCAL_CQ _localCQ;
+        protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+        public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+            _baseCB = baseCB;
+            _localCQ = localCQ;
+            _querySetupper = querySetupper;
+        }
+        public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
-		}
-		public void min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+        }
+        public void min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
-		}
-		public void sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+        }
+        public void sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
-		}
-		public void avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+        }
+        public void avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
-		}
-		public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-			assertAliasName(aliasName);
+        }
+        public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
             _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
-		}
+        }
 
-		protected void assertAliasName(String aliasName) {
+        protected void assertAliasName(String aliasName) {
             if (aliasName == null || aliasName.trim().length() == 0) {
                 throwDeriveReferrerInvalidAliasNameException();
             }
@@ -698,9 +698,9 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
                 }
             }
             if (!existsSetterMethod) {
-		        throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
-		    }
-		}
+                throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+            }
+        }
         protected void throwDeriveReferrerInvalidAliasNameException() {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -773,27 +773,27 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             throw new DeriveReferrerEntityPropertyNotFoundException(msg);
         }
         protected String replaceString(String text, String fromText, String toText) {
-	        return ${glSimpleStringUtil}.replace(text, fromText, toText);
+            return ${glSimpleStringUtil}.replace(text, fromText, toText);
         }
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
-	}
+    }
 
-	public static interface RAQSetupper<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
-	    public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
-	}
-	
+    public static interface RAQSetupper<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+        public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+    }
+    
     public static class DeriveReferrerInvalidAliasNameException extends RuntimeException {
-	    private static final long serialVersionUID = 1L;
-	    public DeriveReferrerInvalidAliasNameException(String msg) {
+        private static final long serialVersionUID = 1L;
+        public DeriveReferrerInvalidAliasNameException(String msg) {
             super(msg);
         }
     }
-	
+    
     public static class DeriveReferrerEntityPropertyNotFoundException extends RuntimeException {
-	    private static final long serialVersionUID = 1L;
-	    public DeriveReferrerEntityPropertyNotFoundException(String msg) {
+        private static final long serialVersionUID = 1L;
+        public DeriveReferrerEntityPropertyNotFoundException(String msg) {
             super(msg);
         }
     }
@@ -804,29 +804,29 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /**
      * @param statementConfig The config of statement. (Nullable)
      */
-	public void configure(${glStatementConfig} statementConfig) {
-	    _statementConfig = statementConfig;
-	}
-	
+    public void configure(${glStatementConfig} statementConfig) {
+        _statementConfig = statementConfig;
+    }
+    
     /**
      * @return The config of statement. (Nullable)
      */
-	public ${glStatementConfig} getStatementConfig() {
-	    return _statementConfig;
-	}
-	
+    public ${glStatementConfig} getStatementConfig() {
+        return _statementConfig;
+    }
+    
     // ===================================================================================
     //                                                                          Format SQL
     //                                                                          ==========
-	public void formatSql() {
-	    getSqlClause().makeFormatClauseEffective();
-	}
-	
+    public void formatSql() {
+        getSqlClause().makeFormatClauseEffective();
+    }
+    
     public boolean isFormatSql() {
-	    return getSqlClause().isFormatClauseEffective();
-	}
+        return getSqlClause().isFormatClauseEffective();
+    }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected void doSetupSelect(SsCall callback) {
@@ -843,7 +843,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         public ${glConditionQueryInterfaceName} qf();
     }
     
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
@@ -899,12 +899,12 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new IllegalStateException(msg);
     }
-	
+    
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(String str) {
-	    return ${glSimpleStringUtil}.initCap(str);
+        return ${glSimpleStringUtil}.initCap(str);
     }
     
     protected String getLineSeparator() {
@@ -914,14 +914,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
-	/**
-	 * Convert this conditionBean to SQL for display.
-	 * @return SQL for display. (NotNull and NotEmpty)
-	 */
-	public String toDisplaySql() {
-	    return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
-	}
-	
+    /**
+     * Convert this conditionBean to SQL for display.
+     * @return SQL for display. (NotNull and NotEmpty)
+     */
+    public String toDisplaySql() {
+        return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
+    }
+    
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                        Purpose Type
@@ -950,10 +950,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * @return SQL for display. (NotNull)
      */
     public String toString() {
-	    try {
+        try {
             return toDisplaySql();
-	    } catch (RuntimeException e) {
-		    return getSqlClause().getClause();
-		}
+        } catch (RuntimeException e) {
+            return getSqlClause().getClause();
+        }
     }
 }
