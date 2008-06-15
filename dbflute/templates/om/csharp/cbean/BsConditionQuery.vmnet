@@ -50,7 +50,7 @@ namespace ${glPackageBaseCQ} {
         //                                                                   IncludeAsMine
         //                                                                   =============
 #foreach ($col in $table.columns)
-        [System.Obsolute("Sorry!")]
+        [System.Obsolete("Sorry!")]
         public void IncludeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
 #end
 
