@@ -186,39 +186,41 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 #end
 #if (${col.isSingleKeyForeignKey()})
+#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-    /**
-     * InScopeSubQuery{in (select xxx.${col.foreignKey.firstForeignColumnName} from ${col.foreignKey.foreignTable.Name} where ...)}.
-     * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
-     */
-    public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
-        assertObjectNotNull("${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery", ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);
-        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+    }
+    public void inScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
 
-    /**
-     * InScopeSubQuery{in (select xxx.${referrer.firstLocalColumnName} from ${referrer.Table.Name} where ...)}.
-     * @param ${referrer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
-     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
-        assertObjectNotNull("${referrer.table.uncapitalisedJavaName}CBquery", ${referrer.table.uncapitalisedJavaName}CBquery);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
     }
-    public void inScope${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+    public void inScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
@@ -226,19 +228,20 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
-#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
 
-    /**
-     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
-     * @param ${referrer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
-     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         assertObjectNotNull("${referrer.table.uncapitalisedJavaName}CBquery", ${referrer.table.uncapitalisedJavaName}CBquery);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
@@ -248,13 +251,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+    public void exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -382,37 +384,41 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 #end
 #if (${col.isSingleKeyForeignKey()})
+#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-    /**
-     * InScopeSubQuery{in (select xxx.${col.foreignKey.firstForeignColumnName} from ${col.foreignKey.foreignTable.Name} where ...)}.
-     * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
-     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+    }
+    public void inScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
 
-    /**
-     * InScopeSubQuery{in (select xxx.${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}.
-     * @param ${referrer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
-     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
     }
-    public void inScope${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+    public void inScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
@@ -420,19 +426,20 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
-#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
 
-    /**
-     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
-     * @param ${referrer.table.uncapitalisedJavaName}CBquery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
-     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerExistsSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
@@ -441,13 +448,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${referrer.referrerPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+    public void exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
         set${subQueryPropertyNameInitCap}(cb.query());
     }
     abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
