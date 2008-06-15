@@ -704,7 +704,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected void throwDeriveReferrerInvalidAliasNameException() {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The alias name for derive-sub-query was Invalid!" + getLineSeparator();
+            msg = msg + "The alias name for derive-referrer was Invalid!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
@@ -737,7 +737,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "A property for derive-sub-query was Not Found in the entity!" + getLineSeparator();
+            msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();

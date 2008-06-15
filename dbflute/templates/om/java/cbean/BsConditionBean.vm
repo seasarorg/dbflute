@@ -247,13 +247,19 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         public void column${col.javaName}() { doColumn("${col.name}"); }
 #end
         protected void doSpecifyRequiredColumn() {
-#foreach ($col in $table.columns)
-#if ($col.isPrimaryKey())
+#foreach ($col in $table.primaryKey)
             column${col.javaName}();// PK
 #end
-#if (!$col.isPrimaryKey() && $col.isForeignKey())
-            column${col.javaName}();// FK
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
+#foreach ($col in $foreignKey.localColumnList)
+#if (!$col.isPrimaryKey())
+                column${col.javaName}();// FK
 #end
+#end
+            }
 #end
         }
         protected String getTableDbName() { return "$table.name"; }
