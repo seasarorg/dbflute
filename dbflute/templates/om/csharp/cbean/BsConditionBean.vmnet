@@ -183,23 +183,23 @@ namespace ${glPackageBaseCB} {
     	}
     }
 	
-    public class ${myConditionBeanClassName}Specification extends AbstractSpecification<${myConditionQueryClassName}> {
+    public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {
         protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
 #set ($tmpCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
-        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+        protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+        protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #end
-        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
+        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end
