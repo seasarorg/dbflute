@@ -87,6 +87,7 @@ public class $myClassName {
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #set ($referrerEntityLongClassName = "${referrerEntityClassName}")
+#if (!${referrer.isOneToOne()})
     protected var ${referrerVariableName}:Array;/* of the entity '${referrerEntityClassName}'. */
 
     public function get ${referrer.refererJavaBeansRulePropertyName}():Array {
@@ -98,6 +99,7 @@ public class $myClassName {
         this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
+#end
 #end
 
     // ===================================================================================
