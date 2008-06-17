@@ -5,12 +5,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author jflute
+ */
 public class LanguageMetaDataJava implements LanguageMetaData {
 
     protected static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
 
     public Map<String, Object> getJdbcToJavaNativeMap() {
+        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         // JavaのNativeMapはTypeMapにてべたっと定義されているのでここでは空っぽ
+        // (Javaだけ特別な扱いになっている)
+        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         return DEFAULT_EMPTY_MAP;
     }
 

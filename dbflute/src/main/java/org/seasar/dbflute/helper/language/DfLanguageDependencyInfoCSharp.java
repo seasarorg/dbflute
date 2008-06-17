@@ -13,8 +13,6 @@ import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefa
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
- * The language dependency info of CSharp.
- * 
  * @author jflute
  */
 public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo {
@@ -30,6 +28,7 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     public DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
         return new DfDefaultDBFluteDiconCSharp();
     }
+    
     public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
         return new DfGeneratedClassPackageDefaultCSharp();
     }

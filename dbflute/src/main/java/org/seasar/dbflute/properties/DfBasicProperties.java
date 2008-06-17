@@ -12,6 +12,7 @@ import java.util.Set;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 
 /**
  * Basic properties.
@@ -19,6 +20,11 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
  * @author jflute
  */
 public final class DfBasicProperties extends DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DfLanguageDependencyInfo _languageDependencyInfo;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -96,6 +102,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return targetLanguage;
     }
 
+    public boolean isTargetLanguageMain() {
+        return getBasicProperties().isTargetLanguageJava() || getBasicProperties().isTargetLanguageCSharp();
+    }
+
     public boolean isTargetLanguageJava() {
         return JAVA_targetLanguage.equals(getTargetLanguage());
     }
@@ -104,7 +114,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return CSHARP_targetLanguage.equals(getTargetLanguage());
     }
 
-    protected DfLanguageDependencyInfo _languageDependencyInfo;
+    public boolean isTargetLanguagePhp() {
+        return PHP_targetLanguage.equals(getTargetLanguage());
+    }
 
     public DfLanguageDependencyInfo getLanguageDependencyInfo() {
         if (_languageDependencyInfo == null) {
@@ -112,6 +124,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
                 _languageDependencyInfo = new DfLanguageDependencyInfoJava();
             } else if (isTargetLanguageCSharp()) {
                 _languageDependencyInfo = new DfLanguageDependencyInfoCSharp();
+            } else if (isTargetLanguagePhp()) {
+                _languageDependencyInfo = new DfLanguageDependencyInfoPhp();
             } else {
                 String msg = "The language is supported: " + getTargetLanguage();
                 throw new IllegalStateException(msg);

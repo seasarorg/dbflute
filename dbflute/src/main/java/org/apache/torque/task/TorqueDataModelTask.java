@@ -83,6 +83,13 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             _log.info("* * * * * * * * * *");
             setControlTemplate("om/java/other/s2jdbc/s2jdbc-Control.vm");
         }
+        if (!getBasicProperties().isTargetLanguageMain()) {
+            final String language = getBasicProperties().getTargetLanguage();
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process " + language + "     *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/" + language + "/Control-" + language + ".vm");
+        }
         super.doExecute();
         setupBehaviorQueryPath();
         refreshResources();

@@ -3,21 +3,21 @@ package org.seasar.dbflute.helper.language.grammar;
 /**
  * @author jflute
  */
-public class DfGrammarInfoJava implements DfGrammarInfo {
+public class DfGrammarInfoPhp implements DfGrammarInfo {
 
     public String getExtendsStringMark() {
         return "extends";
     }
 
     public String getClassFileExtension() {
-        return "java";
+        return "php";
     }
 
     public String getPublicDefinition() {
-        return "public final";
+        return "const";
     }
 
     public String getPublicStaticDefinition() {
-        return "public static final";
+        return "const";
     }
 }
