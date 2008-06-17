@@ -18,7 +18,7 @@ public class DfDefaultDBFluteDiconJava implements DfDefaultDBFluteDicon {
     }
 
     public String getJ2eeDiconResourceName() {
-        return "%PDO_DICON%";
+        return "j2ee.dicon";
     }
 
     public String getRequiredTxComponentName() {

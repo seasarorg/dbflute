@@ -18,7 +18,7 @@ public class DfDefaultDBFluteDiconPhp implements DfDefaultDBFluteDicon {
     }
 
     public String getJ2eeDiconResourceName() {
-        return "j2ee.dicon";
+        return "%PDO_DICON%";
     }
 
     public String getRequiredTxComponentName() {
