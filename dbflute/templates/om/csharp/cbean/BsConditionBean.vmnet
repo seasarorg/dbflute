@@ -203,7 +203,7 @@ namespace ${glPackageBaseCB} {
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end
-        protected void doSpecifyRequiredColumn() {
+        protected override void doSpecifyRequiredColumn() {
 #foreach ($col in $table.primaryKey)
             Column${col.javaName}();// PK
 #end
@@ -219,7 +219,7 @@ namespace ${glPackageBaseCB} {
             }
 #end
         }
-        protected String getTableDbName() { return "$table.name"; }
+        protected override String getTableDbName() { return "$table.name"; }
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
