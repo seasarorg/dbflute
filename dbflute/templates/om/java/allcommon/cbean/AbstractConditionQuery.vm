@@ -612,12 +612,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         String clause = null;
         if (getSqlClause().isFormatClauseEffective()) {
-            final String ln = getLineSeparator();
-            final int subQueryLevel = subQuery.getSubQueryLevel();
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final String endIndent = "       ";
+            String ln = getLineSeparator();
+            int subQueryLevel = subQuery.getSubQueryLevel();
+            String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String endIndent = "       ";
             clause = "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
         } else {
             clause = "exists (" + subQueryClause + ")";
