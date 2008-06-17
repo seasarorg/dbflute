@@ -219,7 +219,6 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                         Specify
         //                                                                         =======
-/* @jflute -- Migration Java to CSharp
         protected abstract class AbstractSpecification<CQ> where CQ : ${glConditionQueryInterfaceName} {
             protected ${glConditionBeanInterfaceName} _baseCB;
             protected SpQyCall<CQ> _qyCall;
@@ -318,7 +317,7 @@ namespace ${glPackageBaseCommonCBean} {
                 throw new DeriveReferrerInvalidForeignSpecificationException(msg);
             }
             protected String getLineSeparator() {
-                return ${glSimpleSystemUtil}.getLineSeparator();
+                return ${glSimpleSystemUtil}.GetLineSeparator();
             }
         }
         
@@ -327,13 +326,12 @@ namespace ${glPackageBaseCommonCBean} {
             public CQ qy(); 
         }
         
-        public class SpecifyColumnNotSetupSelectColumnException extends RuntimeException {
+        public class SpecifyColumnNotSetupSelectColumnException : SystemException {
             public SpecifyColumnNotSetupSelectColumnException(String msg) : base(msg) {
             }
         }
         
-        public class DeriveReferrerInvalidForeignSpecificationException extends RuntimeException {
-            private static long serialVersionUID = 1L;
+        public class DeriveReferrerInvalidForeignSpecificationException : SystemException {
             public DeriveReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
             }
         }
@@ -468,24 +466,19 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
     
-        public interface RAQSetupper<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+        public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName}, LOCAL_CQ : ${glConditionQueryInterfaceName} {
             public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
         }
         
-        public class DeriveReferrerInvalidAliasNameException extends RuntimeException {
-            private static long serialVersionUID = 1L;
-            public DeriveReferrerInvalidAliasNameException(String msg) {
-                super(msg);
+        public class DeriveReferrerInvalidAliasNameException : SystemException {
+            public DeriveReferrerInvalidAliasNameException(String msg) : base(msg) {
             }
         }
         
-        public class DeriveReferrerEntityPropertyNotFoundException extends RuntimeException {
-            private static long serialVersionUID = 1L;
-            public DeriveReferrerEntityPropertyNotFoundException(String msg) {
-                super(msg);
+        public class DeriveReferrerEntityPropertyNotFoundException : SystemException {
+            public DeriveReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
             }
         }
-*/
 
         // ===============================================================================
         //                                                                     Display SQL
