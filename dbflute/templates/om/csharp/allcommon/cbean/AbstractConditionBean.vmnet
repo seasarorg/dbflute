@@ -19,6 +19,12 @@ namespace ${glPackageBaseCommonCBean} {
         protected readonly ${glSqlClauseName} _sqlClause;
         protected int _safetyMaxResultSize;
 
+        // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
+        protected bool _forDeriveReferrer;
+        protected bool _forUnion;
+        protected bool _forExistsSubQuery;
+        protected bool _forInScopeSubQuery;
+
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
@@ -487,6 +493,27 @@ namespace ${glPackageBaseCommonCBean} {
     	    return ${glConditionBeanContextName}.ConvertConditionBean2DisplaySql(this);
     	}
 		
+    
+		// [DBFlute-0.7.4]
+        // ===============================================================================
+        //                                                                    Purpose Type
+        //                                                                    ============
+        public void XSetupForDeriveReferrer() {
+            _forDeriveReferrer = true;
+        }
+    
+        public void XSetupForUnion() {
+            _forUnion = true;
+        }
+    
+        public void XSetupForExistsSubQuery() {
+            _forExistsSubQuery = true;
+        }
+    
+        public void XSetupForInScopeSubQuery() {
+            _forInScopeSubQuery = true;
+        }
+	
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============

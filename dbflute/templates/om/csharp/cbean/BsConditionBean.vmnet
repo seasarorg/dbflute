@@ -105,7 +105,7 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                    Setup Select
         //                                                                    ============
-#foreach ($foreignKeys in $table.ForeignKeys)
+#foreach ($foreignKeys in $table.foreignKeys)
   #set ($tmpPropertyName = "${foreignKeys.foreignPropertyNameInitCap}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
   #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${foreignKeys.foreignTable.javaName}Nss")
@@ -170,9 +170,104 @@ namespace ${glPackageBaseCB} {
   #end
 #end
 
+        // [DBFlute-0.7.4]
         // ===============================================================================
-        //                                                                  Basic Override
-        //                                                                  ==============
-        public override String ToString() { return GetClause(); }
+        //                                                                         Specify
+        //                                                                         =======
+        protected ${myConditionBeanClassName}Specification _specification;
+        public ${myConditionBeanClassName}Specification Specify() {
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(), _forDeriveReferrer); } return _specification;
+        }
+        protected class MySpQyCall : SpQyCall<${myConditionQueryClassName}> {
+    		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return Query(); }
+    	}
+    }
+	
+    public class ${myConditionBeanClassName}Specification extends AbstractSpecification<${myConditionQueryClassName}> {
+        protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+#end
+#end
+        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
+#foreach ($col in $table.columns)
+        public void Column${col.javaName}() { doColumn("${col.name}"); }
+#end
+        protected void doSpecifyRequiredColumn() {
+#foreach ($col in $table.primaryKey)
+            Column${col.javaName}();// PK
+#end
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+            if (_myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}()) {
+#foreach ($col in $foreignKey.localColumnList)
+#if (!$col.isPrimaryKey())
+                Column${col.javaName}();// FK
+#end
+#end
+            }
+#end
+        }
+        protected String getTableDbName() { return "$table.name"; }
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${foreignKey.foreignTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpCBClassName}SpQyCall(_myQyCall), _forDeriveReferrer); }
+            return _${tmpPropertyName};
+        }
+		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
+		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
+		    public SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public bool has() { return _myQyCall.has(); && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
+		}
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpCBClassName}SpQyCall(_myQyCall), _forDeriveReferrer); }
+            return _${tmpPropertyName};
+        }
+		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
+		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
+		    public SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public bool has() { return _myQyCall.has(); && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
+		}
+#end
+#end
+#foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        // public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> Derived${tmpPropertyNameInitCap}() {
+        //     return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), new RAQSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
+        //         public void setup(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) {
+        //             cq.xderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } });
+        // }
+#end
+#end
     }
 }
