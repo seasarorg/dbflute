@@ -232,8 +232,8 @@ namespace ${glPackageBaseCB} {
         }
 		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has(); && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public bool has() { return _myQyCall.has() && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
 #end
@@ -250,8 +250,8 @@ namespace ${glPackageBaseCB} {
         }
 		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has(); && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public bool has() { return _myQyCall.has() && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
 #end
