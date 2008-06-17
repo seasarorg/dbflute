@@ -194,8 +194,19 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	public String getSelectClause() {
 	    StringBuilder sb = new StringBuilder();
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+		
+        // [DBFlute-0.7.4]
+        Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
+        bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+		
 		foreach (${glColumnInfoName} columnInfo in dbmeta.ColumnInfoList) {
-		     String columnName = columnInfo.ColumnDbName;
+		    String columnName = columnInfo.ColumnDbName;
+			
+            // [DBFlute-0.7.4]
+            if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
+                continue;
+            }
+
 			if (sb.length() > 0) {
 			    sb.append(", ");
 			} else {
@@ -209,8 +220,19 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		foreach (String tableAliasName in tableAliasNameSet) {
 		    Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
 			Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
+
+            // [DBFlute-0.7.4]
+            Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
+            bool existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
+
 			foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
-			     String realColumnName = selectColumnInfo.buildRealColumnName();
+			    String realColumnName = selectColumnInfo.buildRealColumnName();
+
+                // [DBFlute-0.7.4]
+                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
+                    continue;
+                }
+
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
 				_selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
 			}
@@ -218,6 +240,18 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
 		    sb.append(getIncludedSelectColumnClause());
 		}
+
+        // [DBFlute-0.7.4]
+        if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
+            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            foreach (String deriveSubQuery in deriveSubQuerySet) {
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator()).append("     ");
+                }
+                sb.append(", ").append(deriveSubQuery);
+            }
+        }
+
 		return sb.toString();
 	}
 	
@@ -239,6 +273,18 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
 		    sb.append(getIncludedSelectColumnClause());
 		}
+
+        // [DBFlute-0.7.4]
+        if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
+            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            foreach (String deriveSubQuery in deriveSubQuerySet) {
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator()).append("     ");
+                }
+                sb.append(", ").append(deriveSubQuery);
+            }
+        }
+
 		return sb.toString();
 	}
 	
@@ -1163,7 +1209,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         bool throughBeginFirst = false;
         String subQueryIdentity = null;
         String indent = null;
-        for (String line in lines) {
+        foreach (String line in lines) {
             if (!throughBegin) {
                 if (line.Contains(beginMarkPrefix)) {
                     throughBegin = true;
