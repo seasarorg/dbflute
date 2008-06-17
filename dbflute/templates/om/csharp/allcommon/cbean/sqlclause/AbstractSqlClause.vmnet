@@ -1230,7 +1230,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
-        String[] lines = sql.Split(lineSeparator.ToCharArray());
+        String[] lines = sql.Split(lineSeparator.ToCharArray());// *Attension about difference between Language!
         String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         String endMarkPrefix = getSubQueryEndMarkPrefix();
         String identityTerminal = getSubQueryIdentityTerminal();
@@ -1253,7 +1253,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                         throw new SubQueryIndentFailureException(msg);
                     }
                     String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
-                    subQueryIdentity = line.Substring(markIndex + beginMarkPrefix.Length, terminalIndex - (markIndex + beginMarkPrefix.Length));// *Attension about Substring() of CSharp!
+                    subQueryIdentity = line.Substring(markIndex + beginMarkPrefix.Length, terminalIndex - (markIndex + beginMarkPrefix.Length));// *Attension about difference between Language!
                     subSb.append(clause);
                     indent = buildSpaceBar(markIndex - preIndent.Length);
                 } else {

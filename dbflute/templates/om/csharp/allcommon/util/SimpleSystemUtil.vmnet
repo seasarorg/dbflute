@@ -10,7 +10,13 @@ namespace ${glPackageBaseCommonUtil} {
         //                                                                              System
         //                                                                              ======
         public static String GetLineSeparator() {
-            return Environment.NewLine;
+            // /- - - - - - - - - - - - - - - - - - - - - -
+            // Because 'CR + LF' caused many trouble!
+    		// And Now 'LF' have little trouble. 
+    		// 
+            // return Environment.NewLine;
+            // - - - - - - - - - -/
+    		return "\n";
         }
     }
 }

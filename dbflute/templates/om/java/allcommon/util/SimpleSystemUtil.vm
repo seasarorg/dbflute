@@ -9,6 +9,12 @@ public class ${glSimpleSystemUtil} {
     //                                                                              System
     //                                                                              ======
     public static String getLineSeparator() {
-        return System.getProperty("line.separator");
+        // /- - - - - - - - - - - - - - - - - - - - - -
+        // Because 'CR + LF' caused many trouble!
+		// And Now 'LF' have little trouble. 
+		// 
+        // return System.getProperty("line.separator");
+        // - - - - - - - - - -/
+		return "\n";
     }
 }
