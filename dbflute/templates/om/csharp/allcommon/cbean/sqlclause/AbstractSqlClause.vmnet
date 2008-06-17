@@ -1155,7 +1155,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                       Format Clause
     //                                                                       =============
-    public boolean isFormatClauseEffective() {
+    public bool isFormatClauseEffective() {
         return _formatClause;
     }
 
@@ -1198,7 +1198,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
-        String[] lines = sql.Split(lineSeparator);
+        String[] lines = sql.Split(lineSeparator.toCharArray());
         String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         String endMarkPrefix = getSubQueryEndMarkPrefix();
         String identityTerminal = getSubQueryIdentityTerminal();
@@ -1220,10 +1220,10 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                         String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
                         throw new SubQueryIndentFailureException(msg);
                     }
-                    String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
-                    subQueryIdentity = line.substring(markIndex + beginMarkPrefix.length(), terminalIndex);
+                    String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
+                    subQueryIdentity = line.Substring(markIndex + beginMarkPrefix.Length, terminalIndex);
                     subSb.append(clause);
-                    indent = buildSpaceBar(markIndex - preIndent.length());
+                    indent = buildSpaceBar(markIndex - preIndent.Length);
                 } else {
                     mainSb.append(line).append(getLineSeparator());
                 }
@@ -1265,7 +1265,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
             throw new SubQueryIndentFailureException(msg);
         }
-        if (filteredSql.contains(beginMarkPrefix)) {
+        if (filteredSql.Contains(beginMarkPrefix)) {
             String msg = "Any begin marks are not filtered!";
             msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
             msg = msg + subQueryIdentity + getLineSeparator();

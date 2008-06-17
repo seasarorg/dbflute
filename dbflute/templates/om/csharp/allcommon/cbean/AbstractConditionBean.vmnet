@@ -22,6 +22,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     ===========
         public ${myClassName}() {
             _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(TableSqlName);
+            _sqlClause.makeFormatClauseEffective();
         }
 
         // ===============================================================================

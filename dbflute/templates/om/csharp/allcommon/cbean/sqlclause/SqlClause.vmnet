@@ -178,7 +178,7 @@ public interface ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                       Format Clause
     //                                                                       =============
-	boolean isFormatClauseEffective();
+	bool isFormatClauseEffective();
     void makeFormatClauseEffective();
 	
     // ===================================================================================
