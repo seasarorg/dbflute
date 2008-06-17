@@ -435,7 +435,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         } else {
             orderByClause = _orderByClause.getOrderByClause();
         }
-        if (isFormatClauseEffective() && orderByClause != null && orderByClause.trim().length() > 0) {
+        if (isFormatClauseEffective() && orderByClause != null && orderByClause.Trim().Length > 0) {
             return getLineSeparator() + " " + orderByClause;
         } else {
             return orderByClause;
