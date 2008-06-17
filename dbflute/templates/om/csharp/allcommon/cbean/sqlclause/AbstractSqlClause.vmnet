@@ -1253,7 +1253,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                         throw new SubQueryIndentFailureException(msg);
                     }
                     String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
-                    subQueryIdentity = line.Substring(markIndex + beginMarkPrefix.Length, terminalIndex);
+                    subQueryIdentity = line.Substring(markIndex + beginMarkPrefix.Length, terminalIndex - (markIndex + beginMarkPrefix.Length));// *Attension about Substring() of CSharp!
                     subSb.append(clause);
                     indent = buildSpaceBar(markIndex - preIndent.Length);
                 } else {
