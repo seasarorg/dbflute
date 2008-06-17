@@ -35,7 +35,13 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     //                                       ---------------
 	/** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}}*/
     protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
+
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } */
+    protected Map<String, Map<String, String>> _specifiedSelectColumnMap;
     
+    /** Specified derive sub-query map. */
+    protected Map<String, String> _specifiedDeriveSubQueryMap;
+
     /** Included select column map. */
     protected Map<String, String> _includedSelectColumnMap = new LinkedHashMap<String, String>();
 
@@ -96,6 +102,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     /** The information of selected foreign table. */
     protected Map<String, String> _selectedForeignInfo;
 	
+    // -----------------------------------------------------
+    //                                         Optional Info
+    //                                         -------------
+    protected bool _formatClause;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -1094,7 +1105,181 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		}
 		_selectedForeignInfo.put(relationPath, foreignPropertyName);
 	}
-	
+    
+    // ===================================================================================
+    //                                                                       Format Clause
+    //                                                                       =============
+    public boolean isFormatClauseEffective() {
+        return _formatClause;
+    }
+
+    public void makeFormatClauseEffective() {
+        _formatClause = true;
+    }
+
+    // ===================================================================================
+    //                                                                    Sub Query Indent
+    //                                                                    ================
+    public String resolveSubQueryBeginMark(String subQueryIdentity) {
+        return getSubQueryBeginMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    public String resolveSubQueryEndMark(String subQueryIdentity) {
+        return getSubQueryEndMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    protected String getSubQueryBeginMarkPrefix() {
+        return "--df:SubQueryBegin#";
+    }
+
+    protected String getSubQueryEndMarkPrefix() {
+        return "--df:SubQueryEnd#";
+    }
+    
+    protected String getSubQueryIdentityTerminal() {
+        return "#IdentityTerminal#";
+    }
+
+    public String filterSubQueryIndent(String sql) {
+        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "") : sql;
+    }
+
+    protected String filterSubQueryIndent(String sql, String preIndent) {
+        if (!isFormatClauseEffective()) {
+            return sql;
+        }
+        String lineSeparator = getLineSeparator();
+        if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
+            return sql;
+        }
+        String[] lines = sql.Split(lineSeparator);
+        String beginMarkPrefix = getSubQueryBeginMarkPrefix();
+        String endMarkPrefix = getSubQueryEndMarkPrefix();
+        String identityTerminal = getSubQueryIdentityTerminal();
+        int terminalLength = identityTerminal.Length;
+        StringBuilder mainSb = new StringBuilder();
+        StringBuilder subSb = null;
+        bool throughBegin = false;
+        bool throughBeginFirst = false;
+        String subQueryIdentity = null;
+        String indent = null;
+        for (String line in lines) {
+            if (!throughBegin) {
+                if (line.Contains(beginMarkPrefix)) {
+                    throughBegin = true;
+                    subSb = new StringBuilder();
+                    int markIndex = line.IndexOf(beginMarkPrefix);
+                    int terminalIndex = line.IndexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
+                    subQueryIdentity = line.substring(markIndex + beginMarkPrefix.length(), terminalIndex);
+                    subSb.append(clause);
+                    indent = buildSpaceBar(markIndex - preIndent.length());
+                } else {
+                    mainSb.append(line).append(getLineSeparator());
+                }
+            } else {
+                // - - - - - - - -
+                // In begin to end
+                // - - - - - - - -
+                if (line.Contains(endMarkPrefix + subQueryIdentity)) {// The end
+                    int markIndex = line.IndexOf(endMarkPrefix);
+                    int terminalIndex = line.IndexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
+                    subSb.append(clause).append(getLineSeparator());
+                    String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent);
+                    mainSb.append(currentSql);
+                    throughBegin = false;
+                    throughBeginFirst = false;
+                } else {
+                    if (!throughBeginFirst) {
+                        subSb.append(line.Trim()).append(getLineSeparator());
+                        throughBeginFirst = true;
+                    } else {
+                        subSb.append(indent).append(line).append(getLineSeparator());
+                    }
+                }
+            }
+        }
+        String filteredSql = mainSb.toString();
+        
+        if (throughBegin) {
+            String msg = "End Mark Not Found!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
+            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        if (filteredSql.contains(beginMarkPrefix)) {
+            String msg = "Any begin marks are not filtered!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
+            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        return filteredSql;
+    }
+    
+    protected String buildSpaceBar(int size) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+    
+    public class SubQueryIndentFailureException : RuntimeException {
+        public SubQueryIndentFailureException(String msg) : base(msg) {
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Specification
+    //                                                                       =============
+    public void specifySelectColumn(String tableAliasName, String columnName) {
+        if (_specifiedSelectColumnMap == null) {
+            _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>();
+        }
+        if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
+            _specifiedSelectColumnMap.put(tableAliasName, new HashMap<String, String>());
+        }
+        Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        elementMap.put(columnName, null);
+        _specifiedSelectColumnMap.put(tableAliasName, elementMap);// The value is dummy for extension at the future.
+    }
+
+    public void specifyDeriveSubQuery(String deriveSubQuery) {
+        if (_specifiedDeriveSubQueryMap == null) {
+            _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
+        }
+        _specifiedDeriveSubQueryMap.put(deriveSubQuery, null);// The value is dummy for extension at the future.
+    }
+    
+    public String getSpecifiedColumnNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
+            if (elementMap != null && elementMap.size() == 1) {
+                return elementMap.keySet().iterator().next();
+            }
+        }
+        return null;
+    }
+
+    public void clearSpecifiedSelectColumn() {
+        if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
+    }
+
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
