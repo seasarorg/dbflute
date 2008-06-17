@@ -460,7 +460,8 @@ public interface ${myClassName} {
     //                                                                       Specification
     //                                                                       =============
     public void specifySelectColumn(String tableAliasName, String columnName);
-    public void specifyDeriveSubQuery(String deriveSubQuery);
+    public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
+	public boolean hasSpecifiedDeriveSubQuery(String aliasName);
     public String getSpecifiedColumnNameAsOne();
     public void clearSpecifiedSelectColumn();
 }

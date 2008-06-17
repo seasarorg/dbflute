@@ -273,7 +273,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 if (isFormatClauseEffective()) {
                     sb.append(getLineSeparator()).append("     ");
@@ -307,7 +307,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 if (isFormatClauseEffective()) {
                     sb.append(getLineSeparator()).append("     ");
@@ -1367,13 +1367,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         _specifiedSelectColumnMap.put(tableAliasName, elementMap);// The value is dummy for extension at the future.
     }
 
-    public void specifyDeriveSubQuery(String deriveSubQuery) {
+    public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {
         if (_specifiedDeriveSubQueryMap == null) {
             _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
         }
-        _specifiedDeriveSubQueryMap.put(deriveSubQuery, null);// The value is dummy for extension at the future.
+        _specifiedDeriveSubQueryMap.put(aliasName, deriveSubQuery);// The value is dummy for extension at the future.
     }
-    
+
+    public boolean hasSpecifiedDeriveSubQuery(String aliasName) {
+        if (_specifiedDeriveSubQueryMap == null) { return false; }
+        return _specifiedDeriveSubQueryMap.containsKey(aliasName);
+    }
+
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());

@@ -268,7 +268,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true); return this; }
     public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false); return this; }
-  #end
+#end
+
+    public ${myClassName} addSpecifiedDerivedOrderBy_Asc(String aliasName) { registerSpecifiedDerivedOrderBy_Asc(aliasName); return this; }
+    public ${myClassName} addSpecifiedDerivedOrderBy_Desc(String aliasName) { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
 
     // ===================================================================================
     //                                                                         Union Query

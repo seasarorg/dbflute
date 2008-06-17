@@ -683,7 +683,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         } else {
             clause = "(" + subQueryClause + ") as " + aliasName;
         }
-        getSqlClause().specifyDeriveSubQuery(clause);
+        getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
     protected String getDeriveSubQueryRealColumnName(String columnName) {
@@ -741,7 +741,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
         msg = msg + "    " + getLineSeparator();
         msg = msg + "    [Wrong]" + getLineSeparator();
@@ -752,7 +752,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
         msg = msg + "    " + getLineSeparator();
         msg = msg + "    [Good!]" + getLineSeparator();
@@ -762,7 +762,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
@@ -795,7 +795,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + " You should confirm the list as follow:" + getLineSeparator();
+        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
         msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
         msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
         msg = msg + "    sum()   : Number" + getLineSeparator();
@@ -884,7 +884,64 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     public void withNullsLast() {// is User Public!
         getSqlClause().addNullsLastToPreviousOrderBy();
     }
-    
+
+    protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
+        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+            throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
+        }
+        getSqlClause().registerOrderBy(aliasName, null, true);
+    }
+
+    protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
+        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+            throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
+        }
+        getSqlClause().registerOrderBy(aliasName, null, false);
+    }
+
+    protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The aliasName was Not Found in specified alias names." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "You should specified an alias name that is the same as one in specify-derived-referrer." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"WRONG_NAME_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Good!]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Not Found Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
+    }
+
+    public static class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
     protected void registerOrderBy(String columnName, boolean ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
     }

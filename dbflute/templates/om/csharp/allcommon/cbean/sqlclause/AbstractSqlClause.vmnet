@@ -1343,7 +1343,12 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         }
         _specifiedDeriveSubQueryMap.put(deriveSubQuery, null);// The value is dummy for extension at the future.
     }
-    
+
+    public bool hasSpecifiedDeriveSubQuery(String aliasName) {
+        if (_specifiedDeriveSubQueryMap == null) { return false; }
+        return _specifiedDeriveSubQueryMap.containsKey(aliasName);
+    }
+
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());

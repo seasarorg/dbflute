@@ -425,7 +425,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         getSqlClause().makeOrderByEffective();
         return this;
     }
-
+	
     // ===================================================================================
     //                                                                        Limit Select
     //                                                                        ============
@@ -609,7 +609,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Good!]" + getLineSeparator();
@@ -619,7 +619,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
@@ -727,7 +727,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\"); // *Point!" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\"); // *Point!" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
@@ -751,7 +751,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Extended Entity]" + getLineSeparator();

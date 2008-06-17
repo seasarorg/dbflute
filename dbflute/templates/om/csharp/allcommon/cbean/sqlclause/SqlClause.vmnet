@@ -194,6 +194,7 @@ public interface ${glSqlClauseInterfaceName} {
     //                                                                       =============
     void specifySelectColumn(String tableAliasName, String columnName);
     void specifyDeriveSubQuery(String deriveSubQuery);
+    bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
     void clearSpecifiedSelectColumn();
 }
