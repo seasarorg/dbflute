@@ -222,267 +222,6 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsSelectCountIgnoreFetchScope() {
             return _isSelectCountIgnoreFetchScope;
         }
-    		
-        // [DBFlute-0.7.4]
-        // ===============================================================================
-        //                                                                         Specify
-        //                                                                         =======
-        protected abstract class AbstractSpecification<CQ> where CQ : ${glConditionQueryInterfaceName} {
-            protected ${glConditionBeanInterfaceName} _baseCB;
-            protected SpQyCall<CQ> _qyCall;
-            protected CQ _query;
-            protected bool _forDeriveReferrer;
-            protected bool alreadySpecifyRequiredColumn;
-            protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, bool forDeriveReferrer) {
-                _baseCB = baseCB;
-                _qyCall = qyCall;
-                _forDeriveReferrer = forDeriveReferrer;
-            }
-            protected void doColumn(String columnName) {
-                assertColumn(columnName);
-                if (_query == null) { _query = _qyCall.qy(); }
-                if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
-                    alreadySpecifyRequiredColumn = true;
-                    doSpecifyRequiredColumn();
-                }
-                String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
-                String tableAliasName;
-                if (_query.isBaseQuery(_query)) {
-                    tableAliasName = _baseCB.SqlClause.getLocalTableAliasName();
-                } else {
-                    tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.getNestLevel());
-                }
-                _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
-            }
-            protected void assertColumn(String columnName) {
-                if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
-            }
-            protected void assertForeign(String foreignPropertyName) {
-                if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
-            }
-            protected abstract void doSpecifyRequiredColumn();
-            protected abstract String getTableDbName();
-            
-            protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
-                String msg = "Look! Read the message below." + getLineSeparator();
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-                msg = msg + "You specified the column that had Not been Set up!" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Advice]" + getLineSeparator();
-                msg = msg + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
-                msg = msg + "  For example:" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Wrong]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.Specify().SpecifyMemberStatus().ColumnMemberStatusName(); // *No!" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Good!]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.SetupSelect_MemberStatus(); // *Point!" + getLineSeparator();
-                msg = msg + "    cb.Specify().SpecifyMemberStatus().ColumnMemberStatusName();" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.GetType().Name + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Specified Column]" + getLineSeparator() + getTableDbName() + "." + columnName + getLineSeparator();
-                msg = msg + "* * * * * * * * * */";
-                throw new SpecifyColumnNotSetupSelectColumnException(msg);
-            }
-            protected void throwDeriveReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
-                String msg = "Look! Read the message below." + getLineSeparator();
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-                msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Advice]" + getLineSeparator();
-                msg = msg + "You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
-                msg = msg + "  For example:" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Wrong]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-                msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
-                msg = msg + "        }" + getLineSeparator();
-                msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Good!]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-                msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
-                msg = msg + "        }" + getLineSeparator();
-                msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
-                msg = msg + "* * * * * * * * * */";
-                throw new DeriveReferrerInvalidForeignSpecificationException(msg);
-            }
-            protected String getLineSeparator() {
-                return ${glSimpleSystemUtil}.GetLineSeparator();
-            }
-        }
-        
-        protected interface SpQyCall<CQ> where CQ : ${glConditionQueryInterfaceName} {
-            bool has(); 
-            CQ qy(); 
-        }
-        
-        public class SpecifyColumnNotSetupSelectColumnException : SystemException {
-            public SpecifyColumnNotSetupSelectColumnException(String msg) : base(msg) {
-            }
-        }
-        
-        public class DeriveReferrerInvalidForeignSpecificationException : SystemException {
-            public DeriveReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
-            }
-        }
-    
-        public class RAFunction<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
-            protected ${glConditionBeanInterfaceName} _baseCB;
-            protected LOCAL_CQ _localCQ;
-            protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
-            public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
-                _baseCB = baseCB;
-                _localCQ = localCQ;
-                _querySetupper = querySetupper;
-            }
-            public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-                assertAliasName(aliasName);
-                _querySetupper.setup("max", subQuery, _localCQ, aliasName.Trim());
-            }
-            public void Min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-                assertAliasName(aliasName);
-                _querySetupper.setup("min", subQuery, _localCQ, aliasName.Trim());
-            }
-            public void Sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-                assertAliasName(aliasName);
-                _querySetupper.setup("sum", subQuery, _localCQ, aliasName.Trim());
-            }
-            public void Avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-                assertAliasName(aliasName);
-                _querySetupper.setup("avg", subQuery, _localCQ, aliasName.Trim());
-            }
-            public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-                assertAliasName(aliasName);
-                _querySetupper.setup("count", subQuery, _localCQ, aliasName.Trim());
-            }
-    
-            protected void assertAliasName(String aliasName) {
-                if (aliasName == null || aliasName.Trim().Length == 0) {
-                    throwDeriveReferrerInvalidAliasNameException();
-                }
-                ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_baseCB.TableDbName);
-                PropertyInfo[] properties = dbmeta.EntityType.GetProperties();
-                String targetPropertyName = aliasName.Replace("_", "").ToLower();
-                bool existsSetterMethod = false;
-                foreach (PropertyInfo property in properties) {
-                    if (!property.CanWrite) {
-                        continue;
-                    }
-                    if (targetPropertyName.Equals(property.Name.ToLower())) {
-                        existsSetterMethod = true;
-                        break;
-                    }
-                }
-                if (!existsSetterMethod) {
-                    throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.EntityType);
-                }
-            }
-            protected void throwDeriveReferrerInvalidAliasNameException() {
-                String msg = "Look! Read the message below." + getLineSeparator();
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-                msg = msg + "The alias name for derive-referrer was Invalid!" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Advice]" + getLineSeparator();
-                msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
-                msg = msg + "  For example:" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Wrong]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
-                msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Good!]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
-                msg = msg + "    }, \"latestPurchaseDatetime\"); // *Point!" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
-                msg = msg + "* * * * * * * * * */";
-                throw new DeriveReferrerInvalidAliasNameException(msg);
-            }
-            protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Type entityType) {
-                String msg = "Look! Read the message below." + getLineSeparator();
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-                msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Advice]" + getLineSeparator();
-                msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();
-                msg = msg + "Or you should confirm whether the alias name has typo or not." + getLineSeparator();
-                msg = msg + "  For example:" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [ConditionBean Invoking]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-                msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-                msg = msg + "        }" + getLineSeparator();
-                msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + "    " + getLineSeparator();
-                msg = msg + "    [Extended Entity]" + getLineSeparator();
-                msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-                msg = msg + "    // At the entity of Purchase..." + getLineSeparator();
-                msg = msg + "    protected Date _latestPurchaseDatetime;" + getLineSeparator();
-                msg = msg + "    public Date getLatestPurchaseDatetime() {" + getLineSeparator();
-                msg = msg + "        return _latestPurchaseDatetime;" + getLineSeparator();
-                msg = msg + "    }" + getLineSeparator();
-                msg = msg + "    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {" + getLineSeparator();
-                msg = msg + "        _latestPurchaseDatetime = latestPurchaseDatetime;" + getLineSeparator();
-                msg = msg + "    }" + getLineSeparator();
-                msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
-                msg = msg + "* * * * * * * * * */";
-                throw new DeriveReferrerEntityPropertyNotFoundException(msg);
-            }
-            protected String replaceString(String text, String fromText, String toText) {
-                return ${glSimpleStringUtil}.Replace(text, fromText, toText);
-            }
-            protected String getLineSeparator() {
-                return ${glSimpleSystemUtil}.GetLineSeparator();
-            }
-        }
-    
-        public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
-            void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
-        }
-        
-        public class DeriveReferrerInvalidAliasNameException : SystemException {
-            public DeriveReferrerInvalidAliasNameException(String msg) : base(msg) {
-            }
-        }
-        
-        public class DeriveReferrerEntityPropertyNotFoundException : SystemException {
-            public DeriveReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
-            }
-        }
 
         // ===============================================================================
         //                                                                     Display SQL
@@ -518,5 +257,263 @@ namespace ${glPackageBaseCommonCBean} {
 		public override String ToString() {
 		    return ToDisplaySql();
 		}
+    }
+	
+    // [DBFlute-0.7.4]
+    public abstract class AbstractSpecification<CQ> where CQ : ${glConditionQueryInterfaceName} {
+        protected ${glConditionBeanInterfaceName} _baseCB;
+        protected SpQyCall<CQ> _qyCall;
+        protected CQ _query;
+        protected bool _forDeriveReferrer;
+        protected bool alreadySpecifyRequiredColumn;
+        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, bool forDeriveReferrer) {
+            _baseCB = baseCB;
+            _qyCall = qyCall;
+            _forDeriveReferrer = forDeriveReferrer;
+        }
+        protected void doColumn(String columnName) {
+            assertColumn(columnName);
+            if (_query == null) { _query = _qyCall.qy(); }
+            if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
+                alreadySpecifyRequiredColumn = true;
+                doSpecifyRequiredColumn();
+            }
+            String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
+            String tableAliasName;
+            if (_query.isBaseQuery(_query)) {
+                tableAliasName = _baseCB.SqlClause.getLocalTableAliasName();
+            } else {
+                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.getNestLevel());
+            }
+            _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
+        }
+        protected void assertColumn(String columnName) {
+            if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+        }
+        protected void assertForeign(String foreignPropertyName) {
+            if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+        }
+        protected abstract void doSpecifyRequiredColumn();
+        protected abstract String getTableDbName();
+        
+        protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified the column that had Not been Set up!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.Specify().SpecifyMemberStatus().ColumnMemberStatusName(); // *No!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.SetupSelect_MemberStatus(); // *Point!" + getLineSeparator();
+            msg = msg + "    cb.Specify().SpecifyMemberStatus().ColumnMemberStatusName();" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.GetType().Name + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Column]" + getLineSeparator() + getTableDbName() + "." + columnName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new SpecifyColumnNotSetupSelectColumnException(msg);
+        }
+        protected void throwDeriveReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerInvalidForeignSpecificationException(msg);
+        }
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+    }
+    
+    public interface SpQyCall<CQ> where CQ : ${glConditionQueryInterfaceName} {
+        bool has(); 
+        CQ qy(); 
+    }
+    
+    public class SpecifyColumnNotSetupSelectColumnException : SystemException {
+        public SpecifyColumnNotSetupSelectColumnException(String msg) : base(msg) {
+        }
+    }
+    
+    public class DeriveReferrerInvalidForeignSpecificationException : SystemException {
+        public DeriveReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
+        }
+    }
+
+    public class RAFunction<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
+        protected ${glConditionBeanInterfaceName} _baseCB;
+        protected LOCAL_CQ _localCQ;
+        protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+        public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+            _baseCB = baseCB;
+            _localCQ = localCQ;
+            _querySetupper = querySetupper;
+        }
+        public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("max", subQuery, _localCQ, aliasName.Trim());
+        }
+        public void Min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("min", subQuery, _localCQ, aliasName.Trim());
+        }
+        public void Sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("sum", subQuery, _localCQ, aliasName.Trim());
+        }
+        public void Avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("avg", subQuery, _localCQ, aliasName.Trim());
+        }
+        public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("count", subQuery, _localCQ, aliasName.Trim());
+        }
+
+        protected void assertAliasName(String aliasName) {
+            if (aliasName == null || aliasName.Trim().Length == 0) {
+                throwDeriveReferrerInvalidAliasNameException();
+            }
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_baseCB.TableDbName);
+            PropertyInfo[] properties = dbmeta.EntityType.GetProperties();
+            String targetPropertyName = aliasName.Replace("_", "").ToLower();
+            bool existsSetterMethod = false;
+            foreach (PropertyInfo property in properties) {
+                if (!property.CanWrite) {
+                    continue;
+                }
+                if (targetPropertyName.Equals(property.Name.ToLower())) {
+                    existsSetterMethod = true;
+                    break;
+                }
+            }
+            if (!existsSetterMethod) {
+                throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.EntityType);
+            }
+        }
+        protected void throwDeriveReferrerInvalidAliasNameException() {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The alias name for derive-referrer was Invalid!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\"); // *Point!" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerInvalidAliasNameException(msg);
+        }
+        protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Type entityType) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();
+            msg = msg + "Or you should confirm whether the alias name has typo or not." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [ConditionBean Invoking]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Extended Entity]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    // At the entity of Purchase..." + getLineSeparator();
+            msg = msg + "    protected Date _latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    public Date getLatestPurchaseDatetime() {" + getLineSeparator();
+            msg = msg + "        return _latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    }" + getLineSeparator();
+            msg = msg + "    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {" + getLineSeparator();
+            msg = msg + "        _latestPurchaseDatetime = latestPurchaseDatetime;" + getLineSeparator();
+            msg = msg + "    }" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new DeriveReferrerEntityPropertyNotFoundException(msg);
+        }
+        protected String replaceString(String text, String fromText, String toText) {
+            return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+        }
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+    }
+
+    public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
+        void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+    }
+    
+    public class DeriveReferrerInvalidAliasNameException : SystemException {
+        public DeriveReferrerInvalidAliasNameException(String msg) : base(msg) {
+        }
+    }
+    
+    public class DeriveReferrerEntityPropertyNotFoundException : SystemException {
+        public DeriveReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
+        }
     }
 }

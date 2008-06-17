@@ -199,7 +199,7 @@ namespace ${glPackageBaseCB} {
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #end
-        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
+        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end
