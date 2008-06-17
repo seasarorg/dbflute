@@ -1198,7 +1198,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
-        String[] lines = sql.Split(lineSeparator.toCharArray());
+        String[] lines = sql.Split(lineSeparator.ToCharArray());
         String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         String endMarkPrefix = getSubQueryEndMarkPrefix();
         String identityTerminal = getSubQueryIdentityTerminal();

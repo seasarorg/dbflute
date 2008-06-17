@@ -1,10 +1,12 @@
 #set ($myClassName = "${glConditionBeanAbstractName}")
 
 using System;
+using System.Reflection;
 
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBean} {
 
@@ -277,7 +279,7 @@ namespace ${glPackageBaseCommonCBean} {
                 msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName();" + getLineSeparator();
                 msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
                 msg = msg + getLineSeparator();
-                msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.getClass().getName() + getLineSeparator();
+                msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.GetType().Name + getLineSeparator();
                 msg = msg + getLineSeparator();
                 msg = msg + "[Specified Column]" + getLineSeparator() + getTableDbName() + "." + columnName + getLineSeparator();
                 msg = msg + "* * * * * * * * * */";
@@ -347,23 +349,23 @@ namespace ${glPackageBaseCommonCBean} {
             }
             public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
                 assertAliasName(aliasName);
-                _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
+                _querySetupper.setup("max", subQuery, _localCQ, aliasName.Trim());
             }
             public void Min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
                 assertAliasName(aliasName);
-                _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
+                _querySetupper.setup("min", subQuery, _localCQ, aliasName.Trim());
             }
             public void Sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
                 assertAliasName(aliasName);
-                _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
+                _querySetupper.setup("sum", subQuery, _localCQ, aliasName.Trim());
             }
             public void Avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
                 assertAliasName(aliasName);
-                _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
+                _querySetupper.setup("avg", subQuery, _localCQ, aliasName.Trim());
             }
             public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
                 assertAliasName(aliasName);
-                _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
+                _querySetupper.setup("count", subQuery, _localCQ, aliasName.Trim());
             }
     
             protected void assertAliasName(String aliasName) {
@@ -371,20 +373,20 @@ namespace ${glPackageBaseCommonCBean} {
                     throwDeriveReferrerInvalidAliasNameException();
                 }
                 ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_baseCB.TableDbName);
-                Method[] methods = dbmeta.EntityType.GetMethods();
-                String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
+                PropertyInfo[] properties = dbmeta.EntityType.GetProperties();
+                String targetPropertyName = aliasName.Replace("_", "").ToLower();
                 bool existsSetterMethod = false;
-                foreach (Method method in methods) {
-                    if (!method.getName().startsWith("set")) {
+                foreach (PropertyInfo property in properties) {
+                    if (!property.CanWrite) {
                         continue;
                     }
-                    if (targetMethodName.equals(method.getName().toLowerCase())) {
+                    if (targetPropertyName.Equals(property.Name.ToLower())) {
                         existsSetterMethod = true;
                         break;
                     }
                 }
                 if (!existsSetterMethod) {
-                    throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+                    throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.EntityType);
                 }
             }
             protected void throwDeriveReferrerInvalidAliasNameException() {
@@ -399,17 +401,15 @@ namespace ${glPackageBaseCommonCBean} {
                 msg = msg + "    [Wrong]" + getLineSeparator();
                 msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
                 msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-                msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-                msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-                msg = msg + "        }" + getLineSeparator();
+                msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
+                msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
                 msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + getLineSeparator();
                 msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
                 msg = msg + "    " + getLineSeparator();
                 msg = msg + "    [Good!]" + getLineSeparator();
                 msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
                 msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-                msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+                msg = msg + "    cb.Specify().DerivePurchaseList().Max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
                 msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
                 msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
                 msg = msg + "        }" + getLineSeparator();
@@ -459,10 +459,10 @@ namespace ${glPackageBaseCommonCBean} {
                 throw new DeriveReferrerEntityPropertyNotFoundException(msg);
             }
             protected String replaceString(String text, String fromText, String toText) {
-                return ${glSimpleStringUtil}.replace(text, fromText, toText);
+                return ${glSimpleStringUtil}.Replace(text, fromText, toText);
             }
             protected String getLineSeparator() {
-                return ${glSimpleSystemUtil}.getLineSeparator();
+                return ${glSimpleSystemUtil}.GetLineSeparator();
             }
         }
     
