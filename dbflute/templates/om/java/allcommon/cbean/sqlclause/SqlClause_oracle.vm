@@ -67,7 +67,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-		final String ln;
+		String ln = null;
 		if (isFormatClauseEffective()) {
 		    ln = getLineSeparator();
 		} else {

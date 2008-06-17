@@ -139,7 +139,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
-        final StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new StringBuilder(512);
         sb.append(getSelectClause());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(false));
@@ -148,7 +148,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     public String getClausePKOnly() {
-        final StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new StringBuilder(512);
         sb.append(getSelectClausePKOnly());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(true));
@@ -157,7 +157,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     protected String buildClauseWithoutMainSelect(boolean pkonly) {
-        final StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
@@ -190,7 +190,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     protected String buildClauseFromWhereAsTemplate(boolean template) {
-        final StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
@@ -200,7 +200,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     protected String buildUnionClause(String selectClause) {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (final Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
             final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
             final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
@@ -221,16 +221,16 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                        Clause Parts
     //                                                                        ============
     public String getSelectClause() {
-        final StringBuilder sb = new StringBuilder();
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
-        final List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
+        StringBuilder sb = new StringBuilder();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
+        List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
 
         // [DBFlute-0.7.4]
-        final Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
-        final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+        Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
+        boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
         for (${glColumnInfoName} columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
+            String columnName = columnInfo.getColumnDbName();
             
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
@@ -242,21 +242,21 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             } else {
                 sb.append("select").append(SELECT_HINT).append(" ");
             }
-            final String realColumnName = getLocalTableAliasName() + "." + columnName;
+            String realColumnName = getLocalTableAliasName() + "." + columnName;
             sb.append(realColumnName).append(" as ").append(columnName);
             _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
         }
-        final Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
+        Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
         for (String tableAliasName : tableAliasNameSet) {
-            final Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
-            final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
+            Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+            Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
 
             // [DBFlute-0.7.4]
-            final Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
-            final boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
+            Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
+            boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
 
             for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
-                final String realColumnName = selectColumnInfo.buildRealColumnName();
+                String realColumnName = selectColumnInfo.buildRealColumnName();
 
                 // [DBFlute-0.7.4]
                 if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
@@ -273,7 +273,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            final Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 if (isFormatClauseEffective()) {
                     sb.append(getLineSeparator()).append("     ");
@@ -286,18 +286,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     public String getSelectClausePKOnly() {
-        final StringBuilder sb = new StringBuilder();
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
-        final ${glUniqueInfoName} uniqueInfo = dbmeta.getPrimaryUniqueInfo();
-        final List<${glColumnInfoName}> columnInfoList = uniqueInfo.getUniqueColumnList();
+        StringBuilder sb = new StringBuilder();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
+        ${glUniqueInfoName} uniqueInfo = dbmeta.getPrimaryUniqueInfo();
+        List<${glColumnInfoName}> columnInfoList = uniqueInfo.getUniqueColumnList();
         for (${glColumnInfoName} columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
+            String columnName = columnInfo.getColumnDbName();
             if (sb.length() > 0) {
                 sb.append(", ");
             } else {
                 sb.append("select").append(SELECT_HINT).append(" ");
             }
-            final String realColumnName = getLocalTableAliasName() + "." + columnName;
+            String realColumnName = getLocalTableAliasName() + "." + columnName;
             sb.append(realColumnName).append(" as ").append(columnName);
             _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
         }
@@ -307,7 +307,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            final Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
+            Set<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.keySet();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 if (isFormatClauseEffective()) {
                     sb.append(getLineSeparator()).append("     ");
@@ -324,11 +324,11 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getIncludedSelectColumnClause() {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (final Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
-            final String aliasName = ite.next();
-            final String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
+        for (Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
+            String aliasName = ite.next();
+            String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
             sb.append(", ").append(realColumnName).append(" as ").append(aliasName);
             _selectClauseRealColumnAliasMap.put(realColumnName, aliasName);
         }
@@ -336,7 +336,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getFromClause() {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (isFormatClauseEffective()) {
             sb.append(getLineSeparator()).append("  ");
         }
@@ -352,14 +352,14 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     protected String getLeftOuterJoinClause() {
-        final StringBuilder sb = new StringBuilder();
-        for (final Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
-            final String aliasName = ite.next();
-            final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-            final String joinTableName = joinInfo.getJoinTableName();
-            final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            final List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
-            final Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
+        StringBuilder sb = new StringBuilder();
+        for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
+            String aliasName = ite.next();
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+            String joinTableName = joinInfo.getJoinTableName();
+            List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
+            Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             if (isFormatClauseEffective()) {
@@ -373,9 +373,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
-            final Set<String> localColumnNameSet = joinOnMap.keySet();
+            Set<String> localColumnNameSet = joinOnMap.keySet();
             for (String localColumnName : localColumnNameSet) {
-                final String foreignColumnName = (String)joinOnMap.get(localColumnName);
+                String foreignColumnName = (String)joinOnMap.get(localColumnName);
                 if (count > 0) {
                     sb.append(" and ");
                 }
@@ -394,7 +394,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
         for (final Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
@@ -423,9 +423,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     protected String buildWhereClause(boolean template) {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (final Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
+        for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
@@ -447,7 +447,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     public String getOrderByClause() {
-        final String orderByClause;
+        String orderByClause = null;
         if (!_unionQueryInfoList.isEmpty()) {
             if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
                 String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
@@ -465,7 +465,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getSqlSuffix() {
-        final String sqlSuffix = createSqlSuffix();
+        String sqlSuffix = createSqlSuffix();
         if (isFormatClauseEffective() && sqlSuffix != null && sqlSuffix.trim().length() > 0) {
             return getLineSeparator() + sqlSuffix;
         } else {
@@ -477,10 +477,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                          Copy Parts
     //                                                                          ==========
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
-        final Set<String> keySet = _includedSelectColumnMap.keySet();
-        for (final Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
-            final String aliasName = ite.next();
-            final String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
+        Set<String> keySet = _includedSelectColumnMap.keySet();
+        for (Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
+            String aliasName = ite.next();
+            String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
             sqlClause.registerIncludedSelectColumn(aliasName, realColumnName);
         }
     }
