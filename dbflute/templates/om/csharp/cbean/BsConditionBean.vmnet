@@ -212,7 +212,7 @@ namespace ${glPackageBaseCB} {
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
-            if (_myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}()) {
+            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
 #foreach ($col in $foreignKey.localColumnList)
 #if (!$col.isPrimaryKey())
                 Column${col.javaName}();// FK
@@ -235,7 +235,7 @@ namespace ${glPackageBaseCB} {
 		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
 		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has() && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
 #end
@@ -253,7 +253,7 @@ namespace ${glPackageBaseCB} {
 		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
 		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has() && _myQyCall.qy().HasConditionQuery${tmpPropertyNameInitCap}(); }
+		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
 #end
