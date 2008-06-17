@@ -340,7 +340,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Good!]" + getLineSeparator();
@@ -350,7 +350,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
@@ -450,7 +450,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
             msg = msg + "    cb.Specify().DerivePurchaseList().Max(delegate(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "        subCB.Specify().ColumnPurchaseDatetime();" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\"); // *Point!" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\"); // *Point!" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
@@ -474,7 +474,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"latestPurchaseDatetime\");" + getLineSeparator();
+            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Extended Entity]" + getLineSeparator();
