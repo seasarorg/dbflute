@@ -322,8 +322,8 @@ namespace ${glPackageBaseCommonCBean} {
         }
         
         protected interface SpQyCall<CQ> where CQ : ${glConditionQueryInterfaceName} {
-            public bool has(); 
-            public CQ qy(); 
+            bool has(); 
+            CQ qy(); 
         }
         
         public class SpecifyColumnNotSetupSelectColumnException : SystemException {
@@ -336,7 +336,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
     
-        public class RAFunction<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName}, LOCAL_CQ : ${glConditionQueryInterfaceName} {
+        public class RAFunction<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
             protected ${glConditionBeanInterfaceName} _baseCB;
             protected LOCAL_CQ _localCQ;
             protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
@@ -420,7 +420,7 @@ namespace ${glPackageBaseCommonCBean} {
                 msg = msg + "* * * * * * * * * */";
                 throw new DeriveReferrerInvalidAliasNameException(msg);
             }
-            protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
+            protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Type entityType) {
                 String msg = "Look! Read the message below." + getLineSeparator();
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
                 msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
@@ -466,8 +466,8 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
     
-        public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName}, LOCAL_CQ : ${glConditionQueryInterfaceName} {
-            public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+        public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
+            void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
         }
         
         public class DeriveReferrerInvalidAliasNameException : SystemException {
