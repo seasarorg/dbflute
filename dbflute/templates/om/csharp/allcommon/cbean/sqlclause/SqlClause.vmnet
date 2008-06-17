@@ -178,24 +178,24 @@ public interface ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                       Format Clause
     //                                                                       =============
-	public boolean isFormatClauseEffective();
-    public void makeFormatClauseEffective();
+	boolean isFormatClauseEffective();
+    void makeFormatClauseEffective();
 	
     // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
-    public String resolveSubQueryBeginMark(String subQueryIdentity);
-    public String resolveSubQueryEndMark(String subQueryIdentity);
-    public String filterSubQueryIndent(String sql);
+    String resolveSubQueryBeginMark(String subQueryIdentity);
+    String resolveSubQueryEndMark(String subQueryIdentity);
+    String filterSubQueryIndent(String sql);
 
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    public void specifySelectColumn(String tableAliasName, String columnName);
-    public void specifyDeriveSubQuery(String deriveSubQuery);
-    public String getSpecifiedColumnNameAsOne();
-    public void clearSpecifiedSelectColumn();
+    void specifySelectColumn(String tableAliasName, String columnName);
+    void specifyDeriveSubQuery(String deriveSubQuery);
+    String getSpecifiedColumnNameAsOne();
+    void clearSpecifiedSelectColumn();
 }
 
 }
