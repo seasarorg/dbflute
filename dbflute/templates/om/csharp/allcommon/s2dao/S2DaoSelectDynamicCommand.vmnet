@@ -314,8 +314,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         		fromWhereClause = ReplaceString(fromWhereClause, cb.SqlClause.getUnionWhereClauseMark(), "");
         		fromWhereClause = ReplaceString(fromWhereClause, cb.SqlClause.getUnionWhereFirstConditionMark(), "");
 
-    			selectCountCommand.Sql = selectClause + " " + fromWhereClause;
-    		
+				String sql = cb.SqlClause.filterSubQueryIndent(selectClause + " " + fromWhereClause);
+    			selectCountCommand.Sql = sql;
+
                 ICommandContext ctx = selectCountCommand.Apply(args);
                 realSelectCountClause = ctx.Sql;
                 AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
