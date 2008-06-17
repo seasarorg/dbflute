@@ -26,6 +26,7 @@
   <property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
   <property name="dbflute.gihyojp.example.dir" value="${workspace.base}/dbflute-gihyojp-example"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
+  <property name="dbflute.pbasic.example.dir" value="${workspace.base}/dbflute-pbasic-example"/>
 
   <target name="dist" description="==> generates distribution">
 
@@ -129,6 +130,13 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-mac-pbasic" description="==> reflect to test application">
+    <copy todir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect-win-main" description="==> reflect to test application">

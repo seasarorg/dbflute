@@ -14,7 +14,7 @@ public class DfDefaultDBFluteDiconPhp implements DfDefaultDBFluteDicon {
     }
 
     public String getDBFluteDiconPackageName() {
-        return "../resources";
+        return "";
     }
 
     public String getJ2eeDiconResourceName() {

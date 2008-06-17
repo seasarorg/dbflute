@@ -183,7 +183,13 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     // ===================================================================================
     //                                                                          Format SQL
     //                                                                          ==========
+    /** @deprecated Sorry! ConditionBean must be formatted as default.*/
 	public void formatSql();
+	
+    /**
+	 * @return Is the SQL formatted?
+	 * @deprecated Sorry! ConditionBean must be formatted as default.
+	 */
 	public boolean isFormatSql();
 	
     // ===================================================================================

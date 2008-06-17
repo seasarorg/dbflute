@@ -95,6 +95,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("* * * * * * * * * *");
             setControlTemplate("om/java/other/s2jdbc/s2jdbc-sql2entity-Control.vm");
         }
+        if (!getBasicProperties().isTargetLanguageMain()) {
+            final String language = getBasicProperties().getTargetLanguage();
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process " + language + "     *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/" + language + "/sql2entity-Control-" + language + ".vm");
+        }
         setupDataSource();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();

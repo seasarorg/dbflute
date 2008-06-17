@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommonBhvSetup} {
 
     public delegate void ${glConditionBeanSetupperName}<CONDITION_BEAN>(CONDITION_BEAN cb) where CONDITION_BEAN : ${glConditionBeanInterfaceName};
 
-//    public interface ${glConditionBeanSetupperName}<CONDITION_BEAN> where CONDITION_BEAN : ConditionBean {
+//    public interface ${glConditionBeanSetupperName}<CONDITION_BEAN> where CONDITION_BEAN : ${glConditionBeanInterfaceName} {
 //        void Setup(CONDITION_BEAN cb);
 //    }
 }
