@@ -3,6 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCValue};
 #set ($myClassName = "${glConditionValueName}")
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
@@ -952,12 +954,14 @@ public class ${myClassName} {
     /**
      * Filter value.
      * If the value is instance of java.util.Date or java.util.Calendar, returns value as java.sql.Date.
-     * 
      * @param value Value. (Nullable)
      * @return Filtered value. (Nullable)
      */
     protected Object filterValue(Object value) {
         if (value == null) {
+            return value;
+        }
+        if (value instanceof java.sql.Time) {
             return value;
         }
         if (value instanceof java.sql.Timestamp) {
@@ -973,16 +977,15 @@ public class ${myClassName} {
     /**
      * Filter value.
      * If the value is instance of java.util.Date or java.util.Calendar, returns value as java.sql.Date.
-     * 
      * @param valueList Value-list. (Nullable)
      * @return Filtered value-list. (Nullable)
      */
-    protected java.util.List filterValue(java.util.List valueList) {
+    protected List filterValue(List valueList) {
         if (valueList == null || valueList.isEmpty()) {
             return valueList;
         }
-        final List${database.filterGenericsString("Object")} resultList = new java.util.ArrayList${database.filterGenericsString("Object")}();
-        for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+        final List<Object> resultList = new ArrayList<Object>();
+        for (Iterator ite = valueList.iterator(); ite.hasNext(); ) {
             Object value = ite.next();
             resultList.add(filterValue(value));
         }
@@ -1136,19 +1139,13 @@ public class ${myClassName} {
     }
 
     protected static class InternalStringUtil {
-
         public static final String[] EMPTY_STRINGS = new String[0];
-
         private InternalStringUtil() {
         }
-
         public static final boolean isEmpty(String text) {
             return text == null || text.length() == 0;
         }
-
-        public static final String replace(String text, String fromText,
-                String toText) {
-
+        public static final String replace(String text, String fromText, String toText) {
             if (text == null || fromText == null || toText == null) {
                 return null;
             }
