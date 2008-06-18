@@ -10,6 +10,8 @@ import java.util.Calendar;
 
 import org.seasar.extension.jdbc.ValueType;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -84,11 +86,14 @@ public class ${glInternalBindVariableUtil} {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {
             return bindVariable.toString();
+        } else if (bindVariable instanceof Time) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            return quote(sdf.format((java.util.Date) bindVariable));
         } else if (bindVariable instanceof Timestamp) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+            SimpleDateFormat sdf = new SimpleDateFormat(getLogTimestampFormat());
             return quote(sdf.format((java.util.Date) bindVariable));
         } else if (bindVariable instanceof java.util.Date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat(getLogDateFormat());
             return quote(sdf.format((java.util.Date) bindVariable));
         } else if (bindVariable instanceof Boolean) {
             return bindVariable.toString();
@@ -99,6 +104,16 @@ public class ${glInternalBindVariableUtil} {
         }
     }
 
+    protected static String getLogDateFormat() {
+        String logDateFormat = ${glDBFluteConfig}.getInstance().getLogDateFormat();
+        return logDateFormat != null ? logDateFormat : "yyyy-MM-dd";
+    }
+
+    protected static String getLogTimestampFormat() {
+        String logTimestampFormat = ${glDBFluteConfig}.getInstance().getLogTimestampFormat();
+        return logTimestampFormat != null ? logTimestampFormat : "yyyy-MM-dd HH:mm:ss";
+    }
+	
 	// For various seasar's version.
 	protected static final Class<?>[] TOTEXT_ARGUMENT_TYPES = new Class<?>[]{Object.class};
 	protected static final Method TOTEXT_METHOD;
