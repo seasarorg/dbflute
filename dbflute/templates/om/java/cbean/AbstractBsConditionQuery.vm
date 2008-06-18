@@ -534,7 +534,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         register${tmpJavaName}(CK_LESS_EQUAL, ${tmpUncapitalisedJavaName});
     }
 #end
-#if (${col.isAvailableDateFromTo()})
+#if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
 
     /**
      * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
