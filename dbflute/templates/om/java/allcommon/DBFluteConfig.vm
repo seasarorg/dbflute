@@ -185,6 +185,11 @@ public class ${myClassName} {
     //                                                                        ============
 	public void clear() {
 	    _defaultStatementConfig = null;
+	    _conditionBeanFormatSql = true;
+	    _queryLogLevelInfo = false;
+	    _executeStatusLogLevelInfo = false;
+	    _logDateFormat = null;
+	    _logTimestampFormat = null;
 		_internalDebug = false;
 	}
 }
