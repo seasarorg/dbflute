@@ -14,7 +14,6 @@ import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommon}.${glQLog};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -23,12 +22,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * @author ${database.ClassAuthor}
  */
 public class ${glInternalBasicHandler} {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalBasicHandler}.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -68,11 +61,11 @@ public class ${glInternalBasicHandler} {
         }
     }
 
-    protected Class[] getArgTypes(Object[] args) {
+    protected Class<?>[] getArgTypes(Object[] args) {
         if (args == null) {
             return null;
         }
-        Class[] argTypes = new Class[args.length];
+        Class<?>[] argTypes = new Class[args.length];
         for (int i = 0; i < args.length; ++i) {
             Object arg = args[i];
             if (arg != null) {
@@ -97,7 +90,7 @@ public class ${glInternalBasicHandler} {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (${glQLog}.isLogEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
-			if (isConditionBeanFormatSqlEffective()) {
+			if (containsLineSeparator(completeSql)) {
                 ${glQLog}.log(getLineSeparator() + completeSql);
 			} else {
                 ${glQLog}.log(completeSql);
@@ -111,13 +104,8 @@ public class ${glInternalBasicHandler} {
         }
     }
 	
-	protected boolean isConditionBeanFormatSqlEffective() {
-	    if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-		    if (${glConditionBeanContextName}.getConditionBeanOnThread().isFormatSql()) {
-			    return true;
-			}
-		}
-		return false;
+	protected boolean containsLineSeparator(String completeSql) {
+	    return completeSql != null ? completeSql.contains(getLineSeparator()) : false;
 	}
 	
     // ===================================================================================

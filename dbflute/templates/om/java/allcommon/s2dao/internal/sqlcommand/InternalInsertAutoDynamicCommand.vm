@@ -62,7 +62,7 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
     protected String createInsertSql(BeanMetaData bmd,
             PropertyType[] propertyTypes) {
         StringBuffer buf = new StringBuffer(100);
-        buf.append("INSERT INTO ");
+        buf.append("insert into ");
         buf.append(bmd.getTableName());
         buf.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
@@ -73,7 +73,7 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
             }
             buf.append(columnName);
         }
-        buf.append(") VALUES (");
+        buf.append(") values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             if (i > 0) {
                 buf.append(", ");

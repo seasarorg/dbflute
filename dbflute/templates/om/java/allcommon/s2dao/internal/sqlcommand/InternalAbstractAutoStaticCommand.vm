@@ -127,7 +127,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     protected void setupInsertSql() {
         BeanMetaData bmd = getBeanMetaData();
         StringBuffer buf = new StringBuffer(100);
-        buf.append("INSERT INTO ");
+        buf.append("insert into ");
         buf.append(bmd.getTableName());
         buf.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
@@ -138,7 +138,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
             }
         }
         buf.setLength(buf.length() - 2);
-        buf.append(") VALUES (");
+        buf.append(") values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
@@ -153,9 +153,9 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     protected void setupUpdateSql() {
         checkPrimaryKey();
         StringBuffer buf = new StringBuffer(100);
-        buf.append("UPDATE ");
+        buf.append("update ");
         buf.append(getBeanMetaData().getTableName());
-        buf.append(" SET ");
+        buf.append(" set ");
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             buf.append(pt.getColumnName());
@@ -169,7 +169,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     protected void setupDeleteSql() {
         checkPrimaryKey();
         StringBuffer buf = new StringBuffer(100);
-        buf.append("DELETE FROM ");
+        buf.append("delete from ");
         buf.append(getBeanMetaData().getTableName());
         setupUpdateWhere(buf);
         setSql(buf.toString());
@@ -184,21 +184,21 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupUpdateWhere(StringBuffer buf) {
         BeanMetaData bmd = getBeanMetaData();
-        buf.append(" WHERE ");
+        buf.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             buf.append(bmd.getPrimaryKey(i));
-            buf.append(" = ? AND ");
+            buf.append(" = ? and ");
         }
         buf.setLength(buf.length() - 5);
         if (bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
-            buf.append(" AND ");
+            buf.append(" and ");
             buf.append(pt.getColumnName());
             buf.append(" = ?");
         }
         if (bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
-            buf.append(" AND ");
+            buf.append(" and ");
             buf.append(pt.getColumnName());
             buf.append(" = ?");
         }

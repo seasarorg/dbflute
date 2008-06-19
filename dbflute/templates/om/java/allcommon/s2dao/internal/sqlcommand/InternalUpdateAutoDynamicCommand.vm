@@ -86,9 +86,9 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     protected String createUpdateSql(BeanMetaData bmd,
             PropertyType[] propertyTypes) {
         StringBuffer buf = new StringBuffer(100);
-        buf.append("UPDATE ");
+        buf.append("update ");
         buf.append(bmd.getTableName());
-        buf.append(" SET ");
+        buf.append(" set ");
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             final String columnName = pt.getColumnName();
@@ -99,21 +99,21 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
             buf.append(" = ?");
         }
 
-        buf.append(" WHERE ");
+        buf.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             buf.append(bmd.getPrimaryKey(i));
-            buf.append(" = ? AND ");
+            buf.append(" = ? and ");
         }
         buf.setLength(buf.length() - 5);
         if (bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
-            buf.append(" AND ");
+            buf.append(" and ");
             buf.append(pt.getColumnName());
             buf.append(" = ?");
         }
         if (bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
-            buf.append(" AND ");
+            buf.append(" and ");
             buf.append(pt.getColumnName());
             buf.append(" = ?");
         }
