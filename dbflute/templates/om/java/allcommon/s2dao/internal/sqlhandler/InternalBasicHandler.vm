@@ -90,7 +90,7 @@ public class ${glInternalBasicHandler} {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (${glQLog}.isLogEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
-			if (containsLineSeparator(completeSql)) {
+			if (isContainsLineSeparatorInSql()) {
                 ${glQLog}.log(getLineSeparator() + completeSql);
 			} else {
                 ${glQLog}.log(completeSql);
@@ -104,8 +104,8 @@ public class ${glInternalBasicHandler} {
         }
     }
 	
-	protected boolean containsLineSeparator(String completeSql) {
-	    return completeSql != null ? completeSql.contains(getLineSeparator()) : false;
+	protected boolean isContainsLineSeparatorInSql() {
+	    return sql != null ? sql.contains(getLineSeparator()) : false;
 	}
 	
     // ===================================================================================

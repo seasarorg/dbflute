@@ -74,7 +74,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             SetupBindVariables(bean);
             if (${glQLog}.IsLogEnabled()) {
 			    String completeSql = GetCompleteSql(_bindVariables);
-			    if (ContainsLineSeparator(completeSql)) {
+			    if (IsContainsLineSeparatorInSql()) {
 			        ${glQLog}.Log(GetLineSeparator() + completeSql);
 			    } else {
 			        ${glQLog}.Log(completeSql);
@@ -92,8 +92,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return ret;
         }
 
-        protected bool ContainsLineSeparator(String completeSql) {
-            return completeSql != null ? completeSql.Contains(GetLineSeparator()) : false;
+        protected bool IsContainsLineSeparatorInSql() {
+            return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
 
         // ===============================================================================
