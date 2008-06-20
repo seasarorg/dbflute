@@ -61,15 +61,15 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
     //                                                                            ========
     /**
      * Select behavior.
-     * @param <BEHAVIOR_TYPE> The type of behavior.
+     * @param <BEHAVIOR> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
-    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE select(Class<BEHAVIOR_TYPE> behaviorType) {
+    public <BEHAVIOR extends ${glBehaviorReadableInterfaceName}> BEHAVIOR select(Class<BEHAVIOR> behaviorType) {
         if (_behaviorCache.containsKey(behaviorType)) {
-            return (BEHAVIOR_TYPE)_behaviorCache.get(behaviorType);
+            return (BEHAVIOR)_behaviorCache.get(behaviorType);
         }
-        final BEHAVIOR_TYPE bhv = (BEHAVIOR_TYPE)getComponent(behaviorType);
+        final BEHAVIOR bhv = (BEHAVIOR)getComponent(behaviorType);
         _behaviorCache.put(behaviorType, bhv);
         return bhv;
     }

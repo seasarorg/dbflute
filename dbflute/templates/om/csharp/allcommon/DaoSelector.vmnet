@@ -7,7 +7,10 @@ namespace ${glPackageBaseCommon} {
 
     [Implementation(typeof(${glCacheDaoSelectorName}))]
     public interface ${glDaoSelectorInterfaceName} {
-        DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glDaoReadableInterfaceName};
+        DAO Select<DAO>() where DAO : ${glDaoReadableInterfaceName};
         ${glDaoReadableInterfaceName} ByName(String tableFlexibleName);
+
+        [System.Obsolete("Please use Select<DAO>()")]
+        DAO Select<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName};
     }
 }

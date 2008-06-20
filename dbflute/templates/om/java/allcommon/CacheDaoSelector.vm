@@ -6,9 +6,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 
 /**
- * The implementation of dao-selector.
+ * The implementation of DAO-selector.
  * <pre>
- * Long long ago this object have cache of dao and bhv.
+ * Long long ago this object have cache of DAO and behavior.
  * But the cache cause wrong performance when this is initialized.
  * So now this object don't have cache.
  * </pre>
@@ -20,21 +20,19 @@ public class ${glCacheDaoSelectorName} extends ${glCacheAbstractSelector} implem
     //                                                                            Selector
     //                                                                            ========
     /**
-     * Select dao.
-     * 
-     * ${database.filterGenericsParamOutput('<DAO_TYPE>', 'The type of behavior.')}
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
+     * Select DAO.
+     * @param <DAO> The type of DAO.
+     * @param daoType DAO type. (NotNull)
+     * @return DAO. (NotNull)
      */
-    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE select(Class<DAO_TYPE> daoType) {
-        return (DAO_TYPE)getComponent(daoType);
+    public <DAO extends ${glDaoReadableInterfaceName}> DAO select(Class<DAO> daoType) {
+        return (DAO)getComponent(daoType);
     }
 
     /**
-     * Select dao-readable by name.
-     * 
+     * Select DAO-readable by name.
      * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
+     * @return DAO-readable. (NotNull)
      */
     public ${glDaoReadableInterfaceName} byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);

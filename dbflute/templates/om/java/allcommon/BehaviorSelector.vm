@@ -16,11 +16,11 @@ public interface ${glBehaviorSelectorInterfaceName} {
 	
     /**
      * Select behavior.
-	 * @param <BEHAVIOR_TYPE> The type of behavior.
+	 * @param <BEHAVIOR> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
-    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE select(Class<BEHAVIOR_TYPE> behaviorType);
+    public <BEHAVIOR extends ${glBehaviorReadableInterfaceName}> BEHAVIOR select(Class<BEHAVIOR> behaviorType);
 
     /**
      * Select behavior-readable.

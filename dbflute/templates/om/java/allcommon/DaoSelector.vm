@@ -1,23 +1,23 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
- * The interface of dao-selector.
+ * The interface of DAO-selector.
  * @author ${database.ClassAuthor}
  */
 public interface ${glDaoSelectorInterfaceName} {
 
     /**
-     * Select dao.
-     * @param <DAO_TYPE> The type of behavior.
-     * @param daoType Dao type. (NotNull)
+     * Select DAO.
+     * @param <DAO> The type of DAO.
+     * @param daoType DAO type. (NotNull)
      * @return Dao. (NotNull)
      */
-    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE select(Class<DAO_TYPE> daoType);
+    public <DAO extends ${glDaoReadableInterfaceName}> DAO select(Class<DAO> daoType);
 
     /**
-     * Select dao-readable by name.
+     * Select DAO-readable by name.
      * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
+     * @return DAO-readable. (NotNull)
      */
     public ${glDaoReadableInterfaceName} byName(String tableFlexibleName);
 }
