@@ -193,7 +193,7 @@ namespace ${glPackageExtendedBhv} {
                     pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
                 }
             }
-            ${refererBhvClassName} referrerBhv = this.BehaviorSelector.Select<${refererBhvClassName}>(typeof(${refererBhvClassName}));
+            ${refererBhvClassName} referrerBhv = this.BehaviorSelector.Select<${refererBhvClassName}>();
             ${refererCBClassName} cb = referrerBhv.NewMyConditionBean();
             cb.Query().Set${referer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
             cb.Query().AddOrderBy_${referer.getLocalColumnJavaNameAsOne()}_Asc();
