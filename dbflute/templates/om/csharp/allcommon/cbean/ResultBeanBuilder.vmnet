@@ -33,7 +33,7 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glPagingResultBeanName}<ENTITY> BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, IList<ENTITY> selectedList) {
             ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
             rb.TableDbName = _tableDbName;
-            rb.AllRecordCount = selectedList.Count;
+            rb.AllRecordCount = allRecordCount;
             rb.SelectedList = selectedList;
             rb.OrderByClause = pb.SqlComponentOfOrderByClause;
             rb.CurrentPageNumber = pb.FetchPageNumber;
