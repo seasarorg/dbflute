@@ -8,10 +8,10 @@ namespace ${glPackageBaseCommon} {
 
     [Implementation(typeof(${glCacheBehaviorSelectorName}))]
     public interface ${glBehaviorSelectorInterfaceName} {
-        BEHAVIOR_TYPE Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadableInterfaceName};
+        BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadableInterfaceName};
         ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName);
 
         [System.Obsolete("Please use Select<BEHAVIOR>()")]
-        BEHAVIOR_TYPE Select<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadableInterfaceName};
+        BEHAVIOR Select<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadableInterfaceName};
     }
 }
