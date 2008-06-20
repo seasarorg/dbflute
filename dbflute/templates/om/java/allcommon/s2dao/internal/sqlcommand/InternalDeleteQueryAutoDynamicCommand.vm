@@ -67,6 +67,9 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
     }
 
     protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
+        // 
+        // @jflute -- Move the logic to SqlClause at the future... 
+        // 
         final String tableSqlName = cb.getTableSqlName();
         final String aliasName = cb.getSqlClause().getLocalTableAliasName();
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cb.getTableDbName());
@@ -84,16 +87,24 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
 		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
 		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
 		
-        final String subQuery = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
-        final StringBuilder sb = new StringBuilder();
-		String ln = "";
-        if (cb.getSqlClause().isFormatClauseEffective()) {
-            ln = getLineSeparator();
+		if (cb.getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}MySql) {
+		    String subQuery = cb.getSqlClause().filterSubQueryIndent(fromWhereClause);
+		    subQuery = replaceString(subQuery, aliasName + ".", "");
+		    subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+		    subQuery = subQuery.substring(subQuery.indexOf("from "));
+		    return "delete " + subQuery;
+        } else {
+            final String subQuery = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            final StringBuilder sb = new StringBuilder();
+		    String ln = "";
+            if (cb.getSqlClause().isFormatClauseEffective()) {
+                ln = getLineSeparator();
+		    }
+            sb.append("delete from ").append(tableSqlName).append(ln);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
 		}
-        sb.append("delete from ").append(tableSqlName).append(ln);
-        sb.append(" where ").append(primaryKeyName);
-        sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
-        return sb.toString();
     }
     
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
