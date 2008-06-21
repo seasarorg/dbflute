@@ -361,7 +361,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         msg = msg + " srcFile=" + _srcFile;
                         throw new IllegalStateException(msg);
                     }
-                    final String typeName = element.substring(0, nameIndex).trim();
+                    final String typeName = resolvePackageName(element.substring(0, nameIndex).trim());
                     final String rearString = element.substring(nameIndex + nameDelimiterLength).trim();
                     final int optionIndex = rearString.indexOf(":");
                     if (optionIndex == 0) {
@@ -396,6 +396,37 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     pmbMetaData.setSuperClassName(baseCommonPackage + "." + cbeanPackageName + "." + projectPrefix
                             + spbName);
                 }
+            }
+
+            protected String resolvePackageName(String typeName) {// [DBFLUTE-271]
+                if (typeName == null) {
+                    return typeName;
+                }
+                if (getBasicProperties().isTargetLanguageJava()) {
+                    if (typeName.startsWith("List<") && typeName.endsWith(">")) {
+                        return "java.util." + typeName;
+                    }
+                    if (typeName.startsWith("Map<") && typeName.endsWith(">")) {
+                        return "java.util." + typeName;
+                    }
+                    if (typeName.equals("BigDecimal")) {
+                        return "java.math." + typeName;
+                    }
+                    if (typeName.equals("Time")) {
+                        return "java.sql." + typeName;
+                    }
+                    if (typeName.equals("Timestamp")) {
+                        return "java.sql." + typeName;
+                    }
+                    if (typeName.equals("Date")) {
+                        return "java.util." + typeName;
+                    }
+                } else {
+                    if (typeName.startsWith("IList<") && typeName.endsWith(">")) {
+                        return "System.Collections.Generic." + typeName;
+                    }
+                }
+                return typeName;
             }
 
             @Override
