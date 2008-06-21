@@ -402,7 +402,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (typeName == null) {
                     return typeName;
                 }
-                if (getBasicProperties().isTargetLanguageJava()) {
+                final DfBasicProperties prop = getBasicProperties();
+                if (prop.isTargetLanguageJava()) {
                     if (typeName.startsWith("List<") && typeName.endsWith(">")) {
                         return "java.util." + typeName;
                     }
@@ -421,7 +422,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     if (typeName.equals("Date")) {
                         return "java.util." + typeName;
                     }
-                } else {
+                } else if (prop.isTargetLanguageCSharp()) {
                     if (typeName.startsWith("IList<") && typeName.endsWith(">")) {
                         return "System.Collections.Generic." + typeName;
                     }
