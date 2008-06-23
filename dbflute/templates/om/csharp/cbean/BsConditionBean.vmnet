@@ -234,7 +234,7 @@ namespace ${glPackageBaseCB} {
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
 		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
@@ -247,12 +247,12 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpCBClassName}SpQyCall(_myQyCall), _forDeriveReferrer); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDeriveReferrer); }
             return _${tmpPropertyName};
         }
-		public class ${tmpCBClassName}SpQyCall : SpQyCall<${tmpCQClassName}> {
+		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
 		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public ${tmpCBClassName}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
+		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
 		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
