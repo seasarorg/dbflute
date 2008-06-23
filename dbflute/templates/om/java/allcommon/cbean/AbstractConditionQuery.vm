@@ -565,9 +565,22 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                       InScopeSubQuery
     //                                       ---------------
+    // {Modified at DBFlute-0.7.5}
     protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
+        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
+    }
+
+    protected void registerNotInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
+    }
+
+    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName
+                                 , String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
+        inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         String clause = null;
@@ -578,9 +591,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             String endIndent = "       ";
-            clause = realColumnName + " in (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
+            clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
         } else {
-            clause = realColumnName + " in (" + subQueryClause + ")";
+            clause = realColumnName + " " + inScopeOption + "in (" + subQueryClause + ")";
         }
         registerWhereClause(clause);
     }
@@ -602,12 +615,26 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         
         return selectClause + " " + fromWhereClause;
     }
+
     // -----------------------------------------------------
     //                                        ExistsSubQuery
     //                                        --------------
+    // {Modified at DBFlute-0.7.5}
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
+        registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
+    }
+
+    protected void registerNotExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
+    }
+
+    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName
+                                 , String existsOption) {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
+        existsOption = existsOption != null ? existsOption + " " : "";
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         String clause = null;
@@ -618,9 +645,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             String endIndent = "       ";
-            clause = "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
+            clause = existsOption + "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
         } else {
-            clause = "exists (" + subQueryClause + ")";
+            clause = existsOption + "exists (" + subQueryClause + ")";
         }
         registerWhereClause(clause);
     }
