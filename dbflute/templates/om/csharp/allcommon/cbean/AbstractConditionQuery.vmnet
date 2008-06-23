@@ -316,7 +316,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
-        inScopeOption = inScopeOption ? inScopeOption + " " : "";
+        inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         String clause = null;
@@ -369,7 +369,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String existsOption) {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
-        existsOption = existsOption ? existsOption + " " : "";
+        existsOption = existsOption != null ? existsOption + " " : "";
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         String clause = null;
