@@ -125,7 +125,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                  ==============
         public virtual ${glOutsideSqlBasicExecutorName} OutsideSql() {
             AssertDaoSelectorNotNull("OutsideSql");
-            ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDaoName}>(typeof(${glOutsideSqlDaoName}));
+            ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDaoName}>();
             return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao, this.TableDbName);
         }
 
