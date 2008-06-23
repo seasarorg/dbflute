@@ -54,11 +54,21 @@ namespace ${glPackageBaseCommon} {
         public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableFlexibleName);
-            return Select<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
+            return InternalSelect<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
         }
 
         [System.Obsolete("Please use Select<BEHAVIOR>()")]
         public virtual BEHAVIOR Select<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadableInterfaceName} {
+            QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
+            BEHAVIOR bhv = (BEHAVIOR)component.GetComponentObject(behaviorType);
+            if (bhv.IsInitialized) {
+                return bhv;
+            }
+            QuillInjector.GetInstance().Inject(bhv);
+            return bhv;
+        }
+
+        protected virtual BEHAVIOR InternalSelect<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadableInterfaceName} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
             BEHAVIOR bhv = (BEHAVIOR)component.GetComponentObject(behaviorType);
             if (bhv.IsInitialized) {
