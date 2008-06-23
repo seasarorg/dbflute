@@ -22,11 +22,17 @@ namespace ${glPackageBaseCommon} {
         public virtual ${glDaoReadableInterfaceName} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableFlexibleName);
-            return Select<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
+            return InternalSelect<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
         }
 
         [System.Obsolete("Please use Select<DAO>()")]
         public virtual DAO Select<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName} {
+            QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
+            DAO dao = (DAO)component.GetComponentObject(daoType);
+            return dao;
+        }
+
+        protected virtual DAO InternalSelect<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
             DAO dao = (DAO)component.GetComponentObject(daoType);
             return dao;
