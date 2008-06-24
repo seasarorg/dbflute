@@ -568,7 +568,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                       =============
 #if (${table.hasOnlyOnePrimaryKey()})
     /**
-     * Query update the several entities.
+     * Query update the several entities. {NoConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyNotRequired}
      * @param cb Condition-bean. (NotNull)
      * @return The updated count.
@@ -576,11 +576,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         assertConditionBeanNotNull(cb);
+        setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
         return getMyDao().updateByQuery(cb, ${myEntityVariableName});
     }
 
     /**
-     * Query delete the several entities.
+     * Query delete the several entities. {NoConcurrencyControl}
      * @param cb Condition-bean. (NotNull)
      * @return The deleted count.
      */
