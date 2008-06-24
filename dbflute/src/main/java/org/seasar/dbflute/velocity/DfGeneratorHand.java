@@ -5,17 +5,17 @@ import org.apache.velocity.context.Context;
 /**
  * @author jflute
  */
-public class DfGeneratorHandler {
+public class DfGeneratorHand {
 
-    private static final DfGeneratorHandler _instance = new DfGeneratorHandler();
+    private static final DfGeneratorHand _instance = new DfGeneratorHand();
 
     // private org.apache.velocity.texen.Generator _generator = org.apache.velocity.texen.Generator.getInstance();
-    private DfGenerator _generator = DfGenerator.getInstance();
+    private DfTaktosGenerator _generator = DfTaktosGenerator.getInstance();
 
-    private DfGeneratorHandler() {
+    private DfGeneratorHand() {
     }
 
-    public static DfGeneratorHandler getInstance() {
+    public static DfGeneratorHand getInstance() {
         return _instance;
     }
 

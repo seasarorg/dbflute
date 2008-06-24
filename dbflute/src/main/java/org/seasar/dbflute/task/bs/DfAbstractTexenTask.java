@@ -47,8 +47,8 @@ import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
-import org.seasar.dbflute.velocity.DfGenerator;
-import org.seasar.dbflute.velocity.DfGeneratorHandler;
+import org.seasar.dbflute.velocity.DfTaktosGenerator;
+import org.seasar.dbflute.velocity.DfGeneratorHand;
 
 /**
  * The abstract class of texen task.
@@ -208,12 +208,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
             }
             Velocity.init();
-            final DfGeneratorHandler generatorHandler = getGeneratorHandler();
-            generatorHandler.setOutputPath(outputDirectory);
-            generatorHandler.setInputEncoding(inputEncoding);
-            generatorHandler.setOutputEncoding(outputEncoding);
+            final DfGeneratorHand generator = getGeneratorHandler();
+            generator.setOutputPath(outputDirectory);
+            generator.setInputEncoding(inputEncoding);
+            generator.setOutputEncoding(outputEncoding);
             if (templatePath != null) {
-                generatorHandler.setTemplatePath(templatePath);
+                generator.setTemplatePath(templatePath);
             }
 
             // - - - - - - - - - - - - - - - - - - - -
@@ -251,7 +251,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
 
             _log.info("generator.parse(\"" + controlTemplate + "\", c);");
-            generatorHandler.parse(controlTemplate, c);
+            generator.parse(controlTemplate, c);
 
             // - - - - - - - - - - - - - - - - - - - -
             // Remove writing output file of velocity.
@@ -261,7 +261,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             // writer.flush();
             // writer.close();
 
-            generatorHandler.shutdown();
+            generator.shutdown();
             cleanup();
         } catch (BuildException e) {
             throw e;
@@ -470,8 +470,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    public DfGeneratorHandler getGeneratorHandler() {
-        return DfGeneratorHandler.getInstance();
+    public DfGeneratorHand getGeneratorHandler() {
+        return DfGeneratorHand.getInstance();
     }
     
     // ===================================================================================

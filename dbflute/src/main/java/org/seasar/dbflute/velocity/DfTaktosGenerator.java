@@ -26,9 +26,9 @@ import org.seasar.framework.util.FileUtil;
  * @author modified by taktos
  * @author modified by jflute
  */
-public class DfGenerator {
+public class DfTaktosGenerator {
 
-    private static final Log _log = LogFactory.getLog(DfGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfTaktosGenerator.class);
 
     /**
      * Where the texen output will placed.
@@ -64,7 +64,7 @@ public class DfGenerator {
      * output withing the control template. This could
      * use some cleaning up.
      */
-    private static DfGenerator instance = new DfGenerator();
+    private static DfTaktosGenerator instance = new DfTaktosGenerator();
 
     /**
      * This is the encoding for the output file(s).
@@ -80,7 +80,7 @@ public class DfGenerator {
     /**
      * Default constructor.
      */
-    private DfGenerator() {
+    private DfTaktosGenerator() {
         setDefaultProps();
     }
 
@@ -89,7 +89,7 @@ public class DfGenerator {
      *
      * @return Generator generator used in the control context.
      */
-    public static DfGenerator getInstance() {
+    public static DfTaktosGenerator getInstance() {
         return instance;
     }
 
@@ -102,7 +102,7 @@ public class DfGenerator {
      * @param String properties used to help populate the control context.
      * @return Generator generator used in the control context.
      */
-    public DfGenerator(String propFile) {
+    public DfTaktosGenerator(String propFile) {
         try {
             BufferedInputStream bi = null;
             try {
@@ -127,7 +127,7 @@ public class DfGenerator {
      *
      * @param Properties properties object to help populate the control context.
      */
-    public DfGenerator(Properties props) {
+    public DfTaktosGenerator(Properties props) {
         this.props = (Properties) props.clone();
     }
 
@@ -290,7 +290,7 @@ public class DfGenerator {
                 StringWriter sw = new StringWriter();
                 template.merge(controlContext, sw);
                 String newContent = sw.toString();
-                String oldContent = new String(FileUtil.getBytes(oldFile), outputEncoding);
+                String oldContent = new String(FileUtil.getBytes(oldFile), this.outputEncoding);
                 if (newContent.equals(oldContent)) {
                     _log.warn("File not changed. skip to generate!");
                     return "";
