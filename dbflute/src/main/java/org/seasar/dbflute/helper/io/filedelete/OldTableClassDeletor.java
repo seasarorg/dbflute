@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.velocity.DfTaktosGenerator;
-import org.seasar.dbflute.velocity.DfGeneratorHand;
+import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
  *
@@ -79,8 +79,8 @@ public class OldTableClassDeletor {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    public DfGeneratorHand getGeneratorHandler() {
-        return DfGeneratorHand.getInstance();
+    public DfGenerator getGeneratorHandler() {
+        return DfGenerator.getInstance();
     }
 
     // ===================================================================================

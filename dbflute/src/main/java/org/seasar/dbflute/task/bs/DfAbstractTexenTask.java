@@ -48,7 +48,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 import org.seasar.dbflute.velocity.DfTaktosGenerator;
-import org.seasar.dbflute.velocity.DfGeneratorHand;
+import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
  * The abstract class of texen task.
@@ -208,7 +208,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
             }
             Velocity.init();
-            final DfGeneratorHand generator = getGeneratorHandler();
+            final DfGenerator generator = getGeneratorHandler();
             generator.setOutputPath(outputDirectory);
             generator.setInputEncoding(inputEncoding);
             generator.setOutputEncoding(outputEncoding);
@@ -470,8 +470,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    public DfGeneratorHand getGeneratorHandler() {
-        return DfGeneratorHand.getInstance();
+    public DfGenerator getGeneratorHandler() {
+        return DfGenerator.getInstance();
     }
     
     // ===================================================================================
