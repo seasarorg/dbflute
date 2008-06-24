@@ -153,7 +153,12 @@ namespace ${glPackageExtendedBhv} {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
+        #endregion
 
+        // ===============================================================================
+        //                                                                     Page Select
+        //                                                                     ===========
+        #region Page Select
         public virtual ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(TableDbName);

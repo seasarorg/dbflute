@@ -184,6 +184,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
+    // ===================================================================================
+    //                                                                         Page Select
+    //                                                                         ===========
     /**
      * Select the page as result-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
