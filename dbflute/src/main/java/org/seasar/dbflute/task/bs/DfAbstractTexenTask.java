@@ -47,7 +47,7 @@ import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
-import org.seasar.dbflute.velocity.DfTaktosGenerator;
+import org.seasar.dbflute.velocity.DfOriginalGenerator;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**

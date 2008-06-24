@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.velocity.DfTaktosGenerator;
+import org.seasar.dbflute.velocity.DfOriginalGenerator;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**

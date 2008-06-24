@@ -86,7 +86,7 @@ import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.velocity.DfTaktosGenerator;
+import org.seasar.dbflute.velocity.DfOriginalGenerator;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 

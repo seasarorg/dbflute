@@ -9,8 +9,10 @@ public class DfGenerator {
 
     private static final DfGenerator _instance = new DfGenerator();
 
-    // private org.apache.velocity.texen.Generator _generator = org.apache.velocity.texen.Generator.getInstance();
-    private DfTaktosGenerator _generator = DfTaktosGenerator.getInstance();
+    private org.apache.velocity.texen.Generator _generator = org.apache.velocity.texen.Generator.getInstance();
+    
+    // TODO: @jflute -- Now trying!
+    // private DfTaktosGenerator _generator = DfTaktosGenerator.getInstance();
 
     private DfGenerator() {
     }

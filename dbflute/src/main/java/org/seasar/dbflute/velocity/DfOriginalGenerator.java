@@ -26,9 +26,9 @@ import org.seasar.framework.util.FileUtil;
  * @author modified by taktos
  * @author modified by jflute
  */
-public class DfTaktosGenerator {
+public class DfOriginalGenerator {
 
-    private static final Log _log = LogFactory.getLog(DfTaktosGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfOriginalGenerator.class);
 
     /**
      * Where the texen output will placed.
@@ -64,7 +64,7 @@ public class DfTaktosGenerator {
      * output withing the control template. This could
      * use some cleaning up.
      */
-    private static DfTaktosGenerator instance = new DfTaktosGenerator();
+    private static DfOriginalGenerator instance = new DfOriginalGenerator();
 
     /**
      * This is the encoding for the output file(s).
@@ -80,7 +80,7 @@ public class DfTaktosGenerator {
     /**
      * Default constructor.
      */
-    private DfTaktosGenerator() {
+    private DfOriginalGenerator() {
         setDefaultProps();
     }
 
@@ -89,7 +89,7 @@ public class DfTaktosGenerator {
      *
      * @return Generator generator used in the control context.
      */
-    public static DfTaktosGenerator getInstance() {
+    public static DfOriginalGenerator getInstance() {
         return instance;
     }
 
@@ -102,7 +102,7 @@ public class DfTaktosGenerator {
      * @param String properties used to help populate the control context.
      * @return Generator generator used in the control context.
      */
-    public DfTaktosGenerator(String propFile) {
+    public DfOriginalGenerator(String propFile) {
         try {
             BufferedInputStream bi = null;
             try {
@@ -127,7 +127,7 @@ public class DfTaktosGenerator {
      *
      * @param Properties properties object to help populate the control context.
      */
-    public DfTaktosGenerator(Properties props) {
+    public DfOriginalGenerator(Properties props) {
         this.props = (Properties) props.clone();
     }
 
