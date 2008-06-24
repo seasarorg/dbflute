@@ -569,11 +569,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if (${table.hasOnlyOnePrimaryKey()})
     /**
      * Query update the several entities.
-     * @param cb Condition-bean. (NotNull)
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyNotRequired}
+     * @param cb Condition-bean. (NotNull)
      * @return The updated count.
      */
-    public int queryUpdate(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} ${myEntityVariableName}) {
+    public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         assertConditionBeanNotNull(cb);
         return getMyDao().updateByQuery(cb, ${myEntityVariableName});
     }
