@@ -7,11 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.velocity.texen.Generator;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.velocity.DfGenerator;
+import org.seasar.dbflute.velocity.DfGeneratorHandler;
 
 /**
- * 
+ *
  * @author jflute
  * @since 0.7.0 (2008/05/07 Wednesday)
  */
@@ -51,7 +52,7 @@ public class OldTableClassDeletor {
      * @return The list of package files. (NotNull)
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
-        final String dirPath = Generator.getInstance().getOutputPath() + "/"
+        final String dirPath = getGeneratorHandler().getOutputPath() + "/"
                 + DfStringUtil.replace(packagePath, ".", "/");
         final File dir = new File(dirPath);
         final FilenameFilter filter = new FilenameFilter() {
@@ -73,6 +74,13 @@ public class OldTableClassDeletor {
             }
         };
         return Arrays.asList(dir.listFiles(filter));
+    }
+    
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    public DfGeneratorHandler getGeneratorHandler() {
+        return DfGeneratorHandler.getInstance();
     }
 
     // ===================================================================================

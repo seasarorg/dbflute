@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -39,7 +39,6 @@ import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
@@ -48,6 +47,8 @@ import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
+import org.seasar.dbflute.velocity.DfGenerator;
+import org.seasar.dbflute.velocity.DfGeneratorHandler;
 
 /**
  * The abstract class of texen task.
@@ -130,7 +131,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     /**
      * Get performance view.
-     * 
+     *
      * @param mil The value of millisecound.
      * @return Performance view. (ex. 1m23s456ms) (NotNull)
      */
@@ -207,17 +208,17 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
             }
             Velocity.init();
-            final Generator generator = Generator.getInstance();
-            generator.setOutputPath(outputDirectory);
-            generator.setInputEncoding(inputEncoding);
-            generator.setOutputEncoding(outputEncoding);
+            final DfGeneratorHandler generatorHandler = getGeneratorHandler();
+            generatorHandler.setOutputPath(outputDirectory);
+            generatorHandler.setInputEncoding(inputEncoding);
+            generatorHandler.setOutputEncoding(outputEncoding);
             if (templatePath != null) {
-                generator.setTemplatePath(templatePath);
+                generatorHandler.setTemplatePath(templatePath);
             }
 
-            // - - - - - - - - - - - - - - - - - - - - 
+            // - - - - - - - - - - - - - - - - - - - -
             // Remove writing output file of velocity.
-            // - - - - - - - - - - - - - - - - - - - - 
+            // - - - - - - - - - - - - - - - - - - - -
             // final File file = new File(outputDirectory);
             // if (!file.exists()) {
             //     file.mkdirs();
@@ -250,17 +251,17 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
 
             _log.info("generator.parse(\"" + controlTemplate + "\", c);");
-            generator.parse(controlTemplate, c);
+            generatorHandler.parse(controlTemplate, c);
 
-            // - - - - - - - - - - - - - - - - - - - - 
+            // - - - - - - - - - - - - - - - - - - - -
             // Remove writing output file of velocity.
-            // - - - - - - - - - - - - - - - - - - - - 
+            // - - - - - - - - - - - - - - - - - - - -
             // final String parsedString = generator.parse(controlTemplate, c);
             // writer.write(parsedString);
             // writer.flush();
             // writer.close();
 
-            generator.shutdown();
+            generatorHandler.shutdown();
             cleanup();
         } catch (BuildException e) {
             throw e;
@@ -350,7 +351,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         try {
             // /------------------------------------------------------------
             // Initialize internal context properties as ExtendedProperties.
-            //   This property is used by Velocity Framework. 
+            //   This property is used by Velocity Framework.
             // -------/
             super.setContextProperties(file);
             {
@@ -369,7 +370,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
             // /---------------------------------------------------------------------------------------------------
             // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
-            //   This property is used by You. 
+            //   This property is used by You.
             // -------/
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
             DfBuildProperties.getInstance().setProperties(prop);
@@ -465,7 +466,14 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
-
+    
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    public DfGeneratorHandler getGeneratorHandler() {
+        return DfGeneratorHandler.getInstance();
+    }
+    
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

@@ -68,7 +68,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
-import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
@@ -87,6 +86,8 @@ import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.velocity.DfGenerator;
+import org.seasar.dbflute.velocity.DfGeneratorHandler;
 import org.xml.sax.Attributes;
 
 /**
@@ -1225,7 +1226,7 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                         Properties - sql2entity  
+    //                                                         Properties - sql2entity
     //                                                         =======================
     public boolean isSql2EntityPlainEntity() {
         return getProperties().getSql2EntityProperties().isPlainEntity();
@@ -1554,7 +1555,7 @@ public class Database {
 
     /**
      * Generate name.
-     * 
+     *
      * @param algorithmName Algorithm name.
      * @param inputs Inputs.
      * @return Generated name.
@@ -1581,7 +1582,7 @@ public class Database {
     }
 
     public void makeDirectory(String packagePath) {
-        FileUtil.mkdir(Generator.getInstance().getOutputPath() + "/" + packagePath);
+        FileUtil.mkdir(getGeneratorHandler().getOutputPath() + "/" + packagePath);
     }
 
     // ===============================================================================
@@ -1756,7 +1757,7 @@ public class Database {
         if (_deletedOldTableBaseBehaviorList == null || _deletedOldTableBaseBehaviorList.isEmpty()) {
             return;
         }
-        final String outputPath = Generator.getInstance().getOutputPath();
+        final String outputPath = getGeneratorHandler().getOutputPath();
         final String packagePath = getExtendedBehaviorPackage();
         final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
         for (String baseClassName : _deletedOldTableBaseBehaviorList) {
@@ -1774,7 +1775,7 @@ public class Database {
         if (_deletedOldTableBaseDaoList == null || _deletedOldTableBaseDaoList.isEmpty()) {
             return;
         }
-        final String outputPath = Generator.getInstance().getOutputPath();
+        final String outputPath = getGeneratorHandler().getOutputPath();
         final String packagePath = getExtendedDaoPackage();
         final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
         for (String baseClassName : _deletedOldTableBaseDaoList) {
@@ -1792,7 +1793,7 @@ public class Database {
         if (_deletedOldTableBaseEntityList == null || _deletedOldTableBaseEntityList.isEmpty()) {
             return;
         }
-        final String outputPath = Generator.getInstance().getOutputPath();
+        final String outputPath = getGeneratorHandler().getOutputPath();
         final String packagePath = getExtendedEntityPackage();
         final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
         for (String baseClassName : _deletedOldTableBaseEntityList) {
@@ -1837,17 +1838,25 @@ public class Database {
     //                                                                    Output Directory
     //                                                                    ================
     public void enableGenerateOutputDirectory() {
-        Generator.getInstance().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
+        getGeneratorHandler().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
     }
 
     public void enableSql2EntityOutputDirectory() {
-        Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
+        getGeneratorHandler().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
     }
 
     public void enableFlexDtoOutputDirectory() {
-        Generator.getInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
+        getGeneratorHandler().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
 
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    public DfGeneratorHandler getGeneratorHandler() {
+        return DfGeneratorHandler.getInstance();
+    }
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
