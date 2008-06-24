@@ -464,4 +464,11 @@ public interface ${myClassName} {
 	public boolean hasSpecifiedDeriveSubQuery(String aliasName);
     public String getSpecifiedColumnNameAsOne();
     public void clearSpecifiedSelectColumn();
+    
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+    public String getClauseQueryDelete();
 }

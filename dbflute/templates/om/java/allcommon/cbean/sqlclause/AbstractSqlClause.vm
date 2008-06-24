@@ -1393,6 +1393,106 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
     }
 
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+        final String aliasName = getLocalTableAliasName();
+        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The target table of queryUpdate() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            final StringBuilder sb = new StringBuilder();
+            String ln = "";
+            if (isFormatClauseEffective()) {
+                ln = getLineSeparator();
+            }
+            sb.append("update ").append(_tableName).append(ln);
+            int index = 0;
+            for (String columnName : columnParameterMap.keySet()) {
+                final String parameter = columnParameterMap.get(columnName); 
+                if (index == 0) {
+                    sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+                } else {
+                    sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+                }
+                ++index;
+            }
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("from "));
+            return "delete " + subQuery;
+        }
+    }
+
+    public String getClauseQueryDelete() {
+        final String aliasName = getLocalTableAliasName();
+        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The target table of queryDelete() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+        
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            final StringBuilder sb = new StringBuilder();
+            String ln = "";
+            if (isFormatClauseEffective()) {
+                ln = getLineSeparator();
+            }
+            sb.append("delete from ").append(_tableName).append(ln);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("from "));
+            return "delete " + subQuery;
+        }
+    }
+
+    protected boolean isUpdateSubQueryUseLocalTableSupported() {
+        return true;
+    }
+
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected ${glDBMetaInterfaceName} findDBMeta() {
+        return ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName); 
+    }
+    
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

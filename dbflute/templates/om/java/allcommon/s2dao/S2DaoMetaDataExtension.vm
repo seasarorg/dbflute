@@ -612,7 +612,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                     Normal OutsideSql
     //                                     -----------------
     @Override
-    protected void setupSelectMethodByManual(Method method, String sql) {
+    protected void setupSelectMethodByManual(Method method, String sql) {// Contains SQL-Annotation
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final String[] argNames = this.daoAnnotationReader.getArgNames(method);
         final Class<?>[] argTypes;
@@ -635,6 +635,21 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return getBeanMetaData();
         }
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
+    }
+
+    @Override
+    protected void setupUpdateMethodByManual(Method method, final String sql) {// Contains SQL-Annotation
+        final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory);
+        cmd.setSql(sql);
+        String[] argNames = daoAnnotationReader.getArgNames(method);
+        if (argNames.length == 0 && isUpdateSignatureForBean(method)) {
+            argNames = new String[] { StringUtil.decapitalize(ClassUtil.getShortClassName(beanClass)) };
+        }
+
+        // It is unnecessary for DBFlute!
+        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+
+        registerSqlCommand(method.getName(), method, sql, argNames, argTypes, cmd);
     }
 
     // -----------------------------------------------------

@@ -62,7 +62,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} lockForUpdate() {
@@ -72,7 +71,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -81,7 +79,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -90,7 +87,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -99,10 +95,18 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+    
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                               Query Update Override
+    //                                                               =====================
+	@Override
+    protected boolean isUpdateSubQueryUseLocalTableSupported() {
+        return false;
     }
 }
