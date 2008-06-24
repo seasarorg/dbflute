@@ -58,8 +58,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 #end
 #end
     // ===================================================================================
-    //                                                                 Basic Entity Update
-    //                                                                 ===================
+    //                                                                       Entity Update
+    //                                                                       =============
     // -----------------------------------------------------
     //                                                Create
     //                                                ------
@@ -149,8 +149,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected abstract void doRemove(${glEntityInterfaceName} entity);
 
     // ===================================================================================
-    //                                                 Basic Entity Update Internal Helper
-    //                                                 ===================================
+    //                                                       Entity Update Internal Helper
+    //                                                       =============================
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
@@ -315,8 +315,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 #end
 
     // ===================================================================================
-    //                                                                   Basic Lump Update
-    //                                                                   =================
+    //                                                                         Lump Update
+    //                                                                         ===========
     /**
      * Lump create the list.
      * @param entityList Entity list. (NotNull and NotEmpty)

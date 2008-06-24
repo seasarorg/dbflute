@@ -347,6 +347,7 @@ targetdatabase = $targetDatabase
     #set ($glInternalUpdateBatchAutoStaticCommand = "${glProjectPrefix}InternalUpdateBatchAutoStaticCommand")
     #set ($glInternalUpdateDynamicCommand = "${glProjectPrefix}InternalUpdateDynamicCommand")
     #set ($glInternalUpdateModifiedOnlyCommand = "${glProjectPrefix}InternalUpdateModifiedOnlyCommand")
+    #set ($glInternalUpdateQueryAutoDynamicCommand = "${glProjectPrefix}InternalUpdateQueryAutoDynamicCommand")
 
     #set ($glInternalAbstractAutoHandler = "${glProjectPrefix}InternalAbstractAutoHandler")
     #set ($glInternalAbstractBatchAutoHandler = "${glProjectPrefix}InternalAbstractBatchAutoHandler")
@@ -1777,6 +1778,11 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalUpdateModifiedOnlyCommand');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalUpdateModifiedOnlyCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalUpdateModifiedOnlyCommand.${glTemplateFileExtension}",$path,"", "")
+
+      ## {DBFlute-0.7.5}
+      $database.info("    parse('InternalUpdateQueryAutoDynamicCommand');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalUpdateQueryAutoDynamicCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalUpdateQueryAutoDynamicCommand.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler}))
       $database.makeDirectory($path)

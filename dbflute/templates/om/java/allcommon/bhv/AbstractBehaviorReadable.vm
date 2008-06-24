@@ -61,11 +61,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // =====================================================================================
-    //                                                                      Basic Read Count
-    //                                                                      ================
+    //                                                                            Count Read
+    //                                                                            ==========
     /**
      * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
      * @return Read count. (NotNull)
      */
@@ -75,11 +74,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // =====================================================================================
-    //                                                                     Basic Read Entity
-    //                                                                     =================
+    //                                                                           Entity Read 
+    //                                                                           ===========
     /**
      * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -111,8 +109,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // =====================================================================================
-    //                                                     Basic Read Entity Internal Helper
-    //                                                     =================================
+    //                                                           Entity Read Internal Helper
+    //                                                           ===========================
     protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
             ENTITY_TYPE helpSelectEntityInternally(CB_TYPE cb, InternalSelectEntityCallback<ENTITY_TYPE, CB_TYPE> callback) {
         assertConditionBeanNotNull(cb);
@@ -154,11 +152,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // =====================================================================================
-    //                                                                       Basic Read List
-    //                                                                       ===============
+    //                                                                             List Read
+    //                                                                             =========
     /**
      * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
@@ -169,7 +166,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */

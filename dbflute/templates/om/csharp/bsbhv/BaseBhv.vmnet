@@ -104,14 +104,19 @@ namespace ${glPackageExtendedBhv} {
         #endregion
 
         // ===============================================================================
-        //                                                                    Basic Select
+        //                                                                    Count Select
         //                                                                    ============
-        #region Basic Select
+        #region Count Select
         public virtual int SelectCount(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.DelegateSelectCount(cb);
         }
+        #endregion
 
+        // ===============================================================================
+        //                                                                   Entity Select
+        //                                                                   =============
+        #region Entity Select
         public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
@@ -138,7 +143,12 @@ namespace ${glPackageExtendedBhv} {
 //            return this.SelectEntityWithDeletedCheck(cb);
 //        }
 #end
+        #endregion
 
+        // ===============================================================================
+        //                                                                     List Select
+        //                                                                     ===========
+        #region List Select
         public virtual ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
@@ -228,8 +238,8 @@ namespace ${glPackageExtendedBhv} {
 
 #if ($table.isWritable())
         // ===============================================================================
-        //                                                             Basic Entity Update
-        //                                                             ===================
+        //                                                                   Entity Update
+        //                                                                   =============
         #region Basic Entity Update
         public virtual void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);

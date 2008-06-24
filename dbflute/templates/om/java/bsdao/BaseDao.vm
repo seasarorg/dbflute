@@ -64,6 +64,9 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.hasOptimisticLock())
     public ${batchUpdateReturnType} updateListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
+#if (${table.hasOnlyOnePrimaryKey()})
+    public int updateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);// {DBFlute-0.7.5}
+#end
     public ${batchUpdateReturnType} deleteList(List<${myExtendedObjectClassName}> entityList);
 #if ($table.hasOptimisticLock())
     public ${batchUpdateReturnType} deleteListNonstrict(List<${myExtendedObjectClassName}> entityList);

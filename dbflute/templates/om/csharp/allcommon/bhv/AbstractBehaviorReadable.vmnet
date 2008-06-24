@@ -48,13 +48,16 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         // ===============================================================================
-        //                                                                    Basic Select
-        //                                                                    ============
+        //                                                                      Count Read
+        //                                                                      ==========
         public virtual int ReadCount(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.CallReadCount(cb);
         }
 
+        // ===============================================================================
+        //                                                                     Entity Read
+        //                                                                     ===========
         public virtual ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
@@ -73,6 +76,9 @@ namespace ${glPackageBaseCommonBhv} {
             return (${glEntityInterfaceName})ls[0];
         }
 
+        // ===============================================================================
+        //                                                                       List Read
+        //                                                                       =========
         public virtual ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${glEntityInterfaceName}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));

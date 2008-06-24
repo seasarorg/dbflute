@@ -18,8 +18,8 @@ namespace ${glPackageBaseCommonBhv} {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // ===============================================================================
-        //                                                             Basic Entity Update
-        //                                                             ===================
+        //                                                                   Entity Update
+        //                                                                   =============
         public virtual void Create(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             CallCreate(entity);

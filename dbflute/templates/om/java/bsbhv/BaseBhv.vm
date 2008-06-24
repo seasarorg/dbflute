@@ -116,8 +116,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
     // ===================================================================================
-    //                                                                  Basic Select Count
-    //                                                                  ==================
+    //                                                                        Count Select
+    //                                                                        ============
     /**
      * Select the count of the condition-bean. {IgnorePagingCondition}
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -129,8 +129,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     // ===================================================================================
-    //                                                                 Basic Select Entity
-    //                                                                 ===================
+    //                                                                       Entity Select
+    //                                                                       =============
     /**
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -172,8 +172,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // ===================================================================================
-    //                                                                   Basic Select List
-    //                                                                   =================
+    //                                                                         List Select
+    //                                                                         ===========
     /**
      * Select the list as result-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -327,8 +327,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isWritable())
 
     // ===================================================================================
-    //                                                                 Basic Entity Update
-    //                                                                 ===================
+    //                                                                       Entity Update
+    //                                                                       =============
     /**
      * Insert the entity.
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
@@ -491,8 +491,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // ===================================================================================
-    //                                                                  Basic Batch Update
-    //                                                                  ==================
+    //                                                                        Batch Update
+    //                                                                        ============
     /**
      * Batch insert the list. This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
@@ -562,10 +562,37 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateDeleteListNonstrict(${myEntityListVariableName});
     }
 #end
-#if ($database.isMakeBehaviorCopyInsert())
+
     // ===================================================================================
-    //                                                                      Various Insert
+    //                                                                       Query  Update
+    //                                                                       =============
+#if (${table.hasOnlyOnePrimaryKey()})
+    /**
+     * Query update the several entities.
+     * @param cb Condition-bean. (NotNull)
+     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyNotRequired}
+     * @return The updated count.
+     */
+    public int queryUpdate(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().updateByQuery(cb, ${myEntityVariableName});
+    }
+
+    /**
+     * Query delete the several entities.
+     * @param cb Condition-bean. (NotNull)
+     * @return The deleted count.
+     */
+    public int queryDelete(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().deleteByQuery(cb);
+    }
+#end
+
+    // ===================================================================================
+    //                                                                      Various Update
     //                                                                      ==============
+#if ($database.isMakeBehaviorCopyInsert())
 #if ($table.isUseIdentity())
 #if ($table.hasPrimaryKey())
 
@@ -593,10 +620,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 #end
-
-    // ===================================================================================
-    //                                                                      Various Update
-    //                                                                      ==============
 #if ($database.isMakeBehaviorLoopUpdate())
     /**
      * Loop update modified elements only.
@@ -618,27 +641,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 #end
-
-#if (${table.hasOnlyOnePrimaryKey()})
-    // ===================================================================================
-    //                                                                      Various Delete
-    //                                                                      ==============
-    /**
-     * Query delete the several entities.
-     * @param cb Condition-bean. (NotNull)
-     * @return The deleted count.
-     */
-    public int queryDelete(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return getMyDao().deleteByQuery(cb);
-    }
-#end
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
     // ===================================================================================
-    //                                                                 Basic Entity Update
-    //                                                                 ===================
+    //                                                                       Entity Update
+    //                                                                       =============
     /**
      * Insert.
      * @param ${myEntityVariableName} Entity. (NotNull)

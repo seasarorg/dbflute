@@ -69,6 +69,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynam
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 
 /**
  * The extension of DaoMetaDataImpl for DBFlute.
@@ -427,6 +428,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                ------
     @Override
     protected void setupUpdateMethodByAuto(final Method method) {
+        if (isFirstArgumentConditionBean(method)) {
+            final SqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(dataSource, statementFactory);
+            putSqlCommand(method.getName(), cmd);
+            return;
+        }
         checkAutoUpdateMethod(method);
         final String[] propertyNames = getPersistentPropertyNames(method);
         SqlCommand cmd;
@@ -637,20 +643,23 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
     }
 
-    @Override
-    protected void setupUpdateMethodByManual(Method method, final String sql) {// Contains SQL-Annotation
-        final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory);
-        cmd.setSql(sql);
-        String[] argNames = daoAnnotationReader.getArgNames(method);
-        if (argNames.length == 0 && isUpdateSignatureForBean(method)) {
-            argNames = new String[] { StringUtil.decapitalize(ClassUtil.getShortClassName(beanClass)) };
-        }
-
-        // It is unnecessary for DBFlute!
-        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-
-        registerSqlCommand(method.getName(), method, sql, argNames, argTypes, cmd);
-    }
+	// @jflute -- This override causes exception, it's pending...
+	//            This is for to use QLog about SQL-Annotation. But the priority is very low. 
+	// 
+    // @Override
+    // protected void setupUpdateMethodByManual(Method method, final String sql) {// Contains SQL-Annotation
+    //     final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory);
+    //     cmd.setSql(sql);
+    //     String[] argNames = daoAnnotationReader.getArgNames(method);
+    //     if (argNames.length == 0 && isUpdateSignatureForBean(method)) {
+    //         argNames = new String[] { StringUtil.decapitalize(ClassUtil.getShortClassName(beanClass)) };
+    //     }
+    // 
+    //     // It is unnecessary for DBFlute!
+    //     // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+    // 
+    //     registerSqlCommand(method.getName(), method, sql, argNames, method.getParameterTypes(), cmd);
+    // }
 
     // -----------------------------------------------------
     //                                  Specified OutsideSql
