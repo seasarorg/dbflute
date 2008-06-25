@@ -635,7 +635,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 	// It's very INTERNAL!
     protected <ENTITY extends ${glEntityInterfaceName}> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
                                                            , Eps<ENTITY> setupper
-                                                           , ColumnInfo columnInfo) {
+                                                           , ${glColumnInfoName} columnInfo) {
         String columnName = columnInfo.getColumnDbName();
         String propertyName = columnInfo.getPropertyName();
         registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);

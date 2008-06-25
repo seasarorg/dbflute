@@ -1039,7 +1039,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return EntityPropertySetupperHandler.findCachedDBMeta(row);
         }
 
-        protected void throwNonsenseClassCastException(Object entity, DBMeta dbmeta, ClassCastException e) {
+        protected void throwNonsenseClassCastException(Object entity, ${glDBMetaInterfaceName} dbmeta, ClassCastException e) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
