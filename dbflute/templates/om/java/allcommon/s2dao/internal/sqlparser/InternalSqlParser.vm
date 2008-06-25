@@ -558,8 +558,11 @@ public class ${glInternalSqlParser} {
         protected void setupValueAndType(InternalValueAndType valueAndType) {
             Object value = valueAndType.getTargetValue();
             Class<?> clazz = valueAndType.getTargetType();
+
+            // LikeSearchOption handling here is for OutsideSql.
             ${glConditionOptionLikeSearchName} likeSearchOption = null;
             String rearOption = null;
+
             for (int pos = 1; pos < _names.length; ++pos) {
                 if (value == null) {
                     break;
@@ -616,6 +619,7 @@ public class ${glInternalSqlParser} {
             valueAndType.setRearOption(rearOption);
         }
 
+        // for OutsideSql
         protected boolean isLastLoop4LikeSearch(int pos, ${glConditionOptionLikeSearchName} likeSearchOption) {
             return _names.length == (pos + 1) && likeSearchOption != null;
         }
@@ -624,19 +628,25 @@ public class ${glInternalSqlParser} {
             return value != null && value instanceof String && ((String) value).length() > 0;
         }
 
+        // for OutsideSql
         protected boolean hasLikeSearchOption(BeanDesc beanDesc, String currentName) {
             return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
         }
 
+        // for OutsideSql
         protected ${glConditionOptionLikeSearchName} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
             final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
 			final ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
 			if (option == null) {
 			    throwLikeSearchOptionNotFoundException(resourceBean, currentName);
 			}
+			if (option.isSplit()) {
+			    throwOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
+			}
             return option;
         }
 
+        // for OutsideSql
         protected void throwLikeSearchOptionNotFoundException(Object resourceBean, String currentName) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -653,6 +663,34 @@ public class ${glInternalSqlParser} {
             throw new ${glRequiredOptionNotFoundException}(msg);
         }
 		
+        // for OutsideSql
+        protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(LikeSearchOption option, Object resourceBean, String currentName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm your method call:"  + getLineSeparator();
+            msg = msg + "  For example:"  + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            final String beanName = resourceBean.getClass().getSimpleName();
+            final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + getLineSeparator();
+            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + getLineSeparator();
+            msg = msg + "      likeSearchOption.splitBySpace(); // *No! Don't invoke this!"  + getLineSeparator();
+            msg = msg + "      pmb." + methodName + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + getLineSeparator();
+            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + getLineSeparator();
+            msg = msg + "      pmb." + methodName + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target LikeSearchOption]" + getLineSeparator() + option + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target ParameterBean]" + getLineSeparator() + resourceBean + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new UnsupportedOperationException(msg);
+        }
+
 		protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, PropertyDesc pd) {
             try {
                 return pd.getValue(beanValue);

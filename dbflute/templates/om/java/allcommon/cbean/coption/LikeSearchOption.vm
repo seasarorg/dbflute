@@ -236,4 +236,12 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     protected ${glConditionOptionSimpleStringName} newDeepCopyInstance() {
         return new ${myClassName}();
     }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = " + _asOrSplit;  
+    }
 }
