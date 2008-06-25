@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
@@ -278,6 +279,13 @@ public final class DfBuildProperties {
     //                                         -------------
     public DfCommonColumnProperties getCommonColumnProperties() {
         return getHandler().getCommonColumnProperties(getProperties());
+    }
+    
+    // -----------------------------------------------------
+    //                                       Behavior Filter
+    //                                       ---------------
+    public DfBehaviorFilterProperties getBehaviorFilterProperties() {
+        return getHandler().getBehaviorFilterProperties(getProperties());
     }
 
     // -----------------------------------------------------

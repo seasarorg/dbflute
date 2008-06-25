@@ -8,7 +8,6 @@ import ${glPackageBaseCommon}.*;
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 #end
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 #if ($database.isMakeFlatExpansion())
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
@@ -577,9 +576,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The updated count.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
-        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        assertConditionBeanNotNull(cb);
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertConditionBeanNotNull(cb);
         setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
+        filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
         return getMyDao().updateByQuery(cb, ${myEntityVariableName});
     }
 
@@ -685,14 +684,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) { if (!processBeforeInsert(entity)) { return 1; } return getMyDao().insert(entity); }
-    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} entity) { if (!processBeforeUpdate(entity)) { return 1; } return getMyDao().updateModifiedOnly(entity); }
+    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
+    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) { if (!processBeforeUpdate(entity)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(entity); }
+    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
 #end
-    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} entity) { if (!processBeforeDelete(entity)) { return 1; } return getMyDao().delete(entity); }
+    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) { if (!processBeforeDelete(entity)) { return 1; } return getMyDao().deleteNonstrict(entity); }
+    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
 #end
 #set ($batchUpdateReturnType = "")
 #if ($database.isVersionAfter1047())
@@ -701,23 +700,23 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #set ($batchUpdateReturnType = "int")
 #end
 
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> entityList) {
-        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().insertList(helpFilterBeforeInsertInternally(entityList));
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
     }
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> entityList) {
-        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().updateList(helpFilterBeforeUpdateInternally(entityList));
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(entityList));
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
     }
 #end
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> entityList) {
-        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(entityList));
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(entityList));
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
     }
 #end
 #else
@@ -725,6 +724,28 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         return getMyDao().insert(entity);
+    }
+#end
+#end
+#if ($table.hasBehaviorFilterBeforeColumn())
+
+    // ===================================================================================
+    //                                                                     Filter Override
+    //                                                                     ===============
+#if ($table.hasBehaviorFilterBeforeInsertColumn())
+    @Override
+    protected void filterEntityOfInsert(${glEntityInterfaceName} entity) {
+#foreach ($column in $table.BehaviorFilterBeforeInsertColumnList)
+        downcast(entity).set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+#end
+    }
+#end
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+    @Override
+    protected void filterEntityOfUpdate(${glEntityInterfaceName} entity) {
+#foreach ($column in $table.BehaviorFilterBeforeUpdateColumnList)
+        downcast(entity).set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+#end
     }
 #end
 #end
@@ -755,14 +776,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-    // ===================================================================================
-    //                                                                          CBSetupper
-    //                                                                          ==========
-    /** @deprecated */ 
-    public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
-        public void setup(${myConditionBeanClassName} cb);
-    }
-    
     // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================

@@ -70,6 +70,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAuto
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The extension of DaoMetaDataImpl for DBFlute.
@@ -1014,6 +1015,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                         registerValue(rs, row, pt, columnName);
                     }
                 }
+            } catch (ClassCastException e) {
+                if (_log.isWarnEnabled()) {
+                    String msg = ClassCastException.class.getSimpleName() + " occurred while ResultSet Handling:";
+                    _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName + " dbmeta");
+                }
+                throwNonsenseClassCastException(row, dbmeta, e);
             } catch (SQLException e) {
                 if (_log.isWarnEnabled()) {
                     String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
@@ -1023,7 +1030,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
             return row;
         }
-        
+
         /**
          * @param row The object of row. (NotNull)
          * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
@@ -1031,8 +1038,43 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
             return EntityPropertySetupperHandler.findCachedDBMeta(row);
         }
+
+        protected void throwNonsenseClassCastException(Object entity, DBMeta dbmeta, ClassCastException e) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "This exception may be from ClassLoader Headache about HotDeploy." + getLineSeparator();
+            msg = msg + "Please add the ignore-package setting to convention.dicon like as follows:" + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    <initMethod name=”addIgnorePackageName”>" + getLineSeparator();
+            msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + getLineSeparator();
+            msg = msg + "    </initMethod>" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target DBMeta]" + getLineSeparator() + dbmeta + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new NonsenseClassCastException(msg, e);
+        }
+        
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.getLineSeparator();
+        }
     }
-    
+
+    public static class NonsenseClassCastException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public NonsenseClassCastException(String msg, ClassCastException e) {
+            super(msg, e);
+        }
+    }
+
     /**
      * The handler of setupper of entity property.
      */

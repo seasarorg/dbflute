@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
@@ -110,6 +111,18 @@ public final class DfPropertiesHandler {
             _commonColumnProperties = new DfCommonColumnProperties(prop);
         }
         return _commonColumnProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                       Behavior Filter
+    //                                       ---------------
+    protected DfBehaviorFilterProperties _behaviorFilterProperties;
+    
+    public DfBehaviorFilterProperties getBehaviorFilterProperties(Properties prop) {
+        if (_behaviorFilterProperties == null) {
+            _behaviorFilterProperties = new DfBehaviorFilterProperties(prop);
+        }
+        return _behaviorFilterProperties;
     }
 
     protected DfOptimisticLockProperties _optimisticLockProperties;

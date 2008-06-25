@@ -272,7 +272,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                Accept
     //                                                ------
     public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> primaryKeyMap) {
-		doAcceptPrimaryKeyMap((${myExtendedObjectClassName})entity, primaryKeyMap, _entityPropertySetupperMap);
+		doAcceptPrimaryKeyMap((${myExtendedObjectClassName})entity, primaryKeyMap, _epsMap);
     }
 
     public void acceptPrimaryKeyMapString(${glEntityInterfaceName} entity, String primaryKeyMapString) {
@@ -280,7 +280,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     public void acceptColumnValueMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> columnValueMap) {
-        doAcceptColumnValueMap((${myExtendedObjectClassName})entity, columnValueMap, _entityPropertySetupperMap);
+        doAcceptColumnValueMap((${myExtendedObjectClassName})entity, columnValueMap, _epsMap);
     }
 
     public void acceptColumnValueMapString(${glEntityInterfaceName} entity, String columnValueMapString) {
@@ -372,22 +372,24 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                               Entity Property Setup
     //                                                               =====================
     // It's very INTERNAL!
-    protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = newHashMap();
+    protected Map<String, Eps<${myExtendedObjectClassName}>> _epsMap = newHashMap();
     {
-	    setupEntityPropertySetupper(_entityPropertySetupperMap);
+#foreach ($column in $table.columns)
+        setupEps(_epsMap, new Eps${column.javaName}(), column${column.javaBeansRulePropertyNameInitCap}());
+#end
     }
     
     public boolean hasEntityPropertySetupper(String propertyName) {
-        return _entityPropertySetupperMap.containsKey(propertyName);
+        return _epsMap.containsKey(propertyName);
     }
 
     public void setupEntityProperty(String propertyName, Object entity, Object value) {
-        findEntityPropertySetupper(_entityPropertySetupperMap, propertyName).setup((${myExtendedObjectClassName})entity, value);
+        findEps(_epsMap, propertyName).setup((${myExtendedObjectClassName})entity, value);
     }
     
 #foreach ($column in $table.columns)
-    public static class EntityProperty${column.javaName}Setupper implements EntityPropertySetupper<${myExtendedObjectClassName}> {
-        public void setup(${myExtendedObjectClassName} entity, Object value) { entity.set${column.javaName}((${column.javaNative})value); }
+    public static class Eps${column.javaName} implements Eps<${myExtendedObjectClassName}> {
+        public void setup(${myExtendedObjectClassName} e, Object v) { e.set${column.javaName}((${column.javaNative})v); }
     }
 #end
 }

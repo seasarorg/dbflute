@@ -1399,6 +1399,24 @@ public class Column {
     }
 
     // ===================================================================================
+    //                                                                     Behavior Filter
+    //                                                                     ===============
+    private String _behaviorFilterBeforeInsertColumnExpression; 
+    public String getBehaviorFilterBeforeInsertColumnExpression() {
+        return _behaviorFilterBeforeInsertColumnExpression;
+    }
+    public void setBehaviorFilterBeforeInsertColumnExpression(String expression) {
+        _behaviorFilterBeforeInsertColumnExpression = expression;
+    }
+    private String _behaviorFilterBeforeUpdateColumnExpression; 
+    public String getBehaviorFilterBeforeUpdateColumnExpression() {
+        return _behaviorFilterBeforeUpdateColumnExpression;
+    }
+    public void setBehaviorFilterBeforeUpdateColumnExpression(String expression) {
+        _behaviorFilterBeforeUpdateColumnExpression = expression;
+    }
+
+    // ===================================================================================
     //                                                                       Column Helper
     //                                                                       =============
     protected ColumnHelper _columnHelper;

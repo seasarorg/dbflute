@@ -498,7 +498,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                ------
     protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptPrimaryKeyMap(ENTITY entity
             , Map<String, ? extends Object> columnValueMap
-            , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+            , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
         List<${glColumnInfoName}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
@@ -518,14 +518,14 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
-                findEntityPropertySetupper(entityPropertySetupperMap, propertyName).setup(entity, value);
+                findEps(entityPropertySetupperMap, propertyName).setup(entity, value);
             }
         }
     }
 
     protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptColumnValueMap(ENTITY entity
             , Map<String, ? extends Object> columnValueMap
-            , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+            , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
         List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
@@ -545,7 +545,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
-                findEntityPropertySetupper(entityPropertySetupperMap, propertyName).setup(entity, value);
+                findEps(entityPropertySetupperMap, propertyName).setup(entity, value);
             }
         }
     }
@@ -633,39 +633,27 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                               Entity Property Setup
     //                                                               =====================
 	// It's very INTERNAL!
-    protected <ENTITY extends ${glEntityInterfaceName}> void setupEntityPropertySetupper(Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
-        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
-        for (${glColumnInfoName} columnInfo : columnInfoList) {
-            String columnName = columnInfo.getColumnDbName();
-            String propertyName = columnInfo.getPropertyName();
-            EntityPropertySetupper<ENTITY> setupper = newEntityPropertySetupper(columnInfo);
-            registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
-        }
+    protected <ENTITY extends ${glEntityInterfaceName}> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
+                                                           , Eps<ENTITY> setupper
+                                                           , ColumnInfo columnInfo) {
+        String columnName = columnInfo.getColumnDbName();
+        String propertyName = columnInfo.getPropertyName();
+        registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
     }
 
-	protected <ENTITY extends ${glEntityInterfaceName}> void registerEntityPropertySetupper(
+    protected <ENTITY extends ${glEntityInterfaceName}> void registerEntityPropertySetupper(
 		                                          String columnName
 												, String propertyName
-	                                            , EntityPropertySetupper<ENTITY> setupper
-											    , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+	                                            , Eps<ENTITY> setupper
+											    , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
 		entityPropertySetupperMap.put(columnName, setupper);
 		entityPropertySetupperMap.put(propertyName, setupper);
 		entityPropertySetupperMap.put(columnName.toLowerCase(), setupper);
 		entityPropertySetupperMap.put(propertyName.toLowerCase(), setupper);
 	}
 	
-    protected <ENTITY extends ${glEntityInterfaceName}> EntityPropertySetupper<ENTITY> newEntityPropertySetupper(${glColumnInfoName} columnInfo) {
-        String name = "EntityProperty" + initCap(columnInfo.getPropertyName()) + "Setupper";
-        try {
-            Class<?> clazz = Class.forName(this.getClass().getName() + "$" + name);
-            return (EntityPropertySetupper<ENTITY>)clazz.newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    protected <ENTITY extends ${glEntityInterfaceName}> EntityPropertySetupper<ENTITY> findEntityPropertySetupper(Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap, String propertyName) {
-        EntityPropertySetupper<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
+    protected <ENTITY extends ${glEntityInterfaceName}> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap, String propertyName) {
+        Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
         if (setupper == null) {
             String msg = "The propertyName was Not Found in the map of setupper of entity property:";
             msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + entityPropertySetupperMap.keySet();

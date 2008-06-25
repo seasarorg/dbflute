@@ -521,14 +521,12 @@ public interface ${myClassName} {
     //                                                                          ==========
     /**
      * Create map list string that is prepared. (for INTERNAL)
-     * 
      * @return Map list string that is prepared. (NotNull)
      */
     public ${glMapListStringName} createMapListString();
 
     /**
      * Create map string builder that is prepared. (for INTERNAL)
-     * 
      * @return Map string builder that is prepared. (NotNull)
      */
     public ${glMapStringBuilderName} createMapStringBuilder();
@@ -541,7 +539,6 @@ public interface ${myClassName} {
 	/**
 	 * Has the setupper of entity property by the name of property? <br />
 	 * Comparing is so flexible. {Ignore cases and underscore}
-	 * 
 	 * @param propertyName The name of the property. (NotNull)
 	 * @return Determination.
 	 */
@@ -549,7 +546,6 @@ public interface ${myClassName} {
 	 
     /**
      * Set up entity property. (for INTERNAL)
-     * 
 	 * @param propertyName The name of the property. (NotNull)
 	 * @param entity The entity for the property. (NotNull)
 	 * @param value The value of the property. (Nullable)
@@ -561,7 +557,7 @@ public interface ${myClassName} {
 	 * This class is for Internal. Don't use this!
 	 * @param <ENTITY_TYPE> The type of entity.
      */
-    public interface EntityPropertySetupper<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+    public interface Eps<ENTITY_TYPE extends ${glEntityInterfaceName}> {
 		
 		/**
 		 * @param entity Entity. (NotNull)

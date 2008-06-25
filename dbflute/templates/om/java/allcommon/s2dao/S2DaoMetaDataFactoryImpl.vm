@@ -155,9 +155,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         // Stop the LinkageError!
         ${glConditionBeanContextName}.initialize();
 
-        // Stop the LinkageError!
-        ${glDBMetaInstanceHandlerName}.getDBMetaMap();
-
         initializeDatabaseProductNameOfContext(xaDataSource);
 
         final StringBuilder sb = new StringBuilder();
