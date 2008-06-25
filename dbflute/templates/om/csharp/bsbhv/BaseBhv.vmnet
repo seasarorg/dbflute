@@ -338,6 +338,7 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                 Filter Override
         //                                                                 ===============
+        #region Filter Override
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
         protected override void FilterEntityOfInsert(${glEntityInterfaceName} entity) {
             base.FilterEntityOfInsert(entity);
@@ -355,6 +356,7 @@ namespace ${glPackageExtendedBhv} {
         }
 #end
 #end
+        #endregion
 
         // ===============================================================================
         //                                                                        Accessor
