@@ -319,20 +319,42 @@ namespace ${glPackageExtendedBhv} {
 #end
 
 #if ($table.isWritable())
-        protected int DelegateInsert(${myExtendedObjectClassName} entity) { if (!ProcessBeforeInsert(entity)) { return 1; } return this.Dao.Insert(entity); }
-        protected int DelegateUpdate(${myExtendedObjectClassName} entity) { if (!ProcessBeforeUpdate(entity)) { return 1; } return this.Dao.UpdateModifiedOnly(entity); }
+        protected int DelegateInsert(${myExtendedObjectClassName} e) { if (!ProcessBeforeInsert(e)) { return 1; } return this.Dao.Insert(e); }
+        protected int DelegateUpdate(${myExtendedObjectClassName} e) { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateModifiedOnly(e); }
 #if ($table.hasOptimisticLock())
-        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { if (!ProcessBeforeUpdate(entity)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(entity); }
+        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
 #end
-        protected int DelegateDelete(${myExtendedObjectClassName} entity) { if (!ProcessBeforeDelete(entity)) { return 1; } return this.Dao.Delete(entity); }
+        protected int DelegateDelete(${myExtendedObjectClassName} e) { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.Delete(e); }
 #if ($table.hasOptimisticLock())
-        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { if (!ProcessBeforeDelete(entity)) { return 1; } return this.Dao.DeleteNonstrict(entity); }
+        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
 #end
-        protected override int DoCallCreate(${glEntityInterfaceName} entity) { return this.DelegateInsert((${myExtendedObjectClassName})entity); }
-        protected override int DoCallModify(${glEntityInterfaceName} entity) { return this.DelegateUpdate((${myExtendedObjectClassName})entity); }
-        protected override int DoCallRemove(${glEntityInterfaceName} entity) { return this.DelegateDelete((${myExtendedObjectClassName})entity); }
+        protected override int DoCallCreate(${glEntityInterfaceName} e) { return this.DelegateInsert((${myExtendedObjectClassName})e); }
+        protected override int DoCallModify(${glEntityInterfaceName} e) { return this.DelegateUpdate((${myExtendedObjectClassName})e); }
+        protected override int DoCallRemove(${glEntityInterfaceName} e) { return this.DelegateDelete((${myExtendedObjectClassName})e); }
 #end
         #endregion
+#if ($table.hasBehaviorFilterBeforeColumn())
+
+    // ===================================================================================
+    //                                                                     Filter Override
+    //                                                                     ===============
+#if ($table.hasBehaviorFilterBeforeInsertColumn())
+        protected override void FilterEntityOfInsert(${glEntityInterfaceName} entity) {
+            base.FilterEntityOfInsert(entity);
+#foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
+            ((${myExtendedObjectClassName})entity).${column.javaName} = ${column.behaviorFilterBeforeInsertColumnExpression};
+#end
+        }
+#end
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+        protected override void FilterEntityOfUpdate(${glEntityInterfaceName} entity) {
+            base.FilterEntityOfUpdate(entity);
+#foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
+            ((${myExtendedObjectClassName})entity).${column.javaName} = ${column.behaviorFilterBeforeUpdateColumnExpression};
+#end
+        }
+#end
+#end
 
         // ===============================================================================
         //                                                                        Accessor

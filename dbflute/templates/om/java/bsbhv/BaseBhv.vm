@@ -735,7 +735,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
     protected void filterEntityOfInsert(${glEntityInterfaceName} entity) {
-#foreach ($column in $table.BehaviorFilterBeforeInsertColumnList)
+        filterEntityOfInsert(entity);
+#foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
         downcast(entity).set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
 #end
     }
@@ -743,7 +744,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
     protected void filterEntityOfUpdate(${glEntityInterfaceName} entity) {
-#foreach ($column in $table.BehaviorFilterBeforeUpdateColumnList)
+        filterEntityOfUpdate(entity);
+#foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
         downcast(entity).set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
 #end
     }

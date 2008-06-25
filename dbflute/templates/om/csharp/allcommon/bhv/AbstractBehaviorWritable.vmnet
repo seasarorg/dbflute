@@ -64,13 +64,12 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
-        #region Delegate Method
-
         // -------------------------------------------------
         //                                            Create
         //                                            ------
         protected virtual bool ProcessBeforeInsert(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            FrameworkFilterEntityOfInsert(entity);
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
             return true;
@@ -81,12 +80,17 @@ namespace ${glPackageBaseCommonBhv} {
             return DoCallCreate(entity);
         }
 
-        protected virtual void FilterEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+        protected virtual void FrameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+            // InjectSequenceToPrimaryKeyIfNeeds(targetEntity); @jflute -- Implements at the future!
+            SetupCommonColumnOfInsertIfNeeds(targetEntity);
+        }
+
+        protected virtual void SetupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
-            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
             if (!entity.CanCommonColumnAutoSetup()) {
                 return;
             }
@@ -116,7 +120,10 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        protected virtual void AssertEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        protected virtual void FilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+        }
+
+        protected virtual void AssertEntityOfInsert(${glEntityInterfaceName} entity) {
         }
 
         protected abstract int DoCallCreate(${glEntityInterfaceName} entity);
@@ -126,6 +133,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                            ------
         protected virtual bool ProcessBeforeUpdate(${glEntityInterfaceName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            FrameworkFilterEntityOfUpdate(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
             return true;
@@ -136,12 +144,16 @@ namespace ${glPackageBaseCommonBhv} {
             return DoCallModify(entity);
         }
 
-        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+        protected virtual void FrameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+            SetupCommonColumnOfUpdateIfNeeds(targetEntity);
+        }
+
+        protected virtual void SetupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
-            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
             if (!entity.CanCommonColumnAutoSetup()) {
                 return;
             }
@@ -168,7 +180,9 @@ namespace ${glPackageBaseCommonBhv} {
   #end
 #end
 #end
+        }
 
+        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
         }
 
         protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
@@ -181,6 +195,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                            ------
         protected virtual bool ProcessBeforeDelete(${glEntityInterfaceName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            FrameworkFilterEntityOfDelete(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
             return true;
@@ -191,42 +206,13 @@ namespace ${glPackageBaseCommonBhv} {
             return DoCallRemove(entity);
         }
 
-        protected virtual void FilterEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
-#if ($database.isExistCommonColumnSetupElement())
-            if (!IsEntityDefinedCommonColumn(targetEntity)) {
-                return;
-            }
-            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-            if (!entity.CanCommonColumnAutoSetup()) {
-                return;
-            }
-            if (_log.IsDebugEnabled) {
-                _log.Debug("...Filtering entity of DELETE about the column columns of " + this.TableDbName);
-            }
-#foreach ($columnName in ${database.commonColumnNameList})
-  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
-  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
-  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
-  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(${columnName})})
-    #set ($logic = ${database.getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(${columnName})})
-    #if ($database.isCommonColumnSetupInvokingLogic($logic))
-      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
-            ${filteredLogic}
-    #else
-
-            ${javaNative} ${uncapitalisedJavaName} = ${logic};
-            entity.${javaName} = ${uncapitalisedJavaName};
-    #end
-  #end
-#end
-#end
-
+        protected virtual void FrameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
         }
 
-        protected virtual void AssertEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        protected virtual void FilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+        }
+
+        protected virtual void AssertEntityOfDelete(${glEntityInterfaceName} entity) {
         }
 
         protected abstract int DoCallRemove(${glEntityInterfaceName} entity);
@@ -244,6 +230,5 @@ namespace ${glPackageBaseCommonBhv} {
                 return false;
             }
         }
-        #endregion
     }
 }
