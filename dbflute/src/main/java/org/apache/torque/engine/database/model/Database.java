@@ -1229,41 +1229,27 @@ public class Database {
     //                                                         Properties - sql2entity
     //                                                         =======================
     public boolean isSql2EntityPlainEntity() {
-        return getProperties().getSql2EntityProperties().isPlainEntity();
+        return false;
     }
 
     public String getSql2EntityBaseEntityPackage() {
-        return getProperties().getSql2EntityProperties().getBaseEntityPackage();
+        return getProperties().getOutsideSqlProperties().getBaseEntityPackage();
     }
 
     public String getSql2EntityDBMetaPackage() {
-        return getProperties().getSql2EntityProperties().getDBMetaPackage();
+        return getProperties().getOutsideSqlProperties().getDBMetaPackage();
     }
 
     public String getSql2EntityExtendedEntityPackage() {
-        return getProperties().getSql2EntityProperties().getExtendedEntityPackage();
+        return getProperties().getOutsideSqlProperties().getExtendedEntityPackage();
     }
 
     public String getSql2EntityBaseParameterBeanPackage() {
-        return getProperties().getSql2EntityProperties().getBaseParameterBeanPackage();
+        return getProperties().getOutsideSqlProperties().getBaseParameterBeanPackage();
     }
 
     public String getSql2EntityExtendedParameterBeanPackage() {
-        return getProperties().getSql2EntityProperties().getExtendedParameterBeanPackage();
-    }
-
-    public String filterProjectSuffixForComponentName(String targetName) {
-        if (getBasicProperties().isAppendProjectSuffixToComponentName()) {
-            final String prefix = getBasicProperties().getProjectPrefix();
-            if (prefix == null || prefix.trim().length() == 0) {
-                return targetName;
-            } else {
-                final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-                return filteredPrefix + targetName.substring(0, 1).toUpperCase() + targetName.substring(1);
-            }
-        } else {
-            return targetName;
-        }
+        return getProperties().getOutsideSqlProperties().getExtendedParameterBeanPackage();
     }
 
     // ===================================================================================
@@ -1428,6 +1414,20 @@ public class Database {
 
     public String getBehaviorSelectorComponentName() {
         return filterProjectSuffixForComponentName("behaviorSelector");
+    }
+
+    public String filterProjectSuffixForComponentName(String targetName) {
+        if (getBasicProperties().isAppendProjectSuffixToComponentName()) {
+            final String prefix = getBasicProperties().getProjectPrefix();
+            if (prefix == null || prefix.trim().length() == 0) {
+                return targetName;
+            } else {
+                final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+                return filteredPrefix + targetName.substring(0, 1).toUpperCase() + targetName.substring(1);
+            }
+        } else {
+            return targetName;
+        }
     }
 
     public String getSharp() {
@@ -1842,13 +1842,12 @@ public class Database {
     }
 
     public void enableSql2EntityOutputDirectory() {
-        getGeneratorHandler().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
+        getGeneratorHandler().setOutputPath(getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory());
     }
 
     public void enableFlexDtoOutputDirectory() {
         getGeneratorHandler().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
-
 
     // ===================================================================================
     //                                                                       Assist Helper
@@ -1856,7 +1855,7 @@ public class Database {
     public DfGenerator getGeneratorHandler() {
         return DfGenerator.getInstance();
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

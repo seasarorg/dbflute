@@ -132,7 +132,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * @return The list of SQL files. (NotNull)
      */
     protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
+        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
         final List<File> sqlFileList = collectSqlFile(sqlDirectory);
         if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
             return sqlFileList;
@@ -142,7 +142,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final List<File> resourcesSqlFileList = collectSqlFile(srcMainResources);
             sqlFileList.addAll(resourcesSqlFileList);
         } catch (Exception e) {
-            _log.debug("Not found sql directory on resources: " + srcMainResources);
+            _log.debug("Not found SQL directory on resources: " + srcMainResources);
         }
         return sqlFileList;
     }

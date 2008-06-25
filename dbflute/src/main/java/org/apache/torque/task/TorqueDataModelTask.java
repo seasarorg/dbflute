@@ -113,7 +113,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
      * @return The list of SQL files. (NotNull)
      */
     protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
+        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
         final List<File> sqlFileList = collectSqlFile(sqlDirectory);
         if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
             return sqlFileList;

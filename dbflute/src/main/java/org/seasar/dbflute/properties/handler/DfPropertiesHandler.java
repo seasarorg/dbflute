@@ -13,6 +13,7 @@ import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
@@ -21,7 +22,6 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
-import org.seasar.dbflute.properties.DfSql2EntityProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -197,15 +197,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                            Sql2Entity
+    //                                            OutsideSql
     //                                            ----------
-    protected DfSql2EntityProperties _sql2EntityProperties;
+    protected DfOutsideSqlProperties _outsideSqlProperties;
 
-    public DfSql2EntityProperties getSql2EntityProperties(Properties prop) {
-        if (_sql2EntityProperties == null) {
-            _sql2EntityProperties = new DfSql2EntityProperties(prop);
+    public DfOutsideSqlProperties getOutsideSqlProperties(Properties prop) {
+        if (_outsideSqlProperties == null) {
+            _outsideSqlProperties = new DfOutsideSqlProperties(prop);
         }
-        return _sql2EntityProperties;
+        return _outsideSqlProperties;
     }
 
     // -----------------------------------------------------
@@ -267,12 +267,12 @@ public final class DfPropertiesHandler {
         }
         return _simpleDtoProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                              Flex DTO
     //                                              --------
     protected DfFlexDtoProperties _flexDtoProperties;
-    
+
     public DfFlexDtoProperties getFlexDtoProperties(Properties prop) {
         if (_flexDtoProperties == null) {
             _flexDtoProperties = new DfFlexDtoProperties(prop);

@@ -20,13 +20,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -173,10 +171,7 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
 
     @Override
     protected String getSqlDirectory() {
-        final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final DfBasicProperties basicProp = prop.getBasicProperties();
-        final String javaDir = basicProp.getOutputDirectory();
-        return javaDir;
+        return getBasicProperties().getOutputDirectory();
     }
 
     @Override
