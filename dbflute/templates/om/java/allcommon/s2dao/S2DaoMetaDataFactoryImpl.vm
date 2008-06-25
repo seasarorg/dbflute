@@ -31,6 +31,7 @@ import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
@@ -153,6 +154,9 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
 
         // Stop the LinkageError!
         ${glConditionBeanContextName}.initialize();
+
+        // Stop the LinkageError!
+        ${glDBMetaInstanceHandlerName}.getDBMetaMap();
 
         initializeDatabaseProductNameOfContext(xaDataSource);
 
