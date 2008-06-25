@@ -39,6 +39,9 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected int _nonTargetSqlCount;
 
     // ===================================================================================
@@ -171,7 +174,7 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
 
     @Override
     protected String getSqlDirectory() {
-        return getBasicProperties().getOutputDirectory();
+        return getProperties().getOutsideSqlProperties().getSqlDirectory();
     }
 
     @Override
