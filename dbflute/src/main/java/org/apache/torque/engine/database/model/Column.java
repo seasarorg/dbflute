@@ -71,6 +71,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -623,18 +624,30 @@ public class Column {
      */
     public boolean isMultipleFK() {
         ForeignKey fk = getForeignKey();
-        if (fk != null) {
-            ForeignKey[] fks = _parentTable.getForeignKeys();
-            for (int i = 0; i < fks.length; i++) {
-                if (fks[i].getForeignTableName().equals(fk.getForeignTableName())
-                        && !fks[i].getLocalColumns().contains(this._name)) {
+        if (fk == null) {
+            return false;
+        }
+        String myForeignTableName = fk.getForeignTableName();
+        ForeignKey[] fks = _parentTable.getForeignKeys();
+        String myColumnName = this._name;
+        for (int i = 0; i < fks.length; i++) {
+            String foreignTableName = fks[i].getForeignTableName();
+            if (!myForeignTableName.equalsIgnoreCase(foreignTableName)) {
+                continue;
+            }
+            List<String> columnsNameList = fks[i].getLocalColumns();
+            for (String columnName : columnsNameList) {
+                if (myColumnName.equalsIgnoreCase(columnName)) {
                     return true;
                 }
             }
         }
-
         // No multiple foreign keys.
         return false;
+    }
+
+    protected String filterUnderscore(String name) {
+        return DfStringUtil.replace(name, "_", "");
     }
 
     /**
@@ -1401,17 +1414,22 @@ public class Column {
     // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============
-    private String _behaviorFilterBeforeInsertColumnExpression; 
+    private String _behaviorFilterBeforeInsertColumnExpression;
+
     public String getBehaviorFilterBeforeInsertColumnExpression() {
         return _behaviorFilterBeforeInsertColumnExpression;
     }
+
     public void setBehaviorFilterBeforeInsertColumnExpression(String expression) {
         _behaviorFilterBeforeInsertColumnExpression = expression;
     }
-    private String _behaviorFilterBeforeUpdateColumnExpression; 
+
+    private String _behaviorFilterBeforeUpdateColumnExpression;
+
     public String getBehaviorFilterBeforeUpdateColumnExpression() {
         return _behaviorFilterBeforeUpdateColumnExpression;
     }
+
     public void setBehaviorFilterBeforeUpdateColumnExpression(String expression) {
         _behaviorFilterBeforeUpdateColumnExpression = expression;
     }

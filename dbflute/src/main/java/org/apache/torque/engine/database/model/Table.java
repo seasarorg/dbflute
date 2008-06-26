@@ -1027,22 +1027,27 @@ public class Table implements IDMethod {
      * Return the first foreign key that includes col in it's list
      * of local columns.  Eg. Foreign key (a,b,c) refrences tbl(x,y,z)
      * will be returned of col is either a,b or c.
-     *
-     * @param col column name included in the key
+     * @param columnName column name included in the key
      * @return Return a Column object or null if it does not exist.
      */
-    public ForeignKey getForeignKey(String col) {
+    public ForeignKey getForeignKey(String columnName) {
         ForeignKey firstFK = null;
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.getLocalColumns().contains(col)) {
-                if (firstFK == null) {
-                    firstFK = key;
-                } else {
-                    //System.out.println(col+" is in multiple FKs.  This is not"
-                    //                   + " being handled properly.");
-                    //throw new IllegalStateException("Cannot call method if " +
-                    //    "column is referenced multiple times");
+            ForeignKey key = iter.next();
+            List<String> localColumns = key.getLocalColumns();
+            for (String localColumnName : localColumns) {
+                if (columnName.equalsIgnoreCase(localColumnName)) {
+                    if (firstFK == null) {
+                        firstFK = key;
+                    } else {
+                        // TODO: @jflute -- What's this?
+                        // 
+                        //System.out.println(col+" is in multiple FKs.  This is not"
+                        //                   + " being handled properly.");
+                        //throw new IllegalStateException("Cannot call method if " +
+                        //    "column is referenced multiple times");
+                    }
+                    break;
                 }
             }
         }
