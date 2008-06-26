@@ -340,18 +340,20 @@ namespace ${glPackageExtendedBhv} {
         //                                                                 ===============
         #region Filter Override
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
-        protected override void FilterEntityOfInsert(${glEntityInterfaceName} entity) {
-            base.FilterEntityOfInsert(entity);
+        protected override void FilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+            base.FilterEntityOfInsert(targetEntity);
+            ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
-            ((${myExtendedObjectClassName})entity).${column.javaName} = ${column.behaviorFilterBeforeInsertColumnExpression};
+            entity.${column.javaName} = ${column.behaviorFilterBeforeInsertColumnExpression};
 #end
         }
 #end
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
-        protected override void FilterEntityOfUpdate(${glEntityInterfaceName} entity) {
-            base.FilterEntityOfUpdate(entity);
+        protected override void FilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+            base.FilterEntityOfUpdate(targetEntity);
+            ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
-            ((${myExtendedObjectClassName})entity).${column.javaName} = ${column.behaviorFilterBeforeUpdateColumnExpression};
+            entity.${column.javaName} = ${column.behaviorFilterBeforeUpdateColumnExpression};
 #end
         }
 #end
