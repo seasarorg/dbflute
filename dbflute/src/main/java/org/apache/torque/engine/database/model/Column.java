@@ -638,7 +638,7 @@ public class Column {
             }
             List<String> columnsNameList = fks[i].getLocalColumns();
             if (!DfCompareUtil.containsIgnoreCase(myColumnName, columnsNameList)) {
-                return false;
+                return true;
             }
         }
         // No multiple foreign keys.
