@@ -1414,24 +1414,24 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
+        final StringBuilder sb = new StringBuilder();
+        String ln = "";
+        if (isFormatClauseEffective()) {
+            ln = getLineSeparator();
+        }
+        sb.append("update ").append(_tableName).append(ln);
+        int index = 0;
+        for (String columnName : columnParameterMap.keySet()) {
+            final String parameter = columnParameterMap.get(columnName); 
+            if (index == 0) {
+                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+            } else {
+                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+            }
+            ++index;
+        }
         if (isUpdateSubQueryUseLocalTableSupported()) {
             final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
-            final StringBuilder sb = new StringBuilder();
-            String ln = "";
-            if (isFormatClauseEffective()) {
-                ln = getLineSeparator();
-            }
-            sb.append("update ").append(_tableName).append(ln);
-            int index = 0;
-            for (String columnName : columnParameterMap.keySet()) {
-                final String parameter = columnParameterMap.get(columnName); 
-                if (index == 0) {
-                    sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
-                } else {
-                    sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
-                }
-                ++index;
-            }
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
             return sb.toString();
@@ -1439,8 +1439,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
-            subQuery = subQuery.substring(subQuery.indexOf("from "));
-            return "delete " + subQuery;
+            subQuery = subQuery.substring(subQuery.indexOf("where "));
+            sb.append(" ").append(subQuery);
+            return sb.toString();
         }
     }
 
