@@ -71,6 +71,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.util.DfCompareUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -88,7 +89,7 @@ public class Column {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Table _parentTable;
+    private Table _table;
 
     // -----------------------------------------------------
     //                                                 Basic
@@ -210,7 +211,7 @@ public class Column {
         // a java name.
         _javaNamingMethod = attrib.getValue("javaNamingMethod");
         if (_javaNamingMethod == null) {
-            _javaNamingMethod = _parentTable.getDatabase().getDefaultJavaNamingMethod();
+            _javaNamingMethod = _table.getDatabase().getDefaultJavaNamingMethod();
         }
 
         //Primary Key
@@ -244,7 +245,7 @@ public class Column {
     }
 
     public String getFullyQualifiedName() {
-        return (_parentTable.getName() + '.' + _name);
+        return (_table.getName() + '.' + _name);
     }
 
     // ==============================================================================
@@ -348,25 +349,25 @@ public class Column {
      * Set the parent Table of the column
      */
     public void setTable(Table parent) {
-        _parentTable = parent;
+        _table = parent;
     }
 
     /**
      * Get the parent Table of the column
      */
     public Table getTable() {
-        if (_parentTable == null) {
+        if (_table == null) {
             String msg = "This Column did not have 'table': columnName=" + _name;
             throw new IllegalStateException(msg);
         }
-        return _parentTable;
+        return _table;
     }
 
     /**
      * Returns the Name of the table the column is in
      */
     public String getTableName() {
-        return _parentTable.getName();
+        return _table.getName();
     }
 
     /**
@@ -628,18 +629,16 @@ public class Column {
             return false;
         }
         String myForeignTableName = fk.getForeignTableName();
-        ForeignKey[] fks = _parentTable.getForeignKeys();
-        String myColumnName = this._name;
+        ForeignKey[] fks = _table.getForeignKeys();
+        String myColumnName = _name;
         for (int i = 0; i < fks.length; i++) {
             String foreignTableName = fks[i].getForeignTableName();
             if (!myForeignTableName.equalsIgnoreCase(foreignTableName)) {
                 continue;
             }
             List<String> columnsNameList = fks[i].getLocalColumns();
-            for (String columnName : columnsNameList) {
-                if (myColumnName.equalsIgnoreCase(columnName)) {
-                    return true;
-                }
+            if (!DfCompareUtil.containsIgnoreCase(myColumnName, columnsNameList)) {
+                return false;
             }
         }
         // No multiple foreign keys.
@@ -653,11 +652,10 @@ public class Column {
     /**
      * get the foreign key object for this column
      * if it is a foreign key or part of a foreign key
-     * 
      * @return Foreign key. (Nullable)
      */
     public ForeignKey getForeignKey() {
-        return _parentTable.getForeignKey(this._name);
+        return _table.getForeignKey(this._name);
     }
 
     /**
