@@ -1052,6 +1052,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + getLineSeparator();
             msg = msg + "    </initMethod>" + getLineSeparator();
             msg = msg + getLineSeparator();
+            msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+            msg = msg + getLineSeparator();
             msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader() + getLineSeparator();
