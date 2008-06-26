@@ -357,8 +357,8 @@ namespace ${glPackageExtendedBhv} {
 #end
         }
 #end
-#end
         #endregion
+#end
 
         // ===============================================================================
         //                                                                        Accessor
