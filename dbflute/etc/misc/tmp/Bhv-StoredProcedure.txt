@@ -25,6 +25,9 @@ ParameterBeanでIN/OUTの指定ができるようにする。
 -- #df:stored#
 call xxx()
 
+※内部で{}を付与する
+※CallableStatementを利用する
+
 ○：
 ストアド呼び出しの強制力がある
 OutsideSqlTestの恩恵あり
@@ -42,6 +45,9 @@ call xxx()
 
 外だしSQL呼び出しで
 outsideSql().stored().selectList()
+
+※内部で{}を付与する
+※CallableStatementを利用する
 
 ○：
 ストアド呼び出しの強制力がある
@@ -62,6 +68,8 @@ pmb.setUserId("hogehoge");
 bhv.callExecute("storedName", pmb);
 // callList()
 // callEntity()
+
+※CallableStatementを利用する
 
 ○：
 SQLファイルが要らない
