@@ -1,0 +1,58 @@
+
+ストアド
+
+
+＜A＞
+外だしSQLで、
+-- #df:stored#
+call xxx()
+
+○：
+ストアド呼び出しの強制力がある
+OutsideSqlTestの恩恵あり
+Selectストアドの場合、Sql2Entityで戻り値を自動生成可能
+Selectストアドの場合、ページングも通常のやり方のまま実現可能
+
+×：
+実現がちょとややこしい
+Sql2Entityのコメントの扱いに一貫性がない
+
+
+＜B＞
+外だしSQLで、
+call xxx()
+
+外だしSQL呼び出しで
+outsideSql().stored().selectList()
+
+○：
+ストアド呼び出しの強制力がある
+OutsideSqlTestの恩恵あり
+Selectストアドの場合、Sql2Entityで戻り値を自動生成可能
+Selectストアドの場合、ページングも通常のやり方のまま実現可能
+実現がしやすい
+
+×：
+ストアド呼び出しの強制力がない
+
+
+
+＜C＞
+Pmb pmb = new Pmb();
+pmb.setHogeId(100);
+pmb.setUserId("hogehoge");
+bhv.callExecute("storedName", pmb);
+// callList()
+// callEntity()
+
+○：
+SQLファイルが要らない
+ストアド呼び出しの強制力がある
+実現がしやすい
+
+×：
+ストアド名がベタでOutsideSqlTestの恩恵なし
+Selectストアドの場合、Sql2Entityが利用できない
+Selectストアドの場合、ページング検索はできない(callPage()を作ればよい!?)
+CB、OutsideSqlとは別の枠組みの方法になる
+
