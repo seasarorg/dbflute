@@ -10,6 +10,7 @@ ParameterBeanでIN/OUTの指定ができるようにする。
 -- !!String memberName:OUT!!
 
 ってな感じか！？
+他のオプションと区別が付かないので
 
 -- !!String memberId:stored(IN)!!
 -- !!String memberName:stored(OUT)!!
