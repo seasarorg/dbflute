@@ -67,7 +67,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         if (args == null || dto == null) {
             return sql;
         }
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         int pos = 0;
         int pos2 = 0;
         int size = procedureMetaData.getParameterTypeSize();
@@ -76,16 +76,16 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             if ((pos2 = sql.indexOf('?', pos)) < 0) {
                 break;
             }
-            buf.append(sql.substring(pos, pos2));
+            sb.append(sql.substring(pos, pos2));
             pos = pos2 + 1;
             if (ppt.isInType()) {
-                buf.append(getBindVariableText(ppt.getValue(dto)));
+                sb.append(getBindVariableText(ppt.getValue(dto)));
             } else {
-                buf.append(sql.substring(pos2, pos));
+                sb.append(sql.substring(pos2, pos));
             }
         }
-        buf.append(sql.substring(pos));
-        return buf.toString();
+        sb.append(sql.substring(pos));
+        return sb.toString();
     }
     protected CallableStatement prepareCallableStatement(final Connection connection) {
         if (getSql() == null) { throw new EmptyRuntimeException("sql"); }
