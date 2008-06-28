@@ -42,7 +42,7 @@ import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.ProcedureMetaDataFactoryImpl;
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
-import org.seasar.dao.impl.ResultSetHandlerFactoryImpl
+import org.seasar.dao.impl.ResultSetHandlerFactoryImpl;
 
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
