@@ -714,9 +714,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     public String convertColumnNameToPropertyName(String columnName) {
         if (columnName.contains("_")) {
-            columnName = generateJavaName(columnName.toUpperCase());
+            columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
         }
-        return columnName + "Pmb";
+        return StringUtils.uncapitalise(columnName);
     }
 
     public String convertProcedureNameToPmbName(String procedureName) {
@@ -728,8 +728,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return procedureName + "Pmb";
     }
 
-    protected String generateJavaName(String name) {
-        return NameFactory.generateJavaNameByMethodUnderscore(name);
+    protected String generateUncapitalisedJavaName(String name) {
+        return StringUtils.uncapitalise(NameFactory.generateJavaNameByMethodUnderscore(name));
     }
 
     protected String generateCapitalisedJavaName(String name) {
