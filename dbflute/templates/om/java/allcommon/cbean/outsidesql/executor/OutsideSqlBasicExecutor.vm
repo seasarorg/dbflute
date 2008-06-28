@@ -12,6 +12,8 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * <pre>
  * {Basic}
  *   o selectList()
+ *   o execute()
+ *   o call()
  * 
  * {Entity}
  *   o entityHandling().selectEntity()
@@ -88,21 +90,25 @@ public class ${glOutsideSqlBasicExecutorName} {
         return _outsideSqlDao.execute(path, pmb, createOutsideSqlOption());
     }
 
+    // [DBFlute-0.7.5]
     // ===================================================================================
-    //                                                                             Execute
-    //                                                                             =======
+    //                                                                      Procedure Call
+    //                                                                      ==============
     /**
-     * Call. {Insert/Update/Delete/Etc...}
-     * @param path The path of procedure. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object. (Nullable)
+     * Call stored procedure.
+     * @param pmb The parameter-bean for procedure. (NotNull)
      */
-    public void call(String path, Object pmb) {
-        _outsideSqlDao.call(path, pmb, createOutsideSqlOption());
+    public void call(${glProcedurePmbName} pmb) {
+        if (pmb == null) { throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!"); }
+        _outsideSqlDao.call(pmb.getProcedureName(), pmb, createOutsideSqlOption());
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Result Handling
+    //                                       ---------------
     /**
      * Specify cursor handling. <br />
      * <pre>
@@ -131,26 +137,9 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
-    // [DBFlute-0.7.5]
-    /**
-     * Specify procedure handling. <br />
-     * <pre>
-     * # ex) Your Program
-     * #
-     * # executor.procedureHandling().call(path, pmb);
-     * #
-     * </pre>
-     * @return The cursor executor of outside-sql. (NotNull)
-     */
-    public OutsideSqlProcedureExecutor procedureCall() {
-        return new OutsideSqlProcedureExecutor();
-    }
-    public class OutsideSqlProcedureExecutor {
-        public void call(${glProcedurePmbName} pmb) {
-            _outsideSqlDao.call(pmb.getProcedureName(), pmb, createOutsideSqlOption());
-        }
-    }
-	
+    // -----------------------------------------------------
+    //                                                Paging
+    //                                                ------
     /**
      * Option of autoPaging. <br />
      * If you invoke this, you don't need to write paging condition on your SQL. <br />
@@ -193,19 +182,25 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
     }
 
-    public ${glOutsideSqlBasicExecutorName} configure(${glStatementConfig} statementConfig) {
-        _statementConfig = statementConfig;
-        return this;
-    }
-	
+    // -----------------------------------------------------
+    //                                       Dynamic Binding
+    //                                       ---------------
     public ${glOutsideSqlBasicExecutorName} dynamicBinding() {
         _dynamicBinding = true;
         return this;
     }
 
     // -----------------------------------------------------
-    //                                                Helper
-    //                                                ------
+    //                                      Statement Config
+    //                                      ----------------
+    public ${glOutsideSqlBasicExecutorName} configure(${glStatementConfig} statementConfig) {
+        _statementConfig = statementConfig;
+        return this;
+    }
+	
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected ${glOutsideSqlOptionName} createOutsideSqlOption() {
         final ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
 		option.setStatementConfig(_statementConfig);
