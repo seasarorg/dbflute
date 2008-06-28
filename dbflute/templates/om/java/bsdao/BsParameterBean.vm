@@ -15,6 +15,13 @@ public class ${myClassName} implements ${glProcedurePmbName} {
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                   Procedure Parameter
+    //                                   -------------------
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
