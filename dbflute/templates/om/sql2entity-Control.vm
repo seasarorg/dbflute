@@ -45,6 +45,9 @@ targetdatabase = $targetDatabase
     ## [ConditionBean]
     #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
 
+    ## [OutsideSql]
+    #set ($glProcedurePmbName = "${glProjectPrefix}ProcedurePmb")
+
     ## [Allcommon-ConditionBean-Option]
     #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
 
