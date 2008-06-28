@@ -86,7 +86,6 @@ import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.velocity.DfOriginalGenerator;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 
@@ -1555,7 +1554,6 @@ public class Database {
 
     /**
      * Generate name.
-     *
      * @param algorithmName Algorithm name.
      * @param inputs Inputs.
      * @return Generated name.

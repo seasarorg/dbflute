@@ -62,11 +62,13 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             setupColumnMetaInfo(columns, columnResultSet);
             if (caseInsensitive) {
                 if (columns.isEmpty()) {
-                    columnResultSetLowerSpare = metaData.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
+                    columnResultSetLowerSpare = metaData
+                            .getColumns(null, realSchemaName, tableName.toLowerCase(), null);
                     setupColumnMetaInfo(columns, columnResultSetLowerSpare);
                 }
                 if (columns.isEmpty()) {
-                    columnResultSetUpperSpare = metaData.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
+                    columnResultSetUpperSpare = metaData
+                            .getColumns(null, realSchemaName, tableName.toUpperCase(), null);
                     setupColumnMetaInfo(columns, columnResultSetUpperSpare);
                 }
             }
@@ -125,25 +127,27 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final int jdbcType = columnMetaInfo.getJdbcType();
+        return getColumnTorqueType(columnMetaInfo.getJdbcType(), columnMetaInfo.getDbTypeName());
+    }
+
+    public String getColumnTorqueType(int jdbcType, String dbTypeName) {
         if (Types.OTHER != jdbcType) {
 
             // For compatible to Oracle's JDBC driver.
-            if (isOracleCompatibleDate(jdbcType, columnMetaInfo.getDbTypeName())) {
+            if (isOracleCompatibleDate(jdbcType, dbTypeName)) {
                 return getDateTorqueType();
             }
 
             try {
                 return TypeMap.getTorqueType(jdbcType);
             } catch (RuntimeException e) {
-                String msg = "Not found the sqlTypeCode in TypeMap: columnMetaInfo=";
-                msg = msg + columnMetaInfo + " message=" + e.getMessage();
+                String msg = "Not found the sqlTypeCode in TypeMap: jdbcType=";
+                msg = msg + jdbcType + " message=" + e.getMessage();
                 _log.warn(msg);
             }
         }
 
         // If other
-        final String dbTypeName = columnMetaInfo.getDbTypeName();
         if (dbTypeName == null) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
             return torqueType;

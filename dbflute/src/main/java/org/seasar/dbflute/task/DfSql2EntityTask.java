@@ -28,19 +28,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.NameFactory;
+import org.apache.torque.engine.database.model.NameGenerator;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureType;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -120,7 +127,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireMan.execute(runner, sqlFileList);
 
         setupProcedureInfo();
-        
+
         fireSuperExecute();
         setupBehaviorQueryPath(sqlFileList);
 
@@ -134,7 +141,28 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
             List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
             for (DfProcedureMetaInfo procedureMetaInfo : procedures) {
-                _log.debug(procedureMetaInfo.toString());
+                String procedureName = procedureMetaInfo.getProcedureName();
+                DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
+                Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+                List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = procedureMetaInfo
+                        .getProcedureColumnMetaInfoList();
+                for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
+                    String columnName = procedureColumnMetaInfo.getColumnName();
+                    String propertyType;
+                    {
+                        int jdbcType = procedureColumnMetaInfo.getJdbcType();
+                        String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
+                        Integer columnSize = procedureColumnMetaInfo.getColumnSize();
+                        Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
+                        String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
+                        propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
+                    }
+                    propertyNameTypeMap.put(columnName, propertyType);
+                }
+                parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
+                String pmbName = convertProcedureNameToPmbName(procedureName);
+                _log.debug("pmbName=" + pmbName + ", propertyNameTypeMap=" + propertyNameTypeMap);
+                // _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             }
         } catch (SQLException ignored) {
             _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * *");
@@ -142,6 +170,43 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("* * * * * * * * * */");
             _log.info("");
         }
+    }
+
+    public String convertProcedureNameToPmbName(String procedureName) {
+        if (!procedureName.contains("_")) {
+            return procedureName;
+        }
+        final List<String> inputs = new ArrayList<String>(2);
+        inputs.add(procedureName);
+        inputs.add(NameGenerator.CONV_METHOD_UNDERSCORE);
+        return StringUtils.capitalise(generateName(NameFactory.JAVA_GENERATOR, inputs));
+    }
+
+    /**
+     * Generate name.
+     * @param algorithmName Algorithm name.
+     * @param inputs Inputs.
+     * @return Generated name.
+     */
+    protected String generateName(String algorithmName, List<?> inputs) {
+        String javaName = null;
+        try {
+            javaName = NameFactory.generateName(NameFactory.JAVA_GENERATOR, inputs);
+        } catch (EngineException e) {
+            String msg = "NameFactory.generateName() threw the exception: inputs=" + inputs;
+            _log.warn(msg, e);
+            throw new RuntimeException(msg, e);
+        } catch (RuntimeException e) {
+            String msg = "NameFactory.generateName() threw the exception: inputs=" + inputs;
+            _log.warn(msg, e);
+            throw new RuntimeException(msg, e);
+        }
+        if (javaName == null) {
+            String msg = "NameFactory.generateName() returned null: inputs=" + inputs;
+            _log.warn(msg);
+            throw new IllegalStateException(msg);
+        }
+        return javaName;
     }
 
     // ===================================================================================
