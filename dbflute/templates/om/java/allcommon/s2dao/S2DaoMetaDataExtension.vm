@@ -1424,11 +1424,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 }
             }
             final BeanDesc pmbDesc = BeanDescFactory.getBeanDesc(pmbType);
-            final Class<?> superclass = pmbType.getSuperclass();
-            if (superclass != null && superclass.equals(pmbType)) {
-                registerParameterType(metaData, pmbDesc, superclass.getDeclaredFields());// *Point
+
+            // *Point
+            final Stack<Class<?>> stack = new Stack<Class<?>>();
+            for (Class<?> clazz = pmbType.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
+                stack.push(clazz);
             }
-            registerParameterType(metaData, pmbDesc, pmbType.getDeclaredFields());
+            for ( ; !stack.isEmpty() ;) {
+                final Class<?> clazz = stack.pop();
+                registerParameterType(metaData, pmbDesc, clazz.getDeclaredFields());
+            }
+
             return metaData;
         }
         protected void registerParameterType(ProcedureMetaDataImpl metaData, BeanDesc pmbDesc, Field[] fields) {
