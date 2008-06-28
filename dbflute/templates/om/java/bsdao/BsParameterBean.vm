@@ -6,6 +6,9 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+    public static final String PROCEDURE_NAME = ${database.pmbMetaDataProcedureName};
+#end
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))

@@ -603,6 +603,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         protected String superClassName;
         protected Map<String, String> propertyNameTypeMap;
         protected Map<String, String> propertyNameOptionMap;
+        protected String procedureName;// Only when this is for procedure
 
         @Override
         public String toString() {
@@ -611,6 +612,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append(", ").append(superClassName);
             sb.append(", ").append(propertyNameTypeMap);
             sb.append(", ").append(propertyNameOptionMap);
+            sb.append(", ").append(procedureName);
             return sb.toString();
         }
 
@@ -644,6 +646,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         public void setPropertyNameOptionMap(Map<String, String> propertyNameOptionMap) {
             this.propertyNameOptionMap = propertyNameOptionMap;
+        }
+
+        public String getProcedureName() {
+            return procedureName;
+        }
+
+        public void setProcedureName(String procedureName) {
+            this.procedureName = procedureName;
         }
     }
 
@@ -686,7 +696,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
                         propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
                     }
-                    propertyNameTypeMap.put(columnName, propertyType);
+                    String propertyName = convertColumnNameToPropertyName(columnName);
+                    propertyNameTypeMap.put(propertyName, propertyType);
 
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(columnName, procedureColumnType.toString());
@@ -695,9 +706,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 parameterBeanMetaData.setClassName(pmbName);
                 parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
+                parameterBeanMetaData.setProcedureName(procedureName);
                 _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             }
         }
+    }
+
+    public String convertColumnNameToPropertyName(String columnName) {
+        if (columnName.contains("_")) {
+            columnName = generateJavaName(columnName.toUpperCase());
+        }
+        return columnName + "Pmb";
     }
 
     public String convertProcedureNameToPmbName(String procedureName) {
@@ -707,6 +726,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             procedureName = StringUtils.capitalise(procedureName);
         }
         return procedureName + "Pmb";
+    }
+
+    protected String generateJavaName(String name) {
+        return NameFactory.generateJavaNameByMethodUnderscore(name);
     }
 
     protected String generateCapitalisedJavaName(String name) {

@@ -423,6 +423,14 @@ public class Database {
         return new PmbMetaDataPropertyOptionFinder(className, propertyName, _pmbMetaDataMap);
     }
 
+    public boolean isPmbMetaDataForProcedure(String className) {
+        return findPmbMetaData(className).getProcedureName() != null;
+    }
+
+    public String getPmbMetaDataProcedureName(String className) {
+        return findPmbMetaData(className).getProcedureName();
+    }
+
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
@@ -482,7 +490,7 @@ public class Database {
         String option = findPmbMetaDataPropertyOption(className, propertyName);
         return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnReturn.toString());
     }
-    
+
     // -----------------------------------------------------
     //                                                Assert
     //                                                ------
