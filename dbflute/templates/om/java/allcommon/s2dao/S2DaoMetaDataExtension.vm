@@ -1453,7 +1453,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 sb.append("?, ");
             }
             if (size > 0) {
-                sb.setLength(buf.length() - 2);
+                sb.setLength(sb.length() - 2);
             }
             sb.append(")}");
             return sb.toString();
