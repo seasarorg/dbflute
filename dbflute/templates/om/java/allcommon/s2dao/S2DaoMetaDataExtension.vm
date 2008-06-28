@@ -1427,7 +1427,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
             // *Point
             final Stack<Class<?>> stack = new Stack<Class<?>>();
-            for (Class<?> clazz = pmbType.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Class<?> clazz = pmbType; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
                 stack.push(clazz);
             }
             for ( ; !stack.isEmpty() ;) {
