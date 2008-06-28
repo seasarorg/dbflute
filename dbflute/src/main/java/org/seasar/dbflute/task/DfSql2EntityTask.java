@@ -657,7 +657,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.info(ignored.getMessage());
             _log.info("* * * * * * * * * */");
-            _log.info("");
         }
     }
 
@@ -692,13 +691,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(columnName, procedureColumnType.toString());
                 }
+                String pmbName = convertProcedureNameToPmbName(procedureName);
+                parameterBeanMetaData.setClassName(pmbName);
                 parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
-                String pmbName = convertProcedureNameToPmbName(procedureName);
                 _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             }
         }
-
     }
 
     public String convertProcedureNameToPmbName(String procedureName) {
