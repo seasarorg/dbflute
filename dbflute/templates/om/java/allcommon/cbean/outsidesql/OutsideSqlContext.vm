@@ -234,7 +234,7 @@ public class ${glOutsideSqlContextName} {
     }
 
     protected boolean isBehaviorQueryPathEnabled() {
-        if (_methodName != null && _methodName.startsWith("call")) {// {DBFlute-0.7.5}
+        if (isProcedure()) {// [DBFlute-0.7.5]
             return false;
         }
         return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
@@ -245,6 +245,11 @@ public class ${glOutsideSqlContextName} {
     //                                                                       =============
     public boolean isSpecifiedOutsideSql() {
         return _outsideSqlPath != null;
+    }
+
+    // [DBFlute-0.7.5]
+    public boolean isProcedure() {
+        return _methodName != null && _methodName.startsWith("call");
     }
 
     // ===================================================================================
