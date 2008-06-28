@@ -844,7 +844,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - -
         final ProcedureMetaDataFactoryImpl myProcedureMetaDataFactory = new ProcedureMetaDataFactoryImpl() {
             @Override
-            protected Class getParameterType(Method method) {// for fitting specified outsideSql
+            protected Class getParameterType(Method method) {// for to fit specified outsideSql
                 return pmb != null ? pmb.getClass() : null;
             }
         };

@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * @author jflute
+ * @since 0.7.5 (2008/06/28 Saturday)
  */
 public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
@@ -33,11 +34,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            ResultSet procedureRs = metaData.getProcedures(null, schemaName, "*");
+            ResultSet procedureRs = metaData.getProcedures(null, schemaName, null);
             setupProcedureMetaInfo(metaInfoList, procedureRs);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
                 String procedureName = procedureMetaInfo.getProcedureName();
-                ResultSet columnRs = metaData.getProcedureColumns(null, schemaName, procedureName, "*");
+                ResultSet columnRs = metaData.getProcedureColumns(null, schemaName, procedureName, null);
                 setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
             }
         } catch (SQLException e) {
@@ -84,8 +85,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final Integer procedureColumnType = new Integer(columnRs.getString("COLUMN_TYPE"));
             final Integer jdbcType = new Integer(columnRs.getString("DATA_TYPE"));
             final String dbTypeName = columnRs.getString("TYPE_NAME");
-            final Integer columnSize = new Integer(columnRs.getString("LENGTH"));
-            final Integer decimalDigits = new Integer(columnRs.getString("PRECISION"));
+            final String length = columnRs.getString("LENGTH");
+            final Integer columnSize = length != null ? new Integer(length) : null;
+            final String precision = columnRs.getString("PRECISION");
+            final Integer decimalDigits = precision != null ? new Integer(precision) : null;
             final String columnComment = columnRs.getString("REMARKS");
 
             final DfProcedureColumnMetaInfo procedureColumnMetaInfo = new DfProcedureColumnMetaInfo();
@@ -166,8 +169,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         protected String columnName;
         protected int jdbcType;
         protected String dbTypeName;
-        protected int columnSize;
-        protected int decimalDigits;
+        protected Integer columnSize;
+        protected Integer decimalDigits;
         protected String columnComment;
         protected DfProcedureColumnType procedureColumnType;
 
@@ -177,14 +180,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
         public void setColumnName(String columnName) {
             this.columnName = columnName;
-        }
-
-        public String getColumnComment() {
-            return columnComment;
-        }
-
-        public void setColumnComment(String columnComment) {
-            this.columnComment = columnComment;
         }
 
         public DfProcedureColumnType getProcedureColumnType() {
@@ -211,25 +206,34 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             this.dbTypeName = dbTypeName;
         }
 
-        public int getColumnSize() {
+        public Integer getColumnSize() {
             return columnSize;
         }
 
-        public void setColumnSize(int columnSize) {
+        public void setColumnSize(Integer columnSize) {
             this.columnSize = columnSize;
         }
 
-        public int getDecimalDigits() {
+        public Integer getDecimalDigits() {
             return decimalDigits;
         }
 
-        public void setDecimalDigits(int decimalDigits) {
+        public void setDecimalDigits(Integer decimalDigits) {
             this.decimalDigits = decimalDigits;
+        }
+
+        public String getColumnComment() {
+            return columnComment;
+        }
+
+        public void setColumnComment(String columnComment) {
+            this.columnComment = columnComment;
         }
 
         @Override
         public String toString() {
-            return "{" + columnName + ", " + procedureColumnType + ", " + columnComment + "}";
+            return "{" + columnName + ", " + procedureColumnType + ", " + jdbcType + ", " + dbTypeName + "("
+                    + columnSize + ", " + decimalDigits + ")" + columnComment + "}";
         }
     }
 

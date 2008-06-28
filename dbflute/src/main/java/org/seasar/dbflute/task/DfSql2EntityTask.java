@@ -16,6 +16,7 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -37,7 +38,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureMetaInfo;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -116,12 +119,29 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<File> sqlFileList = collectSqlFileList();
         fireMan.execute(runner, sqlFileList);
 
+        setupProcedureInfo();
+        
         fireSuperExecute();
         setupBehaviorQueryPath(sqlFileList);
 
         handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
+    }
+
+    protected void setupProcedureInfo() {
+        try {
+            DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
+            List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
+            for (DfProcedureMetaInfo procedureMetaInfo : procedures) {
+                _log.debug(procedureMetaInfo.toString());
+            }
+        } catch (SQLException ignored) {
+            _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * *");
+            _log.info(ignored.getMessage());
+            _log.info("* * * * * * * * * */");
+            _log.info("");
+        }
     }
 
     // ===================================================================================
