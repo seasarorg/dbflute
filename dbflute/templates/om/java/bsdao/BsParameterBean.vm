@@ -8,7 +8,6 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
     public static final String PROCEDURE_NAME = "${database.getPmbMetaDataProcedureName($pmbClassName)}";
-#end
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
@@ -19,6 +18,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     public static String ${propertyName}_PROCEDURE_PARAMETER = "inout";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
     public static String ${propertyName}_PROCEDURE_PARAMETER = "return";
+#end
 #end
 #end
 
