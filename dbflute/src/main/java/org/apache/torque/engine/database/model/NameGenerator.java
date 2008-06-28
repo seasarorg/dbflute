@@ -105,5 +105,5 @@ public interface NameGenerator
      * @return The generated name.
      * @throws EngineException if the name could not be generated
      */
-    String generateName(List inputs) throws EngineException;
+    String generateName(List<?> inputs) throws EngineException;
 }

@@ -62,13 +62,10 @@ import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.
- *
- * @author <a href="mailto:dlr@finemaltcoding.com>Daniel Rall</a>
- * @author <a href="mailto:byron_foster@byron_foster@yahoo.com>Byron Foster</a>
- * @version $Id$
+ * @author Modified by jflute
  */
-public class JavaNameGenerator implements NameGenerator
-{
+public class JavaNameGenerator implements NameGenerator {
+    
     /**
      * <code>inputs</code> should consist of two elements, the
      * original name of the database element and the method for
@@ -86,26 +83,18 @@ public class JavaNameGenerator implements NameGenerator
      * @return The generated name.
      * @see org.apache.torque.engine.database.model.NameGenerator
      */
-    public String generateName(List inputs)
-    {
+    public String generateName(List<?> inputs) {
         String schemaName = (String) inputs.get(0);
         String method = (String) inputs.get(1);
         String javaName = null;
 
-        if (CONV_METHOD_UNDERSCORE.equals(method))
-        {
+        if (CONV_METHOD_UNDERSCORE.equals(method)) {
             javaName = underscoreMethod(schemaName);
-        }
-        else if (CONV_METHOD_JAVANAME.equals(method))
-        {
+        } else if (CONV_METHOD_JAVANAME.equals(method)) {
             javaName = javanameMethod(schemaName);
-        }
-        else if (CONV_METHOD_NOCHANGE.equals(method))
-        {
+        } else if (CONV_METHOD_NOCHANGE.equals(method)) {
             javaName = nochangeMethod(schemaName);
-        }
-        else
-        {
+        } else {
             // if for some reason nothing is defined then we default
             // to the traditional method.
             javaName = underscoreMethod(schemaName);
@@ -125,13 +114,10 @@ public class JavaNameGenerator implements NameGenerator
      * @see org.apache.torque.engine.database.model.NameGenerator
      * @see #underscoreMethod(String)
      */
-    protected String underscoreMethod(String schemaName)
-    {
+    protected String underscoreMethod(String schemaName) {
         StringBuffer name = new StringBuffer();
-        StringTokenizer tok = new StringTokenizer
-            (schemaName, String.valueOf(STD_SEPARATOR_CHAR));
-        while (tok.hasMoreTokens())
-        {
+        StringTokenizer tok = new StringTokenizer(schemaName, String.valueOf(STD_SEPARATOR_CHAR));
+        while (tok.hasMoreTokens()) {
             String namePart = ((String) tok.nextElement());
             if (DfBuildProperties.getInstance().isAvailableToLowerInGeneratorUnderscoreMethod()) {
                 namePart = namePart.toLowerCase();
@@ -151,13 +137,10 @@ public class JavaNameGenerator implements NameGenerator
      * @see org.apache.torque.engine.database.model.NameGenerator
      * @see #underscoreMethod(String)
      */
-    protected String javanameMethod(String schemaName)
-    {
+    protected String javanameMethod(String schemaName) {
         StringBuffer name = new StringBuffer();
-        StringTokenizer tok = new StringTokenizer
-            (schemaName, String.valueOf(STD_SEPARATOR_CHAR));
-        while (tok.hasMoreTokens())
-        {
+        StringTokenizer tok = new StringTokenizer(schemaName, String.valueOf(STD_SEPARATOR_CHAR));
+        while (tok.hasMoreTokens()) {
             String namePart = (String) tok.nextElement();
             name.append(StringUtils.capitalise(namePart));
         }
@@ -171,8 +154,7 @@ public class JavaNameGenerator implements NameGenerator
      * @param name name to be converted.
      * @return The <code>name</code> parameter, unchanged.
      */
-    protected final String nochangeMethod(String name)
-    {
+    protected final String nochangeMethod(String name) {
         return name;
     }
 }

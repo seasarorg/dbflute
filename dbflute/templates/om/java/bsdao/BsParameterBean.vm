@@ -6,6 +6,18 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
+    public static String ${propertyName}_PROCEDURE_PARAMETER = "in";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
+    public static String ${propertyName}_PROCEDURE_PARAMETER = "out";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
+    public static String ${propertyName}_PROCEDURE_PARAMETER = "inout";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
+    public static String ${propertyName}_PROCEDURE_PARAMETER = "return";
+#end
+#end
 
     // ===================================================================================
     //                                                                           Attribute

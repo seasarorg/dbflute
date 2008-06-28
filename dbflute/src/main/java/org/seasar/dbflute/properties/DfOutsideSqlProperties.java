@@ -104,6 +104,14 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                             Procedure ParameterBean
+    //                                                             =======================
+    public boolean isGenerateProcedureParameterBean() {
+        String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
+    // ===================================================================================
     //                                                                      Package Detail
     //                                                                      ==============
     protected String getSpecifiedBaseCustomizeEntityPackage() {

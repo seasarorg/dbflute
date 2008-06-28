@@ -73,6 +73,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.filedelete.OldTableClassDeletor;
+import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
@@ -412,13 +413,21 @@ public class Database {
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
     }
 
+    protected String findPmbMetaDataPropertyOption(String className, String propertyName) {
+        PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
+        return finder.findPmbMetaDataPropertyOption(className, propertyName);
+    }
+
+    protected PmbMetaDataPropertyOptionFinder createPmbMetaDataPropertyOptionFinder(String className,
+            String propertyName) {
+        return new PmbMetaDataPropertyOptionFinder(className, propertyName, _pmbMetaDataMap);
+    }
+
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
     public boolean isPmbMetaDataPropertyOptionLikeSearch(String className, String propertyName) {
-        final PmbMetaDataPropertyOptionFinder finder = new PmbMetaDataPropertyOptionFinder(className, propertyName,
-                _pmbMetaDataMap);
-        final String option = finder.findPmbMetaDataPropertyOption(className, propertyName);
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
         return option != null && option.trim().equalsIgnoreCase("like");
     }
 
@@ -426,20 +435,20 @@ public class Database {
     //                                 Option Classification
     //                                 ---------------------
     public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
-        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
+        PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
         return obj.isPmbMetaDataPropertyOptionClassification();
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
-        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
+        PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
         return obj.getPmbMetaDataPropertyOptionClassificationName();
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
-        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
+        PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
         return obj.getPmbMetaDataPropertyOptionClassificationMapList();
     }
@@ -447,13 +456,33 @@ public class Database {
     protected PmbMetaDataPropertyOptionClassification createPmbMetaDataPropertyOptionClassification(String className,
             String propertyName) {
         DfClassificationProperties classificationProperties = getProperties().getClassificationProperties();
-        PmbMetaDataPropertyOptionFinder pmbMetaDataPropertyOptionFinder = new PmbMetaDataPropertyOptionFinder(
-                className, propertyName, _pmbMetaDataMap);
-        final PmbMetaDataPropertyOptionClassification pmbMetaDataPropertyOptionClassification = new PmbMetaDataPropertyOptionClassification(
-                className, propertyName, classificationProperties, pmbMetaDataPropertyOptionFinder);
-        return pmbMetaDataPropertyOptionClassification;
+        PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
+        return new PmbMetaDataPropertyOptionClassification(className, propertyName, classificationProperties, finder);
     }
 
+    // -----------------------------------------------------
+    //                                    Option LikeSeasrch
+    //                                    ------------------
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
+        return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnIn.toString());
+    }
+
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterOut(String className, String propertyName) {
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
+        return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnOut.toString());
+    }
+
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterInOut(String className, String propertyName) {
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
+        return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnInOut.toString());
+    }
+
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterReturn(String className, String propertyName) {
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
+        return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnReturn.toString());
+    }
+    
     // -----------------------------------------------------
     //                                                Assert
     //                                                ------

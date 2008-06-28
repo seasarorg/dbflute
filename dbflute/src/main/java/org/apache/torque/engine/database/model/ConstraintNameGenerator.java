@@ -64,10 +64,10 @@ import org.apache.torque.engine.EngineException;
  * A <code>NameGenerator</code> implementation for table-specific
  * constraints.  Conforms to the maximum column name length for the
  * type of database in use.
- *
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class ConstraintNameGenerator implements NameGenerator {
+
     /** Log instance. */
     private static Log log = LogFactory.getLog(ConstraintNameGenerator.class);
 
@@ -81,7 +81,7 @@ public class ConstraintNameGenerator implements NameGenerator {
      *
      * @see org.apache.torque.engine.database.model.NameGenerator
      */
-    public String generateName(List inputs) throws EngineException {
+    public String generateName(List<?> inputs) throws EngineException {
         final StringBuffer name = new StringBuffer();
         final Database db = (Database) inputs.get(0);
         name.append((String) inputs.get(1));

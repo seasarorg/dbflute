@@ -54,30 +54,25 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.torque.engine.EngineException;
 
 /**
- * A name generation factory.
- *
- * @author <a href="mailto:dlr@finemaltcoding.com>Daniel Rall</a>
- * @version $Id$
+ * @author Modified by jflute
  */
-public class NameFactory
-{
+public class NameFactory {
     /**
      * The fully qualified class name of the Java name generator.
      */
-    public static final String JAVA_GENERATOR =
-        JavaNameGenerator.class.getName();
+    public static final String JAVA_GENERATOR = JavaNameGenerator.class.getName();
 
     /**
      * The fully qualified class name of the constraint name generator.
      */
-    public static final String CONSTRAINT_GENERATOR =
-        ConstraintNameGenerator.class.getName();
+    public static final String CONSTRAINT_GENERATOR = ConstraintNameGenerator.class.getName();
 
     /**
      * The single instance of this class.
@@ -93,38 +88,25 @@ public class NameFactory
     /**
      * Creates a new instance with storage for algorithm implementations.
      */
-    protected NameFactory()
-    {
+    protected NameFactory() {
         algorithms = new Hashtable<String, NameGenerator>(5);
     }
 
     /**
      * Factory method which retrieves an instance of the named generator.
-     *
-     * @param name The fully qualified class name of the name
-     *        generation algorithm to retrieve.
+     * @param name The fully qualified class name of the name generation algorithm to retrieve.
      * @return A name generator
      */
-    protected NameGenerator getAlgorithm(String name)
-            throws EngineException
-    {
-        synchronized (algorithms)
-        {
+    protected NameGenerator getAlgorithm(String name) throws EngineException {
+        synchronized (algorithms) {
             NameGenerator algorithm = (NameGenerator) algorithms.get(name);
-            if (algorithm == null)
-            {
-                try
-                {
-                    algorithm =
-                        (NameGenerator) Class.forName(name).newInstance();
-                }
-                catch (InstantiationException e)
-                {
-                    throw new EngineException("Unable to instantiate class " 
-                            + name + ": Make sure it's in your run-time classpath", e);
-                }
-                catch (Exception e)
-                {
+            if (algorithm == null) {
+                try {
+                    algorithm = (NameGenerator) Class.forName(name).newInstance();
+                } catch (InstantiationException e) {
+                    throw new EngineException("Unable to instantiate class " + name
+                            + ": Make sure it's in your run-time classpath", e);
+                } catch (Exception e) {
                     throw new EngineException(e);
                 }
                 algorithms.put(name, algorithm);
@@ -136,7 +118,6 @@ public class NameFactory
     /**
      * Given a list of <code>String</code> objects, implements an
      * algorithm which produces a name.
-     *
      * @param algorithmName The fully qualified class name of the
      * {@link org.apache.torque.engine.database.model.NameGenerator}
      * implementation to use to generate names.
@@ -144,10 +125,21 @@ public class NameFactory
      * @return The generated name.
      * @throws EngineException an exception
      */
-    public static String generateName(String algorithmName, List inputs)
-        throws EngineException
-    {
+    public static String generateName(String algorithmName, List<?> inputs) throws EngineException {
         NameGenerator algorithm = instance.getAlgorithm(algorithmName);
         return algorithm.generateName(inputs);
+    }
+
+    public static String generateJavaNameByMethodUnderscore(String name) {
+        try {
+            NameGenerator algorithm = instance.getAlgorithm(NameFactory.JAVA_GENERATOR);
+            List<String> inputs = new ArrayList<String>();
+            inputs.add(name);
+            inputs.add(NameGenerator.CONV_METHOD_UNDERSCORE);
+            return algorithm.generateName(inputs);
+        } catch (EngineException e) {
+            String msg = "generateName() threw the exception: name=" + name;
+            throw new RuntimeException(msg, e);
+        }
     }
 }
