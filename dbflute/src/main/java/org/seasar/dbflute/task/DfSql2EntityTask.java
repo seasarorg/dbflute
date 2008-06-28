@@ -686,7 +686,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = procedureMetaInfo
                         .getProcedureColumnMetaInfoList();
                 for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
-                    String columnName = procedureColumnMetaInfo.getColumnName();
+                    String propertyName;
+                    {
+                        String columnName = procedureColumnMetaInfo.getColumnName();
+                        propertyName = convertColumnNameToPropertyName(columnName);
+                    }
                     String propertyType;
                     {
                         int jdbcType = procedureColumnMetaInfo.getJdbcType();
@@ -696,11 +700,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
                         propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
                     }
-                    String propertyName = convertColumnNameToPropertyName(columnName);
                     propertyNameTypeMap.put(propertyName, propertyType);
 
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
-                    propertyNameOptionMap.put(columnName, procedureColumnType.toString());
+                    propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
                 }
                 String pmbName = convertProcedureNameToPmbName(procedureName);
                 parameterBeanMetaData.setClassName(pmbName);
