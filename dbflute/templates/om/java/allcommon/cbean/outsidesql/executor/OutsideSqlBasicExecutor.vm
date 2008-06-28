@@ -4,6 +4,7 @@ import java.util.List;
 
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -130,6 +131,7 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
+    // [DBFlute-0.7.5]
     /**
      * Specify procedure handling. <br />
      * <pre>
@@ -140,13 +142,12 @@ public class ${glOutsideSqlBasicExecutorName} {
      * </pre>
      * @return The cursor executor of outside-sql. (NotNull)
      */
-    public OutsideSqlProcedureExecutor procedureHandling() {
+    public OutsideSqlProcedureExecutor procedureCall() {
         return new OutsideSqlProcedureExecutor();
     }
-
     public class OutsideSqlProcedureExecutor {
-        public void call(String path, Object pmb) {
-            _outsideSqlDao.call(path, pmb, createOutsideSqlOption());
+        public void call(${glProcedurePmbName} pmb) {
+            _outsideSqlDao.call(pmb.getProcedureName(), pmb, createOutsideSqlOption());
         }
     }
 	

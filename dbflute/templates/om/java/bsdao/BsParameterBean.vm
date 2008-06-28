@@ -1,13 +1,20 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
+#end
+
 /**
  * The parameter-bean of ${pmbClassName}.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-    public static final String PROCEDURE_NAME = "${database.getPmbMetaDataProcedureName($pmbClassName)}";
+public class ${myClassName} implements ${glProcedurePmbName} {
+#else
+public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
@@ -42,6 +49,15 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     public ${myClassName}() {
     }
     
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+    // ===================================================================================
+    //                                                                           Procedure
+    //                                                                           =========
+    public String getProcedureName() {
+        return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
+    }
+
+#end
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

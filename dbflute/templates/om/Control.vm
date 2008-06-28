@@ -179,6 +179,7 @@ targetdatabase = $targetDatabase
     #set ($glOutsideSqlContextName = "${glProjectPrefix}OutsideSqlContext")
     #set ($glOutsideSqlDaoName = "${glProjectPrefix}OutsideSqlDao")
     #set ($glOutsideSqlOptionName = "${glProjectPrefix}OutsideSqlOption")
+    #set ($glProcedurePmbName = "${glProjectPrefix}ProcedurePmb")
 
     ## [Allcommon-ConditionBean-OutsideSql-Executor]
     #set ($glOutsideSqlBasicExecutorName = "${glProjectPrefix}OutsideSqlBasicExecutor")
@@ -953,6 +954,10 @@ targetdatabase = $targetDatabase
     $database.info("    parse('OutsideSqlOption');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOptionName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlOption.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('ProcedurePmb');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glProcedurePmbName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/ProcedurePmb.${glTemplateFileExtension}",$path ,"", "")
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor}))
     $database.makeDirectory($path)
