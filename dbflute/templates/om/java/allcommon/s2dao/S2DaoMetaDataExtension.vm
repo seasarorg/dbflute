@@ -42,6 +42,7 @@ import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.ProcedureMetaDataFactoryImpl;
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
+import org.seasar.dao.impl.ResultSetHandlerFactoryImpl
 
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
@@ -843,7 +844,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - -
         final ProcedureMetaDataFactoryImpl myProcedureMetaDataFactory = new ProcedureMetaDataFactoryImpl() {
             @Override
-            protected Class getParameterType(Method method) {
+            protected Class getParameterType(Method method) {// for fitting specified outsideSql
                 return pmb != null ? pmb.getClass() : null;
             }
         };
@@ -1009,7 +1010,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                               ResultSetHandlerFactoryImpl Extension
     //                                               =====================================
-    public static class ResultSetHandlerFactoryExtension extends org.seasar.dao.impl.ResultSetHandlerFactoryImpl {
+    public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
         public ResultSetHandlerFactoryExtension() {
             super();
         }
@@ -1422,7 +1423,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         protected StatementFactory statementFactory;
         protected ResultSetFactory resultSetFactory;
         protected ProcedureMetaData procedureMetaData;
-
         public InternalArgumentDtoProcedureCommand(DataSource dataSource, ResultSetHandler resultSetHandler,
                 StatementFactory statementFactory, ResultSetFactory resultSetFactory,
                 ProcedureMetaData procedureMetaData) {
@@ -1432,40 +1432,31 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             this.resultSetFactory = resultSetFactory;
             this.procedureMetaData = procedureMetaData;
         }
-
         public Object execute(final Object[] args) {
             final InternalArgumentDtoProcedureHandler handler = newArgumentDtoProcedureHandler();
             return handler.execute(new Object[]{args[1]});
         }
-
         protected InternalArgumentDtoProcedureHandler newArgumentDtoProcedureHandler() {
             return new InternalArgumentDtoProcedureHandler(dataSource, createSql(procedureMetaData), resultSetHandler,
                     statementFactory, resultSetFactory, procedureMetaData);
         }
         protected String createSql(final ProcedureMetaData procedureMetaData) {
-            final StringBuffer buf = new StringBuffer();
-            buf.append("{");
+            final StringBuilder sb = new StringBuilder();
+            sb.append("{");
             int size = procedureMetaData.getParameterTypeSize();
-            
-            System.out.println("procedureMetaData.name=" + procedureMetaData.getProcedureName());
-            System.out.println("procedureMetaData.string=" + procedureMetaData.toString());
-            System.out.println("size=" + size);
-            
             if (procedureMetaData.hasReturnParameterType()) {
-                buf.append("? = ");
+                sb.append("? = ");
                 size--;
             }
-            buf.append("call ");
-            buf.append(procedureMetaData.getProcedureName());
-            buf.append("(");
+            sb.append("call ").append(procedureMetaData.getProcedureName()).append("(");
             for (int i = 0; i < size; i++) {
-                buf.append("?, ");
+                sb.append("?, ");
             }
             if (size > 0) {
-                buf.setLength(buf.length() - 2);
+                sb.setLength(buf.length() - 2);
             }
-            buf.append(")}");
-            return buf.toString();
+            sb.append(")}");
+            return sb.toString();
         }
     }
 
@@ -1480,7 +1471,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
             final Object dto = getArgumentDto(args);
             logSql(args, argTypes);
-            // System.out.println(getSql());
             CallableStatement cs = null;
             try {
                 cs = prepareCallableStatement(connection);
@@ -1496,7 +1486,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 StatementUtil.close(cs);
             }
         }
-        protected String getCompleteSql(final Object[] args) {
+        @Override
+        protected String getCompleteSql(final Object[] args) {// for Procedure Call
             String sql = getSql();
             Object dto = getArgumentDto(args);
             if (args == null || dto == null) {
@@ -1523,11 +1514,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return buf.toString();
         }
         protected CallableStatement prepareCallableStatement(final Connection connection) {
-            if (getSql() == null) {
-                throw new EmptyRuntimeException("sql");
-            }
-            final CallableStatement cs = getStatementFactory().createCallableStatement(connection, getSql());
-            return cs;
+            if (getSql() == null) { throw new EmptyRuntimeException("sql"); }
+            return getStatementFactory().createCallableStatement(connection, getSql());
         }
         protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
             if (dto == null) { return; }
