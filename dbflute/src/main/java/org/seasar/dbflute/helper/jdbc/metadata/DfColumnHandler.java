@@ -41,16 +41,16 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo) {
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, DfTableMetaInfo tableMetaInfo) {
         final String tableName = tableMetaInfo.getTableName();
-        return getColumns(dbMeta, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
+        return getColumns(metaData, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
     }
 
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName) {
-        return getColumns(dbMeta, schemaName, tableName, false);
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, String tableName) {
+        return getColumns(metaData, schemaName, tableName, false);
     }
 
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName,
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, String tableName,
             boolean caseInsensitive) {
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
@@ -58,15 +58,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         ResultSet columnResultSetUpperSpare = null;
         try {
             final String realSchemaName = schemaName;
-            columnResultSet = dbMeta.getColumns(null, realSchemaName, tableName, null);
+            columnResultSet = metaData.getColumns(null, realSchemaName, tableName, null);
             setupColumnMetaInfo(columns, columnResultSet);
             if (caseInsensitive) {
                 if (columns.isEmpty()) {
-                    columnResultSetLowerSpare = dbMeta.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
+                    columnResultSetLowerSpare = metaData.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
                     setupColumnMetaInfo(columns, columnResultSetLowerSpare);
                 }
                 if (columns.isEmpty()) {
-                    columnResultSetUpperSpare = dbMeta.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
+                    columnResultSetUpperSpare = metaData.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
                     setupColumnMetaInfo(columns, columnResultSetUpperSpare);
                 }
             }
