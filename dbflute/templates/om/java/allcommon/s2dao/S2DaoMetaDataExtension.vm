@@ -6,7 +6,9 @@ import java.lang.reflect.Type;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -14,31 +16,33 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Iterator;
+import javax.sql.DataSource;
 
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
-
 import org.seasar.dao.Dbms;
+import org.seasar.dao.ProcedureMetaData;
+import org.seasar.dao.ProcedureParameterType;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RowCreator;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
-import org.seasar.dao.impl.BeanMetaDataImpl;
-import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.SelectDynamicCommand;
-import org.seasar.dao.impl.UpdateAutoStaticCommand;
-
 import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.TableNaming;
 import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.PropertyTypeFactory;
+
+import org.seasar.dao.impl.BeanMetaDataImpl;
+import org.seasar.dao.impl.DaoMetaDataImpl;
+import org.seasar.dao.impl.SelectDynamicCommand;
+import org.seasar.dao.impl.UpdateAutoStaticCommand;
+import org.seasar.dao.impl.ProcedureMetaDataFactoryImpl;
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
 
-import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -46,7 +50,13 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.ValueType;
+import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.framework.exception.EmptyRuntimeException;
+import org.seasar.framework.exception.SIllegalArgumentException;
+import org.seasar.framework.exception.SQLRuntimeException;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -60,6 +70,7 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
@@ -205,6 +216,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final Method method = methods[0];
             if (isOutsideSqlDaoMethodSelect(method)) {
                 setupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
+            } else if (isOutsideSqlDaoMethodCall(method)) {
+                setupSpecifiedOutsideSqlCallCommand(sqlCommandKey, method, outsideSqlContext);
             } else {
                 setupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
             }
@@ -221,6 +234,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected boolean isOutsideSqlDaoMethodSelect(Method method) {
         return method.getName().startsWith("select");
+    }
+
+    protected boolean isOutsideSqlDaoMethodCall(Method method) {
+        return method.getName().startsWith("call");
     }
 
     // ===================================================================================
@@ -811,6 +828,38 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
     }
 
+	// - - - - - - - - - - - -
+    //                    Call
+    //                     - -
+    protected void setupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        // The attribute of Specified-OutsideSqlContext.
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        final Object pmb = outsideSqlContext.getParameterBean();
+        final String procedureName = outsideSqlContext.getOutsideSqlPath();
+
+        // - - - - - - - - - - - - - - -
+        // The attribute of SqlCommand.
+        // - - - - - - - - - - - - - - -
+        final ProcedureMetaDataFactoryImpl myProcedureMetaDataFactory = new ProcedureMetaDataFactoryImpl() {
+            @Override
+            protected Class getParameterType(Method method) {
+                return pmb != null ? pmb.getClass() : null;
+            }
+        };
+        myProcedureMetaDataFactory.setAnnotationReaderFactory(annotationReaderFactory);
+        myProcedureMetaDataFactory.setValueTypeFactory(valueTypeFactory);
+        myProcedureMetaDataFactory.initialize();
+        final ProcedureMetaData metaData = myProcedureMetaDataFactory.createProcedureMetaData(procedureName, method);
+        final InternalArgumentDtoProcedureCommand cmd = createInternalArgumentDtoProcedureCommand(method, metaData);
+        putSqlCommand(sqlCommandKey, cmd);
+    }
+
+    protected InternalArgumentDtoProcedureCommand createInternalArgumentDtoProcedureCommand(Method method, ProcedureMetaData metaData) {
+        final ResultSetHandler resultSetHandler = createResultSetHandler(method);
+        return new InternalArgumentDtoProcedureCommand(dataSource, resultSetHandler, statementFactory, resultSetFactory, metaData);
+    }
+	
     // -----------------------------------------------------
     //                                  Common of OutsideSql
     //                                  --------------------
@@ -1361,6 +1410,171 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         
         protected void restoreRelationNoSuffixExtension() {
             setRelationNoSuffix(backupRelationSuffix.pop());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           Procedure
+    //                                                                           =========
+    protected static class InternalArgumentDtoProcedureCommand implements SqlCommand {
+        protected DataSource dataSource;
+        protected ResultSetHandler resultSetHandler;
+        protected StatementFactory statementFactory;
+        protected ResultSetFactory resultSetFactory;
+        protected ProcedureMetaData procedureMetaData;
+
+        public InternalArgumentDtoProcedureCommand(DataSource dataSource, ResultSetHandler resultSetHandler,
+                StatementFactory statementFactory, ResultSetFactory resultSetFactory,
+                ProcedureMetaData procedureMetaData) {
+            this.dataSource = dataSource;
+            this.resultSetHandler = resultSetHandler;
+            this.statementFactory = statementFactory;
+            this.resultSetFactory = resultSetFactory;
+            this.procedureMetaData = procedureMetaData;
+        }
+
+        public Object execute(final Object[] args) {
+            final InternalArgumentDtoProcedureHandler handler = newArgumentDtoProcedureHandler();
+            return handler.execute(new Object[]{args[1]});
+        }
+
+        protected InternalArgumentDtoProcedureHandler newArgumentDtoProcedureHandler() {
+            return new InternalArgumentDtoProcedureHandler(dataSource, createSql(procedureMetaData), resultSetHandler,
+                    statementFactory, resultSetFactory, procedureMetaData);
+        }
+        protected String createSql(final ProcedureMetaData procedureMetaData) {
+            final StringBuffer buf = new StringBuffer();
+            buf.append("{");
+            int size = procedureMetaData.getParameterTypeSize();
+            
+            System.out.println("procedureMetaData.name=" + procedureMetaData.getProcedureName());
+            System.out.println("procedureMetaData.string=" + procedureMetaData.toString());
+            System.out.println("size=" + size);
+            
+            if (procedureMetaData.hasReturnParameterType()) {
+                buf.append("? = ");
+                size--;
+            }
+            buf.append("call ");
+            buf.append(procedureMetaData.getProcedureName());
+            buf.append("(");
+            for (int i = 0; i < size; i++) {
+                buf.append("?, ");
+            }
+            if (size > 0) {
+                buf.setLength(buf.length() - 2);
+            }
+            buf.append(")}");
+            return buf.toString();
+        }
+    }
+
+    protected static class InternalArgumentDtoProcedureHandler extends ${glInternalBasicSelectHandler} {
+        private ProcedureMetaData procedureMetaData;
+        public InternalArgumentDtoProcedureHandler(final DataSource dataSource, final String sql,
+                final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
+                final ResultSetFactory resultSetFactory, final ProcedureMetaData procedureMetaData) {
+            super(dataSource, sql, resultSetHandler, statementFactory, resultSetFactory);
+            this.procedureMetaData = procedureMetaData;
+        }
+        public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
+            final Object dto = getArgumentDto(args);
+            logSql(args, argTypes);
+            // System.out.println(getSql());
+            CallableStatement cs = null;
+            try {
+                cs = prepareCallableStatement(connection);
+                bindArgs(cs, dto);
+                if (cs.execute()) {
+                    return handleResultSet(cs);
+                } else {
+                    return handleOutParameters(cs, dto);
+                }
+            } catch (final SQLException e) {
+                throw new SQLRuntimeException(e);
+            } finally {
+                StatementUtil.close(cs);
+            }
+        }
+        protected String getCompleteSql(final Object[] args) {
+            String sql = getSql();
+            Object dto = getArgumentDto(args);
+            if (args == null || dto == null) {
+                return sql;
+            }
+            StringBuffer buf = new StringBuffer(100);
+            int pos = 0;
+            int pos2 = 0;
+            int size = procedureMetaData.getParameterTypeSize();
+            for (int i = 0; i < size; i++) {
+                ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+                if ((pos2 = sql.indexOf('?', pos)) < 0) {
+                    break;
+                }
+                buf.append(sql.substring(pos, pos2));
+                pos = pos2 + 1;
+                if (ppt.isInType()) {
+                    buf.append(getBindVariableText(ppt.getValue(dto)));
+                } else {
+                    buf.append(sql.substring(pos2, pos));
+                }
+            }
+            buf.append(sql.substring(pos));
+            return buf.toString();
+        }
+        protected CallableStatement prepareCallableStatement(final Connection connection) {
+            if (getSql() == null) {
+                throw new EmptyRuntimeException("sql");
+            }
+            final CallableStatement cs = getStatementFactory().createCallableStatement(connection, getSql());
+            return cs;
+        }
+        protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
+            if (dto == null) { return; }
+            final int size = procedureMetaData.getParameterTypeSize();
+            for (int i = 0; i < size; i++) {
+                final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+                final ValueType valueType = ppt.getValueType();
+                if (ppt.isOutType()) {
+                    valueType.registerOutParameter(cs, i + 1);
+                }
+                if (ppt.isInType()) {
+                    final Object value = ppt.getValue(dto);
+                    valueType.bindValue(cs, i + 1, value);
+                }
+            }
+        }
+        protected Object handleResultSet(final CallableStatement cs) throws SQLException {
+            ResultSet rs = null;
+            try {
+                rs = getResultSetFactory().getResultSet(cs);
+                return getResultSetHandler().handle(rs);
+            } finally {
+                ResultSetUtil.close(rs);
+            }
+        }
+        protected Object handleOutParameters(final CallableStatement cs, final Object dto) throws SQLException {
+            if (dto == null) { return null; }
+            final int size = procedureMetaData.getParameterTypeSize();
+            for (int i = 0; i < size; i++) {
+                final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+                final ValueType valueType = ppt.getValueType();
+                if (ppt.isOutType()) {
+                    final Object value = valueType.getValue(cs, i + 1);
+                    ppt.setValue(dto, value);
+                }
+            }
+            return dto;
+        }
+        protected Object getArgumentDto(Object[] args) {
+            if (args.length == 0) { return null; }
+            if (args.length == 1) {
+                if (args[0] == null) {
+                    throw new SIllegalArgumentException("EDAO0029", new Object[] {});
+                }
+                return args[0];
+            }
+            throw new IllegalArgumentException("args");
         }
     }
 

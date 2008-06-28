@@ -23,5 +23,9 @@ public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
     //                                                                             =======
     int execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
 
-    // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                                Call
+    //                                                                                ====
+    void call(String path, Object pmb, ${glOutsideSqlOptionName} option);
 }

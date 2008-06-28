@@ -87,11 +87,17 @@ public class ${glOutsideSqlBasicExecutorName} {
         return _outsideSqlDao.execute(path, pmb, createOutsideSqlOption());
     }
 
-// Implements at the future!
-//    public int batchExecute(String path, Object pmb) {
-//        throw new UnsupportedOperationException("Sorry! The method of batchExecute() has not been implemented yet.");
-//        // return _outsideSqlDao.batchExecute(path, pmb, createOutsideSqlOption());
-//    }
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    /**
+     * Call. {Insert/Update/Delete/Etc...}
+     * @param path The path of procedure. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object. (Nullable)
+     */
+    public void call(String path, Object pmb) {
+        _outsideSqlDao.call(path, pmb, createOutsideSqlOption());
+    }
 
     // ===================================================================================
     //                                                                              Option
@@ -124,6 +130,26 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
+    /**
+     * Specify procedure handling. <br />
+     * <pre>
+     * # ex) Your Program
+     * #
+     * # executor.procedureHandling().call(path, pmb);
+     * #
+     * </pre>
+     * @return The cursor executor of outside-sql. (NotNull)
+     */
+    public OutsideSqlProcedureExecutor procedureHandling() {
+        return new OutsideSqlProcedureExecutor();
+    }
+
+    public class OutsideSqlProcedureExecutor {
+        public void call(String path, Object pmb) {
+            _outsideSqlDao.call(path, pmb, createOutsideSqlOption());
+        }
+    }
+	
     /**
      * Option of autoPaging. <br />
      * If you invoke this, you don't need to write paging condition on your SQL. <br />
