@@ -27,16 +27,15 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-
     /** The value of ${propertyName}. */
     protected ${propertyType} _${propertyName};
-#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */
     protected ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} _${propertyName}InternalLikeSearchOption;
-#end
-#end
 
+#end
+#end
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -86,7 +85,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-
     /**
      * Get the value of ${propertyName}. (Converted empty to null)
      * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
@@ -137,6 +135,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
         _${propertyName} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};
     }
+
 #end
 #end
 #end

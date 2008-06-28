@@ -830,8 +830,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
 	// - - - - - - - - - - - -
-    //                    Call
-    //                     - -
+    //               Procedure
+    //               - - - - -
     protected void setupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
