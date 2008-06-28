@@ -1,0 +1,141 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.ResultSetFactory;
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.framework.exception.EmptyRuntimeException;
+import org.seasar.framework.exception.SIllegalArgumentException;
+import org.seasar.framework.exception.SQLRuntimeException;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
+import org.seasar.dao.ProcedureMetaData;
+import org.seasar.dao.ProcedureParameterType;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandler} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private ProcedureMetaData procedureMetaData;
+		
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalProcedureHandler}(final DataSource dataSource, final String sql,
+            final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
+            final ResultSetFactory resultSetFactory, final ProcedureMetaData procedureMetaData) {
+        super(dataSource, sql, resultSetHandler, statementFactory, resultSetFactory);
+        this.procedureMetaData = procedureMetaData;
+    }
+	
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
+        final Object dto = getArgumentDto(args);
+        logSql(args, argTypes);
+        CallableStatement cs = null;
+        try {
+            cs = prepareCallableStatement(connection);
+            bindArgs(cs, dto);
+            if (cs.execute()) {
+                return handleResultSet(cs);
+            } else {
+                return handleOutParameters(cs, dto);
+            }
+        } catch (final SQLException e) {
+            throw new SQLRuntimeException(e);
+        } finally {
+            StatementUtil.close(cs);
+        }
+    }
+    @Override
+    protected String getCompleteSql(final Object[] args) {// for Procedure Call
+        String sql = getSql();
+        Object dto = getArgumentDto(args);
+        if (args == null || dto == null) {
+            return sql;
+        }
+        StringBuffer buf = new StringBuffer(100);
+        int pos = 0;
+        int pos2 = 0;
+        int size = procedureMetaData.getParameterTypeSize();
+        for (int i = 0; i < size; i++) {
+            ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            if ((pos2 = sql.indexOf('?', pos)) < 0) {
+                break;
+            }
+            buf.append(sql.substring(pos, pos2));
+            pos = pos2 + 1;
+            if (ppt.isInType()) {
+                buf.append(getBindVariableText(ppt.getValue(dto)));
+            } else {
+                buf.append(sql.substring(pos2, pos));
+            }
+        }
+        buf.append(sql.substring(pos));
+        return buf.toString();
+    }
+    protected CallableStatement prepareCallableStatement(final Connection connection) {
+        if (getSql() == null) { throw new EmptyRuntimeException("sql"); }
+        return getStatementFactory().createCallableStatement(connection, getSql());
+    }
+    protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
+        if (dto == null) { return; }
+        final int size = procedureMetaData.getParameterTypeSize();
+        for (int i = 0; i < size; i++) {
+            final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            final ValueType valueType = ppt.getValueType();
+            if (ppt.isOutType()) {
+                valueType.registerOutParameter(cs, i + 1);
+            }
+            if (ppt.isInType()) {
+                final Object value = ppt.getValue(dto);
+                valueType.bindValue(cs, i + 1, value);
+            }
+        }
+    }
+    protected Object handleResultSet(final CallableStatement cs) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = getResultSetFactory().getResultSet(cs);
+            return getResultSetHandler().handle(rs);
+        } finally {
+            ResultSetUtil.close(rs);
+        }
+    }
+    protected Object handleOutParameters(final CallableStatement cs, final Object dto) throws SQLException {
+        if (dto == null) { return null; }
+        final int size = procedureMetaData.getParameterTypeSize();
+        for (int i = 0; i < size; i++) {
+            final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            final ValueType valueType = ppt.getValueType();
+            if (ppt.isOutType()) {
+                final Object value = valueType.getValue(cs, i + 1);
+                ppt.setValue(dto, value);
+            }
+        }
+        return dto;
+    }
+    protected Object getArgumentDto(Object[] args) {
+        if (args.length == 0) { return null; }
+        if (args.length == 1) {
+            if (args[0] == null) {
+                throw new SIllegalArgumentException("EDAO0029", new Object[] {});
+            }
+            return args[0];
+        }
+        throw new IllegalArgumentException("args");
+    }
+}

@@ -1,63 +1,63 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Connection;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Iterator;
-import javax.sql.DataSource;
 
+import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
+import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.Dbms;
+import org.seasar.dao.IllegalParameterTypeRuntimeException;
 import org.seasar.dao.ProcedureMetaData;
 import org.seasar.dao.ProcedureParameterType;
-import org.seasar.dao.RelationPropertyType;
-import org.seasar.dao.RowCreator;
-import org.seasar.dao.RelationRowCreator;
-import org.seasar.dao.SqlCommand;
-import org.seasar.dao.BeanAnnotationReader;
-import org.seasar.dao.PropertyTypeFactoryBuilder;
-import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
-import org.seasar.dao.TableNaming;
-import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.PropertyTypeFactory;
-
+import org.seasar.dao.PropertyTypeFactoryBuilder;
+import org.seasar.dao.RelationPropertyType;
+import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
+import org.seasar.dao.RelationRowCreator;
+import org.seasar.dao.RowCreator;
+import org.seasar.dao.SqlCommand;
+import org.seasar.dao.TableNaming;
+import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.SelectDynamicCommand;
-import org.seasar.dao.impl.UpdateAutoStaticCommand;
-import org.seasar.dao.impl.ProcedureMetaDataFactoryImpl;
+import org.seasar.dao.impl.ProcedureMetaDataImpl;
+import org.seasar.dao.impl.ProcedureParameterTypeImpl;
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.ResultSetHandlerFactoryImpl;
-
+import org.seasar.dao.impl.SelectDynamicCommand;
+import org.seasar.dao.impl.UpdateAutoStaticCommand;
+import org.seasar.dao.util.TypeUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.extension.jdbc.ValueType;
+import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.exception.EmptyRuntimeException;
-import org.seasar.framework.exception.SIllegalArgumentException;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.seasar.framework.util.FieldUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -71,12 +71,12 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
-import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoStaticCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalProcedureCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
@@ -626,8 +626,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected boolean isFirstArgumentConditionBean(final Method method) {
-        final Class<?>[] parameterTypes = method.getParameterTypes();
-        return parameterTypes.length > 0 && ${glConditionBeanInterfaceName}.class.isAssignableFrom(parameterTypes[0]);
+        final Class<?>[] pmbTypes = method.getParameterTypes();
+        return pmbTypes.length > 0 && ${glConditionBeanInterfaceName}.class.isAssignableFrom(pmbTypes[0]);
     }
     
     // ===================================================================================
@@ -638,17 +638,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                     -----------------
     @Override
     protected void setupSelectMethodByManual(Method method, String sql) {// Contains SQL-Annotation
-        final Class<?>[] parameterTypes = method.getParameterTypes();
+        final Class<?>[] pmbTypes = method.getParameterTypes();
         final String[] argNames = this.daoAnnotationReader.getArgNames(method);
         final Class<?>[] argTypes;
-        if (parameterTypes != null && parameterTypes.length > 0
-                && ${glCursorHandlerName}.class.isAssignableFrom(parameterTypes[parameterTypes.length-1])) {
-            argTypes = new Class<?>[parameterTypes.length - 1];
-            for (int i=0; i < parameterTypes.length - 1; i++) {
-                argTypes[i] = parameterTypes[i];
+        if (pmbTypes != null && pmbTypes.length > 0
+                && ${glCursorHandlerName}.class.isAssignableFrom(pmbTypes[pmbTypes.length-1])) {
+            argTypes = new Class<?>[pmbTypes.length - 1];
+            for (int i=0; i < pmbTypes.length - 1; i++) {
+                argTypes[i] = pmbTypes[i];
             }
         } else {
-            argTypes = parameterTypes;
+            argTypes = pmbTypes;
         }
         final BeanMetaData myBeanMetaData = getOutsideSqlBeanMetaData(method);
         registerSqlCommand(method.getName(), method, sql, argNames, argTypes, myBeanMetaData);
@@ -830,8 +830,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
 	// - - - - - - - - - - - -
-    //               Procedure
-    //               - - - - -
+    //          Call Procedure
+    //           - - - - - - -
     protected void setupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
@@ -842,23 +842,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - -
         // The attribute of SqlCommand.
         // - - - - - - - - - - - - - - -
-        final ProcedureMetaDataFactoryImpl myProcedureMetaDataFactory = new ProcedureMetaDataFactoryImpl() {
-            @Override
-            protected Class getParameterType(Method method) {// for to fit specified outsideSql
-                return pmb != null ? pmb.getClass() : null;
-            }
-        };
-        myProcedureMetaDataFactory.setAnnotationReaderFactory(annotationReaderFactory);
+        final InternalProcedureMetaDataFactory myProcedureMetaDataFactory = new InternalProcedureMetaDataFactory();
         myProcedureMetaDataFactory.setValueTypeFactory(valueTypeFactory);
-        myProcedureMetaDataFactory.initialize();
-        final ProcedureMetaData metaData = myProcedureMetaDataFactory.createProcedureMetaData(procedureName, method);
-        final InternalArgumentDtoProcedureCommand cmd = createInternalArgumentDtoProcedureCommand(method, metaData);
+        final Class<?> pmbType = pmb != null ? pmb.getClass() : null;
+        final ProcedureMetaData metaData = myProcedureMetaDataFactory.createProcedureMetaData(procedureName, pmbType);
+        final ${glInternalProcedureCommand} cmd = createInternalProcedureCommand(method, metaData);
         putSqlCommand(sqlCommandKey, cmd);
     }
 
-    protected InternalArgumentDtoProcedureCommand createInternalArgumentDtoProcedureCommand(Method method, ProcedureMetaData metaData) {
+    protected ${glInternalProcedureCommand} createInternalProcedureCommand(Method method, ProcedureMetaData metaData) {
         final ResultSetHandler resultSetHandler = createResultSetHandler(method);
-        return new InternalArgumentDtoProcedureCommand(dataSource, resultSetHandler, statementFactory, resultSetFactory, metaData);
+        return new ${glInternalProcedureCommand}(dataSource, resultSetHandler, statementFactory, resultSetFactory, metaData);
     }
 	
     // -----------------------------------------------------
@@ -998,8 +992,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
 
         public static Class<?> getElementTypeOfListFromParameterType(final Method method, final int parameterPosition) {
-            final Type[] parameterTypes = method.getGenericParameterTypes();
-            return getElementTypeOfList(parameterTypes[parameterPosition]);
+            final Type[] pmbTypes = method.getGenericParameterTypes();
+            return getElementTypeOfList(pmbTypes[parameterPosition]);
         }
 
         public static Class<?> getElementTypeOfListFromReturnType(final Method method) {
@@ -1417,152 +1411,109 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                                           Procedure
     //                                                                           =========
-    protected static class InternalArgumentDtoProcedureCommand implements SqlCommand {
-        protected DataSource dataSource;
-        protected ResultSetHandler resultSetHandler;
-        protected StatementFactory statementFactory;
-        protected ResultSetFactory resultSetFactory;
-        protected ProcedureMetaData procedureMetaData;
-        public InternalArgumentDtoProcedureCommand(DataSource dataSource, ResultSetHandler resultSetHandler,
-                StatementFactory statementFactory, ResultSetFactory resultSetFactory,
-                ProcedureMetaData procedureMetaData) {
-            this.dataSource = dataSource;
-            this.resultSetHandler = resultSetHandler;
-            this.statementFactory = statementFactory;
-            this.resultSetFactory = resultSetFactory;
-            this.procedureMetaData = procedureMetaData;
-        }
-        public Object execute(final Object[] args) {
-            final InternalArgumentDtoProcedureHandler handler = newArgumentDtoProcedureHandler();
-            return handler.execute(new Object[]{args[1]});
-        }
-        protected InternalArgumentDtoProcedureHandler newArgumentDtoProcedureHandler() {
-            return new InternalArgumentDtoProcedureHandler(dataSource, createSql(procedureMetaData), resultSetHandler,
-                    statementFactory, resultSetFactory, procedureMetaData);
-        }
-        protected String createSql(final ProcedureMetaData procedureMetaData) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("{");
-            int size = procedureMetaData.getParameterTypeSize();
-            if (procedureMetaData.hasReturnParameterType()) {
-                sb.append("? = ");
-                size--;
+    protected static class InternalProcedureMetaDataFactory {
+        protected ValueTypeFactory valueTypeFactory;
+        protected InternalFieldProcedureAnnotationReader annotationReader = new InternalFieldProcedureAnnotationReader();
+        public ProcedureMetaData createProcedureMetaData(final String procedureName, final Class<?> pmbType) {
+            final ProcedureMetaDataImpl metaData = new ProcedureMetaDataImpl(procedureName);
+            if (pmbType == null) {
+                return metaData;
+            } else {
+                if (!isDtoType(pmbType)) {
+                    throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.getName());
+                }
             }
-            sb.append("call ").append(procedureMetaData.getProcedureName()).append("(");
-            for (int i = 0; i < size; i++) {
-                sb.append("?, ");
+            final BeanDesc dtoDesc = BeanDescFactory.getBeanDesc(pmbType);
+            final Field[] fields = pmbType.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                final Field field = fields[i];
+                if (!isInstanceField(field)) {
+                    continue;
+                }
+                final ProcedureParameterType ppt = getProcedureParameterType(dtoDesc, field);
+                if (ppt == null) {
+                    continue;
+                }
+                metaData.addParameterType(ppt);
             }
-            if (size > 0) {
-                sb.setLength(sb.length() - 2);
+            return metaData;
+        }
+        protected ProcedureParameterType getProcedureParameterType(final BeanDesc dtoDesc, final Field field) {
+            final String type = annotationReader.getProcedureParameter(dtoDesc, field);
+            if (type == null) {
+                return null;
             }
-            sb.append(")}");
-            return sb.toString();
+            field.setAccessible(true);
+            final ProcedureParameterType ppt = new ProcedureParameterTypeImpl(field);
+            if (type.equalsIgnoreCase("in")) {
+                ppt.setInType(true);
+            } else if (type.equalsIgnoreCase("out")) {
+                ppt.setOutType(true);
+            } else if (type.equalsIgnoreCase("inout")) {
+                ppt.setInType(true);
+                ppt.setOutType(true);
+            } else if (type.equalsIgnoreCase("return")) {
+                ppt.setOutType(true);
+                ppt.setReturnType(true);
+            } else {
+                throw new IllegalParameterTypeRuntimeException(type);
+            }
+            final ValueType valueType = getValueType(dtoDesc, field);
+            ppt.setValueType(valueType);
+            return ppt;
+        }
+        protected ValueType getValueType(final BeanDesc dtoDesc, final Field field) {
+            final String name = annotationReader.getValueType(dtoDesc, field);
+            if (name != null) {
+                return valueTypeFactory.getValueTypeByName(name);
+            }
+            final Class type = field.getType();
+            return valueTypeFactory.getValueTypeByClass(type);
+        }
+        protected boolean isInstanceField(final Field field) {
+            final int mod = field.getModifiers();
+            return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
+        }
+        protected boolean isDtoType(final Class clazz) {
+            return !TypeUtil.isSimpleType(clazz) && !isContainerType(clazz);
+        }
+        protected boolean isContainerType(final Class clazz) {
+            if (clazz == null) { throw new NullPointerException("clazz"); }
+            return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz) || clazz.isArray();
+        }
+        public void setValueTypeFactory(final ValueTypeFactory valueTypeFactory) {
+            this.valueTypeFactory = valueTypeFactory;
         }
     }
 
-    protected static class InternalArgumentDtoProcedureHandler extends ${glInternalBasicSelectHandler} {
-        private ProcedureMetaData procedureMetaData;
-        public InternalArgumentDtoProcedureHandler(final DataSource dataSource, final String sql,
-                final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
-                final ResultSetFactory resultSetFactory, final ProcedureMetaData procedureMetaData) {
-            super(dataSource, sql, resultSetHandler, statementFactory, resultSetFactory);
-            this.procedureMetaData = procedureMetaData;
+    protected static class InternalFieldProcedureAnnotationReader {
+        protected String PROCEDURE_PARAMETER_SUFFIX;
+        protected String VALUE_TYPE_SUFFIX;
+        public InternalFieldProcedureAnnotationReader() {
+            PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
+            VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
         }
-        public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
-            final Object dto = getArgumentDto(args);
-            logSql(args, argTypes);
-            CallableStatement cs = null;
-            try {
-                cs = prepareCallableStatement(connection);
-                bindArgs(cs, dto);
-                if (cs.execute()) {
-                    return handleResultSet(cs);
-                } else {
-                    return handleOutParameters(cs, dto);
-                }
-            } catch (final SQLException e) {
-                throw new SQLRuntimeException(e);
-            } finally {
-                StatementUtil.close(cs);
+        public String getProcedureParameter(BeanDesc dtoDesc, Field field) {
+            String fieldName = field.getName();
+            fieldName = fieldName.startsWith("_") ? fieldName.substring("_".length()) : fieldName;
+            String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
+            if (dtoDesc.hasField(annotationName)) {
+                Field f = dtoDesc.getField(annotationName);
+                return (String) FieldUtil.get(f, null);
+            } else {
+                return null;
             }
         }
-        @Override
-        protected String getCompleteSql(final Object[] args) {// for Procedure Call
-            String sql = getSql();
-            Object dto = getArgumentDto(args);
-            if (args == null || dto == null) {
-                return sql;
+        public String getValueType(BeanDesc dtoDesc, Field field) {
+            String fieldName = field.getName();
+            fieldName = fieldName.startsWith("_") ? fieldName.substring("_".length()) : fieldName;
+            String annotationName = fieldName + VALUE_TYPE_SUFFIX;
+            if (dtoDesc.hasField(annotationName)) {
+                Field f = dtoDesc.getField(annotationName);
+                return (String) FieldUtil.get(f, null);
+            } else {
+                return null;
             }
-            StringBuffer buf = new StringBuffer(100);
-            int pos = 0;
-            int pos2 = 0;
-            int size = procedureMetaData.getParameterTypeSize();
-            for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
-                if ((pos2 = sql.indexOf('?', pos)) < 0) {
-                    break;
-                }
-                buf.append(sql.substring(pos, pos2));
-                pos = pos2 + 1;
-                if (ppt.isInType()) {
-                    buf.append(getBindVariableText(ppt.getValue(dto)));
-                } else {
-                    buf.append(sql.substring(pos2, pos));
-                }
-            }
-            buf.append(sql.substring(pos));
-            return buf.toString();
-        }
-        protected CallableStatement prepareCallableStatement(final Connection connection) {
-            if (getSql() == null) { throw new EmptyRuntimeException("sql"); }
-            return getStatementFactory().createCallableStatement(connection, getSql());
-        }
-        protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
-            if (dto == null) { return; }
-            final int size = procedureMetaData.getParameterTypeSize();
-            for (int i = 0; i < size; i++) {
-                final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
-                final ValueType valueType = ppt.getValueType();
-                if (ppt.isOutType()) {
-                    valueType.registerOutParameter(cs, i + 1);
-                }
-                if (ppt.isInType()) {
-                    final Object value = ppt.getValue(dto);
-                    valueType.bindValue(cs, i + 1, value);
-                }
-            }
-        }
-        protected Object handleResultSet(final CallableStatement cs) throws SQLException {
-            ResultSet rs = null;
-            try {
-                rs = getResultSetFactory().getResultSet(cs);
-                return getResultSetHandler().handle(rs);
-            } finally {
-                ResultSetUtil.close(rs);
-            }
-        }
-        protected Object handleOutParameters(final CallableStatement cs, final Object dto) throws SQLException {
-            if (dto == null) { return null; }
-            final int size = procedureMetaData.getParameterTypeSize();
-            for (int i = 0; i < size; i++) {
-                final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
-                final ValueType valueType = ppt.getValueType();
-                if (ppt.isOutType()) {
-                    final Object value = valueType.getValue(cs, i + 1);
-                    ppt.setValue(dto, value);
-                }
-            }
-            return dto;
-        }
-        protected Object getArgumentDto(Object[] args) {
-            if (args.length == 0) { return null; }
-            if (args.length == 1) {
-                if (args[0] == null) {
-                    throw new SIllegalArgumentException("EDAO0029", new Object[] {});
-                }
-                return args[0];
-            }
-            throw new IllegalArgumentException("args");
         }
     }
 
