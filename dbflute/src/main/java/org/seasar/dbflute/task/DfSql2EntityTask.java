@@ -671,27 +671,35 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void doSetupProcedure() throws SQLException {
-        DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
-        boolean generateProcedureParameterBean = outsideSqlProperties.isGenerateProcedureParameterBean();
-        DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
-        List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
+        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        final boolean generateProcedureParameterBean = outsideSqlProperties.isGenerateProcedureParameterBean();
+        final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
+        final List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
+        _log.info(" ");
+        _log.info("...Analyzing procedures");
         for (DfProcedureMetaInfo procedureMetaInfo : procedures) {
-            String procedureName = procedureMetaInfo.getProcedureName();
+            final String procedureName = procedureMetaInfo.getProcedureName();
             _procedureMap.put(procedureName, procedureMetaInfo);
 
             if (generateProcedureParameterBean) {
-                DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
-                Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
-                Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-                List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = procedureMetaInfo
+                final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
+                final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+                final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
+                final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = procedureMetaInfo
                         .getProcedureColumnMetaInfoList();
+                int index = 0;
+                final String pmbName = convertProcedureNameToPmbName(procedureName);
+                _log.info("[" + pmbName + "]");
                 for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
-                    String propertyName;
+                    final String propertyName;
                     {
                         String columnName = procedureColumnMetaInfo.getColumnName();
+                        if (columnName == null || columnName.trim().length() == 0) {
+                            columnName = "arg" + (index + 1);
+                        }
                         propertyName = convertColumnNameToPropertyName(columnName);
                     }
-                    String propertyType;
+                    final String propertyType;
                     {
                         int jdbcType = procedureColumnMetaInfo.getJdbcType();
                         String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
@@ -700,12 +708,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
                         propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
                     }
+                    _log.info("    " + propertyName + " : " + propertyType);
                     propertyNameTypeMap.put(propertyName, propertyType);
 
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
+                    ++index;
                 }
-                String pmbName = convertProcedureNameToPmbName(procedureName);
                 parameterBeanMetaData.setClassName(pmbName);
                 parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
@@ -713,6 +722,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             }
         }
+        _log.info(" ");
     }
 
     public String convertColumnNameToPropertyName(String columnName) {
