@@ -7,17 +7,16 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.seasar.dao.ProcedureMetaData;
+import org.seasar.dao.ProcedureParameterType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.exception.EmptyRuntimeException;
-import org.seasar.framework.exception.SIllegalArgumentException;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
-import org.seasar.dao.ProcedureMetaData;
-import org.seasar.dao.ProcedureParameterType;
 
 /**
  * @author ${database.ClassAuthor}
@@ -116,23 +115,32 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         }
     }
     protected Object handleOutParameters(final CallableStatement cs, final Object dto) throws SQLException {
-        if (dto == null) { return null; }
+        if (dto == null) {
+            return null;
+        }
         final int size = procedureMetaData.getParameterTypeSize();
         for (int i = 0; i < size; i++) {
             final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 final Object value = valueType.getValue(cs, i + 1);
+                if (value instanceof ResultSet) {
+                    String msg = "Not Implemented result-set handling of out parameter.";
+                    throw new UnsupportedOperationException(msg);
+                }
                 ppt.setValue(dto, value);
             }
         }
         return dto;
     }
+
     protected Object getArgumentDto(Object[] args) {
-        if (args.length == 0) { return null; }
+        if (args.length == 0) {
+            return null;
+        }
         if (args.length == 1) {
             if (args[0] == null) {
-                throw new SIllegalArgumentException("EDAO0029", new Object[] {});
+                throw new IllegalArgumentException("args[0] should not be null!");
             }
             return args[0];
         }
