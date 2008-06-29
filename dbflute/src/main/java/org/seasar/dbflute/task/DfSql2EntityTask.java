@@ -691,7 +691,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final String pmbName = convertProcedureNameToPmbName(procedureName);
                 _log.info("[" + pmbName + "]");
                 if (procedureColumnMetaInfoList.isEmpty()) {
-                    _log.info("    *No Parameter!");
+                    _log.info("    *No Parameter");
                 }
                 for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
                     final String propertyName;
