@@ -49,7 +49,8 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             cs = prepareCallableStatement(connection);
             bindArgs(cs, dto);
             if (cs.execute()) {
-                return handleResultSet(cs);
+                String msg = "The result-set handling of result have not already implemented yet.";
+                throw new UnsupportedOperationException(msg);
             } else {
                 return handleOutParameters(cs, dto);
             }
@@ -125,7 +126,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             if (ppt.isOutType()) {
                 final Object value = valueType.getValue(cs, i + 1);
                 if (value instanceof ResultSet) {
-                    String msg = "Not Implemented result-set handling of out parameter.";
+                    String msg = "The result-set handling of out parameter have not already implemented yet.";
                     throw new UnsupportedOperationException(msg);
                 }
                 ppt.setValue(dto, value);
