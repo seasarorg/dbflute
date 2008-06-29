@@ -690,6 +690,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 int index = 0;
                 final String pmbName = convertProcedureNameToPmbName(procedureName);
                 _log.info("[" + pmbName + "]");
+                if (procedureColumnMetaInfoList.isEmpty()) {
+                    _log.info("    *No Parameter!");
+                }
                 for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
                     final String propertyName;
                     {
@@ -729,7 +732,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (columnName.contains("_")) {
             columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
         } else {
-            columnName = StringUtils.uncapitalise(columnName.toUpperCase());
+            boolean allUpperCase = isAllUpperCase(columnName);
+            columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
         }
         return columnName;
     }
@@ -738,11 +742,24 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (procedureName.contains("_")) {
             procedureName = generateCapitalisedJavaName(procedureName.toUpperCase());
         } else {
-            procedureName = StringUtils.capitalise(procedureName);
+            boolean allUpperCase = isAllUpperCase(procedureName);
+            procedureName = StringUtils.capitalise(allUpperCase ? procedureName.toLowerCase() : procedureName);
         }
         return procedureName + "Pmb";
     }
 
+    protected boolean isAllUpperCase(String name) {
+        char[] charArray = name.toCharArray();
+        boolean allUpperCase = true;
+        for (char ch : charArray) {
+            if (Character.isLowerCase(ch)) {
+                allUpperCase = false;
+                break;
+            }
+        }
+        return allUpperCase;
+    }
+    
     protected String generateUncapitalisedJavaName(String name) {
         return StringUtils.uncapitalise(NameFactory.generateJavaNameByMethodUnderscore(name));
     }
