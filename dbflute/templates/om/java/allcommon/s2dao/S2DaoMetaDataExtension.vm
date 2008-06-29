@@ -1451,12 +1451,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         protected ProcedureParameterType getProcedureParameterType(final BeanDesc dtoDesc, final Field field) {
             final String type = annotationReader.getProcedureParameter(dtoDesc, field);
-            if (type == null) {
-                return null;
-            }
             field.setAccessible(true);
             final ProcedureParameterType ppt = new ProcedureParameterTypeImpl(field);
-            if (type.equalsIgnoreCase("in")) {
+            if (type == null) {
+                ppt.setInType(true); // as Default
+            } else if (type.equalsIgnoreCase("in")) {
                 ppt.setInType(true);
             } else if (type.equalsIgnoreCase("out")) {
                 ppt.setOutType(true);
