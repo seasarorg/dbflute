@@ -37,8 +37,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         // Set up default schema name of PostgreSQL.
         // Because PostgreSQL returns system procedures.
         // - - - - - - - - - -/
-        if (isPostgreSQL() && (schemaName == null || schemaName.trim().length() == 0)) {
-            schemaName = "public";
+        if (isPostgreSQL()) {
+            if (schemaName == null || schemaName.trim().length() == 0) {
+                schemaName = "public";
+            }
         }
 
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
@@ -76,8 +78,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             // Remove system procedures of PostgreSQL.
             // Because PostgreSQL returns system procedures.
             // - - - - - - - - - -/
-            if (isPostgreSQL() && procedureName.toLowerCase().startsWith("pldbg")) {
-                continue;
+            if (isPostgreSQL()) {
+                if (procedureName != null && procedureName.toLowerCase().startsWith("pl")) {
+                    continue;
+                }
             }
 
             final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
