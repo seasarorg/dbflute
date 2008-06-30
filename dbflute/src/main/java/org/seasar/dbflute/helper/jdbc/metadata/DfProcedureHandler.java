@@ -33,8 +33,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     public List<DfProcedureMetaInfo> getProcedures(DatabaseMetaData metaData, String schemaName) {
-
-        // Because PostgreSQL returns system functions.
+        // /- - - - - - - - - - - - - - - - - - - - - -
+        // Set up default schema name of PostgreSQL.
+        // Because PostgreSQL returns system procedures.
+        // - - - - - - - - - -/
         if (isPostgreSQL() && (schemaName == null || schemaName.trim().length() == 0)) {
             schemaName = "public";
         }
@@ -70,7 +72,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final Integer procedureType = new Integer(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
 
-            // Because PostgreSQL returns system functions.
+            // /- - - - - - - - - - - - - - - - - - - - - -
+            // Remove system procedures of PostgreSQL.
+            // Because PostgreSQL returns system procedures.
+            // - - - - - - - - - -/
             if (isPostgreSQL() && procedureName.toLowerCase().startsWith("pldbg")) {
                 continue;
             }
