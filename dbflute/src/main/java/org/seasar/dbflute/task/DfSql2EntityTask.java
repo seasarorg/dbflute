@@ -689,7 +689,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         .getProcedureColumnMetaInfoList();
                 int index = 0;
                 final String pmbName = convertProcedureNameToPmbName(procedureName);
-                _log.info("[" + pmbName + "]");
+                _log.info("[" + pmbName + "]: " + procedureMetaInfo.getProcedureType());
                 if (procedureColumnMetaInfoList.isEmpty()) {
                     _log.info("    *No Parameter");
                 }
@@ -711,11 +711,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
                         propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
                     }
-                    _log.info("    " + propertyName + " : " + propertyType);
                     propertyNameTypeMap.put(propertyName, propertyType);
 
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
+                    
+                    _log.info("    " + propertyType + " " + propertyName + "; // " + procedureColumnMetaInfo.getProcedureColumnType());
                     ++index;
                 }
                 parameterBeanMetaData.setClassName(pmbName);
