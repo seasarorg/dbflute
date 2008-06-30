@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.DfBuildProperties;
+
 /**
  * @author jflute
  * @since 0.7.5 (2008/06/28 Saturday)
@@ -31,6 +33,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     public List<DfProcedureMetaInfo> getProcedures(DatabaseMetaData metaData, String schemaName) {
+
+        // Because PostgreSQL returns system functions.
+        if (isPostgreSQL() && (schemaName == null || schemaName.trim().length() == 0)) {
+            schemaName = "public";
+        }
+
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         ResultSet columnResultSet = null;
         try {
@@ -61,6 +69,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String procedureName = procedureRs.getString("PROCEDURE_NAME");
             final Integer procedureType = new Integer(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
+
+            // Because PostgreSQL returns system functions.
+            if (isPostgreSQL() && procedureName.toLowerCase().startsWith("pldbg")) {
+                continue;
+            }
 
             final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
             metaInfo.setProcedureName(procedureName);
@@ -115,6 +128,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnComment(columnComment);
             procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
         }
+    }
+
+    protected boolean isPostgreSQL() {
+        return DfBuildProperties.getInstance().getBasicProperties().isDatabasePostgreSQL();
     }
 
     // ===================================================================================
