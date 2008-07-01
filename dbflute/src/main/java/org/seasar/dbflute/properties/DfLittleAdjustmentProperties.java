@@ -25,6 +25,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                          Skip Generate If Same File
+    //                                                          ==========================
+    public boolean isSkipGenerateIfSameFile() {
+        return booleanProp("torque.isSkipGenerateIfSameFile", false);
+    }
+
+    // ===================================================================================
     //                                                             Non PrimaryKey Writable
     //                                                             =======================
     public boolean isAvailableNonPrimaryKeyWritable() {

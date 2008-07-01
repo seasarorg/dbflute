@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -47,7 +48,6 @@ import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
-import org.seasar.dbflute.velocity.DfOriginalGenerator;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
@@ -454,6 +454,16 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         } else {
             return null;
         }
+    }
+
+    // ===================================================================================
+    //                                                                   Skip Information
+    //                                                                   =================
+    protected void showSkippedFileInformation() {
+        List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("Skipped file count: " + skipFileNameList.size());
+        _log.info("- - - - - - - - - -/");
     }
 
     // ===================================================================================

@@ -1,51 +1,84 @@
 package org.seasar.dbflute.velocity;
 
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 
 /**
  * @author jflute
+ * @since 0.7.6 (2008/07/01 Tuesday)
  */
-public class DfGenerator {
+public abstract class DfGenerator {
 
-    private static final DfGenerator _instance = new DfGenerator();
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    public static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
 
-    private org.apache.velocity.texen.Generator _generator = org.apache.velocity.texen.Generator.getInstance();
-    
-    // TODO: @jflute -- Now trying!
-    // private DfTaktosGenerator _generator = DfTaktosGenerator.getInstance();
+    private static DfGenerator _instance;
 
-    private DfGenerator() {
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected DfGenerator() {
     }
 
+    // ===================================================================================
+    //                                                                  Singleton Instance
+    //                                                                  ==================
     public static DfGenerator getInstance() {
+        if (_instance != null) {
+            return _instance;
+        }
+        synchronized (DfGenerator.class) {
+            if (_instance != null) {
+                return _instance;
+            }
+            if (isSkipGenerateIfSameFile()) {
+                _instance = DfOriginalGenerator.getInstance();
+            } else {
+                _instance = new DfVelocityGenerator();
+            }
+        }
         return _instance;
     }
 
-    public String getOutputPath() {
-        return _generator.getOutputPath();
+    protected static boolean isSkipGenerateIfSameFile() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
     }
 
-    public void setOutputPath(String outputPath) {
-        _generator.setOutputPath(outputPath);
-    }
+    // ===================================================================================
+    //                                                                  Generator's Method
+    //                                                                  ==================
+    public abstract String getOutputPath();
 
-    public void setInputEncoding(String inputEncoding) {
-        _generator.setInputEncoding(inputEncoding);
-    }
+    public abstract void setOutputPath(String outputPath);
 
-    public void setOutputEncoding(String outputEncoding) {
-        _generator.setOutputEncoding(outputEncoding);
-    }
+    public abstract void setInputEncoding(String inputEncoding);
 
-    public void setTemplatePath(String templatePath) {
-        _generator.setTemplatePath(templatePath);
-    }
+    public abstract void setOutputEncoding(String outputEncoding);
 
-    public void parse(String controlTemplate, Context controlContext) throws Exception {
-        _generator.parse(controlTemplate, controlContext);
-    }
+    public abstract void setTemplatePath(String templatePath);
 
-    public void shutdown() {
-        _generator.shutdown();
+    public abstract String parse(String controlTemplate, Context controlContext) throws Exception;
+
+    public abstract void shutdown();
+    
+    // ===================================================================================
+    //                                                                    Skip Information
+    //                                                                    ================
+    public abstract List<String> getSkipFileNameList();
+    
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return getInstance().toString();
     }
 }

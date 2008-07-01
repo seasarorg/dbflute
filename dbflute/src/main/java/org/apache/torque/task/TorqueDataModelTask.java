@@ -92,6 +92,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         }
         super.doExecute();
         setupBehaviorQueryPath();
+        showSkippedFileInformation();
         refreshResources();
     }
 

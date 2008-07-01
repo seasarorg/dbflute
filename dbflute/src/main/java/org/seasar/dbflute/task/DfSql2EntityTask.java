@@ -130,7 +130,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         fireSuperExecute();
         setupBehaviorQueryPath(sqlFileList);
-
+        showSkippedFileInformation();
         handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
