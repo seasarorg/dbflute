@@ -457,12 +457,16 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     // ===================================================================================
-    //                                                                   Skip Information
-    //                                                                   =================
+    //                                                                    Skip Information
+    //                                                                    ================
     protected void showSkippedFileInformation() {
+        List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
+        if (parseFileNameList.isEmpty()) {
+            return;// Do nothing!
+        }
         List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Skipped file count: " + skipFileNameList.size());
+        _log.info("Skipped file count: " + skipFileNameList.size() + " / " + parseFileNameList.size());
         _log.info("- - - - - - - - - -/");
     }
 
@@ -476,14 +480,14 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
-    
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     public DfGenerator getGeneratorHandler() {
         return DfGenerator.getInstance();
     }
-    
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

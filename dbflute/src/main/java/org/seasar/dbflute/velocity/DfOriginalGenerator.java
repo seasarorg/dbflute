@@ -83,6 +83,11 @@ public class DfOriginalGenerator extends DfGenerator {
     protected String inputEncoding;
 
     /**
+     * The list of file name parsed. {DBFlute Original Attribute}
+     */
+    protected List<String> parseFileNameList = new ArrayList<String>();// [Extension]
+
+    /**
      * The list of file name skipped. {DBFlute Original Attribute}
      */
     protected List<String> skipFileNameList = new ArrayList<String>();// [Extension]
@@ -205,6 +210,7 @@ public class DfOriginalGenerator extends DfGenerator {
         }
 
         Template template = getTemplate(inputTemplate, specifiedInputEncoding);
+        parseFileNameList.add(outputFile);
 
         if (outputFile == null || outputFile.equals("")) {
             StringWriter sw = new StringWriter();
@@ -442,6 +448,14 @@ public class DfOriginalGenerator extends DfGenerator {
             template = Velocity.getTemplate(templateName, encoding);
         }
         return template;
+    }
+
+    public List<String> getParseFileNameList() {
+        return parseFileNameList;
+    }
+
+    public void setParseFileNameList(List<String> parseFileNameList) {
+        this.parseFileNameList = parseFileNameList;
     }
 
     public List<String> getSkipFileNameList() {

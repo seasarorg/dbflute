@@ -46,8 +46,12 @@ public class DfVelocityGenerator extends DfGenerator {
         _generator.setTemplatePath(templatePath);
     }
 
-    public String parse(String controlTemplate, Context controlContext) throws Exception {
-        return _generator.parse(controlTemplate, controlContext);
+    public String parse(String inputTemplate, Context controlContext) throws Exception {
+        return _generator.parse(inputTemplate, controlContext);
+    }
+
+    public String parse(String inputTemplate, String outputFile, String objectID, Object object) throws Exception {
+        return _generator.parse(inputTemplate, outputFile, objectID, object);
     }
 
     public void shutdown() {
@@ -57,6 +61,10 @@ public class DfVelocityGenerator extends DfGenerator {
     // ===================================================================================
     //                                                                    Skip Information
     //                                                                    ================
+    public List<String> getParseFileNameList() {
+        return new ArrayList<String>();
+    }
+
     public List<String> getSkipFileNameList() {
         return new ArrayList<String>();
     }
