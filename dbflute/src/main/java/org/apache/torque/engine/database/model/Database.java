@@ -601,6 +601,10 @@ public class Database {
     public boolean isTargetLanguageCSharp() {
         return getBasicProperties().isTargetLanguageCSharp();
     }
+    
+    public boolean isTargetLanguagePhp() {
+        return getBasicProperties().isTargetLanguagePhp();
+    }
 
     public boolean isJavaVersionGreaterEqualTiger() {
         return getBasicProperties().isJavaVersionGreaterEqualTiger();
