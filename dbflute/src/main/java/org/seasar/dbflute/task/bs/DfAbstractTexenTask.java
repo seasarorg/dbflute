@@ -462,19 +462,19 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                    Skip Information
     //                                                                    ================
     protected void showSkippedFileInformation() {
-        List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
-        List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
-        if (skipFileNameList.isEmpty()) {
+        boolean skipGenerateIfSameFile = getProperties().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
+        if (!skipGenerateIfSameFile) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("All files have been generated. (overrided)");
-            _log.info("");
-            _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
             _log.info("- - - - - - - - - -/");
             _log.info("");
             return;
         }
+        List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
+        List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Several files have skipped generating because of no changing.");
+        _log.info("Several files have skipped generating");
+        _log.info("        because they have no changing.");
         _log.info("");
         _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
         _log.info("- - - - - - - - - -/");

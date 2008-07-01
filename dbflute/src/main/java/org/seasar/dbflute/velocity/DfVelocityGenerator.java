@@ -17,11 +17,6 @@ public class DfVelocityGenerator extends DfGenerator {
     //                                                                           =========
     private Generator _generator = Generator.getInstance();
 
-    /**
-     * The list of file name parsed. {DBFlute Original Attribute}
-     */
-    protected List<String> parseFileNameList = new ArrayList<String>();// [Extension]
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -52,7 +47,6 @@ public class DfVelocityGenerator extends DfGenerator {
     }
     
     public String parse(String inputTemplate, String outputFile, String objectID, Object object) throws Exception {
-        parseFileNameList.add(outputFile);
         return _generator.parse(inputTemplate, outputFile, objectID, object);
     }
 
@@ -68,7 +62,7 @@ public class DfVelocityGenerator extends DfGenerator {
     //                                                                    Skip Information
     //                                                                    ================
     public List<String> getParseFileNameList() {
-        return parseFileNameList;
+        return new ArrayList<String>();
     }
 
     public List<String> getSkipFileNameList() {
