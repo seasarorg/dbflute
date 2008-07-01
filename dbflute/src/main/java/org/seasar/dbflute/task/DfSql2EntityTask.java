@@ -693,6 +693,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (procedureColumnMetaInfoList.isEmpty()) {
                     _log.info("    *No Parameter");
                 }
+                if (_pmbMetaDataMap.containsKey(pmbName)) {
+                    _log.info("    *It was found the same name of parameter bean, so skip and continue!");
+                    continue;
+                }
                 for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
                     final String propertyName;
                     {
