@@ -410,10 +410,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.info("");
             _log.info("    --> OK, Look the refreshed project!");
             _log.info("- - - - - - - - - -/");
+            _log.info("");
         } catch (IOException ignored) {
             _log.info("");
             _log.info("    --> Oh, no! " + ignored.getMessage() + ": " + url);
             _log.info("- - - - - - - - - -/");
+            _log.info("");
         } finally {
             if (is != null) {
                 try {
@@ -461,13 +463,22 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                    ================
     protected void showSkippedFileInformation() {
         List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
-        if (parseFileNameList.isEmpty()) {
-            return;// Do nothing!
-        }
         List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
+        if (skipFileNameList.isEmpty()) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("All files have been generated. (overrided)");
+            _log.info("");
+            _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
+            _log.info("- - - - - - - - - -/");
+            _log.info("");
+            return;
+        }
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Skipped file count: " + skipFileNameList.size() + " / " + parseFileNameList.size());
+        _log.info("Several files have skipped generating because of no changing.");
+        _log.info("");
+        _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
         _log.info("- - - - - - - - - -/");
+        _log.info("");
     }
 
     // ===================================================================================

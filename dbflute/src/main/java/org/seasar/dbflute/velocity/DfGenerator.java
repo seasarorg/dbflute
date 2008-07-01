@@ -65,10 +65,10 @@ public abstract class DfGenerator {
 
     public abstract void setTemplatePath(String templatePath);
 
-    public abstract String parse(String controlTemplate, Context controlContext) throws Exception;
-
     public abstract String parse(String inputTemplate, String outputFile, String objectID, Object object)
             throws Exception;
+
+    public abstract String parse(String controlTemplate, Context controlContext) throws Exception;
 
     public abstract void shutdown();
 
@@ -76,6 +76,7 @@ public abstract class DfGenerator {
     //                                                                    Skip Information
     //                                                                    ================
     public abstract List<String> getParseFileNameList();
+
     public abstract List<String> getSkipFileNameList();
 
     // ===================================================================================
