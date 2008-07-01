@@ -641,13 +641,16 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                      access-context
     ##                                                                      ==============
+    $database.info("public void parseAccessContext() {")
     $database.info("    parseAccessContext()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glAccessContextName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("}")
 
     ## -----------------------------------------------------
     ##                                         allcommon dao
     ##                                         -------------
+    $database.info("public void parseDaoInterface() {")
     $database.info("    parseDaoReadable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoReadableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DaoReadable.${glTemplateFileExtension}",$path ,"", "")
@@ -655,6 +658,7 @@ targetdatabase = $targetDatabase
     $database.info("    parseDaoWritable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoWritableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DaoWritable.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("}")
 
     ## -----------------------------------------------------
     ##                                      allcommon entity
@@ -1220,6 +1224,8 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInstanceHandlerName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMetaInstanceHandler.${glTemplateFileExtension}",$path,"", "")
 
+    $database.info("}")
+
     ## -------------------------------------------------------
     ##                                     allcommon exception
     ##                                     -------------------
@@ -1551,7 +1557,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glCacheAbstractSelector}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CacheAbstractSelector.${glTemplateFileExtension}",$path ,"", "")
     #end
-    $database.info("public void parseBehaviorSelector() {")
     $database.info("    parse('BehaviorSelector');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBehaviorSelectorInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/BehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
@@ -1562,7 +1567,6 @@ targetdatabase = $targetDatabase
     $database.info("    parse('CacheBehaviorSelector');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glCacheBehaviorSelectorName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/CacheBehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
-    $database.info("}")
 
     $database.info("    parse('DaoSelector');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
@@ -2042,6 +2046,7 @@ targetdatabase = $targetDatabase
     ##
     ## Loop by tables.
     ##
+    $database.info("public void parseTableClass() {")
     #foreach ($table in $database.tables)
       #if (!$table.isForReferenceOnly())
 
@@ -2177,6 +2182,7 @@ targetdatabase = $targetDatabase
         #end
       #end
     #end
+    $database.info("}")
 
     ## ===================================================================================
     ##                                                                          Simple Dto

@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -82,9 +83,9 @@ public class DfOriginalGenerator extends DfGenerator {
     protected String inputEncoding;
 
     /**
-     * The list of file name skipped. {DBFlute Orignal Attribute}
+     * The list of file name skipped. {DBFlute Original Attribute}
      */
-    protected List<String> skipFileNameList;// [Extension]
+    protected List<String> skipFileNameList = new ArrayList<String>();// [Extension]
 
     // ===================================================================================
     //                                                                         Constructor
