@@ -2046,7 +2046,8 @@ targetdatabase = $targetDatabase
     ##
     ## Loop by tables.
     ##
-    $database.info("public void parseTableClass() {")
+    $database.info(" ")
+    $database.info("/* * * * * * * * * * * * * * {Table Class}")
     #foreach ($table in $database.tables)
       #if (!$table.isForReferenceOnly())
 
@@ -2182,7 +2183,8 @@ targetdatabase = $targetDatabase
         #end
       #end
     #end
-    $database.info("}")
+    $database.info("* * * * * * * * * */")
+    $database.info(" ")
 
     ## ===================================================================================
     ##                                                                          Simple Dto
