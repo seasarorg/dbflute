@@ -360,14 +360,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                       ---------------
     /**
      * Register included-select-column.
-     * 
      * @param aliasName Alias name. This should not contain comma. (NotNull)
      * @param realColumnName Real column name. This should not contain comma. (NotNull)
+     * @deprecated Unsupported!
      */
     protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
-        assertAliasName(aliasName);
-        assertColumnName(realColumnName);
-        getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
+        throw new UnsupportedOperationException();
     }
 
     // -----------------------------------------------------
@@ -971,6 +969,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected void registerOrderBy(String columnName, boolean ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
+    }
+
+    protected void regOBA(String columnName) {
+        registerOrderBy(columnName, true);
+    }
+
+    protected void regOBD(String columnName) {
+        registerOrderBy(columnName, false);
     }
     
     // ===================================================================================

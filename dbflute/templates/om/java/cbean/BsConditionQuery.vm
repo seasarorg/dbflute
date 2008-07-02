@@ -31,40 +31,26 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                              Inline
     //                                                                              ======
     /**
-     * Prepare inline query.
+     * Prepare inline query. <br />
+     * {select ... from ... left outer join (select * from ${table.name}) where abc = [abc] ...}
      * @return Inline query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} inline() {
         if (_inlineQuery == null) {
             _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
         }
-        _inlineQuery.xsetOnClauseInline(false);
-        return _inlineQuery;
+        _inlineQuery.xsetOnClauseInline(false); return _inlineQuery;
     }
     
     /**
-     * Prepare on-clause query.
+     * Prepare on-clause query. <br />
+     * {select ... from ... left outer join ${table.name} on ... and abc = [abc] ...}
      * @return On-clause query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} on() {
         if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
-        ${myConditionInlineQueryClassName} inlineQuery = inline();
-        inlineQuery.xsetOnClauseInline(true);
-        return inlineQuery;
+        ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
     }
-
-    // ===================================================================================
-    //                                                                       IncludeAsMine
-    //                                                                       =============
-    // public void includeAsMine_Xxx(String aliasName) {
-    //   Your aliasName should not contain comma.
-    // 
-#foreach ($col in $table.columns)
-#if ($database.isMakeDeprecated())
-    /** @deprecated */
-    public void includeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
-#end
-#end
 
     // ===================================================================================
     //                                                                               Query
@@ -93,8 +79,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -116,8 +101,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -140,8 +124,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -164,8 +147,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -188,8 +170,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -209,8 +190,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -230,8 +210,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
       #end
 #if (${col.hasSingleKeyReferrer()})
@@ -253,8 +232,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -277,8 +255,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -301,8 +278,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -325,8 +301,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -346,8 +321,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-        _${subQueryPropertyName}Map.put(key, subQuery);
-        return "${subQueryPropertyName}." + key;
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
 #end
 #end
@@ -362,8 +336,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #if (!${col.isNotNull()})
     #end
 
-    public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true); return this; }
-    public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false); return this; }
+    public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { regOBA("${col.name}"); return this; }
+    public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}"); return this; }
 #end
 
     // ===================================================================================
@@ -424,15 +398,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerOuterJoin(getConditionQuery${foreignKeys.foreignPropertyNameInitCap}(), joinOnMap);
     }
     protected ${foreignCQClassName} createQuery${foreignKeys.foreignPropertyNameInitCap}() {
-        String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
-        String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-        cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}");
-        cq.xsetRelationPath(nextRelationPath);
-        return cq;
-    }
-    protected String resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}() {
-        return resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
+        String nrp = resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
+        String jan = resolveJoinAliasName(nrp, getNextNestLevel());
+        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+        cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
     }
     public boolean hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
         return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap} != null;
@@ -467,15 +436,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerOuterJoin(getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(), joinOnMap);
     }
     protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
-        String nextRelationPath = resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}();
-        String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
-        cq.xsetRelationPath(nextRelationPath);
-        return cq;
-    }
-    protected String resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}() {
-        return resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
+        String nrp = resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
+        String jan = resolveJoinAliasName(nrp, getNextNestLevel());
+        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
     }
     public boolean hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;

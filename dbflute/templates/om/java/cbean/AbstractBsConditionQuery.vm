@@ -702,18 +702,14 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (!${col.isNotNull()})
 
     /**
-     * IsNull(is null). And OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * IsNull(is null). And OnceRegistered.
      */
-    public void set${tmpJavaName}_IsNull() {
-        register${tmpJavaName}(CK_IS_NULL, DUMMY_OBJECT);
-    }
+    public void set${tmpJavaName}_IsNull() { register${tmpJavaName}(CK_IS_NULL, DUMMY_OBJECT); }
 
     /**
-     * IsNotNull(is not null). And OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * IsNotNull(is not null). And OnceRegistered.
      */
-    public void set${tmpJavaName}_IsNotNull() {
-        register${tmpJavaName}(CK_IS_NOT_NULL, DUMMY_OBJECT);
-    }
+    public void set${tmpJavaName}_IsNotNull() { register${tmpJavaName}(CK_IS_NOT_NULL, DUMMY_OBJECT); }
 #end
 
     protected void register${tmpJavaName}(${glConditionKeyName} key, Object value) {
