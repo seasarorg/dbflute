@@ -179,34 +179,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         };
         return invoker.invokePaging(handler);
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @param invoker Select-page-invoker (NotNull)
-     * @return Read page. (NotNull)
-     * @deprecated
-     */
-    public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker) {
-        assertConditionBeanNotNull(cb);
-        final SelectPageCallback<${glEntityInterfaceName}> pageCallback = new SelectPageCallback<${glEntityInterfaceName}>() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
-            public int selectCountIgnoreFetchScope() {
-                return readCount(cb);
-            }
-            public java.util.List<${glEntityInterfaceName}> selectListWithFetchScope() {
-                return readList(cb);
-            }
-        };
-        return invoker.invokeSelectPage(pageCallback);
-    }
-#end
 
     /**
      * Assert that record has not been deleted.
-     * 
      * @param entity Selected entity.
      * @param searchKey4log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
@@ -218,7 +193,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that record has not been deleted.
-     * 
      * @param ls Selected list.
      * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
@@ -230,7 +204,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the entity is not deleted.
-     * 
      * @param entity Selected entity. (Nullable)
      * @param searchKey4log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
@@ -243,7 +216,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the entity is not deleted.
-     * 
      * @param ls Selected list. (Nullable)
      * @param searchKey4Log Search-key for Logging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
@@ -402,7 +374,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Help load referrer internally. <br />
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * 
      * @param <LOCAL_ENTITY_TYPE> The type of base entity.
      * @param <PK_TYPE> The type of primary key.
      * @param <REFERRER_CB_TYPE> The type of referrer condition-bean.
@@ -447,7 +418,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Help load referrer internally. <br />
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * 
      * @param <LOCAL_ENTITY_TYPE> The type of base entity.
      * @param <PK_TYPE> The type of primary key.
      * @param <REFERRER_CB_TYPE> The type of referrer condition-bean.
@@ -544,7 +514,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * To lower case for primary key if the value is string.
-     * 
      * @param <PK_TYPE> The type of primary key.
      * @param value The value of primary key. (Nullable)
      * @return The value of primary key. (Nullable)
@@ -679,7 +648,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                     ===============
     /**
      * ${database.ImplementComment}
-     * 
      * @return All count.
      */
     protected int callGetCountAll() {
@@ -690,7 +658,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return All list. (NotNull)
      */
     protected java.util.List<${glEntityInterfaceName}> callGetListAll() {
@@ -701,7 +668,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
@@ -715,21 +681,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read entity. If the select result is zero, it returns null. (Nullable)
-     */
-    protected ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return (${glEntityInterfaceName})result;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */

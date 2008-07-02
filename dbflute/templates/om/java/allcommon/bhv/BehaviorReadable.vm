@@ -4,9 +4,6 @@ import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
-import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
@@ -43,7 +40,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                          ==========
     /**
      * Get table db-name.
-     * 
      * @return Table db-name. (NotNull)
      */
     public String getTableDbName();
@@ -53,7 +49,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                              ======
     /**
      * Get dbmeta.
-     * 
      * @return DBMeta. (NotNull)
      */
     public ${glDBMetaInterfaceName} getDBMeta();
@@ -63,7 +58,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                        ============
     /**
      * Get dao-readable.
-     * 
      * @return Dao-readable. (NotNull)
      */
     public ${glDaoReadableInterfaceName} getDaoReadable();
@@ -73,14 +67,12 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                        ============
     /**
      * New entity.
-     * 
      * @return Entity. (NotNull)
      */
     public ${glEntityInterfaceName} newEntity();
 
     /**
      * New condition-bean.
-     * 
      * @return Condition-bean. (NotNull)
      */
     public ${glConditionBeanInterfaceName} newConditionBean();
@@ -90,7 +82,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                       =============
     /**
      * Get count all.
-     * 
      * @return Count all.
      */
     public int getCountAll();
@@ -114,7 +105,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                   =================
     /**
      * Read entity by condition-bean.
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -123,7 +113,6 @@ public interface ${glBehaviorReadableInterfaceName} {
 
     /**
      * Read simple entity by condition-bean with deleted check.
-     * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
@@ -136,7 +125,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     //                                                                     ===============
     /**
      * Read list as result-bean.
-     * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
@@ -144,80 +132,17 @@ public interface ${glBehaviorReadableInterfaceName} {
 
     /**
      * Read page as result-bean.
-     * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Read page as result-bean.
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @param invoker Select-page-invoker (NotNull)
-     * @return Read page. (NotNull)
-     * @deprecated
-     */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
-#end
 
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
     /**
      * ${database.ImplementComment}
-     * 
      * @return The value of sequence. (NotNull)
      */
     public ${database.sequenceReturnType} readNextVal();
-
-    // ===================================================================================
-    //                                                                        Static Class
-    //                                                                        ============
-    /**
-     * The interface of select-page callback.
-     * 
-     * @param <T> The generic template for 'selectedList'.
-     */
-    public static interface SelectPageCallback<ENTITY> {
-        public ${glPagingBeanInterfaceName} getPagingBean();
-        public int selectCountIgnoreFetchScope();
-        public java.util.List<ENTITY> selectListWithFetchScope();
-    }
-
-    public static class ResultBeanBuilder<ENTITY> extends ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<ENTITY> {
-        public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
-            super(bhv.getTableDbName());
-        }
-    }
-
-    public static interface SelectPageInvoker<ENTITY> {
-        public ${glPagingResultBeanName}<ENTITY> invokeSelectPage(SelectPageCallback<ENTITY> callback);
-    }
-
-    public static class SelectPageSimpleInvoker<ENTITY> implements SelectPageInvoker<ENTITY> {
-        protected ${glBehaviorReadableInterfaceName} _bhv;
-        public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
-            _bhv = bhv;
-        }
-
-        public ${glPagingResultBeanName}<ENTITY> invokeSelectPage(final SelectPageCallback<ENTITY> callback) {
-            final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
-                public ${glPagingBeanInterfaceName} getPagingBean() {
-                    return callback.getPagingBean();
-                }
-                public int count() {
-                    return callback.selectCountIgnoreFetchScope();
-                }
-                public java.util.List<ENTITY> paging() {
-                    return callback.selectListWithFetchScope();
-                }
-            };
-            return new ${glPagingInvokerName}<ENTITY>(_bhv.getTableDbName()).invokePaging(handler);
-        }
-    }
-
-    public static interface SimpleCBSetupper {
-    }
 }

@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
  * The invoker of paging.
- * 
+ * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
 public class ${glPagingInvokerName}<ENTITY> {
@@ -24,7 +24,6 @@ public class ${glPagingInvokerName}<ENTITY> {
     //                                                                              ======
     /**
      * Invoke select-page by handler.
-     * 
      * @param handler The handler of paging. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
@@ -53,7 +52,6 @@ public class ${glPagingInvokerName}<ENTITY> {
 
     /**
      * Is it necessary to read page again?
-     * 
      * @param rb The result bean of paging. (NotNull)
      * @return Determination.
      */
@@ -66,7 +64,6 @@ public class ${glPagingInvokerName}<ENTITY> {
     //                                                                              ======
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException

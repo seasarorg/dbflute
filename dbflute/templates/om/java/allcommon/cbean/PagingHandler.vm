@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
  * The handler of paging.
- * 
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
@@ -10,21 +9,18 @@ public interface ${glPagingHandlerName}<ENTITY> {
 
     /**
      * Get the bean of paging.
-     * 
      * @return The bean of paging. (NotNull)
      */
     public ${glPagingBeanInterfaceName} getPagingBean();
 
     /**
      * Execute SQL for count.
-     * 
      * @return The count of execution.
      */
     public int count();
 
     /**
      * Execute SQL for paging.
-     * 
      * @return The list of entity. (NotNull)
      */
     public java.util.List<ENTITY> paging();
