@@ -10,6 +10,7 @@ public class DfNameHintUtil {
 
     public static final String PREFIX_MARK = "prefix:";
     public static final String SUFFIX_MARK = "suffix:";
+    public static final String CONTAIN_MARK = "contain:";
 
     public static boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         if (!targetList.isEmpty()) {
@@ -21,7 +22,6 @@ public class DfNameHintUtil {
             }
             return true;
         }
-
         for (final Iterator<String> ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
             if (isHitByTheHint(name, tableHint)) {
@@ -34,15 +34,21 @@ public class DfNameHintUtil {
     public static boolean isHitByTheHint(String name, String hint) {
         final String prefixMark = PREFIX_MARK;
         final String suffixMark = SUFFIX_MARK;
+        final String containMark = CONTAIN_MARK;
 
         if (hint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-            final String pureTableHint = hint.substring(prefixMark.length(), hint.length());
-            if (name.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
+            final String pureHint = hint.substring(prefixMark.length(), hint.length());
+            if (name.toLowerCase().startsWith(pureHint.toLowerCase())) {
                 return true;
             }
         } else if (hint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-            final String pureTableHint = hint.substring(suffixMark.length(), hint.length());
-            if (name.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
+            final String pureHint = hint.substring(suffixMark.length(), hint.length());
+            if (name.toLowerCase().endsWith(pureHint.toLowerCase())) {
+                return true;
+            }
+        } else if (hint.toLowerCase().startsWith(containMark.toLowerCase())) {
+            final String pureHint = hint.substring(containMark.length(), hint.length());
+            if (name.toLowerCase().contains(pureHint.toLowerCase())) {
                 return true;
             }
         } else {
