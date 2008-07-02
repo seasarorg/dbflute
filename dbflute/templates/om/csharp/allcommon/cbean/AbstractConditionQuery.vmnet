@@ -21,18 +21,18 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static readonly ${glConditionKeyName} CK_EQUAL = ${glConditionKeyName}.CK_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_NOT_EQUAL = ${glConditionKeyName}.CK_NOT_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_GREATER_EQUAL = ${glConditionKeyName}.CK_GREATER_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_GREATER_THAN = ${glConditionKeyName}.CK_GREATER_THAN;
-    protected static readonly ${glConditionKeyName} CK_LESS_EQUAL = ${glConditionKeyName}.CK_LESS_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_LESS_THAN = ${glConditionKeyName}.CK_LESS_THAN;
-    protected static readonly ${glConditionKeyName} CK_PREFIX_SEARCH = ${glConditionKeyName}.CK_PREFIX_SEARCH;
-    protected static readonly ${glConditionKeyName} CK_LIKE_SEARCH = ${glConditionKeyName}.CK_LIKE_SEARCH;
-    protected static readonly ${glConditionKeyName} CK_IN_SCOPE = ${glConditionKeyName}.CK_IN_SCOPE;
-    protected static readonly ${glConditionKeyName} CK_NOT_IN_SCOPE = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
-    protected static readonly ${glConditionKeyName} CK_IS_NULL = ${glConditionKeyName}.CK_IS_NULL;
-    protected static readonly ${glConditionKeyName} CK_IS_NOT_NULL = ${glConditionKeyName}.CK_IS_NOT_NULL;
+    protected static readonly ${glConditionKeyName} CK_EQ = ${glConditionKeyName}.CK_EQUAL;
+    protected static readonly ${glConditionKeyName} CK_NE = ${glConditionKeyName}.CK_NOT_EQUAL;
+    protected static readonly ${glConditionKeyName} CK_GE = ${glConditionKeyName}.CK_GREATER_EQUAL;
+    protected static readonly ${glConditionKeyName} CK_GT = ${glConditionKeyName}.CK_GREATER_THAN;
+    protected static readonly ${glConditionKeyName} CK_LE = ${glConditionKeyName}.CK_LESS_EQUAL;
+    protected static readonly ${glConditionKeyName} CK_LT = ${glConditionKeyName}.CK_LESS_THAN;
+    protected static readonly ${glConditionKeyName} CK_PS = ${glConditionKeyName}.CK_PREFIX_SEARCH;
+    protected static readonly ${glConditionKeyName} CK_LS = ${glConditionKeyName}.CK_LIKE_SEARCH;
+    protected static readonly ${glConditionKeyName} CK_INS = ${glConditionKeyName}.CK_IN_SCOPE;
+    protected static readonly ${glConditionKeyName} CK_NINS = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
+    protected static readonly ${glConditionKeyName} CK_ISN = ${glConditionKeyName}.CK_IS_NULL;
+    protected static readonly ${glConditionKeyName} CK_ISNN = ${glConditionKeyName}.CK_IS_NOT_NULL;
 
     protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
     protected static readonly Object DUMMY_OBJECT = new Object();
@@ -583,16 +583,19 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-
-    protected String filterRemoveEmptyString(String value) {
-        return ((value != null && !"".Equals(value)) ? value : null);
-    }
-
-    protected String filterRES(String value) {
+    protected String fRES(String value) {
         return filterRemoveEmptyString(value);
     }
 
-    protected System.Collections.IList convertToList<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
+    private String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".Equals(value)) ? value : null);
+    }
+
+    protected System.Collections.IList cTL<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
+        return convertToList(col);
+    }
+
+    private System.Collections.IList convertToList<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
         }
@@ -606,7 +609,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return resultList;
     }
 
-    protected System.Collections.IList filterRemoveEmptyStringFromList(System.Collections.IList ls) {
+    private System.Collections.IList filterRemoveEmptyStringFromList(System.Collections.IList ls) {
         if (ls == null) {
             return null;
         }
@@ -621,7 +624,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return resultList;
     }
 
-    protected System.Collections.IList filterRESFromList(System.Collections.IList ls) {
+    protected System.Collections.IList fRESL(System.Collections.IList ls) {
         return filterRemoveEmptyStringFromList(ls);
     }
 

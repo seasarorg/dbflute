@@ -30,22 +30,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final ${glConditionKeyName} CK_EQUAL = ${glConditionKeyName}.CK_EQUAL;
-    protected static final ${glConditionKeyName} CK_NOT_EQUAL = ${glConditionKeyName}.CK_NOT_EQUAL;
-    protected static final ${glConditionKeyName} CK_GREATER_EQUAL = ${glConditionKeyName}.CK_GREATER_EQUAL;
-    protected static final ${glConditionKeyName} CK_GREATER_THAN = ${glConditionKeyName}.CK_GREATER_THAN;
-    protected static final ${glConditionKeyName} CK_LESS_EQUAL = ${glConditionKeyName}.CK_LESS_EQUAL;
-    protected static final ${glConditionKeyName} CK_LESS_THAN = ${glConditionKeyName}.CK_LESS_THAN;
-    protected static final ${glConditionKeyName} CK_PREFIX_SEARCH = ${glConditionKeyName}.CK_PREFIX_SEARCH;
-    protected static final ${glConditionKeyName} CK_LIKE_SEARCH = ${glConditionKeyName}.CK_LIKE_SEARCH;
-    protected static final ${glConditionKeyName} CK_IN_SCOPE = ${glConditionKeyName}.CK_IN_SCOPE;
-    protected static final ${glConditionKeyName} CK_NOT_IN_SCOPE = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
-    protected static final ${glConditionKeyName} CK_IS_NULL = ${glConditionKeyName}.CK_IS_NULL;
-    protected static final ${glConditionKeyName} CK_IS_NOT_NULL = ${glConditionKeyName}.CK_IS_NOT_NULL;
+    protected static final ${glConditionKeyName} CK_EQ = ${glConditionKeyName}.CK_EQUAL;
+    protected static final ${glConditionKeyName} CK_NE = ${glConditionKeyName}.CK_NOT_EQUAL;
+    protected static final ${glConditionKeyName} CK_GE = ${glConditionKeyName}.CK_GREATER_EQUAL;
+    protected static final ${glConditionKeyName} CK_GT = ${glConditionKeyName}.CK_GREATER_THAN;
+    protected static final ${glConditionKeyName} CK_LE = ${glConditionKeyName}.CK_LESS_EQUAL;
+    protected static final ${glConditionKeyName} CK_LT = ${glConditionKeyName}.CK_LESS_THAN;
+    protected static final ${glConditionKeyName} CK_PS = ${glConditionKeyName}.CK_PREFIX_SEARCH;
+    protected static final ${glConditionKeyName} CK_LS = ${glConditionKeyName}.CK_LIKE_SEARCH;
+    protected static final ${glConditionKeyName} CK_INS = ${glConditionKeyName}.CK_IN_SCOPE;
+    protected static final ${glConditionKeyName} CK_NINS = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
+    protected static final ${glConditionKeyName} CK_ISN = ${glConditionKeyName}.CK_IS_NULL;
+    protected static final ${glConditionKeyName} CK_ISNN = ${glConditionKeyName}.CK_IS_NOT_NULL;
 
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
     /** Condition value for DUMMY. */
     protected static final ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
 
@@ -55,6 +52,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** The property of condition-query. */
     protected static final String CQ_PROPERTY = "conditionQuery";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** SQL clause. */
     protected final ${glSqlClauseName} _sqlClause;
 
@@ -1143,16 +1143,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param value Query-value-string. (Nullable)
      * @return Filtered value. (Nullable)
      */
-    protected String filterRemoveEmptyString(String value) {
-        return ((value != null && !"".equals(value)) ? value : null);
+    protected String fRES(String value) {
+        return filterRemoveEmptyString(value);
     }
 
     /**
      * @param value Query-value-string. (Nullable)
      * @return Filtered value. (Nullable)
      */
-    protected String filterRES(String value) {
-        return filterRemoveEmptyString(value);
+    private String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".equals(value)) ? value : null);
     }
     
     /**
@@ -1160,7 +1160,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param <PROPERTY_TYPE> The type of property.
      * @return List. (Nullable: If the argument is null, returns null.)
      */
-    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
+    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> cTL(Collection<PROPERTY_TYPE> col) {
+        return convertToList(col);
+    }
+    
+    /**
+     * @param col Target collection. (Nullable)
+     * @param <PROPERTY_TYPE> The type of property.
+     * @return List. (Nullable: If the argument is null, returns null.)
+     */
+    private <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
         }
@@ -1232,7 +1241,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -1250,7 +1258,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Assert that the column-name is not null and is not empty and does not contain comma.
-     * 
      * @param columnName Column-name. (NotNull)
      * @exception IllegalArgumentException
      */
@@ -1271,7 +1278,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Assert that the alias-name is not null and is not empty and does not contain comma.
-     * 
      * @param aliasName Alias-name. (NotNull)
      * @exception IllegalArgumentException
      */
@@ -1295,7 +1301,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */
