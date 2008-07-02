@@ -220,7 +220,7 @@ namespace ${glPackageBaseCQ} {
   #if (${col.isJavaNativeNumberObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            reg${tmpJavaName}(CK_EQUAL, value);
+            reg${tmpJavaName}(CK_EQ, value);
         }
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.ClassificationMapList)

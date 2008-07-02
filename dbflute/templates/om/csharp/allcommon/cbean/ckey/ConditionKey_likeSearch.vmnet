@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionKeyName}PrefixSearch")
+#set ($myClassName = "${glConditionKeyName}LikeSearch")
 
 using System;
 
@@ -15,18 +15,18 @@ public class ${myClassName} : ${glConditionKeyName} {
         _operand = "like";
     }
 
-    public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
         if (value == null) {
             return false;
         }
         return true;
     }
 
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
         throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
     }
 
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
@@ -39,11 +39,11 @@ public class ${myClassName} : ${glConditionKeyName} {
         conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.RearOption));
     }
 
-    protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
         throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
     }
 
-    protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         conditionValue.setLikeSearch((String)value, (${glConditionOptionLikeSearchName})option).setLikeSearchLocation(location);
     }
 }

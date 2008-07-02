@@ -124,6 +124,10 @@ public abstract class ${myClassName} {
         return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";
     }
 
+    protected String buildBindClauseWithRearOption(String columnName, String location, String rearOption) {
+        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null" + rearOption;
+    }
+
     protected String buildBindClause(String columnName, String location, String dummyValue) {
         return columnName + " " + getOperand() + " " + "/*dto." + location + "*/" + dummyValue;
     }
