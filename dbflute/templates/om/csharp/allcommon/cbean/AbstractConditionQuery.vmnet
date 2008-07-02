@@ -292,7 +292,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         // - - - - - - - - -
         // Use splitByXxx().
         // - - - - - - - - -
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("The method 'splitByXxx()' have been unsupported yet!");
     }
 
     protected void throwLikeSearchOptionNotFoundException(String capPropName, String value) {

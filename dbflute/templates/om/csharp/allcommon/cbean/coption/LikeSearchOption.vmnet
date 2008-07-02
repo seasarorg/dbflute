@@ -2,6 +2,7 @@
 
 using System;
 
+using ${glPackageBaseCommonException};
 // using ${glPackageBaseCommonCOptionPartsLocal};
 
 namespace ${glPackageBaseCommonCOption} {
@@ -90,14 +91,14 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                          Real Value
     //                                                                          ==========
-    public override String GenerateRealValue(String value) {
-        value = base.GenerateRealValue(value);
+    public override String generateRealValue(String value) {
+        value = base.generateRealValue(value);
 
         // Escape
         if (_escape != null && _escape.Trim().Length != 0) {
-            String tmp = Replace(value, _escape, _escape + _escape);
-            tmp = Replace(tmp, "%", _escape + "%");
-            tmp = Replace(tmp, "_", _escape + "_");
+            String tmp = replaceString(value, _escape, _escape + _escape);
+            tmp = replaceString(tmp, "%", _escape + "%");
+            tmp = replaceString(tmp, "_", _escape + "_");
             value = tmp;
         }
         String wildCard = "${database.wildCard}";
@@ -111,7 +112,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             return wildCard + value + wildCard;
         } else {
             String msg = "The like was wrong string: " + _like;
-            throw new SystemException(msg);
+            throw new IllegalStateException(msg);
         }
     }
 

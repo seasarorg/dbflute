@@ -2,6 +2,7 @@
 
 using System;
 using System.Text;
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCValue} {
@@ -151,7 +152,7 @@ public class ${myClassName} {
             }
         }
         LikeSearchValue likeSearchValue = (LikeSearchValue)_likeSearch.remove(0);
-        return (String)filterValue(likeSearchValue.generateRealValue());
+        return likeSearchValue.generateRealValue();
     }}
 
     public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
@@ -198,7 +199,7 @@ public class ${myClassName} {
             if (_option == null) {
                 return _value;
             }
-            return _option.GenerateRealValue(_value);
+            return _option.generateRealValue(_value);
         }
     }
 
