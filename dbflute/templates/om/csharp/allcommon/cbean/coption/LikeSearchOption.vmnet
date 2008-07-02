@@ -15,8 +15,6 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     protected String _like;
     protected String _escape;
 
-    // protected java.util.List<LikeAsOrCallback> _likeAsOrCallbackList = new java.util.ArrayList<LikeAsOrCallback>();
-
     // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
@@ -28,46 +26,16 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     }}
 
     // ===================================================================================
-    //                                                                                AsOr
-    //                                                                                ====
-    // public static interface LikeAsOrCallback {
-    //     public String getAdditionalTargetPropertyName();
-    //     public String filterValue(String currentValue);
-    //     public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback);
-    // }
-
-    // public static abstract class DefaultLikeAsOrCallback implements LikeAsOrCallback {
-    //     public String filterValue(String currentValue) {
-    //         return currentValue;
-    //     }
-    //     public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback) {
-    //         return optionDeepCopyWithoutCallback;
-    //     }
-    // }
-
-    // public java.util.List${database.filterGenericsString('LikeAsOrCallback')} getLikeAsOrCallbackList() {
-    //     return _likeAsOrCallbackList;
-    // }
-
-    // public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
-    //     _likeAsOrCallbackList.add(likeAsOrCallback);
-    // }
-
-    // public void clearLikeAsOrCallback() {
-    //     _likeAsOrCallbackList.clear();
-    // }
-
-    // ===================================================================================
     //                                                                                Like
     //                                                                                ====
     public ${myClassName} LikePrefix() {
         _like = LIKE_PREFIX;
         return this;
     }
-    // public ${myClassName} LikeSuffix() {
-    //     _like = LIKE_SUFFIX;
-    //     return this;
-    // }
+    public ${myClassName} LikeSuffix() {
+        _like = LIKE_SUFFIX;
+        return this;
+    }
     public ${myClassName} LikeContain() {
         _like = LIKE_CONTAIN;
         return this;
@@ -79,6 +47,25 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                              Escape
     //                                                                              ======
+    public ${myClassName} EscapeByPipeLine() {
+        _escape = "|";
+        return this;
+    }
+
+    public ${myClassName} EscapeByAtMark() {
+        _escape = "@";
+        return this;
+    }
+
+    public ${myClassName} EscapeBySlash() {
+        _escape = "/";
+        return this;
+    }
+
+    public ${myClassName} EscapeByBackSlash() {
+        _escape = "\\";
+        return this;
+    }
 
     // ===================================================================================
     //                                                                               Split

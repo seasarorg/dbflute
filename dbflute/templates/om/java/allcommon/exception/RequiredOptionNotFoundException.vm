@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
  * The exception of when the required option is not found.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glRequiredOptionNotFoundException} extends RuntimeException {
@@ -12,7 +11,6 @@ public class ${glRequiredOptionNotFoundException} extends RuntimeException {
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message.
      */
     public ${glRequiredOptionNotFoundException}(String msg) {
@@ -21,7 +19,6 @@ public class ${glRequiredOptionNotFoundException} extends RuntimeException {
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message.
      * @param cause Throwable.
      */

@@ -7,6 +7,7 @@ using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
@@ -268,6 +269,46 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
+    protected void registerLikeSearchQuery(${glConditionKeyName} key
+                                         , String value
+                                         , ${glConditionValueName} cvalue
+                                         , String colName
+                                         , String capPropName
+                                         , String uncapPropName
+                                         , ${glConditionOptionLikeSearchName} option) {
+        String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
+        if (!key.isValidRegistration(cvalue, value, validationMsg)) {
+            return;
+        }
+        if (option == null) {
+            throwLikeSearchOptionNotFoundException(capPropName, value);
+            return;// Unreachable!
+        }
+        if (value == null || !option.isSplit()) {
+            // As Normal Condition.
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            return;
+        }
+        // - - - - - - - - -
+        // Use splitByXxx().
+        // - - - - - - - - -
+        throw new UnsupportedOperationException();
+    }
+
+    protected void throwLikeSearchOptionNotFoundException(String capPropName, String value) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your method call:"  + getLineSeparator();
+        String beanName = GetType().Name;
+        String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
+        msg = msg + "    " + beanName + "." + methodName + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glRequiredOptionNotFoundException}(msg);
+    }
+        
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------

@@ -573,10 +573,10 @@ public class ${myClassName} {
     //                                                                         Like Search
     //                                                                         ===========
     /** Value of likeSearch. */
-    protected java.util.List${database.filterGenericsString('LikeSearchValue')} _likeSearch;
+    protected List<LikeSearchValue> _likeSearch;
 
     /** Value of likeSearch for spare. */
-    protected java.util.List${database.filterGenericsString('LikeSearchValue')} _likeSearch4Spare;
+    protected List<LikeSearchValue> _likeSearch4Spare;
 
     /**
      * Get the value of likeSearch.
@@ -605,8 +605,8 @@ public class ${myClassName} {
      */
     public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
         if (_likeSearch == null) {
-            _likeSearch = new java.util.ArrayList${database.filterGenericsString('LikeSearchValue')}();
-            _likeSearch4Spare= new java.util.ArrayList${database.filterGenericsString('LikeSearchValue')}();
+            _likeSearch = new ArrayList<LikeSearchValue>();
+            _likeSearch4Spare= new ArrayList<LikeSearchValue>();
         }
         if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
             for (int index=0; index < _likeSearch4Spare.size(); index++) {
@@ -1173,7 +1173,7 @@ public class ${myClassName} {
             if (str == null) {
                 return EMPTY_STRINGS;
             }
-            java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
+            List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
             java.util.StringTokenizer st = new java.util.StringTokenizer(str, delim);
             while (st.hasMoreElements()) {
                 list.add(st.nextToken());

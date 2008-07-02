@@ -1,8 +1,8 @@
 #set ($myClassName = "${glConditionValueName}")
 
 using System;
-using System.Collections;
 using System.Text;
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCValue} {
 
@@ -135,6 +135,76 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                         Like Search
+    //                                                                         ===========
+    protected List<LikeSearchValue> _likeSearch;
+    protected List<LikeSearchValue> _likeSearch4Spare;
+
+    public String LikeSearch { get {
+        if (_likeSearch == null) {
+            return null;
+        }
+        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+                _likeSearch.add(_likeSearch4Spare.get(index));
+            }
+        }
+        LikeSearchValue likeSearchValue = (LikeSearchValue)_likeSearch.remove(0);
+        return (String)filterValue(likeSearchValue.generateRealValue());
+    }}
+
+    public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+        if (_likeSearch == null) {
+            _likeSearch = new ArrayList<LikeSearchValue>();
+            _likeSearch4Spare= new ArrayList<LikeSearchValue>();
+        }
+        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+                _likeSearch.add(_likeSearch4Spare.get(index));
+            }
+        }
+        LikeSearchValue likeSearchValue = new LikeSearchValue(value, option);
+        _likeSearch.add(likeSearchValue);
+        _likeSearch4Spare.add(likeSearchValue);
+        return this;
+    }
+
+    protected String _likeSearchLocation;
+
+    public String getLikeSearchLocation() {
+        return _likeSearchLocation;
+    }
+
+    public ${myClassName} setLikeSearchLocation(String location) {
+        _likeSearchLocation = location;
+        return this;
+    }
+
+    protected class LikeSearchValue {
+        protected String _value;
+        protected ${glConditionOptionLikeSearchName} _option;
+        public LikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+            _value = value;
+            _option = option;
+        }
+        public String getValue() {
+            return _value;
+        }
+        public ${glConditionOptionLikeSearchName} getOption() {
+            return _option;
+        }
+        public String generateRealValue() {
+            if (_option == null) {
+                return _value;
+            }
+            return _option.GenerateRealValue(_value);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            In Scope
+    //                                                                            ========
     protected System.Collections.IList _inScope;
 
     public System.Collections.IList InScope {
