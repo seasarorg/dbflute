@@ -2,7 +2,7 @@
 
 using System;
 
-using ${glPackageBaseCommonException};
+using ${glPackageBaseCommonJavaLike};
 // using ${glPackageBaseCommonCOptionPartsLocal};
 
 namespace ${glPackageBaseCommonCOption} {
