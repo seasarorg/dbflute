@@ -36,12 +36,12 @@ namespace ${glPackageBaseCQ} {
   #if (${col.isJavaNativeStringObject()})
 
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_EQUAL, filterRES(value));
         }
     #if ($database.isMakeConditionQueryEqualEmptyString())
 
         public void Set${tmpJavaName}_Equal_EmptyString() {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, "");
+            register${tmpJavaName}(CK_EQUAL, "");
         }
     #end
     #if (${col.hasClassification()})
@@ -52,67 +52,62 @@ namespace ${glPackageBaseCQ} {
         /// ${database.getMapValue($classificationMap, 'comment')}
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+            register${tmpJavaName}(CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
         }
       #end
     #end
     #if (${col.isAvailableStringNotEqual()})
 
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_NOT_EQUAL, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringGreaterThan()})
 
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_GREATER_THAN, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringLessThan()})
 
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_LESS_THAN, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringGreaterEqual()})
 
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_GREATER_EQUAL, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringLessEqual()})
 
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_LESS_EQUAL, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringPrefixSearch()})
 
         public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
+            register${tmpJavaName}(CK_PREFIX_SEARCH, filterRES(value));
         }
     #end
     #if (${col.isAvailableStringLikeSearch()})
 
         public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-            if (value == null || value.Length == 0) { return; }
-            if (likeSearchOption.IsLikeContain) {
-                Set${tmpJavaName}_PrefixSearch("%" + value);
-            } else {
-                throw new NotSupportedException("Now only LikeContain() has been supported. Sorry...");
-            }
+            registerLikeSearchQuery(CK_LIKE_SEARCH, filterRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
     #end
     #if (${col.isAvailableStringInScope()})
 
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList<${col.JavaNative}>(valueList)));
+            register${tmpJavaName}(CK_IN_SCOPE, filterRESFromList(convertToList<${col.JavaNative}>(valueList)));
         }
     #end
     #if (${col.isAvailableStringNotInScope()})
 
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList<${col.JavaNative}>(valueList)));
+            register${tmpJavaName}(CK_NOT_IN_SCOPE, filterRESFromList(convertToList<${col.JavaNative}>(valueList)));
         }
     #end
 #if (${col.isSingleKeyForeignKey()})
@@ -225,7 +220,7 @@ namespace ${glPackageBaseCQ} {
   #if (${col.isJavaNativeNumberObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+            register${tmpJavaName}(CK_EQUAL, value);
         }
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.ClassificationMapList)
@@ -236,50 +231,50 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
             String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
+            register${tmpJavaName}(CK_EQUAL, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
       #end
     #end
     #if (${col.isAvailableNumberNotEqual()})
 
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+            register${tmpJavaName}(CK_NOT_EQUAL, value);
         }
     #end
     #if (${col.isAvailableNumberGreaterThan()})
 
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+            register${tmpJavaName}(CK_GREATER_THAN, value);
         }
     #end
     #if (${col.isAvailableNumberLessThan()})
 
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+            register${tmpJavaName}(CK_LESS_THAN, value);
         }
     #end
     #if (${col.isAvailableNumberGreaterEqual()})
 
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+            register${tmpJavaName}(CK_GREATER_EQUAL, value);
         }
     #end
     #if (${col.isAvailableNumberLessEqual()})
 
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+            register${tmpJavaName}(CK_LESS_EQUAL, value);
         }
     #end
     #if (${col.isAvailableNumberInScope()})
 
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, convertToList<${col.JavaNative}>(valueList));
+            register${tmpJavaName}(CK_IN_SCOPE, convertToList<${col.JavaNative}>(valueList));
         }
     #end
     #if (${col.isAvailableNumberNotInScope()})
 
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, convertToList<${col.JavaNative}>(valueList));
+            register${tmpJavaName}(CK_NOT_IN_SCOPE, convertToList<${col.JavaNative}>(valueList));
         }
     #end
 #if (${col.isSingleKeyForeignKey()})
@@ -392,43 +387,43 @@ namespace ${glPackageBaseCQ} {
   #if (${col.isJavaNativeDateObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+            register${tmpJavaName}(CK_EQUAL, value);
         }
     #if (${col.isAvailableDateNotEqual()})
 
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+            register${tmpJavaName}(CK_NOT_EQUAL, value);
         }
     #end
     #if (${col.isAvailableDateGreaterThan()})
 
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+            register${tmpJavaName}(CK_GREATER_THAN, value);
         }
     #end
     #if (${col.isAvailableDateLessThan()})
 
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+            register${tmpJavaName}(CK_LESS_THAN, value);
         }
     #end
     #if (${col.isAvailableDateGreaterEqual()})
 
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+            register${tmpJavaName}(CK_GREATER_EQUAL, value);
         }
     #end
     #if (${col.isAvailableDateLessEqual()})
 
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+            register${tmpJavaName}(CK_LESS_EQUAL, value);
         }
     #end
   #end
   #if (${col.isJavaNativeBooleanObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+            register${tmpJavaName}(CK_EQUAL, value);
         }
   #end
   #if (${col.isJavaNativeBinaryObject()})
@@ -436,11 +431,11 @@ namespace ${glPackageBaseCQ} {
   #if (!${col.isNotNull()})
 
         public void Set${tmpJavaName}_IsNull() {
-            register${tmpJavaName}(${glConditionKeyName}.CK_IS_NULL, DUMMY_OBJECT);
+            register${tmpJavaName}(CK_IS_NULL, DUMMY_OBJECT);
         }
 
         public void Set${tmpJavaName}_IsNotNull() {
-            register${tmpJavaName}(${glConditionKeyName}.CK_IS_NOT_NULL, DUMMY_OBJECT);
+            register${tmpJavaName}(CK_IS_NOT_NULL, DUMMY_OBJECT);
         }
   #end
   
