@@ -61,6 +61,18 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             reg${tmpJavaName}(CK_NE, fRES(value));
         }
+    #if (${col.hasClassification()})
+      #foreach ($classificationMap in $col.ClassificationMapList)
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as notEqual. { != }
+        /// ${database.getMapValue($classificationMap, 'comment')}
+        /// </summary>
+        public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+            reg${tmpJavaName}(CK_NE, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        }
+      #end
+    #end
     #end
     #if (${col.isAvailableStringGreaterThan()})
 
