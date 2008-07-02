@@ -95,7 +95,7 @@ namespace ${glPackageBaseCQ} {
     #if (${col.isAvailableStringLikeSearch()})
 
         public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-            registerLikeSearchQuery(CK_LIKE_SEARCH, filterRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+            registerLikeSearchQuery(CK_LIKE_SEARCH, filterRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
     #end
     #if (${col.isAvailableStringInScope()})
