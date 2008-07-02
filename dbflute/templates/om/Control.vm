@@ -1286,11 +1286,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glOutsideSqlNotFoundException}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/exception/OutsideSqlNotFoundException.${glTemplateFileExtension}",$path,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('RequiredOptionNotFoundException');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRequiredOptionNotFoundException}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/exception/RequiredOptionNotFoundException.${glTemplateFileExtension}",$path,"", "")
-    #end
+    $database.info("    parse('RequiredOptionNotFoundException');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRequiredOptionNotFoundException}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/exception/RequiredOptionNotFoundException.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageJava())
       $database.info("    parseRecordHasAlreadyBeenDeletedException();")

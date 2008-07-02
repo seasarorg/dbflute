@@ -613,7 +613,7 @@ public class ${myClassName} {
                 _likeSearch.add(_likeSearch4Spare.get(index));
             }
         }
-        final LikeSearchValue likeSearchValue = new LikeSearchValue(value, option);
+        LikeSearchValue likeSearchValue = new LikeSearchValue(value, option);
         _likeSearch.add(likeSearchValue);
         _likeSearch4Spare.add(likeSearchValue);
         return this;
