@@ -35,7 +35,6 @@ namespace ${myExtendedDaoPackageName} {
 #end
         
         int SelectCount(${myAttachedCBArgsString});
-        ${myExtendedObjectClassName} SelectEntity(${myAttachedCBArgsString});
         IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
 
 #if ($table.hasPrimaryKey())

@@ -39,7 +39,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     public int selectCount(${myConditionBeanClassName} cb);
-    public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb);
     public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
 #if ($table.isWritable())
 

@@ -675,7 +675,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) { return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()}); }
 #end
     ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
-    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectEntity(cb); }
     ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
 #if ($table.isUseSequence())
     ${database.behaviorDelegateModifier} ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
