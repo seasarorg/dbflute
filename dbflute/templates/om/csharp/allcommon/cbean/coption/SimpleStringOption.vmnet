@@ -18,9 +18,9 @@ public class ${myClassName} : ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                           Rear Option
     //                                                                           ===========
-    public virtual String RearOption { get {
+    public virtual String getRearOption() {
         return "";
-    }}
+    }
 
     // =====================================================================================
     //                                                                                 Split

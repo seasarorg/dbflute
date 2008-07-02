@@ -19,12 +19,12 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
-    public override String RearOption { get {
+    public override String getRearOption() {
         if (_escape == null || _escape.Trim().Length == 0) {
             return "";
         }
         return " escape '" + _escape + "'";
-    }}
+    }
 
     // ===================================================================================
     //                                                                                Like
@@ -41,9 +41,6 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
         _like = LIKE_CONTAIN;
         return this;
     }
-	public bool IsLikeContain { get {
-	    return _like != null ? _like.Equals(LIKE_CONTAIN) : false;
-	}}
 
     // ===================================================================================
     //                                                                              Escape

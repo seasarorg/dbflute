@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommonCKey} {
 
 public class ${myClassName} : ${glConditionKeyName} {
 
-    protected ${myClassName}() {
+    public ${myClassName}() {
         _conditionKey = "likeSearch";
         _operand = "like";
     }
@@ -36,7 +36,7 @@ public class ${myClassName} : ${glConditionKeyName} {
             throw new IllegalArgumentException(msg);
         }
         ${glConditionOptionLikeSearchName} myOption = (${glConditionOptionLikeSearchName})option;
-        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.RearOption));
+        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.getRearOption()));
     }
 
     protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
