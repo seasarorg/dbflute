@@ -39,6 +39,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler;
@@ -54,6 +55,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
@@ -719,8 +721,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
-                    
-                    _log.info("    " + propertyType + " " + propertyName + "; // " + procedureColumnMetaInfo.getProcedureColumnType());
+
+                    _log.info("    " + propertyType + " " + propertyName + "; // "
+                            + procedureColumnMetaInfo.getProcedureColumnType());
                     ++index;
                 }
                 parameterBeanMetaData.setClassName(pmbName);
@@ -764,7 +767,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return allUpperCase;
     }
-    
+
     protected String generateUncapitalisedJavaName(String name) {
         return StringUtils.uncapitalise(NameFactory.generateJavaNameByMethodUnderscore(name));
     }
@@ -804,18 +807,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
                     + tbl.getUncapitalisedJavaName());
 
+            final boolean allCommonColumn = hasAllCommonColumn(columnJdbcTypeMap);
             final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
             for (String columnName : columnNameSet) {
-                final Column col = new Column();
-                setupColumnName(columnName, col);
-                setupPrimaryKey(entityName, columnName, col);
-                setupTorqueType(columnJdbcTypeMap, columnName, col);
-                setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, col);
-                setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, col);
+                final Column column = new Column();
+                setupColumnName(columnName, column);
+                setupPrimaryKey(entityName, columnName, column);
+                setupTorqueType(columnJdbcTypeMap, columnName, column, allCommonColumn);
+                setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
+                setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, column);
 
-                tbl.addColumn(col);
-                _log.info("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
-                        + col.getJavaName() + " : " + col.getUncapitalisedJavaName());
+                tbl.addColumn(column);
+                _log.info("   " + (column.isPrimaryKey() ? "*" : " ") + columnName + " --> " + column.getName() + " : "
+                        + column.getJavaName() + " : " + column.getUncapitalisedJavaName());
             }
             _log.info("");
         }
@@ -825,6 +829,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         VelocityContext context = createVelocityContext(appData);
         return context;
+    }
+
+    protected boolean hasAllCommonColumn(Map<String, DfColumnMetaInfo> columnJdbcTypeMap) {
+        Map<String, Object> commonColumnMap = getCommonColumnMap();
+        if (commonColumnMap.isEmpty()) {
+            return false;
+        }
+        DfFlexibleNameMap<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
+        Set<String> commonColumnSet = commonColumnMap.keySet();
+        for (String commonColumnName : commonColumnSet) {
+            if (!flexibleColumnJdbcTypeMap.containsKey(commonColumnName)) {
+                return false; // Not All!
+            }
+        }
+        return true;
     }
 
     protected void setupColumnName(String columnName, final Column col) {
@@ -845,11 +864,28 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         col.setPrimaryKey(primaryKeyList.contains(columnName));
     }
 
-    protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
-            final Column col) {
+    protected void setupTorqueType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column,
+            boolean allCommonColumn) {
+        if (allCommonColumn) {
+            final String commonColumnTorqueType = getCommonColumnTorqueType(columnName);
+            if (commonColumnTorqueType != null) {
+                column.setTorqueType(commonColumnTorqueType);
+                return;
+            }
+        }
         final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
         final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
-        col.setTorqueType(columnTorqueType);
+        column.setTorqueType(columnTorqueType);
+    }
+
+    protected String getCommonColumnTorqueType(String columnName) {
+        DfFlexibleNameMap<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
+        return (String) flexibleNameMap.get(columnName);
+    }
+
+    protected Map<String, Object> getCommonColumnMap() {
+        DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
+        return prop.getCommonColumnMap();
     }
 
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
@@ -898,6 +934,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         } else {
             return true;// Contains connector character!
         }
+    }
+
+    protected <KEY, VALUE> DfFlexibleNameMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
+        return new DfFlexibleNameMap<KEY, VALUE>(map);
     }
 
     // ===================================================================================

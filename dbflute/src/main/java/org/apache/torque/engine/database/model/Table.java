@@ -2398,7 +2398,6 @@ public class Table implements IDMethod {
     //                                                                       =============
     /**
      * Is this table defined all common columns?
-     * 
      * @return Determination.
      */
     public boolean hasAllCommonColumn() {
