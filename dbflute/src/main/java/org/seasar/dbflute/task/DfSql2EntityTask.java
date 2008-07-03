@@ -866,6 +866,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void setupTorqueType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column,
             boolean allCommonColumn) {
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // If the select columns have common columns, 
+        // The types of common column are set up from common column properties.
+        // - - - - - - - - - -/
         if (allCommonColumn) {
             final String commonColumnTorqueType = getCommonColumnTorqueType(columnName);
             if (commonColumnTorqueType != null) {
