@@ -249,11 +249,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             if (columnSize <= 0) {// Example: sum(COLUMN)
                                 columnSize = md.getColumnDisplaySize(i);
                             }
+                            final String columnTypeName = md.getColumnTypeName(i);
                             int scale = md.getScale(i);
+                            
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
                             metaInfo.setSql2EntityTableName(sql2EntityTableName);
                             metaInfo.setColumnName(columnName);
                             metaInfo.setJdbcType(columnType);
+                            metaInfo.setDbTypeName(columnTypeName);
                             metaInfo.setColumnSize(columnSize);
                             metaInfo.setDecimalDigits(scale);
                             columnJdbcTypeMap.put(columnName, metaInfo);
@@ -814,6 +817,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupColumnName(columnName, column);
                 setupPrimaryKey(entityName, columnName, column);
                 setupTorqueType(columnJdbcTypeMap, columnName, column, allCommonColumn);
+                setupDbType(columnJdbcTypeMap, columnName, column);
                 setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
                 setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, column);
 
@@ -880,6 +884,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
         final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
         column.setTorqueType(columnTorqueType);
+    }
+
+    protected void setupDbType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column) {
+        final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
+        column.setDbType(columnMetaInfo.getDbTypeName());
     }
 
     protected String getCommonColumnTorqueType(String columnName) {

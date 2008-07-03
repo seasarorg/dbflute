@@ -249,8 +249,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             return dbTypeName;
         }
 
-        public void setDbTypeName(String sqlTypeName) {
-            this.dbTypeName = sqlTypeName;
+        public void setDbTypeName(String dbTypeName) {
+            this.dbTypeName = dbTypeName;
         }
 
         public String getSql2EntityableName() {
