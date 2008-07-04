@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
         //                                                                      ==========
         protected static readonly IDbParameterParser _parser = new BasicDbParameterParser();
         protected static readonly string sqlLogDateFormat = "yyyy-MM-dd";
-        protected static readonly string sqlLogDateTimeFormat = "yyyy-MM-dd HH.mm.ss";
+        protected static readonly string sqlLogDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 		
     	// ===============================================================================
         //                                                                     Constructor
@@ -53,57 +53,34 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
         }
 
         protected static string GetBindVariableText(object bindVariable) {
-            if (bindVariable is INullable)
-            {
+            if (bindVariable is INullable) {
                 INullable nullable = bindVariable as INullable;
-                if (nullable.IsNull)
-                {
+                if (nullable.IsNull) {
                     return GetBindVariableText(null);
-                }
-                else
-                {
+                } else {
                     PropertyInfo pi = bindVariable.GetType().GetProperty("Value");
                     return GetBindVariableText(pi.GetValue(bindVariable, null));
                 }
-            }
-            else if (bindVariable is string)
-            {
+            } else if (bindVariable is string) {
                 return "'" + bindVariable + "'";
-            }
-            else if (bindVariable == null)
-            {
+            } else if (bindVariable == null) {
                 return "null";
-            }
-            else if (bindVariable.GetType().IsPrimitive)
-            {
+            } else if (bindVariable.GetType().IsPrimitive) {
                 return bindVariable.ToString();
-            }
-            else if (bindVariable is decimal)
-            {
+            } else if (bindVariable is decimal) {
                 return bindVariable.ToString();
-            }
-            else if (bindVariable is DateTime)
-            {
-                if ((DateTime) bindVariable == ((DateTime) bindVariable).Date)
-                {
+            } else if (bindVariable is DateTime) {
+                if ((DateTime) bindVariable == ((DateTime) bindVariable).Date) {
                     return "'" + ((DateTime) bindVariable).ToString(sqlLogDateFormat) + "'";
-                }
-                else
-                {
+                } else {
                     return "'" + ((DateTime) bindVariable).ToString(sqlLogDateTimeFormat) + "'";
                 }
-            }
-            else if (bindVariable is bool)
-            {
+            } else if (bindVariable is bool) {
                 return bindVariable.ToString();
-            }
-            else if (bindVariable.GetType().IsEnum)
-            {
+            } else if (bindVariable.GetType().IsEnum) {
                 object o = Convert.ChangeType(bindVariable, Enum.GetUnderlyingType(bindVariable.GetType()));
                 return o.ToString();
-            }
-            else
-            {
+            } else {
                 return "'" + bindVariable + "'";
             }
         }
