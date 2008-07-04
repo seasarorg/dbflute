@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
         //                                                                      ==========
         protected static readonly IDbParameterParser _parser = new BasicDbParameterParser();
         protected static readonly string sqlLogDateFormat = "yyyy-MM-dd";
-        protected static readonly string sqlLogDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        protected static readonly string sqlLogDateTimeFormat = "yyyy-MM-dd HH.mm.ss";
 		
     	// ===============================================================================
         //                                                                     Constructor
