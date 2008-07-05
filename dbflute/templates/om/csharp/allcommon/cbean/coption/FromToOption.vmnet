@@ -46,7 +46,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                       Internal Main
     //                                                                       =============
-    public java.util.Date filterFromDate(java.util.Date fromDate) {
+    public DateTime? filterFromDate(DateTime? fromDate) {
         if (fromDate == null) {
             return null;
         }
@@ -54,14 +54,14 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             final java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTimeInMillis(fromDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
-            final java.util.Date cloneDate = (java.util.Date) fromDate.clone();
+            final DateTime cloneDate = (DateTime) fromDate.clone();
             cloneDate.setTime(cal.getTimeInMillis());
             return cloneDate;
         }
         return fromDate;
     }
 
-    public java.util.Date filterToDate(java.util.Date toDate) {
+    public DateTime? filterToDate(DateTime? toDate) {
         if (toDate == null) {
             return null;
         }
@@ -70,7 +70,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             cal.setTimeInMillis(toDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
             addCalendarNextDay(cal);// Key Point!
-            final java.util.Date cloneDate = (java.util.Date) toDate.clone();
+            final DateTime cloneDate = (DateTime) toDate.clone();
             cloneDate.setTime(cal.getTimeInMillis());
             return cloneDate;
         }

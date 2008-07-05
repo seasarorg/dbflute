@@ -3,7 +3,7 @@
 using System;
 
 using ${glPackageBaseCommonJavaLike};
-usig ${glPackageBaseCommonCBeanPagenavi};
+using ${glPackageBaseCommonCBeanPagenavi};
 
 namespace ${glPackageBaseCommonCBeanPagenaviRange} {
 

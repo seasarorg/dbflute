@@ -96,9 +96,9 @@ namespace ${glPackageBaseCommonCBean} {
             if (_pageRangeBean == null) {
                 _pageRangeBean = new ${glPageRangeBeanName}();
             }
-            _pageRangeBean.PageRangeOption = _pageRangeOption);
-            _pageRangeBean.CurrentPageNumber = CurrentPageNumber);
-            _pageRangeBean.AllPageCount = AllPageCount);
+            _pageRangeBean.PageRangeOption = _pageRangeOption;
+            _pageRangeBean.CurrentPageNumber = CurrentPageNumber;
+            _pageRangeBean.AllPageCount = AllPageCount;
             return _pageRangeBean;
         }
     
@@ -133,14 +133,14 @@ namespace ${glPackageBaseCommonCBean} {
                 String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
                 throw new IllegalStateException(msg);
             }
-            if (_pageGroupOption.PageGroupSiz) == 0) {
+            if (_pageGroupOption.PageGroupSize) == 0) {
                 String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
-                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                msg = msg + " pageGroupSize=" + _pageGroupOption.PageGroupSize;
                 throw new IllegalStateException(msg);
             }
             if (_pageGroupOption.PageGroupSize == 1) {
                 String msg = "The pageGroupSize should be greater than 1. But the value is one.";
-                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                msg = msg + " pageGroupSize=" + _pageGroupOption.PageGroupSize;
                 throw new IllegalStateException(msg);
             }
         }
