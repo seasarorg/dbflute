@@ -990,15 +990,13 @@ targetdatabase = $targetDatabase
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi}))
     $database.makeDirectory($path)
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('PageNumberLink');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLink.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('PageNumberLink');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLink.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parse('PageNumberLinkSetupper');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkSetupperName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLinkSetupper.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parse('PageNumberLinkSetupper');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkSetupperName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLinkSetupper.${glTemplateFileExtension}",$path ,"", "")
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup}))
     $database.makeDirectory($path)
