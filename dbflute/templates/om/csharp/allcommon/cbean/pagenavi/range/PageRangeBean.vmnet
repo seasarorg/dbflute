@@ -43,11 +43,11 @@ public class ${myClassName} {
             resultList.Add(i);
         }
 
-        resultList.add(new Integer(currentPageNumber));
+        resultList.Add(currentPageNumber);
 
         int endPageNumber = (currentPageNumber + pageRangeSize);
         for (int i = currentPageNumber + 1 ; i <= endPageNumber && i <= allPageCount; i++) {
-            resultList.add(i);
+            resultList.Add(i);
         }
 
         bool fillLimit = PageRangeOption.IsFillLimit;
@@ -57,7 +57,7 @@ public class ${myClassName} {
             int lastElements = resultList[resultList.Count - 1];
             if (firstElements > 1) {
                 for (int i = firstElements - 1 ; resultList.Count < limitSize && i > 0; i--) {
-                    resultList.Add(0, i);
+                    resultList.Insert(0, i);
                 }
             }
             for (int i = lastElements + 1 ; resultList.Count < limitSize && i <= allPageCount; i++) {
@@ -69,7 +69,7 @@ public class ${myClassName} {
 
     public int[] CreatePageNumberArray() {
         AssertPageRangeValid();
-        return ConvertListToIntArray(createPageNumberList());
+        return ConvertListToIntArray(CreatePageNumberList());
     }
 
     public bool IsExistPrePageRange() {
@@ -87,7 +87,7 @@ public class ${myClassName} {
         if (array.Length == 0) {
             return false;
         }
-        return array[array.Length-1] < _allPageCount;
+        return array[array.Length-1] < AllPageCount;
     }
 
     // ===================================================================================

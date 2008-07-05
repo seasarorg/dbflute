@@ -31,7 +31,7 @@ public class ${myClassName} {
 
     public int CalculateStartPageNumber() {
         AssertPageGroupValid();
-        int pageGroupSize = PageGroupOption.getPageGroupSize();
+        int pageGroupSize = PageGroupOption.PageGroupSize;
         int currentPageNumber = CurrentPageNumber;
 
         int currentPageGroupNumber = (currentPageNumber / pageGroupSize);

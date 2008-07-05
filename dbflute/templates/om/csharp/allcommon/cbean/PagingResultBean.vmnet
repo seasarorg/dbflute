@@ -184,8 +184,8 @@ namespace ${glPackageBaseCommonCBean} {
             sb.append(" listSize=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
             sb.append(" pageSize=").append(this.PageSize);
             sb.append(" page:{").append(IsExistPrePage()).append("/").append(IsExistNextPage()).append("}");
-            sb.append(" groupSize=").append(this.PageGroupSize);
-            sb.append(" rangeSize=").append(this.PageRangeSize);
+            sb.append(" groupSize=").append(_pageGroupBean);
+            sb.append(" rangeSize=").append(_pageRangeBean);
 
             return sb.toString();
         }
