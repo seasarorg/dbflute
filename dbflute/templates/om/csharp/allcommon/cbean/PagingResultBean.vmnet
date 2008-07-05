@@ -3,6 +3,7 @@
 using System;
 using System.Text;
 
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonCBeanPagenaviGroup};
 using ${glPackageBaseCommonCBeanPagenaviRange};
@@ -30,7 +31,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected ${glPageRangeBeanName} _pageRangeBean;
         protected ${glPageRangeOptionName} _pageRangeOption;
         protected ${glPageGroupBeanName} _pageGroupBean;
-        protected ${glPageGroupOptioname} _pageGroupOption;
+        protected ${glPageGroupOptionName} _pageGroupOption;
 
         #endregion
 
