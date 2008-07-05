@@ -20,14 +20,14 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    // public <LINK> System.Collections.Generic.IList<LINK> BuildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLinkName} {
-    //     System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
-    //     System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
-    //     foreach (int pageNumber in pageNumberList) {
-    //         pageNumberLinkList.Add(pageNumberLinkSetupper.Invoke(pageNumber, pageNumber == CurrentPageNumber));
-    //     }
-    //     return pageNumberLinkList;
-    // }
+    public System.Collections.Generic.IList<LINK> BuildPageNumberLinkList<LINK>(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLinkName} {
+        System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
+        System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
+        foreach (int pageNumber in pageNumberList) {
+            pageNumberLinkList.Add(pageNumberLinkSetupper.Invoke(pageNumber, pageNumber == CurrentPageNumber));
+        }
+        return pageNumberLinkList;
+    }
 
     public System.Collections.Generic.IList<int> CreatePageNumberList() {
         AssertPageRangeValid();

@@ -11,9 +11,9 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                         Initializer
     //                                                                         ===========
-    public ${myClassName} Initialize(int pageNumberElement, boolean current, String pageNumberLinkHref) {
+    public ${myClassName} Initialize(int pageNumberElement, bool current, String pageNumberLinkHref) {
         PageNumberElement = pageNumberElement;
-        Current = current;
+        IsCurrent = current;
         PageNumberLinkHref = pageNumberLinkHref;
         return this;
     }
