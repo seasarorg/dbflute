@@ -46,7 +46,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             return null;
         }
         if (_compareAsDate) {
-            fromDate.Add();
+            DateTime cloneDate = new DateTime(fromDate.Value.Year, fromDate.Value.Month, fromDate.Value.Day);
             return cloneDate;
         }
         return fromDate;
@@ -57,7 +57,8 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             return null;
         }
         if (_compareAsDate) {
-            fromDate.Add();
+            DateTime cloneDate = new DateTime(toDate.Value.Year, toDate.Value.Month, toDate.Value.Day);
+            cloneDate.AddDays(1);
             return cloneDate;
         }
         return toDate;
@@ -83,20 +84,6 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
         } else {
             return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
         }
-    }
-
-    // ===================================================================================
-    //                                                                     Calendar Helper
-    //                                                                     ===============
-    protected void addCalendarNextDay(java.util.Calendar cal) {
-        cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
-    }
-
-    protected void clearCalendarHourMinuteSecondMilli(java.util.Calendar cal) {
-        cal.clear(java.util.Calendar.MILLISECOND);
-        cal.clear(java.util.Calendar.SECOND);
-        cal.clear(java.util.Calendar.MINUTE);
-        cal.set(java.util.Calendar.HOUR_OF_DAY, cal.getActualMinimum(java.util.Calendar.HOUR_OF_DAY));
     }
 }
 

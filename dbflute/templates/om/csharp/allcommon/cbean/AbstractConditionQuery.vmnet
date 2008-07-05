@@ -279,6 +279,24 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
+    protected void registerFromToQuery(DateTime? fromDate, DateTime? toDate, ${glConditionValueName} cvalue
+                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
+        {
+            DateTime? filteredFromDate = option.filterFromDate(fromDate);
+            ${glConditionKeyName} fromKey = option.getFromDateConditionKey();
+            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName, capPropName, uncapPropName);
+            }
+        }
+        {
+            DateTime? filteredToDate = option.filterToDate(toDate);
+            ${glConditionKeyName} toKey = option.getToDateConditionKey();
+            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName, capPropName, uncapPropName);
+            }
+        }
+    }
+	
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------

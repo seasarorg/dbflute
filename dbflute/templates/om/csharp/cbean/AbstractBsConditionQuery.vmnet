@@ -430,7 +430,16 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             reg${tmpJavaName}(CK_LE, value);
         }
-    #end
+	#end
+#if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
+        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
+            registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
+        }
+        public void Set${tmpJavaName}_DateFromTo(DateTime? fromDate, DateTime? toDate) {
+            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glConditionOptionDateFromToName}());
+        }
+#end
+
   #end
   #if (${col.isJavaNativeBooleanObject()})
   
