@@ -72,23 +72,23 @@ public class ${myClassName} {
         return ConvertListToIntArray(createPageNumberList());
     }
 
-    public bool IsExistPrePageRange { get {
+    public bool IsExistPrePageRange() {
         AssertPageRangeValid();
         int[] array = CreatePageNumberArray();
         if (array.Length == 0) {
             return false;
         }
         return array[0] > 1;
-    }}
+    }
 
-    public bool IsExistNextPageRange { get {
+    public bool IsExistNextPageRange() {
         AssertPageRangeValid();
         int[] array = CreatePageNumberArray();
         if (array.Length == 0) {
             return false;
         }
         return array[array.Length-1] < _allPageCount;
-    }}
+    }
 
     // ===================================================================================
     //                                                                       Assist Helper

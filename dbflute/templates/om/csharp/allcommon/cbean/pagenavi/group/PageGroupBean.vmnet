@@ -73,12 +73,12 @@ public class ${myClassName} {
         return ConvertListToIntArray(CreatePageNumberList());
     }
 
-    public bool IsExistPrePageGroup { get {
+    public bool IsExistPrePageGroup() {
         AssertPageGroupValid();
         return (CurrentPageNumber > PageGroupOption.PageGroupSize);
-    }}
+    }
 
-    public bool IsExistNextPageGroup { get {
+    public bool IsExistNextPageGroup() {
         AssertPageGroupValid();
         int currentPageGroupStartPageNumber = CalculateStartPageNumber();
         if (!(currentPageGroupStartPageNumber > 0)) {
@@ -88,7 +88,7 @@ public class ${myClassName} {
         }
         int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + PageGroupOption.PageGroupSize;
         return (nextPageGroupStartPageNumber <= AllPageCount);
-    }}
+    }
 
     // ===================================================================================
     //                                                                       Assist Helper

@@ -16,7 +16,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    public overirde String ToString() {
+    public override String ToString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(" pageGroupSize=").append(PageGroupSize);

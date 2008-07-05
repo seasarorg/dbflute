@@ -8,10 +8,6 @@ namespace ${glPackageBaseCommonCOption} {
 
 public class ${myClassName} : ${glConditionOptionSimpleStringName} {
 
-    public static readonly String LIKE_PREFIX = "prefix";
-    public static readonly String LIKE_SUFFIX = "suffix";
-    public static readonly String LIKE_CONTAIN = "contain";
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -50,11 +46,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             return null;
         }
         if (_compareAsDate) {
-            final java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.setTimeInMillis(fromDate.getTime());
-            clearCalendarHourMinuteSecondMilli(cal);
-            final DateTime cloneDate = (DateTime) fromDate.clone();
-            cloneDate.setTime(cal.getTimeInMillis());
+            fromDate.Add();
             return cloneDate;
         }
         return fromDate;
@@ -65,12 +57,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             return null;
         }
         if (_compareAsDate) {
-            final java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.setTimeInMillis(toDate.getTime());
-            clearCalendarHourMinuteSecondMilli(cal);
-            addCalendarNextDay(cal);// Key Point!
-            final DateTime cloneDate = (DateTime) toDate.clone();
-            cloneDate.setTime(cal.getTimeInMillis());
+            fromDate.Add();
             return cloneDate;
         }
         return toDate;
