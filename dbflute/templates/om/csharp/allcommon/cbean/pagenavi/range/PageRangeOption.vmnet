@@ -1,0 +1,30 @@
+#set ($myClassName = "${glPageRangeOptionName}")
+
+using System;
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCBeanPagenaviRange} {
+
+[System.Serializable]
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    public int PageRangeSize { get; set; }
+    public bool IsFillLimit { get; set; }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" pageRangeSize=").append(PageRangeSize);
+        sb.append(" fillLimit=").append(IsFillLimit);
+
+        return sb.toString();
+    }
+}
+
+}

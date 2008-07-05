@@ -1,0 +1,137 @@
+#set ($myClassName = "${glPageGroupBeanName}")
+
+using System;
+
+using ${glPackageBaseCommonJavaLike};
+usig ${glPackageBaseCommonCBeanPagenavi};
+
+namespace ${glPackageBaseCommonCBeanPagenaviGroup} {
+
+[System.Serializable]
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    public int CurrentPageNumber { get; set; }
+    public int AllPageCount { get; set; }
+    public ${glPageGroupOptionName} PageGroupOption { get; set; }
+
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    // public <LINK> List<LINK> BuildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) where : ${glPageNumberLinkName} {
+    //     System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
+    //     System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
+    //     foreach (int pageNumber in pageNumberList) {
+    //         pageNumberLinkList.Add(pageNumberLinkSetupper.Invoke(pageNumber, pageNumber == CurrentPageNumber));
+    //     }
+    //     return pageNumberLinkList;
+    // }
+
+    public int CalculateStartPageNumber() {
+        assertPageGroupValid();
+        int pageGroupSize = PageGroupOption.getPageGroupSize();
+        int currentPageNumber = CurrentPageNumber;
+
+        int currentPageGroupNumber = (currentPageNumber / pageGroupSize);
+        if ((currentPageNumber % pageGroupSize) == 0)
+        {
+            currentPageGroupNumber--;
+        }
+        int currentPageGroupStartPageNumber = (pageGroupSize * currentPageGroupNumber) + 1;
+        if (!(currentPageNumber >= currentPageGroupStartPageNumber)) {
+            String msg = "currentPageNumber should be greater equal currentPageGroupStartPageNumber. But:";
+            msg = msg + " currentPageNumber=" + currentPageNumber;
+            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        return currentPageGroupStartPageNumber;
+    }
+
+    public System.Collections.Generic.IList<int> CreatePageNumberList() {
+        assertPageGroupValid();
+        int pageGroupSize = PageGroupOption.PageGroupSize;
+        int allPageCount = AllPageCount;
+        int currentPageGroupStartPageNumber = CalculateStartPageNumber();
+        if (!(currentPageGroupStartPageNumber > 0)) {
+            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
+
+        System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
+        for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
+            resultList.add(i);
+        }
+        return resultList;
+    }
+
+    public int[] CreatePageNumberArray() {
+        assertPageGroupValid();
+        return convertListToIntArray(CreatePageNumberList());
+    }
+
+    public bool IsExistPrePageGroup { get {
+        assertPageGroupValid();
+        return (CurrentPageNumber > PageGroupOption.PageGroupSize);
+    }}
+
+    public bool IsExistNextPageGroup { get {
+        assertPageGroupValid();
+        int currentPageGroupStartPageNumber = CalculateStartPageNumber();
+        if (!(currentPageGroupStartPageNumber > 0)) {
+            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + PageGroupOption.PageGroupSize;
+        return (nextPageGroupStartPageNumber <= AllPageCount);
+    }}
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected int[] convertListToIntArray(System.Collections.Generic.IList<int> ls) {
+        int[] resultArray = new int[ls.Count];
+        int arrayIndex = 0;
+        foreach (int pageNumber in ls) {
+            resultArray[arrayIndex] = pageNumber;
+            arrayIndex++;
+        }
+        return resultArray;
+    }
+
+    protected void assertPageGroupValid() {
+        if (PageGroupOption == null) {
+            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            throw new IllegalStateException(msg);
+        }
+        if (PageGroupOption.PageGroupSize == 0) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+            msg = msg + " pageGroupSize=" + PageGroupOption.PageGroupSize;
+            throw new IllegalStateException(msg);
+        }
+        if (PageGroupOption.PageGroupSize == 1) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+            msg = msg + " pageGroupSize=" + PageGroupOption.PageGroupSize;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" currentPageNumber=").append(CurrentPageNumber);
+        sb.append(" allPageCount=").append(AllPageCount);
+        sb.append(" pageGroupOption=").append(PageGroupOption);
+
+        return sb.toString();
+    }
+}
+
+}

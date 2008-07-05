@@ -985,10 +985,10 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                    allcommon condition-bean page-navi
     ##                    ----------------------------------
-    #if ($database.isTargetLanguageJava())
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi}))
-      $database.makeDirectory($path)
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi}))
+    $database.makeDirectory($path)
 
+    #if ($database.isTargetLanguageJava())
       $database.info("    parse('PageNumberLink');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLink.${glTemplateFileExtension}",$path ,"", "")
@@ -996,29 +996,29 @@ targetdatabase = $targetDatabase
       $database.info("    parse('PageNumberLinkSetupper');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkSetupperName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLinkSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('PageGroupBean');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupBeanName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupBean.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parse('PageGroupOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupOptionName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupOption.${glTemplateFileExtension}",$path ,"", "")
-
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('PageRangeBean');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeBeanName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeBean.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parse('PageRangeOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeOptionName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeOption.${glTemplateFileExtension}",$path ,"", "")
     #end
+
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup}))
+    $database.makeDirectory($path)
+
+    $database.info("    parse('PageGroupBean');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupBeanName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupBean.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('PageGroupOption');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupOptionName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupOption.${glTemplateFileExtension}",$path ,"", "")
+
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange}))
+    $database.makeDirectory($path)
+
+    $database.info("    parse('PageRangeBean');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeBeanName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeBean.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('PageRangeOption');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeOptionName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeOption.${glTemplateFileExtension}",$path ,"", "")
 
     ## -------------------------------------------------------
     ##                     allcommon condition-bean sql-clause

@@ -1,0 +1,42 @@
+#set ($myClassName = "${glPageNumberLinkName}")
+
+using System;
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCBeanPagenavi} {
+
+[System.Serializable]
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                         Initializer
+    //                                                                         ===========
+    public ${myClassName} Initialize(int pageNumberElement, boolean current, String pageNumberLinkHref) {
+        PageNumberElement = pageNumberElement;
+        Current = current;
+        PageNumberLinkHref = pageNumberLinkHref;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" pageNumberElement=").append(PageNumberElement);
+        sb.append(" pageNumberLinkHref=").append(PageNumberLinkHref);
+        sb.append(" current=").append(IsCurrent);
+
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public int PageNumberElement { get; set; }
+    public bool IsCurrent { get; set; }
+    public String PageNumberLinkHref { get; set; }
+}
+
+}
