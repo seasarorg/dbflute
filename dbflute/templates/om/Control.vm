@@ -837,15 +837,17 @@ targetdatabase = $targetDatabase
       $database.info("    parse('SimpleStringOption')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
+	#end
 
-      $database.info("    parse('FromToOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/FromToOption.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('FromToOption');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/FromToOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parse('DateFromToOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionDateFromToName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/DateFromToOption.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('DateFromToOption');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionDateFromToName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/DateFromToOption.${glTemplateFileExtension}",$path ,"", "")
 
+    #if ($database.isTargetLanguageJava())
       $database.info("    parseLikeSearchOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
