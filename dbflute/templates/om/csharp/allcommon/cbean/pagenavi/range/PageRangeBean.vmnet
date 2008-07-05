@@ -1,4 +1,4 @@
-#set ($myClassName = "${glPageRangeBean}")
+#set ($myClassName = "${glPageRangeBeanName}")
 
 using System;
 

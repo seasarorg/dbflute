@@ -4,6 +4,8 @@ using System;
 using System.Text;
 
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonCBeanPagenaviGroup};
+using ${glPackageBaseCommonCBeanPagenaviRange};
 
 namespace ${glPackageBaseCommonCBean} {
 
@@ -25,11 +27,10 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>The value of current page number.</summary>
         protected int _currentPageNumber;
 
-        /// <summary>The value of page-group size.</summary>
-        protected int _pageGroupSize = 0;
-
-        /// <summary>The value of page-range size.</summary>
-        protected int _pageRangeSize = 0;
+        protected ${glPageRangeBeanName} _pageRangeBean;
+        protected ${glPageRangeOptionName} _pageRangeOption;
+        protected ${glPageGroupBeanName} _pageGroupBean;
+        protected ${glPageGroupOptioname} _pageGroupOption;
 
         #endregion
 
@@ -51,65 +52,98 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                              ========
         #region Property
 
-        /// <summary>
-        /// The property of page size.
-        /// </summary>
         public int PageSize {
             get { return _pageSize; }
             set { _pageSize = value; }
         }
 
-        /// <summary>
-        /// The property of current page number.
-        /// </summary>
         public int CurrentPageNumber {
             get { return _currentPageNumber; }
             set { _currentPageNumber = value; }
         }
 
-        /// <summary>
-        /// The property of all page count.
-        /// </summary>
         public int AllPageCount {
             get { return CalculateAllPageCount(_allRecordCount, _pageSize); }
         }
 
-        /**
-         * Get the value of currentStartRecordNumber.
-         * 
-         * @return The value of currentStartRecordNumber.
-         */
         public int CurrentStartRecordNumber {
             get { return CalculateCurrentStartRecordNumber(_currentPageNumber, _pageSize); }
         }
 
-        /**
-         * Get the value of currentEndRecordNumber.
-         * 
-         * @return The value of currentEndRecordNumber.
-         */
         public int CurrentEndRecordNumber {
             get { return CalculateCurrentEndRecordNumber(_currentPageNumber, _pageSize); }
         }
 
-        /// <summary>
-        /// The property of page-group size.
-        /// </summary>
-        public int PageGroupSize {
-            get { return _pageGroupSize; }
-            set { _pageGroupSize = value; }
+        public ${glPageRangeOptionName} PageRangeOption {
+            set { _pageRangeOption = value; }
         }
 
-        /// <summary>
-        /// The property of range-group size.
-        /// </summary>
-        public int PageRangeSize {
-            get { return _pageRangeSize; }
-            set { _pageRangeSize = value; }
+        public ${glPageGroupOptionName} PageGroupOption {
+            set { _pageGroupOption = value; }
         }
 
         #endregion
 
+        // ===============================================================================
+        //                                                                Page Group/Range
+        //                                                                ================
+        // -------------------------------------------------
+        //                                        Page Range
+        //                                        ----------
+        public ${glPageRangeBeanName} PageRange() {
+            AssertPageRangeValid();
+            if (_pageRangeBean == null) {
+                _pageRangeBean = new ${glPageRangeBeanName}();
+            }
+            _pageRangeBean.PageRangeOption = _pageRangeOption);
+            _pageRangeBean.CurrentPageNumber = CurrentPageNumber);
+            _pageRangeBean.AllPageCount = AllPageCount);
+            return _pageRangeBean;
+        }
+    
+        protected void AssertPageRangeValid() {
+            if (_pageRangeOption == null) {
+                String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+                throw new IllegalStateException(msg);
+            }
+            int pageRangeSize = _pageRangeOption.PageRangeSize;
+            if (pageRangeSize == 0) {
+                String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
+                throw new IllegalStateException(msg);
+            }
+        }
+
+        // -------------------------------------------------
+        //                                        Page Group
+        //                                        ----------
+        public ${glPageGroupBeanName} PageGroup() {
+            AssertPageGroupValid();
+            if (_pageGroupBean == null) {
+                _pageGroupBean = new ${glPageGroupBeanName}();
+            }
+            _pageGroupBean.PageGroupOption = _pageGroupOption;
+            _pageGroupBean.CurrentPageNumber = CurrentPageNumber;
+            _pageGroupBean.AllPageCount = AllPageCount;
+            return _pageGroupBean;
+        }
+    
+        protected void AssertPageGroupValid() {
+            if (_pageGroupOption == null) {
+                String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+                throw new IllegalStateException(msg);
+            }
+            if (_pageGroupOption.PageGroupSiz) == 0) {
+                String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                throw new IllegalStateException(msg);
+            }
+            if (_pageGroupOption.PageGroupSize == 1) {
+                String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                throw new IllegalStateException(msg);
+            }
+        }
+	
         // =====================================================================================
         //                                                                             Calculate
         //                                                                             =========
@@ -137,20 +171,10 @@ namespace ${glPackageBaseCommonCBean} {
             return CalculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.Count - 1;
         }
 
-        /// <summary>
-        /// Is existing previous page?
-        /// Using values are currentPageNumber.
-        /// </summary>
-        /// <returns>Determination.</returns>
         public bool IsExistPrePage() {
             return (_allRecordCount > 0 && _currentPageNumber > 1);
         }
 
-        /// <summary>
-        /// Is existing next page?
-        /// Using values are currentPageNumber and allPageCount.
-        /// </summary>
-        /// <returns>Determination.</returns>
         public bool IsExistNextPage() {
             return (_allRecordCount > 0 && _currentPageNumber < this.AllPageCount);
         }
