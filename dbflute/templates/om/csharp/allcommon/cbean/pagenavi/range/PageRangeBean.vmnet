@@ -30,7 +30,7 @@ public class ${myClassName} {
     // }
 
     public System.Collections.Generic.IList<int> CreatePageNumberList() {
-        assertPageRangeValid();
+        AssertPageRangeValid();
         int pageRangeSize = PageRangeOption.PageRangeSize;
         int allPageCount = AllPageCount;
         int currentPageNumber = CurrentPageNumber;
@@ -57,23 +57,23 @@ public class ${myClassName} {
             int lastElements = resultList[resultList.Count - 1];
             if (firstElements > 1) {
                 for (int i = firstElements - 1 ; resultList.Count < limitSize && i > 0; i--) {
-                    resultList.add(0, i);
+                    resultList.Add(0, i);
                 }
             }
             for (int i = lastElements + 1 ; resultList.Count < limitSize && i <= allPageCount; i++) {
-                resultList.add(i);
+                resultList.Add(i);
             }
         }
         return resultList;
     }
 
     public int[] CreatePageNumberArray() {
-        assertPageRangeValid();
-        return convertListToIntArray(createPageNumberList());
+        AssertPageRangeValid();
+        return ConvertListToIntArray(createPageNumberList());
     }
 
     public bool IsExistPrePageRange { get {
-        assertPageRangeValid();
+        AssertPageRangeValid();
         int[] array = CreatePageNumberArray();
         if (array.Length == 0) {
             return false;
@@ -82,7 +82,7 @@ public class ${myClassName} {
     }}
 
     public bool IsExistNextPageRange { get {
-        assertPageRangeValid();
+        AssertPageRangeValid();
         int[] array = CreatePageNumberArray();
         if (array.Length == 0) {
             return false;
@@ -93,7 +93,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected int[] convertListToIntArray(System.Collections.Generic.IList<int> ls) {
+    protected int[] ConvertListToIntArray(System.Collections.Generic.IList<int> ls) {
         int[] resultArray = new int[ls.Count];
         int arrayIndex = 0;
         foreach (int pageNumber in ls) {
@@ -103,7 +103,7 @@ public class ${myClassName} {
         return resultArray;
     }
 
-    protected void assertPageRangeValid() {
+    protected void AssertPageRangeValid() {
         if (PageRangeOption == null) {
             String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
             throw new IllegalStateException(msg);

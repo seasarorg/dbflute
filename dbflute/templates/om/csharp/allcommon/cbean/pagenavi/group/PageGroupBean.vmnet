@@ -30,7 +30,7 @@ public class ${myClassName} {
     // }
 
     public int CalculateStartPageNumber() {
-        assertPageGroupValid();
+        AssertPageGroupValid();
         int pageGroupSize = PageGroupOption.getPageGroupSize();
         int currentPageNumber = CurrentPageNumber;
 
@@ -50,7 +50,7 @@ public class ${myClassName} {
     }
 
     public System.Collections.Generic.IList<int> CreatePageNumberList() {
-        assertPageGroupValid();
+        AssertPageGroupValid();
         int pageGroupSize = PageGroupOption.PageGroupSize;
         int allPageCount = AllPageCount;
         int currentPageGroupStartPageNumber = CalculateStartPageNumber();
@@ -63,23 +63,23 @@ public class ${myClassName} {
 
         System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
         for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
-            resultList.add(i);
+            resultList.Add(i);
         }
         return resultList;
     }
 
     public int[] CreatePageNumberArray() {
-        assertPageGroupValid();
-        return convertListToIntArray(CreatePageNumberList());
+        AssertPageGroupValid();
+        return ConvertListToIntArray(CreatePageNumberList());
     }
 
     public bool IsExistPrePageGroup { get {
-        assertPageGroupValid();
+        AssertPageGroupValid();
         return (CurrentPageNumber > PageGroupOption.PageGroupSize);
     }}
 
     public bool IsExistNextPageGroup { get {
-        assertPageGroupValid();
+        AssertPageGroupValid();
         int currentPageGroupStartPageNumber = CalculateStartPageNumber();
         if (!(currentPageGroupStartPageNumber > 0)) {
             String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
@@ -93,7 +93,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected int[] convertListToIntArray(System.Collections.Generic.IList<int> ls) {
+    protected int[] ConvertListToIntArray(System.Collections.Generic.IList<int> ls) {
         int[] resultArray = new int[ls.Count];
         int arrayIndex = 0;
         foreach (int pageNumber in ls) {
@@ -103,7 +103,7 @@ public class ${myClassName} {
         return resultArray;
     }
 
-    protected void assertPageGroupValid() {
+    protected void AssertPageGroupValid() {
         if (PageGroupOption == null) {
             String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
             throw new IllegalStateException(msg);
