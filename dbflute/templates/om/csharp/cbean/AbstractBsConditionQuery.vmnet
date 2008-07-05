@@ -396,41 +396,35 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #end
-  #if (${col.isJavaNativeDateObject()})
-  
+#if (${col.isJavaNativeDateObject()})
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
-    #if (${col.isAvailableDateNotEqual()})
-
+#if (${col.isAvailableDateNotEqual()})
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             reg${tmpJavaName}(CK_NE, value);
         }
-    #end
-    #if (${col.isAvailableDateGreaterThan()})
-
+#end
+#if (${col.isAvailableDateGreaterThan()})
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             reg${tmpJavaName}(CK_GT, value);
         }
-    #end
-    #if (${col.isAvailableDateLessThan()})
-
+#end
+#if (${col.isAvailableDateLessThan()})
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
             reg${tmpJavaName}(CK_LT, value);
         }
-    #end
-    #if (${col.isAvailableDateGreaterEqual()})
-
+#end
+#if (${col.isAvailableDateGreaterEqual()})
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
             reg${tmpJavaName}(CK_GE, value);
         }
-    #end
-    #if (${col.isAvailableDateLessEqual()})
-
+#end
+#if (${col.isAvailableDateLessEqual()})
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             reg${tmpJavaName}(CK_LE, value);
         }
-	#end
+#end
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
         public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
             registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
@@ -439,8 +433,7 @@ namespace ${glPackageBaseCQ} {
             Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glConditionOptionDateFromToName}());
         }
 #end
-
-  #end
+#end
   #if (${col.isJavaNativeBooleanObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {

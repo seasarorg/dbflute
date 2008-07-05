@@ -58,8 +58,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
         }
         if (_compareAsDate) {
             DateTime cloneDate = new DateTime(toDate.Value.Year, toDate.Value.Month, toDate.Value.Day);
-            cloneDate.AddDays(1);
-            return cloneDate;
+            return cloneDate.AddDays(1);
         }
         return toDate;
     }
