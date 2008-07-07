@@ -11,8 +11,10 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    public int PageRangeSize { get; set; }
-    public bool IsFillLimit { get; set; }
+    public int _pageRangeSize;
+    public int PageRangeSize { get { return _pageRangeSize; } set { _pageRangeSize = value; } }
+    public bool _isFillLimit;
+    public bool IsFillLimit { get { return _isFillLimit; } set { _isFillLimit = value; } }
 
     // ===================================================================================
     //                                                                      Basic Override

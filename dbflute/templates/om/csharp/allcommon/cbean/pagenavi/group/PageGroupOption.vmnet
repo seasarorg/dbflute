@@ -11,7 +11,8 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    public int PageGroupSize { get; set; }
+    public int _pageGroupSize;
+    public int PageGroupSize { get { return _pageGroupSize; } set { _pageGroupSize = value; } }
 
     // ===================================================================================
     //                                                                      Basic Override
