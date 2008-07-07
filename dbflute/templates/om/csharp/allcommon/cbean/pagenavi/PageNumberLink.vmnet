@@ -34,9 +34,12 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public int PageNumberElement { get; set; }
-    public bool IsCurrent { get; set; }
-    public String PageNumberLinkHref { get; set; }
+    public int _pageNumberElement;
+    public int PageNumberElement { get { return _pageNumberElement; } set { _pageNumberElement = value; } }
+    public bool _isCurrent;
+    public bool IsCurrent { get { return _isCurrent; } set { _isCurrent = value; } }
+    public String _pageNumberLinkHref;
+    public String PageNumberLinkHref { get { return _pageNumberLinkHref; } set { _pageNumberLinkHref = value; } }
 }
 
 }

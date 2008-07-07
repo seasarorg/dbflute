@@ -833,11 +833,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('SimpleStringOption')")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parse('SimpleStringOption')")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
 	
     $database.info("    parse('FromToOption');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
