@@ -823,22 +823,22 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}IsNotNull.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_isNotNull.${glTemplateFileExtension}",$path ,"", "")
 
+    ## -----------------------------------------------------
+    ##             allcommon condition-bean condition-option
+    ##             -----------------------------------------
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
+    $database.makeDirectory($path)
+
+    $database.info("    parseConditionOption")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
+
     #if ($database.isTargetLanguageJava())
-      ## -----------------------------------------------------
-      ##             allcommon condition-bean condition-option
-      ##             -----------------------------------------
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
-      $database.makeDirectory($path)
-
-      $database.info("    parseConditionOption")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
-
       $database.info("    parse('SimpleStringOption')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
-	#end
-
+    #end
+	
     $database.info("    parse('FromToOption');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/FromToOption.${glTemplateFileExtension}",$path ,"", "")
@@ -847,15 +847,17 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionDateFromToName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/DateFromToOption.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parseLikeSearchOption")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parseLikeSearchOption")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
 
+    #if ($database.isTargetLanguageJava())
       $database.info("    parseInScopeOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInScopeName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/InScopeOption.${glTemplateFileExtension}",$path ,"", "")
+	#end
 
+    #if ($database.isTargetLanguageJava())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOptionParts}))
       $database.makeDirectory($path)
 
@@ -877,27 +879,6 @@ targetdatabase = $targetDatabase
       $database.info("    parseJapaneseOptionPartsAgent")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal})}${glConditionOptionPartsAgentJapaneseName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/local/JapaneseOptionPartsAgent.${glTemplateFileExtension}",$path ,"", "")
-    #end
-
-    #if ($database.isTargetLanguageCSharp())
-      ## -----------------------------------------------------
-      ##             allcommon condition-bean condition-option
-      ##             -----------------------------------------
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('ConditionOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parse('SimpleStringOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parse('LikeSearchOption');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
-
     #end
 
     ## -------------------------------------------------------
