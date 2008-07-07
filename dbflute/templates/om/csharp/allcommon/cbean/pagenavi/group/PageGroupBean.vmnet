@@ -14,9 +14,9 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
     protected int _currentPageNumner;
-    public int CurrentPageNumber { get { return _currentPageNumner } set { _currentPageNumner = value; }
+    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
     protected int _allPageCount;
-    public int AllPageCount { get { return _allPageCount } set { _allPageCount = value; } }
+    public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
     protected ${glPageGroupOptionName} _pageGroupOption;
     public ${glPageGroupOptionName} PageGroupOption { get { return _pageGroupOption; } set { _pageGroupOption = value; } }
 
