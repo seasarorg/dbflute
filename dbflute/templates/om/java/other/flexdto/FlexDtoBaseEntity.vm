@@ -88,6 +88,7 @@ public class $myClassName {
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #set ($referrerEntityLongClassName = "${referrerEntityClassName}")
 #if (!${referrer.isOneToOne()})
+    ${referrerEntityClassName};
     protected var ${referrerVariableName}:Array;/* of the entity '${referrerEntityClassName}'. */
 
     public function get ${referrer.refererJavaBeansRulePropertyName}():Array {
