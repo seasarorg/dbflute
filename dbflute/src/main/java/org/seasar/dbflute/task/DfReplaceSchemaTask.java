@@ -43,6 +43,9 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
+/**
+ * @author jflute
+ */
 public class DfReplaceSchemaTask extends DfAbstractTask {
 
     // ===================================================================================

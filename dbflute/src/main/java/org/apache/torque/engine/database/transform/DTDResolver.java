@@ -64,7 +64,11 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * @author modified by jflute
+ */
 public class DTDResolver implements EntityResolver {
+
     /** Where the DTD is located on the web. */
     public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/dtd/database.dtd";
 
@@ -97,7 +101,6 @@ public class DTDResolver implements EntityResolver {
     /**
      * An implementation of the SAX <code>EntityResolver</code>
      * interface to be called by the XML parser.
-     *
      * @param publicId The public identifier of the external entity
      * @param systemId The system identifier of the external entity
      * @return An <code>InputSource</code> for the
@@ -119,7 +122,6 @@ public class DTDResolver implements EntityResolver {
 
     /**
      * Retrieves a XML input source for the specified URL.
-     *
      * @param urlString The URL of the input source.
      * @return <code>InputSource</code> for the URL.
      */

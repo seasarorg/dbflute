@@ -28,7 +28,43 @@
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
   <property name="dbflute.pbasic.example.dir" value="${workspace.base}/dbflute-pbasic-example"/>
 
-  <target name="dist" description="==> generates distribution">
+  <target name="clean">
+    <delete dir="target/classes"/>
+    <mkdir dir="target/classes"/>
+  </target>
+  
+  <target name="copy-resources">
+    <copy todir="target/classes">
+      <fileset dir="src/main/java">
+        <exclude name="**/*.java"/>
+      </fileset>
+      <fileset dir="src/main/resources">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" depends="clean, copy-resources" description="==> compiles sources">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Compiling sources!                       |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+  	<javac destdir="target/classes">
+      <src path="src/main/java" />
+  	  <src path="src/main/resources" />
+      <classpath>
+        <fileset dir="lib/forCompile">
+          <include name="**/*.jar" />
+        </fileset>
+      </classpath>
+  	  <include name="**/*"/>
+  	</javac>
+  </target>
+
+  <target name="dist" depends="compile" description="==> generates distribution">
 
     <echo message="+------------------------------------------+"/>
     <echo message="|                                          |"/>
@@ -159,72 +195,6 @@
 
   <target name="reflect-win-small" description="==> reflect to test application">
     <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <!-- OLD -->
-  <target name="reflectbasic" description="==> reflect to test application">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-
-    <copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-
-    <copy todir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-
-    <copy todir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-
-  	<copy todir="${dbflute.gihyojp.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.gihyojp.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-
-  <target name="reflectvarious" description="==> reflect to test application">
-    <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

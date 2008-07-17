@@ -847,7 +847,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getLocalColumnNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getLocalColumns());
+        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getLocalColumnList());
     }
 
     /**
