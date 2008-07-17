@@ -889,11 +889,11 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         msg = msg + "    " + className + " cb = new " + className + "();" + getLineSeparator();
         msg = msg + "    cb." + methodName + "; // You shuold call here!" + getLineSeparator();
         msg = msg + "    cb.query().setXxx...;" + getLineSeparator();
-        msg = msg + "    {" + getLineSeparator();
-        msg = msg + "        " + className + " unionCB = new " + className + "();" + getLineSeparator();
-        msg = msg + "        unionCB.query().setXxx;" + getLineSeparator();
-        msg = msg + "        cb.union(unionCB);" + getLineSeparator();
-        msg = msg + "    }" + getLineSeparator();
+        msg = msg + "    cb.union(new UnionQuery<" + className + ">() {" + getLineSeparator();
+        msg = msg + "        public void query(" + className + " unionCB) {" + getLineSeparator();
+        msg = msg + "            unionCB.query().setXxx...;" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    });" + getLineSeparator();
         msg = msg + "    // You should not call setupSelect after calling union()!" + getLineSeparator();
         msg = msg + "    // cb." + methodName + ";" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
