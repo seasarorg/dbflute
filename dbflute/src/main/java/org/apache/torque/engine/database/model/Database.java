@@ -85,7 +85,6 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupR
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
-import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
@@ -989,6 +988,17 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnSetupResourceList();
     }
 
+    // --------------------------------------
+    //                         logic handling
+    //                         --------------
+    public boolean isCommonColumnSetupInvokingLogic(String logic) {
+        return getProperties().getCommonColumnProperties().isCommonColumnSetupInvokingLogic(logic);
+    }
+
+    public String removeCommonColumnSetupInvokingMark(String logic) {
+        return getProperties().getCommonColumnProperties().removeCommonColumnSetupInvokingMark(logic);
+    }
+
     // ===============================================================================
     //                                                     Properties - Classification
     //                                                     ===========================
@@ -1532,24 +1542,6 @@ public class Database {
     public String getMapValue(Map<?, ?> map, String key) {
         final Object value = map.get(key);
         return value != null ? (String) value : "";
-    }
-
-    // ===============================================================================
-    //                                                                   Common Column
-    //                                                                   =============
-    public boolean isCommonColumnSetupInvokingLogic(String logic) {
-        return logic.startsWith("$");
-    }
-
-    public String removeCommonColumnSetupInvokingMark(String logic) {
-        return filterInvokingLogic(logic.substring("$".length()));
-    }
-
-    public String filterInvokingLogic(String logic) {
-        String tmp = DfPropertyUtil.convertAll(logic, "$$Semicolon$$", ";");
-        tmp = DfPropertyUtil.convertAll(tmp, "$$StartBrace$$", "{");
-        tmp = DfPropertyUtil.convertAll(tmp, "$$EndBrace$$", "}");
-        return tmp;
     }
 
     // ===============================================================================

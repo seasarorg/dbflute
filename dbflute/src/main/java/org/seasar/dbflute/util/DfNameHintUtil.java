@@ -12,25 +12,29 @@ public class DfNameHintUtil {
     public static final String SUFFIX_MARK = "suffix:";
     public static final String CONTAIN_MARK = "contain:";
 
-    public static boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
+    public static boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         if (!targetList.isEmpty()) {
-            for (final Iterator<String> ite = targetList.iterator(); ite.hasNext();) {
-                final String targetTableHint = (String) ite.next();
-                if (isHitByTheHint(name, targetTableHint)) {
-                    return false;
-                }
-            }
-            return true;
+            return isHitByTargetList(name, targetList);
         }
         for (final Iterator<String> ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
             if (isHitByTheHint(name, tableHint)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected static boolean isHitByTargetList(final String name, final List<String> targetList) {
+        for (final Iterator<String> ite = targetList.iterator(); ite.hasNext();) {
+            final String targetTableHint = (String) ite.next();
+            if (isHitByTheHint(name, targetTableHint)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public static boolean isHitByTheHint(String name, String hint) {
         final String prefixMark = PREFIX_MARK;
         final String suffixMark = SUFFIX_MARK;

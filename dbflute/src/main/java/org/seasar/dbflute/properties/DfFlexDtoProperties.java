@@ -51,11 +51,11 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     protected boolean isBindableTableExcept(final String tableName) {
         final List<String> targetList = getBindableTableTargetList();
         final List<String> exceptList = getBindableTableExceptList();
-        return isExceptByHint(tableName, targetList, exceptList);
+        return !isTargetByHint(tableName, targetList, exceptList);
     }
 
-    protected boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
-        return DfNameHintUtil.isExceptByHint(name, targetList, exceptList);
+    protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
+        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
 
     protected boolean isHintMatchTheName(String name, String hint) {

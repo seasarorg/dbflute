@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -262,6 +263,24 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                    Intercept Common
     //                                                                    ================
+    // -----------------------------------------------------
+    //                                        Logic Handling
+    //                                        --------------
+    public boolean isCommonColumnSetupInvokingLogic(String logic) {
+        return logic.startsWith("$");
+    }
+
+    public String removeCommonColumnSetupInvokingMark(String logic) {
+        return filterInvokingLogic(logic.substring("$".length()));
+    }
+
+    protected String filterInvokingLogic(String logic) {
+        String tmp = DfPropertyUtil.convertAll(logic, "$$Semicolon$$", ";");
+        tmp = DfPropertyUtil.convertAll(tmp, "$$StartBrace$$", "{");
+        tmp = DfPropertyUtil.convertAll(tmp, "$$EndBrace$$", "}");
+        return tmp;
+    }
+
     // -----------------------------------------------------
     //                                                filter
     //                                                ------
