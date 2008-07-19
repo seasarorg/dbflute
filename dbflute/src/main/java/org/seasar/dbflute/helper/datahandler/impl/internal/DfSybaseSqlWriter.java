@@ -7,7 +7,6 @@ import org.seasar.extension.dataset.TableWriter;
 import org.seasar.extension.dataset.impl.SqlWriter;
 
 /**
- * 
  * @author jflute
  */
 public class DfSybaseSqlWriter extends SqlWriter {

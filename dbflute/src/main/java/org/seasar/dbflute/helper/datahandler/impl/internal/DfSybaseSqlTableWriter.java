@@ -17,7 +17,6 @@ import org.seasar.extension.jdbc.util.DataSourceUtil;
 import org.seasar.framework.util.StatementUtil;
 
 /**
- * 
  * @author jflute
  */
 public class DfSybaseSqlTableWriter extends SqlTableWriter {
@@ -87,7 +86,6 @@ public class DfSybaseSqlTableWriter extends SqlTableWriter {
 
     /**
      * Has auto-increment at the table?
-     * <p>
      * @param conn Connection.
      * @param tableName Table from which to retrieve PK information.
      * @return Determination. (Nullable)

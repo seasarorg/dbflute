@@ -5,11 +5,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author jflute
+ */
 public class DfInternalSqlBuildingResult {
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String sql;
     protected List<Object> bindParameters = new ArrayList<Object>();
     protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getSql() {
         return sql;
     }

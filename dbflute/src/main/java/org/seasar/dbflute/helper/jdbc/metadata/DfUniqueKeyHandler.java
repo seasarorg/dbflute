@@ -28,18 +28,22 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
+ * This class generates an XML schema of an existing database from JDBC meta data.
  * @author jflute
  */
 public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
 
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * <p>
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param schemaName Schema name. (NotNull & AllowedEmpty)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.

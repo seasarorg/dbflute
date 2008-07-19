@@ -26,9 +26,9 @@ import org.seasar.dbflute.util.DfNameHintUtil;
  */
 public class DfAbstractMetaDataHandler {
 
-    //========================================================================================
-    //                                                                               Attribute
-    //                                                                               =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** List for except table. */
     protected List<String> _tableExceptList;
 
@@ -38,9 +38,9 @@ public class DfAbstractMetaDataHandler {
     /** Simple list for except column. */
     protected List<String> _simpleColumnExceptList;
 
-    //========================================================================================
-    //                                                                                Property
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Property
+    //                                                                            ========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }

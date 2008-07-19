@@ -28,13 +28,18 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
  * @author jflute
  */
 public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfForeignKeyHandler.class);
 
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta JDBC meta data.

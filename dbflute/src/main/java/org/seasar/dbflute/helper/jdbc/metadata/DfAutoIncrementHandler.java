@@ -32,7 +32,6 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Is auto-increment column?
-     * 
      * @param conn Connection.
      * @param tableMetaInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
@@ -89,7 +88,6 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Has auto-increment at the table?
-     * 
      * @param conn Connection.
      * @param tableMetaInfo The meta information of table.
      * @return Determination. (Nullable)

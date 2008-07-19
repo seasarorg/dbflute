@@ -35,8 +35,14 @@ import org.seasar.dbflute.helper.datahandler.impl.internal.DfInternalSqlBuilding
 import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
+/**
+ * @author jflute
+ */
 public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataWriterImpl.class);
 

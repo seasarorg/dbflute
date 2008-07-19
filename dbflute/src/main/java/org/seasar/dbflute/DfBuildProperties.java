@@ -15,15 +15,8 @@
  */
 package org.seasar.dbflute;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
@@ -48,28 +41,15 @@ import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
-import org.seasar.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 
 /**
  * Build properties.
- * <pre>
- * Singletonでbuild.propertiesの情報を保持する。
- * ProcessのInitialize時にsetProperties()でPropertiesを設定されることが前提である。
- * </pre>
  * @author jflute
  */
 public final class DfBuildProperties {
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(DfBuildProperties.class);
-
     /** Singleton-instance. */
     private static final DfBuildProperties _instance = new DfBuildProperties();
-
-    /** The delimiter of map-list-string. */
-    private static final String MAP_LIST_STRING_DELIMITER = ";";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -88,7 +68,6 @@ public final class DfBuildProperties {
 
     /**
      * Get singleton-instance.
-     * 
      * @return Singleton-instance. (NotNull)
      */
     public synchronized static DfBuildProperties getInstance() {
@@ -112,115 +91,11 @@ public final class DfBuildProperties {
 
     /**
      * Get Build-properties.
-     * 
      * @return Build-properties. (NotNull)
      */
     final public Properties getProperties() {
         return _buildProperties;
     }
-
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // TODO: @jflute - DfAbstractHelperPropertiesに移行中。移行完了後は削除
-    // ===================================================================================
-    //                                                                    Property Utility
-    //                                                                    ================
-    /**
-     * Get property as string. {Delegate method}
-     * 
-     * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as string. (Nullable: If the default-value is null)
-     * @deprecated
-     */
-    final public String stringProp(String key, String defaultValue) {
-        try {
-            return DfPropertyUtil.stringProp(_buildProperties, key);
-        } catch (PropertyNotFoundException e) {
-            return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as boolean. {Delegate method}
-     * 
-     * @param key Property-key. (NotNull)
-     * @param defaultValue Default value.
-     * @return Property as boolean.
-     * @deprecated
-     */
-    final public boolean booleanProp(String key, boolean defaultValue) {
-        try {
-            return DfPropertyUtil.booleanProp(_buildProperties, key);
-        } catch (PropertyNotFoundException e) {
-            return defaultValue;
-        } catch (PropertyBooleanFormatException e) {
-            return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as list. {Delegate method}
-     * 
-     * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as list. (Nullable: If the default-value is null)
-     * @deprecated
-     */
-    final public List<Object> listProp(String key, List<Object> defaultValue) {
-        try {
-            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, MAP_LIST_STRING_DELIMITER);
-            if (result.isEmpty()) {
-                return defaultValue;
-            } else {
-                return result;
-            }
-        } catch (PropertyNotFoundException e) {
-            return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as map. {Delegate method}
-     * 
-     * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as map. (Nullable: If the default-value is null)
-     * @deprecated
-     */
-    final public Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
-        try {
-            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, MAP_LIST_STRING_DELIMITER);
-            if (result.isEmpty()) {
-                return defaultValue;
-            } else {
-                return result;
-            }
-        } catch (PropertyNotFoundException e) {
-            return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★s
-
-    // ===================================================================================
-    //                                                                  Default Definition
-    //                                                                  ==================
-    public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
-    public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
-    public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
-    public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
 
     // ===================================================================================
     //                                                                    Property Handler
@@ -280,7 +155,7 @@ public final class DfBuildProperties {
     public DfCommonColumnProperties getCommonColumnProperties() {
         return getHandler().getCommonColumnProperties(getProperties());
     }
-    
+
     // -----------------------------------------------------
     //                                       Behavior Filter
     //                                       ---------------
@@ -345,49 +220,6 @@ public final class DfBuildProperties {
     // -----------------------------------------------------
     //                                          Table Except
     //                                          ------------
-    protected List<String> _tableExceptList;
-
-    public List<String> getTableExceptList() {
-        if (_tableExceptList == null) {
-            final List<Object> tmpLs = listProp("torque.table.except.list", DEFAULT_EMPTY_LIST);
-            _tableExceptList = new ArrayList<String>();
-            for (Object object : tmpLs) {
-                _tableExceptList.add((String) object);
-            }
-            _tableExceptList.addAll(getTableExceptInformation().getTableExceptList());
-        }
-        return _tableExceptList;
-    }
-
-    protected TableExceptInformation _tableExceptInformation;
-
-    public TableExceptInformation getTableExceptInformation() {
-        if (_tableExceptInformation == null) {
-            if ("mssql".equals(getBasicProperties().getDatabaseName())) {
-                _tableExceptInformation = new TableExceptSQLServer();
-            } else {
-                _tableExceptInformation = new TableExceptDefault();
-            }
-        }
-        return _tableExceptInformation;
-    }
-
-    public static interface TableExceptInformation {
-        public List<String> getTableExceptList();
-    }
-
-    public static class TableExceptSQLServer implements TableExceptInformation {
-        public List<String> getTableExceptList() {
-            return Arrays.asList(new String[] { "sysconstraints", "syssegments", "dtproperties" });
-        }
-    }
-
-    public static class TableExceptDefault implements TableExceptInformation {
-        public List<String> getTableExceptList() {
-            return Arrays.asList(new String[] {});
-        }
-    }
-
     public DfTypeMappingProperties getTypeMappingProperties() {
         return getHandler().getTypeMappingProperties(getProperties());
     }
@@ -395,7 +227,7 @@ public final class DfBuildProperties {
     public DfRefreshProperties getRefreshProperties() {
         return getHandler().getRefreshProperties(getProperties());
     }
-    
+
     public DfSimpleDtoProperties getSimpleDtoProperties() {
         return getHandler().getSimpleDtoProperties(getProperties());
     }
@@ -406,13 +238,6 @@ public final class DfBuildProperties {
 
     public DfS2jdbcProperties getS2jdbcProperties() {
         return getHandler().getS2JdbcProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //         ToLowerInGeneratorUnderscoreMethod (Internal)
-    //         ---------------------------------------------
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return booleanProp("torque.isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
     // -----------------------------------------------------

@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -183,89 +184,4 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     protected boolean isOracle() {
         return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
     }
-
-    // ===================================================================================
-    //                                                                    Column Meta Info
-    //                                                                    ================
-    public static class DfColumnMetaInfo {
-        protected String columnName;
-        protected int jdbcType;
-        protected String dbTypeName;
-        protected int columnSize;
-        protected int decimalDigits;
-        protected boolean required;
-        protected String defaultValue;
-        protected String sql2entityTableName;
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
-        }
-
-        public int getColumnSize() {
-            return columnSize;
-        }
-
-        public void setColumnSize(int columnSize) {
-            this.columnSize = columnSize;
-        }
-
-        public int getDecimalDigits() {
-            return decimalDigits;
-        }
-
-        public void setDecimalDigits(int decimalDigits) {
-            this.decimalDigits = decimalDigits;
-        }
-
-        public String getDefaultValue() {
-            return defaultValue;
-        }
-
-        public void setDefaultValue(String defaultValue) {
-            this.defaultValue = defaultValue;
-        }
-
-        public boolean isRequired() {
-            return required;
-        }
-
-        public void setRequired(boolean required) {
-            this.required = required;
-        }
-
-        public int getJdbcType() {
-            return jdbcType;
-        }
-
-        public void setJdbcType(int jdbcType) {
-            this.jdbcType = jdbcType;
-        }
-
-        public String getDbTypeName() {
-            return dbTypeName;
-        }
-
-        public void setDbTypeName(String dbTypeName) {
-            this.dbTypeName = dbTypeName;
-        }
-
-        public String getSql2EntityableName() {
-            return sql2entityTableName;
-        }
-
-        public void setSql2EntityTableName(String sql2entityTableName) {
-            this.sql2entityTableName = sql2entityTableName;
-        }
-
-        @Override
-        public String toString() {
-            return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcType
-                    + ", " + required + ", " + defaultValue + "}";
-        }
-    }
-
 }

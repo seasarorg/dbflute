@@ -36,8 +36,14 @@ import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 
+/**
+ * @author jflute
+ */
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 

@@ -1272,7 +1272,7 @@ public class Database {
     //                      Properties - ToLowerInGeneratorUnderscoreMethod (Internal)
     //                      ==========================================================
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return getProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
     // ===============================================================================

@@ -43,7 +43,7 @@ import org.seasar.dbflute.helper.excel.DfXlsReader;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataColumn;
 import org.seasar.extension.dataset.DataRow;

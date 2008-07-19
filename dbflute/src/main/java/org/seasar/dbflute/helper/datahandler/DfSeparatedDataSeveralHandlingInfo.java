@@ -15,12 +15,22 @@
  */
 package org.seasar.dbflute.helper.datahandler;
 
+/**
+ * @author jflute
+ */
 public class DfSeparatedDataSeveralHandlingInfo {
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String basePath;
     protected String typeName;
     protected String delimter;
     protected boolean errorContinue;
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getBasePath() {
         return basePath;
     }

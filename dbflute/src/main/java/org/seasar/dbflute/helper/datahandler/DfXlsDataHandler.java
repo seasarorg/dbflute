@@ -22,7 +22,11 @@ import javax.sql.DataSource;
 
 import org.seasar.extension.dataset.DataSet;
 
+/**
+ * @author jflute
+ */
 public interface DfXlsDataHandler {
+
     public List<DataSet> readSeveralData(String dataDirectoryName);
 
     public void writeSeveralData(String dataDirectoryName, DataSource dataSource);

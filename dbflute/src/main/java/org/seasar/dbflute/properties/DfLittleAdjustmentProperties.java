@@ -46,6 +46,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                              ToLower in Generator Underscore Method
+    //                                              ======================================
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
+        return booleanProp("torque.isAvailableToLowerInGeneratorUnderscoreMethod", true);
+    }
+
+    // ===================================================================================
     //                                                                  Friendly Framework 
     //                                                                  ==================
     public boolean isUseBuri() {

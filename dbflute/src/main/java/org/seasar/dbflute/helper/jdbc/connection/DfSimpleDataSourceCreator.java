@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.helper.jdbc.connection;
 
 import java.io.PrintWriter;
@@ -25,13 +40,13 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSimpleDataSourceCreator.class);
     
-    // =========================================================================================
-    //                                                                                 Attribute
-    //                                                                                 =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** DB driver. */
     protected String _driver = null;
 
-    /** DB url. */
+    /** DB URL. */
     protected String _url = null;
 
     /** User name. */
@@ -46,54 +61,9 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     /** Connection */
     protected Connection _conn;
 
-    // =========================================================================================
-    //                                                                                  Accessor
-    //                                                                                  ========
-    /**
-     * Set the JDBC driver to be used.
-     *
-     * @param driver driver class name
-     */
-    public void setDriver(String driver) {
-        this._driver = driver;
-    }
-
-    /**
-     * Set the DB connection url.
-     *
-     * @param url connection url
-     */
-    public void setUrl(String url) {
-        this._url = url;
-    }
-
-    /**
-     * Set the user name for the DB connection.
-     *
-     * @param userId database user
-     */
-    public void setUserId(String userId) {
-        this._userId = userId;
-    }
-
-    /**
-     * Set the password for the DB connection.
-     *
-     * @param password database password
-     */
-    public void setPassword(String password) {
-        this._password = password;
-    }
-
-    /**
-     * Set the autoCommit for the DB connection.
-     *
-     * @param autoCommit Is auto commit?
-     */
-    public void setAutoCommit(boolean autoCommit) {
-        this._autoCommit = autoCommit;
-    }
-
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public void create() {
         if (!DfDataSourceContext.isExistDataSource()) {
             _log.info("...create()");
@@ -205,7 +175,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     protected Driver newDriver() {
         final Driver driverInstance;
         try {
-            final Class dc = Class.forName(_driver);
+            final Class<?> dc = Class.forName(_driver);
             driverInstance = (Driver) dc.newInstance();
         } catch (ClassNotFoundException e) {
             String msg = "Class Not Found: JDBC driver " + _driver + " could not be loaded.";
@@ -380,6 +350,49 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
             _realConnection.setTypeMap(map);
         }
-
     }
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Set the JDBC driver to be used.
+     * @param driver driver class name
+     */
+    public void setDriver(String driver) {
+        this._driver = driver;
+    }
+
+    /**
+     * Set the DB connection URL.
+     * @param url connection URL
+     */
+    public void setUrl(String url) {
+        this._url = url;
+    }
+
+    /**
+     * Set the user name for the DB connection.
+     * @param userId database user
+     */
+    public void setUserId(String userId) {
+        this._userId = userId;
+    }
+
+    /**
+     * Set the password for the DB connection.
+     * @param password database password
+     */
+    public void setPassword(String password) {
+        this._password = password;
+    }
+
+    /**
+     * Set the autoCommit for the DB connection.
+     * @param autoCommit Is auto commit?
+     */
+    public void setAutoCommit(boolean autoCommit) {
+        this._autoCommit = autoCommit;
+    }
+
 }

@@ -20,6 +20,7 @@
   <property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
   <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
   <property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
+  <property name="dbflute.sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example"/>
   <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
   <property name="dbflute.s2jdbc.example.dir" value="${workspace.base}/dbflute-s2jdbc-example"/>
   <property name="dbflute.flexserver.example.dir" value="${workspace.base}/dbflute-flexserver-example"/>
@@ -129,6 +130,11 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  	
+    <copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   	
     <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>

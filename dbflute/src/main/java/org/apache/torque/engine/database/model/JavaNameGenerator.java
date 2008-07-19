@@ -59,13 +59,14 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.
  * @author Modified by jflute
  */
 public class JavaNameGenerator implements NameGenerator {
-    
+
     /**
      * <code>inputs</code> should consist of two elements, the
      * original name of the database element and the method for
@@ -115,9 +116,11 @@ public class JavaNameGenerator implements NameGenerator {
     protected String underscoreMethod(String schemaName) {
         StringBuffer name = new StringBuffer();
         StringTokenizer tok = new StringTokenizer(schemaName, String.valueOf(STD_SEPARATOR_CHAR));
+        DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        boolean availableToLowerInGeneratorUnderscoreMethod = prop.isAvailableToLowerInGeneratorUnderscoreMethod();
         while (tok.hasMoreTokens()) {
             String namePart = ((String) tok.nextElement());
-            if (DfBuildProperties.getInstance().isAvailableToLowerInGeneratorUnderscoreMethod()) {
+            if (availableToLowerInGeneratorUnderscoreMethod) {
                 namePart = namePart.toLowerCase();
             }
             name.append(StringUtils.capitalise(namePart));
