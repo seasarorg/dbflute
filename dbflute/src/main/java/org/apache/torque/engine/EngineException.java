@@ -57,57 +57,42 @@ package org.apache.torque.engine;
 import org.apache.commons.lang.exception.NestableException;
 
 /**
- * The base class of all exceptions thrown by the engine.
- *
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @author <a href="mailto:jvz@apache.org">Jason van Zyl</a>
- * @version $Id$
+ * @author Modified by jflute
  */
-public class EngineException extends NestableException
-{
+public class EngineException extends NestableException {
+    
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a new <code>EngineException</code> without specified detail
-     * message.
+     * Constructs a new <code>EngineException</code> without specified detail message.
      */
-    public EngineException()
-    {
+    public EngineException() {
     }
 
     /**
-     * Constructs a new <code>EngineException</code> with specified detail
-     * message.
-     *
+     * Constructs a new <code>EngineException</code> with specified detail message.
      * @param msg the error message.
      */
-    public EngineException(String msg)
-    {
+    public EngineException(String msg) {
         super(msg);
     }
 
     /**
      * Constructs a new <code>EngineException</code> with specified nested
      * <code>Throwable</code>.
-     *
-     * @param nested the exception or error that caused this exception
-     *               to be thrown.
+     * @param nested the exception or error that caused this exception to be thrown.
      */
-    public EngineException(Throwable nested)
-    {
+    public EngineException(Throwable nested) {
         super(nested);
     }
 
     /**
      * Constructs a new <code>EngineException</code> with specified detail
      * message and nested <code>Throwable</code>.
-     *
      * @param msg the error message.
-     * @param nested the exception or error that caused this exception
-     *               to be thrown.
+     * @param nested the exception or error that caused this exception to be thrown.
      */
-    public EngineException(String msg, Throwable nested)
-    {
+    public EngineException(String msg, Throwable nested) {
         super(msg, nested);
     }
 }
