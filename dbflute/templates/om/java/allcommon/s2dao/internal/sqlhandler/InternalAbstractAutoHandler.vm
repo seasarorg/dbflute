@@ -133,6 +133,9 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+                if (isStaticVersionNoAutoIncrementOnQuery()) {
+                    continue;// because of always 'VERSION_NO = VERSION_NO + 1'
+                }
                 Object value = pt.getPropertyDesc().getValue(bean);
                 if (value == null) {
                     continue;// because of 'VERSION_NO = VERSION_NO + 1'
@@ -148,6 +151,10 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
         setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+    }
+
+    protected boolean isStaticVersionNoAutoIncrementOnQuery() {
+        return false;
     }
 
     protected void setupDeleteBindVariables(Object bean) {

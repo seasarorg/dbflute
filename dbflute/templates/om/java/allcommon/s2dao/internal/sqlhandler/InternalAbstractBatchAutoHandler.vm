@@ -33,14 +33,13 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     public ${glInternalAbstractBatchAutoHandler}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
             PropertyType[] propertyTypes) {
-
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int[] execute(List list, Class[] argTypes) throws SQLRuntimeException {
+    public int[] execute(List<?> list, Class<?>[] argTypes) throws SQLRuntimeException {
         return execute(list);
     }
 
@@ -58,7 +57,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         try {
             PreparedStatement ps = prepareStatement(connection);
             try {
-                for (Iterator iter = list.iterator(); iter.hasNext();) {
+                for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
                     Object bean = (Object) iter.next();
                     execute(ps, bean);
                 }
@@ -72,11 +71,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     }
 	
     public int execute(Object[] args) throws SQLRuntimeException {
-        List list = null;
+        List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
         } else if (args[0] instanceof List) {
-            list = (List) args[0];
+            list = (List<?>) args[0];
         }
         if (list == null) {
             throw new IllegalArgumentException("args[0]");
@@ -92,11 +91,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     }
 
     public int[] executeBatch(Object[] args) throws SQLRuntimeException {
-        List list = null;
+        List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
         } else if (args[0] instanceof List) {
-            list = (List) args[0];
+            list = (List<?>) args[0];
         }
         if (list == null) {
             throw new IllegalArgumentException("args[0]");
@@ -109,5 +108,13 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
         bindArgs(ps, getBindVariables(), getBindVariableValueTypes());
         PreparedStatementUtil.addBatch(ps);
+    }
+
+    // ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+    @Override
+    protected boolean isStaticVersionNoAutoIncrementOnQuery() {
+        return true;// because of always 'VERSION_NO = VERSION_NO + 1'
     }
 }

@@ -93,12 +93,8 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected boolean isInsertTarget(PropertyType propertyType) {
         if (propertyType.isPrimaryKey()) {
-#if ($database.isVersionAfter1047())
             String name = propertyType.getPropertyName();
             final IdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
-#else
-	        final IdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator();
-#end
             return generator.isSelfGenerate();
         }
         return true;
@@ -126,7 +122,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupInsertSql() {
         BeanMetaData bmd = getBeanMetaData();
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder buf = new StringBuilder(100);
         buf.append("insert into ");
         buf.append(bmd.getTableName());
         buf.append(" (");
@@ -152,23 +148,27 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupUpdateSql() {
         checkPrimaryKey();
-        StringBuffer buf = new StringBuffer(100);
-        buf.append("update ");
-        buf.append(getBeanMetaData().getTableName());
-        buf.append(" set ");
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("update ");
+        sb.append(getBeanMetaData().getTableName());
+        sb.append(" set ");
+        String versionNoPropertyName = getBeanMetaData().getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
-            buf.append(pt.getColumnName());
-            buf.append(" = ?, ");
+            if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+                sb.append(pt.getColumnName()).append(" = ").append(pt.getColumnName()).append(" + 1, ");
+                continue;
+            }
+            sb.append(pt.getColumnName()).append(" = ?, ");
         }
-        buf.setLength(buf.length() - 2);
-        setupUpdateWhere(buf);
-        setSql(buf.toString());
+        sb.setLength(sb.length() - 2);
+        setupUpdateWhere(sb);
+        setSql(sb.toString());
     }
 
     protected void setupDeleteSql() {
         checkPrimaryKey();
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder buf = new StringBuilder(100);
         buf.append("delete from ");
         buf.append(getBeanMetaData().getTableName());
         setupUpdateWhere(buf);
@@ -182,25 +182,20 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
         }
     }
 
-    protected void setupUpdateWhere(StringBuffer buf) {
+    protected void setupUpdateWhere(StringBuilder sb) {
         BeanMetaData bmd = getBeanMetaData();
-        buf.append(" where ");
+        sb.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            buf.append(bmd.getPrimaryKey(i));
-            buf.append(" = ? and ");
+            sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
         }
-        buf.setLength(buf.length() - 5);
+        sb.setLength(sb.length() - 5);
         if (bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
-            buf.append(" and ");
-            buf.append(pt.getColumnName());
-            buf.append(" = ?");
+            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         if (bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
-            buf.append(" and ");
-            buf.append(pt.getColumnName());
-            buf.append(" = ?");
+            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
     }
 }
