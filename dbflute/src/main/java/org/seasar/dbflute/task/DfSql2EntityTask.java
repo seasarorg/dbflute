@@ -47,6 +47,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureMetaInfo;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSQLExecutionFailureException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -298,10 +299,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
                     }
                 } catch (SQLException e) {
-                    String msg = "Failed to execute: " + sql;
                     if (!_runInfo.isErrorContinue()) {
-                        throw new RuntimeException(msg, e);
+                        String msg = "Look! Read the message below." + getLineSeparator();
+                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                        msg = msg + "It failed to execute the SQL!" + getLineSeparator();
+                        msg = msg + getLineSeparator();
+                        msg = msg + "[Executed SQL]" + getLineSeparator();
+                        msg = msg + sql + getLineSeparator();
+                        msg = msg + getLineSeparator();
+                        msg = msg + "[SQLException]" + getLineSeparator();
+                        msg = msg + e.getMessage() + getLineSeparator();
+                        msg = msg + "* * * * * * * * * */";
+                        throw new DfSQLExecutionFailureException(msg, e);
                     }
+                    _log.warn("Failed to execute: " + sql, e);
                     _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + getLineSeparator() + sql);
                 } finally {
                     if (rs != null) {

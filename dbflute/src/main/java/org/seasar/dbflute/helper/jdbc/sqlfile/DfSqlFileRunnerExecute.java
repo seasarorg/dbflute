@@ -9,6 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
+/**
+ * @author jflute
+ */
 public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     // ===================================================================================
@@ -37,12 +40,25 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             statement.execute(sql);
             _goodSqlCount++;
         } catch (SQLException e) {
-            String msg = "Failed to execute: " + sql;
             if (!_runInfo.isErrorContinue()) {
-                throw new RuntimeException(msg, e);
+                String msg = "Look! Read the message below." + getLineSeparator();
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                msg = msg + "It failed to execute the SQL!" + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[Executed SQL]" + getLineSeparator();
+                msg = msg + sql + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[SQLException]" + getLineSeparator();
+                msg = msg + e.getMessage() + getLineSeparator();
+                msg = msg + "* * * * * * * * * */";
+                throw new DfSQLExecutionFailureException(msg, e);
             }
-            _log.warn(msg, e);
+            _log.warn("Failed to execute: " + sql, e);
             _log.warn("" + System.getProperty("line.separator"));
         }
+    }
+
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }

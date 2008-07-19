@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
 
 public class DfSqlFileFireMan {
 
@@ -15,9 +14,8 @@ public class DfSqlFileFireMan {
 
     /**
      * Load the sql file and then execute it.
-     * @throws BuildException
      */
-    public void execute(DfSqlFileRunner runner, List<File> fileList) throws BuildException {
+    public void execute(DfSqlFileRunner runner, List<File> fileList) {
         try {
             int goodSqlCount = 0;
             int totalSqlCount = 0;
