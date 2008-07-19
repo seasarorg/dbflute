@@ -24,9 +24,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             : base(dataSource, commandFactory, beanMetaData, propertyNames) {
         }
 
-        protected override IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, 
-            string[] propertyNames)
-        {
+        protected override IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames) {
             IDictionary modifiedPropertyNames = bmd.GetModifiedPropertyNames(bean);
             IList types = new ArrayList();
             string timestampPropertyName = bmd.TimestampPropertyName;
@@ -47,36 +45,26 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return propertyTypes;
         }
 
-        protected override bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, 
-            string[] propertyNames)
-        {
-            if ( propertyTypes.Length > 0 )
-            {
+        protected override bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, String[] propertyNames) {
+            if (propertyTypes.Length > 0) {
                 return true;
             }
-
-            if ( _log.IsDebugEnabled )
-            {
+            if (_log.IsDebugEnabled) {
                 string s = CreateNoUpdateLogMessage(bean, bmd);
                 _log.Debug(s);
             }
             return false;
         }
 
-        protected virtual string CreateNoUpdateLogMessage(object bean, IBeanMetaData bmd)
-        {
+        protected virtual string CreateNoUpdateLogMessage(object bean, IBeanMetaData bmd) {
             StringBuilder builder = new StringBuilder();
             builder.Append("skip UPDATE: table=");
             builder.Append(bmd.TableName);
             int size = bmd.PrimaryKeySize;
-            for ( int i = 0; i < size; i++ )
-            {
-                if ( i == 0 )
-                {
+            for ( int i = 0; i < size; i++ ) {
+                if ( i == 0 ) {
                     builder.Append(", key{");
-                } 
-                else
-                {
+                } else {
                     builder.Append(", ");
                 }
                 string keyName = bmd.GetPrimaryKey(i);
@@ -84,8 +72,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                 builder.Append("=");
                 builder.Append(bmd.GetPropertyTypeByColumnName(keyName)
                         .PropertyInfo.GetValue(bean, null));
-                if ( i == size - 1 )
-                {
+                if (i == size - 1) {
                     builder.Append("}");
                 }
             }

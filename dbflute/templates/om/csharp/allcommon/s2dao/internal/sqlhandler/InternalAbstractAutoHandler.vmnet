@@ -46,15 +46,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public int Execute(object[] args)
-        {
+        public int Execute(object[] args) {
             IDbConnection connection = Connection;
-            try
-            {
+            try {
                 return Execute(connection, args[0]);
-            }
-            finally
-            {
+            } finally {
                 ConnectionHolderDataSource holderDataSoure = DataSource as ConnectionHolderDataSource;
                 holderDataSoure.ReleaseConnection();
                 holderDataSoure.CloseConnection(connection);
@@ -114,18 +110,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             ArrayList varTypeList = new ArrayList();
             for (int i = 0; i < _propertyTypes.Length; ++i) {
                 IPropertyType pt = _propertyTypes[i];
-                if (string.Compare(pt.PropertyName, BeanMetaData.TimestampPropertyName, true) == 0)
-                {
+                if (string.Compare(pt.PropertyName, BeanMetaData.TimestampPropertyName, true) == 0) {
                     Timestamp = DateTime.Now;
                     SetupTimestampVariableList(varList, pt);
-                }
-                else if (pt.PropertyName.Equals(BeanMetaData.VersionNoPropertyName))
-                {
+                } else if (pt.PropertyName.Equals(BeanMetaData.VersionNoPropertyName)) {
                     VersionNo = 0;
                     varList.Add(ConversionUtil.ConvertTargetType(VersionNo, pt.PropertyInfo.PropertyType));
-                }
-                else
-                {
+                } else {
                     varList.Add(pt.PropertyInfo.GetValue(bean, null));
                 }
                 varTypeList.Add(pt.PropertyInfo.PropertyType);
@@ -134,24 +125,21 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             BindVariableTypes = (Type[]) varTypeList.ToArray(typeof(Type));
         }
 
-        protected void SetupUpdateBindVariables(object bean)
-        {
+        protected void SetupUpdateBindVariables(Object bean) {
             ArrayList varList = new ArrayList();
             ArrayList varTypeList = new ArrayList();
-            for (int i = 0; i < _propertyTypes.Length; ++i)
-            {
+            for (int i = 0; i < _propertyTypes.Length; ++i) {
                 IPropertyType pt = _propertyTypes[i];
-                if (string.Compare(pt.PropertyName, BeanMetaData.TimestampPropertyName, true) == 0)
-                {
+                if (string.Compare(pt.PropertyName, BeanMetaData.TimestampPropertyName, true) == 0) {
                     Timestamp = DateTime.Now;
                     SetupTimestampVariableList(varList, pt);
-                }
-                else if (string.Compare(pt.PropertyName, BeanMetaData.VersionNoPropertyName, true) == 0)
-                {
+                } else if (String.Compare(pt.PropertyName, BeanMetaData.VersionNoPropertyName, true) == 0) {
+                    Object value = pt.PropertyInfo.GetValue(bean, null);
+                    if (value == null) {
+                        continue;// because of 'VERSION_NO = VERSION_NO + 1'
+                    }
                     SetupVersionNoValiableList(varList, pt, bean);
-                }
-                else
-                {
+                } else {
                     varList.Add(pt.PropertyInfo.GetValue(bean, null));
                 }
                 varTypeList.Add(pt.PropertyInfo.PropertyType);
@@ -161,8 +149,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             BindVariableTypes = (Type[]) varTypeList.ToArray(typeof(Type));
         }
 
-        protected void SetupDeleteBindVariables(object bean)
-        {
+        protected void SetupDeleteBindVariables(object bean) {
             ArrayList varList = new ArrayList();
             ArrayList varTypeList = new ArrayList();
             AddAutoUpdateWhereBindVariables(varList, varTypeList, bean);
@@ -170,27 +157,22 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             BindVariableTypes = (Type[]) varTypeList.ToArray(typeof(Type));
         }
 
-        protected void AddAutoUpdateWhereBindVariables(ArrayList varList, ArrayList varTypeList,
-            object bean)
-        {
+        protected void AddAutoUpdateWhereBindVariables(ArrayList varList, ArrayList varTypeList, Object bean) {
             IBeanMetaData bmd = BeanMetaData;
-            for (int i = 0; i < bmd.PrimaryKeySize; ++i)
-            {
+            for (int i = 0; i < bmd.PrimaryKeySize; ++i) {
                 IPropertyType pt = bmd.GetPropertyTypeByColumnName(bmd.GetPrimaryKey(i));
                 PropertyInfo pi = pt.PropertyInfo;
                 varList.Add(pi.GetValue(bean, null));
                 varTypeList.Add(pi.PropertyType);
             }
-            if (bmd.HasVersionNoPropertyType)
-            {
+            if (bmd.HasVersionNoPropertyType) {
                 IPropertyType pt = bmd.VersionNoPropertyType;
                 PropertyInfo pi = pt.PropertyInfo;
                 _log.Debug(pi.Name);
                 varList.Add(pi.GetValue(bean, null));
                 varTypeList.Add(pi.PropertyType);
             }
-            if (bmd.HasTimestampPropertyType)
-            {
+            if (bmd.HasTimestampPropertyType) {
                 IPropertyType pt = bmd.TimestampPropertyType;
                 PropertyInfo pi = pt.PropertyInfo;
                 varList.Add(pi.GetValue(bean, null));
@@ -198,74 +180,52 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        protected void UpdateTimestampIfNeed(object bean)
-        {
-            if (Timestamp != DateTime.MinValue)
-            {
+        protected void UpdateTimestampIfNeed(Object bean) {
+            if (Timestamp != DateTime.MinValue) {
                 PropertyInfo pi = BeanMetaData.TimestampPropertyType.PropertyInfo;
                 SetupTimestampPropertyInfo(pi, bean);
             }
         }
 
-        protected void UpdateVersionNoIfNeed(object bean)
-        {
-            if (VersionNo != Int32.MinValue)
-            {
+        protected void UpdateVersionNoIfNeed(object bean) {
+            if (VersionNo != Int32.MinValue) {
                 PropertyInfo pi = BeanMetaData.VersionNoPropertyType.PropertyInfo;
                 SetupVersionNoPropertyInfo(pi, bean);
             }
         }
 
-        protected void SetupTimestampVariableList(IList varList, IPropertyType pt)
-        {
-            if (pt.PropertyType == typeof(DateTime))
-            {
+        protected void SetupTimestampVariableList(IList varList, IPropertyType pt) {
+            if (pt.PropertyType == typeof(DateTime)) {
                 varList.Add(Timestamp);
-            }
-            else if (pt.PropertyType == typeof(DateTime?))
-            {
+            } else if (pt.PropertyType == typeof(DateTime?)) {
                 varList.Add(Timestamp);
-            }
-            else if (pt.PropertyType == typeof(SqlDateTime))
-            {
+            } else if (pt.PropertyType == typeof(SqlDateTime)) {
                 varList.Add(new SqlDateTime(Timestamp));
-            }
-            else
-            {
+            } else {
                 throw new WrongPropertyTypeOfTimestampException(pt.PropertyName, pt.PropertyType.Name);
             }
         }
 
-        protected void SetupTimestampPropertyInfo(PropertyInfo pi, object bean)
-        {
-            if (pi.PropertyType == typeof(DateTime))
-            {
+        protected void SetupTimestampPropertyInfo(PropertyInfo pi, object bean) {
+            if (pi.PropertyType == typeof(DateTime)) {
                 pi.SetValue(bean, Timestamp, null);
-            }
-            else if (pi.PropertyType == typeof(DateTime?))
-            {
+            } else if (pi.PropertyType == typeof(DateTime?)) {
                 pi.SetValue(bean, new DateTime?(Timestamp), null);
-            }
-            else if (pi.PropertyType == typeof(SqlDateTime))
-            {
+            } else if (pi.PropertyType == typeof(SqlDateTime)) {
                 pi.SetValue(bean, new SqlDateTime(Timestamp), null);
-            }
-            else
-            {
+            } else {
                 throw new WrongPropertyTypeOfTimestampException(pi.Name, pi.PropertyType.Name);
             }
         }
 
-        protected void SetupVersionNoValiableList(IList varList, IPropertyType pt, object bean)
-        {
+        protected void SetupVersionNoValiableList(IList varList, IPropertyType pt, object bean) {
             object value = pt.PropertyInfo.GetValue(bean, null);
             int intValue = Convert.ToInt32(value) + 1;
             VersionNo = intValue;
             varList.Add(ConversionUtil.ConvertTargetType(VersionNo, pt.PropertyInfo.PropertyType));
         }
 
-        protected void SetupVersionNoPropertyInfo(PropertyInfo pi, object bean)
-        {
+        protected void SetupVersionNoPropertyInfo(PropertyInfo pi, object bean) {
             pi.SetValue(bean, ConversionUtil.ConvertTargetType(VersionNo, pi.PropertyType), null);
         }
 
@@ -279,17 +239,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        public new IDataSource DataSource
-        {
+        public new IDataSource DataSource {
             get { return base.DataSource; }
-            set
-            {
-                if (value is ConnectionHolderDataSource)
-                {
+            set {
+                if (value is ConnectionHolderDataSource) {
                     base.DataSource = value;
-                }
-                else
-                {
+                } else {
                     base.DataSource = new ConnectionHolderDataSource(value);
                 }
             }

@@ -27,24 +27,13 @@ import org.seasar.framework.util.StatementUtil;
 public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasicHandler} {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalAbstractAutoHandler}.class);
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private BeanMetaData beanMetaData;
-
     private Object[] bindVariables;
-
     private ValueType[] bindVariableValueTypes;
-
     private Timestamp timestamp;
-
     private Integer versionNo;
-
     private PropertyType[] propertyTypes;
 
     // ===================================================================================
@@ -67,7 +56,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         }
     }
 
-    public int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
+    public int execute(Object[] args, Class<?>[] argTypes) throws SQLRuntimeException {
         return execute(args);
     }
 
@@ -110,8 +99,8 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     protected abstract void setupBindVariables(Object bean);
 
     protected void setupInsertBindVariables(Object bean) {
-        List varList = new ArrayList();
-        List varValueTypeList = new ArrayList();
+        final List<Object> varList = new ArrayList<Object>();
+        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
         final BeanMetaData bmd = getBeanMetaData();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
@@ -120,7 +109,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
-            } else if (pt.getPropertyName().equals(versionNoPropertyName)) {
+            } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
                 setVersionNo(new Integer(0));
                 varList.add(getVersionNo());
             } else {
@@ -129,13 +118,12 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             varValueTypeList.add(pt.getValueType());
         }
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList
-                .toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
     protected void setupUpdateBindVariables(Object bean) {
-        List varList = new ArrayList();
-        List varValueTypeList = new ArrayList();
+        final List<Object> varList = new ArrayList<Object>();
+        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
         final BeanMetaData bmd = getBeanMetaData();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
@@ -144,8 +132,11 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
-            } else if (pt.getPropertyName().equals(versionNoPropertyName)) {
+            } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
                 Object value = pt.getPropertyDesc().getValue(bean);
+                if (value == null) {
+                    continue;// because of 'VERSION_NO = VERSION_NO + 1'
+                }
                 int intValue = IntegerConversionUtil.toPrimitiveInt(value) + 1;
                 setVersionNo(new Integer(intValue));
                 varList.add(getVersionNo());
@@ -156,21 +147,18 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         }
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList
-                .toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
     protected void setupDeleteBindVariables(Object bean) {
-        List varList = new ArrayList();
-        List varValueTypeList = new ArrayList();
+        final List<Object> varList = new ArrayList<Object>();
+        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList
-                .toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
-    protected void addAutoUpdateWhereBindVariables(List varList,
-            List varValueTypeList, Object bean) {
+    protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
         BeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             PropertyType pt = bmd.getPropertyTypeByColumnName(bmd

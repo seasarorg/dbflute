@@ -22,7 +22,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                       Attribute
         //                                                                       =========
         protected readonly IBeanMetaData _beanMetaData;
-        protected readonly string[] _propertyNames;
+        protected readonly String[] _propertyNames;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -35,15 +35,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         }
 
         public override object Execute(object[] args) {
-            object bean = args[0];
+            Object bean = args[0];
             IBeanMetaData bmd = BeanMetaData;
-            string[] propertyNames = PropertyNames;
+            String[] propertyNames = PropertyNames;
             IPropertyType[] propertyTypes = CreateTargetPropertyTypes(bmd, bean, propertyNames);
             if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false) {
                 return NO_UPDATE;
             }
-            ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
-            handler.Sql = SetupSql(bmd, propertyTypes);
+            ${glInternalAbstractAutoHandler} handler = CreateInternalAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
+            handler.Sql = CreateUpdateSql(bmd, propertyTypes, bean);
             int i = handler.Execute(args);
             if (i < 1) {
                 throw new NotSingleRowUpdatedRuntimeException(args[0], i);
@@ -53,62 +53,62 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 		
         protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames) {
             IList types = new ArrayList();
-            string timestampPropertyName = bmd.TimestampPropertyName;
-            string versionNoPropertyName = bmd.VersionNoPropertyName;
-            for (int i = 0; i < propertyNames.Length; ++i)
-            {
+            String timestampPropertyName = bmd.TimestampPropertyName;
+            String versionNoPropertyName = bmd.VersionNoPropertyName;
+            for (int i = 0; i < propertyNames.Length; ++i) {
                 IPropertyType pt = bmd.GetPropertyType(propertyNames[i]);
                 if (IsTargetProperty(pt, timestampPropertyName, versionNoPropertyName, bean)) {
                     types.Add(pt);
                 }
             }
-
             IPropertyType[] propertyTypes = new IPropertyType[types.Count];
             types.CopyTo(propertyTypes, 0);
             return propertyTypes;
         }
 		
-        protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+        protected virtual ${glInternalAbstractAutoHandler} CreateInternalAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             return new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
         }
 
-        protected virtual string SetupSql(IBeanMetaData bmd, IPropertyType[] propertyTypes) {
-            StringBuilder builder = new StringBuilder(100);
-            builder.Append("UPDATE ");
-            builder.Append(bmd.TableName);
-            builder.Append(" SET ");
+        protected virtual String CreateUpdateSql(IBeanMetaData bmd, IPropertyType[] propertyTypes, Object bean) {
+            if (bmd.PrimaryKeySize == 0) {
+                String msg = "The table '" + bmd.TableName + "' does not have primary keys!";
+                throw new SystemException(msg);
+            }
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("UPDATE ").Append(bmd.TableName).Append(" SET ");
+            String versionNoPropertyName = bmd.VersionNoPropertyName;
             for (int i = 0; i < propertyTypes.Length; ++i) {
                 IPropertyType pt = propertyTypes[i];
-                string columnName = pt.ColumnName;
+                String columnName = pt.ColumnName;
                 if (i > 0) {
-                    builder.Append(", ");
+                    sb.Append(", ");
                 }
-                builder.Append(columnName);
-                builder.Append(" = ?");
+                if (String.Compare(pt.PropertyName, versionNoPropertyName, true) == 0) {
+                    Object value = pt.PropertyInfo.GetValue(bean, null);
+                    if (value == null) {
+                        sb.Append(columnName).Append(" = ").Append(columnName).Append(" + 1");
+                        continue;
+                    }
+                }
+                sb.Append(columnName).Append(" = ?");
             }
-
-            builder.Append(" WHERE ");
+            sb.Append(" WHERE ");
             const string ADD_AND = " AND ";
             for (int i = 0; i < bmd.PrimaryKeySize; ++i) {
-                builder.Append(bmd.GetPrimaryKey(i));
-                builder.Append(" = ?");
-                builder.Append(ADD_AND);
+                sb.Append(bmd.GetPrimaryKey(i)).Append(" = ?").Append(ADD_AND);
             }
-            builder.Length = builder.Length - ADD_AND.Length;
+            sb.Length = sb.Length - ADD_AND.Length;
             if (bmd.HasVersionNoPropertyType) {
                 IPropertyType pt = bmd.VersionNoPropertyType;
-                builder.Append(ADD_AND);
-                builder.Append(pt.ColumnName);
-                builder.Append(" = ?");
+                sb.Append(ADD_AND).Append(pt.ColumnName).Append(" = ?");
             }
             if (bmd.HasTimestampPropertyType) {
                 IPropertyType pt = bmd.TimestampPropertyType;
-                builder.Append(ADD_AND);
-                builder.Append(pt.ColumnName);
-                builder.Append(" = ?");
+                sb.Append(ADD_AND).Append(pt.ColumnName).Append(" = ?");
             }
-            return builder.ToString();
+            return sb.ToString();
         }
 
         protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean) {
@@ -145,13 +145,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        public IBeanMetaData BeanMetaData
-        {
+        public IBeanMetaData BeanMetaData {
             get { return _beanMetaData; }
         }
 
-        public string[] PropertyNames
-        {
+        public string[] PropertyNames {
             get { return _propertyNames; }
         }
 	}

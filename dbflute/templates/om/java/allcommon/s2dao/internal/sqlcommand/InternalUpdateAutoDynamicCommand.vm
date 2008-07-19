@@ -12,12 +12,21 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
 
 /**
  * @author ${database.ClassAuthor}
  */
 public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
+
+	// ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalUpdateAutoDynamicCommand}.class);
+
+    private static final Integer NO_UPDATE = new Integer(0);
 
 	// ===================================================================================
     //                                                                           Attribute
@@ -39,15 +48,15 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     public Object execute(Object[] args) {
         final Object bean = args[0];
         final BeanMetaData bmd = getBeanMetaData();
-        final PropertyType[] propertyTypes = createUpdatePropertyTypes(bmd,
-                bean, getPropertyNames());
-
-        ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
-        
-		// It is unnecessary!
-		// injectDaoClass(handler);
-		
-        handler.setSql(createUpdateSql(bmd, propertyTypes));
+        final PropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames());
+        if (propertyTypes.length == 0) {
+            if (_log.isDebugEnabled()) {
+                _log.debug(createNoUpdateLogMessage(bean, bmd));
+            }
+            return NO_UPDATE;
+        }
+        ${glInternalUpdateAutoHandler} handler = createInternalUpdateAutoHandler(bmd, propertyTypes);
+        handler.setSql(createUpdateSql(bmd, propertyTypes, bean));
         int i = handler.execute(args);
         if (isCheckSingleRowUpdate() && i < 1) {
             throw createNotSingleRowUpdatedRuntimeException(args[0], i);
@@ -55,13 +64,16 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
         return new Integer(i);
     }
 
-    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
-        return new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(bean, rows);
+    protected ${glInternalUpdateAutoHandler} createInternalUpdateAutoHandler(BeanMetaData bmd, PropertyType[] propertyTypes) {
+        return new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
     }
 
-    protected PropertyType[] createUpdatePropertyTypes(BeanMetaData bmd,
-            Object bean, String[] propertyNames) {
-        List types = new ArrayList();
+    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
+        return new ${glEntityAlreadyUpdatedException}(bean, rows);
+    }
+
+    protected PropertyType[] createUpdatePropertyTypes(BeanMetaData bmd, Object bean, String[] propertyNames) {
+        final List<PropertyType> types = new ArrayList<PropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyNames.length; ++i) {
@@ -78,75 +90,91 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
         if (types.isEmpty()) {
             throw new NoUpdatePropertyTypeRuntimeException();
         }
-        PropertyType[] propertyTypes = (PropertyType[]) types
-                .toArray(new PropertyType[types.size()]);
+        PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
         return propertyTypes;
     }
 
-    protected String createUpdateSql(BeanMetaData bmd,
-            PropertyType[] propertyTypes) {
-        StringBuffer buf = new StringBuffer(100);
-        buf.append("update ");
-        buf.append(bmd.getTableName());
-        buf.append(" set ");
+    protected String createNoUpdateLogMessage(final Object bean, final BeanMetaData bmd) {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("skip UPDATE: table=").append(bmd.getTableName());
+        final int size = bmd.getPrimaryKeySize();
+        for (int i = 0; i < size; i++) {
+            if (i == 0) {
+                sb.append(", key{");
+            } else {
+                sb.append(", ");
+            }
+            final String keyName = bmd.getPrimaryKey(i);
+            sb.append(keyName).append("=");
+            sb.append(bmd.getPropertyTypeByColumnName(keyName).getPropertyDesc().getValue(bean));
+            if (i == size - 1) {
+                sb.append("}");
+            }
+        }
+        final String s = new String(sb);
+        return s;
+    }
+
+    /**
+     * Create update SQL. The update is by the primary keys.
+     * @param bmd The meta data of bean. (NotNull & RequiredPrimaryKeys)
+     * @param propertyTypes The types of property for update. (NotNull)
+     * @param bean A bean for update for handling version no and so on. (NotNull)
+     * @return The update SQL. (NotNull)
+     */
+    protected String createUpdateSql(BeanMetaData bmd, PropertyType[] propertyTypes, Object bean) {
+        if (bmd.getPrimaryKeySize() == 0) {
+            String msg = "The table '" + bmd.getTableName() + "' does not have primary keys!";
+            throw new IllegalStateException(msg);
+        }
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("update ");
+        sb.append(bmd.getTableName());
+        sb.append(" set ");
+        final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             final String columnName = pt.getColumnName();
             if (i > 0) {
-                buf.append(", ");
+                sb.append(", ");
             }
-            buf.append(columnName);
-            buf.append(" = ?");
+            if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+                final Object versionNo = pt.getPropertyDesc().getValue(bean);
+                if (versionNo == null) {
+                    sb.append(columnName).append(" = ").append(columnName).append(" + 1");
+                    continue;
+                }
+            }
+            sb.append(columnName).append(" = ?");
         }
-
-        buf.append(" where ");
+        sb.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            buf.append(bmd.getPrimaryKey(i));
-            buf.append(" = ? and ");
+            sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
         }
-        buf.setLength(buf.length() - 5);
+        sb.setLength(sb.length() - 5);
         if (bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
-            buf.append(" and ");
-            buf.append(pt.getColumnName());
-            buf.append(" = ?");
+            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         if (bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
-            buf.append(" and ");
-            buf.append(pt.getColumnName());
-            buf.append(" = ?");
+            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
-
-        return buf.toString();
+        return sb.toString();
     }
 
-    /**
-     * @return Returns the beanMetaData.
-     */
     public BeanMetaData getBeanMetaData() {
         return beanMetaData;
     }
 
-    /**
-     * @param beanMetaData
-     *            The beanMetaData to set.
-     */
     public void setBeanMetaData(BeanMetaData beanMetaData) {
         this.beanMetaData = beanMetaData;
     }
 
-    /**
-     * @return Returns the propertyNames.
-     */
     public String[] getPropertyNames() {
         return propertyNames;
     }
 
-    /**
-     * @param propertyNames
-     *            The propertyNames to set.
-     */
     public void setPropertyNames(String[] propertyNames) {
         this.propertyNames = propertyNames;
     }
