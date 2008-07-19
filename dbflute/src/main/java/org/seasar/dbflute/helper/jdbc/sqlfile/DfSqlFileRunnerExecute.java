@@ -45,6 +45,9 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
                 msg = msg + "It failed to execute the SQL!" + getLineSeparator();
                 msg = msg + getLineSeparator();
+                msg = msg + "[SQL File]" + getLineSeparator();
+                msg = msg + _srcFile + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[Executed SQL]" + getLineSeparator();
                 msg = msg + sql + getLineSeparator();
                 msg = msg + getLineSeparator();
