@@ -52,7 +52,7 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-  	<javac destdir="target/classes">
+  	<javac destdir="target/classes" encoding="UTF-8">
       <src path="src/main/java" />
   	  <src path="src/main/resources" />
       <classpath>
