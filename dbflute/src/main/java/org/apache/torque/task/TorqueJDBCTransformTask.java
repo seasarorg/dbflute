@@ -61,7 +61,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,9 +129,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** The document root element. */
     protected Element _databaseNode;
 
-    /** Hashtable to track what table a column belongs to. */
-    protected Hashtable<String, String> _columnTableMap;
-
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
@@ -185,7 +181,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     /**
-     * Generates an XML database schema from JDBC metadata.
+     * Generates an XML database schema from JDBC meta data.
      * <p>
      * @throws Exception a generic exception.
      */
@@ -221,9 +217,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
-
-        // Build a database-wide column -> table map.
-        setupColumnTableMap(dbMetaData, tableList);
 
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
@@ -386,32 +379,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     /**
-     * Set up column-table map. 
-     * <p>
-     * @param dbMetaData JDBC metadata.
-     * @param tableMetaInfoList A list of table-name.
-     * @throws SQLException
-     */
-    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableMetaInfoList)
-            throws SQLException {
-        // Build a database-wide column -> table map.
-        _columnTableMap = new Hashtable<String, String>();
-        for (int i = 0; i < tableMetaInfoList.size(); i++) {
-            final DfTableMetaInfo tableMetaInfo = tableMetaInfoList.get(i);
-            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMetaInfo);
-
-            final String tableName = tableMetaInfo.getTableName();
-            for (int j = 0; j < columns.size(); j++) {
-                final DfColumnMetaInfo columnMetaInfo = columns.get(j);
-                _columnTableMap.put(columnMetaInfo.getColumnName(), tableName);
-            }
-        }
-    }
-
-    /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * 
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
@@ -423,7 +392,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Get unique column name list.
-     * 
      * @param dbMeta
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return Unique column name list.
@@ -436,7 +404,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Get auto-increment column name.
-     * 
      * @param tableMetaInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
      * @param conn Connection.
@@ -450,8 +417,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Retrieves a list of foreign key columns for a given table.
-     *
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
@@ -462,10 +428,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     /**
-     * Get all the table names in the current database that are not
-     * system tables.
-     * 
-     * @param dbMeta JDBC database metadata.
+     * Get all the table names in the current database that are not system tables.
+     * @param dbMeta JDBC database meta data.
      * @return The list of all the tables in a database.
      * @throws SQLException
      */
@@ -475,10 +439,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Retrieves all the column names and types for a given table from
-     * JDBC metadata.  It returns a List of Lists.  Each element
+     * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
-     *
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException

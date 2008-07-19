@@ -78,7 +78,6 @@ public class ConstraintNameGenerator implements NameGenerator {
      * trimming is necessary due to database type length constraints),
      * and the fourth is a <code>Integer</code> indicating the number
      * of this contraint.
-     *
      * @see org.apache.torque.engine.database.model.NameGenerator
      */
     public String generateName(List<?> inputs) throws EngineException {

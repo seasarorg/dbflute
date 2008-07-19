@@ -66,8 +66,7 @@ import org.xml.sax.Attributes;
 
 /**
  * Information about indices of a table.
- *
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class Index {
 
@@ -84,7 +83,7 @@ public class Index {
 
     /** columns */
     private List<String> _indexColumns = new ArrayList<String>(3);
-    
+
     /**
      * Creates a new instance with default characteristics (no name or
      * parent table, small column list size allocation, non-unique).
@@ -95,7 +94,6 @@ public class Index {
     /**
      * Creates a new instance for the list of columns composing an
      * index.  Otherwise performs as {@link #Index()}.
-     *
      * @param table The table this index is associated with.
      * @param indexColumns The list of {@link
      * org.apache.torque.engine.database.model.Column} objects which
@@ -109,7 +107,7 @@ public class Index {
         if (indexColumns.size() > 0) {
             this._indexColumns = new ArrayList<String>(3);
             for (Object object : indexColumns) {
-                _indexColumns.add((String)object);
+                _indexColumns.add((String) object);
             }
             createName();
 
@@ -123,7 +121,6 @@ public class Index {
 
     /**
      * Creates a name for the index using the NameFactory.
-     *
      * @throws EngineException if the name could not be created
      */
     private void createName() throws EngineException {
@@ -141,10 +138,8 @@ public class Index {
         _indexName = NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
     }
 
-
     /**
      * Gets the name of this index.
-     *
      * @return the name of this index
      */
     public String getName() {
@@ -161,7 +156,6 @@ public class Index {
 
     /**
      * Set the name of this index.
-     *
      * @param name the name of this index
      */
     public void setName(String name) {
@@ -170,7 +164,6 @@ public class Index {
 
     /**
      * Set the parent Table of the index
-     *
      * @param parent the table
      */
     public void setTable(Table parent) {
@@ -179,7 +172,6 @@ public class Index {
 
     /**
      * Get the parent Table of the index
-     *
      * @return the table
      */
     public Table getTable() {
@@ -192,7 +184,6 @@ public class Index {
 
     /**
      * Returns the uniqueness of this index.
-     *
      * @return the uniqueness of this index
      */
     public boolean isUnique() {
@@ -201,16 +192,14 @@ public class Index {
 
     /**
      * Imports index from an XML specification
-     *
      * @param attrib the xml attributes
      */
     public void loadFromXML(Attributes attrib) {
         _indexName = attrib.getValue("name");
     }
-    
+
     /**
      * Adds a new column to an index.
-     *
      * @param attrib xml attributes for the column
      */
     public void addColumn(Attributes attrib) {
@@ -237,10 +226,9 @@ public class Index {
         }
         return true;
     }
-    
+
     /**
      * String representation of the index. This is an xml representation.
-     *
      * @return a xml representation
      */
     public String toString() {

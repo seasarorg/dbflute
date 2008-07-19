@@ -83,8 +83,11 @@ import org.xml.sax.Attributes;
  * @author Modified by jflute
  */
 public class Table implements IDMethod {
-    /** Logging class from commons.logging */
-    private static Log _log = LogFactory.getLog(Table.class);
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(Table.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -424,7 +427,6 @@ public class Table implements IDMethod {
     //                                  --------------------
     /**
      * Get annotation table name. (for S2Dao)
-     * 
      * @return Annotation table name. (NotNull)
      */
     public String getAnnotationTableName() {
@@ -433,7 +435,6 @@ public class Table implements IDMethod {
 
     /**
      * Get table sql-name.
-     * 
      * @return Table sql-name. (NotNull)
      */
     public String getTableSqlName() {
@@ -457,7 +458,6 @@ public class Table implements IDMethod {
 
     /**
      * Set the description for the Table
-     *
      * @param newDescription description for the Table
      */
     public void setDescription(String newDescription) {
@@ -2584,61 +2584,41 @@ public class Table implements IDMethod {
     //                                                                            ========
     /**
      * Returns a XML representation of this table.
-     *
      * @return XML representation of this table
      */
     public String toString() {
         StringBuilder result = new StringBuilder();
-
         result.append("<table name=\"").append(getName()).append('\"');
-
         if (_javaName != null) {
             result.append(" javaName=\"").append(_javaName).append('\"');
         }
-
         if (_idMethod != null) {
             result.append(" idMethod=\"").append(_idMethod).append('\"');
         }
-
         if (_skipSql) {
             result.append(" skipSql=\"").append(new Boolean(_skipSql)).append('\"');
         }
-
         if (_abstractValue) {
             result.append(" abstract=\"").append(new Boolean(_abstractValue)).append('\"');
         }
-
-        //        if (_baseClass != null) {
-        //            result.append(" baseClass=\"").append(_baseClass).append('\"');
-        //        }
-        //
-        //        if (_basePeer != null) {
-        //            result.append(" basePeer=\"").append(_basePeer).append('\"');
-        //        }
-
         result.append(">\n");
-
         if (_columnList != null) {
             for (Iterator<Column> iter = _columnList.iterator(); iter.hasNext();) {
                 result.append(iter.next());
             }
         }
-
         if (_foreignKeys != null) {
             for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
                 result.append(iter.next());
             }
         }
-
         if (_idMethodParameters != null) {
             Iterator<IdMethodParameter> iter = _idMethodParameters.iterator();
             while (iter.hasNext()) {
                 result.append(iter.next());
             }
         }
-
         result.append("</table>\n");
-
         return result.toString();
     }
 
@@ -2649,5 +2629,4 @@ public class Table implements IDMethod {
     public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
         this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
     }
-
 }

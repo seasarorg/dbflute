@@ -72,8 +72,14 @@ import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
  */
 public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
 
+    // ===================================================================================
+    //                                                                       Main Override
+    //                                                                       =============
     @Override
     protected void doExecute() {
         final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
@@ -96,6 +102,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         refreshResources();
     }
 
+    @Override
     protected boolean isUseDataSource() {
         return false;
     }

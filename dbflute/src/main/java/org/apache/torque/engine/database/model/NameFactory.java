@@ -64,6 +64,7 @@ import org.apache.torque.engine.EngineException;
  * @author Modified by jflute
  */
 public class NameFactory {
+
     /**
      * The fully qualified class name of the Java name generator.
      */

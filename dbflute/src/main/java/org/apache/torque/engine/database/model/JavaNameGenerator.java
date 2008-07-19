@@ -77,7 +77,6 @@ public class JavaNameGenerator implements NameGenerator {
      * an underscore.  All other letters are lowercased. "javaname"
      * works the same as the <code>CONV_METHOD_JAVANAME</code> method
      * but will not lowercase any characters.
-     *
      * @param inputs list expected to contain two parameters, element
      * 0 contains name to convert, element 1 contains method for conversion.
      * @return The generated name.
@@ -108,7 +107,6 @@ public class JavaNameGenerator implements NameGenerator {
      * <code>STD_SEPARATOR_CHAR</code>, capitilizes first letter of
      * name and each letter after the <code>STD_SEPERATOR</code>,
      * converts the rest of the letters to lowercase.
-     *
      * @param schemaName name to be converted.
      * @return converted name.
      * @see org.apache.torque.engine.database.model.NameGenerator
@@ -129,9 +127,7 @@ public class JavaNameGenerator implements NameGenerator {
 
     /**
      * Converts a database schema name to java object name.  Operates
-     * same as underscoreMethod but does not convert anything to
-     * lowercase.
-     *
+     * same as underscoreMethod but does not convert anything to lowercase.
      * @param schemaName name to be converted.
      * @return converted name.
      * @see org.apache.torque.engine.database.model.NameGenerator
@@ -150,7 +146,6 @@ public class JavaNameGenerator implements NameGenerator {
     /**
      * Converts a database schema name to java object name.  In this
      * case no conversion is made.
-     *
      * @param name name to be converted.
      * @return The <code>name</code> parameter, unchanged.
      */

@@ -57,12 +57,10 @@ package org.apache.torque.engine.database.model;
 /**
  * Interface for various ID retrieval method types
  * (i.e. auto-increment, sequence, ID broker, etc.).
- *
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @version $Id$
+ * @author Modified by jflute
  */
-public interface IDMethod
-{
+public interface IDMethod {
+
     /**
      * Key generation via database-specific ID method
      * (i.e. auto-increment for MySQL, sequence for Oracle, etc.).

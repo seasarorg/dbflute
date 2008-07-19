@@ -62,11 +62,12 @@ import java.util.Set;
  * are roughly equivalent.  For example, adding a unique constraint to
  * a column also creates an index on that column (this is known to be
  * true for MySQL and Oracle).
+ * @author Modified by jflute
  */
 public class Unique extends Index {
+
     /**
      * Returns <code>true</code>.
-     *
      * @return true
      */
     public final boolean isUnique() {
@@ -75,7 +76,6 @@ public class Unique extends Index {
 
     /**
      * String representation of the index. This is an xml representation.
-     *
      * @return string representation in xml
      */
     public String toString() {

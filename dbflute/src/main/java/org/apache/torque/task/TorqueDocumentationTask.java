@@ -59,9 +59,7 @@ import org.apache.velocity.context.Context;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
- * Documentation task for Torque.
- * 
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 

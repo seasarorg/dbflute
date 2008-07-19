@@ -60,10 +60,7 @@ import org.apache.torque.engine.EngineException;
 
 /**
  * The generic interface to a name generation algorithm.
- *
- * @author <a href="mailto:dlr@finemaltcoding.com>Daniel Rall</a>
- * @author <a href="mailto:byron_foster@byron_foster@yahoo.com>Byron Foster</a>
- * @version $Id$
+ * @author Modified by jflute
  */
 public interface NameGenerator
 {

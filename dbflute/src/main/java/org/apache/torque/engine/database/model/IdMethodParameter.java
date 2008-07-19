@@ -58,13 +58,10 @@ import org.xml.sax.Attributes;
 
 /**
  * Information related to an ID method.
- *
- * @author <a href="mailto:jmcnally@collab.net">John McNally</a>
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @version $Id$
+ * @author Modified by jflute
  */
-public class IdMethodParameter
-{
+public class IdMethodParameter {
+    
     private String name;
     private String value;
     private Table parentTable;
@@ -72,8 +69,7 @@ public class IdMethodParameter
     /**
      * Imports foreign key from an XML specification
      */
-    public void loadFromXML (Attributes attrib)
-    {
+    public void loadFromXML(Attributes attrib) {
         name = attrib.getValue("name");
         value = attrib.getValue("value");
     }
@@ -81,75 +77,62 @@ public class IdMethodParameter
     /**
      * Get the parameter name
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     /**
      * Set the parameter name
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
     /**
      * Get the parameter value
      */
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
     /**
      * Set the parameter value
      */
-    public void setValue(String value)
-    {
+    public void setValue(String value) {
         this.value = value;
     }
 
     /**
      * Set the parent Table of the id method
      */
-    public void setTable(Table parent)
-    {
+    public void setTable(Table parent) {
         parentTable = parent;
     }
 
     /**
      * Get the parent Table of the id method
      */
-    public Table getTable()
-    {
+    public Table getTable() {
         return parentTable;
     }
 
     /**
      * Returns the Name of the table the id method is in
      */
-    public String getTableName()
-    {
+    public String getTableName() {
         return parentTable.getName();
     }
 
     /**
      * XML representation of the foreign key.
      */
-    public String toString()
-    {
+    public String toString() {
         StringBuffer result = new StringBuffer();
         result.append(" <id-method-parameter");
-        if (getName() != null)
-        {
-            result.append(" name=\"")
-                  .append(getName())
-                  .append("\"");
+        if (getName() != null) {
+            result.append(" name=\"").append(getName()).append("\"");
         }
-        result.append(" value=\"")
-              .append(getValue())
-              .append("\">\n");
+        result.append(" value=\"").append(getValue()).append("\">\n");
         return result.toString();
     }
 }

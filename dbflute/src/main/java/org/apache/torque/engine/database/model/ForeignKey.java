@@ -70,7 +70,6 @@ import org.xml.sax.Attributes;
 
 /**
  * A class for information about foreign keys of a table.
- * <p>
  * @author Modified by jflute
  */
 public class ForeignKey {
@@ -331,7 +330,7 @@ public class ForeignKey {
     public List<Column> getLocalColumnList() {
         return getLocalColumnObjectList();
     }
-    
+
     public Column getLocalColumnAsOne() {
         String localColumnNameAsOne = getLocalColumnNameAsOne();
         return getTable().getColumn(localColumnNameAsOne);
@@ -384,11 +383,11 @@ public class ForeignKey {
     public List<Column> getForeignColumnList() {
         return getForeignColumnObjectList();
     }
-    
+
     public List<String> getForeignColumnNameList() {
         return _foreignColumns;
     }
-    
+
     public List<String> getForeignColumns() {// Old Style Name
         return _foreignColumns;
     }
@@ -396,7 +395,7 @@ public class ForeignKey {
     public Column getForeignColumnAsOne() {
         return getForeignTable().getColumn(getForeignColumnNameAsOne());
     }
-    
+
     public String getForeignColumnNameAsOne() {
         if (getForeignColumns().size() != 1) {
             String msg = "This method is for only-one foreign-key: getForeignColumns().size()="

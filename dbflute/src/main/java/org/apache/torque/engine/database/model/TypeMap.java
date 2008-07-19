@@ -99,6 +99,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  * TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
  * ------------------------------------------------------
  * </pre>
+ * @author Modified by jflute
  */
 public class TypeMap {
 
@@ -256,7 +257,6 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
 
-        // TODO: @jflute -- Resolve mapping as language dependency! 
         _javaNativeToFlexNativeMap = new Hashtable<String, String>();
         _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
         _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));
