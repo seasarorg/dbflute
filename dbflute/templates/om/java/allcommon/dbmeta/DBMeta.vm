@@ -3,7 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 #set ($myClassName = "${glDBMetaInterfaceName}")
 import java.util.Map;
 import java.util.List;
-import java.sql.Connection;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};

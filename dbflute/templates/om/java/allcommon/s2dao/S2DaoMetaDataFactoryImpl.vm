@@ -31,7 +31,6 @@ import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
