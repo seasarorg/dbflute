@@ -87,7 +87,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             throw new MethodNotFoundRuntimeException(_daoType, methodName, null);
         }
 
-        protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, OutsideSqlContext outsideSqlContext) {
+        protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) {
             MethodInfo method = _daoInterface.GetMethod(outsideSqlContext.MethodName);// By real method name.
             if (method != null && method.IsAbstract) {
                 if (IsOutsideSqlDaoMethodSelect(method)) {
@@ -480,8 +480,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 base.SetupProperty(beanType, dbMetaData, dbms);
                 return;
             }
-            Entity entity = (Entity)ClassUtil.NewInstance(beanType);
-            DBMeta dbmeta = entity.DBMeta;
+            ${glEntityInterfaceName} entity = (Entity)ClassUtil.NewInstance(beanType);
+            ${glDBMetaInterfaceName} dbmeta = entity.DBMeta;
             foreach (PropertyInfo pi in beanType.GetProperties()) {
                 IPropertyType pt = null;
                 RelnoAttribute relnoAttr = _beanAnnotationReader.GetRelnoAttribute(pi);
@@ -513,7 +513,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
             }
         }
-        protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, DBMeta dbmeta) {
+        protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
             string columnName = _beanAnnotationReader.GetColumn(pi);
             if (columnName == null) {
                 return null;
