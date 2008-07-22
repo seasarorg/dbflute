@@ -31,6 +31,7 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} i
         return execute(args, getArgTypes(args));
     }
 
+    @SuppressWarnings("unchecked")
     public int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
         Connection connection = getConnection();
         try {
@@ -40,6 +41,7 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} i
         }
     }
 
+    @SuppressWarnings("unchecked")
     public int execute(Connection connection, Object[] args, Class[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = prepareStatement(connection);

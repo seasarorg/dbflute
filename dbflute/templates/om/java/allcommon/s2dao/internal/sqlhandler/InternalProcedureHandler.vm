@@ -41,6 +41,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
+    @SuppressWarnings("unchecked")
     public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
         final Object dto = getArgumentDto(args);
         logSql(args, argTypes);

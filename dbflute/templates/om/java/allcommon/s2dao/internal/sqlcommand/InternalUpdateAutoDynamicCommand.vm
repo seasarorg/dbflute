@@ -12,6 +12,7 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
 
@@ -139,9 +140,13 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
                 sb.append(", ");
             }
             if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+                if (!isVersionNoAutoIncrementOnMemory()) {
+                    setupVersionNoAutoIncrementOnQuery(sb, columnName);
+                    continue;
+                }
                 final Object versionNo = pt.getPropertyDesc().getValue(bean);
                 if (versionNo == null) {
-                    sb.append(columnName).append(" = ").append(columnName).append(" + 1");
+                    setupVersionNoAutoIncrementOnQuery(sb, columnName);
                     continue;
                 }
             }
@@ -161,6 +166,14 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         return sb.toString();
+    }
+
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return ${glDBFluteConfig}.getInstance().isVersionNoAutoIncrementOnMemory();
+    }
+    
+    protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {
+        sb.append(columnName).append(" = ").append(columnName).append(" + 1");
     }
 
     public BeanMetaData getBeanMetaData() {

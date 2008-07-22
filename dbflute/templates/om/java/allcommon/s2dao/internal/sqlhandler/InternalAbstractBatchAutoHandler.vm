@@ -114,7 +114,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected boolean isStaticVersionNoAutoIncrementOnQuery() {
-        return true;// because of always 'VERSION_NO = VERSION_NO + 1'
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return false;// Always On Query because of executeBatch()!
     }
 }

@@ -84,25 +84,19 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
         return buf.toString();
     }
 
-    protected PropertyType[] createInsertPropertyTypes(BeanMetaData bmd,
-            Object bean, String[] propertyNames) {
+    protected PropertyType[] createInsertPropertyTypes(BeanMetaData bmd, Object bean, String[] propertyNames) {
 
         if (0 == propertyNames.length) {
-            throw new SRuntimeException("EDAO0024", new Object[] { bean
-                    .getClass().getName() });
+            throw new SRuntimeException("EDAO0024", new Object[] { bean.getClass().getName() });
         }
-        List types = new ArrayList();
+        List<PropertyType> types = new ArrayList<PropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
 
         for (int i = 0; i < propertyNames.length; ++i) {
             PropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
-#if ($database.isVersionAfter1047())
                 final IdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
-#else
-	            final IdentifierGenerator generator = bmd.getIdentifierGenerator();
-#end
                 if (!generator.isSelfGenerate()) {
                     continue;
                 }
@@ -110,8 +104,7 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
                 if (pt.getPropertyDesc().getValue(bean) == null) {
                     final String propertyName = pt.getPropertyName();
                     if (!propertyName.equalsIgnoreCase(timestampPropertyName)
-                            && !propertyName
-                                    .equalsIgnoreCase(versionNoPropertyName)) {
+                            && !propertyName.equalsIgnoreCase(versionNoPropertyName)) {
                         continue;
                     }
                 }
@@ -121,8 +114,7 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
         if (types.isEmpty()) {
             throw new SRuntimeException("EDAO0014");
         }
-        PropertyType[] propertyTypes = (PropertyType[]) types
-                .toArray(new PropertyType[types.size()]);
+        PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
         return propertyTypes;
     }
 

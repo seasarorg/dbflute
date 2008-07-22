@@ -21,6 +21,8 @@ import org.seasar.framework.util.IntegerConversionUtil;
 import org.seasar.framework.util.PreparedStatementUtil;
 import org.seasar.framework.util.StatementUtil;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -133,7 +135,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
-                if (isStaticVersionNoAutoIncrementOnQuery()) {
+                if (!isVersionNoAutoIncrementOnMemory()) {
                     continue;// because of always 'VERSION_NO = VERSION_NO + 1'
                 }
                 Object value = pt.getPropertyDesc().getValue(bean);
@@ -153,8 +155,8 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
-    protected boolean isStaticVersionNoAutoIncrementOnQuery() {
-        return false;
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return ${glDBFluteConfig}.getInstance().isVersionNoAutoIncrementOnMemory();
     }
 
     protected void setupDeleteBindVariables(Object bean) {
@@ -168,8 +170,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
         BeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            PropertyType pt = bmd.getPropertyTypeByColumnName(bmd
-                    .getPrimaryKey(i));
+            PropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
@@ -190,16 +191,14 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
 
     protected void updateTimestampIfNeed(Object bean) {
         if (getTimestamp() != null) {
-            PropertyDesc pd = getBeanMetaData().getTimestampPropertyType()
-                    .getPropertyDesc();
+            PropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
             pd.setValue(bean, getTimestamp());
         }
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
         if (getVersionNo() != null) {
-            PropertyDesc pd = getBeanMetaData().getVersionNoPropertyType()
-                    .getPropertyDesc();
+            PropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
             pd.setValue(bean, getVersionNo());
         }
     }

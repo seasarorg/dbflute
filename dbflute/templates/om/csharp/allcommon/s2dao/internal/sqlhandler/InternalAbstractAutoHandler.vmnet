@@ -134,6 +134,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     Timestamp = DateTime.Now;
                     SetupTimestampVariableList(varList, pt);
                 } else if (String.Compare(pt.PropertyName, BeanMetaData.VersionNoPropertyName, true) == 0) {
+                    if (!IsVersionNoAutoIncrementOnMemory()) {
+                        continue;// because of always 'VERSION_NO = VERSION_NO + 1'
+                    }
                     Object value = pt.PropertyInfo.GetValue(bean, null);
                     if (value == null) {
                         continue;// because of 'VERSION_NO = VERSION_NO + 1'
@@ -147,6 +150,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             AddAutoUpdateWhereBindVariables(varList, varTypeList, bean);
             BindVariables = varList.ToArray();
             BindVariableTypes = (Type[]) varTypeList.ToArray(typeof(Type));
+        }
+
+        protected bool IsVersionNoAutoIncrementOnMemory() {
+            return false;
         }
 
         protected void SetupDeleteBindVariables(object bean) {

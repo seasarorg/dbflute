@@ -50,6 +50,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} i
         return execute(args, getArgTypes(args));
     }
 
+    @SuppressWarnings("unchecked")
     public Object execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
         Connection con = getConnection();
         try {
@@ -59,6 +60,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} i
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Object execute(Connection connection, Object[] args, Class[] argTypes) throws SQLRuntimeException {
         logSql(args, argTypes);
         PreparedStatement ps = null;

@@ -80,15 +80,14 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     protected abstract void setupPropertyTypes(String[] propertyNames);
 
     protected void setupInsertPropertyTypes(String[] propertyNames) {
-        List types = new ArrayList();
+        List<PropertyType> types = new ArrayList<PropertyType>();
         for (int i = 0; i < propertyNames.length; ++i) {
             PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (isInsertTarget(pt)) {
                 types.add(pt);
             }
         }
-        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types
-                .size()]);
+        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
     }
 
     protected boolean isInsertTarget(PropertyType propertyType) {
@@ -101,7 +100,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     }
 
     protected void setupUpdatePropertyTypes(String[] propertyNames) {
-        List types = new ArrayList();
+        List<PropertyType> types = new ArrayList<PropertyType>();
         for (int i = 0; i < propertyNames.length; ++i) {
             PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
@@ -122,28 +121,28 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupInsertSql() {
         BeanMetaData bmd = getBeanMetaData();
-        StringBuilder buf = new StringBuilder(100);
-        buf.append("insert into ");
-        buf.append(bmd.getTableName());
-        buf.append(" (");
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("insert into ");
+        sb.append(bmd.getTableName());
+        sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
-                buf.append(pt.getColumnName());
-                buf.append(", ");
+                sb.append(pt.getColumnName());
+                sb.append(", ");
             }
         }
-        buf.setLength(buf.length() - 2);
-        buf.append(") values (");
+        sb.setLength(sb.length() - 2);
+        sb.append(") values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
-                buf.append("?, ");
+                sb.append("?, ");
             }
         }
-        buf.setLength(buf.length() - 2);
-        buf.append(")");
-        setSql(buf.toString());
+        sb.setLength(sb.length() - 2);
+        sb.append(")");
+        setSql(sb.toString());
     }
 
     protected void setupUpdateSql() {
@@ -168,11 +167,11 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupDeleteSql() {
         checkPrimaryKey();
-        StringBuilder buf = new StringBuilder(100);
-        buf.append("delete from ");
-        buf.append(getBeanMetaData().getTableName());
-        setupUpdateWhere(buf);
-        setSql(buf.toString());
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("delete from ");
+        sb.append(getBeanMetaData().getTableName());
+        setupUpdateWhere(sb);
+        setSql(sb.toString());
     }
 
     protected void checkPrimaryKey() {

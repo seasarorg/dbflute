@@ -24,6 +24,7 @@ public class ${myClassName} {
 	protected boolean _conditionBeanFormatSql = true;
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
+	protected boolean _versionNoAutoIncrementOnMemory;
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -107,6 +108,21 @@ public class ${myClassName} {
 		    _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
 		}
 	    _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
+	}
+	
+    // ===================================================================================
+    //                                                 Version No Auto Increment On Memory
+    //                                                 ===================================
+	public boolean isVersionNoAutoIncrementOnMemory() {
+	    return _versionNoAutoIncrementOnMemory;
+	}
+	
+	public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting versionNoAutoIncrementOnMemory: " + versionNoAutoIncrementOnMemory);
+		}
+	    _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
 	}
 	
     // ===================================================================================

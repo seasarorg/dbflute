@@ -19,7 +19,7 @@ public abstract class ${glInternalAbstractDynamicCommand} extends ${glInternalAb
     //                                                                           =========
     protected Node rootNode;
     protected String[] argNames = new String[0];
-    protected Class[] argTypes = new Class[0];
+    protected Class<?>[] argTypes = new Class[0];
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -65,11 +65,11 @@ public abstract class ${glInternalAbstractDynamicCommand} extends ${glInternalAb
         this.argNames = argNames;
     }
 
-    public Class[] getArgTypes() {
+    public Class<?>[] getArgTypes() {
         return argTypes;
     }
 
-    public void setArgTypes(Class[] argTypes) {
+    public void setArgTypes(Class<?>[] argTypes) {
         this.argTypes = argTypes;
     }
 }
