@@ -86,9 +86,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                     sb.Append(", ");
                 }
                 if (String.Compare(pt.PropertyName, versionNoPropertyName, true) == 0) {
+                    if (!IsVersionNoAutoIncrementOnMemory()) {
+                        SetupVersionNoAutoIncrementOnQuery(sb, columnName);
+                        continue;// because of always 'VERSION_NO = VERSION_NO + 1'
+                    }
                     Object value = pt.PropertyInfo.GetValue(bean, null);
                     if (value == null) {
-                        sb.Append(columnName).Append(" = ").Append(columnName).Append(" + 1");
+                        SetupVersionNoAutoIncrementOnQuery(sb, columnName);
                         continue;
                     }
                 }
@@ -109,6 +113,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                 sb.Append(ADD_AND).Append(pt.ColumnName).Append(" = ?");
             }
             return sb.ToString();
+        }
+
+        protected bool IsVersionNoAutoIncrementOnMemory() {
+            return false;
+        }
+
+        protected void SetupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {
+            sb.Append(columnName).Append(" = ").Append(columnName).Append(" + 1");
         }
 
         protected virtual bool IsTargetProperty(IPropertyType pt, string timestampPropertyName, string versionNoPropertyName, object bean) {
