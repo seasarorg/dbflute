@@ -11,12 +11,12 @@ public class ${glInternalSqlLog} {
     private String rawSql;
     private String completeSql;
     private Object[] bindArgs;
-    private Class[] bindArgTypes;
+    private Class<?>[] bindArgTypes;
 	
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glInternalSqlLog}(String rawSql, String completeSql, Object[] bindArgs, Class[] bindArgTypes) {
+    public ${glInternalSqlLog}(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
         this.rawSql = rawSql;
         this.completeSql = completeSql;
         this.bindArgs = bindArgs;
@@ -30,7 +30,7 @@ public class ${glInternalSqlLog} {
         return bindArgs;
     }
 
-    public Class[] getBindArgTypes() {
+    public Class<?>[] getBindArgTypes() {
         return bindArgTypes;
     }
 

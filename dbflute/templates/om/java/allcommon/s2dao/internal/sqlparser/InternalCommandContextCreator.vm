@@ -12,12 +12,12 @@ public class ${glInternalCommandContextCreator} {
     //                                                                           Attribute
     //                                                                           =========
     protected String[] argNames;
-    protected Class[] argTypes;
+    protected Class<?>[] argTypes;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-	public ${glInternalCommandContextCreator}(String[] argNames, Class[] argTypes) {
+	public ${glInternalCommandContextCreator}(String[] argNames, Class<?>[] argTypes) {
 	    this.argNames = (argNames != null ? argNames : new String[0]);
 	    this.argTypes = (argTypes != null ? argTypes : new Class[0]);
 	}
@@ -29,7 +29,7 @@ public class ${glInternalCommandContextCreator} {
         final CommandContext ctx = new CommandContextImpl();
         if (args != null) {
             for (int i = 0; i < args.length; ++i) {
-                Class argType = null;
+                Class<?> argType = null;
                 if (args[i] != null) {
                     if (i < argTypes.length) {
                         argType = argTypes[i];
