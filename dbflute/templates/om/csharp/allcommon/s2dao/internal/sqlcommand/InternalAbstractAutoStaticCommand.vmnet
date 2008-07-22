@@ -54,8 +54,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
         protected abstract void SetupPropertyTypes(string[] propertyNames);
 
-        protected void SetupInsertPropertyTypes(string[] propertyNames)
-        {
+        protected void SetupInsertPropertyTypes(string[] propertyNames) {
             ArrayList types = new ArrayList();
             for (int i = 0; i < propertyNames.Length; ++i)
             {
@@ -67,8 +66,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             propertyTypes = (IPropertyType[]) types.ToArray(typeof(IPropertyType));
         }
 
-        protected void SetupUpdatePropertyTypes(string[] propertyNames)
-        {
+        protected void SetupUpdatePropertyTypes(string[] propertyNames) {
             ArrayList types = new ArrayList();
             for (int i = 0; i < propertyNames.Length; ++i)
             {
@@ -79,62 +77,61 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             propertyTypes = (IPropertyType[]) types.ToArray(typeof(IPropertyType));
         }
 
-        protected virtual void SetupDeletePropertyTypes(string[] propertyNames)
-        {
+        protected virtual void SetupDeletePropertyTypes(string[] propertyNames) {
         }
 
         protected abstract void SetupSql();
 
-        protected void SetupInsertSql()
-        {
+        protected void SetupInsertSql() {
             IBeanMetaData bmd = BeanMetaData;
-            StringBuilder buf = new StringBuilder(100);
-            buf.Append("INSERT INTO ");
-            buf.Append(bmd.TableName);
-            buf.Append(" (");
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("INSERT INTO ");
+            sb.Append(bmd.TableName);
+            sb.Append(" (");
             for (int i = 0; i < propertyTypes.Length; ++i)
             {
                 IPropertyType pt = propertyTypes[i];
-                buf.Append(pt.ColumnName);
-                buf.Append(", ");
+                sb.Append(pt.ColumnName);
+                sb.Append(", ");
             }
-            buf.Length = buf.Length - 2;
-            buf.Append(") VALUES (");
-            for (int i = 0; i < propertyTypes.Length; ++i)
-            {
-                buf.Append("?, ");
+            sb.Length = sb.Length - 2;
+            sb.Append(") VALUES (");
+            for (int i = 0; i < propertyTypes.Length; ++i) {
+                sb.Append("?, ");
             }
-            buf.Length = buf.Length - 2;
-            buf.Append(")");
-            Sql = buf.ToString();
+            sb.Length = sb.Length - 2;
+            sb.Append(")");
+            Sql = sb.ToString();
         }
 
-        protected void SetupUpdateSql()
-        {
+        protected void SetupUpdateSql() {
             CheckPrimaryKey();
-            StringBuilder buf = new StringBuilder(100);
-            buf.Append("UPDATE ");
-            buf.Append(BeanMetaData.TableName);
-            buf.Append(" SET ");
-            for (int i = 0; i < propertyTypes.Length; ++i)
-            {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("UPDATE ");
+            sb.Append(BeanMetaData.TableName);
+            sb.Append(" SET ");
+            for (int i = 0; i < propertyTypes.Length; ++i) {
                 IPropertyType pt = propertyTypes[i];
-                buf.Append(pt.ColumnName);
-                buf.Append(" = ?, ");
+                if (String.Compare(pt.PropertyName, BeanMetaData.VersionNoPropertyName, true) == 0) {
+                    sb.Append(pt.ColumnName).Append(" = ").Append(pt.ColumnName).Append(" + 1, ");
+                    continue;
+                }
+                sb.Append(pt.ColumnName);
+                sb.Append(" = ?, ");
             }
-            buf.Length = buf.Length - 2;
-            SetupUpdateWhere(buf);
-            Sql = buf.ToString();
+            sb.Length = sb.Length - 2;
+            SetupUpdateWhere(sb);
+            Sql = sb.ToString();
         }
 
         protected void SetupDeleteSql()
         {
             CheckPrimaryKey();
-            StringBuilder buf = new StringBuilder(100);
-            buf.Append("DELETE FROM ");
-            buf.Append(BeanMetaData.TableName);
-            SetupUpdateWhere(buf);
-            Sql = buf.ToString();
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("DELETE FROM ");
+            sb.Append(BeanMetaData.TableName);
+            SetupUpdateWhere(sb);
+            Sql = sb.ToString();
         }
 
         protected void CheckPrimaryKey()
@@ -144,29 +141,29 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                 throw new PrimaryKeyNotFoundRuntimeException(bmd.BeanType);
         }
 
-        protected void SetupUpdateWhere(StringBuilder buf)
+        protected void SetupUpdateWhere(StringBuilder sb)
         {
             IBeanMetaData bmd = BeanMetaData;
-            buf.Append(" WHERE ");
+            sb.Append(" WHERE ");
             for (int i = 0; i < bmd.PrimaryKeySize; ++i)
             {
-                buf.Append(bmd.GetPrimaryKey(i));
-                buf.Append(" = ? AND ");
+                sb.Append(bmd.GetPrimaryKey(i));
+                sb.Append(" = ? AND ");
             }
-            buf.Length = buf.Length - 5;
+            sb.Length = sb.Length - 5;
             if (bmd.HasVersionNoPropertyType)
             {
                 IPropertyType pt = bmd.VersionNoPropertyType;
-                buf.Append(" AND ");
-                buf.Append(pt.ColumnName);
-                buf.Append(" = ?");
+                sb.Append(" AND ");
+                sb.Append(pt.ColumnName);
+                sb.Append(" = ?");
             }
             if (bmd.HasTimestampPropertyType)
             {
                 IPropertyType pt = bmd.TimestampPropertyType;
-                buf.Append(" AND ");
-                buf.Append(pt.ColumnName);
-                buf.Append(" = ?");
+                sb.Append(" AND ");
+                sb.Append(pt.ColumnName);
+                sb.Append(" = ?");
             }
         }
     }
