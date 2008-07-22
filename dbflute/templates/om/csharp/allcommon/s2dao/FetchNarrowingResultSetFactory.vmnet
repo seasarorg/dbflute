@@ -38,7 +38,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return dataReader;
             }
             ${glFetchNarrowingResultSetWrapper} wrapper = null;
-            if (OutsideSqlContext.IsExistOutsideSqlContextOnThread()) {
+            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
                 ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
                 wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, outsideSqlContext.IsOffsetByCursorForcedly, outsideSqlContext.IsLimitByCursorForcedly);
             } else {

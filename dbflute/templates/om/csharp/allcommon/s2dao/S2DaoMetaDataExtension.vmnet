@@ -480,7 +480,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 base.SetupProperty(beanType, dbMetaData, dbms);
                 return;
             }
-            ${glEntityInterfaceName} entity = (Entity)ClassUtil.NewInstance(beanType);
+            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ClassUtil.NewInstance(beanType);
             ${glDBMetaInterfaceName} dbmeta = entity.DBMeta;
             foreach (PropertyInfo pi in beanType.GetProperties()) {
                 IPropertyType pt = null;
@@ -552,7 +552,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 			}
 		}
 		protected bool IsEntity(Type beanType) {
-            return typeof(Entity).IsAssignableFrom(beanType);
+            return typeof(${glEntityInterfaceName}).IsAssignableFrom(beanType);
         }
         public override bool HasModifiedPropertyNamesPropertyName {
             get {

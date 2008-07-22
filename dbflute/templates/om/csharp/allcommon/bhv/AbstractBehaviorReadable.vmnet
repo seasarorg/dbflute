@@ -81,12 +81,12 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                       =========
         public virtual ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ResultBeanBuilder<${glEntityInterfaceName}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
+            return new ${glResultBeanBuilderName}<${glEntityInterfaceName}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
         public virtual ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            PagingInvoker<${glEntityInterfaceName}> invoker = new PagingInvoker<${glEntityInterfaceName}>(TableDbName);
+            ${glPagingInvokerName}<${glEntityInterfaceName}> invoker = new ${glPagingInvokerName}<${glEntityInterfaceName}>(TableDbName);
             return invoker.InvokePaging(new InternalReadPagingHandler(this, cb));
         }
 
