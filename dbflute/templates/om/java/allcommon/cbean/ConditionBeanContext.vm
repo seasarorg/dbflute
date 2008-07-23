@@ -320,13 +320,26 @@ public class ${glConditionBeanContextName} {
 		}
 	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb);
 	}
-	
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                                   Unique Constraint
+    //                                                                   =================
+    /**
+     * Is the SQLException from unique constraint?
+     * @param sqlState SQLState of the SQLException. (Nullable: If null, use errorCode.)
+     * @param errorCode ErrorCode of the SQLException. (If sqlState is not null, this is unused.)
+     * @return Is the SQLException from unique constraint?
+     */
+    public static boolean isUniqueConstraintException(String sqlState, int errorCode) {
+        return createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
+    }
+
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
     /**
      * Get the value of line separator.
-     * 
      * @return The value of line separator. (NotNull)
      */
     protected static String getLineSeparator() {

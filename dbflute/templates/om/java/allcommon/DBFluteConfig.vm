@@ -25,6 +25,7 @@ public class ${myClassName} {
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
 	protected boolean _versionNoAutoIncrementOnMemory;
+	protected boolean _uniqueConstraintExceptionBySQLState;
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -109,7 +110,8 @@ public class ${myClassName} {
 		}
 	    _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
 	}
-	
+
+    // [DBFlute-0.7.7]
     // ===================================================================================
     //                                                 Version No Auto Increment On Memory
     //                                                 ===================================
@@ -123,6 +125,22 @@ public class ${myClassName} {
 		    _log.info("...Setting versionNoAutoIncrementOnMemory: " + versionNoAutoIncrementOnMemory);
 		}
 	    _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+	}
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                              Unique ConstraintException by SQLState
+    //                                              ======================================
+	public boolean isUniqueConstraintExceptionBySQLState() {
+	    return _uniqueConstraintExceptionBySQLState;
+	}
+	
+	public void setUniqueConstraintExceptionBySQLState(boolean uniqueConstraintExceptionBySQLState) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting uniqueConstraintExceptionBySQLState: " + uniqueConstraintExceptionBySQLState);
+		}
+	    _uniqueConstraintExceptionBySQLState = uniqueConstraintExceptionBySQLState;
 	}
 	
     // ===================================================================================

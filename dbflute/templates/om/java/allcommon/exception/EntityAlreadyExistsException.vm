@@ -1,0 +1,22 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+import java.sql.SQLException;
+import org.seasar.framework.exception.SQLRuntimeException;
+
+/**
+ * The exception of when the entity already exists on the database.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glEntityAlreadyExistsException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * @param cause SQLException. (NotNull)
+     */
+    public ${glEntityAlreadyExistsException}(String msg, SQLException cause) {
+        super(msg, cause);
+    }
+}

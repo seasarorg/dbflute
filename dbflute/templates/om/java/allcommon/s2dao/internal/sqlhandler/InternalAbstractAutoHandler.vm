@@ -18,10 +18,11 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.IntegerConversionUtil;
-import org.seasar.framework.util.PreparedStatementUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 
 /**
  * @author ${database.ClassAuthor}
@@ -70,7 +71,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         int ret = -1;
         try {
             bindArgs(ps, bindVariables, bindVariableValueTypes);
-            ret = PreparedStatementUtil.executeUpdate(ps);
+            ret = executeUpdate(ps);
         } finally {
             StatementUtil.close(ps);
         }
@@ -86,8 +87,8 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             ValueType valueType = valueTypes[i];
             try {
                 valueType.bindValue(ps, i + 1, args[i]);
-            } catch (SQLException ex) {
-                throw new SQLRuntimeException(ex);
+            } catch (SQLException e) {
+                throw new SQLRuntimeException(e);
             }
         }
     }
@@ -201,6 +202,49 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             PropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
             pd.setValue(bean, getVersionNo());
         }
+    }
+
+    // ===================================================================================
+    //                                                                      JDBC Delegator
+    //                                                                      ==============
+    protected int executeUpdate(PreparedStatement ps) {
+        try {
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            if (isUniqueConstraintException(e)) {
+                throwEntityAlreadyExistsException(e, ps);
+            }
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    protected void throwEntityAlreadyExistsException(SQLException e, PreparedStatement ps) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The entity already exists on the database!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
+        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[PreparedStatement]" + getLineSeparator() + ps + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new ${glEntityAlreadyExistsException}(msg, e);
+    }
+
+    protected boolean isUniqueConstraintException(SQLException e) {
+        String sqlState = isUniqueConstraintExceptionBySQLState() ? e.getSQLState() : null;
+        return ${glConditionBeanContextName}.isUniqueConstraintException(sqlState, e.getErrorCode());
+    }
+
+    protected boolean isUniqueConstraintExceptionBySQLState() {
+        return ${glDBFluteConfig}.getInstance().isUniqueConstraintExceptionBySQLState();
     }
 
     // ===================================================================================

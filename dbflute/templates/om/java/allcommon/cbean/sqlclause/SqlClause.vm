@@ -471,4 +471,16 @@ public interface ${myClassName} {
     //                                                                        ============
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap);
     public String getClauseQueryDelete();
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                                   Unique Constraint
+    //                                                                   =================
+    /**
+     * Is the SQLException from unique constraint?
+     * @param sqlState SQLState of the SQLException. (Nullable: If null, use errorCode.)
+     * @param errorCode ErrorCode of the SQLException. (If sqlState is not null, this is unused.)
+     * @return Is the SQLException from unique constraint?
+     */	
+    public boolean isUniqueConstraintException(String sqlState, int errorCode);
 }

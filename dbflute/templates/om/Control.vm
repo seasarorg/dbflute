@@ -242,6 +242,7 @@ targetdatabase = $targetDatabase
     #set ($glEndCommentNotFoundException = "${glProjectPrefix}EndCommentNotFoundException")
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
+    #set ($glEntityAlreadyExistsException = "${glProjectPrefix}EntityAlreadyExistsException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
     #set ($glIfCommentConditionNotFoundException = "${glProjectPrefix}IfCommentConditionNotFoundException")
     #set ($glIfCommentNotBooleanResultException = "${glProjectPrefix}IfCommentNotBooleanResultException")
@@ -1254,6 +1255,10 @@ targetdatabase = $targetDatabase
     $database.info("    parse('EntityAlreadyDeletedException');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityAlreadyDeletedException}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/exception/EntityAlreadyDeletedException.${glTemplateFileExtension}",$path,"", "")
+
+    $database.info("    parse('EntityAlreadyExistsException');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityAlreadyExistsException}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/exception/EntityAlreadyExistsException.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('EntityDuplicatedException');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityDuplicatedException}.${glClassFileExtension}" )

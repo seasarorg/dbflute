@@ -1,0 +1,16 @@
+
+using System;
+using Seasar.Framework.Exceptions.;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the entity already exists on the database.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glEntityAlreadyExistsException} : Exception {
+
+        public ${glEntityAlreadyExistsException}(String msg, Exception e)
+        : base(msg,e) {}
+    }
+}
