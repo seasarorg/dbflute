@@ -1490,15 +1490,27 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                   Unique Constraint
     //                                                                   =================
-    public boolean isUniqueConstraintException(String sqlState, int errorCode) {
-        if (sqlState != null) {
-            String prefix = sqlState.length() > 2 ? sqlState.substring(0, 2) : sqlState;
-            return "23".equals(prefix) || "27".equals(prefix) || "44".equals(prefix);
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        if (sqlState == null && errorCode == null) {
+            return false;
         }
-        return isUniqueConstraintErrorCode(errorCode);
+        if (sqlState != null) {
+            if (!isUniqueConstraintSQLState(sqlState)) {
+                return false;
+            }
+        }
+        if (errorCode != null) {
+            return isUniqueConstraintErrorCode(errorCode);
+        } else {
+            return true;// SQLState Only
+        }
     }
     
-    protected boolean isUniqueConstraintErrorCode(int errorCode) {
+    protected boolean isUniqueConstraintSQLState(String sqlState) {
+        return false;// Expect Override by Database!
+    }
+
+    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
         return false;// Expect Override by Database!
     }
 

@@ -79,7 +79,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} lockForUpdate() {
@@ -89,7 +88,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -98,7 +96,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -107,7 +104,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -116,10 +112,23 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _fetchFirstSqlSuffix + _lockSqlSuffix;
+    }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
+    @Override    
+    protected boolean isUniqueConstraintSQLState(String sqlState) {
+        return "23505".equals(sqlState);
+    }
+
+    @Override    
+    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
+        return errorCode == -803;
     }
 }

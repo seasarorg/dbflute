@@ -1,6 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 #set ($myClassName = "${glDBFluteConfig}")
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -25,8 +28,8 @@ public class ${myClassName} {
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
 	protected boolean _versionNoAutoIncrementOnMemory;
-	protected boolean _uniqueConstraintExceptionBySQLState;
-	protected boolean _uniqueConstraintExceptionByErrorCode;
+	protected UniqueConstraintDeterminationType _uniqueConstraintDeterminationType = UniqueConstraintDeterminationType.NONE;
+	protected UniqueConstraintDeterminator _uniqueConstraintDeterminator;
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -130,36 +133,40 @@ public class ${myClassName} {
 
     // [DBFlute-0.7.7]
     // ===================================================================================
-    //                                              Unique ConstraintException by SQLState
-    //                                              ======================================
-	public boolean isUniqueConstraintExceptionBySQLState() {
-	    return _uniqueConstraintExceptionBySQLState;
-	}
-	
-	public void setUniqueConstraintExceptionBySQLState(boolean uniqueConstraintExceptionBySQLState) {
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting uniqueConstraintExceptionBySQLState: " + uniqueConstraintExceptionBySQLState);
-		}
-	    _uniqueConstraintExceptionBySQLState = uniqueConstraintExceptionBySQLState;
+    //                                                                   Unique Constraint
+    //                                                                   =================
+	public UniqueConstraintDeterminationType getUniqueConstraintDeterminationType() {
+	    return _uniqueConstraintDeterminationType;
 	}
 
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                             Unique ConstraintException by ErrorCode
-    //                                             =======================================
-	public boolean isUniqueConstraintExceptionByErrorCode() {
-	    return _uniqueConstraintExceptionByErrorCode;
-	}
-	
-	public void setUniqueConstraintExceptionByErrorCode(boolean uniqueConstraintExceptionByErrorCode) {
+	public void setUniqueConstraintDeterminationType(UniqueConstraintDeterminationType uniqueConstraintDeterminationType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting uniqueConstraintExceptionByErrorCode: " + uniqueConstraintExceptionByErrorCode);
+		    _log.info("...Setting uniqueConstraintDeterminationType: " + uniqueConstraintDeterminationType);
 		}
-	    _uniqueConstraintExceptionByErrorCode = uniqueConstraintExceptionByErrorCode;
+	    _uniqueConstraintDeterminationType = uniqueConstraintDeterminationType;
 	}
-	
+
+    public static enum UniqueConstraintDeterminationType {
+        NONE, SQLSTATE, ERRORCODE, SQLSTATE_ERRORCODE
+    }
+
+	public UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+	    return _uniqueConstraintDeterminator;
+	}
+
+	public void setUniqueConstraintDeterminator(UniqueConstraintDeterminator uniqueConstraintDeterminator) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting uniqueConstraintDeterminator: " + uniqueConstraintDeterminator);
+		}
+	    _uniqueConstraintDeterminator = uniqueConstraintDeterminator;
+	}
+
+    public static interface UniqueConstraintDeterminator {
+        public boolean isUniqueConstraintException(Throwable t);
+    }
+
     // ===================================================================================
     //                                                                          Log Format
     //                                                                          ==========

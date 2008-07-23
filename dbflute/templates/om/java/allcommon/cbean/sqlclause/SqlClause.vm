@@ -477,10 +477,10 @@ public interface ${myClassName} {
     //                                                                   Unique Constraint
     //                                                                   =================
     /**
-     * Is the SQLException from unique constraint?
-     * @param sqlState SQLState of the SQLException. (Nullable: If null, use errorCode.)
-     * @param errorCode ErrorCode of the SQLException. (If sqlState is not null, this is unused.)
+     * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
+     * @param sqlState SQLState of the SQLException. (Nullable)
+     * @param errorCode ErrorCode of the SQLException. (Nullable)
      * @return Is the SQLException from unique constraint?
      */	
-    public boolean isUniqueConstraintException(String sqlState, int errorCode);
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode);
 }

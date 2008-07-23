@@ -87,10 +87,15 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     // [DBFlute-0.7.7]
     // ===================================================================================
-    //                                                                   Unique Constraint
-    //                                                                   =================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
     @Override    
-    protected boolean isUniqueConstraintErrorCode(int errorCode) {
+    protected boolean isUniqueConstraintSQLState(String sqlState) {
+        return "23001".equals(sqlState);
+    }
+
+    @Override    
+    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
         return errorCode == 23001;
     }
 }

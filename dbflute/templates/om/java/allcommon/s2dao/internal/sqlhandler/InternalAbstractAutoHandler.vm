@@ -239,8 +239,14 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     }
 
     protected boolean isUniqueConstraintException(SQLException e) {
-        if (isUniqueConstraintExceptionBySQLState()) {
+        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
+        if (determinator != null) {
+            return determinator.isUniqueConstraintException(e);
+        }
+        if (isUniqueConstraintExceptionBySQLStateErrorCode()) {
             return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+        } else if (isUniqueConstraintExceptionBySQLState()) {
+            return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), null);
         } else if (isUniqueConstraintExceptionByErrorCode()) {
             return ${glConditionBeanContextName}.isUniqueConstraintException(null, e.getErrorCode());
         } else {
@@ -248,12 +254,24 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         }
     }
 
+    protected boolean isUniqueConstraintExceptionBySQLStateErrorCode() {
+        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.SQLSTATE_ERRORCODE);
+    }
+
     protected boolean isUniqueConstraintExceptionBySQLState() {
-        return ${glDBFluteConfig}.getInstance().isUniqueConstraintExceptionBySQLState();
+        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.SQLSTATE);
     }
 
     protected boolean isUniqueConstraintExceptionByErrorCode() {
-        return ${glDBFluteConfig}.getInstance().isUniqueConstraintExceptionByErrorCode();
+        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.ERRORCODE);
+    }
+
+    protected ${glDBFluteConfig}.UniqueConstraintDeterminationType getUniqueConstraintDeterminationType() {
+        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminationType();
+    }
+
+    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
     }
 
     // ===================================================================================

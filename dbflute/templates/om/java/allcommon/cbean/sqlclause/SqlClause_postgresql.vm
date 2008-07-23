@@ -90,4 +90,18 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
+    @Override    
+    protected boolean isUniqueConstraintSQLState(String sqlState) {
+        return "23505".equals(sqlState);
+    }
+
+    @Override    
+    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
+        return errorCode == 0;
+    }
 }

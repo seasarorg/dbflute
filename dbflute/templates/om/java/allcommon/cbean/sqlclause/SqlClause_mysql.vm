@@ -109,4 +109,18 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
         return false;
     }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
+    @Override    
+    protected boolean isUniqueConstraintSQLState(String sqlState) {
+        return "23000".equals(sqlState);
+    }
+
+    @Override    
+    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
+        return errorCode == 1062;
+    }
 }

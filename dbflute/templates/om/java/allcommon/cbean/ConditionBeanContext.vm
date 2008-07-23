@@ -251,13 +251,7 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			final String dispalySql;
-			if (cb.isFormatSql()) {
-			    dispalySql = cb.toDisplaySql();
-			} else {
-			    dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableSqlName());
-			}
-			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
@@ -276,13 +270,7 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			final String dispalySql;
-			if (cb.isFormatSql()) {
-			    dispalySql = cb.toDisplaySql();
-			} else {
-			    dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableSqlName());
-			}
-			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
@@ -292,20 +280,6 @@ public class ${glConditionBeanContextName} {
         } else {
             throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
-    }
-
-    protected static String filterDisplaySql(String displaySql, String tableDbName) {
-        if (displaySql == null || displaySql.trim().length() == 0) {
-            return null;
-        }
-        if (displaySql.indexOf(getLineSeparator()) >= 0) {
-            return displaySql;
-        }
-        int basePointIndex = displaySql.indexOf(" from " + tableDbName);
-        if (basePointIndex < 0) {
-            return displaySql;
-        }
-        return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
     }
 
     // ===================================================================================
@@ -326,12 +300,12 @@ public class ${glConditionBeanContextName} {
     //                                                                   Unique Constraint
     //                                                                   =================
     /**
-     * Is the SQLException from unique constraint?
-     * @param sqlState SQLState of the SQLException. (Nullable: If null, use errorCode.)
-     * @param errorCode ErrorCode of the SQLException. (If sqlState is not null, this is unused.)
+     * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
+     * @param sqlState SQLState of the SQLException. (Nullable)
+     * @param errorCode ErrorCode of the SQLException. (Nullable)
      * @return Is the SQLException from unique constraint?
      */
-    public static boolean isUniqueConstraintException(String sqlState, int errorCode) {
+    public static boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
     }
 
