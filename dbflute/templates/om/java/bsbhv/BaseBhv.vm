@@ -335,6 +335,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Insert the entity.
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -355,6 +356,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
@@ -372,6 +374,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -397,6 +400,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -418,6 +422,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {

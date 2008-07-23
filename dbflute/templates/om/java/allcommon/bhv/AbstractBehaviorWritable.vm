@@ -66,6 +66,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * Create.
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void create(${glEntityInterfaceName} entity) {
         doCreate(entity);
@@ -82,6 +83,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void modify(${glEntityInterfaceName} entity) {
         doModify(entity);
@@ -94,6 +96,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity) {
         doModifyNonstrict(entity);
@@ -110,6 +113,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
@@ -123,6 +127,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
     public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
