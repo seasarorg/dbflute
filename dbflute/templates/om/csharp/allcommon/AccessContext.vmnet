@@ -117,7 +117,7 @@ namespace ${glPackageBaseCommon} {
 		public IDictionary<String, Object> AccessValueMap {
 		    get { return _accessValueMap; }
 		}
-        public void registerAccessValue(String key, Object value) {
+        public void RegisterAccessValue(String key, Object value) {
             if (_accessValueMap == null) {
                 _accessValueMap = new Dictionary<String, Object>();
             }
