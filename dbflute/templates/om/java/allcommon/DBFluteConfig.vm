@@ -26,6 +26,7 @@ public class ${myClassName} {
 	protected boolean _executeStatusLogLevelInfo;
 	protected boolean _versionNoAutoIncrementOnMemory;
 	protected boolean _uniqueConstraintExceptionBySQLState;
+	protected boolean _uniqueConstraintExceptionByErrorCode;
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -141,6 +142,22 @@ public class ${myClassName} {
 		    _log.info("...Setting uniqueConstraintExceptionBySQLState: " + uniqueConstraintExceptionBySQLState);
 		}
 	    _uniqueConstraintExceptionBySQLState = uniqueConstraintExceptionBySQLState;
+	}
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                             Unique ConstraintException by ErrorCode
+    //                                             =======================================
+	public boolean isUniqueConstraintExceptionByErrorCode() {
+	    return _uniqueConstraintExceptionByErrorCode;
+	}
+	
+	public void setUniqueConstraintExceptionByErrorCode(boolean uniqueConstraintExceptionByErrorCode) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting uniqueConstraintExceptionByErrorCode: " + uniqueConstraintExceptionByErrorCode);
+		}
+	    _uniqueConstraintExceptionByErrorCode = uniqueConstraintExceptionByErrorCode;
 	}
 	
     // ===================================================================================

@@ -239,12 +239,21 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     }
 
     protected boolean isUniqueConstraintException(SQLException e) {
-        String sqlState = isUniqueConstraintExceptionBySQLState() ? e.getSQLState() : null;
-        return ${glConditionBeanContextName}.isUniqueConstraintException(sqlState, e.getErrorCode());
+        if (isUniqueConstraintExceptionBySQLState()) {
+            return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+        } else if (isUniqueConstraintExceptionByErrorCode()) {
+            return ${glConditionBeanContextName}.isUniqueConstraintException(null, e.getErrorCode());
+        } else {
+            return false;
+        }
     }
 
     protected boolean isUniqueConstraintExceptionBySQLState() {
         return ${glDBFluteConfig}.getInstance().isUniqueConstraintExceptionBySQLState();
+    }
+
+    protected boolean isUniqueConstraintExceptionByErrorCode() {
+        return ${glDBFluteConfig}.getInstance().isUniqueConstraintExceptionByErrorCode();
     }
 
     // ===================================================================================
