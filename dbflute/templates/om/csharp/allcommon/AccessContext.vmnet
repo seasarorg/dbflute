@@ -1,6 +1,7 @@
 
 using System;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace ${glPackageBaseCommon} {
 
@@ -71,6 +72,17 @@ namespace ${glPackageBaseCommon} {
             }
             return DateTime.Now;// as Default
 		}
+
+		public static String GetAccessValueOnThread(String key) {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                IDictionary<String, Object> accessValueMap = userContextOnThread.AccessValueMap;
+                if (accessValueMap != null) {
+                    return accessValueMap[key];
+                }
+            }
+            return null;// as Default
+		}
 		
         protected String _accessUser;
     
@@ -79,6 +91,8 @@ namespace ${glPackageBaseCommon} {
         protected String _accessModule;
     
         protected DateTime? _accessTimestamp;
+
+        protected IDictionary<String, Object> _accessValueMap;
 		
 		public String AccessUser {
 		    get { return _accessUser; }
@@ -99,5 +113,15 @@ namespace ${glPackageBaseCommon} {
 		    get { return _accessTimestamp; }
 			set { _accessTimestamp = value; }
 		}
+
+		public IDictionary<String, Object> AccessValueMap {
+		    get { return _accessValueMap; }
+		}
+        public void registerAccessValue(String key, Object value) {
+            if (_accessValueMap == null) {
+                _accessValueMap = new Dictionary<String, Object>();
+            }
+            _accessValueMap.Add(key, value);
+        }
     }
 }

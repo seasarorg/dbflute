@@ -1,5 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Access-Context.
  * <p>
@@ -155,6 +158,17 @@ public class ${glAccessContextName} {
         return new java.sql.Timestamp(System.currentTimeMillis());// as Default
     }
 
+    public static Object getAccessValueOnThread(String key) {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final Map<String, Object> accessValueMap = userContextOnThread.getAccessValueMap();
+            if (accessValueMap != null) {
+                return accessValueMap.get(key);
+            }
+        }
+        return null;// as Default
+    }
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -165,6 +179,7 @@ public class ${glAccessContextName} {
     protected AccessDateProvider accessDateProvider;
     protected java.sql.Timestamp accessTimestamp;
     protected AccessTimestampProvider accessTimestampProvider;
+    protected Map<String, Object> accessValueMap;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -225,6 +240,17 @@ public class ${glAccessContextName} {
         this.accessTimestampProvider = accessTimestampProvider;
     }
 
+    public Map<String, Object> getAccessValueMap() {
+        return accessValueMap;
+    }
+
+    public void registerAccessValue(String key, Object value) {
+        if (accessValueMap == null) {
+            accessValueMap = new HashMap<String, Object>();
+        }
+        accessValueMap.put(key, value);
+    }
+
     // ===================================================================================
     //                                                                  Provider Interface
     //                                                                  ==================
@@ -235,7 +261,6 @@ public class ${glAccessContextName} {
 
         /**
          * Get access date.
-         * 
          * @return Access date. (NotNull)
          */
         public java.util.Date getAccessDate();
@@ -248,7 +273,6 @@ public class ${glAccessContextName} {
 
         /**
          * Get access timestamp.
-         * 
          * @return Access timestamp. (NotNull)
          */
         public java.sql.Timestamp getAccessTimestamp();
