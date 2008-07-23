@@ -73,7 +73,7 @@ namespace ${glPackageBaseCommon} {
             return DateTime.Now;// as Default
 		}
 
-		public static String GetAccessValueOnThread(String key) {
+		public static Object GetAccessValueOnThread(String key) {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
                 IDictionary<String, Object> accessValueMap = userContextOnThread.AccessValueMap;

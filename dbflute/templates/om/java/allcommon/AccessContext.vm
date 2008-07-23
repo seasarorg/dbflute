@@ -158,6 +158,15 @@ public class ${glAccessContextName} {
         return new java.sql.Timestamp(System.currentTimeMillis());// as Default
     }
 
+    /**
+     * Get access value on thread.
+     * <p>
+     * If it can't get access value from access-context, 
+     * returns null as default value!
+     * </p>
+     * @param key Key. (NotNull)
+     * @return Access value. (Nullable)
+     */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
             final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
