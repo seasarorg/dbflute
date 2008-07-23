@@ -243,27 +243,15 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         if (determinator != null) {
             return determinator.isUniqueConstraintException(e);
         }
-        if (isUniqueConstraintExceptionBySQLStateErrorCode()) {
+        if (isUniqueConstraintExceptionAuto()) {
             return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
-        } else if (isUniqueConstraintExceptionBySQLState()) {
-            return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), null);
-        } else if (isUniqueConstraintExceptionByErrorCode()) {
-            return ${glConditionBeanContextName}.isUniqueConstraintException(null, e.getErrorCode());
         } else {
             return false;
         }
     }
 
-    protected boolean isUniqueConstraintExceptionBySQLStateErrorCode() {
-        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.SQLSTATE_ERRORCODE);
-    }
-
-    protected boolean isUniqueConstraintExceptionBySQLState() {
-        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.SQLSTATE);
-    }
-
-    protected boolean isUniqueConstraintExceptionByErrorCode() {
-        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.ERRORCODE);
+    protected boolean isUniqueConstraintExceptionAuto() {
+        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.AUTO);
     }
 
     protected ${glDBFluteConfig}.UniqueConstraintDeterminationType getUniqueConstraintDeterminationType() {

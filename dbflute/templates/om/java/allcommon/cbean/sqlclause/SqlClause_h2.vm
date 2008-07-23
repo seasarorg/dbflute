@@ -89,13 +89,8 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     // ===================================================================================
     //                                                          Unique Constraint Override
     //                                                          ==========================
-    @Override    
-    protected boolean isUniqueConstraintSQLState(String sqlState) {
+    @Override
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return "23001".equals(sqlState);
-    }
-
-    @Override    
-    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
-        return errorCode == 23001;
     }
 }

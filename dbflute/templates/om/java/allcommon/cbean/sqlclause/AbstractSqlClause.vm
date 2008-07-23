@@ -1491,29 +1491,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                   Unique Constraint
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        if (sqlState == null && errorCode == null) {
-            return false;
-        }
-        if (sqlState != null) {
-            if (!isUniqueConstraintSQLState(sqlState)) {
-                return false;
-            }
-        }
-        if (errorCode != null) {
-            return isUniqueConstraintErrorCode(errorCode);
-        } else {
-            return true;// SQLState Only
-        }
+        return false;
     }
     
-    protected boolean isUniqueConstraintSQLState(String sqlState) {
-        return false;// Expect Override by Database!
-    }
-
-    protected boolean isUniqueConstraintErrorCode(Integer errorCode) {
-        return false;// Expect Override by Database!
-    }
-
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                       Assist Helper
