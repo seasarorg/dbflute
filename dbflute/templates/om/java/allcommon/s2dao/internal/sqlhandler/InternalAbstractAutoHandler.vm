@@ -14,10 +14,8 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.IntegerConversionUtil;
-import org.seasar.framework.util.StatementUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 
@@ -52,7 +50,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         try {
             return execute(connection, args[0]);
         } finally {
-            ConnectionUtil.close(connection);
+            close(connection);
         }
     }
 
@@ -70,7 +68,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             bindArgs(ps, bindVariables, bindVariableValueTypes);
             ret = executeUpdate(ps);
         } finally {
-            StatementUtil.close(ps);
+            close(ps);
         }
         postUpdateBean(bean);
         return ret;
