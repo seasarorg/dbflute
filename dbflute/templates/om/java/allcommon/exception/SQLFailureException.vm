@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 import java.sql.SQLException;
-import org.seasar.framework.exception.SQLRuntimeException;
 
 /**
  * The exception of when the SQL failed to execute.
@@ -16,6 +15,7 @@ public class ${glSQLFailureException} extends RuntimeException {
 
     /**
      * Constructor.
+     * @param msg Exception message. (NotNull)
      * @param cause SQLException. (NotNull)
      */
     public ${glSQLFailureException}(String msg, SQLException cause) {
