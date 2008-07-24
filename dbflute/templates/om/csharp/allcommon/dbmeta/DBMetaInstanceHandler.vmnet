@@ -121,7 +121,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(String tableName) {// For lazy-load by koyak
+        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
             if (_tableDbNameInstanceMap.containsKey(tableName)) {
                 return _tableDbNameInstanceMap.get(tableName);
             }
