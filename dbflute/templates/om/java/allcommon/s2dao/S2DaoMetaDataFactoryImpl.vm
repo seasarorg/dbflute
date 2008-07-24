@@ -1,6 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
