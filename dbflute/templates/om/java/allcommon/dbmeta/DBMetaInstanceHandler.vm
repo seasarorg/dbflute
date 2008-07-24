@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInstanceHandlerName}")
-#set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
 
 import java.util.Collections;
 import java.util.Map;
@@ -11,7 +10,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
 /**
  * DBMeta instance handler.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
@@ -19,6 +17,21 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** Table DB-name instance map. */
+    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new LinkedHashMap<String, ${glDBMetaInterfaceName}>();
+
+    /** The map of table DB-name and class name. */
+    protected static final Map<String, String> _tableDbNameClassNameMap;
+    static {
+        Map<String, String> tmpMap = new LinkedHashMap<String, String>();
+
+#foreach ($table in $database.tables)
+        tmpMap.put("${table.Name}", "${table.DBMetaFullClassName}");
+#end
+
+        _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
+    }
+
     /** The key-to-lower map of DB-name and property-name for table. */
     protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
     static {
@@ -41,18 +54,6 @@ public class ${myClassName} {
 #end
 
         _tablePropertyNameDbNameKeyToLowerMap = Collections.unmodifiableMap(tmpMap);
-    }
-
-    /** Table db-name instance map. */
-    protected static final Map${database.filterGenericsString(${instanceMapGenericDefinition})} _tableDbNameInstanceMap;
-    static {
-        Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
-
-#foreach ($table in $database.tables)
-        tmpMap.put("${table.Name}", getDBMeta("${table.DBMetaFullClassName}"));
-#end
-
-        _tableDbNameInstanceMap = Collections.unmodifiableMap(tmpMap);
     }
 
     protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
@@ -114,19 +115,32 @@ public class ${myClassName} {
     }
 
     /**
-     * Get instance by table db-name.
-     * 
-     * @param tableDbName Table db-name. (NotNull)
+     * Get instance by table DB-name.
+     * @param tableDbName Table DB-name. (NotNull)
      * @return Instance. (NotNull)
      */
     protected static ${glDBMetaInterfaceName} byTableDbName(String tableDbName) {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
-        ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableDbNameInstanceMap.get(tableDbName);
+        ${glDBMetaInterfaceName} instance = getCachedDBMeta(tableDbName);
         if (instance == null) {
             String msg = "The instance map returned null by the key: key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
             throw new IllegalStateException(msg);
         }
         return instance;
+    }
+    
+    protected static ${glDBMetaInterfaceName} getCachedDBMeta(String tableName) {// For lazy-load by koyak
+        if (_tableDbNameInstanceMap.containsKey(tableName)) {
+            return _tableDbNameInstanceMap.get(tableName);
+        }
+        synchronized (_tableDbNameInstanceMap) {
+            if (_tableDbNameInstanceMap.containsKey(tableName)) {
+                return _tableDbNameInstanceMap.get(tableName);
+            }
+            String entityName = _tableDbNameClassNameMap.get(tableName);
+            _tableDbNameInstanceMap.put(tableName, getDBMeta(entityName));
+        }
+        return _tableDbNameInstanceMap.get(tableName);
     }
 
     // ===================================================================================

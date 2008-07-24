@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                      Definition
         //                                                                      ==========
         protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMetaInterfaceName}>();
-        protected static readonly Map<String, String> _tableDbNameToEntityNameMap;
+        protected static readonly Map<String, String> _tableDbNameClassNameMap;
         protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
         protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
 
@@ -24,7 +24,7 @@ namespace ${glPackageBaseCommonDBMeta} {
 #foreach ($table in $database.tables)
                 tmpMap.put("${table.name}", "${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm");
 #end
-                _tableDbNameToEntityNameMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+                _tableDbNameClassNameMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
@@ -121,7 +121,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(string tableName) {// For lazy-load
+        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(String tableName) {// For lazy-load by koyak
             if (_tableDbNameInstanceMap.containsKey(tableName)) {
                 return _tableDbNameInstanceMap.get(tableName);
             }
@@ -129,7 +129,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                 if (_tableDbNameInstanceMap.containsKey(tableName)) {
                     return _tableDbNameInstanceMap.get(tableName);
                 }
-                String entityName = _tableDbNameToEntityNameMap.get(tableName);
+                String entityName = _tableDbNameClassNameMap.get(tableName);
                 _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
             }
             return _tableDbNameInstanceMap.get(tableName);
