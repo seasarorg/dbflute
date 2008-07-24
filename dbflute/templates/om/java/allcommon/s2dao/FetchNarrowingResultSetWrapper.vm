@@ -1,12 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.impl.ResultSetWrapper;
-import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
  * The wrapper of fetch narrowing result set.
@@ -80,7 +81,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
                 }
                 _fetchCounter = _resultSet.getRow();
             } catch (SQLException e) {
-                throw new SQLRuntimeException(e);
+                handleSQLException(e, null);
             }
         } else {
             try {
@@ -95,7 +96,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
                     ++_fetchCounter;
                 }
             } catch (SQLException e) {
-                throw new SQLRuntimeException(e);
+                handleSQLException(e, null);
             }
         }
     }
@@ -195,10 +196,18 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         try {
             return !(_resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
         } catch (SQLException e) {
-            throw new SQLRuntimeException(e);
+            handleSQLException(e, null);
+            return false;// Unreachable!
         }
     }
 
+    // ===================================================================================
+    //                                                                   Exception Handler
+    //                                                                   =================
+    protected void handleSQLException(SQLException e, Statement statement) {
+        new SQLExceptionHandler().handleSQLException(e, statement);
+    }
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

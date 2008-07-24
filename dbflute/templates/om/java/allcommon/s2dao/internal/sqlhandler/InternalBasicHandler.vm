@@ -122,72 +122,87 @@ public class ${glInternalBasicHandler} {
     }
 
     protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-        if (isSqlExceptionOldStyleHandling()) {
-            throw new SQLRuntimeException(e);
-        }
-        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-            throwEntityAlreadyExistsException(e, statement);
-        }
-        throwSQLFailureException(e, statement);
+        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid);
     }
 
-    protected boolean isUniqueConstraintException(SQLException e) {
-        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
-        if (determinator != null) {
-            return determinator.isUniqueConstraintException(e);
+    public static class SQLExceptionHandler {
+
+	    public void handleSQLException(SQLException e, Statement statement) {
+	        handleSQLException(e, statement, false);
+	    }
+	
+	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
+	        if (isSqlExceptionOldStyleHandling()) {
+	            throw new SQLRuntimeException(e);
+	        }
+	        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
+	            throwEntityAlreadyExistsException(e, statement);
+	        }
+	        throwSQLFailureException(e, statement);
+	    }
+	
+	    protected boolean isUniqueConstraintException(SQLException e) {
+	        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
+	        if (determinator != null) {
+	            return determinator.isUniqueConstraintException(e);
+	        }
+	        return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+	    }
+	
+	    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+	        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
+	    }
+	
+	    protected boolean isSqlExceptionOldStyleHandling() {
+	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
+	    }
+	
+	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement) {
+	        String msg = "Look! Read the message below." + getLineSeparator();
+	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+	        msg = msg + "The entity already exists on the database!" + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[Advice]" + getLineSeparator();
+	        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
+	        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        if (statement != null) {
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	            msg = msg + getLineSeparator();
+	        }
+	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+	        msg = msg + "* * * * * * * * * */";
+	        throw new ${glEntityAlreadyExistsException}(msg, e);
+	    }
+	
+	    protected void throwSQLFailureException(SQLException e, Statement statement) {
+	        String msg = "Look! Read the message below." + getLineSeparator();
+	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+	        msg = msg + "The SQL failed to execute!" + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[Advice]" + getLineSeparator();
+	        msg = msg + "Please confirm the SQLException message." + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        if (statement != null) {
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	            msg = msg + getLineSeparator();
+	        }
+	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+	        msg = msg + getLineSeparator();
+	        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+	        msg = msg + "* * * * * * * * * */";
+	        throw new ${glSQLFailureException}(msg, e);
+	    }
+
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.getLineSeparator();
         }
-        return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
-    }
-
-    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
-    }
-
-    protected boolean isSqlExceptionOldStyleHandling() {
-        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
-    }
-
-    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The entity already exists on the database!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
-        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        if (statement != null) {
-            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-            msg = msg + getLineSeparator();
-        }
-        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new ${glEntityAlreadyExistsException}(msg, e);
-    }
-
-    protected void throwSQLFailureException(SQLException e, Statement statement) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The SQL failed to execute!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the SQLException message." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        if (statement != null) {
-            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-            msg = msg + getLineSeparator();
-        }
-        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new ${glSQLFailureException}(msg, e);
     }
 
     // ===================================================================================

@@ -1,18 +1,19 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.framework.util.PreparedStatementUtil;
 
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-#end
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
  * Fetch page result set factory.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
@@ -33,22 +34,25 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
      * @param statement Statement. (NotNull)
      * @return Result set for procedure executing of s2dao. (NotNull)
      */
-    public java.sql.ResultSet getResultSet(java.sql.Statement statement) {
-        // return org.seasar.framework.util.StatementUtil.getResultSet(statement);
-        return doGetResultSet(statement);// This behavior is same as StatementUtil.getResultSet().
+    public ResultSet getResultSet(Statement statement) {
+        return doGetResultSet(statement);
     }
 
-    protected java.sql.ResultSet doGetResultSet(java.sql.Statement statement) throws org.seasar.framework.exception.SQLRuntimeException {
+    protected ResultSet doGetResultSet(Statement statement)  {
         try {
             return statement.getResultSet();
-        } catch (java.sql.SQLException ex) {
-            throw new org.seasar.framework.exception.SQLRuntimeException(ex);
+        } catch (SQLException e) {
+            handleSQLException(e, statement);
+            return null;// Unreachable!
         }
+    }
+
+    protected void handleSQLException(SQLException e, Statement statement) {
+        new SQLExceptionHandler().handleSQLException(e, statement);
     }
 
     /**
      * Create result set.
-     * 
      * @param ps Prepared statement. (NotNull)
      * @return Result set. (NotNull)
      */

@@ -13,7 +13,6 @@ import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
-import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -343,8 +342,8 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
                     final ValueType valueType = findValueType(argTypes[i], args[i]);
                     try {
                         valueType.bindValue(ps, i + 1, args[i]);
-                    } catch (java.sql.SQLException ex) {
-                        throw new SQLRuntimeException(ex);
+                    } catch (java.sql.SQLException e) {
+                        handleSQLException(e, ps);
                     }
                 }
             }
