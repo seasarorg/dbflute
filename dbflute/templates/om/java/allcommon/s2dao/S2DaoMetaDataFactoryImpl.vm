@@ -182,7 +182,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("  [XADataSource]:").append(getLineSeparator());
             sb.append("    driver = " + driverClassName).append(getLineSeparator());
             sb.append("    url    = " + url).append(getLineSeparator());
-            sb.append("    user   = " + user).append(getLineSeparator());
+            sb.append("    user   = " + user);
         }
         _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
