@@ -5,23 +5,14 @@
 >
 <beans>
 
-	<bean id="resultSetFactory" class="org.seasar.extension.jdbc.impl.BasicResultSetFactory"/>
-	<bean id="statementFactory" class="org.seasar.extension.jdbc.impl.BasicStatementFactory"/>
-
 	<bean id="daoMetaDataFactory" class="${database.extendedDaoMetaDataFactoryImplClassName}">
         <constructor-arg index="0">
             <ref bean="dataSource"/>
         </constructor-arg>
         <constructor-arg index="1">
-            <ref bean="statementFactory"/>
-        </constructor-arg>
-        <constructor-arg index="2">
-            <ref bean="resultSetFactory"/>
-        </constructor-arg>
-        <constructor-arg index="3">
             <ref bean="annotationReaderFactory"/>
         </constructor-arg>
-        <constructor-arg index="4">
+        <constructor-arg index="2">
             <ref bean="xaDataSource"/>
         </constructor-arg>
         <property name="resultSetHandlerFactory" ref="resultSetHandlerFactory"></property>
