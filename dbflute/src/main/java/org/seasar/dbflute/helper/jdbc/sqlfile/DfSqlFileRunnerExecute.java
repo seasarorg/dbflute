@@ -60,14 +60,23 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
                 msg = msg + "It failed to execute the SQL!" + getLineSeparator();
                 msg = msg + getLineSeparator();
-                msg = msg + "[SQL File]" + getLineSeparator();
-                msg = msg + _srcFile + getLineSeparator();
+                msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
                 msg = msg + getLineSeparator();
-                msg = msg + "[Executed SQL]" + getLineSeparator();
-                msg = msg + sql + getLineSeparator();
+                msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
                 msg = msg + getLineSeparator();
-                msg = msg + "[SQLException]" + getLineSeparator();
+                msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
                 msg = msg + e.getMessage() + getLineSeparator();
+                SQLException nextException = e.getNextException();
+                if (nextException != null) {
+                    msg = msg + getLineSeparator();
+                    msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName()
+                            + getLineSeparator();
+                    msg = msg + nextException.getMessage() + getLineSeparator();
+                }
                 msg = msg + "* * * * * * * * * */";
                 throw new DfSQLExecutionFailureException(msg, e);
             }

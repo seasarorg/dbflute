@@ -252,7 +252,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             }
                             final String columnTypeName = md.getColumnTypeName(i);
                             int scale = md.getScale(i);
-                            
+
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
                             metaInfo.setSql2EntityTableName(sql2EntityTableName);
                             metaInfo.setColumnName(columnName);
@@ -301,17 +301,27 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 } catch (SQLException e) {
                     if (!_runInfo.isErrorContinue()) {
                         String msg = "Look! Read the message below." + getLineSeparator();
-                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
+                                + getLineSeparator();
                         msg = msg + "It failed to execute the SQL!" + getLineSeparator();
                         msg = msg + getLineSeparator();
-                        msg = msg + "[SQL File]" + getLineSeparator();
-                        msg = msg + _srcFile + getLineSeparator();
+                        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
                         msg = msg + getLineSeparator();
-                        msg = msg + "[Executed SQL]" + getLineSeparator();
-                        msg = msg + sql + getLineSeparator();
+                        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
                         msg = msg + getLineSeparator();
-                        msg = msg + "[SQLException]" + getLineSeparator();
+                        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+                        msg = msg + getLineSeparator();
+                        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+                        msg = msg + getLineSeparator();
+                        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
                         msg = msg + e.getMessage() + getLineSeparator();
+                        SQLException nextException = e.getNextException();
+                        if (nextException != null) {
+                            msg = msg + getLineSeparator();
+                            msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName()
+                                    + getLineSeparator();
+                            msg = msg + nextException.getMessage() + getLineSeparator();
+                        }
                         msg = msg + "* * * * * * * * * */";
                         throw new DfSQLExecutionFailureException(msg, e);
                     }
