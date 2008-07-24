@@ -174,11 +174,13 @@ public class ${glInternalBasicHandler} {
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
 	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+	        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
+	        msg = msg + e.getMessage() + getLineSeparator();
             SQLException nextException = e.getNextException();
             if (nextException != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator() + nextException.getMessage() + getLineSeparator();
+	            msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName() + getLineSeparator();
+	            msg = msg + nextException.getMessage() + getLineSeparator();
             }
 	        msg = msg + "* * * * * * * * * */";
 	        throw new ${glEntityAlreadyExistsException}(msg, e);
@@ -200,11 +202,13 @@ public class ${glInternalBasicHandler} {
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
 	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+	        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
+	        msg = msg + e.getMessage() + getLineSeparator();
             SQLException nextException = e.getNextException();
             if (nextException != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator() + nextException.getMessage() + getLineSeparator();
+	            msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName() + getLineSeparator();
+	            msg = msg + nextException.getMessage() + getLineSeparator();
             }
             msg = msg + "* * * * * * * * * */";
             throw new ${glSQLFailureException}(msg, e);
