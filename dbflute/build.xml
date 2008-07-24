@@ -208,5 +208,17 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
+
+  <target name="reflect-win-limit-basic" description="==> reflect to test application">
+    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+
+  <target name="reflect-win-limit-nbasic" description="==> reflect to test application">
+    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 		
 </project>
