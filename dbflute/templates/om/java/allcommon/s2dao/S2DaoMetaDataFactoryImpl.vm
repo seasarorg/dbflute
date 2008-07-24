@@ -68,9 +68,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                         -------------
     public static final String dataSource_BINDING = "bindingType=must";
 
-    // Commentted out at [DBFlute-0.7.7]
-    // public static final String statementFactory_BINDING = "bindingType=must";
-
     public static final String annotationReaderFactory_BINDING = "bindingType=must";
 
     public static final String valueTypeFactory_BINDING = "bindingType=must";
@@ -94,8 +91,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                         Factory Basic
     //                                         -------------
     protected DataSource dataSource;
-
-    protected StatementFactory statementFactory;
 
     protected AnnotationReaderFactory annotationReaderFactory;
 
@@ -148,11 +143,9 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                                                         Constructor
     //                                                                         ===========
     public ${glDaoMetaDataFactoryImpl}(DataSource dataSource
-                                  , StatementFactory statementFactory
                                   , AnnotationReaderFactory annotationReaderFactory
                                   , XADataSource xaDataSource) {
         this.dataSource = dataSource;
-        this.statementFactory = statementFactory;
         this.annotationReaderFactory = annotationReaderFactory;
 
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
@@ -192,10 +185,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("    url    = " + url).append(getLineSeparator());
             sb.append("    user   = " + user).append(getLineSeparator());
         }
-        final String statementFactoryExpression = statementFactory != null ? statementFactory.getClass().getSimpleName(): "null";
-        sb.append("  [StatementFactory]:").append(getLineSeparator());
-        sb.append("    Injected statementFactory is " + statementFactoryExpression + ". But DBFlute uses original statementFactory.").append(getLineSeparator());
-        sb.append("    If the injected statementFactory is ConfigurableStatementFactory, the config is inherited to the original statementFactory.").append(getLineSeparator());
         _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
 
@@ -420,26 +409,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
                     reflectStatementOptions(defaultStatementConfig, ps);
                     return;
                 }
-                if (!(statementFactory instanceof ConfigurableStatementFactory)) {
-                    return;
-                }
-                final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
-                final Class<?> confSfType = ConfigurableStatementFactory.class;
-                final String confMethodName = "configurePreparedStatement";
-                final Class<?>[] confMethodParameterType = new Class<?>[]{PreparedStatement.class};
-                try {
-                    final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
-                    confMethod.setAccessible(true);// Because the method is protected!
-                    if (internalDebug) {
-                        _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
-                    }
-                    confMethod.invoke(confSf, new Object[]{ps});
-                    return;
-                } catch (Exception e) {
-                    String msg = "The configuration of statement factory threw exception:";
-                    msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
-                    throw new RuntimeException(msg, e);
-                }
             }
             protected void reflectStatementOptions(${glStatementConfig} config, PreparedStatement ps) {
                 try {
@@ -521,10 +490,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
 
     public void setDataSource(final DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public void setStatementFactory(final StatementFactory statementFactory) {
-        this.statementFactory = statementFactory;
     }
 
     public void setUseDaoClassForLog(final boolean userDaoClassForLog) {
