@@ -13,7 +13,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMetaInterfaceName}>;
+        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMetaInterfaceName}>();
         protected static readonly Map<String, String> _tableDbNameToEntityNameMap;
         protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
         protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
