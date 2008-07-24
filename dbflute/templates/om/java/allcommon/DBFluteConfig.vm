@@ -25,8 +25,8 @@ public class ${myClassName} {
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
 	protected boolean _versionNoAutoIncrementOnMemory;
-	protected UniqueConstraintDeterminationType _uniqueConstraintDeterminationType = UniqueConstraintDeterminationType.AUTO;
 	protected UniqueConstraintDeterminator _uniqueConstraintDeterminator;
+	protected boolean _sqlExceptionOldStyleHandling;
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -132,22 +132,6 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                   Unique Constraint
     //                                                                   =================
-	public UniqueConstraintDeterminationType getUniqueConstraintDeterminationType() {
-	    return _uniqueConstraintDeterminationType;
-	}
-
-	public void setUniqueConstraintDeterminationType(UniqueConstraintDeterminationType uniqueConstraintDeterminationType) {
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting uniqueConstraintDeterminationType: " + uniqueConstraintDeterminationType);
-		}
-	    _uniqueConstraintDeterminationType = uniqueConstraintDeterminationType;
-	}
-
-    public static enum UniqueConstraintDeterminationType {
-        NONE, AUTO
-    }
-
 	public UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
 	    return _uniqueConstraintDeterminator;
 	}
@@ -163,6 +147,22 @@ public class ${myClassName} {
     public static interface UniqueConstraintDeterminator {
         public boolean isUniqueConstraintException(Throwable t);
     }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                             SQL Exception Old Style
+    //                                                             =======================
+	public boolean isSqlExceptionOldStyleHandling() {
+	    return _sqlExceptionOldStyleHandling;
+	}
+
+	public void setSqlExceptionOldStyleHandling(boolean sqlExceptionOldStyleHandling) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting sqlExceptionOldStyleHandling: " + sqlExceptionOldStyleHandling);
+		}
+	    _sqlExceptionOldStyleHandling = sqlExceptionOldStyleHandling;
+	}
 
     // ===================================================================================
     //                                                                          Log Format

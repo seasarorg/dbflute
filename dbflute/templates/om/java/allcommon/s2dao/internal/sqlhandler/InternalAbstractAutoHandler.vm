@@ -16,13 +16,10 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.IntegerConversionUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 
 /**
  * @author ${database.ClassAuthor}
@@ -50,7 +47,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         this.propertyTypes = propertyTypes;
     }
 
-    public int execute(Object[] args) throws SQLRuntimeException {
+    public int execute(Object[] args) {
         Connection connection = getConnection();
         try {
             return execute(connection, args[0]);
@@ -59,7 +56,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         }
     }
 
-    public int execute(Object[] args, Class<?>[] argTypes) throws SQLRuntimeException {
+    public int execute(Object[] args, Class<?>[] argTypes) {
         return execute(args);
     }
 
@@ -88,7 +85,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             try {
                 valueType.bindValue(ps, i + 1, args[i]);
             } catch (SQLException e) {
-                throw new SQLRuntimeException(e);
+                handleSQLException(e, ps);
             }
         }
     }
@@ -202,64 +199,6 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             PropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
             pd.setValue(bean, getVersionNo());
         }
-    }
-
-    // ===================================================================================
-    //                                                                      JDBC Delegator
-    //                                                                      ==============
-    protected int executeUpdate(PreparedStatement ps) {
-        try {
-            return ps.executeUpdate();
-        } catch (SQLException e) {
-            if (isUniqueConstraintException(e)) {
-                throwEntityAlreadyExistsException(e, ps);
-            }
-            throw new SQLRuntimeException(e);
-        }
-    }
-
-    protected void throwEntityAlreadyExistsException(SQLException e, PreparedStatement ps) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The entity already exists on the database!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
-        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[PreparedStatement]" + getLineSeparator() + ps + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQLException]" + getLineSeparator() + e.getMessage() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new ${glEntityAlreadyExistsException}(msg, e);
-    }
-
-    protected boolean isUniqueConstraintException(SQLException e) {
-        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
-        if (determinator != null) {
-            return determinator.isUniqueConstraintException(e);
-        }
-        if (isUniqueConstraintExceptionAuto()) {
-            return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
-        } else {
-            return false;
-        }
-    }
-
-    protected boolean isUniqueConstraintExceptionAuto() {
-        return getUniqueConstraintDeterminationType().equals(${glDBFluteConfig}.UniqueConstraintDeterminationType.AUTO);
-    }
-
-    protected ${glDBFluteConfig}.UniqueConstraintDeterminationType getUniqueConstraintDeterminationType() {
-        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminationType();
-    }
-
-    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
     }
 
     // ===================================================================================

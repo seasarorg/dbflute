@@ -7,10 +7,6 @@ import javax.sql.DataSource;
 
 import org.seasar.dao.CommandContext;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.PreparedStatementUtil;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * @author ${database.ClassAuthor}
@@ -34,12 +30,12 @@ public class ${glInternalCommandContextHandler} extends ${glInternalBasicHandler
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int execute(Object[] args) throws SQLRuntimeException {
+    public int execute(Object[] args) {
         final Connection connection = getConnection();
         try {
             return execute(connection, commandContext);
         } finally {
-            ConnectionUtil.close(connection);
+            close(connection);
         }
     }
 
@@ -49,9 +45,9 @@ public class ${glInternalCommandContextHandler} extends ${glInternalBasicHandler
         int ret = -1;
         try {
             bindArgs(ps, context.getBindVariables(), context.getBindVariableTypes());
-            ret = PreparedStatementUtil.executeUpdate(ps);
+            ret = executeUpdate(ps);
         } finally {
-            StatementUtil.close(ps);
+            close(ps);
         }
         return ret;
     }

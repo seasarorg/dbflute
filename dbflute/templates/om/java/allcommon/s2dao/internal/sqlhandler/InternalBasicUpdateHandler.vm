@@ -6,16 +6,11 @@ import java.sql.PreparedStatement;
 import javax.sql.DataSource;
 
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.UpdateHandler;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.PreparedStatementUtil;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} implements UpdateHandler {
+public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -27,17 +22,17 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} i
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int execute(Object[] args) throws SQLRuntimeException {
+    public int execute(Object[] args) {
         return execute(args, getArgTypes(args));
     }
 
     @SuppressWarnings("unchecked")
-    public int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
+    public int execute(Object[] args, Class[] argTypes) {
         Connection connection = getConnection();
         try {
             return execute(connection, args, argTypes);
         } finally {
-            ConnectionUtil.close(connection);
+            close(connection);
         }
     }
 
@@ -47,9 +42,9 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} i
         PreparedStatement ps = prepareStatement(connection);
         try {
             bindArgs(ps, args, argTypes);
-            return PreparedStatementUtil.executeUpdate(ps);
+            return executeUpdate(ps);
         } finally {
-            StatementUtil.close(ps);
+            close(ps);
         }
     }
 }

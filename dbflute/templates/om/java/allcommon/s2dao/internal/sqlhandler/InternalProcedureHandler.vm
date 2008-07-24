@@ -13,10 +13,6 @@ import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.exception.EmptyRuntimeException;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * @author ${database.ClassAuthor}
@@ -55,10 +51,11 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             } else {
                 return handleOutParameters(cs, dto);
             }
-        } catch (final SQLException e) {
-            throw new SQLRuntimeException(e);
+        } catch (SQLException e) {
+            handleSQLException(e, cs);
+            return null;// Unreachable!
         } finally {
-            StatementUtil.close(cs);
+            close(cs);
         }
     }
     @Override
@@ -89,7 +86,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         return sb.toString();
     }
     protected CallableStatement prepareCallableStatement(final Connection connection) {
-        if (getSql() == null) { throw new EmptyRuntimeException("sql"); }
+        if (getSql() == null) { throw new IllegalStateException("The SQL should not be null!"); }
         return getStatementFactory().createCallableStatement(connection, getSql());
     }
     protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
@@ -113,7 +110,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             rs = getResultSetFactory().getResultSet(cs);
             return getResultSetHandler().handle(rs);
         } finally {
-            ResultSetUtil.close(rs);
+            close(rs);
         }
     }
     protected Object handleOutParameters(final CallableStatement cs, final Object dto) throws SQLException {

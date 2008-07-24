@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandle
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -11,10 +12,6 @@ import javax.sql.DataSource;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.PreparedStatementUtil;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * @author ${database.ClassAuthor}
@@ -39,11 +36,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int[] execute(List<?> list, Class<?>[] argTypes) throws SQLRuntimeException {
+    public int[] execute(List<?> list, Class<?>[] argTypes) {
         return execute(list);
     }
 
-    public int[] execute(List<?> list) throws SQLRuntimeException {
+    public int[] execute(List<?> list) {
         if (list == null) {
             throw new IllegalArgumentException("list");
         }
@@ -61,16 +58,16 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
                     Object bean = (Object) iter.next();
                     execute(ps, bean);
                 }
-                return PreparedStatementUtil.executeBatch(ps);
+                return executeBatch(ps);
             } finally {
-                StatementUtil.close(ps);
+                close(ps);
             }
         } finally {
-            ConnectionUtil.close(connection);
+            close(connection);
         }
     }
 	
-    public int execute(Object[] args) throws SQLRuntimeException {
+    public int execute(Object[] args) {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
@@ -90,7 +87,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         return updatedRow;
     }
 
-    public int[] executeBatch(Object[] args) throws SQLRuntimeException {
+    public int[] executeBatch(Object[] args) {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
@@ -107,7 +104,27 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         setupBindVariables(bean);
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
         bindArgs(ps, getBindVariables(), getBindVariableValueTypes());
-        PreparedStatementUtil.addBatch(ps);
+        addBatch(ps);
+    }
+
+    // ===================================================================================
+    //                                                                      JDBC Delegator
+    //                                                                      ==============
+    protected int[] executeBatch(PreparedStatement ps) {
+        try {
+            return ps.executeBatch();
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+            return null;// Unreachable!
+        }
+    }
+	
+    protected void addBatch(PreparedStatement ps) {
+        try {
+            ps.addBatch();
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+        }
     }
 
     // ===================================================================================

@@ -10,18 +10,12 @@ import javax.sql.DataSource;
 
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.SelectHandler;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.exception.EmptyRuntimeException;
-import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} implements SelectHandler {
+public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -46,32 +40,33 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} i
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public Object execute(Object[] args) throws SQLRuntimeException {
+    public Object execute(Object[] args) {
         return execute(args, getArgTypes(args));
     }
 
     @SuppressWarnings("unchecked")
-    public Object execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
+    public Object execute(Object[] args, Class[] argTypes) {
         Connection con = getConnection();
         try {
             return execute(con, args, argTypes);
         } finally {
-            ConnectionUtil.close(con);
+            close(con);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Object execute(Connection connection, Object[] args, Class[] argTypes) throws SQLRuntimeException {
+    public Object execute(Connection connection, Object[] args, Class[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(connection);
             bindArgs(ps, args, argTypes);
             return execute(ps);
-        } catch (SQLException ex) {
-            throw new SQLRuntimeException(ex);
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+            return null;// Unreachable!
         } finally {
-            StatementUtil.close(ps);
+            close(ps);
         }
     }
 
@@ -82,24 +77,24 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} i
     protected PreparedStatement prepareStatement(Connection connection) {
         PreparedStatement ps = super.prepareStatement(connection);
         if (fetchSize > -1) {
-            StatementUtil.setFetchSize(ps, fetchSize);
+            setFetchSize(ps, fetchSize);
         }
         if (maxRows > -1) {
-            StatementUtil.setMaxRows(ps, maxRows);
+            setMaxRows(ps, maxRows);
         }
         return ps;
     }
 
     protected Object execute(PreparedStatement ps) throws SQLException {
         if (resultSetHandler == null) {
-            throw new EmptyRuntimeException("resultSetHandler");
+            throw new IllegalStateException("The resultSetHandler should not be null!");
         }
         ResultSet resultSet = null;
         try {
             resultSet = createResultSet(ps);
             return resultSetHandler.handle(resultSet);
         } finally {
-            ResultSetUtil.close(resultSet);
+            close(resultSet);
         }
     }
 
