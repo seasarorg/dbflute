@@ -1,9 +1,16 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Connection;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 import org.seasar.dao.AnnotationReaderFactory;
 import org.seasar.dao.BeanEnhancer;
@@ -24,14 +31,19 @@ import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.pager.PagingSqlRewriter;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
  * The implementation of DaoMetaDataFactory for DBFlute.
@@ -56,9 +68,8 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                         -------------
     public static final String dataSource_BINDING = "bindingType=must";
 
-    public static final String statementFactory_BINDING = "bindingType=must";
-
-    public static final String resultSetFactory_BINDING = "bindingType=must";
+    // Commentted out at [DBFlute-0.7.7]
+    // public static final String statementFactory_BINDING = "bindingType=must";
 
     public static final String annotationReaderFactory_BINDING = "bindingType=must";
 
@@ -85,8 +96,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     protected DataSource dataSource;
 
     protected StatementFactory statementFactory;
-
-    protected ResultSetFactory resultSetFactory;
 
     protected AnnotationReaderFactory annotationReaderFactory;
 
@@ -138,14 +147,12 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glDaoMetaDataFactoryImpl}(javax.sql.DataSource dataSource,
-            StatementFactory statementFactory,
-            ResultSetFactory resultSetFactory,
-            AnnotationReaderFactory annotationReaderFactory,
-            javax.sql.XADataSource xaDataSource) {
+    public ${glDaoMetaDataFactoryImpl}(DataSource dataSource
+                                  , StatementFactory statementFactory
+                                  , AnnotationReaderFactory annotationReaderFactory
+                                  , XADataSource xaDataSource) {
         this.dataSource = dataSource;
         this.statementFactory = statementFactory;
-        this.resultSetFactory = resultSetFactory;
         this.annotationReaderFactory = annotationReaderFactory;
 
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
@@ -186,12 +193,9 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("    user   = " + user).append(getLineSeparator());
         }
         final String statementFactoryExpression = statementFactory != null ? statementFactory.getClass().getSimpleName(): "null";
-        final String resultSetFactoryExpression = resultSetFactory != null ? resultSetFactory.getClass().getSimpleName(): "null";
         sb.append("  [StatementFactory]:").append(getLineSeparator());
         sb.append("    Injected statementFactory is " + statementFactoryExpression + ". But DBFlute uses original statementFactory.").append(getLineSeparator());
         sb.append("    If the injected statementFactory is ConfigurableStatementFactory, the config is inherited to the original statementFactory.").append(getLineSeparator());
-        sb.append("  [ResultSetFactory]:").append(getLineSeparator());
-        sb.append("    Injected resultSetFactory is " + resultSetFactoryExpression + ". But DBFlute uses original resultSetFactory.");
         _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
 
@@ -304,8 +308,8 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         final DaoMetaDataImpl daoMetaData = createDaoMetaDataExtension();
         daoMetaData.setDaoClass(daoClass);
         daoMetaData.setDataSource(dataSource);
-        daoMetaData.setStatementFactory(statementFactory);
-        daoMetaData.setResultSetFactory(resultSetFactory);
+        daoMetaData.setStatementFactory(createCustomizeStatememtFactory());
+        daoMetaData.setResultSetFactory(createCustomizeResultSetFactory());
         daoMetaData.setValueTypeFactory(valueTypeFactory);
         daoMetaData.setBeanMetaDataFactory(getBeanMetaDataFactory());
         daoMetaData.setDaoNamingConvention(getDaoNamingConvention());
@@ -332,13 +336,138 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
         dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         dmdExtension.setTableNaming(tableNaming);
-        dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
         dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
 
     protected ${glDaoMetaDataExtension} newDaoMetaDataExtension() {
         return new ${glDaoMetaDataExtension}();
+    }
+
+    // ===================================================================================
+    //                                                                  Result Set Factory
+    //                                                                  ==================
+    /**
+     * Create the customize result set factory that is for all SQL on DBFlute.
+     * @return The customize statement factory. (NotNull)
+     */
+    protected ResultSetFactory createCustomizeResultSetFactory() {
+        return new ${glFetchNarrowingResultSetFactory}();
+    }
+
+    // ===================================================================================
+    //                                                                   Statement Factory
+    //                                                                   =================
+    /**
+     * Create the customize statement factory that is for all SQL on DBFlute.
+     * @return The customize statement factory. (NotNull)
+     */
+    protected StatementFactory createCustomizeStatememtFactory() {
+        final ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+        final boolean internalDebug = ${glDBFluteConfig}.getInstance().isInternalDebug();
+        return new StatementFactory() {
+            public PreparedStatement createPreparedStatement(Connection con, String sql) {
+                try {
+                    final ${glStatementConfig} config = findStatementConfigOnThread();;
+                    final int resultSetType;
+                    if (config != null && config.hasResultSetType()) {
+                        resultSetType = config.getResultSetType();
+                    } else if (defaultStatementConfig != null && defaultStatementConfig.hasResultSetType()) {
+                        resultSetType = defaultStatementConfig.getResultSetType();
+                    } else {
+                        resultSetType = ${database.statementResultSetType};
+                    }
+                    final int resultSetConcurrency = ${database.statementResultSetConcurrency};
+                    if (internalDebug) {
+                        _log.debug("...Creating prepareStatement(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
+                    }
+                    final PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
+                    if (config != null && config.hasStatementOptions()) {
+                        if (internalDebug) {
+                            _log.debug("...Setting statement config as request:" + config);
+                        }
+                        reflectStatementOptions(config, ps);
+                    } else {
+                        reflectDefaultOptionsToStatementIfNeeds(ps);
+                    }
+                    return ps;
+                } catch (SQLException e) {
+                    handleSQLException(e, null);
+                    return null;// Unreachable!
+                }
+            }
+            public CallableStatement createCallableStatement(Connection conn, String sql) {
+                return prepareCall(conn, sql);
+            }
+            protected ${glStatementConfig} findStatementConfigOnThread() {
+                final ${glStatementConfig} config;
+                if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+                    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+                    config = cb.getStatementConfig();
+                } else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+                    final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                    config = context.getStatementConfig();
+                } else {
+                    config = null;
+                }
+                return config;
+            }
+            protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
+                if (defaultStatementConfig != null && defaultStatementConfig.hasStatementOptions()) {
+                    if (internalDebug) {
+                        _log.debug("...Setting statement config as default:" + defaultStatementConfig);
+                    }
+                    reflectStatementOptions(defaultStatementConfig, ps);
+                    return;
+                }
+                if (!(statementFactory instanceof ConfigurableStatementFactory)) {
+                    return;
+                }
+                final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
+                final Class<?> confSfType = ConfigurableStatementFactory.class;
+                final String confMethodName = "configurePreparedStatement";
+                final Class<?>[] confMethodParameterType = new Class<?>[]{PreparedStatement.class};
+                try {
+                    final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
+                    confMethod.setAccessible(true);// Because the method is protected!
+                    if (internalDebug) {
+                        _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
+                    }
+                    confMethod.invoke(confSf, new Object[]{ps});
+                    return;
+                } catch (Exception e) {
+                    String msg = "The configuration of statement factory threw exception:";
+                    msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
+                    throw new RuntimeException(msg, e);
+                }
+            }
+            protected void reflectStatementOptions(${glStatementConfig} config, PreparedStatement ps) {
+                try {
+                    if (config.hasQueryTimeout()) {
+                        ps.setQueryTimeout(config.getQueryTimeout());
+                    }
+                    if (config.hasFetchSize()) {
+                        ps.setFetchSize(config.getFetchSize());
+                    }
+                    if (config.hasMaxRows()) {
+                        ps.setMaxRows(config.getMaxRows());
+                    }
+                } catch (SQLException e) {
+                    handleSQLException(e, ps);
+                }
+            }
+            protected CallableStatement prepareCall(Connection conn, String sql) {
+                try {
+                    return conn.prepareCall(sql);
+                } catch (SQLException e) {
+                    handleSQLException(e, null);
+                    return null;// Unreachable!
+                }
+            }
+            protected void handleSQLException(SQLException e, Statement statement) {
+                new SQLExceptionHandler().handleSQLException(e, statement);
+            }
+        };
     }
 
     // ===================================================================================
@@ -392,10 +521,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
 
     public void setDataSource(final DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public void setResultSetFactory(final ResultSetFactory resultSetFactory) {
-        this.resultSetFactory = resultSetFactory;
     }
 
     public void setStatementFactory(final StatementFactory statementFactory) {

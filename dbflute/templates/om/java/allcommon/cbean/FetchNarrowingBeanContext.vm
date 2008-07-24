@@ -12,7 +12,6 @@ public class ${glFetchNarrowingBeanContextName} {
 
     /**
      * Get fetch-narrowing-bean on thread.
-     * 
      * @return Condition-bean context. (Nullable)
      */
     public static ${glFetchNarrowingBeanInterfaceName} getFetchNarrowingBeanOnThread() {
@@ -21,7 +20,6 @@ public class ${glFetchNarrowingBeanContextName} {
 
     /**
      * Set fetch-narrowing-bean on thread.
-     * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      */
     public static void setFetchNarrowingBeanOnThread(${glFetchNarrowingBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
@@ -34,7 +32,6 @@ public class ${glFetchNarrowingBeanContextName} {
 
     /**
      * Is existing fetch-narrowing-bean on thread?
-     * 
      * @return Determination.
      */
     public static boolean isExistFetchNarrowingBeanOnThread() {
@@ -50,7 +47,6 @@ public class ${glFetchNarrowingBeanContextName} {
 
     /**
      * Is the argument fetch-narrowing-bean?
-     * 
      * @param dtoInstance Dto instance.
      * @return Determination.
      */
@@ -64,11 +60,10 @@ public class ${glFetchNarrowingBeanContextName} {
 
     /**
      * Is the type fetch-narrowing-bean?
-     * 
      * @param dtoClass DtoClass.
      * @return Determination.
      */
-    public static boolean isTheTypeFetchNarrowingBean(final Class dtoClass) {
+    public static boolean isTheTypeFetchNarrowingBean(final Class<?> dtoClass) {
         if (${glFetchNarrowingBeanInterfaceName}.class.isAssignableFrom(dtoClass)) {
             return true;
         } else {

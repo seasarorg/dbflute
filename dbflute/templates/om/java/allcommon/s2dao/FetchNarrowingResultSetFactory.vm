@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.ResultSetFactory;
-import org.seasar.framework.util.PreparedStatementUtil;
 
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
@@ -13,7 +13,7 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
- * Fetch page result set factory.
+ * Fetch narrowing result set factory.
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
@@ -31,6 +31,7 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
     //                                                                                Main
     //                                                                                ====
     /**
+     * Get result set.
      * @param statement Statement. (NotNull)
      * @return Result set for procedure executing of s2dao. (NotNull)
      */
@@ -38,26 +39,13 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
         return doGetResultSet(statement);
     }
 
-    protected ResultSet doGetResultSet(Statement statement)  {
-        try {
-            return statement.getResultSet();
-        } catch (SQLException e) {
-            handleSQLException(e, statement);
-            return null;// Unreachable!
-        }
-    }
-
-    protected void handleSQLException(SQLException e, Statement statement) {
-        new SQLExceptionHandler().handleSQLException(e, statement);
-    }
-
     /**
      * Create result set.
      * @param ps Prepared statement. (NotNull)
      * @return Result set. (NotNull)
      */
-    public java.sql.ResultSet createResultSet(java.sql.PreparedStatement ps) {
-        final java.sql.ResultSet resultSet = PreparedStatementUtil.executeQuery(ps);
+    public ResultSet createResultSet(PreparedStatement ps) {
+        final ResultSet resultSet = executeQuery(ps);
 
         if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             return resultSet;
@@ -93,5 +81,30 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
             return true;
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                      JDBC Delegator
+    //                                                                      ==============
+    protected ResultSet doGetResultSet(Statement statement)  {
+        try {
+            return statement.getResultSet();
+        } catch (SQLException e) {
+            handleSQLException(e, statement);
+            return null;// Unreachable!
+        }
+    }
+
+    protected ResultSet executeQuery(PreparedStatement ps) {
+        try {
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+            return null;// Unreachable!
+        }
+    }
+
+    protected void handleSQLException(SQLException e, Statement statement) {
+        new SQLExceptionHandler().handleSQLException(e, statement);
     }
 }

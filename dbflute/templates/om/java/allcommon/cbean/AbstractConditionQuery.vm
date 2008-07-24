@@ -409,6 +409,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
+    @SuppressWarnings("deprecation")
     protected void registerLikeSearchQuery(${glConditionKeyName} key
                                          , String value
                                          , ${glConditionValueName} cvalue

@@ -51,7 +51,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return booleanProp("torque.isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
-
+    
+    // ===================================================================================
+    //                                                                       Compatibility
+    //                                                                       =============
+    public boolean isCompatibleVersionNoAutoIncrementOnMemory() {
+        return booleanProp("torque.isCompatibleVersionNoAutoIncrementOnMemory", false);
+    }
+    
+    public boolean isCompatibleSQLExceptionHandlingOldStyle() {
+        return booleanProp("torque.isCompatibleSQLExceptionHandlingOldStyle", false);
+    }
+    
     // ===================================================================================
     //                                                                  Friendly Framework 
     //                                                                  ==================

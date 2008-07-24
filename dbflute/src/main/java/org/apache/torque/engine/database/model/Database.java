@@ -600,7 +600,7 @@ public class Database {
     public boolean isTargetLanguageCSharp() {
         return getBasicProperties().isTargetLanguageCSharp();
     }
-    
+
     public boolean isTargetLanguagePhp() {
         return getBasicProperties().isTargetLanguagePhp();
     }
@@ -1208,6 +1208,14 @@ public class Database {
 
     public boolean isUseTeeda() {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
+    }
+
+    public boolean isCompatibleVersionNoAutoIncrementOnMemory() {// This is for compatibility!
+        return getProperties().getLittleAdjustmentProperties().isCompatibleVersionNoAutoIncrementOnMemory();
+    }
+
+    public boolean isCompatibleSQLExceptionHandlingOldStyle() {// This is for compatibility!
+        return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
     }
 
     // -----------------------------------------------------

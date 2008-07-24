@@ -128,7 +128,7 @@ public class ${myClassName} implements java.io.Serializable {
     protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (Iterator ite = ls.iterator(); ite.hasNext(); ) {
+        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext(); ) {
             final Integer tmpPageNumber = (Integer)ite.next();
             resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;

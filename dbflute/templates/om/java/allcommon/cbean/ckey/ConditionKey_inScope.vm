@@ -37,16 +37,16 @@ public class ${myClassName} extends ${glConditionKeyName} {
         if (value == null) {
             return false;
         }
-        if (value instanceof java.util.List && ((java.util.List)value).isEmpty()) {
+        if (value instanceof java.util.List && ((java.util.List<?>)value).isEmpty()) {
             return false;
         }
         if (value instanceof java.util.List) {
             if (conditionValue.hasInScope()) {
-                if (conditionValue.equalInScope(((java.util.List)value))) {
+                if (conditionValue.equalInScope(((java.util.List<?>)value))) {
                     _log.warn("The value has already registered at " + callerName + ": value=" + value);
                     return false;
                 } else {
-                    conditionValue.overrideInScope(((java.util.List)value));
+                    conditionValue.overrideInScope(((java.util.List<?>)value));
                     return false;
                 }
             }
@@ -93,7 +93,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param location Location. (NotNull)
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
-        conditionValue.setInScope((java.util.List)value).setInScopeLocation(location);
+        conditionValue.setInScope((java.util.List<?>)value).setInScopeLocation(location);
     }
 
     /**
@@ -104,6 +104,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param option Condition option. (NotNull)
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
-        conditionValue.setInScope((java.util.List)value, (${glConditionOptionInScopeName})option).setInScopeLocation(location);
+        conditionValue.setInScope((java.util.List<?>)value, (${glConditionOptionInScopeName})option).setInScopeLocation(location);
     }
 }

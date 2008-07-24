@@ -667,34 +667,33 @@ public class ${myClassName} {
     //                                                                            In Scope
     //                                                                            ========
     /** Value of inScope. */
-    protected List _inScope;
+    protected List<?> _inScope;
 
     protected ${glConditionOptionInScopeName} _inScopeOption;
 
     /**
      * Get the value of inScope.
-     * 
      * @return The value of inScope. (Nullable)
      */
-    public List getInScope() {
+    @SuppressWarnings("unchecked")
+    public List<?> getInScope() {
         if (_inScopeOption != null) {
-            return filterValue(_inScopeOption.generateRealValueList(_inScope));
+            return filterValue(_inScopeOption.generateRealValueList((List<String>)_inScope));
         }
         return filterValue(_inScope);
     }
 
     /**
      * Set the value of inScope.
-     * 
      * @param value The value of inScope. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} setInScope(List value) {
+    public ${myClassName} setInScope(List<?> value) {
         _inScope = value;
         return this;
     }
 
-    public ${myClassName} setInScope(List value, ${glConditionOptionInScopeName} option) {
+    public ${myClassName} setInScope(List<?> value, ${glConditionOptionInScopeName} option) {
         _inScope = value;
         _inScopeOption = option;
         return this;
@@ -702,7 +701,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of inScope?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasInScope() {
@@ -711,21 +709,19 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of inScope?
-     * 
      * @param value The value of inScope. (Nullable)
      * @return Determination. (NotNull)
      */
-    public boolean equalInScope(List value) {
+    public boolean equalInScope(List<?> value) {
         return hasInScope() ? _inScope.equals(value) : value == null;
     }
 
     /**
      * Override the value of inScope.
-     * 
      * @param value The value of inScope. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} overrideInScope(List value) {
+    public ${myClassName} overrideInScope(List<?> value) {
         _inScope = value;
         return this;
     }
@@ -735,7 +731,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of inScope.
-     * 
      * @return The location of inScope. (Nullable)
      */
     public String getInScopeLocation() {
@@ -744,7 +739,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of inScope.
-     * 
      * @param location The location of inScope. (Nullable)
      * @return this. (NotNull)
      */
@@ -757,31 +751,28 @@ public class ${myClassName} {
     //                                                                        Not In Scope
     //                                                                        ============
     /** Value of notInScope. */
-    protected List _notInScope;
+    protected List<?> _notInScope;
 
     /**
      * Get the value of notInScope.
-     * 
      * @return The value of notInScope. (Nullable)
      */
-    public List getNotInScope() {
+    public List<?> getNotInScope() {
         return filterValue(_notInScope);
     }
 
     /**
      * Set the value of notInScope.
-     * 
      * @param value The value of notInScope. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} setNotInScope(List value) {
+    public ${myClassName} setNotInScope(List<?> value) {
         _notInScope = value;
         return this;
     }
 
     /**
      * Does it has the value of inNotScope?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasNotInScope() {
@@ -790,21 +781,19 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of inNotScope?
-     * 
      * @param value The value of inNotScope. (Nullable)
      * @return Determination. (NotNull)
      */
-    public boolean equalNotInScope(List value) {
+    public boolean equalNotInScope(List<?> value) {
         return hasNotInScope() ? _notInScope.equals(value) : value == null;
     }
 
     /**
      * Override the value of inNotScope.
-     * 
      * @param value The value of inNotScope. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} overrideNotInScope(List value) {
+    public ${myClassName} overrideNotInScope(List<?> value) {
         _notInScope = value;
         return this;
     }
@@ -814,7 +803,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of notInScope.
-     * 
      * @return The location of notInScope. (Nullable)
      */
     public String getNotInScopeLocation() {
@@ -823,7 +811,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of notInScope.
-     * 
      * @param location The location of notInScope. (Nullable)
      * @return this. (NotNull)
      */
@@ -840,7 +827,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of isNull.
-     * 
      * @return The value of isNull. (Nullable)
      */
     public Object getIsNull() {
@@ -849,7 +835,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of isNull.
-     * 
      * @param value The value of isNull. (Nullable)
      * @return this. (NotNull)
      */
@@ -860,7 +845,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of isNull?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasIsNull() {
@@ -872,7 +856,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of isNull.
-     * 
      * @return The location of isNull. (Nullable)
      */
     public String getIsNullLocation() {
@@ -881,7 +864,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of isNull.
-     * 
      * @param location The location of isNull. (Nullable)
      * @return this. (NotNull)
      */
@@ -898,7 +880,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of isNotNull.
-     * 
      * @return The value of isNotNull. (Nullable)
      */
     public Object getIsNotNull() {
@@ -907,7 +888,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of isNotNull.
-     * 
      * @param value The value of isNotNull. (Nullable)
      * @return this. (NotNull)
      */
@@ -918,7 +898,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of isNotNull?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasIsNotNull() {
@@ -930,7 +909,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of isNotNull.
-     * 
      * @return The location of isNotNull. (Nullable)
      */
     public String getIsNotNullLocation() {
@@ -939,7 +917,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of isNotNull.
-     * 
      * @param location The location of isNotNull. (Nullable)
      * @return this. (NotNull)
      */
@@ -980,12 +957,12 @@ public class ${myClassName} {
      * @param valueList Value-list. (Nullable)
      * @return Filtered value-list. (Nullable)
      */
-    protected List filterValue(List valueList) {
+    protected List<?> filterValue(List<?> valueList) {
         if (valueList == null || valueList.isEmpty()) {
             return valueList;
         }
         final List<Object> resultList = new ArrayList<Object>();
-        for (Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+        for (Iterator<?> ite = valueList.iterator(); ite.hasNext(); ) {
             Object value = ite.next();
             resultList.add(filterValue(value));
         }

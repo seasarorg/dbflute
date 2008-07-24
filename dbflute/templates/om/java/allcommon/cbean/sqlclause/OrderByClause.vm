@@ -18,7 +18,7 @@ public class ${myClassName} implements java.io.Serializable {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected List${database.filterGenericsString(${glOrderByElementName})} _orderByList = new ArrayList${database.filterGenericsString(${glOrderByElementName})}();
+    protected List<${glOrderByElementName}> _orderByList = new ArrayList${database.filterGenericsString(${glOrderByElementName})}();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -232,7 +232,7 @@ public class ${myClassName} implements java.io.Serializable {
      * Get iterator of order-by list.
      * @return Determination.
      */
-    public java.util.Iterator iterator() {
+    public java.util.Iterator<${glOrderByElementName}> iterator() {
         return _orderByList.iterator();
     }
 

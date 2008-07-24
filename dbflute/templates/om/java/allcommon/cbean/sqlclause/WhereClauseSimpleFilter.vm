@@ -37,7 +37,7 @@ public interface ${myClassName} {
      */
     public static class WhereClauseToEmbeddedSimpleFilter implements ${myClassName} {
 
-        protected java.util.Set${database.filterGenericsString(${glColumnInfoName})} _filterTargetColumnInfoSet;
+        protected java.util.Set<${glColumnInfoName}> _filterTargetColumnInfoSet;
 
         public WhereClauseToEmbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
             this._filterTargetColumnInfoSet = new java.util.HashSet${database.filterGenericsString(${glColumnInfoName})}();
@@ -58,7 +58,7 @@ public interface ${myClassName} {
             if (_filterTargetColumnInfoSet == null || _filterTargetColumnInfoSet.isEmpty()) {
                 return toEmbedded(clauseElement);
             }
-            for (final java.util.Iterator ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
+            for (final java.util.Iterator<${glColumnInfoName}> ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
                 final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
                 if (isTargetClause(clauseElement, columnInfo.getColumnDbName())) {
                     return toEmbedded(clauseElement);

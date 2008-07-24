@@ -6,8 +6,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -48,11 +46,8 @@ import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.util.TypeUtil;
 import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
@@ -69,7 +64,6 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
-import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
@@ -83,7 +77,6 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAuto
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
-import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -125,9 +118,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     /** The selector of behavior. {Since DBFlute-0.7.1} */
     protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
     
-    /** The config of dbflute. {Since DBFlute-0.6.2} */
-    protected ${glStatementConfig} _defaultStatementConfig;
-    
     /** The lock monitor of method initialization. */
     protected Object _methodInitializationLockMonitor = new Object();
     
@@ -138,31 +128,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                         Constructor
     //                                                                         ===========
     public ${glDaoMetaDataExtension}() {
-    }
-
-    // ===================================================================================
-    //                                                           OutsideSql Check Override
-    //                                                           =========================
-    protected void setupMethodByAuto(Method method) {
-        final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
-        if (outsideSql != null) {
-            String msg = "This method '" + method.getName() + "()' should use Outside Sql but the file was not found!";
-            msg = msg + " Expected sql file name is '" + method.getDeclaringClass().getSimpleName() + "_" + method.getName() + ".sql'";
-            throw new IllegalStateException(msg);
-        }
-        super.setupMethodByAuto(method);
-    }
-
-    // ===================================================================================
-    //                                                           ResultSetHandler Override
-    //                                                           =========================
-    @Override
-    protected ResultSetHandler createResultSetHandler(Method method) {
-        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, beanMetaData, method);
-    }
-
-    protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {
-        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, specifiedBeanMetaData, method);
     }
 
     // ===================================================================================
@@ -244,116 +209,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                             Customize SelectDynamicCommand Creation
-    //                                             =======================================
-    protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(org.seasar.extension.jdbc.ResultSetHandler handler) {
-        final ResultSetFactory customizeResultSetFactory = createCustomizeResultSetFactory();
-        final StatementFactory customizeStatementFactory = createCustomizeStatememtFactory();
-        return new ${glSelectDynamicCommand}(dataSource, customizeStatementFactory, handler, customizeResultSetFactory);
+    //                                                           OutsideSql Check Override
+    //                                                           =========================
+    protected void setupMethodByAuto(Method method) {
+        final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
+        if (outsideSql != null) {
+            String msg = "This method '" + method.getName() + "()' should use Outside Sql but the file was not found!";
+            msg = msg + " Expected sql file name is '" + method.getDeclaringClass().getSimpleName() + "_" + method.getName() + ".sql'";
+            throw new IllegalStateException(msg);
+        }
+        super.setupMethodByAuto(method);
     }
-    
-    protected ResultSetFactory createCustomizeResultSetFactory() {
-        return new ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetFactory}();
-    }
-    
-    protected StatementFactory createCustomizeStatememtFactory() {
-        return new StatementFactory() {
-            public PreparedStatement createPreparedStatement(java.sql.Connection con, String sql) {
-                try {
-                    final ${glStatementConfig} config = findStatementConfigOnThread();;
-                    final int resultSetType;
-                    if (config != null && config.hasResultSetType()) {
-                        resultSetType = config.getResultSetType();
-                    } else if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
-                        resultSetType = _defaultStatementConfig.getResultSetType();
-                    } else {
-                        resultSetType = ${database.statementResultSetType};
-                    }
-                    final int resultSetConcurrency = ${database.statementResultSetConcurrency};
-                    if (_internalDebug) {
-                        _log.debug("...Creating prepareStatement(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
-                    }
-                    final PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
-                    if (config != null && config.hasStatementOptions()) {
-                        if (_internalDebug) {
-                            _log.debug("...Setting statement config as request:" + config);
-                        }
-                        reflectStatementOptions(config, ps);
-                    } else {
-                        reflectDefaultOptionsToStatementIfNeeds(ps);
-                    }
-                    return ps;
-                } catch (SQLException e) {
-                    handleSQLException(e, null);
-                    return null;// Unreachable!
-                }
-            }
-            public java.sql.CallableStatement createCallableStatement(java.sql.Connection con, String sql) {
-                return org.seasar.extension.jdbc.util.ConnectionUtil.prepareCall(con, sql);
-            }
-            protected ${glStatementConfig} findStatementConfigOnThread() {
-                final ${glStatementConfig} config;
-                if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-                    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-                    config = cb.getStatementConfig();
-                } else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-                    final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-                    config = context.getStatementConfig();
-                } else {
-                    config = null;
-                }
-                return config;
-            }
-            protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
-                if (_defaultStatementConfig != null && _defaultStatementConfig.hasStatementOptions()) {
-                    if (_internalDebug) {
-                        _log.debug("...Setting statement config as default:" + _defaultStatementConfig);
-                    }
-                    reflectStatementOptions(_defaultStatementConfig, ps);
-                    return;
-                }
-                if (!(statementFactory instanceof ConfigurableStatementFactory)) {
-                    return;
-                }
-                final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
-                final Class confSfType = ConfigurableStatementFactory.class;
-                final String confMethodName = "configurePreparedStatement";
-                final Class[] confMethodParameterType = new Class[]{PreparedStatement.class};
-                try {
-                    final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
-                    confMethod.setAccessible(true);// Because the method is protected!
-                    if (_internalDebug) {
-                        _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
-                    }
-                    confMethod.invoke(confSf, new Object[]{ps});
-                    return;
-                } catch (Exception e) {
-                    String msg = "The configuration of statement factory threw exception:";
-                    msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
-                    throw new RuntimeException(msg, e);
-                }
-            }
-            protected void reflectStatementOptions(${glStatementConfig} config, PreparedStatement ps) {
-                try {
-                    if (config.hasQueryTimeout()) {
-                        ps.setQueryTimeout(config.getQueryTimeout());
-                    }
-                    if (config.hasFetchSize()) {
-                        ps.setFetchSize(config.getFetchSize());
-                    }
-                    if (config.hasMaxRows()) {
-                        ps.setMaxRows(config.getMaxRows());
-                    }
-                } catch (SQLException e) {
-                    handleSQLException(e, ps);
-                }
-            }
-            protected void handleSQLException(SQLException e, Statement statement) {
-                new SQLExceptionHandler().handleSQLException(e, statement);
-            }
-        };
-    }
-    
 
     // ===================================================================================
     //                                                              ConditionBean Override
@@ -365,6 +231,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final String query = daoAnnotationReader.getQuery(method);
         final SqlCommand cmd;
         if (query != null && !startsWithOrderBy(query)) {
+            // For Pure S2Dao *Deprecated at the future...
             cmd = setupInternalQuerySelectMethodByAuto(method, handler, argNames, query);
         } else {
             cmd = setupInternalNonQuerySelectMethodByAuto(method, handler, argNames, query);
@@ -372,6 +239,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         putSqlCommand(method.getName(), cmd);
     }
 
+    // For Pure S2Dao *Deprecated at the future...
     protected SelectDynamicCommand setupInternalQuerySelectMethodByAuto(final Method method
                                                                       , final ResultSetHandler handler
                                                                       , final String[] argNames
@@ -390,10 +258,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (isAutoSelectSqlByDto(method, argNames)) {
             return setupInternalNonQuerySelectMethodByDto(method, handler, argNames, query);
         } else {
+            // For Pure S2Dao *Deprecated at the future...
             return setupNonQuerySelectMethodByArgs(method, handler, argNames, query);
         }
     }
     
+    // For condition-bean!
     protected SqlCommand setupInternalNonQuerySelectMethodByDto(Method method
                                                               , ResultSetHandler handler
                                                               , String[] argNames
@@ -959,7 +829,31 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected boolean isCheckSingleRowUpdate(Method method) {
         return checkSingleRowUpdateForAll & daoAnnotationReader.isCheckSingleRowUpdate(method);
     }
-    
+
+    // ===================================================================================
+    //                                             Customize SelectDynamicCommand Creation
+    //                                             =======================================
+    /**
+     * Create the customize select dynamic command that is for all select SQL on DBFlute.
+     * @param handler The handler of result set. (NotNull)
+     * @return The customize select dynamic command. (NotNull)
+     */
+    protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(ResultSetHandler handler) {
+        return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
+    }
+
+    // ===================================================================================
+    //                                                           ResultSetHandler Override
+    //                                                           =========================
+    @Override
+    protected ResultSetHandler createResultSetHandler(Method method) {
+        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, beanMetaData, method);
+    }
+
+    protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {// For specified BeanMetaData
+        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, specifiedBeanMetaData, method);
+    }
+
     // ===================================================================================
     //                                                                       Vert Internal
     //                                                                       =============
@@ -1607,14 +1501,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     public void setBehaviorSelector(final ${glBehaviorSelectorInterfaceName} behaviorSelector) {
         this._behaviorSelector = behaviorSelector;
-    }
-    
-    public ${glStatementConfig} getDefaultStatementConfig() {
-        return _defaultStatementConfig;
-    }
-
-    public void setDefaultStatementConfig(final ${glStatementConfig} defaultStatementConfig) {
-        this._defaultStatementConfig = defaultStatementConfig;
     }
     
     public boolean isInternalDebug() {

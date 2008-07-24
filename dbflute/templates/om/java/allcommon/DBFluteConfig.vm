@@ -21,12 +21,12 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
 	protected ${glStatementConfig} _defaultStatementConfig;
-	protected boolean _conditionBeanFormatSql = true;
+	protected boolean _conditionBeanFormatSql = true;// This is for compatibility!
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
-	protected boolean _versionNoAutoIncrementOnMemory;
+	protected boolean _versionNoAutoIncrementOnMemory = ${database.isCompatibleVersionNoAutoIncrementOnMemory()};// This is for compatibility!
 	protected UniqueConstraintDeterminator _uniqueConstraintDeterminator;
-	protected boolean _sqlExceptionOldStyleHandling;
+	protected boolean _sqlExceptionOldStyleHandling = ${database.isCompatibleSQLExceptionHandlingOldStyle()};// This is for compatibility!
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 	protected boolean _internalDebug;
@@ -73,7 +73,11 @@ public class ${myClassName} {
 	public boolean isConditionBeanFormatSql() {
 	    return _conditionBeanFormatSql;
 	}
-	
+
+    /**
+     * @param conditionBeanFormatSql The value of the config.
+     * @deprecated This is for compatibility!
+     */
 	public void setConditionBeanFormatSql(boolean conditionBeanFormatSql) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
@@ -119,7 +123,11 @@ public class ${myClassName} {
 	public boolean isVersionNoAutoIncrementOnMemory() {
 	    return _versionNoAutoIncrementOnMemory;
 	}
-	
+
+    /**
+     * @param versionNoAutoIncrementOnMemory The value of the config.
+     * @deprecated This is for compatibility!
+     */
 	public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
@@ -156,6 +164,10 @@ public class ${myClassName} {
 	    return _sqlExceptionOldStyleHandling;
 	}
 
+    /**
+     * @param sqlExceptionOldStyleHandling The value of the config.
+     * @deprecated This is for compatibility!
+     */
 	public void setSqlExceptionOldStyleHandling(boolean sqlExceptionOldStyleHandling) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
