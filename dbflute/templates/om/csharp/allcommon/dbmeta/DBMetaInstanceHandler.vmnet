@@ -13,17 +13,18 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
+        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMetaInterfaceName}>;
+        protected static readonly Map<String, String> _tableDbNameToEntityNameMap;
         protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
         protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
 
         static ${myClassName}() {
             {
-                Map<String, ${glDBMetaInterfaceName}> tmpMap = new HashMap<String, ${glDBMetaInterfaceName}>();
+                Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.put("${table.name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+                tmpMap.put("${table.name}", "${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm");
 #end
-                _tableDbNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+                _tableDbNameToEntityNameMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
@@ -113,13 +114,27 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
-                return (${glDBMetaInterfaceName})_tableDbNameInstanceMap.get(tableDbName);
+                return GetCachedDBMeta(tableDbName);
             } catch (System.Collections.Generic.KeyNotFoundException e) {
                 String msg = "The tableDbNameInstanceMap didn't contain the key of '" + tableDbName + "': ";
                 throw new ArgumentOutOfRangeException(msg + _tableDbNameInstanceMap, e);
             }
         }
-		
+
+        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(string tableName) {// For lazy-load
+            if (_tableDbNameInstanceMap.containsKey(tableName)) {
+                return _tableDbNameInstanceMap.get(tableName);
+            }
+            lock (_tableDbNameInstanceMap) {
+                if (_tableDbNameInstanceMap.containsKey(tableName)) {
+                    return _tableDbNameInstanceMap.get(tableName);
+                }
+                String entityName = _tableDbNameToEntityNameMap.get(tableName);
+                _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
+            }
+            return _tableDbNameInstanceMap.get(tableName);
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============

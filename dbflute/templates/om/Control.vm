@@ -251,6 +251,7 @@ targetdatabase = $targetDatabase
     #set ($glRequiredOptionNotFoundException = "${glProjectPrefix}RequiredOptionNotFoundException")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
+    #set ($glSQLFailureException = "${glProjectPrefix}SQLFailureException")
 
     ## [Allcommon-Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")
@@ -1281,6 +1282,11 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasOverlappedException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasOverlappedException.${glTemplateFileExtension}",$path,"", "")
     #end
+
+    ## DBFlute-0.7.7
+    $database.info("    parse('SQLFailureException');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glSQLFailureException}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/exception/SQLFailureException.${glTemplateFileExtension}",$path,"", "")
     $database.info("}")
 
     ## -------------------------------------------------------

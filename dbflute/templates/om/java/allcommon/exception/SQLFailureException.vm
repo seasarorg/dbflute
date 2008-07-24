@@ -4,20 +4,26 @@ import java.sql.SQLException;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 /**
- * The exception of when the entity already exists on the database.
+ * The exception of when the SQL failed to execute.
  * @author ${database.ClassAuthor}
  */
-public class ${glEntityAlreadyExistsException} extends ${glSQLFailureException} {
+public class ${glSQLFailureException} extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    protected SQLException sqlEx;
 
     /**
      * Constructor.
      * @param cause SQLException. (NotNull)
      */
-    public ${glEntityAlreadyExistsException}(String msg, SQLException cause) {
+    public ${glSQLFailureException}(String msg, SQLException cause) {
         super(msg, cause);
         sqlEx = cause;
+    }
+	
+    public SQLException getSQLException() {
+        return sqlEx;
     }
 }
