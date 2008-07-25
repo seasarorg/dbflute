@@ -1077,7 +1077,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * Assert that the argument is not null.
      * @param variableName Variable name. (NotNull)
-     * @param arg Argument. (NotNull)
+     * @param value Value. (NotNull)
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);

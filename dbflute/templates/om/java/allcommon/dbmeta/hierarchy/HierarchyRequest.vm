@@ -190,8 +190,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     /**
      * Assert same source dbmeta.
-     * 
-     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
      */
     protected void assertSameLocalDestinationDBMeta(${glColumnInfoName} destinationColumnInfo) {
         if (!requestElementList.isEmpty()) {

@@ -33,11 +33,6 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-	/** 
-     * @param refererColumnDbName Value.
-     * @return Value.
-     * @deprecated
-     */
     public ${glColumnInfoName} findLocalByReferer(String refererColumnDbName) {
         final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(refererDBMeta, refererColumnDbName);
         final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})refererLocalColumnInfoMap.get(keyColumnInfo);
@@ -49,11 +44,6 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return resultColumnInfo;
     }
 
-	/** 
-     * @param refererColumnDbName Value.
-     * @return Value.
-     * @deprecated
-     */
     public ${glColumnInfoName} findRefererByLocal(String localColumnDbName) {
         final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(localDBMeta, localColumnDbName);
         final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localRefererColumnInfoMap.get(keyColumnInfo);
@@ -102,7 +92,6 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return true;
     }
 
-    /** @deprecated */
     public boolean isReferer() {
         return true;
     }
@@ -110,12 +99,10 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /** @deprecated */
     public String getRefererPropertyName() {
         return refererPropertyName;
     }
 
-    /** @deprecated */
     public void setRefererPropertyName(String refererPropertyName) {
         this.refererPropertyName = refererPropertyName;
     }
@@ -128,22 +115,18 @@ public class ${myClassName} implements ${glRelationInfoName} {
         this.localDBMeta = localDBMeta;
     }
 
-    /** @deprecated */
     public ${glDBMetaInterfaceName} getRefererDBMeta() {
         return refererDBMeta;
     }
 
-    /** @deprecated */
     public void setRefererDBMeta(${glDBMetaInterfaceName} refererDBMeta) {
         this.refererDBMeta = refererDBMeta;
     }
 
-    /** @deprecated */
     public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalRefererColumnInfoMap() {
         return localRefererColumnInfoMap;
     }
 
-    /** @deprecated */
     public void setLocalRefererColumnInfoMap(java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localRefererColumnInfoMap) {
         this.localRefererColumnInfoMap = localRefererColumnInfoMap;
         final java.util.Set keySet = localRefererColumnInfoMap.keySet();
@@ -155,7 +138,6 @@ public class ${myClassName} implements ${glRelationInfoName} {
         }
     }
 
-    /** @deprecated */
     public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getRefererLocalColumnInfoMap() {
         return refererLocalColumnInfoMap;
     }

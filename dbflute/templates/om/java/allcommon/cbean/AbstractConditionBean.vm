@@ -533,7 +533,8 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected boolean alreadySpecifyRequiredColumn;
         /**
          * @param baseCB The condition-bean of base level. (NotNull)
-         * @param query The condition-query of current level. (Nullable: if it's null, this instance is for deriving only.)
+         * @param qyCall The callback for condition-query. (NotNull)
+         * @param forDeriveReferrer Is this for derive referrer?
          */
         protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, boolean forDeriveReferrer) {
             _baseCB = baseCB;

@@ -181,31 +181,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     /**
-     * Assert that record has not been deleted.
-     * @param entity Selected entity.
-     * @param searchKey4log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @deprecated Please use assertEntityNotDeleted().
-     */
-    protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
-        assertEntityNotDeleted(entity, searchKey4Log);
-    }
-
-    /**
-     * Assert that record has not been deleted.
-     * @param ls Selected list.
-     * @param searchKey4Log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @deprecated Please use assertEntityNotDeleted().
-     */
-    protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
-        assertEntityNotDeleted(ls, searchKey4Log);
-    }
-
-    /**
      * Assert that the entity is not deleted.
      * @param entity Selected entity. (Nullable)
-     * @param searchKey4log Search-key for Logging.
+     * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
     protected void assertEntityNotDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
@@ -227,19 +205,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     /**
-     * @param ls Selected list.
-     * @param searchKey4Log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated Please use assertEntitySelectedAsOne.
-     */
-    protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
-        assertEntitySelectedAsOne(ls, searchKey4Log);
-    }
-
-    /**
      * Assert that the entity is selected as one.
-     * 
      * @param ls Selected list. (NotNull)
      * @param searchKey4Log Search-key for Logging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}

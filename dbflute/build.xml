@@ -168,13 +168,6 @@
   	<chmod dir="${dbflute.gihyojp.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-small" description="==> reflect to test application">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-
   <target name="reflect-mac-limit-basic" description="==> reflect to test application">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
@@ -182,7 +175,7 @@
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-pbasic" description="==> reflect to test application">
+  <target name="reflect-mac-limit-pbasic" description="==> reflect to test application">
     <copy todir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -206,12 +199,6 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-small" description="==> reflect to test application">
-    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

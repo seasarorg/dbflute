@@ -200,7 +200,7 @@ public abstract class ${myClassName} {
      * Build bind clause. (for s2dao)
      * @param columnName Column name. (NotNull)
      * @param location Location. (NotNull)
-     * @param additionalOption Additional option. (NotNull)
+     * @param rearOption Rear option. (NotNull)
      * @return Bind clause. (NotNull)
      */
     protected String buildBindClauseWithRearOption(String columnName, String location, String rearOption) {
