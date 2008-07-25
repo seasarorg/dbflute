@@ -1,11 +1,6 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
-import java.util.*;
-
-#if ($table.hasRelation())
-import ${myDomainEntityPackageName}.*;
-#end
 import ${myExtendedEntityPackageName}.*;
 
 /**
@@ -126,15 +121,15 @@ public abstract class $myClassName implements java.io.Serializable {
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #if (!${referrer.isOneToOne()})
     /** The list of referrer table '${referrer.table.name}'. */
-    protected List<${referrerEntityClassName}> $referrerVariableName;
+    protected java.util.List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
      * Get the list of referrer table. {without lazyload} <br />
      * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
+    public java.util.List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new java.util.ArrayList<${referrerEntityClassName}>(); }
 #end
         return ${referrerVariableName};
     }
@@ -143,7 +138,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Set the list of referrer table.
      * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
@@ -228,7 +223,7 @@ public abstract class $myClassName implements java.io.Serializable {
      */
     public String toString() {
         final String delimiter = ",";
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
 #foreach ($col in $table.Columns)
         sb.append(delimiter).append(get${col.JavaName}());
