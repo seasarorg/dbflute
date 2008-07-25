@@ -3,7 +3,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 
 import java.util.*;
 
+#if ($table.hasRelation())
 import ${myDomainEntityPackageName}.*;
+#end
 import ${myExtendedEntityPackageName}.*;
 
 /**

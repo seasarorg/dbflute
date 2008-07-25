@@ -69,7 +69,10 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return _likeAsOrCallbackList;
     }
 
-	/** @deprecated */
+	/** 
+     * @param likeAsOrCallback Callback.
+     * @deprecated
+     */
     public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
         getLikeAsOrCallbackList().add(likeAsOrCallback);
     }

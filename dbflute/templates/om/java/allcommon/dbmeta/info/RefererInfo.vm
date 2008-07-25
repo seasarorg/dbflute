@@ -33,7 +33,11 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-    /** @deprecated */
+	/** 
+     * @param refererColumnDbName Value.
+     * @return Value.
+     * @deprecated
+     */
     public ${glColumnInfoName} findLocalByReferer(String refererColumnDbName) {
         final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(refererDBMeta, refererColumnDbName);
         final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})refererLocalColumnInfoMap.get(keyColumnInfo);
@@ -45,7 +49,11 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return resultColumnInfo;
     }
 
-    /** @deprecated */
+	/** 
+     * @param refererColumnDbName Value.
+     * @return Value.
+     * @deprecated
+     */
     public ${glColumnInfoName} findRefererByLocal(String localColumnDbName) {
         final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(localDBMeta, localColumnDbName);
         final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localRefererColumnInfoMap.get(keyColumnInfo);

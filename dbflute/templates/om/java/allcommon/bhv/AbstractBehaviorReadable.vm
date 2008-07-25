@@ -292,7 +292,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Create value-label list.
      * @param <ENTITY> The type of entity.
-     * @param cb Condition-bean. (NotNull)
+     * @param entityList The list of entity. (NotNull)
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
      */
