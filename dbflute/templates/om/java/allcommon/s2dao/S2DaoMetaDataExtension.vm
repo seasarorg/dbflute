@@ -35,7 +35,6 @@ import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
 import org.seasar.dao.SqlCommand;
-import org.seasar.dao.SqlFileNotFoundRuntimeException;
 import org.seasar.dao.TableNaming;
 import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.dbms.DbmsManager;
@@ -58,7 +57,6 @@ import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.FieldUtil;
-import org.seasar.framework.util.MethodUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -192,7 +190,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         final Method[] methods = daoBeanDesc.getMethods(methodName);
         if (methods.length == 1 && MethodUtil.isAbstract(methods[0])) {
-            setupMethodInternally(methods[0]);
+            setupMethod(methods[0]);
         }
         final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
         if (cmd != null) {
@@ -231,65 +229,25 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return method.getName().startsWith("call");
     }
 
-    protected void setupMethodInternally(final Method method) {
-        setupMethodInternally(daoInterface, method);
-    }
-
-    protected void setupMethodInternally(final Class daoInterface, final Method method) {
-        assertAnnotation(method);
-
-        // For Pure S2Dao *Deprecated at the future... But thinking...
-        setupMethodByAnnotation(daoInterface, method);
-
-        // For Pure S2Dao *Deprecated at the future... But thinking...
-        if (!completedSetupMethod(method)) {
-            setupMethodBySqlFile(daoInterface, method);
-        }
-
-        // Are these setup methods unnecessary for DBFlute?
-        if (!completedSetupMethod(method)) {
-            setupMethodByInterfaces(daoInterface, method);
-        }
-        if (!completedSetupMethod(method)) {
-            setupMethodBySuperClass(daoInterface, method);
-        }
-
-        // For Pure S2Dao *Deprecated at the future... 
-        if (!completedSetupMethod(method) && daoAnnotationReader.isSqlFile(method)) {
-            String fileName = getSqlFilePath(daoInterface, method) + ".sql";
-            throw new SqlFileNotFoundRuntimeException(daoInterface, method, fileName);
-        }
-
-        if (!completedSetupMethod(method)) {
-            setupMethodByAutoInternally(method);
-        }
-    }
-
     // ===================================================================================
     //                                                                Setup Method by Auto
     //                                                                ====================
-    protected void setupMethodByAutoInternally(Method method) {
+    @Override
+    protected void setupMethodByAuto(Method method) {
         final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
         if (outsideSql != null) {
             String msg = "This method '" + method.getName() + "()' should use Outside Sql but the file was not found!";
             msg = msg + " Expected sql file name is '" + method.getDeclaringClass().getSimpleName() + "_" + method.getName() + ".sql'";
             throw new IllegalStateException(msg);
         }
-        if (isInsert(method.getName())) {
-            setupInsertMethodByAutoInternally(method);
-        } else if (isUpdate(method.getName())) {
-            setupUpdateMethodByAutoInternally(method);
-        } else if (isDelete(method.getName())) {
-            setupDeleteMethodByAutoInternally(method);
-        } else {
-            setupSelectMethodByAutoInternally(method);
-        }
+        super.setupMethodByAuto(method);
     }
 
     // ===================================================================================
     //                                                                 ConditionBean Setup
     //                                                                 ===================
-    protected void setupSelectMethodByAutoInternally(final Method method) {
+    @Override
+    protected void setupSelectMethodByAuto(final Method method) {
         final ResultSetHandler handler = createResultSetHandler(method);
         final String[] argNames = daoAnnotationReader.getArgNames(method);
         final String query = daoAnnotationReader.getQuery(method);
@@ -352,7 +310,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Insert
     //                                                ------
-    protected void setupInsertMethodByAutoInternally(final Method method) {
+    @Override
+    protected void setupInsertMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
         final String[] propertyNames = getPersistentPropertyNames(method);
         final SqlCommand command;
@@ -384,7 +343,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected void setupUpdateMethodByAutoInternally(final Method method) {
+    @Override
+    protected void setupUpdateMethodByAuto(final Method method) {
         if (isFirstArgumentConditionBean(method)) {
             final SqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(dataSource, statementFactory);
             putSqlCommand(method.getName(), cmd);
@@ -485,7 +445,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    protected void setupDeleteMethodByAutoInternally(final Method method) {
+    @Override
+    protected void setupDeleteMethodByAuto(final Method method) {
         if (isFirstArgumentConditionBean(method)) {
             final SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(dataSource, statementFactory);
             putSqlCommand(method.getName(), cmd);
