@@ -57,6 +57,7 @@ import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.FieldUtil;
+import org.seasar.framework.util.MethodUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
