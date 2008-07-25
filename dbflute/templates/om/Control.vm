@@ -227,7 +227,6 @@ targetdatabase = $targetDatabase
     ## [Allcommon-DBMetaInfo]
     #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
     #set ($glReferrerInfoName = "${glProjectPrefix}ReferrerInfo")
-    #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
     #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
     #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
