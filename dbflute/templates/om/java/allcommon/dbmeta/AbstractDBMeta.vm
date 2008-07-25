@@ -491,6 +491,17 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     // ===================================================================================
+    //                                                                        Various Info
+    //                                                                        ============
+    // These methods is expected to override if it needs.
+    public boolean hasSequence() { return false; }
+    public boolean hasVersionNo() { return false; }
+    public ${glColumnInfoName} getVersionNoColumnInfo() { return null; }
+    public boolean hasUpdateDate() { return false; }
+    public ${glColumnInfoName} getUpdateDateColumnInfo() { return null; }
+    public boolean hasCommonColumn() { return false; }
+
+    // ===================================================================================
     //                                                                     Entity Handling
     //                                                                     ===============  
     // -----------------------------------------------------

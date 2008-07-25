@@ -35,12 +35,12 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        final ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
-        final String[] argNames = new String[]{"dto"};
-        final Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
-        final String twoWaySql = buildQueryDeleteTwoWaySql(cb);
-        final CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
-        final ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
+        String[] argNames = new String[]{"dto"};
+        Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
+        String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
         int rows = handler.execute(args);
         return new Integer(rows);
     }
@@ -51,7 +51,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
             msg = msg + " args=" + (args != null ? args.length : null);
             throw new IllegalArgumentException(msg);
         }
-        final Object fisrtArg = args[0];
+        Object fisrtArg = args[0];
         if (!(fisrtArg instanceof ${glConditionBeanInterfaceName})) {
             String msg = "The type of argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
             msg = msg + " type=" + fisrtArg.getClass();
@@ -69,11 +69,11 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
     }
     
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
-        final CommandContext context;
+        CommandContext context;
         {
-            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
-            final Node node = parser.parse();
-            final ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            Node node = parser.parse();
+            ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }

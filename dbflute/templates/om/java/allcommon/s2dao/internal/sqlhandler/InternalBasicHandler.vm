@@ -11,8 +11,6 @@ import javax.sql.DataSource;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.extension.jdbc.util.DataSourceUtil;
-import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommon}.${glQLog};
@@ -222,6 +220,25 @@ public class ${glInternalBasicHandler} {
     // ===================================================================================
     //                                                                      JDBC Delegator
     //                                                                      ==============
+    protected Connection getConnection() {
+        if (dataSource == null) {
+            throw new IllegalStateException("The dataSource should not be null!");
+        }
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+
+    protected PreparedStatement prepareStatement(Connection conn) {
+        if (sql == null) {
+            throw new IllegalStateException("The sql should not be null!");
+        }
+        return statementFactory.createPreparedStatement(conn, sql);
+    }
+
     protected int executeUpdate(PreparedStatement ps) {
         try {
             return ps.executeUpdate();
@@ -318,19 +335,5 @@ public class ${glInternalBasicHandler} {
 
     public void setStatementFactory(StatementFactory statementFactory) {
         this.statementFactory = statementFactory;
-    }
-
-    protected Connection getConnection() {
-        if (dataSource == null) {
-            throw new EmptyRuntimeException("dataSource");
-        }
-        return DataSourceUtil.getConnection(dataSource);
-    }
-
-    protected PreparedStatement prepareStatement(Connection connection) {
-        if (sql == null) {
-            throw new EmptyRuntimeException("sql");
-        }
-        return statementFactory.createPreparedStatement(connection, sql);
     }
 }

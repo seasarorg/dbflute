@@ -3,6 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlComman
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.Date;
+import java.sql.Timestamp;
 import java.lang.reflect.Method;
 import javax.sql.DataSource;
 
@@ -43,20 +45,23 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        final ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
-        final ${glEntityInterfaceName} entity = extractEntityWithCheck(args);
-        final String[] argNames = new String[]{"dto", "entity"};
-        final Class<?>[] argTypes = new Class<?>[]{cb.getClass(), entity.getClass()};
-        final String twoWaySql = buildQueryUpdateTwoWaySql(cb, entity);
-        final CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
-        final ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
+        ${glEntityInterfaceName} entity = extractEntityWithCheck(args);
+        String[] argNames = new String[]{"dto", "entity"};
+        Class<?>[] argTypes = new Class<?>[]{cb.getClass(), entity.getClass()};
+        String twoWaySql = buildQueryUpdateTwoWaySql(cb, entity);
+        if (twoWaySql == null) {
+            return 0;// No execute!
+        }
+        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
         int rows = handler.execute(args);
         return new Integer(rows);
     }
     
     protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
         assertArgument(args);
-        final Object fisrtArg = args[0];
+        Object fisrtArg = args[0];
         if (!(fisrtArg instanceof ${glConditionBeanInterfaceName})) {
             String msg = "The type of first argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
             msg = msg + " type=" + fisrtArg.getClass();
@@ -67,7 +72,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
     
     protected ${glEntityInterfaceName} extractEntityWithCheck(Object[] args) {
         assertArgument(args);
-        final Object secondArg = args[1];
+        Object secondArg = args[1];
         if (!(secondArg instanceof ${glEntityInterfaceName})) {
             String msg = "The type of second argument should be " + ${glEntityInterfaceName}.class + "! But:";
             msg = msg + " type=" + secondArg.getClass();
@@ -88,22 +93,47 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
         return new ${glInternalCommandContextHandler}(dataSource, statementFactory, context);
     }
 
+    /**
+     * @param cb Condition-bean. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @return The two-way SQL of query update. (Nullable: If the set of modified properties is empty, return null.)
+     */
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
-        final Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(entity.getTableDbName());
-        final Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
+        Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(entity.getTableDbName());
+        Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
+        if (modifiedPropertyNames.isEmpty()) {
+            return null;
+        }
         String currentPropertyName = null;
         try {
             for (String propertyName : modifiedPropertyNames) {
                 currentPropertyName = propertyName;
-                final ${glColumnInfoName} columnInfo = dbmeta.findColumnInfo(propertyName);
-                final Method method = columnInfo.findGetter();
-                final Object value = method.invoke(entity, (Object[])null);
+                ${glColumnInfoName} columnInfo = dbmeta.findColumnInfo(propertyName);
+                String columnName = columnInfo.getColumnDbName();
+                Method getter = columnInfo.findGetter();
+                Object value = getter.invoke(entity, (Object[])null);
                 if (value != null) {
-                    columnParameterMap.put(dbmeta.findDbName(propertyName), "/*entity." + propertyName + "*/null");
+                    columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
                 } else {
-                    columnParameterMap.put(dbmeta.findDbName(propertyName), "null");
+                    columnParameterMap.put(columnName, "null");
                 }
+            }
+            if (dbmeta.hasVersionNo()) {
+                ${glColumnInfoName} columnInfo = dbmeta.getVersionNoColumnInfo();
+                String columnName = columnInfo.getColumnDbName();
+                columnParameterMap.put(columnName, columnName + " + 1");
+            }
+            if (dbmeta.hasUpdateDate()) {
+                ${glColumnInfoName} columnInfo = dbmeta.getUpdateDateColumnInfo();
+                Method setter = columnInfo.findSetter();
+                if (Timestamp.class.isAssignableFrom(columnInfo.getPropertyType())) {
+                    setter.invoke(entity, new Timestamp(System.currentTimeMillis()));
+                } else {
+                    setter.invoke(entity, new Date());
+                }
+                String columnName = columnInfo.getColumnDbName();
+                columnParameterMap.put(columnName, "/*entity." + columnInfo.getPropertyName() + "*/null");
             }
         } catch (Exception e) {
             throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
@@ -139,11 +169,11 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
     }
 
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
-        final CommandContext context;
+        CommandContext context;
         {
-            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
-            final Node node = parser.parse();
-            final ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            Node node = parser.parse();
+            ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }

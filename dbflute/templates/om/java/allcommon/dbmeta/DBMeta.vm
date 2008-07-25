@@ -264,14 +264,12 @@ public interface ${myClassName} {
 
         /**
          * Get the trace of relation.
-         * 
          * @return The trace of relation as the list of relation info. (NotNull)
          */
         public List${database.filterGenericsString($glRelationInfoName)} getTraceRelation();
 
         /**
          * Get the trace of column.
-         * 
          * @return The trace of column as column info. (Nullable)
          */
         public ${glColumnInfoName} getTraceColumn();
@@ -287,7 +285,6 @@ public interface ${myClassName} {
     //                                                                       =============
     /**
      * Has sequence?
-     * 
      * @return Determination.
      */
     public boolean hasSequence();
@@ -302,10 +299,22 @@ public interface ${myClassName} {
     public boolean hasVersionNo();
 
     /**
+     * Get the column information of version no.
+     * @return The column information of version no. (Nullable: If it doesn't have the column, return null.)
+     */
+    public ${glColumnInfoName} getVersionNoColumnInfo();
+
+    /**
      * Has update date?
      * @return Determination.
      */
     public boolean hasUpdateDate();
+
+    /**
+     * Get the column information of update date.
+     * @return The column information of update date. (Nullable: If it doesn't have the column, return null.)
+     */
+    public ${glColumnInfoName} getUpdateDateColumnInfo();
 
     // ===================================================================================
     //                                                                  Common Column Info
@@ -537,7 +546,6 @@ public interface ${myClassName} {
     //                                                               Entity Property Setup
     //                                                               =====================
 	// It's very INTERNAL!
-	
 	/**
 	 * Has the setupper of entity property by the name of property? <br />
 	 * Comparing is so flexible. {Ignore cases and underscore}
@@ -566,5 +574,12 @@ public interface ${myClassName} {
 		 * @param value Value. (Nullable)
 		 */
         void setup(ENTITY_TYPE entity, Object value);
+    }
+
+	// ===================================================================================
+    //                                                                Optimistic Lock Type
+    //                                                                ====================
+    public static enum OptimisticLockType {
+        NONE, VERSION_NO, UPDATE_DATE
     }
 }

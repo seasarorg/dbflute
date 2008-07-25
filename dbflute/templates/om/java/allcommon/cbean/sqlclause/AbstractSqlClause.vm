@@ -1088,7 +1088,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                     ===============
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-narrowing start-index.
      */
     public int getFetchNarrowingSkipStartIndex() {
@@ -1097,7 +1096,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-narrowing size.
      */
     public int getFetchNarrowingLoopCount() {
@@ -1106,7 +1104,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determiantion.
      */
     public boolean isFetchNarrowingEffective() {
@@ -1398,6 +1395,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                        Query Update
     //                                                                        ============
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+        if (columnParameterMap.isEmpty()) {
+            return null;
+        }
         final String aliasName = getLocalTableAliasName();
         final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
         if (dbmeta.hasTwoOrMorePrimaryKeys()) {
@@ -1421,6 +1421,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
+        // It is guaranteed that the map has one or more elements.
         for (String columnName : columnParameterMap.keySet()) {
             final String parameter = columnParameterMap.get(columnName); 
             if (index == 0) {

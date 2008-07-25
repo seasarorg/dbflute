@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 #set ($myClassName = "${glColumnInfoName}")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName}.OptimisticLockType;
 
 /**
  * The information of column.
@@ -20,6 +21,7 @@ public class ${myClassName} {
     protected boolean primary;
     protected Integer columnSize;
     protected Integer columnDecimalDigits;
+    protected OptimisticLockType optimisticLockType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -28,11 +30,19 @@ public class ${myClassName} {
         this(dbmeta, columnDbName, null, null, false, null, null);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class<?> propertyType, boolean primary, Integer columnSize) {
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+                           , Class<?> propertyType, boolean primary, Integer columnSize) {
         this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, null);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+                           , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
+        this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE);
+    }
+
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+                           , Class<?> propertyType, boolean primary, Integer columnSize
+                           , Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
         this.dbmeta = dbmeta;
         this.columnDbName = columnDbName;
         this.propertyName = propertyName;
@@ -40,6 +50,7 @@ public class ${myClassName} {
         this.primary = primary;
         this.columnSize = columnSize;
         this.columnDecimalDigits = columnDecimalDigits;
+        this.optimisticLockType = optimisticLockType;
     }
 
     // ===================================================================================
@@ -58,6 +69,21 @@ public class ${myClassName} {
 
     public java.lang.reflect.Method findGetter() {
         return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
+    }
+
+    // ===================================================================================
+    //                                                                Optimistic Lock Type
+    //                                                                ====================
+    public boolean isOptimisticLock() {
+        return isVersionNo() || isUpdateDate();
+    }
+
+    public boolean isVersionNo() {
+        return OptimisticLockType.VERSION_NO == optimisticLockType;
+    }
+
+    public boolean isUpdateDate() {
+        return OptimisticLockType.UPDATE_DATE == optimisticLockType;
     }
 
     // ===================================================================================

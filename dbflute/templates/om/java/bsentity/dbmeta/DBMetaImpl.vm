@@ -29,7 +29,13 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
+#if ($col.isVersionNo())
+    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
+#elseif ($col.isUpdateDate())
+    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
+#else
     protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+#end
 #end
 
 #foreach ($col in $table.columns)
@@ -260,10 +266,20 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                        Various Info
     //                                                                        ============
-    public boolean hasSequence() { return ${table.isUseSequence()}; }
-    public boolean hasVersionNo() { return ${table.isUseVersionNo()}; }
-    public boolean hasUpdateDate() { return ${table.isUseUpdateDate()}; }
-    public boolean hasCommonColumn() { return ${table.hasAllCommonColumn()}; }
+#if ($table.isUseSequence())
+    public boolean hasSequence() { return true; }
+#end
+#if ($table.isUseVersionNo())
+    public boolean hasVersionNo() { return true; }
+    public ${glColumnInfoName} getVersionNoColumnInfo() { return _column${table.versionNoJavaName}; }
+#end
+#if ($table.isUseUpdateDate())
+    public boolean hasUpdateDate() { return true; }
+    public ${glColumnInfoName} getUpdateDateColumnInfo() { return _column${table.updateDateJavaName}; }
+#end
+#if ($table.hasAllCommonColumn())
+    public boolean hasCommonColumn() { return true; }
+#end
 
     // ===================================================================================
     //                                                                     Entity Handling

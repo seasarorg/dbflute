@@ -5,9 +5,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,8 +35,10 @@ import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
 import org.seasar.dao.SqlCommand;
+import org.seasar.dao.SqlFileNotFoundRuntimeException;
 import org.seasar.dao.TableNaming;
 import org.seasar.dao.ValueTypeFactory;
+import org.seasar.dao.dbms.DbmsManager;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.ProcedureMetaDataImpl;
@@ -54,6 +58,7 @@ import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.FieldUtil;
+import org.seasar.framework.util.MethodUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -77,6 +82,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAuto
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -131,13 +137,30 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                           SqlCommand Setup Override
-    //                                                           =========================
+    //                                                                 Initialize Override
+    //                                                                 ===================
     @Override
-    protected void setupSqlCommand() {
-        // Do nothing for lazy initializing!
+    public void initialize() {
+        beanClass = daoAnnotationReader.getBeanClass();
+        daoInterface = getDaoInterface(daoClass);
+        daoBeanDesc = BeanDescFactory.getBeanDesc(daoClass);
+        final Connection conn = getConnection();// It is first impact to Database!
+        try {
+            final DatabaseMetaData dbMetaData = getMetaData(conn);
+            dbms = DbmsManager.getDbms(dbMetaData);
+        } finally {
+            close(conn);
+        }
+        this.beanMetaData = beanMetaDataFactory.createBeanMetaData(daoInterface, beanClass);
+        checkSingleRowUpdateForAll = daoAnnotationReader.isCheckSingleRowUpdate();
+
+        // Comment out for lazy-load!
+        // setupSqlCommand();
     }
 
+    // ===================================================================================
+    //                                                           SqlCommand Setup Override
+    //                                                           =========================
     @Override
     public SqlCommand getSqlCommand(String methodName) throws MethodNotFoundRuntimeException {
         SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
@@ -168,8 +191,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         }
         final Method[] methods = daoBeanDesc.getMethods(methodName);
-        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
-            setupMethod(methods[0]);
+        if (methods.length == 1 && MethodUtil.isAbstract(methods[0])) {
+            setupMethodInternally(methods[0]);
         }
         final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
         if (cmd != null) {
@@ -208,24 +231,65 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return method.getName().startsWith("call");
     }
 
+    protected void setupMethodInternally(final Method method) {
+        setupMethodInternally(daoInterface, method);
+    }
+
+    protected void setupMethodInternally(final Class daoInterface, final Method method) {
+        assertAnnotation(method);
+
+        // For Pure S2Dao *Deprecated at the future... But thinking...
+        setupMethodByAnnotation(daoInterface, method);
+
+        // For Pure S2Dao *Deprecated at the future... But thinking...
+        if (!completedSetupMethod(method)) {
+            setupMethodBySqlFile(daoInterface, method);
+        }
+
+        // Are these setup methods unnecessary for DBFlute?
+        if (!completedSetupMethod(method)) {
+            setupMethodByInterfaces(daoInterface, method);
+        }
+        if (!completedSetupMethod(method)) {
+            setupMethodBySuperClass(daoInterface, method);
+        }
+
+        // For Pure S2Dao *Deprecated at the future... 
+        if (!completedSetupMethod(method) && daoAnnotationReader.isSqlFile(method)) {
+            String fileName = getSqlFilePath(daoInterface, method) + ".sql";
+            throw new SqlFileNotFoundRuntimeException(daoInterface, method, fileName);
+        }
+
+        if (!completedSetupMethod(method)) {
+            setupMethodByAutoInternally(method);
+        }
+    }
+
     // ===================================================================================
-    //                                                           OutsideSql Check Override
-    //                                                           =========================
-    protected void setupMethodByAuto(Method method) {
+    //                                                                Setup Method by Auto
+    //                                                                ====================
+    protected void setupMethodByAutoInternally(Method method) {
         final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
         if (outsideSql != null) {
             String msg = "This method '" + method.getName() + "()' should use Outside Sql but the file was not found!";
             msg = msg + " Expected sql file name is '" + method.getDeclaringClass().getSimpleName() + "_" + method.getName() + ".sql'";
             throw new IllegalStateException(msg);
         }
-        super.setupMethodByAuto(method);
+        if (isInsert(method.getName())) {
+            setupInsertMethodByAutoInternally(method);
+        } else if (isUpdate(method.getName())) {
+            setupUpdateMethodByAutoInternally(method);
+        } else if (isDelete(method.getName())) {
+            setupDeleteMethodByAutoInternally(method);
+        } else {
+            setupSelectMethodByAutoInternally(method);
+        }
     }
 
     // ===================================================================================
-    //                                                              ConditionBean Override
-    //                                                              ======================
-    @Override
-    protected void setupSelectMethodByAuto(final Method method) {
+    //                                                                 ConditionBean Setup
+    //                                                                 ===================
+    protected void setupSelectMethodByAutoInternally(final Method method) {
         final ResultSetHandler handler = createResultSetHandler(method);
         final String[] argNames = daoAnnotationReader.getArgNames(method);
         final String query = daoAnnotationReader.getQuery(method);
@@ -288,8 +352,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Insert
     //                                                ------
-    @Override
-    protected void setupInsertMethodByAuto(final Method method) {
+    protected void setupInsertMethodByAutoInternally(final Method method) {
         checkAutoUpdateMethod(method);
         final String[] propertyNames = getPersistentPropertyNames(method);
         final SqlCommand command;
@@ -321,8 +384,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    @Override
-    protected void setupUpdateMethodByAuto(final Method method) {
+    protected void setupUpdateMethodByAutoInternally(final Method method) {
         if (isFirstArgumentConditionBean(method)) {
             final SqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(dataSource, statementFactory);
             putSqlCommand(method.getName(), cmd);
@@ -423,8 +485,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    @Override
-    protected void setupDeleteMethodByAuto(final Method method) {
+    protected void setupDeleteMethodByAutoInternally(final Method method) {
         if (isFirstArgumentConditionBean(method)) {
             final SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(dataSource, statementFactory);
             putSqlCommand(method.getName(), cmd);
@@ -852,6 +913,48 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {// For specified BeanMetaData
         return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, specifiedBeanMetaData, method);
+    }
+
+    // ===================================================================================
+    //                                                                      JDBC Delegator
+    //                                                                      ==============
+    protected Connection getConnection() {
+        if (dataSource == null) {
+            throw new IllegalStateException("The dataSource should not be null!");
+        }
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+
+    protected DatabaseMetaData getMetaData(Connection conn) {
+        try {
+            return conn.getMetaData();
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+
+    protected void close(Connection conn) {
+        if (conn == null) {
+            return;
+        }
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                  Exception Handlnig
+    //                                                                  ==================
+    protected void handleSQLException(SQLException e, Statement statement) {
+        new SQLExceptionHandler().handleSQLException(e, statement);
     }
 
     // ===================================================================================

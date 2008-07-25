@@ -1408,6 +1408,14 @@ public class Column {
         final String versionNoPropertyName = getTable().getVersionNoPropertyName();
         return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
     }
+    
+    // ===================================================================================
+    //                                                                          Version No
+    //                                                                          ==========
+    public boolean isUpdateDate() {
+        final String updateDatePropertyName = getTable().getUpdateDatePropertyName();
+        return getTable().isUseUpdateDate() && getJavaName().equalsIgnoreCase(updateDatePropertyName);
+    }
 
     // ===================================================================================
     //                                                                     Behavior Filter

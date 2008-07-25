@@ -1,6 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-#if ($database.isVersionAfter1047())
 import java.sql.DatabaseMetaData;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,12 +7,9 @@ import java.util.Map;
 
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.impl.BeanMetaDataImpl;
-#end
 import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
-#if ($database.isVersionAfter1047())
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-#end
 
 /**
  * BeanMetaDataFactoryImpl for DBFlute.
@@ -22,7 +18,6 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
  @SuppressWarnings("unchecked")
 public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
 
-#if ($database.isVersionAfter1047())
     protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = Collections.synchronizedMap(new HashMap<Class<? extends ${glEntityInterfaceName}>, BeanMetaData>());
 
     @Override
@@ -110,14 +105,4 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
     protected int getLimitRelationNestLevel() {
 	    return 2;// for Compatible to old version DBFlute
     }
-#else
-    /**
-     * Get the limit nest level of relation.
-     * @return The limit nest level of relation.
-     */
-	@Override
-    protected int getLimitRelationNestLevel() {
-	    return 2;// Extension for DBFlute
-    }
-#end
 }

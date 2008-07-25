@@ -469,6 +469,10 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
+    /**
+     * @param columnParameterMap The map of column parameters. (NotNull)
+     * @return The clause of query update. (Nullable: If columnParameterMap is empty, return null)
+     */
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap);
     public String getClauseQueryDelete();
 
