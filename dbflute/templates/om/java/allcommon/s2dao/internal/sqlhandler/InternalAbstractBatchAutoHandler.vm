@@ -58,7 +58,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
                     Object bean = (Object) iter.next();
                     execute(ps, bean);
                 }
-                return executeBatch(ps);
+                return executeBatch(ps, list);
             } finally {
                 close(ps);
             }
@@ -110,11 +110,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     // ===================================================================================
     //                                                                      JDBC Delegator
     //                                                                      ==============
-    protected int[] executeBatch(PreparedStatement ps) {
+    protected int[] executeBatch(PreparedStatement ps, Object resource) {
         try {
             return ps.executeBatch();
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            handleSQLException(e, ps, true, resource);
             return null;// Unreachable!
         }
     }

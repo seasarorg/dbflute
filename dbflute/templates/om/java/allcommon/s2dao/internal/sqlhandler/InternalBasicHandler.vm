@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.seasar.dao.CommandContext;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -119,8 +120,8 @@ public class ${glInternalBasicHandler} {
         handleSQLException(e, statement, false);
     }
 
-    protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid);
+    protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
+        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, resource);
     }
 
     public static class SQLExceptionHandler {
@@ -128,34 +129,38 @@ public class ${glInternalBasicHandler} {
 	    public void handleSQLException(SQLException e, Statement statement) {
 	        handleSQLException(e, statement, false);
 	    }
-	
+	    
 	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
+	        handleSQLException(e, statement, uniqueConstraintValid, null);
+	    }
+	
+	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
 	        if (isSqlExceptionOldStyleHandling()) {
 	            throw new SQLRuntimeException(e);
 	        }
 	        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-	            throwEntityAlreadyExistsException(e, statement);
+	            throwEntityAlreadyExistsException(e, statement, resource);
 	        }
-	        throwSQLFailureException(e, statement);
+	        throwSQLFailureException(e, statement, resource);
 	    }
 	
 	    protected boolean isUniqueConstraintException(SQLException e) {
-	        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
+	        DBFluteConfig.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
 	        if (determinator != null) {
 	            return determinator.isUniqueConstraintException(e);
 	        }
-	        return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+	        return ConditionBeanContext.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
 	    }
 	
-	    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-	        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
+	    protected DBFluteConfig.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+	        return DBFluteConfig.getInstance().getUniqueConstraintDeterminator();
 	    }
 	
 	    protected boolean isSqlExceptionOldStyleHandling() {
-	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
+	        return DBFluteConfig.getInstance().isSqlExceptionOldStyleHandling();
 	    }
 	
-	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement) {
+	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, Object resource) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The entity already exists on the database!" + getLineSeparator();
@@ -168,6 +173,11 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
 	            msg = msg + getLineSeparator();
 	        }
+            if (resource != null) {
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
+	            msg = msg + getLineSeparator();
+            }
 	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
@@ -184,7 +194,7 @@ public class ${glInternalBasicHandler} {
 	        throw new ${glEntityAlreadyExistsException}(msg, e);
 	    }
 	
-	    protected void throwSQLFailureException(SQLException e, Statement statement) {
+	    protected void throwSQLFailureException(SQLException e, Statement statement, Object resource) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The SQL failed to execute!" + getLineSeparator();
@@ -196,6 +206,11 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
 	            msg = msg + getLineSeparator();
 	        }
+            if (resource != null) {
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
+	            msg = msg + getLineSeparator();
+            }
 	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
@@ -211,6 +226,30 @@ public class ${glInternalBasicHandler} {
             msg = msg + "* * * * * * * * * */";
             throw new ${glSQLFailureException}(msg, e);
         }
+
+        protected String buildResourceDisplay(Object resource) {
+            if (resource == null) { return ""; }
+            if (resource instanceof CommandContext) {
+                CommandContext ctx = (CommandContext)resource;
+                Object[] variables = ctx.getBindVariables();
+                return buildResourceDisplay(variables);
+            } else if (resource instanceof Object[]) {
+                return buildResourceDisplay((Object[])resource);
+            } else {
+                return resource.toString();
+            }
+        }
+        
+        protected String buildResourceDisplay(Object[] resources) {
+            if (resources == null) { return ""; }
+            StringBuilder sb = new StringBuilder();
+            for (Object resource : resources) {
+                sb.append(", ").append(resource);
+            }
+            sb.delete(0, ", ".length()).insert(0, "{").append("}");
+            return sb.toString();
+        }
+        
 
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
@@ -239,11 +278,11 @@ public class ${glInternalBasicHandler} {
         return statementFactory.createPreparedStatement(conn, sql);
     }
 
-    protected int executeUpdate(PreparedStatement ps) {
+    protected int executeUpdate(PreparedStatement ps, Object resource) {
         try {
             return ps.executeUpdate();
         } catch (SQLException e) {
-            handleSQLException(e, ps, true);
+            handleSQLException(e, ps, true, resource);
             return 0;// Unreachable!
         }
     }

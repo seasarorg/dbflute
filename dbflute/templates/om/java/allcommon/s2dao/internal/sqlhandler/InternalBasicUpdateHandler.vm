@@ -42,7 +42,7 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} {
         PreparedStatement ps = prepareStatement(connection);
         try {
             bindArgs(ps, args, argTypes);
-            return executeUpdate(ps);
+            return executeUpdate(ps, args);
         } finally {
             close(ps);
         }
