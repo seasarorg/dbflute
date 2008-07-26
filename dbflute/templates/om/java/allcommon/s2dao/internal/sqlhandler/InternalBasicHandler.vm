@@ -117,7 +117,7 @@ public class ${glInternalBasicHandler} {
     //                                                                   Exception Handler
     //                                                                   =================
     protected void handleSQLException(SQLException e, Statement statement) {
-        handleSQLException(e, statement, false);
+        handleSQLException(e, statement, false, null);
     }
 
     protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
@@ -127,13 +127,9 @@ public class ${glInternalBasicHandler} {
     public static class SQLExceptionHandler {
 
 	    public void handleSQLException(SQLException e, Statement statement) {
-	        handleSQLException(e, statement, false);
+	        handleSQLException(e, statement, false, null);
 	    }
 	    
-	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-	        handleSQLException(e, statement, uniqueConstraintValid, null);
-	    }
-	
 	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
 	        if (isSqlExceptionOldStyleHandling()) {
 	            throw new SQLRuntimeException(e);
@@ -145,19 +141,19 @@ public class ${glInternalBasicHandler} {
 	    }
 	
 	    protected boolean isUniqueConstraintException(SQLException e) {
-	        DBFluteConfig.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
+	        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
 	        if (determinator != null) {
 	            return determinator.isUniqueConstraintException(e);
 	        }
-	        return ConditionBeanContext.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+	        return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
 	    }
 	
-	    protected DBFluteConfig.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-	        return DBFluteConfig.getInstance().getUniqueConstraintDeterminator();
+	    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+	        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
 	    }
 	
 	    protected boolean isSqlExceptionOldStyleHandling() {
-	        return DBFluteConfig.getInstance().isSqlExceptionOldStyleHandling();
+	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
 	    }
 	
 	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, Object resource) {
