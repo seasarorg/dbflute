@@ -87,7 +87,7 @@ namespace ${glPackageBaseCommonBhv} {
 		
         protected void InjectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
             ${glDBMetaInterfaceName} dbmeta = entity.DBMeta;
-            if (!dbmeta.HasSequence || dbmeta.HasTwoOrMorePrimaryKeys || entity.HasPrimaryKeyValue()) {
+            if (!dbmeta.HasSequence || dbmeta.HasTwoOrMorePrimaryKeys || entity.HasPrimaryKeyValue) {
                 return;
             }
             SetupNextValueToPrimaryKey(entity);
