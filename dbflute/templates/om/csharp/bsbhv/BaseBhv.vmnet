@@ -173,8 +173,8 @@ namespace ${glPackageExtendedBhv} {
             public IList<${myExtendedObjectClassName}> Paging() { return _bhv.SelectList(_cb); }
         }
         #endregion
-
 #if ($table.isUseSequence())
+
         // ===============================================================================
         //                                                                        Sequence
         //                                                                        ========
