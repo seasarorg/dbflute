@@ -59,7 +59,7 @@ namespace ${myExtendedDaoPackageName} {
 #if ($table.isUseSequence())
 
         [Sql("${table.SequenceNextSql}")]
-        int SelectNextVal();
+        ${table.sequenceReturnType} SelectNextVal();
 #end
     }
 }
