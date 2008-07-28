@@ -81,9 +81,18 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected virtual void FrameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
-            // InjectSequenceToPrimaryKeyIfNeeds(targetEntity); @jflute -- Implements at the future!
+            InjectSequenceToPrimaryKeyIfNeeds(targetEntity);
             SetupCommonColumnOfInsertIfNeeds(targetEntity);
         }
+		
+        protected void InjectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
+            ${glDBMetaInterfaceName} dbmeta = entity.DBMeta;
+            if (!dbmeta.HasSequence || dbmeta.HasTwoOrMorePrimaryKeys || entity.HasPrimaryKeyValue()) {
+                return;
+            }
+            SetupNextValueToPrimaryKey(entity);
+        }
+        protected abstract void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity);
 
         protected virtual void SetupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
