@@ -92,7 +92,8 @@ namespace ${glPackageBaseCommonBhv} {
             }
             SetupNextValueToPrimaryKey(entity);
         }
-        protected abstract void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity);
+        protected virtual void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity) {// Expect Override of Sub Class!
+        }
 
         protected virtual void SetupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())

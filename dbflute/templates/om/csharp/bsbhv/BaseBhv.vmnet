@@ -174,22 +174,19 @@ namespace ${glPackageExtendedBhv} {
         }
         #endregion
 
+#if ($table.isUseSequence())
         // ===============================================================================
         //                                                                        Sequence
         //                                                                        ========
-        protected override void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity) {
-#if ($table.isUseSequence() && $table.hasOnlyOnePrimaryKey())
-            ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
-            myEntity.${table.primaryKeyJavaNameAsOne} = SelectNextVal();
-#else
-            throw new SystemException("The relation about sequence and primary key is wrong: " + entity);
-#end
-        }
-
-#if ($table.isUseSequence())
         public ${table.sequenceReturnType} SelectNextVal() {
             return DelegateSelectNextVal();
         }
+#if ($table.hasOnlyOnePrimaryKey())
+        protected override void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity) {// Very Internal
+            ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
+            myEntity.${table.primaryKeyJavaNameAsOne} = SelectNextVal();
+        }
+#end
 #end
 
 #if (${table.hasOnlyOnePrimaryKey()})
