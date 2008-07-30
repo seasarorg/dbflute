@@ -18,6 +18,7 @@ package org.seasar.dbflute;
 import java.util.Properties;
 
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -181,9 +182,16 @@ public final class DfBuildProperties {
     public DfSelectParamProperties getSelectParamProperties() {
         return getHandler().getSelectParamProperties(getProperties());
     }
+    
+    // -----------------------------------------------------
+    //                                Additional Primary Key
+    //                                ----------------------
+    public DfAdditionalPrimaryKeyProperties getAdditionalPrimaryKeyProperties() {
+        return getHandler().getAdditionalPrimaryKeyProperties(getProperties());
+    }
 
     // -----------------------------------------------------
-    //                                Additional Foreign-Key
+    //                                Additional Foreign Key
     //                                ----------------------
     public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
         return getHandler().getAdditionalForeignKeyProperties(getProperties());

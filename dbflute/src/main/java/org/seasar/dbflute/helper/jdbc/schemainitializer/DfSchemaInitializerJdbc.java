@@ -185,6 +185,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
                 return sb.toString();
             }
+
             public String buildDropMaterializedViewSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append("drop materialized view ").append(metaInfo.getTableName());
@@ -196,6 +197,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected static interface DfDropTableByJdbcCallback {
         public String buildDropTableSql(DfTableMetaInfo metaInfo);
+
         public String buildDropMaterializedViewSql(DfTableMetaInfo metaInfo);
     }
 
@@ -218,8 +220,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         statement.execute(dropMaterializedViewSql);
                         _log.info("  --> " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        _log.info(ignored.getMessage());
-                        throw e;
+                        if (metaInfo.isTableTypeView()) {
+                            _log.info("The drop view failed to execute: msg=" + e.getMessage());
+                        } else {
+                            throw e;
+                        }
                     }
                 }
             }

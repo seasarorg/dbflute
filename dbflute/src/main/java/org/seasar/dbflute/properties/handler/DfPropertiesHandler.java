@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties.handler;
 import java.util.Properties;
 
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
@@ -151,7 +152,22 @@ public final class DfPropertiesHandler {
         }
         return _sequenceIdentityProperties;
     }
+    
+    // -----------------------------------------------------
+    //                                Additional Primary Key
+    //                                ----------------------
+    protected DfAdditionalPrimaryKeyProperties _additionalPrimaryKeyProperties;
+    
+    public DfAdditionalPrimaryKeyProperties getAdditionalPrimaryKeyProperties(Properties prop) {
+        if (_additionalPrimaryKeyProperties == null) {
+            _additionalPrimaryKeyProperties = new DfAdditionalPrimaryKeyProperties(prop);
+        }
+        return _additionalPrimaryKeyProperties;
+    }
 
+    // -----------------------------------------------------
+    //                                Additional Foreign Key
+    //                                ----------------------
     protected DfAdditionalForeignKeyProperties _additionalForeignKeyProperties;
 
     public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties(Properties prop) {

@@ -85,6 +85,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupR
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
+import org.seasar.dbflute.torque.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
@@ -508,8 +509,14 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                                    CustomizeDao
-    //                                                                    ============
+    //                                                                     Initializer
+    //                                                                     ===========
+    // -----------------------------------------------------
+    //                                         Customize Dao
+    //                                         -------------
+    /**
+     * @deprecated Not Supported
+     */
     public void initializeCustomizeDao() {
         // Not support so do nothing!
     }
@@ -517,23 +524,34 @@ public class Database {
     public java.util.List<Table> getCustomizeTableList() {
         return new ArrayList<Table>(100);
     }
+    
+    // -----------------------------------------------------
+    //                                  AdditionalPrimaryKey
+    //                                  --------------------
+    public void initializeAdditionalPrimaryKey() {
+        final DfAdditionalPrimaryKeyInitializer initializer = new DfAdditionalPrimaryKeyInitializer(this);
+        initializer.initializeAdditionalPrimaryKey();
+    }
 
-    // ===============================================================================
-    //                                                            AdditionalForeignKey
-    //                                                            ====================
+    // -----------------------------------------------------
+    //                                  AdditionalForeignKey
+    //                                  --------------------
     public void initializeAdditionalForeignKey() {
         final DfAdditionalForeignKeyInitializer initializer = new DfAdditionalForeignKeyInitializer(this);
         initializer.initializeAdditionalForeignKey();
     }
-
+    
+    // -----------------------------------------------------
+    //                              ClassificationDeployment
+    //                              ------------------------
     public void initializeClassificationDeployment() {
         getClassificationProperties().initializeClassificationDeploymentMap(getTableList());
         getClassificationProperties().initializeClassificationDeploymentMap(getCustomizeTableList());
     }
-
-    // ===============================================================================
-    //                                                                    IncludeQuery
-    //                                                                    ============
+    
+    // -----------------------------------------------------
+    //                                          IncludeQuery
+    //                                          ------------
     public void initializeIncludeQuery() {
         IncludeQueryInitializer initializer = new IncludeQueryInitializer();
         initializer.setIncludeQueryProperties(getProperties().getIncludeQueryProperties());

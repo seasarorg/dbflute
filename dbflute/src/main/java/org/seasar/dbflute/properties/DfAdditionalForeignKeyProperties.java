@@ -15,9 +15,11 @@ import org.seasar.dbflute.util.DfStringUtil;
  */
 public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param prop Properties. (NotNull)
      */
     public DfAdditionalForeignKeyProperties(Properties prop) {
@@ -34,31 +36,31 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         if (_additionalForeignKeyMap == null) {
             _additionalForeignKeyMap = new LinkedHashMap<String, Map<String, String>>();
             final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
-            final Set fisrtKeySet = generatedMap.keySet();
-            for (Object foreignName : fisrtKeySet) {
+            final Set<String> fisrtKeySet = generatedMap.keySet();
+            for (Object foreignName : fisrtKeySet) {// FK Loop!
                 final Object firstValue = generatedMap.get(foreignName);
                 if (!(firstValue instanceof Map)) {
                     String msg = "The value type should be Map: tableName=" + foreignName + " property=CustomizeDao";
                     msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
                     throw new IllegalStateException(msg);
                 }
-                final Map ForeignDefinitionMap = (Map) firstValue;
-                Set secondKeySet = ForeignDefinitionMap.keySet();
+                final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
+                final Set<?> secondKeySet = foreignDefinitionMap.keySet();
                 final Map<String, String> genericForeignDefinitiontMap = new LinkedHashMap<String, String>();
-                for (Object componentName : secondKeySet) {
-                    final Object secondValue = ForeignDefinitionMap.get(componentName);
+                for (Object componentName : secondKeySet) {// FK Component Loop!
+                    final Object secondValue = foreignDefinitionMap.get(componentName);
                     if (secondValue == null) {
                         continue;
                     }
                     if (!(componentName instanceof String)) {
-                        String msg = "The key type should be String: foreignName=" + foreignName
-                                + " property=AdditionalForeignKey";
+                        String msg = "The key type should be String: foreignName=" + foreignName;
+                        msg = msg + " property=AdditionalForeignKey";
                         msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
                         throw new IllegalStateException(msg);
                     }
                     if (!(secondValue instanceof String)) {
-                        String msg = "The value type should be String: foreignName=" + foreignName
-                                + " property=AdditionalForeignKey";
+                        String msg = "The value type should be String: foreignName=" + foreignName;
+                        msg = msg + " property=AdditionalForeignKey";
                         msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
                         throw new IllegalStateException(msg);
                     }

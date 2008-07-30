@@ -30,11 +30,14 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 
 /**
- * Torque task utility.
+ * The initializer of additional foreign key.
  * @author jflute
  */
 public class DfAdditionalForeignKeyInitializer {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfAdditionalForeignKeyInitializer.class);
 
@@ -54,32 +57,32 @@ public class DfAdditionalForeignKeyInitializer {
     //                                                                AdditionalForeignKey
     //                                                                ====================
     public void initializeAdditionalForeignKey() {
-        _log.debug("/======================================");
-        _log.debug("...Initializing additional foreign key.");
+        _log.info("/======================================");
+        _log.info("...Initializing additional foreign key.");
 
         final Map<String, Map<String, String>> additionalForeignKeyMap = getAdditionalForeignKeyMap();
-        final Set<String> tableNameKeySet = additionalForeignKeyMap.keySet();
-        for (String foreignName : tableNameKeySet) {
-            final String foreignTableName = getForeignTableName(foreignName);
+        final Set<String> foreignKeyNameKeySet = additionalForeignKeyMap.keySet();
+        for (String foreignKeyName : foreignKeyNameKeySet) {
+            final String foreignTableName = getForeignTableName(foreignKeyName);
             assertForeignTable(foreignTableName);
-            final List<String> foreignColumnNameList = getForeignColumnNameList(foreignName, foreignTableName);
+            final List<String> foreignColumnNameList = getForeignColumnNameList(foreignKeyName, foreignTableName);
             assertForeignTableColumn(foreignTableName, foreignColumnNameList);
-            final String localTableName = getLocalTableName(foreignName);
-            final String fixedCondition = getFixedCondition(foreignName);
-            final String fixedSuffix = getFixedSuffix(foreignName);
+            final String localTableName = getLocalTableName(foreignKeyName);
+            final String fixedCondition = getFixedCondition(foreignKeyName);
+            final String fixedSuffix = getFixedSuffix(foreignKeyName);
 
-            _log.debug("    " + foreignName);
+            _log.info("    " + foreignKeyName);
             if (localTableName.equals("*")) {
-                processAllTableFK(foreignName, foreignTableName, foreignColumnNameList, fixedCondition, fixedSuffix);
+                processAllTableFK(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, fixedSuffix);
             } else {
                 assertLocalTable(localTableName);
                 final Table table = getTable(localTableName);
-                final List<String> localColumnNameList = getLocalColumnNameList(foreignName, foreignTableName,
+                final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                         foreignColumnNameList, localTableName, true);
                 assertLocalTableColumn(localTableName, localColumnNameList);
                 if (table.isExistForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList)) {
                     String msg = "The foreign key has already set up: ";
-                    _log.debug(msg + foreignTableName + " " + localColumnNameList + " " + foreignColumnNameList);
+                    _log.info(msg + foreignTableName + " " + localColumnNameList + " " + foreignColumnNameList);
                     continue;
                 }
 
@@ -88,7 +91,7 @@ public class DfAdditionalForeignKeyInitializer {
                 showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
             }
         }
-        _log.debug("========/");
+        _log.info("========/");
     }
 
     protected void processAllTableFK(String foreignName, String foreignTableName, List<String> foreignColumnNameList,
@@ -100,13 +103,14 @@ public class DfAdditionalForeignKeyInitializer {
             if (localColumnNameList == null || !table.containsColumnsByFlexibleName(localColumnNameList)) {
                 continue;
             }
-
             if (table.isExistForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList)) {
                 String msg = "The foreign key has already set up: ";
-                _log.debug(msg + foreignTableName + " " + localColumnNameList + " " + foreignColumnNameList);
+                msg = msg + " localTable=" + table.getName() + " foreignTable=" + foreignTableName;
+                msg = msg + " localColumnNameList=" + localColumnNameList + " foreignColumnNameList="
+                        + foreignColumnNameList;
+                _log.info(msg);
                 continue;
             }
-
             setupForeignKeyToTable(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList,
                     fixedSuffix);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
@@ -140,7 +144,7 @@ public class DfAdditionalForeignKeyInitializer {
         } else {
             msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
         }
-        _log.debug(msg);
+        _log.info(msg);
     }
 
     protected List<String> getForeignColumnNameList(String foreignName, final String foreignTableName) {
@@ -197,7 +201,7 @@ public class DfAdditionalForeignKeyInitializer {
     protected void assertForeignTableColumn(final String foreignTableName, List<String> foreignColumnNameList) {
         if (!getTable(foreignTableName).containsColumnsByFlexibleName(foreignColumnNameList)) {
             String msg = "Not found column by the foreignColumnNameList: " + foreignColumnNameList;
-            msg = msg + " of " + foreignTableName;
+            msg = msg + " of the foreign table '" + foreignTableName + "'";
             msg = msg + " additionalForeignKeyMap=" + getAdditionalForeignKeyMap();
             throw new IllegalStateException(msg);
         }
@@ -214,34 +218,34 @@ public class DfAdditionalForeignKeyInitializer {
     protected void assertLocalTableColumn(final String localTableName, List<String> localColumnNameList) {
         if (!getTable(localTableName).containsColumnsByFlexibleName(localColumnNameList)) {
             String msg = "Not found column by the localColumnNameList: " + localColumnNameList;
-            msg = msg + " of " + localTableName;
+            msg = msg + " of the local table '" + localTableName + "'";
             msg = msg + " additionalForeignKeyMap=" + getAdditionalForeignKeyMap();
             throw new IllegalStateException(msg);
         }
     }
 
-    protected String getLocalTableName(String foreignName) {
-        return getProperties().findLocalTableName(foreignName);
+    protected String getLocalTableName(String foreignKeyName) {
+        return getProperties().findLocalTableName(foreignKeyName);
     }
 
-    protected String getForeignTableName(String foreignName) {
-        return getProperties().findForeignTableName(foreignName);
+    protected String getForeignTableName(String foreignKeyName) {
+        return getProperties().findForeignTableName(foreignKeyName);
     }
 
-    protected List<String> getLocalColumnNameList(String foreignName) {
-        return getProperties().findLocalColumnNameList(foreignName);
+    protected List<String> getLocalColumnNameList(String foreignKeyName) {
+        return getProperties().findLocalColumnNameList(foreignKeyName);
     }
 
-    protected List<String> getForeignColumnNameList(String foreignName) {
-        return getProperties().findForeignColumnNameList(foreignName);
+    protected List<String> getForeignColumnNameList(String foreignKeyName) {
+        return getProperties().findForeignColumnNameList(foreignKeyName);
     }
 
-    protected String getFixedCondition(String foreignName) {
-        return getProperties().findFixedCondition(foreignName);
+    protected String getFixedCondition(String foreignKeyName) {
+        return getProperties().findFixedCondition(foreignKeyName);
     }
 
-    protected String getFixedSuffix(String foreignName) {
-        return getProperties().findFixedSuffix(foreignName);
+    protected String getFixedSuffix(String foreignKeyName) {
+        return getProperties().findFixedSuffix(foreignKeyName);
     }
 
     protected Map<String, Map<String, String>> getAdditionalForeignKeyMap() {

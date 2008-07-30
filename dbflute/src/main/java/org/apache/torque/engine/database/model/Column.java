@@ -460,11 +460,12 @@ public class Column {
         }
     }
 
-    // -------------------------------------------
-    //                                 Primary Key
-    //                                 -----------
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
     /**
      * Set if the column is a primary key or not
+     * @param pk Determination.
      */
     public void setPrimaryKey(boolean pk) {
         _isPrimaryKey = pk;
@@ -472,17 +473,19 @@ public class Column {
 
     /**
      * Return true if the column is a primary key
+     * @return Determination.
      */
     public boolean isPrimaryKey() {
         return _isPrimaryKey;
     }
 
-    // -------------------------------------------
-    //                               AutoIncrement
-    //                               -------------
+    // -----------------------------------------------------
+    //                                        Auto Increment
+    //                                        --------------
     /**
      * Return auto increment/sequence string for the target database. We need to
      * pass in the props for the target database!
+     * @return Determination.
      */
     public boolean isAutoIncrement() {
         return _isAutoIncrement;
@@ -491,16 +494,18 @@ public class Column {
     /**
      * Set the auto increment value.
      * Use isAutoIncrement() to find out if it is set or not.
+     * @param value Determination.
      */
     public void setAutoIncrement(boolean value) {
         _isAutoIncrement = value;
     }
 
-    // -------------------------------------------
-    //                                  Unique Key
-    //                                  ----------
+    // -----------------------------------------------------
+    //                                            Unique Key
+    //                                            ----------
     /**
      * Set true if the column is UNIQUE
+     * @param u Determination.
      */
     public void setUnique(boolean u) {
         throw new UnsupportedOperationException();
@@ -508,6 +513,7 @@ public class Column {
 
     /**
      * Get the UNIQUE property
+     * @return Determination.
      */
     public boolean isUnique() {
         final List<Unique> uniqueList = getTable().getUniqueList();
@@ -1408,7 +1414,7 @@ public class Column {
         final String versionNoPropertyName = getTable().getVersionNoPropertyName();
         return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
     }
-    
+
     // ===================================================================================
     //                                                                          Version No
     //                                                                          ==========
