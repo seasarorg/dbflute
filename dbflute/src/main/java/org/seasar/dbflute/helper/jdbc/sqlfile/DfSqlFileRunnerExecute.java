@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper.jdbc.sqlfile;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -52,7 +53,11 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
      */
     protected void execSQL(Statement statement, String sql) {
         try {
-            statement.execute(sql);
+            if (isAssertCountNotZero(sql)) {
+                assertCountNotZero(statement, sql);
+            } else {
+                statement.execute(sql);
+            }
             _goodSqlCount++;
         } catch (SQLException e) {
             if (!_runInfo.isErrorContinue()) {
@@ -85,7 +90,42 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         }
     }
 
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+    protected boolean isAssertCountNotZero(String sql) {
+        return sql.contains("--") && sql.contains("#df:assertCountNotZero#");
+    }
+
+    protected void assertCountNotZero(Statement statement, String sql) throws SQLException {
+        ResultSet rs = statement.executeQuery(sql);
+        int count = 0;
+        while (rs.next()) {// One loop only!
+            count = rs.getInt(1);
+            break;
+        }
+        if (count == 0) {
+            throwAssertionFailureCountZeroException(sql);
+        }
+    }
+
+    protected void throwAssertionFailureCountZeroException(String sql) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The SQL of 'select count' returned ZERO!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your test data!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfAssertionFailureCountZeroException(msg);
+    }
+
+    public static class DfAssertionFailureCountZeroException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public DfAssertionFailureCountZeroException(String msg) {
+            super(msg);
+        }
     }
 }
