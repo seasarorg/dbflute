@@ -245,7 +245,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         continue;
                     } else if (line.trim().contains("#df:end#")) {
                         inGroup = false;
-                        sqlList.add(sql);
+                        addSqlToList(sqlList, sql);
                         sql = "";
                         continue;
                     }
@@ -292,7 +292,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         continue;
                     }
                     if (!delimiterChanger.isDelimiterChanger(sql)) {
-                        sqlList.add(sql);
+                        addSqlToList(sqlList, sql);
                         sql = "";
                     } else {
                         _runInfo.setDelimiter(delimiterChanger.getNewDelimiter(sql, _runInfo.getDelimiter()));
@@ -302,7 +302,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
             sql = sql.trim();
             if (sql.length() > 0) {
-                sqlList.add(sql);// for Last SQL
+                addSqlToList(sqlList, sql);// for Last SQL
             }
         } catch (IOException e) {
             throw new RuntimeException("The method 'extractSqlList()' threw the exception!", e);
@@ -316,6 +316,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
         }
         return sqlList;
+    }
+    
+    protected void addSqlToList(List<String> sqlList, String sql) {
+        sqlList.add(removeCR(sql));
     }
 
     public DelimiterChanger newDelimterChanger() {
@@ -338,6 +342,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             str = str.substring(1);
         }
         return str;
+    }
+    
+    protected String removeCR(String str) {
+        return str.replaceAll("\r", "");
     }
 
     protected String replaceCommentQuestionMarkIfNeeds(String line) {

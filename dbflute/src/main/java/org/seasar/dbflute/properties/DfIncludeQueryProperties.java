@@ -28,6 +28,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     //                                                              ==================
     protected Map<String, Map<String, Map<String, List<String>>>> _includeQueryMap;
 
+    @SuppressWarnings("unchecked")
     public Map<String, Map<String, Map<String, List<String>>>> getIncludeQueryMap() {
         if (_includeQueryMap != null) {
             return _includeQueryMap;
@@ -51,6 +52,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Map<String, Map<String, List<String>>>> _excludeQueryMap;
 
+    @SuppressWarnings("unchecked")
     public Map<String, Map<String, Map<String, List<String>>>> getExcludeQueryMap() {
         if (_excludeQueryMap != null) {
             return _excludeQueryMap;
