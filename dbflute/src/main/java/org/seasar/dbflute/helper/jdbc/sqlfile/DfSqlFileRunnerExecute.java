@@ -89,7 +89,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             _log.warn("" + System.getProperty("line.separator"));
         }
     }
-    
+
     protected boolean isValidAssertSql() {
         return false;// as default!
     }
@@ -99,14 +99,21 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected void assertCountNotZero(Statement statement, String sql) throws SQLException {
-        ResultSet rs = statement.executeQuery(sql);
-        int count = 0;
-        while (rs.next()) {// One loop only!
-            count = rs.getInt(1);
-            break;
-        }
-        if (count == 0) {
-            throwAssertionFailureCountZeroException(sql);
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery(sql);
+            int count = 0;
+            while (rs.next()) {// One loop only!
+                count = rs.getInt(1);
+                break;
+            }
+            if (count == 0) {
+                throwAssertionFailureCountZeroException(sql);
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
         }
     }
 
