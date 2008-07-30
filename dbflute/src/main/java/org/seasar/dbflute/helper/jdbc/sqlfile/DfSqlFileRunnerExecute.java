@@ -53,7 +53,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
      */
     protected void execSQL(Statement statement, String sql) {
         try {
-            if (isAssertCountNotZero(sql)) {
+            if (isValidAssertSql() && isAssertCountNotZero(sql)) {
                 assertCountNotZero(statement, sql);
             } else {
                 statement.execute(sql);
@@ -88,6 +88,10 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             _log.warn("Failed to execute: " + sql, e);
             _log.warn("" + System.getProperty("line.separator"));
         }
+    }
+    
+    protected boolean isValidAssertSql() {
+        return false;// as default!
     }
 
     protected boolean isAssertCountNotZero(String sql) {

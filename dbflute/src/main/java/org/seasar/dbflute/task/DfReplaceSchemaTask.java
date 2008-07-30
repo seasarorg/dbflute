@@ -176,6 +176,15 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             _log.info("");
         }
     }
+    
+    protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
+        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return true;
+            }
+        };
+    }
 
     protected void takeFinally(DfRunnerInformation runInfo) {
         if (_log.isInfoEnabled()) {
@@ -186,16 +195,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             _log.info("* * * * * * * **");
         }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner(runInfo), getTakeFinallySqlFileList());
+        fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
         if (_log.isInfoEnabled()) {
             _log.info("");
         }
     }
 
-    protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
+    protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return true;
+            }
+            @Override
+            protected boolean isValidAssertSql() {
                 return true;
             }
         };
