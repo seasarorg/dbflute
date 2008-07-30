@@ -54,7 +54,7 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-  	<javac destdir="target/classes" encoding="UTF-8">
+  	<javac destdir="target/classes" encoding="UTF-8" debug="true">
       <src path="src/main/java" />
   	  <src path="src/main/resources" />
       <classpath>
