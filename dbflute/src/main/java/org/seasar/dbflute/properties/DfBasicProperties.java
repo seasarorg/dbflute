@@ -268,7 +268,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        // return System.getProperty("line.separator");
+        return "\n";// For to resolve environment dependency!
     }
 
     // ===================================================================================
