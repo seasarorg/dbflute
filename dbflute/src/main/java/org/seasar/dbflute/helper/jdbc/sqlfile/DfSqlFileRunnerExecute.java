@@ -16,8 +16,13 @@
 package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -53,8 +58,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
      */
     protected void execSQL(Statement statement, String sql) {
         try {
-            if (isValidAssertSql() && isAssertCountNotZero(sql)) {
-                assertCountNotZero(statement, sql);
+            if (isValidAssertSql()) {
+                if (isAssertCountZero(sql)) {
+                    assertCountZero(statement, sql);
+                } else if (isAssertListZero(sql)) {
+                    assertListZero(statement, sql);
+                } else {
+                    statement.execute(sql);
+                }
             } else {
                 statement.execute(sql);
             }
@@ -94,11 +105,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         return false;// as default!
     }
 
-    protected boolean isAssertCountNotZero(String sql) {
-        return sql.contains("--") && sql.contains("#df:assertCountNotZero#");
+    protected boolean isAssertCountZero(String sql) {
+        return sql.contains("--") && sql.contains("#df:assertCountZero#");
     }
 
-    protected void assertCountNotZero(Statement statement, String sql) throws SQLException {
+    protected boolean isAssertListZero(String sql) {
+        return sql.contains("--") && sql.contains("#df:assertListZero#");
+    }
+
+    protected void assertCountZero(Statement statement, String sql) throws SQLException {
         ResultSet rs = null;
         try {
             rs = statement.executeQuery(sql);
@@ -107,8 +122,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 count = rs.getInt(1);
                 break;
             }
-            if (count == 0) {
-                throwAssertionFailureCountZeroException(sql);
+            if (count > 0) {
+                throwAssertionFailureCountNotZeroException(sql, count);
             }
         } finally {
             if (rs != null) {
@@ -117,10 +132,36 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         }
     }
 
-    protected void throwAssertionFailureCountZeroException(String sql) {
+    protected void assertListZero(Statement statement, String sql) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery(sql);
+            final ResultSetMetaData metaData = rs.getMetaData();
+            final int columnCount = metaData.getColumnCount();
+            final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+            int count = 0;
+            while (rs.next()) {// One loop only!
+                Map<String, String> recordMap = new LinkedHashMap<String, String>();
+                for (int i = 1; i <= columnCount; i++) {
+                    recordMap.put(metaData.getColumnName(i), rs.getString(i));
+                }
+                resultList.add(recordMap);
+                ++count;
+            }
+            if (count > 0) {
+                throwAssertionFailureListNotZeroException(sql, count, resultList);
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+        }
+    }
+
+    protected void throwAssertionFailureCountNotZeroException(String sql, int resultCount) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The SQL of 'select count' returned ZERO!" + getLineSeparator();
+        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm your test data!" + getLineSeparator();
@@ -128,14 +169,46 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Result Count]" + getLineSeparator() + resultCount + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureCountZeroException(msg);
+        throw new DfAssertionFailureCountNotZeroException(msg);
     }
 
-    public static class DfAssertionFailureCountZeroException extends RuntimeException {
+    public static class DfAssertionFailureCountNotZeroException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public DfAssertionFailureCountZeroException(String msg) {
+        public DfAssertionFailureCountNotZeroException(String msg) {
+            super(msg);
+        }
+    }
+
+    protected void throwAssertionFailureListNotZeroException(String sql, int resultCount,
+            List<Map<String, String>> resultList) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your test data!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Result Count]" + getLineSeparator() + resultCount + getLineSeparator();
+        msg = msg + "[Result List]" + getLineSeparator();
+        for (Map<String, String> recordMap : resultList) {
+            msg = msg + recordMap + getLineSeparator();
+        }
+        msg = msg + "* * * * * * * * * */";
+        throw new DfAssertionFailureListNotZeroException(msg);
+    }
+
+    public static class DfAssertionFailureListNotZeroException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public DfAssertionFailureListNotZeroException(String msg) {
             super(msg);
         }
     }
