@@ -145,7 +145,7 @@ public class ${glInternalBasicHandler} {
 	        if (determinator != null) {
 	            return determinator.isUniqueConstraintException(e);
 	        }
-	        return ${glConditionBeanContextName}.isUniqueConstraintException(e.getSQLState(), e.getErrorCode());
+	        return ${glConditionBeanContextName}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
 	    }
 	
 	    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
@@ -174,7 +174,7 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
 	            msg = msg + getLineSeparator();
             }
-	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
 	        msg = msg + getLineSeparator();
@@ -207,7 +207,7 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
 	            msg = msg + getLineSeparator();
             }
-	        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
 	        msg = msg + getLineSeparator();
@@ -246,6 +246,38 @@ public class ${glInternalBasicHandler} {
             return sb.toString();
         }
         
+        protected String extractSQLState(SQLException e) {
+            String sqlState = e.getSQLState();
+            if (sqlState != null) {
+                return sqlState;
+            }
+            SQLException nextEx = e.getNextException();
+            if (nextEx == null) {
+                return null;
+            }
+            sqlState = nextEx.getSQLState();
+            if (sqlState != null) {
+                return sqlState;
+            }
+            SQLException nextNextEx = nextEx.getNextException();
+            if (nextNextEx == null) {
+                return null;
+            }
+            sqlState = nextNextEx.getSQLState();
+            if (sqlState != null) {
+                return sqlState;
+            }
+            SQLException nextNextNextEx = nextNextEx.getNextException();
+            if (nextNextNextEx == null) {
+                return null;
+            }
+            sqlState = nextNextNextEx.getSQLState();
+            if (sqlState != null) {
+                return sqlState;
+            }
+            // It doesn't use recursive call by design because JDBC is unpredictable fellow.
+            return null;
+        }
 
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
