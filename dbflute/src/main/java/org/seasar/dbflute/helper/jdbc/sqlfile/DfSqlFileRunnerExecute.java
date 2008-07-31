@@ -86,12 +86,19 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 msg = msg + getLineSeparator();
                 msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
                 msg = msg + e.getMessage() + getLineSeparator();
-                SQLException nextException = e.getNextException();
-                if (nextException != null) {
+                SQLException nextEx = e.getNextException();
+                if (nextEx != null) {
                     msg = msg + getLineSeparator();
-                    msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName()
+                    msg = msg + "[NextException]" + getLineSeparator() + nextEx.getClass().getName()
                             + getLineSeparator();
-                    msg = msg + nextException.getMessage() + getLineSeparator();
+                    msg = msg + nextEx.getMessage() + getLineSeparator();
+                    SQLException nextNextEx = nextEx.getNextException();
+                    if (nextNextEx != null) {
+                        msg = msg + getLineSeparator();
+                        msg = msg + "[NextNextException]" + getLineSeparator() + nextNextEx.getClass().getName()
+                                + getLineSeparator();
+                        msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                    }
                 }
                 msg = msg + "* * * * * * * * * */";
                 throw new DfSQLExecutionFailureException(msg, e);
