@@ -55,10 +55,8 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,7 +100,6 @@ public class ForeignKey {
     //                                                                                ====
     /**
      * Imports foreign key from an XML specification
-     *
      * @param attrib the XML attributes
      */
     public void loadFromXML(Attributes attrib) {
@@ -115,8 +112,6 @@ public class ForeignKey {
     }
 
     /**
-     * TODO: To write Detail Comment.
-     * 
      * @return Determination.
      */
     public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
@@ -128,14 +123,25 @@ public class ForeignKey {
                 foreginTablePrimaryKeyNameList.add(column.getName());
             }
         }
-        final Set<String> foreginTablePrimaryKeyNameSet = new HashSet<String>(foreginTablePrimaryKeyNameList);
-        final Set<String> foreignColumnsSet = new HashSet<String>(_foreignColumns);
-        return foreginTablePrimaryKeyNameSet.equals(foreignColumnsSet);
+        if (foreginTablePrimaryKeyNameList.size() != _foreignColumns.size()) {
+            return false;
+        }
+        for (String foreginTablePrimaryKeyName : foreginTablePrimaryKeyNameList) {
+            boolean exists = false;
+            for (String foreignColumn : _foreignColumns) {
+                if (foreginTablePrimaryKeyName.equalsIgnoreCase(foreignColumn)) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
      * Get the foreignTableName of the FK
-     *
      * @return the name of the foreign table
      */
     public String getForeignTableName() {
@@ -144,7 +150,6 @@ public class ForeignKey {
 
     /**
      * Set the foreignTableName of the FK
-     *
      * @param tableName the name of the foreign table
      */
     public void setForeignTableName(String tableName) {
@@ -153,7 +158,6 @@ public class ForeignKey {
 
     /**
      * Returns the name attribute.
-     *
      * @return the name
      */
     public String getName() {
@@ -162,7 +166,6 @@ public class ForeignKey {
 
     /**
      * Sets the name attribute.
-     *
      * @param name the name
      */
     public void setName(String name) {
@@ -171,7 +174,6 @@ public class ForeignKey {
 
     /**
      * Adds a new reference entry to the foreign key
-     *
      * @param attrib the xml attributes
      */
     public void addReference(Attributes attrib) {
@@ -180,7 +182,6 @@ public class ForeignKey {
 
     /**
      * Adds a new reference entry to the foreign key
-     *
      * @param local name of the local column
      * @param foreign name of the foreign column
      */
@@ -193,7 +194,6 @@ public class ForeignKey {
 
     /**
      * Adds a new reference entry to the foreign key
-     *
      * @param localColumnNameList Name list  of the local column
      * @param foreignColumnNameList Name list of the foreign column
      */

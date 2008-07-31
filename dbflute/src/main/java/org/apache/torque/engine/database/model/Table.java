@@ -1414,11 +1414,11 @@ public class Table implements IDMethod {
     //                                                 -----
     /**
      * Adds the foreign key from another table that refers to this table.
-     *
      * @param fk A foreign key refering to this table
      */
     public void addReferrer(ForeignKey fk) {
         if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
+            _log.warn("The foreign columns are NOT the same as the primary keys of the foreign table: " + fk);
             return;
         }
         if (_referrers == null) {
