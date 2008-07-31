@@ -71,40 +71,40 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             }
             _goodSqlCount++;
         } catch (SQLException e) {
-            if (!_runInfo.isErrorContinue()) {
-                String msg = "Look! Read the message below." + getLineSeparator();
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-                msg = msg + "It failed to execute the SQL!" + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-                msg = msg + getLineSeparator();
-                msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
-                msg = msg + e.getMessage() + getLineSeparator();
-                SQLException nextEx = e.getNextException();
-                if (nextEx != null) {
-                    msg = msg + getLineSeparator();
-                    msg = msg + "[NextException]" + getLineSeparator() + nextEx.getClass().getName()
-                            + getLineSeparator();
-                    msg = msg + nextEx.getMessage() + getLineSeparator();
-                    SQLException nextNextEx = nextEx.getNextException();
-                    if (nextNextEx != null) {
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[NextNextException]" + getLineSeparator() + nextNextEx.getClass().getName()
-                                + getLineSeparator();
-                        msg = msg + nextNextEx.getMessage() + getLineSeparator();
-                    }
-                }
-                msg = msg + "* * * * * * * * * */";
-                throw new DfSQLExecutionFailureException(msg, e);
+            if (_runInfo.isErrorContinue()) {
+                _log.warn("Failed to execute: " + sql, e);
+                _log.warn("" + System.getProperty("line.separator"));
             }
-            _log.warn("Failed to execute: " + sql, e);
-            _log.warn("" + System.getProperty("line.separator"));
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "It failed to execute the SQL!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
+            msg = msg + e.getMessage() + getLineSeparator();
+            SQLException nextEx = e.getNextException();
+            if (nextEx != null) {
+                msg = msg + getLineSeparator();
+                msg = msg + "[NextException]" + getLineSeparator();
+                msg = msg + nextEx.getClass().getName() + getLineSeparator();
+                msg = msg + nextEx.getMessage() + getLineSeparator();
+                SQLException nextNextEx = nextEx.getNextException();
+                if (nextNextEx != null) {
+                    msg = msg + getLineSeparator();
+                    msg = msg + "[NextNextException]" + getLineSeparator();
+                    msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
+                    msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                }
+            }
+            msg = msg + "* * * * * * * * * */";
+            throw new DfSQLExecutionFailureException(msg, e);
         }
     }
 

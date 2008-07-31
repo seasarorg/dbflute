@@ -183,12 +183,14 @@ public class ${glInternalBasicHandler} {
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator() + nextEx.getClass().getName() + getLineSeparator();
+	            msg = msg + "[NextException]" + getLineSeparator();
+                msg = msg + nextEx.getClass().getName() + getLineSeparator();
 	            msg = msg + nextEx.getMessage() + getLineSeparator();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
 	                msg = msg + getLineSeparator();
-	                msg = msg + "[NextNextException]" + getLineSeparator() + nextNextEx.getClass().getName() + getLineSeparator();
+	                msg = msg + "[NextNextException]" + getLineSeparator();
+                    msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
@@ -222,12 +224,14 @@ public class ${glInternalBasicHandler} {
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator() + nextEx.getClass().getName() + getLineSeparator();
+	            msg = msg + "[NextException]" + getLineSeparator();
+                msg = msg + nextEx.getClass().getName() + getLineSeparator();
 	            msg = msg + nextEx.getMessage() + getLineSeparator();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
 	                msg = msg + getLineSeparator();
-	                msg = msg + "[NextNextException]" + getLineSeparator() + nextNextEx.getClass().getName() + getLineSeparator();
+	                msg = msg + "[NextNextException]" + getLineSeparator();
+                    msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
