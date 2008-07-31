@@ -455,10 +455,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             _log.info("");
         } catch (IOException e) {
             String msg = "Process Callback failed to execute: process=" + processCommand;
-            throw new DfReplaceSchemaProcessCallbackException(msg, e);
+            _log.warn(msg + " e.getMessage()=" + e.getMessage());
+            // Because of continue.
+            // throw new DfReplaceSchemaProcessCallbackException(msg, e);
         } catch (InterruptedException e) {
             String msg = "Process Callback failed to execute: process=" + processCommand;
-            throw new DfReplaceSchemaProcessCallbackException(msg, e);
+            _log.warn(msg + " e.getMessage()=" + e.getMessage());
+            // Because of continue.
+            // throw new DfReplaceSchemaProcessCallbackException(msg, e);
         } finally {
             try {
                 if (stdIn != null) {
