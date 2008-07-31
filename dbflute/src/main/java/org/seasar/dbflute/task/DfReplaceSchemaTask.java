@@ -15,8 +15,12 @@
  */
 package org.seasar.dbflute.task;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -70,12 +74,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (_log.isInfoEnabled()) {
             _log.info("");
             _log.info("{Replace Schema Properties}");
-            _log.info("environmentType  = " + getEnvironmentType());
-            _log.info("loggingInsertSql = " + getMyProperties().isLoggingInsertSql());
-            _log.info("autoCommit       = " + getMyProperties().isAutoCommit());
-            _log.info("rollbackOnly     = " + getMyProperties().isRollbackOnly());
-            _log.info("errorContinue    = " + getMyProperties().isErrorContinue());
-            _log.info("sqlFileEncoding  = " + getMyProperties().getSqlFileEncoding());
+            _log.info("environmentType   = " + getEnvironmentType());
+            _log.info("loggingInsertSql  = " + getMyProperties().isLoggingInsertSql());
+            _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
+            _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
+            _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
+            _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
+            _log.info("beforeTakeFinally = " + getMyProperties().getBeforeTakeFinally());
             _log.info("");
         }
 
@@ -92,6 +97,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
 
+        beforeTakeFinally();
         takeFinally(runInfo);
     }
 
@@ -176,39 +182,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             _log.info("");
         }
     }
-    
+
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
-                return true;
-            }
-        };
-    }
-
-    protected void takeFinally(DfRunnerInformation runInfo) {
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * **");
-            _log.info("*              *");
-            _log.info("* Take Finally *");
-            _log.info("*              *");
-            _log.info("* * * * * * * **");
-        }
-        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-        }
-    }
-
-    protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
-        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
-            @Override
-            protected boolean isSqlTrimAndRemoveLineSeparator() {
-                return true;
-            }
-            @Override
-            protected boolean isValidAssertSql() {
                 return true;
             }
         };
@@ -282,8 +260,45 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // --------------------------------------------
+    //                          Before Take Finally
+    //                          -------------------
+    protected void beforeTakeFinally() {
+        String processCommand = getMyProperties().getBeforeTakeFinally();
+        if (processCommand == null) {
+            return;
+        }
+        callbackProcess("beforeTakeFinally", processCommand);
+    }
+
+    // --------------------------------------------
     //                                 Take Finally
     //                                 ------------
+    protected void takeFinally(DfRunnerInformation runInfo) {
+        _log.info("");
+        _log.info("* * * * * * * **");
+        _log.info("*              *");
+        _log.info("* Take Finally *");
+        _log.info("*              *");
+        _log.info("* * * * * * * **");
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+        _log.info("");
+    }
+
+    protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
+        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected boolean isSqlTrimAndRemoveLineSeparator() {
+                return true;
+            }
+
+            @Override
+            protected boolean isValidAssertSql() {
+                return true;
+            }
+        };
+    }
+
     protected List<File> getTakeFinallySqlFileList() {
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getTakeFinallyNextSqlFileList());
@@ -412,5 +427,78 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         } else {
             xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
         }
+    }
+
+    // --------------------------------------------
+    //                              Callback Helper
+    //                              ---------------
+    protected void callbackProcess(String timing, String processCommand) {
+        _log.info("");
+        _log.info("* * * * * * * * * **");
+        _log.info("*                  *");
+        _log.info("* Process Callback *");
+        _log.info("*                  *");
+        _log.info("* * * * * * * * * **");
+        _log.info("[" + timing + "]: begin --> " + processCommand);
+        final ProcessBuilder processBuilder = new ProcessBuilder(processCommand);
+        final Process process;
+        InputStream stdIn = null;
+        InputStream errIn = null;
+        try {
+            process = processBuilder.start();
+            stdIn = process.getInputStream();
+            errIn = process.getErrorStream();
+            showConsole(stdIn);
+            showConsole(errIn);
+            int ret = process.waitFor();
+            _log.info("[" + timing + "]: end(" + ret + ") --> " + processCommand);
+            _log.info("");
+        } catch (IOException e) {
+            String msg = "Process Callback failed to execute: process=" + processCommand;
+            throw new DfReplaceSchemaProcessCallbackException(msg, e);
+        } catch (InterruptedException e) {
+            String msg = "Process Callback failed to execute: process=" + processCommand;
+            throw new DfReplaceSchemaProcessCallbackException(msg, e);
+        } finally {
+            try {
+                if (stdIn != null) {
+                    stdIn.close();
+                }
+                if (errIn != null) {
+                    errIn.close();
+                }
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    protected void showConsole(InputStream ins) throws IOException {
+        if (ins == null) {
+            return;
+        }
+        // Use default encoding of the environment because of the console!
+        final BufferedReader br = new BufferedReader(new InputStreamReader(ins));
+        final StringBuilder sb = new StringBuilder();
+        String line = null;
+        while (true) {
+            line = br.readLine();
+            if (line == null) {
+                break;
+            }
+            sb.append(line + getLineSeparator());
+        }
+        _log.info(sb.toString().trim());
+    }
+
+    public static class DfReplaceSchemaProcessCallbackException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public DfReplaceSchemaProcessCallbackException(String msg, Throwable t) {
+            super(msg, t);
+        }
+    }
+
+    protected String getLineSeparator() {
+        return "\n";
     }
 }
