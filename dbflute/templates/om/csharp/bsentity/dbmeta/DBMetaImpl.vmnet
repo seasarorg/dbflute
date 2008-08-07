@@ -52,7 +52,7 @@ namespace ${myDBMetaPackageName} {
 #end
 
 #foreach ($col in $table.columns)
-        public ${glColumnInfoName} Column${col.javaName} { get { _column${col.javaName}; } }
+        public ${glColumnInfoName} Column${col.javaName} { get { return _column${col.javaName}; } }
 #end
 
         protected void InitializeColumnInfo() {
