@@ -55,6 +55,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                              Flat Directory Package
     //                                                              ======================
+    /**
+     * Get the package for flat directory. Normally, this property is only for C#.
+     * @return The package for flat directory. (Nullable)
+     */
     public String getFlatDirectoryPackage() {
         return stringProp("torque.flatDirectoryPackage", null);
     }
