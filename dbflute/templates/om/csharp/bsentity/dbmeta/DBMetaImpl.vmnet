@@ -61,18 +61,11 @@ namespace ${myDBMetaPackageName} {
 #end
         }
 
-        protected List<${glColumnInfoName}> _columnInfoList;
-        public override List<${glColumnInfoName}> ColumnInfoList {
-            get {
-                if (_columnInfoList != null) { return _columnInfoList; }
-                lock (this) {
-                    _columnInfoList = new ArrayList<${glColumnInfoName}>();
+        protected void InitializeColumnInfoList() {
+            _columnInfoList = new ArrayList<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
-                    _columnInfoList.add(Column${col.javaName});
+            _columnInfoList.add(Column${col.javaName});
 #end
-                    return _columnInfoList;
-                }
-            }
         }
 
         // ===============================================================================

@@ -15,6 +15,11 @@ namespace ${glPackageBaseCommonDBMeta} {
     public abstract class ${myClassName} : ${glDBMetaInterfaceName} {
 
         // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected List<${glColumnInfoName}> _columnInfoList;
+
+        // ===============================================================================
         //                                                                      Table Info
         //                                                                      ==========
         public abstract String TableDbName { get; }
@@ -23,10 +28,27 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        protected void InitializeColumnInfoList() {
-            List<${glColumnInfoName}> ignoredValue = ColumnInfoList;
-            if (ignoredValue == null) { throw new IllegalStateException("ColumnInfoList should not be null!"); }
+        public bool HasColumn(String columnFlexibleName) {
+            if (!HasFlexibleName(columnFlexibleName)) {
+                return false;
+            }
+            String propertyName = FindPropertyName(columnFlexibleName);
+            return HasProperty("Column" + InitCap(propertyName));
         }
+
+        public ${glColumnInfoName} FindColumnInfo(String columnFlexibleName) {
+            AssertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+            if (!HasColumn(columnFlexibleName)) {
+                String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
+                msg = msg + " tableName=" + TableDbName;
+                throw new SystemException(msg);
+            }
+            String propertyName = "Column" + InitCap(FindPropertyName(columnFlexibleName));
+            PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
+            return (${glColumnInfoName})propertyInfo.GetValue(this, null);
+        }
+
+        public List<${glColumnInfoName}> ColumnInfoList { get { return _columnInfoList; } }
 
         // ===============================================================================
         //                                                                   Name Handling
@@ -96,31 +118,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                 ===============
         public abstract ${glEntityInterfaceName} NewEntity();
         public abstract ${glConditionBeanInterfaceName} NewConditionBean();
-
-        // ===============================================================================
-        //                                                                     Column Info
-        //                                                                     ===========
-        public abstract List<${glColumnInfoName}> ColumnInfoList { get; }
-
-        public bool HasColumn(String columnFlexibleName) {
-            if (!HasFlexibleName(columnFlexibleName)) {
-                return false;
-            }
-            String propertyName = FindPropertyName(columnFlexibleName);
-            return HasProperty("Column" + InitCap(propertyName));
-        }
-
-        public ${glColumnInfoName} FindColumnInfo(String columnFlexibleName) {
-            AssertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-            if (!HasColumn(columnFlexibleName)) {
-                String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
-                msg = msg + " tableName=" + TableDbName;
-                throw new SystemException(msg);
-            }
-            String propertyName = "Column" + InitCap(FindPropertyName(columnFlexibleName));
-            PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
-            return (${glColumnInfoName})propertyInfo.GetValue(this, null);
-        }
 
         // ===============================================================================
         //                                                                     Unique Info
