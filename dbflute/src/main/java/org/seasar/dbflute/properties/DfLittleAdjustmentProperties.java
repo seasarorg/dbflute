@@ -53,6 +53,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
     
     // ===================================================================================
+    //                                                              Flat Directory Package
+    //                                                              ======================
+    public String getFlatDirectoryPackage() {
+        return stringProp("torque.flatDirectoryPackage", null);
+    }
+    
+    // ===================================================================================
     //                                                                       Compatibility
     //                                                                       =============
     public boolean isCompatibleVersionNoAutoIncrementOnMemory() {
