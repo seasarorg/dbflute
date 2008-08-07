@@ -1030,7 +1030,6 @@ public class ForeignKey {
     //                                                                            ===============
     /**
      * String representation of the foreign key. This is an xml representation.
-     *
      * @return string representation in xml
      */
     public String toString() {

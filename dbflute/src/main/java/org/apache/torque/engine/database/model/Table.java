@@ -1414,11 +1414,15 @@ public class Table implements IDMethod {
     //                                                 -----
     /**
      * Adds the foreign key from another table that refers to this table.
-     * @param fk A foreign key refering to this table
+     * @param fk A foreign key referring to this table
      */
     public void addReferrer(ForeignKey fk) {
         if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
-            _log.warn("The foreign columns are NOT the same as the primary keys of the foreign table: " + fk);
+            String msg = "Cannot add referrer!" + getLineSeparator();
+            msg = msg + " Because the foreign columns are NOT the same as";
+            msg = msg + " the primary keys of the foreign table:" + getLineSeparator();
+            msg = msg + fk.toString();
+            _log.info(msg);
             return;
         }
         if (_referrers == null) {
@@ -2542,8 +2546,15 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
-    //                                                                            toString
-    //                                                                            ========
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * Returns a XML representation of this table.
      * @return XML representation of this table
