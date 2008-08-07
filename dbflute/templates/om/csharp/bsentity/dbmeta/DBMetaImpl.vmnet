@@ -29,6 +29,7 @@ namespace ${myDBMetaPackageName} {
 
         private static readonly ${myClassName} _instance = new ${myClassName}();
         private ${myClassName}() {
+            InitializeColumnInfoList();
         }
         public static ${myClassName} GetInstance() {
             return _instance;
@@ -46,11 +47,11 @@ namespace ${myDBMetaPackageName} {
         //                                                                     Column Info
         //                                                                     ===========
 #foreach ($col in $table.columns)
-        protected ${glColumnInfoName} _column${col.javaName} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+        protected ${glColumnInfoName} _column${col.javaName};
 #end
 
 #foreach ($col in $table.columns)
-        public ${glColumnInfoName} Column${col.javaName} { get { return _column${col.javaName}; } }
+        public ${glColumnInfoName} Column${col.javaName} { get { if (_column${col.javaName} == null) { _column${col.javaName} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}); } return _column${col.javaName} } }
 #end
 
         protected List<${glColumnInfoName}> _columnInfoList;
