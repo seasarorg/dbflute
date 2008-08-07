@@ -57,7 +57,7 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
-            _column${col.javaName} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}); } return _column${col.javaName};
+            _column${col.javaName} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
 #end
         }
 
