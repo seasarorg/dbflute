@@ -86,7 +86,7 @@ public class DfAdditionalForeignKeyInitializer {
                     continue;
                 }
 
-                setupForeignKeyToTable(foreignTableName, foreignColumnNameList, fixedCondition, table,
+                setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
                         localColumnNameList, fixedSuffix);
                 showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
             }
@@ -94,11 +94,11 @@ public class DfAdditionalForeignKeyInitializer {
         _log.info("========/");
     }
 
-    protected void processAllTableFK(String foreignName, String foreignTableName, List<String> foreignColumnNameList,
-            String fixedCondition, String fixedSuffix) {
+    protected void processAllTableFK(String foreignKeyName, String foreignTableName,
+            List<String> foreignColumnNameList, String fixedCondition, String fixedSuffix) {
         final Table[] tableArray = getTables();
         for (final Table table : tableArray) {
-            final List<String> localColumnNameList = getLocalColumnNameList(foreignName, foreignTableName,
+            final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                     foreignColumnNameList, table.getName(), false);
             if (localColumnNameList == null || !table.containsColumnsByFlexibleName(localColumnNameList)) {
                 continue;
@@ -111,15 +111,18 @@ public class DfAdditionalForeignKeyInitializer {
                 _log.info(msg);
                 continue;
             }
-            setupForeignKeyToTable(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList,
-                    fixedSuffix);
+            final String currentForeignKeyName = foreignKeyName + "_" + table.getName();
+            setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
+                    table, localColumnNameList, fixedSuffix);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
         }
     }
 
-    protected void setupForeignKeyToTable(String foreignTableName, List<String> foreignColumnNameList,
-            String fixedCondition, Table table, List<String> localColumnNameList, String fixedSuffix) {
+    protected void setupForeignKeyToTable(String foreignKeyname, String foreignTableName,
+            List<String> foreignColumnNameList, String fixedCondition, Table table, List<String> localColumnNameList,
+            String fixedSuffix) {
         final ForeignKey fk = new ForeignKey();
+        fk.setName(foreignKeyname);
         fk.setForeignTableName(foreignTableName);
         fk.addReference(localColumnNameList, foreignColumnNameList);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {

@@ -77,11 +77,10 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Table _baseTable;
-
-    private String _foreignTableName;
-
     private String _name;
+    
+    private Table _localTable;
+    private String _foreignTableName;
 
     private List<String> _localColumns = new ArrayList<String>(3);
     private List<String> _foreignColumns = new ArrayList<String>(3);
@@ -90,9 +89,7 @@ public class ForeignKey {
     protected DfFlexibleNameMap<String, String> _foreignLocalMap = new DfFlexibleNameMap<String, String>();
 
     private String _foreignPropertyNamePrefix;
-
     private String _fixedCondition;
-
     private String _fixedSuffix;
 
     // ===================================================================================
@@ -117,7 +114,7 @@ public class ForeignKey {
     public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
         final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
         {
-            final Table fkTable = _baseTable.getDatabase().getTable(_foreignTableName);
+            final Table fkTable = _localTable.getDatabase().getTable(_foreignTableName);
             final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
             for (Column column : foreignTablePrimaryKeyList) {
                 foreginTablePrimaryKeyNameList.add(column.getName());
@@ -138,38 +135,6 @@ public class ForeignKey {
             }
         }
         return true;
-    }
-
-    /**
-     * Get the foreignTableName of the FK
-     * @return the name of the foreign table
-     */
-    public String getForeignTableName() {
-        return _foreignTableName;
-    }
-
-    /**
-     * Set the foreignTableName of the FK
-     * @param tableName the name of the foreign table
-     */
-    public void setForeignTableName(String tableName) {
-        _foreignTableName = tableName;
-    }
-
-    /**
-     * Returns the name attribute.
-     * @return the name
-     */
-    public String getName() {
-        return _name;
-    }
-
-    /**
-     * Sets the name attribute.
-     * @param name the name
-     */
-    public void setName(String name) {
-        this._name = name;
     }
 
     /**
@@ -314,7 +279,7 @@ public class ForeignKey {
     }
 
     public boolean isSelfReference() {
-        return _baseTable.getName().equals(_foreignTableName);
+        return _localTable.getName().equals(_foreignTableName);
     }
 
     // ==========================================================================================
@@ -525,7 +490,6 @@ public class ForeignKey {
     //                                                                     ======================
     /**
      * Returns a comma delimited string of local column names
-     * <p>
      * @return Generated string.
      */
     public String getLocalColumnNames() {
@@ -534,7 +498,6 @@ public class ForeignKey {
 
     /**
      * Returns a comma delimited string of foreign column names
-     * <p>
      * @return Generated string.
      */
     public String getForeignColumnNames() {
@@ -543,7 +506,6 @@ public class ForeignKey {
 
     /**
      * Returns first local column name.
-     * 
      * @return Fisrt local column name.
      */
     public String getFirstLocalColumnName() {
@@ -552,7 +514,6 @@ public class ForeignKey {
 
     /**
      * Returns first local column name.
-     * 
      * @return Fisrt local column name.
      */
     public String getFirstForeignColumnName() {
@@ -561,7 +522,6 @@ public class ForeignKey {
 
     /**
      * Get the value of foreign property name.
-     * 
      * @return Generated string.
      */
     public String getForeignPropertyName() {
@@ -570,7 +530,6 @@ public class ForeignKey {
 
     /**
      * Get the value of foreign property name.
-     * 
      * @return Generated string.
      */
     public String getForeignJavaBeansRulePropertyName() {
@@ -579,7 +538,6 @@ public class ForeignKey {
 
     /**
      * Get the value of foreign property name.
-     * 
      * @return Generated string.
      */
     public String getForeignJavaBeansRulePropertyNameInitCap() {
@@ -588,7 +546,6 @@ public class ForeignKey {
 
     /**
      * Get the value of foreign property name.
-     * 
      * @param isJavaBeansRule Is java-beans rule.
      * @return Generated string.
      */
@@ -850,9 +807,7 @@ public class ForeignKey {
     }
 
     /**
-     * Returns LocalColumn-Getter-CommaString. 
-     *     [getRcvlcqNo(), getSprlptTp()]
-     * <p>
+     * Returns LocalColumn-Getter-CommaString.[getRcvlcqNo(), getSprlptTp()]
      * @return Generated string.
      */
     public String getLocalColumnGetterCommaString() {
@@ -871,9 +826,7 @@ public class ForeignKey {
     }
 
     /**
-     * Returns ForeignTable-BeanSetupString. 
-     *     [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp())]
-     * <p>
+     * Returns ForeignTable-BeanSetupString. [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp())]
      * @param setterSuffix Setter suffix(_Equal and _IsNotNull and so on...).
      * @return Generated string.
      */
@@ -899,11 +852,8 @@ public class ForeignKey {
     }
 
     /**
-     * Returns ChildrenTable-BeanSetupString. 
-     *     [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp());]
-     * <p>
+     * Returns ChildrenTable-BeanSetupString. [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp());]
      * Abount ForeginKey that Table#getRefferer() returns, Local means children.
-     * <p>
      * @param setterSuffix Setter suffix(_Equal and _IsNotNull and so on...).
      * @return Generated string.
      */
@@ -932,7 +882,6 @@ public class ForeignKey {
     /**
      * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN) <br />
      * (for s2dao)
-     * 
      * @return Generated string.
      */
     public String getRelationKeysCommaString() {
@@ -1000,7 +949,6 @@ public class ForeignKey {
     /**
      * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
      * (for s2dao)
-     * 
      * @return Generated string.
      */
     public String getChildKeysCommaString() {
@@ -1025,24 +973,26 @@ public class ForeignKey {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    // ==========================================================================================
-    //                                                                            toString Method
-    //                                                                            ===============
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * String representation of the foreign key. This is an xml representation.
      * @return string representation in xml
      */
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("    <foreign-key foreignTable=\"").append(getForeignTableName()).append("\" name=\"").append(
-                getName()).append("\">\n");
+        StringBuffer sb = new StringBuffer();
+        sb.append("    <foreign-key");
+        sb.append(" foreignTable=\"").append(getForeignTableName()).append("\"");
+        sb.append(" name=\"").append(getName()).append("\"");
+        sb.append(">\n");
 
         for (int i = 0; i < _localColumns.size(); i++) {
-            result.append("        <reference local=\"").append(_localColumns.get(i)).append("\" foreign=\"").append(
-                    _foreignColumns.get(i)).append("\"/>\n");
+            sb.append("        <reference local=\"").append(_localColumns.get(i));
+            sb.append("\" foreign=\"").append(_foreignColumns.get(i)).append("\"/>\n");
         }
-        result.append("    </foreign-key>\n");
-        return result.toString();
+        sb.append("    </foreign-key>");
+        return sb.toString();
     }
 
     public boolean hasFixedCondition() {
@@ -1057,21 +1007,51 @@ public class ForeignKey {
     //                                                                            Accessor
     //                                                                            ========
     /**
+     * Returns the name attribute.
+     * @return the name
+     */
+    public String getName() {
+        return _name;
+    }
+
+    /**
+     * Sets the name attribute.
+     * @param name the name
+     */
+    public void setName(String name) {
+        this._name = name;
+    }
+
+    /**
+     * Get the foreignTableName of the FK
+     * @return the name of the foreign table
+     */
+    public String getForeignTableName() {
+        return _foreignTableName;
+    }
+
+    /**
+     * Set the foreignTableName of the FK
+     * @param tableName the name of the foreign table
+     */
+    public void setForeignTableName(String tableName) {
+        _foreignTableName = tableName;
+    }
+
+    /**
      * Set the base Table of the foreign key
-     *
      * @param baseTable the table
      */
     public void setTable(Table baseTable) {
-        _baseTable = baseTable;
+        _localTable = baseTable;
     }
 
     /**
      * Get the base Table of the foreign key
-     *
      * @return the base table
      */
     public Table getTable() {
-        return _baseTable;
+        return _localTable;
     }
 
     public String getFixedCondition() {

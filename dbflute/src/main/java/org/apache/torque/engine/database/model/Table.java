@@ -1418,8 +1418,9 @@ public class Table implements IDMethod {
      */
     public void addReferrer(ForeignKey fk) {
         if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
-            String msg = "Cannot add referrer!" + getLineSeparator();
-            msg = msg + " Because the foreign columns are NOT the same as";
+            String msg = "Relation Building Information:" + getLineSeparator();
+            msg = msg + "Cannot add referrer!" + getLineSeparator();
+            msg = msg + "Because the foreign columns are NOT the same as";
             msg = msg + " the primary keys of the foreign table:" + getLineSeparator();
             msg = msg + fk.toString();
             _log.info(msg);
