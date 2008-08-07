@@ -1901,6 +1901,21 @@ public class Database {
     }
 
     public String getPackageAsPath(String pckge) {
+        final String flatDirectoryPackage = getProperties().getLittleAdjustmentProperties().getFlatDirectoryPackage();
+        if (flatDirectoryPackage == null || flatDirectoryPackage.trim().length() == 0) {
+            return resolvePackageAsPath(pckge);
+        }
+        if (!pckge.contains(flatDirectoryPackage)) {
+            return resolvePackageAsPath(pckge);
+        }
+        final String flatMark = "$$df:flatMark$$";
+        pckge = DfStringUtil.replace(pckge, flatDirectoryPackage, flatMark);
+        pckge = resolvePackageAsPath(pckge);
+        pckge = DfStringUtil.replace(pckge, flatMark, flatDirectoryPackage);
+        return pckge;
+    }
+    
+    protected String resolvePackageAsPath(String pckge) {
         return pckge.replace('.', File.separator.charAt(0)) + File.separator;
     }
 
