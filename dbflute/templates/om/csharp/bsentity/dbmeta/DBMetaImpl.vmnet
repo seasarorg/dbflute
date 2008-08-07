@@ -21,34 +21,6 @@ namespace ${myDBMetaPackageName} {
 
     /// <summary>
     /// The DB meta of ${table.name}.
-    /// <![CDATA[
-    /// [primary-key]
-    ///     ${table.primaryKeyNameCommaString}
-    /// 
-    /// [column]
-    ///     ${table.columnNameCommaString}
-    /// 
-    /// [sequence]
-    ///     ${table.definedSequenceName}
-    /// 
-    /// [identity]
-    ///     ${table.identityColumnName}
-    /// 
-    /// [version-no]
-    ///     ${table.versionNoColumnName}
-    /// 
-    /// [foreign-table]
-    ///     ${table.foreignTableNameCommaString}
-    /// 
-    /// [referrer-table]
-    ///     ${table.referrerTableNameCommaString}
-    /// 
-    /// [foreign-property]
-    ///     ${table.foreignPropertyNameCommaString}
-    /// 
-    /// [referrer-property]
-    ///     ${table.referrerPropertyNameCommaString}
-    /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public class ${myClassName} : ${glDBMetaAbstractName} {
@@ -60,6 +32,39 @@ namespace ${myDBMetaPackageName} {
         }
         public static ${myClassName} GetInstance() {
             return _instance;
+        }
+
+        // ===============================================================================
+        //                                                                      Table Info
+        //                                                                      ==========
+        #region Table Name
+        public override String TableDbName { get { return TABLE_DB_NAME; } }
+        public override String TablePropertyName { get { return TABLE_PROPERTY_NAME; } }
+        #endregion
+
+        // ===============================================================================
+        //                                                                     Column Info
+        //                                                                     ===========
+#foreach ($col in $table.columns)
+        protected ${glColumnInfoName} _column${col.javaName} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+#end
+
+#foreach ($col in $table.columns)
+        public ${glColumnInfoName} Column${col.javaName} { get { return _column${col.javaName}; } }
+#end
+
+        protected List<${glColumnInfoName}> _columnInfoList;
+        public override List<${glColumnInfoName}> ColumnInfoList {
+            get {
+                if (_columnInfoList != null) { return _columnInfoList; }
+                lock (this) {
+                    _columnInfoList = new ArrayList<${glColumnInfoName}>();
+#foreach ($col in $table.columns)
+                    _columnInfoList.add(Column${col.javaName});
+#end
+                    return _columnInfoList;
+                }
+            }
         }
 
         // ===============================================================================
@@ -136,14 +141,6 @@ namespace ${myDBMetaPackageName} {
         #endregion
 
         // ===============================================================================
-        //                                                                      Table Name
-        //                                                                      ==========
-        #region Table Name
-        public override String TableDbName { get { return TABLE_DB_NAME; } }
-        public override String TablePropertyName { get { return TABLE_PROPERTY_NAME; } }
-        #endregion
-
-        // ===============================================================================
         //                                                                        Name Map
         //                                                                        ========
         #region Name Map
@@ -191,23 +188,6 @@ namespace ${myDBMetaPackageName} {
 #end
 #if (${isExistConditionBean})
         public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
-#end
-
-        // ===============================================================================
-        //                                                                     Column Info
-        //                                                                     ===========
-        public override List<${glColumnInfoName}> ColumnInfoList {
-            get {
-                List<${glColumnInfoName}> columnInfoList = new ArrayList<${glColumnInfoName}>();
-#foreach ($col in $table.columns)
-                columnInfoList.add(Column${col.javaName});
-#end
-                return columnInfoList;
-            }
-        }
-
-#foreach ($col in $table.columns)
-        public ${glColumnInfoName} Column${col.javaName} { get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}); } }
 #end
 
         // ===============================================================================

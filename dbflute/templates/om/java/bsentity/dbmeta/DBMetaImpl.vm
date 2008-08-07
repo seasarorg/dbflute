@@ -41,6 +41,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($col in $table.columns)
     public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
 #end
+    { initializeColumnInfoList(); }
 #if ($database.isMakeDBMetaStaticDefinition())
 
     // ===================================================================================

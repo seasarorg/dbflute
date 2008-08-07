@@ -15,10 +15,18 @@ namespace ${glPackageBaseCommonDBMeta} {
     public abstract class ${myClassName} : ${glDBMetaInterfaceName} {
 
         // ===============================================================================
-        //                                                                      Table Name
+        //                                                                      Table Info
         //                                                                      ==========
         public abstract String TableDbName { get; }
         public abstract String TablePropertyName { get; }
+
+        // ===============================================================================
+        //                                                                     Column Info
+        //                                                                     ===========
+        protected void InitializeColumnInfoList() {
+            List<${glColumnInfoName}> ignoredValue = ColumnInfoList;
+            if (ignoredValue == null) { throw new IllegalStateException("ColumnInfoList should not be null!"); }
+        }
 
         // ===============================================================================
         //                                                                   Name Handling

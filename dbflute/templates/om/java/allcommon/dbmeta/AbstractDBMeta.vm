@@ -95,22 +95,25 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 return _columnInfoList;
             }
             Method[] methods = this.getClass().getMethods();
-            List<${glColumnInfoName}> resultList = newArrayList();
+            _columnInfoList = newArrayList();
             String prefix = "column";
             Class<${glColumnInfoName}> returnType = ${glColumnInfoName}.class;
             Object[] args = new Object[]{};
             try {
                 for (Method method : methods) {
                     if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        resultList.add((${glColumnInfoName})method.invoke(this, args));
+                        _columnInfoList.add((${glColumnInfoName})method.invoke(this, args));
                     }
                 }
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
-            _columnInfoList = resultList;
             return _columnInfoList;
         }
+    }
+
+    protected void initializeColumnInfoList() {
+        getColumnInfoList();// Ignore return value because of initialization only!
     }
 	
     // =====================================================================================
