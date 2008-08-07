@@ -113,7 +113,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 	
-
     // =====================================================================================
     //                                                                         Name Handling
     //                                                                         =============
