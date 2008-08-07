@@ -318,36 +318,6 @@ public class Database {
         }
     }
 
-    /**
-     * Creats a string representation of this Database.
-     * The representation is given in xml format.
-     * @return string representation in xml
-     */
-    public String toString() {
-        StringBuffer result = new StringBuffer();
-
-        result.append("<database name=\"").append(getName()).append('"').append(" package=\"").append(getPackage())
-                .append('"').append(" defaultIdMethod=\"").append(getDefaultIdMethod()).append('"').append(">\n");
-
-        for (Iterator<Table> i = _tableList.iterator(); i.hasNext();) {
-            result.append(i.next());
-        }
-
-        result.append("</database>");
-        return result.toString();
-    }
-
-    // ===================================================================================
-    //                                                                    Check Properties
-    //                                                                    ================
-    public void checkProperties() {
-        getProperties().getSequenceIdentityProperties().checkSequenceDefinitionMap(new SequenceDefinitionMapChecker() {
-            public boolean hasTable(String tableName) {
-                return getTable(tableName) != null;
-            }
-        });
-    }
-
     // ===================================================================================
     //                                                                      Parameter Bean
     //                                                                      ==============
@@ -508,9 +478,9 @@ public class Database {
         }
     }
 
-    // ===============================================================================
-    //                                                                     Initializer
-    //                                                                     ===========
+    // ===================================================================================
+    //                                                                         Initializer
+    //                                                                         ===========
     // -----------------------------------------------------
     //                                         Customize Dao
     //                                         -------------
@@ -521,10 +491,6 @@ public class Database {
         // Not support so do nothing!
     }
 
-    public java.util.List<Table> getCustomizeTableList() {
-        return new ArrayList<Table>(100);
-    }
-    
     // -----------------------------------------------------
     //                                  AdditionalPrimaryKey
     //                                  --------------------
@@ -540,15 +506,14 @@ public class Database {
         final DfAdditionalForeignKeyInitializer initializer = new DfAdditionalForeignKeyInitializer(this);
         initializer.initializeAdditionalForeignKey();
     }
-    
+
     // -----------------------------------------------------
     //                              ClassificationDeployment
     //                              ------------------------
     public void initializeClassificationDeployment() {
         getClassificationProperties().initializeClassificationDeploymentMap(getTableList());
-        getClassificationProperties().initializeClassificationDeploymentMap(getCustomizeTableList());
     }
-    
+
     // -----------------------------------------------------
     //                                          IncludeQuery
     //                                          ------------
@@ -563,16 +528,298 @@ public class Database {
         initializer.initializeIncludeQuery();
     }
 
-    // ===============================================================================
-    //                                                                      Properties
-    //                                                                      ==========
+    // ===================================================================================
+    //                                                                    Check Properties
+    //                                                                    ================
+    public void checkProperties() {
+        getProperties().getSequenceIdentityProperties().checkSequenceDefinitionMap(new SequenceDefinitionMapChecker() {
+            public boolean hasTable(String tableName) {
+                return getTable(tableName) != null;
+            }
+        });
+    }
+
+    // ===================================================================================
+    //                                                              Delete Old Table Class
+    //                                                              ======================
+    public void deleteOldTableClass() {
+        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            return;
+        }
+        info("// /- - - - - - - - - - - - -");
+        info("// Delete old table classes!");
+        info("// - - - - - - - - - -/");
+        deleteOldTableClass_for_BaseBehavior();
+        deleteOldTableClass_for_BaseDao();
+        deleteOldTableClass_for_BaseEntity();
+        deleteOldTableClass_for_DBMeta();
+        deleteOldTableClass_for_BaseConditionBean();
+        deleteOldTableClass_for_AbstractBaseConditionQuery();
+        deleteOldTableClass_for_BaseConditionQuery();
+        deleteOldTableClass_for_NestSelectSetupper();
+        deleteOldTableClass_for_ExtendedConditionBean();
+        deleteOldTableClass_for_ExtendedConditionQuery();
+        deleteOldTableClass_for_ExtendedConditionInlineQuery();
+        deleteOldTableClass_for_ExtendedBehavior();
+        deleteOldTableClass_for_ExtendedDao();
+        deleteOldTableClass_for_ExtendedEntity();
+        info(" ");
+    }
+
+    protected List<String> _deletedOldTableBaseBehaviorList;
+
+    public void deleteOldTableClass_for_BaseBehavior() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseBehaviorClassName();
+            }
+        };
+        final String packagePath = getBaseBehaviorPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Bhv", setupper);
+        _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
+    }
+
+    protected List<String> _deletedOldTableBaseDaoList;
+
+    public void deleteOldTableClass_for_BaseDao() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseDaoClassName();
+            }
+        };
+        final String packagePath = getBaseDaoPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dao", setupper);
+        _deletedOldTableBaseDaoList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseDaoList);
+    }
+
+    protected List<String> _deletedOldTableBaseEntityList;
+
+    public void deleteOldTableClass_for_BaseEntity() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseEntityClassName();
+            }
+        };
+        final String packagePath = getBaseEntityPackage();
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, null, setupper);
+        _deletedOldTableBaseEntityList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldTableBaseEntityList);
+    }
+
+    public void deleteOldTableClass_for_DBMeta() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getDBMetaClassName();
+            }
+        };
+        final String packagePath = getDBMetaPackage();
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dbm", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_BaseConditionBean() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseConditionBeanClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".bs";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getAbstractBaseConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix() + "Abstract" + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_BaseConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getBaseConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_NestSelectSetupper() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getNestSelectSetupperClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".nss";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionBean() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionBeanClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage();
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
+        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
+            public String setup(Table table) {
+                return table.getExtendedConditionInlineQueryClassName();
+            }
+        };
+        final String packagePath = getConditionBeanPackage() + ".cq.ciq";// TODO: @jflute -- Resolve language
+        final String classPrefix = getProjectPrefix();
+        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    public void deleteOldTableClass_for_ExtendedBehavior() {
+        if (_deletedOldTableBaseBehaviorList == null || _deletedOldTableBaseBehaviorList.isEmpty()) {
+            return;
+        }
+        final String outputPath = getGeneratorHandler().getOutputPath();
+        final String packagePath = getExtendedBehaviorPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseBehaviorList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldTableClass_for_ExtendedDao() {
+        if (_deletedOldTableBaseDaoList == null || _deletedOldTableBaseDaoList.isEmpty()) {
+            return;
+        }
+        final String outputPath = getGeneratorHandler().getOutputPath();
+        final String packagePath = getExtendedDaoPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseDaoList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldTableClass_for_ExtendedEntity() {
+        if (_deletedOldTableBaseEntityList == null || _deletedOldTableBaseEntityList.isEmpty()) {
+            return;
+        }
+        final String outputPath = getGeneratorHandler().getOutputPath();
+        final String packagePath = getExtendedEntityPackage();
+        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
+        for (String baseClassName : _deletedOldTableBaseEntityList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
+        for (String className : deletedClassNameList) {
+            _log.info("deleteOldTableClass('" + className + "');");
+        }
+    }
+
+    protected OldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
+            String classSuffix, NotDeleteClassNameSetupper notDeleteClassNameSetupper) {
+        final OldTableClassDeletor deletor = new OldTableClassDeletor();
+        deletor.setPackagePath(packagePath);
+        deletor.setClassPrefix(classPrefix);
+        deletor.setClassSuffix(classSuffix);
+        deletor.setClassExtension(getClassFileExtension());
+        final Set<String> notDeleteClassNameSet = new HashSet<String>();
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            final String baseBehaviorClassName = notDeleteClassNameSetupper.setup(table);
+            notDeleteClassNameSet.add(baseBehaviorClassName);
+        }
+        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
+        return deletor;
+    }
+
+    protected static interface NotDeleteClassNameSetupper {
+        public String setup(Table table);
+    }
+
+    // ===================================================================================
+    //                                                                    Output Directory
+    //                                                                    ================
+    public void enableGenerateOutputDirectory() {
+        getGeneratorHandler().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
+    }
+
+    public void enableSql2EntityOutputDirectory() {
+        getGeneratorHandler().setOutputPath(getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory());
+    }
+
+    public void enableFlexDtoOutputDirectory() {
+        getGeneratorHandler().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
+    }
+
+    // ===================================================================================
+    //                                                                           Generator
+    //                                                                           =========
+    public DfGenerator getGeneratorHandler() {
+        return DfGenerator.getInstance();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
-    // ===============================================================================
-    //                                                                Basic Properties
-    //                                                                ================
+    // ===================================================================================
+    //                                                                    Basic Properties
+    //                                                                    ================
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
@@ -1482,8 +1729,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                           Hard Code
-    //                                                                           =========
+    //                                                                      Component Name
+    //                                                                      ==============
     public String getDaoSelectorComponentName() {
         return filterProjectSuffixForComponentName("daoSelector");
     }
@@ -1506,73 +1753,9 @@ public class Database {
         }
     }
 
-    public String getSharp() {
-        return "#";
-    }
-
-    public String getDollar() {
-        return "$";
-    }
-
-    public String getOverrideComment() {
-        return "The override.";
-    }
-
-    public String getImplementComment() {
-        return "The implementation.";
-    }
-
-    // ===============================================================================
-    //                                                                         Logging
-    //                                                                         =======
-    public void info(String msg) {
-        _log.info(msg);
-    }
-
-    public void debug(String msg) {
-        _log.debug(msg);
-    }
-
-    // ===============================================================================
-    //                                                                          String
-    //                                                                          ======
-    public String initCap(String str) {
-        if (str == null) {
-            String msg = "Argument[str] must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.length() == 0) {
-            return "";
-        }
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
-    }
-
-    // for Seasar's property.
-    public String decapitalizePropertyName(String javaName) {
-        if (javaName == null || javaName.length() == 0) {
-            return javaName;
-        }
-        if (javaName.length() > 1 && Character.isUpperCase(javaName.charAt(1))
-                && Character.isUpperCase(javaName.charAt(0))) {
-
-            return javaName;
-        }
-        char chars[] = javaName.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
-    }
-
-    // ===============================================================================
-    //                                                                             Map
-    //                                                                             ===
-    public String getMapValue(Map<?, ?> map, String key) {
-        final Object value = map.get(key);
-        return value != null ? (String) value : "";
-    }
-
-    // ===============================================================================
-    //                                                                         TypeMap
-    //                                                                         =======
+    // ===================================================================================
+    //                                                                            Type Map
+    //                                                                            ========
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
             return TypeMap.findJavaNativeString(jdbcType, null, null);
@@ -1638,279 +1821,109 @@ public class Database {
         return javaName;
     }
 
+    // ===================================================================================
+    //                                                                 Helper for Template
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                             Character
+    //                                             ---------
+    public String getSharp() {
+        return "#";
+    }
+
+    public String getDollar() {
+        return "$";
+    }
+
+    // -----------------------------------------------------
+    //                                               Comment
+    //                                               -------
+    public String getOverrideComment() {
+        return "The override.";
+    }
+
+    public String getImplementComment() {
+        return "The implementation.";
+    }
+
+    // -----------------------------------------------------
+    //                                               Logging
+    //                                               -------
+    public void info(String msg) {
+        _log.info(msg);
+    }
+
+    public void debug(String msg) {
+        _log.debug(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
+    public String initCap(String str) {
+        if (str == null) {
+            String msg = "Argument[str] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (str.length() == 0) {
+            return "";
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    // for Seasar's property.
+    public String decapitalizePropertyName(String javaName) {
+        if (javaName == null || javaName.length() == 0) {
+            return javaName;
+        }
+        if (javaName.length() > 1 && Character.isUpperCase(javaName.charAt(1))
+                && Character.isUpperCase(javaName.charAt(0))) {
+            return javaName;
+        }
+        char chars[] = javaName.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
+    }
+
+    // -----------------------------------------------------
+    //                                                   Map
+    //                                                   ---
+    public String getMapValue(Map<?, ?> map, String key) {
+        final Object value = map.get(key);
+        return value != null ? (String) value : "";
+    }
+
+    // -----------------------------------------------------
+    //                                                   I/O
+    //                                                   ---
     public void makeDirectory(String packagePath) {
         FileUtil.mkdir(getGeneratorHandler().getOutputPath() + "/" + packagePath);
     }
 
-    // ===============================================================================
-    //                                                          Delete Old Table Class
-    //                                                          ======================
-    public void deleteOldTableClass() {
-        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
-            return;
-        }
-        info("// /- - - - - - - - - - - - -");
-        info("// Delete old table classes!");
-        info("// - - - - - - - - - -/");
-        deleteOldTableClass_for_BaseBehavior();
-        deleteOldTableClass_for_BaseDao();
-        deleteOldTableClass_for_BaseEntity();
-        deleteOldTableClass_for_DBMeta();
-        deleteOldTableClass_for_BaseConditionBean();
-        deleteOldTableClass_for_AbstractBaseConditionQuery();
-        deleteOldTableClass_for_BaseConditionQuery();
-        deleteOldTableClass_for_NestSelectSetupper();
-        deleteOldTableClass_for_ExtendedConditionBean();
-        deleteOldTableClass_for_ExtendedConditionQuery();
-        deleteOldTableClass_for_ExtendedConditionInlineQuery();
-        deleteOldTableClass_for_ExtendedBehavior();
-        deleteOldTableClass_for_ExtendedDao();
-        deleteOldTableClass_for_ExtendedEntity();
-        info(" ");
-    }
-
-    protected List<String> _deletedOldTableBaseBehaviorList;
-
-    public void deleteOldTableClass_for_BaseBehavior() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getBaseBehaviorClassName();
-            }
-        };
-        final String packagePath = getBaseBehaviorPackage();
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Bhv", setupper);
-        _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
-        showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
-    }
-
-    protected List<String> _deletedOldTableBaseDaoList;
-
-    public void deleteOldTableClass_for_BaseDao() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getBaseDaoClassName();
-            }
-        };
-        final String packagePath = getBaseDaoPackage();
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dao", setupper);
-        _deletedOldTableBaseDaoList = deletor.deleteOldTableClass();
-        showDeleteOldTableFile(_deletedOldTableBaseDaoList);
-    }
-
-    protected List<String> _deletedOldTableBaseEntityList;
-
-    public void deleteOldTableClass_for_BaseEntity() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getBaseEntityClassName();
-            }
-        };
-        final String packagePath = getBaseEntityPackage();
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, null, setupper);
-        _deletedOldTableBaseEntityList = deletor.deleteOldTableClass();
-        showDeleteOldTableFile(_deletedOldTableBaseEntityList);
-    }
-
-    public void deleteOldTableClass_for_DBMeta() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getDBMetaClassName();
-            }
-        };
-        final String packagePath = getDBMetaPackage();
-        final String classPrefix = getProjectPrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dbm", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_BaseConditionBean() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getBaseConditionBeanClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".bs";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getAbstractBaseConditionQueryClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + "Abstract" + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_BaseConditionQuery() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getBaseConditionQueryClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".cq.bs";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_NestSelectSetupper() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getNestSelectSetupperClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".nss";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_ExtendedConditionBean() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getExtendedConditionBeanClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage();
-        final String classPrefix = getProjectPrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_ExtendedConditionQuery() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getExtendedConditionQueryClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".cq";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
-        final NotDeleteClassNameSetupper setupper = new NotDeleteClassNameSetupper() {
-            public String setup(Table table) {
-                return table.getExtendedConditionInlineQueryClassName();
-            }
-        };
-        final String packagePath = getConditionBeanPackage() + ".cq.ciq";// TODO: @jflute -- Resolve language
-        final String classPrefix = getProjectPrefix();
-        final OldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
-    }
-
-    public void deleteOldTableClass_for_ExtendedBehavior() {
-        if (_deletedOldTableBaseBehaviorList == null || _deletedOldTableBaseBehaviorList.isEmpty()) {
-            return;
-        }
-        final String outputPath = getGeneratorHandler().getOutputPath();
-        final String packagePath = getExtendedBehaviorPackage();
-        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
-        for (String baseClassName : _deletedOldTableBaseBehaviorList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
-            }
-        }
-    }
-
-    public void deleteOldTableClass_for_ExtendedDao() {
-        if (_deletedOldTableBaseDaoList == null || _deletedOldTableBaseDaoList.isEmpty()) {
-            return;
-        }
-        final String outputPath = getGeneratorHandler().getOutputPath();
-        final String packagePath = getExtendedDaoPackage();
-        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
-        for (String baseClassName : _deletedOldTableBaseDaoList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
-            }
-        }
-    }
-
-    public void deleteOldTableClass_for_ExtendedEntity() {
-        if (_deletedOldTableBaseEntityList == null || _deletedOldTableBaseEntityList.isEmpty()) {
-            return;
-        }
-        final String outputPath = getGeneratorHandler().getOutputPath();
-        final String packagePath = getExtendedEntityPackage();
-        final String dirPath = outputPath + "/" + DfStringUtil.replace(packagePath, ".", "/");
-        for (String baseClassName : _deletedOldTableBaseEntityList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
-            }
-        }
-    }
-
-    protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
-        for (String className : deletedClassNameList) {
-            _log.info("deleteOldTableClass('" + className + "');");
-        }
-    }
-
-    protected OldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
-            String classSuffix, NotDeleteClassNameSetupper notDeleteClassNameSetupper) {
-        final OldTableClassDeletor deletor = new OldTableClassDeletor();
-        deletor.setPackagePath(packagePath);
-        deletor.setClassPrefix(classPrefix);
-        deletor.setClassSuffix(classSuffix);
-        deletor.setClassExtension(getClassFileExtension());
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            final String baseBehaviorClassName = notDeleteClassNameSetupper.setup(table);
-            notDeleteClassNameSet.add(baseBehaviorClassName);
-        }
-        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
-        return deletor;
-    }
-
-    protected static interface NotDeleteClassNameSetupper {
-        public String setup(Table table);
+    public String getPackageAsPath(String pckge) {
+        return pckge.replace('.', File.separator.charAt(0)) + File.separator;
     }
 
     // ===================================================================================
-    //                                                                    Output Directory
-    //                                                                    ================
-    public void enableGenerateOutputDirectory() {
-        getGeneratorHandler().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
-    }
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * Creates a string representation of this Database.
+     * The representation is given in xml format.
+     * @return string representation in xml
+     */
+    public String toString() {
+        StringBuffer result = new StringBuffer();
 
-    public void enableSql2EntityOutputDirectory() {
-        getGeneratorHandler().setOutputPath(getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory());
-    }
+        result.append("<database name=\"").append(getName()).append('"').append(" package=\"").append(getPackage())
+                .append('"').append(" defaultIdMethod=\"").append(getDefaultIdMethod()).append('"').append(">\n");
 
-    public void enableFlexDtoOutputDirectory() {
-        getGeneratorHandler().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
-    }
+        for (Iterator<Table> i = _tableList.iterator(); i.hasNext();) {
+            result.append(i.next());
+        }
 
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    public DfGenerator getGeneratorHandler() {
-        return DfGenerator.getInstance();
+        result.append("</database>");
+        return result.toString();
     }
 
     // ===================================================================================

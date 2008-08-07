@@ -1,9 +1,7 @@
 package org.seasar.dbflute.velocity;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
@@ -108,32 +106,6 @@ public class DfOriginalGenerator extends DfGenerator {
      */
     public static DfOriginalGenerator getInstance() {
         return instance;
-    }
-
-    /**
-     * Create a new generator object with properties loaded from
-     * a file.  If the file does not exist or any other exception
-     * occurs during the reading operation the default properties
-     * are used.
-     * @param propFile properties used to help populate the control context.
-     */
-    public DfOriginalGenerator(String propFile) {
-        try {
-            BufferedInputStream bi = null;
-            try {
-                bi = new BufferedInputStream(new FileInputStream(propFile));
-                props.load(bi);
-            } finally {
-                if (bi != null) {
-                    bi.close();
-                }
-            }
-        } catch (Exception e) {
-            /*
-             * If something goes wrong we use default properties
-             */
-            setDefaultProps();
-        }
     }
 
     /**
