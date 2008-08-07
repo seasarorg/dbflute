@@ -32,6 +32,11 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected List<${glColumnInfoName}> _columnInfoList;
+
+    // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
     /**
@@ -59,9 +64,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             msg = msg + " tableName=" + getTableDbName();
             throw new IllegalArgumentException(msg);
         }
-        final String propertyName = findPropertyName(columnFlexibleName);
-        final String methodName = "column" + initCap(propertyName);
-        java.lang.reflect.Method method = null;
+        String methodName = "column" + initCap(findPropertyName(columnFlexibleName));
+        Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
@@ -77,28 +81,38 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             throw new RuntimeException(e.getCause());
         }
     }
-	
+
     /**
 	 * ${database.ImplementComment}
      * @return The list of columns. (NotNull and NotEmpty)
      */
     public List<${glColumnInfoName}> getColumnInfoList() {
-        Method[] methods = this.getClass().getMethods();
-        List<${glColumnInfoName}> resultList = newArrayList();
-        String prefix = "column";
-        Class<${glColumnInfoName}> returnType = ${glColumnInfoName}.class;
-		Object[] args = new Object[]{};
-        try {
-            for (Method method : methods) {
-                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                    resultList.add((${glColumnInfoName})method.invoke(this, args));
-                }
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        if (_columnInfoList != null) {
+            return _columnInfoList;
         }
-        return resultList;
+        synchronized (this) {
+            if (_columnInfoList != null) {
+                return _columnInfoList;
+            }
+            Method[] methods = this.getClass().getMethods();
+            List<${glColumnInfoName}> resultList = newArrayList();
+            String prefix = "column";
+            Class<${glColumnInfoName}> returnType = ${glColumnInfoName}.class;
+            Object[] args = new Object[]{};
+            try {
+                for (Method method : methods) {
+                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                        resultList.add((${glColumnInfoName})method.invoke(this, args));
+                    }
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            _columnInfoList = resultList;
+            return _columnInfoList;
+        }
     }
+	
 
     // =====================================================================================
     //                                                                         Name Handling
