@@ -71,7 +71,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     /** DB driver. */
     protected String _driver;
 
-    /** DB url. */
+    /** DB URL. */
     protected String _url;
 
     /** User name. */
@@ -116,6 +116,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
             _log.info("[Task End: " + getPerformanceView(after - before) + "]");
             _log.info("_/_/_/_/_/");
+            _log.info("");
         }
     }
 

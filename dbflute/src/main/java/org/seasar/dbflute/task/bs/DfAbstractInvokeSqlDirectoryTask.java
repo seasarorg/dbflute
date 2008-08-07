@@ -13,24 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.task;
+package org.seasar.dbflute.task.bs;
 
 import java.io.File;
 import java.util.List;
 
-import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 /**
  * @author jflute
  */
-public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
+public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
 
     // ===================================================================================
     //                                                                          DataSource
@@ -43,11 +41,6 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    /**
-     * Load the SQL files and then execute them.
-     *
-     * @throws BuildException
-     */
     @Override
     protected void doExecute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
@@ -72,9 +65,7 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
         return runInfo;
     }
 
-    protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
-        // for Override
-    }
+    protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
 
     // ===================================================================================
     //                                                                        For Override

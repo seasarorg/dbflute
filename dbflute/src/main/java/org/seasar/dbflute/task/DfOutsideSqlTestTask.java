@@ -25,13 +25,14 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
  */
-public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
+public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
     // ===================================================================================
     //                                                                          Definition

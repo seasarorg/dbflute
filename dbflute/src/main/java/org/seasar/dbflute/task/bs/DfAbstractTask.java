@@ -32,9 +32,8 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
- * Abstract DB meta texen task for Torque.
- * 
- * @author mkubo
+ * The abstract task.
+ * @author jflute
  */
 public abstract class DfAbstractTask extends Task {
 
@@ -46,7 +45,7 @@ public abstract class DfAbstractTask extends Task {
     /** DB driver. */
     protected String _driver = null;
 
-    /** DB url. */
+    /** DB URL. */
     protected String _url = null;
 
     /** User name. */
@@ -81,6 +80,7 @@ public abstract class DfAbstractTask extends Task {
             _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
             _log.info("[Task End: " + getPerformanceView(after - before) + "]");
             _log.info("_/_/_/_/_/");
+            _log.info("");
         }
     }
 
