@@ -131,15 +131,15 @@ targetdatabase = $targetDatabase
     #set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")
     #set ($glPackageExtendedCustomizeEntity = "${database.Sql2EntityExtendedEntityPackage}" )
 
-    #set ($path = $strings.getPackageAsPath(${glPackageBaseCustomizeEntity}))
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCustomizeEntity}))
     $database.makeDirectory($path)
 
     #if (!$database.isSql2EntityPlainEntity())
-      #set ($path = $strings.getPackageAsPath(${glPackageCustomizeDBMeta}))
+      #set ($path = $database.getPackageAsPath(${glPackageCustomizeDBMeta}))
       $database.makeDirectory($path)
     #end
 
-    #set ($path = $strings.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
+    #set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
     $database.makeDirectory($path)
 
     $database.debug("public void parseCustomizeEntity() {")
@@ -168,7 +168,7 @@ targetdatabase = $targetDatabase
       #set ($isExistConditionBean = false)
 
       #if ($table.isSql2EntityTypeSafeCursor())
-        #set ($path = $strings.getPackageAsPath(${myBaseDaoCursorPackageName}))
+        #set ($path = $database.getPackageAsPath(${myBaseDaoCursorPackageName}))
         $database.makeDirectory($path)
 
         $database.debug("        parse('BaseTypeSafeCursor')")
@@ -179,7 +179,7 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/bsdao/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
 
-        #set ($path = $strings.getPackageAsPath(${myExtendedDaoCursorPackageName}))
+        #set ($path = $database.getPackageAsPath(${myExtendedDaoCursorPackageName}))
         $database.makeDirectory($path)
 
         $database.debug("        parse('ExtendedTypeSafeCursor')")
@@ -229,9 +229,9 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseParameterBean = "${database.sql2EntityBaseParameterBeanPackage}" )
     #set ($glPackageExtendedParameterBean = "${database.sql2EntityExtendedParameterBeanPackage}" )
 
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseParameterBean}))
+      #set ($path = $database.getPackageAsPath(${glPackageBaseParameterBean}))
       $database.makeDirectory($path)
-      #set ($path = $strings.getPackageAsPath(${glPackageExtendedParameterBean}))
+      #set ($path = $database.getPackageAsPath(${glPackageExtendedParameterBean}))
       $database.makeDirectory($path)
 
       #foreach ($pmbMetaData in $database.pmbMetaDataList)
@@ -264,14 +264,14 @@ targetdatabase = $targetDatabase
       #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
       #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}.customize")
 
-      #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+      #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
 
-      #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+      #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
 
       #if ($database.isSimpleDtoUseDtoMapper())
-        #set ($path = $strings.getPackageAsPath(${myDtoMapperPackageName}))
+        #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
         $database.makeDirectory($path)
       #end
 
@@ -311,10 +311,10 @@ targetdatabase = $targetDatabase
       #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
       #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
 
-      #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+      #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
 
-      #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+      #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
 
       #foreach ($table in $database.tables)
