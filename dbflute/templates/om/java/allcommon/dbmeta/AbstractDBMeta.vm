@@ -82,6 +82,18 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
+    protected ${glColumnInfoName} cci(String columnDbName, String propertyName
+                           , Class<?> propertyType, boolean primary
+                           , Integer columnSize, Integer columnDecimalDigits) {
+        return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+    }
+
+    protected ${glColumnInfoName} cci(String columnDbName, String propertyName
+                           , Class<?> propertyType, boolean primary
+                           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
+        return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
+    }
+
     /**
 	 * ${database.ImplementComment}
      * @return The list of columns. (NotNull and NotEmpty)

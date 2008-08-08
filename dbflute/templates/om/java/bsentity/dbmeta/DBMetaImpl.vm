@@ -30,11 +30,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                         ===========
 #foreach ($col in $table.columns)
 #if ($col.isVersionNo())
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
+    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
 #elseif ($col.isUpdateDate())
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
+    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
 #else
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
 #end
 #end
 
