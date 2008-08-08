@@ -112,7 +112,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         void Setup(ENTITY entity, Object value);
     }
 
-    enum OptimisticLockType {
+    public enum OptimisticLockType {
         NONE, VERSION_NO, UPDATE_DATE
     }
 }
