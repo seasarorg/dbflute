@@ -601,7 +601,7 @@ public class Column {
         if (columnSize == null) {
             return "null";
         }
-        return helper().getLanguageDependencyInfo().getIntegerConvertExpression(String.valueOf(columnSize));
+        return String.valueOf(columnSize);
     }
 
     // -----------------------------------------------------
@@ -612,7 +612,7 @@ public class Column {
         if (decimalDigits == null) {
             return "null";
         }
-        return helper().getLanguageDependencyInfo().getIntegerConvertExpression(String.valueOf(decimalDigits));
+        return String.valueOf(decimalDigits);
     }
 
     // -----------------------------------------------------
