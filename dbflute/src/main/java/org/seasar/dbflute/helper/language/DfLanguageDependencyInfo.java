@@ -58,8 +58,10 @@ public interface DfLanguageDependencyInfo {
     public String getDefaultSourceDirectory();
     
     /**
+     * This method is for JDK-1.4 that has no AUTO BOXING!
+     * But now DBFlute does not support JDBC-1.4 so that this method is unused.
      * @param value The integer value. (NotNull)
-     * @return The expression of integer cnovertion. (NotNull)
+     * @return The expression of integer convertion. (NotNull)
      */
     public String getIntegerConvertExpression(String value);
     
