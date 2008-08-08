@@ -57,7 +57,13 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
+#if ($col.isVersionNo())
+            _column${col.javaName} = cci("${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
+#elseif ($col.isUpdateDate())
+            _column${col.javaName} = cci("${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
+#else
             _column${col.javaName} = cci("${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+#end
 #end
         }
 

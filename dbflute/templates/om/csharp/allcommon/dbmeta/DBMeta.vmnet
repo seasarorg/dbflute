@@ -111,4 +111,8 @@ namespace ${glPackageBaseCommonDBMeta} {
     public interface EntityPropertySetupper<ENTITY> where ENTITY : ${glEntityInterfaceName} {
         void Setup(ENTITY entity, Object value);
     }
+
+    enum OptimisticLockType {
+        NONE, VERSION_NO, UPDATE_DATE
+    }
 }

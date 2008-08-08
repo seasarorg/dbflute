@@ -48,8 +48,14 @@ namespace ${glPackageBaseCommonDBMeta} {
             return (${glColumnInfoName})propertyInfo.GetValue(this, null);
         }
 
-        protected ${glColumnInfoName} cci(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
+        // Very Very Internal!
+        protected ${glColumnInfoName} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
             return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+        }
+
+        // Very Very Internal!
+        protected ${glColumnInfoName} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
+            return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
         }
 
         public List<${glColumnInfoName}> ColumnInfoList { get { return _columnInfoList; } }

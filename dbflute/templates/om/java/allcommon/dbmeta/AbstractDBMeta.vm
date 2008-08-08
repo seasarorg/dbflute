@@ -84,13 +84,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     protected ${glColumnInfoName} cci(String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary
-                           , Integer columnSize, Integer columnDecimalDigits) {
+                           , Integer columnSize, Integer columnDecimalDigits) {// Very Very Internal!
         return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
     }
 
     protected ${glColumnInfoName} cci(String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary
-                           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
+                           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {// Very Very Internal!
         return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
     }
 

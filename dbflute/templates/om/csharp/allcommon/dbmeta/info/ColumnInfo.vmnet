@@ -19,6 +19,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected bool primary;
         protected int? columnSize;
         protected int? columnDecimalDigits;
+        protected OptimisticLockType optimisticLockType;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -26,7 +27,11 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) : this (dbmeta, columnDbName, null, null, false, null, null) {
         }
 
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
+        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
+            : this (dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE) {
+        }
+
+        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
             this.propertyName = propertyName;
@@ -34,6 +39,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.primary = primary;
             this.columnSize = columnSize;
             this.columnDecimalDigits = columnDecimalDigits;
+            this.optimisticLockType = optimisticLockType;
         }
 
         // ===============================================================================
@@ -49,6 +55,21 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected virtual PropertyInfo FindProperty(Type clazz, String methodName, Type[] argTypes) {
             return clazz.GetProperty(methodName, argTypes);
         }
+
+        // ===============================================================================
+        //                                                            Optimistic Lock Type
+        //                                                            ====================
+        public bool IsOptimisticLock { get {
+            return IsVersionNo || IsUpdateDate;
+        }}
+
+        public bool IsVersionNo { get {
+            return OptimisticLockType.VERSION_NO == optimisticLockType;
+        }}
+
+        public bool IsUpdateDate { get {
+            return OptimisticLockType.UPDATE_DATE == optimisticLockType;
+        }}
 
         // ===============================================================================
         //                                                                  Basic Override
