@@ -740,7 +740,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final int jdbcType = procedureColumnMetaInfo.getJdbcType();
                     final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
                     final String propertyType;
-                    if (jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor")) {
+                    if (isResultSetProperty(procedureColumnMetaInfo)) {
                         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo()
                                 .getGrammarInfo();
                         propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
