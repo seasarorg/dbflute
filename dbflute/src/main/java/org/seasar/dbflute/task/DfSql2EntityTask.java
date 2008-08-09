@@ -790,6 +790,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String convertColumnNameToPropertyName(String columnName) {
+        columnName = filterColumnName4PropertyNameAboutVendorDependency(columnName);
         if (columnName.contains("_")) {
             columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
         } else {
