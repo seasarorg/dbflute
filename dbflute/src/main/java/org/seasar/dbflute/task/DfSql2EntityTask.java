@@ -769,22 +769,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         _log.info(" ");
     }
-
-    public String convertColumnNameToPropertyName(String columnName) {
-        if (columnName.contains("_")) {
-            columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
-        } else {
-            boolean allUpperCase = isAllUpperCase(columnName);
-            columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
-        }
-        return columnName;
-    }
-
-    public String convertProcedureNameToPmbName(String procedureName) {
-        if (getBasicProperties().isDatabaseSqlServer() && procedureName.contains(";")) {
-            // Becuase SQLServer returns 'Abc;1'.
-            procedureName = procedureName.substring(0, procedureName.indexOf(";"));
-        }
+    
+    protected String convertProcedureNameToPmbName(String procedureName) {
+        procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
         if (procedureName.contains("_")) {
             procedureName = generateCapitalisedJavaName(procedureName.toUpperCase());
         } else {
@@ -793,7 +780,33 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return procedureName + "Pmb";
     }
+    
+    protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
+        // Because SQLServer returns 'Abc;1'.
+        if (getBasicProperties().isDatabaseSqlServer() && procedureName.contains(";")) {
+            procedureName = procedureName.substring(0, procedureName.indexOf(";"));
+        }
+        return procedureName;
+    }
 
+    protected String convertColumnNameToPropertyName(String columnName) {
+        if (columnName.contains("_")) {
+            columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
+        } else {
+            boolean allUpperCase = isAllUpperCase(columnName);
+            columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
+        }
+        return columnName;
+    }
+    
+    protected String filterColumnName4PropertyNameAboutVendorDependency(String columnName) {
+        // Because SQLServer returns '@returnValue'.
+        if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
+            columnName = columnName.substring("@".length());
+        }
+        return columnName;
+    }
+    
     protected boolean isAllUpperCase(String name) {
         char[] charArray = name.toCharArray();
         boolean allUpperCase = true;
