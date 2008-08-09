@@ -206,15 +206,11 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             int count = rsmd.getColumnCount();
             PropertyType[] propertyTypes = new PropertyType[count];
             for (int i = 0; i < count; ++i) {
-                String propertyName = replaceString(rsmd.getColumnLabel(i + 1), "_", "");
+                String propertyName = rsmd.getColumnLabel(i + 1);
                 ValueType valueType = ValueTypes.getValueType(rsmd.getColumnType(i + 1));
                 propertyTypes[i] = new PropertyTypeImpl(propertyName, valueType);
             }
             return propertyTypes;
-        }
-
-        protected String replaceString(String text, String fromText, String toText) {
-            return ${glSimpleStringUtil}.replace(text, fromText, toText);
         }
     }
 
