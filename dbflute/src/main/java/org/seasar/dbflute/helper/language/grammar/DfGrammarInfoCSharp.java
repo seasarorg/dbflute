@@ -21,7 +21,7 @@ public class DfGrammarInfoCSharp implements DfGrammarInfo {
         return "public static readonly";
     }
 
-    public String getGenericMapListWithFullPackage(String key, String value) {
+    public String getGenericMapListClassName(String key, String value) {
         return "System.Collections.Generic.IList<System.Collections.Generic.IDictionary<" + key + ", " + value + ">>";
     }
 }

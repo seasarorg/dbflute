@@ -25,5 +25,5 @@ public interface DfGrammarInfo {
      */
     public String getPublicStaticDefinition();
     
-    public String getGenericMapListWithFullPackage(String key, String value);
+    public String getGenericMapListClassName(String key, String value);
 }

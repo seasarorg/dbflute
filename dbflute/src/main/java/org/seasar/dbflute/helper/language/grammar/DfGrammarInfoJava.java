@@ -21,7 +21,7 @@ public class DfGrammarInfoJava implements DfGrammarInfo {
         return "public static final";
     }
     
-    public String getGenericMapListWithFullPackage(String key, String value) {
-        return "java.util.List<Map<" + key + ", " + value + ">>";
+    public String getGenericMapListClassName(String key, String value) {
+        return "java.util.List<java.util.Map<" + key + ", " + value + ">>";
     }
 }

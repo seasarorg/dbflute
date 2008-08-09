@@ -21,7 +21,7 @@ public class DfGrammarInfoPhp implements DfGrammarInfo {
         return "const";
     }
 
-    public String getGenericMapListWithFullPackage(String key, String value) {
+    public String getGenericMapListClassName(String key, String value) {
         return "Unsupported!";
     }
 }

@@ -742,7 +742,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String propertyType;
                     if (jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor")) {
                         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-                        propertyType = grammarInfo.getGenericMapListWithFullPackage("String", "Object");
+                        propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
                     } else {
                         Integer columnSize = procedureColumnMetaInfo.getColumnSize();
                         Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
