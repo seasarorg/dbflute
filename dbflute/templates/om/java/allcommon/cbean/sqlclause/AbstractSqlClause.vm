@@ -1504,9 +1504,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
     
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected final String replaceString(String text, String fromText, String toText) {
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replaceString(String text, String fromText, String toText) {
         return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
     
