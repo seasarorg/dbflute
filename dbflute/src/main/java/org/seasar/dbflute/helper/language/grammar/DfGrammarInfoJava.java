@@ -20,4 +20,8 @@ public class DfGrammarInfoJava implements DfGrammarInfo {
     public String getPublicStaticDefinition() {
         return "public static final";
     }
+    
+    public String getGenericMapListWithFullPackage(String key, String value) {
+        return "java.util.List<Map<" + key + ", " + value + ">>";
+    }
 }

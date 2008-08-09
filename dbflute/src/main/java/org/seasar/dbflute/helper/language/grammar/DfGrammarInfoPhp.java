@@ -20,4 +20,8 @@ public class DfGrammarInfoPhp implements DfGrammarInfo {
     public String getPublicStaticDefinition() {
         return "const";
     }
+
+    public String getGenericMapListWithFullPackage(String key, String value) {
+        return "Unsupported!";
+    }
 }

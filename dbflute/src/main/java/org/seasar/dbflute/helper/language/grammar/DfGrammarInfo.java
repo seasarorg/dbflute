@@ -24,4 +24,6 @@ public interface DfGrammarInfo {
      * @return The definition of 'public static'. (NotNull)
      */
     public String getPublicStaticDefinition();
+    
+    public String getGenericMapListWithFullPackage(String key, String value);
 }

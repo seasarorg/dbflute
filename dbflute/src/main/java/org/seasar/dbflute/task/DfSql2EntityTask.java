@@ -55,6 +55,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
@@ -740,7 +741,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
                     final String propertyType;
                     if (jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor")) {
-                        propertyType = "java.util.List<java.util.Map<String, Object>>";
+                        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+                        propertyType = grammarInfo.getGenericMapListWithFullPackage("String", "Object");
                     } else {
                         Integer columnSize = procedureColumnMetaInfo.getColumnSize();
                         Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
