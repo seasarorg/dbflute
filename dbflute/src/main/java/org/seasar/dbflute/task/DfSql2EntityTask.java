@@ -708,19 +708,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
         _log.info(" ");
         _log.info("...Analyzing procedures");
-        for (DfProcedureMetaInfo procedureMetaInfo : procedures) {
-            final String procedureName = procedureMetaInfo.getProcedureName();
-            _procedureMap.put(procedureName, procedureMetaInfo);
+        for (DfProcedureMetaInfo metaInfo : procedures) {
+            final String procedureName = metaInfo.getProcedureName();
+            _procedureMap.put(procedureName, metaInfo);
 
             if (generateProcedureParameterBean) {
                 final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
                 final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
                 final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-                final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = procedureMetaInfo
+                final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
                         .getProcedureColumnMetaInfoList();
                 int index = 0;
                 final String pmbName = convertProcedureNameToPmbName(procedureName);
-                _log.info("[" + pmbName + "]: " + procedureMetaInfo.getProcedureType());
+                _log.info("[" + pmbName + "]: " + metaInfo.getProcedureType());
                 if (procedureColumnMetaInfoList.isEmpty()) {
                     _log.info("    *No Parameter");
                 }
@@ -728,36 +728,24 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     _log.info("    *It was found the same name of parameter bean, so skip and continue!");
                     continue;
                 }
-                for (DfProcedureColumnMetaInfo procedureColumnMetaInfo : procedureColumnMetaInfoList) {
+                for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
                     final String propertyName;
                     {
-                        String columnName = procedureColumnMetaInfo.getColumnName();
+                        String columnName = columnMetaInfo.getColumnName();
                         if (columnName == null || columnName.trim().length() == 0) {
                             columnName = "arg" + (index + 1);
                         }
                         propertyName = convertColumnNameToPropertyName(columnName);
                     }
-                    final int jdbcType = procedureColumnMetaInfo.getJdbcType();
-                    final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
-                    final String propertyType;
-                    if (isResultSetProperty(procedureColumnMetaInfo)) {
-                        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo()
-                                .getGrammarInfo();
-                        propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
-                    } else {
-                        Integer columnSize = procedureColumnMetaInfo.getColumnSize();
-                        Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
-                        String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
-                        propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
-                    }
+                    final String propertyType = getProcedureColumnPropertyType(columnMetaInfo);
                     propertyNameTypeMap.put(propertyName, propertyType);
 
-                    DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
+                    DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
 
                     String msg = "    " + propertyType + " " + propertyName + ";";
-                    msg = msg + " // " + procedureColumnMetaInfo.getProcedureColumnType();
-                    msg = msg + "(" + jdbcType + ", " + dbTypeName + ")";
+                    msg = msg + " // " + columnMetaInfo.getProcedureColumnType();
+                    msg = msg + "(" + columnMetaInfo.getJdbcType() + ", " + columnMetaInfo.getDbTypeName() + ")";
                     _log.info(msg);
                     ++index;
                 }
@@ -771,13 +759,27 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info(" ");
     }
 
+    protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
+        final String propertyType;
+        if (isResultSetProperty(procedureColumnMetaInfo)) {
+            final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+            propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
+        } else {
+            final int jdbcType = procedureColumnMetaInfo.getJdbcType();
+            final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
+            final Integer columnSize = procedureColumnMetaInfo.getColumnSize();
+            final Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
+            final String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
+            propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
+        }
+        return propertyType;
+    }
+
     protected boolean isResultSetProperty(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         final int jdbcType = procedureColumnMetaInfo.getJdbcType();
         final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
         if (getBasicProperties().isDatabaseOracle()) {
             return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
-        } else if (getBasicProperties().isDatabaseSqlServer()) {
-            return procedureColumnMetaInfo.getProcedureColumnType() == DfProcedureColumnType.procedureColumnReturn;
         } else {
             return false;
         }
