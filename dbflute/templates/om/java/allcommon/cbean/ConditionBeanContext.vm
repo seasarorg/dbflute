@@ -309,6 +309,18 @@ public class ${glConditionBeanContextName} {
         return createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
     }
 
+    // [DBFlute-0.7.8]
+    // ===================================================================================
+    //                                                                       Database Type
+    //                                                                       =============
+    /**
+     * Is the database oracle?
+     * @return Is the database oracle?
+     */
+    public static boolean isOracle() {
+        return createSqlClause("dummy") instanceof ${glSqlClauseName}Oracle;
+    }
+
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
