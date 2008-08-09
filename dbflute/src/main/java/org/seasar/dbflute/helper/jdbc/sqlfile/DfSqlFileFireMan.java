@@ -54,7 +54,7 @@ public class DfSqlFileFireMan {
             }
             String msg = "[Fired SQL] success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
             msg = msg + " (in " + fileList.size() + " files)";
-            _log.debug(msg);
+            _log.info(msg);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;

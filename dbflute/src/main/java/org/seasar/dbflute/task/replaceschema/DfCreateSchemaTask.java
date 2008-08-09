@@ -49,7 +49,6 @@ public class DfCreateSchemaTask extends DfAbstractTask {
         _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
         _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
         _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
-        _log.info("");
         initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();
@@ -60,13 +59,12 @@ public class DfCreateSchemaTask extends DfAbstractTask {
     //                            Initialize Schema
     //                            -----------------
     protected void initializeSchema() {
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * * * *");
-            _log.info("*                   *");
-            _log.info("* Initialize Schema *");
-            _log.info("*                   *");
-            _log.info("* * * * * * * * * * *");
-        }
+        _log.info("");
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Initialize Schema *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaInitializer initializer;
         if (basicProperties.isDatabaseMySQL()) {

@@ -781,6 +781,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     public String convertProcedureNameToPmbName(String procedureName) {
+        if (getBasicProperties().isDatabaseSqlServer() && procedureName.contains(";")) {
+            // Becuase SQLServer returns 'Abc;1'.
+            procedureName = procedureName.substring(0, procedureName.indexOf(";"));
+        }
         if (procedureName.contains("_")) {
             procedureName = generateCapitalisedJavaName(procedureName.toUpperCase());
         } else {

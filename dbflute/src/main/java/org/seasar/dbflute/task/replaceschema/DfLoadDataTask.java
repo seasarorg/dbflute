@@ -35,6 +35,7 @@ public class DfLoadDataTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Load Data         *");

@@ -95,6 +95,7 @@ public class DfTakeFinallyTask extends DfAbstractTask {
     //                                 Take Finally
     //                                 ------------
     protected void takeFinally(DfRunnerInformation runInfo) {
+        _log.info("");
         _log.info("* * * * * * * **");
         _log.info("*              *");
         _log.info("* Take Finally *");
