@@ -1444,13 +1444,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return valueTypeFactory.getValueTypeByName(name);
             }
             final Class type = field.getType();
-            if (List.class.isAssignableFrom(type)) {
+            if (List.class.isAssignableFrom(type)) {// is for out parameter cursor.
                 if (${glConditionBeanContextName}.isOracle()) {
                     return ValueTypes.ORACLE_RESULT_SET;
-                } else if (${glConditionBeanContextName}.isPostgreSQL()) {
+                } else if (${glConditionBeanContextName}.isPostgreSql()) {
                     return ValueTypes.POSTGRE_RESULT_SET;
                 } else {
-                    return ValueTypes.SERIALIZABLE_BYTE_ARRAY; 
+                    // Unsupported out parameter cursor about other databases.
                 }
             }
             return valueTypeFactory.getValueTypeByClass(type);

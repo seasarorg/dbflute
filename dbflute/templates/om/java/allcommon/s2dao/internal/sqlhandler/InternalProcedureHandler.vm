@@ -22,8 +22,6 @@ import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.util.CaseInsensitiveMap;
 
-import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
-
 /**
  * @author ${database.ClassAuthor}
  */
