@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -735,10 +736,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
                         propertyName = convertColumnNameToPropertyName(columnName);
                     }
+                    final int jdbcType = procedureColumnMetaInfo.getJdbcType();
+                    final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
                     final String propertyType;
-                    {
-                        int jdbcType = procedureColumnMetaInfo.getJdbcType();
-                        String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
+                    if (jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor")) {
+                        propertyType = "java.util.List<java.util.Map<String, Object>>";
+                    } else {
                         Integer columnSize = procedureColumnMetaInfo.getColumnSize();
                         Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
                         String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
@@ -749,8 +752,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     DfProcedureColumnType procedureColumnType = procedureColumnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
 
-                    _log.info("    " + propertyType + " " + propertyName + "; // "
-                            + procedureColumnMetaInfo.getProcedureColumnType());
+                    String msg = "    " + propertyType + " " + propertyName + ";";
+                    msg = msg + " // " + procedureColumnMetaInfo.getProcedureColumnType();
+                    msg = msg + "(" + jdbcType + ", " + dbTypeName + ")";
+                    _log.info(msg);
                     ++index;
                 }
                 parameterBeanMetaData.setClassName(pmbName);

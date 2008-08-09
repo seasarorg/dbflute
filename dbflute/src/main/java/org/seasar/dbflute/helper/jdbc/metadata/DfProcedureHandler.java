@@ -200,6 +200,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         protected String columnComment;
         protected DfProcedureColumnType procedureColumnType;
 
+        public boolean isColumnTypeResult() {
+            return procedureColumnType != null
+                    && procedureColumnType.equals(DfProcedureColumnType.procedureColumnResult);
+        }
+
         public String getColumnName() {
             return columnName;
         }
