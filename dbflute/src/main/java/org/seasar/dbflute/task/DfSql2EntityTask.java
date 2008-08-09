@@ -741,7 +741,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
                     final String propertyType;
                     if (jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor")) {
-                        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+                        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo()
+                                .getGrammarInfo();
                         propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
                     } else {
                         Integer columnSize = procedureColumnMetaInfo.getColumnSize();
@@ -769,7 +770,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         _log.info(" ");
     }
-    
+
+    protected boolean isResultSetProperty(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
+        final int jdbcType = procedureColumnMetaInfo.getJdbcType();
+        final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
+        if (getBasicProperties().isDatabaseOracle()) {
+            return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
+        } else if (getBasicProperties().isDatabaseSqlServer()) {
+            return procedureColumnMetaInfo.getProcedureColumnType() == DfProcedureColumnType.procedureColumnReturn;
+        } else {
+            return false;
+        }
+    }
+
     protected String convertProcedureNameToPmbName(String procedureName) {
         procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
         if (procedureName.contains("_")) {
@@ -780,7 +793,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return procedureName + "Pmb";
     }
-    
+
     protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
         // Because SQLServer returns 'Abc;1'.
         if (getBasicProperties().isDatabaseSqlServer() && procedureName.contains(";")) {
@@ -799,7 +812,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return columnName;
     }
-    
+
     protected String filterColumnName4PropertyNameAboutVendorDependency(String columnName) {
         // Because SQLServer returns '@returnValue'.
         if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
@@ -807,7 +820,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return columnName;
     }
-    
+
     protected boolean isAllUpperCase(String name) {
         char[] charArray = name.toCharArray();
         boolean allUpperCase = true;
