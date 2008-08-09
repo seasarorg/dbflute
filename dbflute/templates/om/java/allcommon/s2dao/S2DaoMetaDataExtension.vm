@@ -51,7 +51,6 @@ import org.seasar.dao.util.TypeUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.OracleResultSetType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
@@ -1447,7 +1446,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final Class type = field.getType();
             if (List.class.isAssignableFrom(type)) {
                 if (${glConditionBeanContextName}.isOracle()) {
-                    return new OracleResultSetType();
+                    return ValueTypes.ORACLE_RESULT_SET;
+                } else if (${glConditionBeanContextName}.isPostgreSQL()) {
+                    return ValueTypes.POSTGRE_RESULT_SET;
+                } else {
+                    return ValueTypes.SERIALIZABLE_BYTE_ARRAY; 
                 }
             }
             return valueTypeFactory.getValueTypeByClass(type);

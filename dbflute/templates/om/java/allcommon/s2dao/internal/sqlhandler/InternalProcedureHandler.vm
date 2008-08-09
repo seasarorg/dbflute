@@ -22,7 +22,6 @@ import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.util.CaseInsensitiveMap;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 
 /**
@@ -123,7 +122,6 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
-                final int cursorType = ${glConditionBeanContextName}.getCursorType();
                 valueType.registerOutParameter(cs, i + 1);
             }
             if (ppt.isInType()) {

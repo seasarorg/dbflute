@@ -314,11 +314,19 @@ public class ${glConditionBeanContextName} {
     //                                                                       Database Type
     //                                                                       =============
     /**
-     * Is the database oracle?
-     * @return Is the database oracle?
+     * Is the database Oracle?
+     * @return Is the database Oracle?
      */
     public static boolean isOracle() {
         return createSqlClause("dummy") instanceof ${glSqlClauseName}Oracle;
+    }
+
+    /**
+     * Is the database PostgreSQL?
+     * @return Is the database PostgreSQL?
+     */
+    public static boolean isPostgreSql() {
+        return createSqlClause("dummy") instanceof ${glSqlClauseName}PostgreSql;
     }
 
     // ===================================================================================
