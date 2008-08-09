@@ -35,24 +35,11 @@ public class DfLoadDataTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-            _log.info("{Load Data Properties}");
-            _log.info("environmentType   = " + getEnvironmentType());
-            _log.info("loggingInsertSql  = " + getMyProperties().isLoggingInsertSql());
-            _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
-            _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
-            _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
-            _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
-            _log.info("");
-        }
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * * * *");
-            _log.info("*                   *");
-            _log.info("* Load Data         *");
-            _log.info("*                   *");
-            _log.info("* * * * * * * * * * *");
-        }
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Load Data         *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
         writeDbFromSeparatedFileAsCommonData("tsv", "\t");
         writeDbFromSeparatedFileAsCommonData("csv", ",");
         writeDbFromXlsAsCommonData();

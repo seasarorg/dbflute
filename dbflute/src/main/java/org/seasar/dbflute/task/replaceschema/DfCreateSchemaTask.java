@@ -43,15 +43,13 @@ public class DfCreateSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-            _log.info("{Create Schema Properties}");
-            _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
-            _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
-            _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
-            _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
-            _log.info("");
-        }
+        _log.info("");
+        _log.info("{Replace Schema Properties}");
+        _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
+        _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
+        _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
+        _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
+        _log.info("");
         initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();

@@ -42,19 +42,6 @@ public class DfTakeFinallyTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-            _log.info("{Take Finally Properties}");
-            _log.info("environmentType   = " + getEnvironmentType());
-            _log.info("loggingInsertSql  = " + getMyProperties().isLoggingInsertSql());
-            _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
-            _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
-            _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
-            _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
-            _log.info("beforeTakeFinally = " + getMyProperties().getBeforeTakeFinally());
-            _log.info("");
-        }
-
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
