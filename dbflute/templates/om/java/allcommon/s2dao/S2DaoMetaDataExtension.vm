@@ -1450,7 +1450,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 } else if (${glConditionBeanContextName}.isPostgreSql()) {
                     return ValueTypes.POSTGRE_RESULT_SET;
                 } else {
-                    // Unsupported out parameter cursor about other databases.
+                    return ValueTypes.SERIALIZABLE_BYTE_ARRAY;
                 }
             }
             return valueTypeFactory.getValueTypeByClass(type);
