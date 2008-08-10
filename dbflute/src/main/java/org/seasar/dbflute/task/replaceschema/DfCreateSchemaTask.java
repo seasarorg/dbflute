@@ -31,6 +31,11 @@ public class DfCreateSchemaTask extends DfAbstractTask {
     private static final Log _log = LogFactory.getLog(DfCreateSchemaTask.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean validTaskEndInformation = true;
+
+    // ===================================================================================
     //                                                                 DataSource Override
     //                                                                 ===================
     @Override
@@ -53,6 +58,11 @@ public class DfCreateSchemaTask extends DfAbstractTask {
 
         final DfRunnerInformation runInfo = createRunnerInformation();
         createSchema(runInfo);
+    }
+
+    @Override
+    protected boolean isValidTaskEndInformation() {
+        return validTaskEndInformation;
     }
 
     // --------------------------------------------
@@ -204,4 +214,12 @@ public class DfCreateSchemaTask extends DfAbstractTask {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setValidTaskEndInformation(String validTaskEndInformation) {
+        this.validTaskEndInformation = validTaskEndInformation != null
+                && validTaskEndInformation.trim().equalsIgnoreCase("true");
+        ;
+    }
 }

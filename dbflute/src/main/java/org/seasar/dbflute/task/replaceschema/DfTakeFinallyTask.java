@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +31,11 @@ public class DfTakeFinallyTask extends DfAbstractTask {
     private static final Log _log = LogFactory.getLog(DfTakeFinallyTask.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Timestamp beforeTimestamp;
+
+    // ===================================================================================
     //                                                                 DataSource Override
     //                                                                 ===================
     @Override
@@ -46,6 +52,15 @@ public class DfTakeFinallyTask extends DfAbstractTask {
 
         beforeTakeFinally();
         takeFinally(runInfo);
+    }
+
+    @Override
+    protected long getTaskBeforeTimeMillis() {
+        if (beforeTimestamp != null) {
+            return beforeTimestamp.getTime();
+        } else {
+            return super.getTaskBeforeTimeMillis();
+        }
     }
 
     // --------------------------------------------
@@ -249,5 +264,16 @@ public class DfTakeFinallyTask extends DfAbstractTask {
 
     protected String getLineSeparator() {
         return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setBeforeTimestamp(String beforeTimestamp) {
+        try {
+            this.beforeTimestamp = Timestamp.valueOf(beforeTimestamp);
+        } catch (RuntimeException ignored) {
+            _log.warn("Wrong beforeTimestampExpression: " + beforeTimestamp, ignored);
+        }
     }
 }

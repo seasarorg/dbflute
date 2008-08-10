@@ -267,11 +267,15 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
 
-    <torque-create-schema contextProperties="${torque.contextProperties}">
+    <tstamp>
+      <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+    </tstamp>
+
+    <torque-create-schema contextProperties="${torque.contextProperties}" validTaskEndInformation="false">
     </torque-create-schema>
-    <torque-load-data contextProperties="${torque.contextProperties}">
+    <torque-load-data contextProperties="${torque.contextProperties}" validTaskEndInformation="false">
     </torque-load-data>
-    <torque-take-finally contextProperties="${torque.contextProperties}">
+    <torque-take-finally contextProperties="${torque.contextProperties}" beforeTimestamp="${now.date}">
     </torque-take-finally>
   </target>
 

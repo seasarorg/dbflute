@@ -23,6 +23,11 @@ public class DfLoadDataTask extends DfAbstractTask {
     private static final Log _log = LogFactory.getLog(DfLoadDataTask.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean validTaskEndInformation = true;
+    
+    // ===================================================================================
     //                                                                 DataSource Override
     //                                                                 ===================
     @Override
@@ -50,6 +55,11 @@ public class DfLoadDataTask extends DfAbstractTask {
         writeDbFromXlsAsAdditionalData();
     }
 
+    @Override
+    protected boolean isValidTaskEndInformation() {
+        return validTaskEndInformation;
+    }
+    
     protected String getEnvironmentType() {
         return getMyProperties().getEnvironmentType();
     }
@@ -141,5 +151,14 @@ public class DfLoadDataTask extends DfAbstractTask {
         } else {
             xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setValidTaskEndInformation(String validTaskEndInformation) {
+        this.validTaskEndInformation = validTaskEndInformation != null
+                && validTaskEndInformation.trim().equalsIgnoreCase("true");
+        ;
     }
 }

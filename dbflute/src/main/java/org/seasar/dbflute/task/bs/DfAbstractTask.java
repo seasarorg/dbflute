@@ -39,9 +39,9 @@ public abstract class DfAbstractTask extends Task {
 
     private static final Log _log = LogFactory.getLog(DfAbstractTask.class);
 
-    // =========================================================================================
-    //                                                                                 Attribute
-    //                                                                                 =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** DB driver. */
     protected String _driver = null;
 
@@ -59,9 +59,12 @@ public abstract class DfAbstractTask extends Task {
 
     protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     @Override
     final public void execute() {
-        long before = System.currentTimeMillis();
+        long before = getTaskBeforeTimeMillis();
         try {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
@@ -76,12 +79,26 @@ public abstract class DfAbstractTask extends Task {
             _log.error("execute() threw the exception!", e);
             throw e;
         } finally {
-            long after = System.currentTimeMillis();
-            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            _log.info("[Task End: " + getPerformanceView(after - before) + "]");
-            _log.info("_/_/_/_/_/");
+            long after = getTaskAfterTimeMillis();
+            if (isValidTaskEndInformation()) {
+                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+                _log.info("[Task End: " + getPerformanceView(after - before) + "]");
+                _log.info("_/_/_/_/_/");
+            }
             _log.info("");
         }
+    }
+
+    protected long getTaskBeforeTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    protected long getTaskAfterTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    protected boolean isValidTaskEndInformation() {
+        return true;
     }
 
     protected void initializeDatabaseInfo() {
@@ -171,7 +188,7 @@ public abstract class DfAbstractTask extends Task {
             }
         }
     }
-    
+
     public void setContextProperties(String file) {
         final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
         DfBuildProperties.getInstance().setProperties(prop);
