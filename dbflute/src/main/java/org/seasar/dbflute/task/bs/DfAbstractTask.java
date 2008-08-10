@@ -113,8 +113,7 @@ public abstract class DfAbstractTask extends Task {
 
     /**
      * Get performance view.
-     * 
-     * @param mil The value of millisecound.
+     * @param mil The value of millisecond.
      * @return Performance view. (ex. 1m23s456ms) (NotNull)
      */
     protected String getPerformanceView(long mil) {

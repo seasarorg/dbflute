@@ -30,7 +30,6 @@ import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * Ant task utility.
- * 
  * @author jflute
  */
 public final class DfAntTaskUtil {
@@ -40,13 +39,12 @@ public final class DfAntTaskUtil {
 
     /**
      * Get the property object that saves 'build-properties'.
-     * <p>
      * Copy from TexenTask#setContextProperties(). A little modified...
-     * 
      * @param file File-full-path-comma-string.
      * @param project Project-instance of ANT.
      * @return Context-properties.
      */
+    @SuppressWarnings("unchecked")
     public static Properties getBuildProperties(String file, Project project) {
         final Properties prop = new Properties();
         try {
@@ -59,7 +57,7 @@ public final class DfAntTaskUtil {
                 final Properties source = new Properties();
                 try {
                     final File fullPath = project.resolveFile(sources[i]);
-                    _log.debug("Using contextProperties file: " + fullPath);
+                    _log.info("Using contextProperties file: " + fullPath);
                     source.load(new FileInputStream(fullPath));
                 } catch (Exception e) {
                     final ClassLoader classLoader = project.getClass().getClassLoader();
@@ -87,11 +85,11 @@ public final class DfAntTaskUtil {
             DfBuildProperties.getInstance().setProperties(prop);
 
             // Show properties!
-            _log.debug("[Properties]: size=" + prop.size());
+            _log.info("[Properties]: size=" + prop.size());
             for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {
                 final String key = (String) ite.next();
                 final String value = prop.getProperty(key);
-                _log.debug("    " + key + " = " + value);
+                _log.info("    " + key + " = " + value);
             }
         } catch (Exception e) {
             _log.warn("setContextProperties() threw the exception!!!", e);

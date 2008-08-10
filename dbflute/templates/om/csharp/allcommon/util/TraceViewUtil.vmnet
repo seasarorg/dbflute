@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonUtil} {
         /// <summary>
         /// Convert to performance view.
         /// </summary>
-        /// <param name="before">The value of before millisecound. (NotNull)</param>
+        /// <param name="before">The value of before millisecond. (NotNull)</param>
         /// <param name="after">The value of after millisecound. (NotNull)</param>
         /// <returns>Performance view. (ex. 1m23s456ms) (NotNull)</returns>
         public static String ConvertToPerformanceView(DateTime before, DateTime after) {

@@ -7,8 +7,7 @@ public class ${glTraceViewUtilName} {
 
     /**
      * Convert to performance view.
-     * 
-     * @param afterMinusBefore The value of after-minus-before millisecound.
+     * @param afterMinusBefore The value of after-minus-before millisecond.
      * @return Performance view. (ex. 1m23s456ms) (NotNull)
      */
     public static String convertToPerformanceView(long afterMinusBefore) {
@@ -45,7 +44,6 @@ public class ${glTraceViewUtilName} {
 
     /**
      * Convert object array to string view.
-     * 
      * @param objArray The array of object. (Nullable)
      * @return The string divided with comma. (NotNull: If the argument is null, returns empty string.)
      */
