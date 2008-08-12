@@ -371,7 +371,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
                     final PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
                     if (config != null && config.hasStatementOptions()) {
                         if (internalDebug) {
-                            _log.debug("...Setting statement config as request:" + config);
+                            _log.debug("...Setting statement config as request: " + config);
                         }
                         reflectStatementOptions(config, ps);
                     } else {
@@ -402,7 +402,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
                 if (defaultStatementConfig != null && defaultStatementConfig.hasStatementOptions()) {
                     if (internalDebug) {
-                        _log.debug("...Setting statement config as default:" + defaultStatementConfig);
+                        _log.debug("...Setting statement config as default: " + defaultStatementConfig);
                     }
                     reflectStatementOptions(defaultStatementConfig, ps);
                     return;

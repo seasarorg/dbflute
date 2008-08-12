@@ -55,6 +55,12 @@ namespace ${glPackageBaseCommonCBean} {
         bool IsSelectCountIgnoreFetchScope();
 		
         // ===============================================================================
+        //                                                                Statement Config
+        //                                                                ================
+        void Configure(${glStatementConfig} statementConfig);
+        ${glStatementConfig} StatementConfig { get; }
+
+        // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
     	String ToDisplaySql();

@@ -9,6 +9,8 @@ using Seasar.Extension.ADO.Impl;
 using Seasar.Quill.Dao.Impl;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonS2Dao} {
@@ -24,14 +26,30 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
     public class InternalBasicCommandFactory : BasicCommandFactory {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
+        //                                                                Command Creation
+        //                                                                ================
         public override IDbCommand CreateCommand(IDbConnection conn, string sql) {
             IDbCommand cmd = conn.CreateCommand();
             cmd.CommandText = ChangeSignSql(cmd, sql);
             ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.GetInstance().DefaultStatementConfig;
+            bool internalDebug = ${glDBFluteConfig}.GetInstance().IsInternalDebug;
             ${glStatementConfig} config = FindStatementConfigOnThread();
             if (config != null && config.HasQueryTimeout()) {
+                if (internalDebug) {
+                    _log.Debug("...Setting statement config as request: " + config);
+                }
                 cmd.CommandTimeout = config.QueryTimeout.Value;// DBFlute original logic.
             } else if (defaultStatementConfig != null && defaultStatementConfig.HasQueryTimeout()) {
+                if (internalDebug) {
+                    _log.Debug("...Setting statement config as default: " + config);
+                }
                 cmd.CommandTimeout = defaultStatementConfig.QueryTimeout.Value;// DBFlute original logic.
             } else {
                 if (CommandTimeout > -1) {
@@ -43,13 +61,13 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected ${glStatementConfig} FindStatementConfigOnThread() {
             ${glStatementConfig} config = null;
-            // if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-            //     ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-            //     config = cb.getStatementConfig();
-            // } else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            //     ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-            //     config = context.getStatementConfig();
-            // }
+            if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+                ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+                config = cb.StatementConfig;
+            } else if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                config = context.StatementConfig;
+            }
             return config;
         }
     }

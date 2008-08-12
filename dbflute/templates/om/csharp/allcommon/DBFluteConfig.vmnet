@@ -157,7 +157,7 @@ public class ${myClassName} {
     //                                                                        Config Clear
     //                                                                        ============
 	public void Clear() {
-	    // _defaultStatementConfig = null;
+	    _defaultStatementConfig = null;
 		_internalDebug = false;
 	}
 }

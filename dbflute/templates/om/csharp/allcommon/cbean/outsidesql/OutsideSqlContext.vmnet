@@ -106,6 +106,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         protected String _methodName;
 		
+        protected ${glStatementConfig} _statementConfig;
+
         protected String _tableDbName;
 
         // ===============================================================================
@@ -273,6 +275,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public String MethodName {
             get { return _methodName; }
             set { this._methodName = value; }
+        }
+
+        public ${glStatementConfig} StatementConfig {
+            get { return _statementConfig; }
+            set { this._statementConfig = value; }
         }
 
         public String TableDbName {

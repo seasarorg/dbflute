@@ -18,6 +18,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                       =========
         protected readonly ${glSqlClauseName} _sqlClause;
         protected int _safetyMaxResultSize;
+        protected ${glStatementConfig} _statementConfig;
 
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forDeriveReferrer;
@@ -222,6 +223,18 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsSelectCountIgnoreFetchScope() {
             return _isSelectCountIgnoreFetchScope;
         }
+
+
+        // ===============================================================================
+        //                                                                Statement Config
+        //                                                                ================
+        public void Configure(${glStatementConfig} statementConfig) {
+            _statementConfig = statementConfig;
+        }
+    
+        public ${glStatementConfig} StatementConfig { get {
+            return _statementConfig;
+        }}
 
         // ===============================================================================
         //                                                                     Display SQL
