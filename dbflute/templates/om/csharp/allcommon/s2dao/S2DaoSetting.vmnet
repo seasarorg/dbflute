@@ -17,7 +17,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glS2DaoSetting} : AbstractDaoSetting {
         protected override void SetupDao(IDataSource dataSource) {
-            BasicCommandFactory commandFactory = new BasicCommandFactory();
+            BasicCommandFactory commandFactory = new InternalBasicCommandFactory();
             BasicDataReaderFactory dataReaderFactory = new BasicDataReaderFactory(commandFactory);
             FieldAnnotationReaderFactory annotationReaderFactory = new FieldAnnotationReaderFactory();
             _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
