@@ -6,6 +6,7 @@ using System.Reflection;
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBean} {

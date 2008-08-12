@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBean} {
 
