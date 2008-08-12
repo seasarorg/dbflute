@@ -9,10 +9,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glS2DaoSetting} : AbstractDaoSetting {
         protected override void SetupDao(IDataSource dataSource) {
-            BasicCommandFactory commandFacoty = new BasicCommandFactory();
-            BasicDataReaderFactory dataReaderFactory = new BasicDataReaderFactory(commandFacoty);
+            BasicCommandFactory commandFactory = new BasicCommandFactory();
+            BasicDataReaderFactory dataReaderFactory = new BasicDataReaderFactory(commandFactory);
             FieldAnnotationReaderFactory annotationReaderFactory = new FieldAnnotationReaderFactory();
-            _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFacoty, annotationReaderFactory, dataReaderFactory);
+            _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
             _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
         }
     }
