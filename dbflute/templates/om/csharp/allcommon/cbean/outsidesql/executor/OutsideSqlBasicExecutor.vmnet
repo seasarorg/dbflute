@@ -78,8 +78,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             return this;
         }
 
-        public void Configure(${glStatementConfig} statementConfig) {
+        public ${glOutsideSqlBasicExecutorName} Configure(${glStatementConfig} statementConfig) {
             _statementConfig = statementConfig;
+            return this;
         }
 
         // -------------------------------------------------
