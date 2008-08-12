@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
@@ -14,6 +15,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         protected ${glOutsideSqlDaoName} _outsideSqlDao;
         protected String _tableDbName;
         protected bool _dynamicBinding;
+        protected ${glStatementConfig} _statementConfig;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -76,11 +78,16 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             return this;
         }
 
+        public void Configure(${glStatementConfig} statementConfig) {
+            _statementConfig = statementConfig;
+        }
+
         // -------------------------------------------------
         //                                            Helper
         //                                            ------
         protected ${glOutsideSqlOptionName} CreateOutsideSqlOption() {
             ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+            option.StatementConfig = _statementConfig;
             if (_dynamicBinding) {
                 option.DynamicBinding();
             }

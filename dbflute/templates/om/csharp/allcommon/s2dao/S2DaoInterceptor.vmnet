@@ -309,6 +309,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
             outsideSqlContext.MethodName = invocation.Method.Name;
+			outsideSqlContext.StatementConfig = option.StatementConfig;
 			outsideSqlContext.TableDbName = option.TableDbName;
 			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
@@ -336,6 +337,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.MethodName = invocation.Method.Name;
+            outsideSqlContext.StatementConfig = option.StatementConfig;
 			outsideSqlContext.TableDbName = option.TableDbName;
 			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
