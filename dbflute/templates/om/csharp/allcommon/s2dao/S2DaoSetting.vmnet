@@ -29,9 +29,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             cmd.CommandText = ChangeSignSql(cmd, sql);
             ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.GetInstance().DefaultStatementConfig;
             ${glStatementConfig} config = findStatementConfigOnThread();;
-            if (config != null) {
+            if (config != null && config.HasQueryTimeout()) {
                 cmd.CommandTimeout = config.QueryTimeout;
-            } else if (defaultStatementConfig != null) {
+            } else if (defaultStatementConfig != null && defaultStatementConfig.HasQueryTimeout()) {
                 cmd.CommandTimeout = defaultStatementConfig.QueryTimeout;
             } else {
                 if (CommandTimeout > -1) {
