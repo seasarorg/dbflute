@@ -28,17 +28,29 @@ namespace ${glPackageBaseCommonS2Dao} {
             IDbCommand cmd = conn.CreateCommand();
             cmd.CommandText = ChangeSignSql(cmd, sql);
             ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.GetInstance().DefaultStatementConfig;
-            ${glStatementConfig} config = findStatementConfigOnThread();;
+            ${glStatementConfig} config = FindStatementConfigOnThread();
             if (config != null && config.HasQueryTimeout()) {
-                cmd.CommandTimeout = config.QueryTimeout;
+                cmd.CommandTimeout = config.QueryTimeout;// DBFlute original logic.
             } else if (defaultStatementConfig != null && defaultStatementConfig.HasQueryTimeout()) {
-                cmd.CommandTimeout = defaultStatementConfig.QueryTimeout;
+                cmd.CommandTimeout = defaultStatementConfig.QueryTimeout;// DBFlute original logic.
             } else {
                 if (CommandTimeout > -1) {
-                    cmd.CommandTimeout = CommandTimeout;
+                    cmd.CommandTimeout = CommandTimeout;// S2Dao original logic.
                 }
             }
             return cmd;
+        }
+
+        protected ${glStatementConfig} FindStatementConfigOnThread() {
+            // ${glStatementConfig} config = null;
+            // if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+            //     ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+            //     config = cb.getStatementConfig();
+            // } else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            //     ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            //     config = context.getStatementConfig();
+            // }
+            return config;
         }
     }
 }
