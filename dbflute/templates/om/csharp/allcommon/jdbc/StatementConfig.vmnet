@@ -37,7 +37,7 @@ namespace ${glPackageBaseCommonJdbc} {
     	// -------------------------------------------------
         //                                  Statement Option
         //                                  ----------------
-        public int? QueryTimeout() { get {
+        public int? QueryTimeout { get {
             return _queryTimeout;
         } set {
             _queryTimeout = value;
