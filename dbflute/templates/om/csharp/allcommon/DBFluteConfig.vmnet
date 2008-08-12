@@ -16,13 +16,13 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-	// protected ${glStatementConfig} _defaultStatementConfig;
+	protected ${glStatementConfig} _defaultStatementConfig;
 	protected bool _conditionBeanFormatSql = true;
 	protected bool _queryLogLevelInfo;
 	protected bool _executeStatusLogLevelInfo;
 	protected bool _internalDebug;
 	protected bool _locked = true;
-	
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -43,17 +43,18 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                            Default Statement Config
     //                                                            ========================
-    // public ${glStatementConfig} getDefaultStatementConfig() {
-    //     return _defaultStatementConfig;
-    // }
-	// 
-    // public void setDefaultStatementConfig(${glStatementConfig} defaultStatementConfig) {
-	//     assertNotLocked();
-	//     if (_log.isInfoEnabled()) {
-	// 	    _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
-	// }
-    //     _defaultStatementConfig = defaultStatementConfig;
-    // }
+    public ${glStatementConfig} DefaultStatementConfig {
+        get {
+            return _defaultStatementConfig;
+        }
+        set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting defaultStatementConfig: " + value);
+		    }
+            _defaultStatementConfig = value;
+        }
+    }
 	
     // ===================================================================================
     //                                                            ConditionBean Format Sql

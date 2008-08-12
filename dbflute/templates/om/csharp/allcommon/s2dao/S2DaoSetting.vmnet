@@ -1,4 +1,8 @@
 
+using System;
+using System.Data;
+using System.Data.SqlTypes;
+
 using Seasar.Dao.Impl;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
@@ -14,6 +18,25 @@ namespace ${glPackageBaseCommonS2Dao} {
             FieldAnnotationReaderFactory annotationReaderFactory = new FieldAnnotationReaderFactory();
             _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
             _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
+        }
+    }
+
+    public class InternalBasicCommandFactory : BasicCommandFactory {
+        public override IDbCommand CreateCommand(IDbConnection conn, string sql) {
+            IDbCommand cmd = conn.CreateCommand();
+            cmd.CommandText = ChangeSignSql(cmd, sql);
+            ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.GetInstance().DefaultStatementConfig;
+            ${glStatementConfig} config = findStatementConfigOnThread();;
+            if (config != null) {
+                cmd.CommandTimeout = config.QueryTimeout;
+            } else if (defaultStatementConfig != null) {
+                cmd.CommandTimeout = defaultStatementConfig.QueryTimeout;
+            } else {
+                if (CommandTimeout > -1) {
+                    cmd.CommandTimeout = CommandTimeout;
+                }
+            }
+            return cmd;
         }
     }
 }

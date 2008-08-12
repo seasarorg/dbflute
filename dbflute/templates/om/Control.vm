@@ -1641,13 +1641,11 @@ targetdatabase = $targetDatabase
       $database.info("    parse('LatestSqlProvider');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProviderName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/LatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
+	#end
 
-    #end
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('StatementConfig');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glStatementConfig}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/StatementConfig.${glTemplateFileExtension}",$path,"", "")
-    #end
+    $database.info("    parse('StatementConfig');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glStatementConfig}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/StatementConfig.${glTemplateFileExtension}",$path,"", "")
     $database.info("}")
 
     ## -----------------------------------------------------------------------------------------------------

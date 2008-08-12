@@ -1,0 +1,47 @@
+
+using System;
+using System.Data;
+
+namespace ${glPackageBaseCommonJdbc} {
+
+    public class ${glStatementConfig} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+	    // -------------------------------------------------
+        //                                  Statement Option
+        //                                  ----------------
+        protected int? _queryTimeout;
+    
+	    // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
+    	// -------------------------------------------------
+        //                                  Statement Option
+        //                                  ----------------
+	    public bool HasQueryTimeout() {
+            return _queryTimeout != null;
+        }
+	
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+	    public override String ToString() {
+	        return "{" + _queryTimeout + "}";
+	    }
+	
+	    // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+    	// -------------------------------------------------
+        //                                  Statement Option
+        //                                  ----------------
+        public int? QueryTimeout() { get {
+            return _queryTimeout;
+        } set {
+            _queryTimeout = value;
+        }}
+    }
+
+}
