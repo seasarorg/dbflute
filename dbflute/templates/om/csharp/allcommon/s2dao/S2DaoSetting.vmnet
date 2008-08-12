@@ -45,12 +45,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (internalDebug) {
                     _log.Debug("...Setting statement config as request: " + config);
                 }
-                cmd.CommandTimeout = config.QueryTimeout.Value;// DBFlute original logic.
+                cmd.CommandTimeout = config.GetQueryTimeout().Value;// DBFlute original logic.
             } else if (defaultStatementConfig != null && defaultStatementConfig.HasQueryTimeout()) {
                 if (internalDebug) {
                     _log.Debug("...Setting statement config as default: " + config);
                 }
-                cmd.CommandTimeout = defaultStatementConfig.QueryTimeout.Value;// DBFlute original logic.
+                cmd.CommandTimeout = defaultStatementConfig.GetQueryTimeout().Value;// DBFlute original logic.
             } else {
                 if (CommandTimeout > -1) {
                     cmd.CommandTimeout = CommandTimeout;// S2Dao original logic.

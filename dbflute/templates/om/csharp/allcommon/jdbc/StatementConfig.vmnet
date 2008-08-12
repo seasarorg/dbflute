@@ -13,7 +13,15 @@ namespace ${glPackageBaseCommonJdbc} {
         //                                  Statement Option
         //                                  ----------------
         protected int? _queryTimeout;
-    
+
+	    // ===============================================================================
+        //                                                               Setting Interface
+        //                                                               =================
+    	// -------------------------------------------------
+        //                                  Statement Option
+        //                                  ----------------
+        public ${glStatementConfig} QueryTimeout(int? queryTimeout) { _queryTimeout = queryTimeout; return this; }
+
 	    // ===============================================================================
         //                                                                   Determination
         //                                                                   =============
@@ -37,11 +45,8 @@ namespace ${glPackageBaseCommonJdbc} {
     	// -------------------------------------------------
         //                                  Statement Option
         //                                  ----------------
-        public int? QueryTimeout { get {
+        public int? GetQueryTimeout() {
             return _queryTimeout;
-        } set {
-            _queryTimeout = value;
-        }}
+        }
     }
-
 }
