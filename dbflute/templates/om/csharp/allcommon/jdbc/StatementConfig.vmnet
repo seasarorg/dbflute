@@ -20,10 +20,10 @@ namespace ${glPackageBaseCommonJdbc} {
     	// -------------------------------------------------
         //                                  Statement Option
         //                                  ----------------
-	    public bool HasQueryTimeout() {
+        public bool HasQueryTimeout() {
             return _queryTimeout != null;
         }
-	
+
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
