@@ -6,8 +6,10 @@ using System.Data.SqlTypes;
 using Seasar.Dao.Impl;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
-
 using Seasar.Quill.Dao.Impl;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
