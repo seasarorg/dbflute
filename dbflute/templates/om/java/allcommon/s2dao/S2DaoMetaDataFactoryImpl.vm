@@ -315,7 +315,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         return daoMetaData;
     }
     
-    protected ${glDaoMetaDataExtension} createDaoMetaDataExtension() {// Override!
+    protected ${glDaoMetaDataExtension} createDaoMetaDataExtension() {
         final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(beanEnhancer);
         dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);

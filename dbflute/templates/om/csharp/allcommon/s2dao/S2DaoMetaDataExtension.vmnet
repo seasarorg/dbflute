@@ -232,7 +232,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 filteredParameterTypes = parameterTypes;
             }
             IBeanMetaData myMetaData = GetOutsideSqlBeanMetaData(mi, _dbMetaData, _dbms);
-            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler4SelectMethodByManual(mi, myMetaData));
+            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler(mi, bmd));
             RegisterSqlCommand(mi.Name, mi, sql, filteredParameterNames, filteredParameterTypes, cmd);
         }
 
@@ -244,29 +244,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(beanClass4SelectMethodByManual, _annotationReaderFactory, false);
             bmdExt.Initialize(databaseMetaData, dbInfo);// Don't use cache!
             return bmdExt;
-        }
-
-        protected IDataReaderHandler CreateDataReaderHandler4SelectMethodByManual(MethodInfo mi, IBeanMetaData bmd) {
-            Type retType = mi.ReturnType;
-
-            if (retType.IsArray) {
-                return CreateBeanArrayMetaDataDataReaderHandler(bmd);
-            } else if (!retType.IsGenericType && typeof(IList).IsAssignableFrom(retType)) {
-                return CreateBeanListMetaDataDataReaderHandler(bmd);
-            } else if (IsBeanTypeAssignable4SelectMethodByManual(retType, bmd)) {
-                return CreateBeanMetaDataDataReaderHandler(bmd);
-            } else if (Array.CreateInstance(_beanType, 0).GetType().IsAssignableFrom(retType)) {
-                return CreateBeanArrayMetaDataDataReaderHandler(bmd);
-            } else if(retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>))
-                    || retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.List<>)))) {
-                return CreateBeanGenericListMetaDataDataReaderHandler(bmd);
-            } else {
-                return CreateObjectDataReaderHandler();
-            }
-        }
-
-        protected bool IsBeanTypeAssignable4SelectMethodByManual(Type type, IBeanMetaData bmd) {
-            return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
         }
 
         // -------------------------------------------------
@@ -339,7 +316,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (valueType == null || !valueType.Equals(ValueTypes.OBJECT)) {
                 return new InternalObjectGenericListResultSetHandler(customizeEntityType, valueType);
             }
-            return CreateBeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData);
+            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
         }
 
         public class InternalObjectGenericListResultSetHandler : IDataReaderHandler {
