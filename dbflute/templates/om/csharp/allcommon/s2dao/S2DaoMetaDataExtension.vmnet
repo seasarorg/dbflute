@@ -232,8 +232,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 filteredParameterTypes = parameterTypes;
             }
             IBeanMetaData myMetaData = GetOutsideSqlBeanMetaData(mi, _dbMetaData, _dbms);
-            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler(mi, bmd));
-            RegisterSqlCommand(mi.Name, mi, sql, filteredParameterNames, filteredParameterTypes, cmd);
+            IDataReaderHandler myDataReaderHandler = CreateDataReaderHandler(mi, myMetaData);
+            RegisterSqlCommand(mi.Name, mi, sql, filteredParameterNames, filteredParameterTypes, myDataReaderHandler);
         }
 
         protected IBeanMetaData GetOutsideSqlBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {

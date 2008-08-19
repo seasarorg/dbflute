@@ -9,6 +9,7 @@ using Seasar.Framework.Util;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
 using Seasar.Dao;
+using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommonJavaLike};
 
@@ -161,53 +162,43 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ObjectArrayDataReaderHandler(elementType);
         }
 
-        protected virtual BeanDataSetMetaDataDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType)
-        {
+        protected virtual BeanDataSetMetaDataDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
             return new BeanDataSetMetaDataDataReaderHandler(returnType);
         }
 
-        protected virtual BeanDataTableMetaDataDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType)
-        {
+        protected virtual BeanDataTableMetaDataDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
             return new BeanDataTableMetaDataDataReaderHandler(returnType);
         }
 
-        protected virtual BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd)
-        {
+        protected virtual BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd)
-        {
+        protected virtual BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd)
-        {
+        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanArrayMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd)
-        {
+        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanGenericListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler()
-        {
+        protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {
             return new ObjectDataReaderHandler();
         }
 
-        protected virtual IRowCreator CreateRowCreator()
-        {// [DAONET-56] (2007/08/29)
+        protected virtual IRowCreator CreateRowCreator() {
             return new RowCreatorImpl();
         }
 
-        protected virtual IRelationRowCreator CreateRelationRowCreator()
-        {// [DAONET-56] (2007/08/29)
+        protected virtual IRelationRowCreator CreateRelationRowCreator() {
             return new RelationRowCreatorImpl();
         }
 
-        protected virtual bool IsBeanTypeAssignable(Type beanType, Type type)
-        {
+        protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
             return beanType.IsAssignableFrom(type) ||
                 type.IsAssignableFrom(beanType);
         }
