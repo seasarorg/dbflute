@@ -317,9 +317,29 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         return sqlList;
     }
-    
+
     protected void addSqlToList(List<String> sqlList, String sql) {
+        if (isSqlLineCommentOnly(sql)) {
+            return;
+        }
         sqlList.add(removeCR(sql));
+    }
+
+    protected boolean isSqlLineCommentOnly(String sql) {
+        sql = sql.trim();
+        String[] lines = sql.split("\n");
+        for (String line : lines) {
+            line = line.trim();
+            if (line.length() == 0) {
+                continue;
+            }
+            if (line.startsWith("--")) {
+                continue;
+            }
+            return false;
+        }
+        _log.info("The SQL is line comment only so skip it:" + getLineSeparator() + sql);
+        return true;
     }
 
     public DelimiterChanger newDelimterChanger() {
@@ -343,7 +363,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         return str;
     }
-    
+
     protected String removeCR(String str) {
         return str.replaceAll("\r", "");
     }
