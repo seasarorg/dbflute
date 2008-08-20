@@ -780,6 +780,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
         if (getBasicProperties().isDatabaseOracle()) {
             return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
+        } else if (getBasicProperties().isDatabasePostgreSQL()) {
+            return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("refcursor");
         } else {
             return false;
         }
