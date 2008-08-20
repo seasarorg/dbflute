@@ -191,16 +191,15 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected virtual IRowCreator CreateRowCreator() {
-            return new RowCreatorImpl();
+            return new RowCreatorExtension();
         }
 
         protected virtual IRelationRowCreator CreateRelationRowCreator() {
-            return new RelationRowCreatorImpl();
+            return new RelationRowCreatorExtension();
         }
 
         protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
-            return beanType.IsAssignableFrom(type) ||
-                type.IsAssignableFrom(beanType);
+            return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
         }
     }
 }
