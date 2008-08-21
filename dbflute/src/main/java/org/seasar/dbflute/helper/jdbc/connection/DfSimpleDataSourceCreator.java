@@ -44,21 +44,24 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     //                                                                           Attribute
     //                                                                           =========
     /** DB driver. */
-    protected String _driver = null;
+    protected String _driver;
 
     /** DB URL. */
-    protected String _url = null;
+    protected String _url;
 
     /** User name. */
-    protected String _userId = null;
+    protected String _userId;
 
     /** Password */
-    protected String _password = null;
+    protected String _password;
 
-    /** Password */
+    /** Is the mode auto commit? */
     protected boolean _autoCommit;
+    
+    /** Connection properties. */
+    protected Properties _connectionProperties;
 
-    /** Connection */
+    /** Connection object. */
     protected Connection _conn;
 
     // ===================================================================================
@@ -109,39 +112,6 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         }
     }
 
-    public static class DfSimpleDataSource implements DataSource {
-
-        protected DfSimpleDataSourceCreator _dataSourceProvider;
-
-        public DfSimpleDataSource(DfSimpleDataSourceCreator dataSourceProvider) {
-            _dataSourceProvider = dataSourceProvider;
-        }
-
-        public Connection getConnection() throws SQLException {
-            return _dataSourceProvider.getConnection();
-        }
-
-        public Connection getConnection(String username, String password) throws SQLException {
-            throw new UnsupportedOperationException("Use getConnection()");
-        }
-
-        public PrintWriter getLogWriter() throws SQLException {
-            throw new UnsupportedOperationException("getLogWriter()");
-        }
-
-        public int getLoginTimeout() throws SQLException {
-            throw new UnsupportedOperationException("getLoginTimeout()");
-        }
-
-        public void setLogWriter(PrintWriter out) throws SQLException {
-            throw new UnsupportedOperationException("setLoginTimeout()");
-        }
-
-        public void setLoginTimeout(int seconds) throws SQLException {
-            throw new UnsupportedOperationException("setLoginTimeout()");
-        }
-    }
-
     public Connection getConnection() {
         if (_conn == null) {
             _conn = new DfSimpleConnection(newConnection());
@@ -152,11 +122,15 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     protected Connection newConnection() {
         Connection connection = null;
         final Driver driverInstance = newDriver();
-        final Properties dbInfoProp = new Properties();
-        dbInfoProp.put("user", _userId);
-        dbInfoProp.put("password", _password);
+        final Properties info = new Properties();
+        if (_connectionProperties != null) {
+            info.putAll(_connectionProperties);
+        }
+        info.put("user", _userId);
+        info.put("password", _password);
+        
         try {
-            connection = driverInstance.connect(_url, dbInfoProp);
+            connection = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             throw new BuildException("Driver#connect() threw the exception: _url=" + _url, e);
         }
@@ -188,6 +162,39 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
             throw new BuildException(msg, e);
         }
         return driverInstance;
+    }
+    
+    public static class DfSimpleDataSource implements DataSource {
+
+        protected DfSimpleDataSourceCreator _dataSourceProvider;
+
+        public DfSimpleDataSource(DfSimpleDataSourceCreator dataSourceProvider) {
+            _dataSourceProvider = dataSourceProvider;
+        }
+
+        public Connection getConnection() throws SQLException {
+            return _dataSourceProvider.getConnection();
+        }
+
+        public Connection getConnection(String username, String password) throws SQLException {
+            throw new UnsupportedOperationException("Use getConnection()");
+        }
+
+        public PrintWriter getLogWriter() throws SQLException {
+            throw new UnsupportedOperationException("getLogWriter()");
+        }
+
+        public int getLoginTimeout() throws SQLException {
+            throw new UnsupportedOperationException("getLoginTimeout()");
+        }
+
+        public void setLogWriter(PrintWriter out) throws SQLException {
+            throw new UnsupportedOperationException("setLoginTimeout()");
+        }
+
+        public void setLoginTimeout(int seconds) throws SQLException {
+            throw new UnsupportedOperationException("setLoginTimeout()");
+        }
     }
 
     public static class DfSimpleConnection implements Connection {
@@ -395,4 +402,11 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         this._autoCommit = autoCommit;
     }
 
+    /**
+     * Set the connection properties for the DB connection.
+     * @param connectionProperties The connection properties.
+     */
+    public void setConnectionProperties(Properties connectionProperties) {
+        this._connectionProperties = connectionProperties;
+    }
 }
