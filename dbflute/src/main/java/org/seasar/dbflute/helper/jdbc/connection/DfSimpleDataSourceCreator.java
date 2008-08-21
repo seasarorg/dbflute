@@ -39,7 +39,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
 
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSimpleDataSourceCreator.class);
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -55,14 +55,14 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     /** Password */
     protected String _password;
 
-    /** Is the mode auto commit? */
-    protected boolean _autoCommit;
-    
     /** Connection properties. */
     protected Properties _connectionProperties;
 
-    /** Connection object. */
-    protected Connection _conn;
+    /** Is the mode auto commit? */
+    protected boolean _autoCommit;
+
+    /** Cached connection object. */
+    protected Connection _cachedConnection;
 
     // ===================================================================================
     //                                                                                Main
@@ -113,22 +113,22 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     }
 
     public Connection getConnection() {
-        if (_conn == null) {
-            _conn = new DfSimpleConnection(newConnection());
+        if (_cachedConnection == null) {
+            _cachedConnection = new DfSimpleConnection(newConnection());
         }
-        return _conn;
+        return _cachedConnection;
     }
 
     protected Connection newConnection() {
         Connection connection = null;
         final Driver driverInstance = newDriver();
         final Properties info = new Properties();
-        if (_connectionProperties != null) {
+        if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
             info.putAll(_connectionProperties);
         }
         info.put("user", _userId);
         info.put("password", _password);
-        
+
         try {
             connection = driverInstance.connect(_url, info);
         } catch (SQLException e) {
@@ -163,7 +163,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         }
         return driverInstance;
     }
-    
+
     public static class DfSimpleDataSource implements DataSource {
 
         protected DfSimpleDataSourceCreator _dataSourceProvider;
@@ -358,7 +358,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
             _realConnection.setTypeMap(map);
         }
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -395,18 +395,18 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     }
 
     /**
-     * Set the autoCommit for the DB connection.
-     * @param autoCommit Is auto commit?
-     */
-    public void setAutoCommit(boolean autoCommit) {
-        this._autoCommit = autoCommit;
-    }
-
-    /**
      * Set the connection properties for the DB connection.
      * @param connectionProperties The connection properties.
      */
     public void setConnectionProperties(Properties connectionProperties) {
         this._connectionProperties = connectionProperties;
+    }
+
+    /**
+     * Set the autoCommit for the DB connection.
+     * @param autoCommit Is auto commit?
+     */
+    public void setAutoCommit(boolean autoCommit) {
+        this._autoCommit = autoCommit;
     }
 }

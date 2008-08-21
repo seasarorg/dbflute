@@ -42,7 +42,6 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -83,8 +82,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     /** Password */
     protected String _password;
 
+    /** Connection properties. */
+    protected Properties _connectionProperties;
+
     /** Data source creator. (for help) */
-    protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
+    protected DfSimpleDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
 
     // ===================================================================================
     //                                                                                Main
@@ -121,11 +123,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void initializeDatabaseInfo() {
-        _driver = DfBuildProperties.getInstance().getBasicProperties().getDatabaseDriver();
-        _url = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUri();
-        _userId = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUser();
-        _schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
-        _password = DfBuildProperties.getInstance().getBasicProperties().getDatabasePassword();
+        _driver = getBasicProperties().getDatabaseDriver();
+        _url = getBasicProperties().getDatabaseUri();
+        _userId = getBasicProperties().getDatabaseUser();
+        _schema = getBasicProperties().getDatabaseSchema();
+        _password = getBasicProperties().getDatabasePassword();
+        _connectionProperties = getBasicProperties().getDatabaseConnectionProperties();
     }
 
     abstract protected void doExecute();
@@ -312,6 +315,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _dataSourceCreator.setPassword(_password);
         _dataSourceCreator.setDriver(_driver);
         _dataSourceCreator.setUrl(_url);
+        _dataSourceCreator.setConnectionProperties(_connectionProperties);
         _dataSourceCreator.setAutoCommit(true);
         _dataSourceCreator.create();
     }

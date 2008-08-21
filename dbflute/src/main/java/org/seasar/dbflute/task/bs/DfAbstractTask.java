@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.task.bs;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -26,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -44,21 +42,24 @@ public abstract class DfAbstractTask extends Task {
     //                                                                           Attribute
     //                                                                           =========
     /** DB driver. */
-    protected String _driver = null;
+    protected String _driver;
 
     /** DB URL. */
-    protected String _url = null;
+    protected String _url;
 
     /** User name. */
-    protected String _userId = null;
+    protected String _userId;
 
     /** Schema name. */
-    protected String _schema = null;
+    protected String _schema;
 
     /** Password */
-    protected String _password = null;
+    protected String _password;
 
-    protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
+    /** Connection properties. */
+    protected Properties _connectionProperties;
+
+    protected DfSimpleDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
 
     // ===================================================================================
     //                                                                             Execute
@@ -103,11 +104,12 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void initializeDatabaseInfo() {
-        _driver = DfBuildProperties.getInstance().getBasicProperties().getDatabaseDriver();
-        _url = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUri();
-        _userId = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUser();
-        _schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
-        _password = DfBuildProperties.getInstance().getBasicProperties().getDatabasePassword();
+        _driver = getBasicProperties().getDatabaseDriver();
+        _url = getBasicProperties().getDatabaseUri();
+        _userId = getBasicProperties().getDatabaseUser();
+        _schema = getBasicProperties().getDatabaseSchema();
+        _password = getBasicProperties().getDatabasePassword();
+        _connectionProperties = getBasicProperties().getDatabaseConnectionProperties();
     }
 
     abstract protected void doExecute();
@@ -156,6 +158,7 @@ public abstract class DfAbstractTask extends Task {
         _dataSourceCreator.setPassword(_password);
         _dataSourceCreator.setDriver(_driver);
         _dataSourceCreator.setUrl(_url);
+        _dataSourceCreator.setConnectionProperties(_connectionProperties);
         _dataSourceCreator.setAutoCommit(true);
         _dataSourceCreator.create();
     }
@@ -169,10 +172,6 @@ public abstract class DfAbstractTask extends Task {
         return DfDataSourceContext.getDataSource();
     }
 
-    protected Connection getConnection() throws SQLException {
-        return getDataSource().getConnection();
-    }
-    
     protected void connectSchema() {
         if (getBasicProperties().isDatabaseDB2() && _schema != null) {
             final Statement statement;

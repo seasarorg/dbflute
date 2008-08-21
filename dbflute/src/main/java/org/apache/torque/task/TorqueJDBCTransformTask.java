@@ -141,6 +141,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("  URL    : " + _url);
         _log.info("  user   : " + _userId);
         _log.info("  schema : " + _schema);
+        _log.info("  props  : " + _connectionProperties);
 
         final DocumentTypeImpl docType = new DocumentTypeImpl(null, "database", null, DTDResolver.WEB_SITE_DTD);
         _doc = new DocumentImpl(docType);
@@ -161,7 +162,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 xmlSerializer = new XMLSerializer(printWriter, outputFormar);
             }
             xmlSerializer.serialize(_doc);
-
+            
             _log.info("$ * * * * * * * * */");
             _log.info("$ ");
 
@@ -181,7 +182,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         Class.forName(_driver);
 
         _log.info("...Getting DB-connection");
-        final Connection conn = getConnection();
+        final Connection conn = getDataSource().getConnection();
 
         _log.info("...Getting DB-meta-data");
         final DatabaseMetaData dbMetaData = conn.getMetaData();
@@ -441,7 +442,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             throws SQLException {
         return _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

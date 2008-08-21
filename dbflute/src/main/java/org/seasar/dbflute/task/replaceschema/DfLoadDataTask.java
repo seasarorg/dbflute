@@ -143,6 +143,7 @@ public class DfLoadDataTask extends DfAbstractTask {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
+        xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());

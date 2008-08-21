@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -337,12 +338,18 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _databaseInfo.getDatabasePassword();
     }
 
+    public Properties getDatabaseConnectionProperties() {
+        return _databaseInfo.getDatabaseConnectionProperties();
+    }
+
     public class DatabaseInfo {
+
         private static final String KEY_DRIVER = "driver";
         private static final String KEY_URL = "url";
         private static final String KEY_SCHEMA = "schema";
         private static final String KEY_USER = "user";
         private static final String KEY_PASSWORD = "password";
+        private static final String KEY_PROPERTIES_MAP = "propertiesMap";
 
         /** Database info map. (for cache) */
         protected Map<String, Object> _databaseInfoMap;
@@ -373,7 +380,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             final StringBuilder sb = new StringBuilder();
             final Set<String> keySet = _databaseInfoMap.keySet();
             for (String key : keySet) {
-                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_SCHEMA, KEY_USER, KEY_PASSWORD)) {
+                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_SCHEMA, KEY_USER, KEY_PASSWORD, KEY_PROPERTIES_MAP)) {
                     continue;
                 }
                 final Object value = _databaseInfoMap.get(key);
@@ -421,6 +428,22 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return stringProp("torque.database.password");
         }
 
+        public Properties getDatabaseConnectionProperties() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_PROPERTIES_MAP;
+            final Map<String, String> propertiesMap = getDatabaseInfoElementAsMap(key);
+            final Properties props = new Properties();
+            if (propertiesMap.isEmpty()) {
+                return props;
+            }
+            final Set<String> keySet = propertiesMap.keySet();
+            for (String propKey : keySet) {
+                final String propValue = propertiesMap.get(propKey);
+                props.setProperty(propKey, propValue);
+            }
+            return props;
+        }
+
         protected void initializeDatabaseInfoMap() {
             if (_databaseInfoMap == null) {
                 Map<String, Object> databaseInfoMap = getOutsidePropMap("databaseInfo");
@@ -444,6 +467,18 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
                 }
                 final String value = (String) _databaseInfoMap.get(key);
                 return value != null ? value : "";
+            }
+            return null;
+        }
+
+        @SuppressWarnings("unchecked")
+        protected Map<String, String> getDatabaseInfoElementAsMap(final String key) {
+            if (_databaseInfoMap != null) {
+                if (!_databaseInfoMap.containsKey(key)) {
+                    return new LinkedHashMap<String, String>();
+                }
+                final Map<String, String> valueList = (Map<String, String>) _databaseInfoMap.get(key);
+                return valueList != null ? valueList : new LinkedHashMap<String, String>();
             }
             return null;
         }
