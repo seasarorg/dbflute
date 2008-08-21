@@ -28,7 +28,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                          Skip Generate If Same File
     //                                                          ==========================
     public boolean isSkipGenerateIfSameFile() {
-        return booleanProp("torque.isSkipGenerateIfSameFile", false);
+        // The default value is true since 0.7.8.
+        return booleanProp("torque.isSkipGenerateIfSameFile", true);
     }
 
     // ===================================================================================
