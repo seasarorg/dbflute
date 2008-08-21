@@ -2,14 +2,20 @@ package org.apache.torque.engine.database.model;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.seasar.dbflute.DfDBFluteTestCase;
 
-public class ForeignKeyTest {
+public class ForeignKeyTest extends DfDBFluteTestCase {
 
     @Test
-    public void test_xxx() throws Exception {
+    public void test_toString() {
+        // ## Arrange ##
         final ForeignKey foreignKey = new ForeignKey();
-        final String toString = foreignKey.toString();
-        System.out.println(toString);
-        Assert.assertNotNull(toString);
+        
+        // ## Act ##
+        final String actual = foreignKey.toString();
+        
+        // ## Assert ##
+        log(actual);
+        Assert.assertNotNull(actual);
     }
 }

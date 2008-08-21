@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.DfDBFluteTestBase;
+import org.seasar.dbflute.DfDBFluteTestCase;
 import org.seasar.framework.util.ResourceUtil;
 
 /**
  * @author jflute
  * @since 0.5.7 (2007/11/03 Saturday)
  */
-public class DfSqlFileGetterTest extends DfDBFluteTestBase {
+public class DfSqlFileGetterTest extends DfDBFluteTestCase {
 
     @Test
     public void test_getSqlFileList() throws Exception {

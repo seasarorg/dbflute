@@ -56,33 +56,45 @@ public class TableTest {
         final Table table = new Table();
         table._javaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE;
         final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final Properties buildProperties = new Properties();
-        buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
-        prop.setProperties(buildProperties);
+        final Properties originalProp = prop.getProperties();
+        try {
+            final Properties buildProperties = new Properties();
+            buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
+            prop.setProperties(buildProperties);
 
-        // ## Act & Assert ##
-        Assert.assertEquals("VersionNo", table.buildVersionNoJavaName("VERSION_NO"));
-        Assert.assertEquals("VersionNo", table.buildVersionNoJavaName("version_no"));
-        Assert.assertEquals("Versionno", table.buildVersionNoJavaName("versionno"));
-        Assert.assertEquals("Versionno", table.buildVersionNoJavaName("versionNo"));
+            // ## Act & Assert ##
+            Assert.assertEquals("VersionNo", table.buildVersionNoJavaName("VERSION_NO"));
+            Assert.assertEquals("VersionNo", table.buildVersionNoJavaName("version_no"));
+            Assert.assertEquals("Versionno", table.buildVersionNoJavaName("versionno"));
+            Assert.assertEquals("Versionno", table.buildVersionNoJavaName("versionNo"));
+        } finally {
+            prop.setProperties(originalProp);
+        }
     }
 
     @Test
     public void test_Table_buildVersionNoJavaName_JavaNameSameDbName() throws Exception {
+        // TODO: @jflute -- test_Table_buildVersionNoJavaName_JavaNameNotSameDbName()と一緒に実行すると落ちる。
+        
         // ## Arrange ##
         final Table table = new Table();
         table._javaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE;
         final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final Properties buildProperties = new Properties();
-        buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
-        buildProperties.setProperty("torque.isJavaNameOfColumnSameAsDbName", "true");
-        prop.setProperties(buildProperties);
+        final Properties originalProp = prop.getProperties();
+        try {
+            final Properties buildProperties = new Properties();
+            buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
+            buildProperties.setProperty("torque.isJavaNameOfColumnSameAsDbName", "true");
+            prop.setProperties(buildProperties);
 
-        // ## Act & Assert ##
-        Assert.assertEquals("VERSION_NO", table.buildVersionNoJavaName("VERSION_NO"));
-        Assert.assertEquals("version_no", table.buildVersionNoJavaName("version_no"));
-        Assert.assertEquals("versionno", table.buildVersionNoJavaName("versionno"));
-        Assert.assertEquals("versionNo", table.buildVersionNoJavaName("versionNo"));
+            // ## Act & Assert ##
+            Assert.assertEquals("VERSION_NO", table.buildVersionNoJavaName("VERSION_NO"));
+            Assert.assertEquals("version_no", table.buildVersionNoJavaName("version_no"));
+            Assert.assertEquals("versionno", table.buildVersionNoJavaName("versionno"));
+            Assert.assertEquals("versionNo", table.buildVersionNoJavaName("versionNo"));
+        } finally {
+            prop.setProperties(originalProp);
+        }
     }
 
     @Test
@@ -102,15 +114,20 @@ public class TableTest {
         final Table table = new Table();
         table._javaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE;
         final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final Properties buildProperties = new Properties();
-        buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
-        prop.setProperties(buildProperties);
+        final Properties originalProp = prop.getProperties();
+        try {
+            final Properties buildProperties = new Properties();
+            buildProperties.setProperty("torque.isAvailableToLowerInGeneratorUnderscoreMethod", "true");// Default
+            prop.setProperties(buildProperties);
 
-        // ## Act & Assert ##
-        Assert.assertEquals("VersionNo", table.makeJavaName("VERSION_NO"));
-        Assert.assertEquals("VersionNo", table.makeJavaName("version_no"));
-        Assert.assertEquals("Versionno", table.makeJavaName("VersionNo"));
-        Assert.assertEquals("Versionno", table.makeJavaName("VERSIONNO"));
-        Assert.assertEquals("Versionno", table.makeJavaName("VersionNo"));
+            // ## Act & Assert ##
+            Assert.assertEquals("VersionNo", table.makeJavaName("VERSION_NO"));
+            Assert.assertEquals("VersionNo", table.makeJavaName("version_no"));
+            Assert.assertEquals("Versionno", table.makeJavaName("VersionNo"));
+            Assert.assertEquals("Versionno", table.makeJavaName("VERSIONNO"));
+            Assert.assertEquals("Versionno", table.makeJavaName("VersionNo"));
+        } finally {
+            prop.setProperties(originalProp);
+        }
     }
 }

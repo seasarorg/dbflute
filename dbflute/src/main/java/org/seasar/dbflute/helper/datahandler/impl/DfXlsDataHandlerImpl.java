@@ -108,11 +108,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             for (int i = 0; i < dataSet.getTableSize(); i++) {
                 final DataTable dataTable = dataSet.getTable(i);
                 final String tableName = dataTable.getTableName();
-                if (tableName.startsWith("#")) {// It's comment out!
+                if (isCommentOutSheet(tableName)) {// since 0.7.8 
                     _log.info("*The sheet has comment-out mark so skip it: " + tableName);
                     continue;
                 }
-                if (isSkipSheet(tableName)) {// [DBFLUTE-251]
+                if (isSkipSheet(tableName)) {// since 0.7.8 for [DBFLUTE-251]
                     _log.info("*The sheet name matched skip-sheet specification so skip it: " + tableName);
                     continue;
                 }
@@ -249,6 +249,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
     }
 
+    protected boolean isCommentOutSheet(String sheetName) {
+        return sheetName.startsWith("#");
+    }
+    
     protected boolean isSkipSheet(String sheetName) {
         if (_skipSheetPattern == null) {
             return false;
