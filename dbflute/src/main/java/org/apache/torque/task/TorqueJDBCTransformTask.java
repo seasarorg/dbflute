@@ -100,7 +100,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                 DataSource Override
     //                                                                 ===================
     protected boolean isUseDataSource() {
-        return false;
+        return true;
     }
 
     // ===================================================================================
