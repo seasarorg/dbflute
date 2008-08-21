@@ -146,7 +146,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final Connection conn = getConnection();// It is first impact to Database!
         try {
             final DatabaseMetaData dbMetaData = getMetaData(conn);
-            dbms = DbmsManager.getDbms(dbMetaData);
+            dbms = DbmsManager.getDbms(getDatabaseProductName(dbMetaData));
         } finally {
             close(conn);
         }
@@ -895,6 +895,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected DatabaseMetaData getMetaData(Connection conn) {
         try {
             return conn.getMetaData();
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+
+    protected String getDatabaseProductName(DatabaseMetaData dbMetaData) {
+        try {
+            return dbMetaData.getDatabaseProductName();
         } catch (SQLException e) {
             handleSQLException(e, null);
             return null;// Unreachable!
