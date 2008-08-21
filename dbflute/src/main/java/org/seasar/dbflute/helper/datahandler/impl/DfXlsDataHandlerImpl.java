@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.sql.DataSource;
 
@@ -71,6 +73,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //                                                                           =========
     protected boolean _loggingInsertSql;
     protected String _schemaName;
+    protected Pattern _skipSheetPattern;
 
     // ===================================================================================
     //                                                                                Read
@@ -105,7 +108,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             for (int i = 0; i < dataSet.getTableSize(); i++) {
                 final DataTable dataTable = dataSet.getTable(i);
                 final String tableName = dataTable.getTableName();
-
+                if (tableName.startsWith("#")) {// It's comment out!
+                    _log.info("*The sheet has comment-out mark so skip it: " + tableName);
+                    continue;
+                }
+                if (isSkipSheet(tableName)) {// [DBFLUTE-251]
+                    _log.info("*The sheet name matched skip-sheet specification so skip it: " + tableName);
+                    continue;
+                }
                 if (dataTable.getRowSize() == 0) {
                     _log.info("*Not found row at the table: " + tableName);
                     continue;
@@ -237,6 +247,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected boolean isSkipSheet(String sheetName) {
+        if (_skipSheetPattern == null) {
+            return false;
+        }
+        return _skipSheetPattern.matcher(sheetName).matches();
     }
 
     protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,
@@ -605,5 +622,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     public void setSchemaName(String schemaName) {
         _schemaName = schemaName;
+    }
+
+    public void setSkipSheet(String skipSheet) {
+        if (skipSheet == null || skipSheet.trim().length() == 0) {
+            return;
+        }
+        try {
+            _skipSheetPattern = Pattern.compile(skipSheet);
+        } catch (PatternSyntaxException e) {
+            String msg = "The pattern syntax for skip-sheet was wrong: " + skipSheet;
+            throw new IllegalStateException(msg, e);
+        }
     }
 }

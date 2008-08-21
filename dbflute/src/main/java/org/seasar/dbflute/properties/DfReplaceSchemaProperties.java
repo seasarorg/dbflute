@@ -103,6 +103,15 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return "UTF-8";
         }
     }
+    
+    public String getSkipSheet() {
+        final String skipSheet = (String) getReplaceSchemaDefinitionMap().get("skipSheet");
+        if (skipSheet != null && skipSheet.trim().length() != 0) {
+            return skipSheet;
+        } else {
+            return null;
+        }
+    }
 
     // ===================================================================================
     //                                                                       Assist Helper
