@@ -170,6 +170,10 @@ public abstract class DfAbstractTask extends Task {
         return DfDataSourceContext.getDataSource();
     }
 
+    protected Connection getConnection() throws SQLException {
+        return getDataSource().getConnection();
+    }
+    
     protected void connectSchema() {
         if (getBasicProperties().isDatabaseDB2() && _schema != null) {
             final Statement statement;
@@ -190,11 +194,6 @@ public abstract class DfAbstractTask extends Task {
         }
     }
 
-    protected Connection getConnection() throws SQLException {
-        // TODO: @jflute -- Should it use data source???
-        return DriverManager.getConnection(_url, _userId, _password);
-    }
-    
     public void setContextProperties(String file) {
         final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
         DfBuildProperties.getInstance().setProperties(prop);
