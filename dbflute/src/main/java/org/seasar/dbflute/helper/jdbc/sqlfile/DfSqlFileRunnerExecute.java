@@ -73,7 +73,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         } catch (SQLException e) {
             if (_runInfo.isErrorContinue()) {
                 _log.warn("Failed to execute: " + sql, e);
-                _log.warn("" + System.getProperty("line.separator"));
+                return;
             }
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
