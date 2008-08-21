@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.task.bs;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -188,6 +190,11 @@ public abstract class DfAbstractTask extends Task {
         }
     }
 
+    protected Connection getConnection() throws SQLException {
+        // TODO: @jflute -- Should it use data source???
+        return DriverManager.getConnection(_url, _userId, _password);
+    }
+    
     public void setContextProperties(String file) {
         final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
         DfBuildProperties.getInstance().setProperties(prop);

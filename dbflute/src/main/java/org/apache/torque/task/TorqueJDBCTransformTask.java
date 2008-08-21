@@ -58,7 +58,6 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.LinkedHashMap;
@@ -97,16 +96,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 
-    public static final int IDX_COLUMN_NAME = 0;
-
-    public static final int IDX_COLUMN_TYPE = 1;
-
-    public static final int IDX_COLUMN_SIZE = 2;
-
-    public static final int IDX_COLUMN_NULL_TYPE = 3;
-
-    public static final int IDX_COLUMN_DEFAULT_VALUE = 4;
-
+    // ===================================================================================
+    //                                                                 DataSource Override
+    //                                                                 ===================
     protected boolean isUseDataSource() {
         return false;
     }
@@ -182,7 +174,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Generates an XML database schema from JDBC meta data.
-     * <p>
      * @throws Exception a generic exception.
      */
     protected void generateXML() throws Exception {
@@ -190,7 +181,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         Class.forName(_driver);
 
         _log.info("...Getting DB-connection");
-        final Connection conn = DriverManager.getConnection(_url, _userId, _password);
+        final Connection conn = getConnection();
 
         _log.info("...Getting DB-meta-data");
         final DatabaseMetaData dbMetaData = conn.getMetaData();
