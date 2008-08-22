@@ -245,6 +245,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         continue;
                     } else if (line.trim().contains("#df:end#")) {
                         inGroup = false;
+                        sql = removeTerminater4ToolIfNeeds(sql);// [DBFLUTE-309]
                         addSqlToList(sqlList, sql);
                         sql = "";
                         continue;
@@ -342,6 +343,24 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         return true;
     }
 
+    protected String removeTerminater4ToolIfNeeds(String sql) {
+        String terminater = getTerminater4Tool();
+        if (terminater == null || terminater.trim().length() == 0) {
+            return sql;
+        }
+        sql = sql.trim();
+        if (sql.endsWith(terminater)) {
+            String rear = sql.length() > 10 ? ": ..." + sql.substring(sql.length() - 10) : ".";
+            _log.info("...Removing terminater '" + terminater + "' for tools" + rear);
+            sql = sql.substring(0, sql.length() - terminater.length());
+        }
+        return sql;
+    }
+    
+    protected String getTerminater4Tool() {// for override.
+        return null;
+    }
+
     public DelimiterChanger newDelimterChanger() {
         final String databaseName = DfBuildProperties.getInstance().getBasicProperties().getDatabaseName();
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
@@ -359,6 +378,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return str;
         }
         if ("UTF-8".equalsIgnoreCase(_runInfo.getEncoding()) && str.length() > 0 && str.charAt(0) == '\uFEFF') {
+            String front = str.length() > 5 ? ": " + str.substring(0, 5) + "..." : ".";
+            _log.info("...Removing UTF-8 bom" + front);
             str = str.substring(1);
         }
         return str;

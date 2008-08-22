@@ -12,9 +12,8 @@ import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
 
-public class DfLoadDataTask extends DfAbstractTask {
+public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     // ===================================================================================
     //                                                                          Definition
@@ -27,14 +26,6 @@ public class DfLoadDataTask extends DfAbstractTask {
     //                                                                           =========
     protected boolean validTaskEndInformation = true;
     
-    // ===================================================================================
-    //                                                                 DataSource Override
-    //                                                                 ===================
-    @Override
-    protected boolean isUseDataSource() {
-        return true;
-    }
-
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======

@@ -20,9 +20,8 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
 
-public class DfTakeFinallyTask extends DfAbstractTask {
+public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
     // ===================================================================================
     //                                                                          Definition
@@ -34,14 +33,6 @@ public class DfTakeFinallyTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     protected Timestamp beforeTimestamp;
-
-    // ===================================================================================
-    //                                                                 DataSource Override
-    //                                                                 ===================
-    @Override
-    protected boolean isUseDataSource() {
-        return true;
-    }
 
     // ===================================================================================
     //                                                                             Execute
@@ -126,6 +117,11 @@ public class DfTakeFinallyTask extends DfAbstractTask {
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
+            }
+            
+            @Override
+            protected String getTerminater4Tool() {
+                return resolveTerminater4Tool();
             }
 
             @Override

@@ -20,9 +20,8 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
 
-public class DfCreateSchemaTask extends DfAbstractTask {
+public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     // ===================================================================================
     //                                                                          Definition
@@ -34,14 +33,6 @@ public class DfCreateSchemaTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean validTaskEndInformation = true;
-
-    // ===================================================================================
-    //                                                                 DataSource Override
-    //                                                                 ===================
-    @Override
-    protected boolean isUseDataSource() {
-        return true;
-    }
 
     // ===================================================================================
     //                                                                             Execute
@@ -151,6 +142,10 @@ public class DfCreateSchemaTask extends DfAbstractTask {
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
+            }
+            @Override
+            protected String getTerminater4Tool() {
+                return resolveTerminater4Tool();
             }
         };
     }
