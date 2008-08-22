@@ -145,21 +145,33 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
                         // ColumnValue and ColumnObject
                         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
-                        final Map<String, String> columnValueMap = columnContainer.getColumnValueMap();
+                        final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
                         if (columnValueMap.isEmpty()) {
                             String msg = "The table was Not Found in the file:";
                             msg = msg + " tableName=" + tableName + " file=" + file;
                             throw new TableNotFoundException(msg);
                         }
                         if (_loggingInsertSql) {
-                            final List<String> valueList = new ArrayList<String>(columnValueMap.values());
+                            final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
 
                         int bindCount = 1;
                         final Set<String> columnNameSet = columnValueMap.keySet();
                         for (String columnName : columnNameSet) {
-                            String value = columnValueMap.get(columnName);
+                            final Object obj = columnValueMap.get(columnName);
+                            if (isNotNullNotString(obj)) {
+                                if (obj instanceof Timestamp) {
+                                    statement.setTimestamp(bindCount, (Timestamp) obj);
+                                    bindCount++;
+                                    continue;
+                                } else {
+                                    statement.setObject(bindCount, obj);
+                                    bindCount++;
+                                    continue;
+                                }
+                            }
+                            String value = (String) obj;
                             if (value == null) {
                                 final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
                                 if (columnMetaInfo != null) {
@@ -252,12 +264,16 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected boolean isCommentOutSheet(String sheetName) {
         return sheetName.startsWith("#");
     }
-    
+
     protected boolean isSkipSheet(String sheetName) {
         if (_skipSheetPattern == null) {
             return false;
         }
         return _skipSheetPattern.matcher(sheetName).matches();
+    }
+
+    protected boolean isNotNullNotString(Object obj) {
+        return obj != null && !(obj instanceof String);
     }
 
     protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,
@@ -569,14 +585,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected static class ColumnContainer {
-        protected Map<String, String> columnValueMap = new LinkedHashMap<String, String>();
+        protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
         protected Map<String, DataColumn> columnObjectMap = new LinkedHashMap<String, DataColumn>();
 
-        public Map<String, String> getColumnValueMap() {
+        public Map<String, Object> getColumnValueMap() {
             return columnValueMap;
         }
 
-        public void addColumnValue(String columnName, String columnValue) {
+        public void addColumnValue(String columnName, Object columnValue) {
             this.columnValueMap.put(columnName, columnValue);
         }
 

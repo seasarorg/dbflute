@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
@@ -33,27 +35,27 @@ public class DfXlsDataHandlerImplTest extends DfDBFluteTestCase {
     @Test
     public void test_DfXlsDataHandlerImpl_isSkipSheet() {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl dfXlsDataHandlerImpl = new DfXlsDataHandlerImpl();
-        dfXlsDataHandlerImpl.setSkipSheet("MST.+");
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+        impl.setSkipSheet("MST.+");
 
         // ## Act & Assert ##
-        assertTrue(dfXlsDataHandlerImpl.isSkipSheet("MST_STATUS"));
-        assertTrue(dfXlsDataHandlerImpl.isSkipSheet("MST_"));
-        assertFalse(dfXlsDataHandlerImpl.isSkipSheet("MST"));
-        assertFalse(dfXlsDataHandlerImpl.isSkipSheet("MS_STATUS"));
-        assertFalse(dfXlsDataHandlerImpl.isSkipSheet("AMST_STATUS"));
-        assertFalse(dfXlsDataHandlerImpl.isSkipSheet("9MST_STATUS"));
-        assertFalse(dfXlsDataHandlerImpl.isSkipSheet("#MST_STATUS"));
+        assertTrue(impl.isSkipSheet("MST_STATUS"));
+        assertTrue(impl.isSkipSheet("MST_"));
+        assertFalse(impl.isSkipSheet("MST"));
+        assertFalse(impl.isSkipSheet("MS_STATUS"));
+        assertFalse(impl.isSkipSheet("AMST_STATUS"));
+        assertFalse(impl.isSkipSheet("9MST_STATUS"));
+        assertFalse(impl.isSkipSheet("#MST_STATUS"));
     }
 
     @Test
     public void test_DfXlsDataHandlerImpl_setSkipSheet_SyntaxError() {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl dfXlsDataHandlerImpl = new DfXlsDataHandlerImpl();
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
 
         // ## Act & Assert ##
         try {
-            dfXlsDataHandlerImpl.setSkipSheet("MST.*+`*`+*P*`+*}+");
+            impl.setSkipSheet("MST.*+`*`+*P*`+*}+");
             fail();
         } catch (IllegalStateException e) {
             // OK
@@ -62,5 +64,17 @@ public class DfXlsDataHandlerImplTest extends DfDBFluteTestCase {
             log(e.getCause().getMessage());
             assertTrue(e.getCause() instanceof PatternSyntaxException);
         }
+    }
+
+    @Test
+    public void test_DfXlsDataHandlerImpl_isNotNullNotString() {
+        // ## Arrange ##
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+
+        // ## Act & Assert ##
+        assertFalse(impl.isNotNullNotString(null));
+        assertFalse(impl.isNotNullNotString("abc"));
+        assertTrue(impl.isNotNullNotString(new Date()));
+        assertTrue(impl.isNotNullNotString(new Timestamp(System.currentTimeMillis())));
     }
 }
