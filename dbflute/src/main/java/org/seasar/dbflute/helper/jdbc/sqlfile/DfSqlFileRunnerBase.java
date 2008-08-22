@@ -350,7 +350,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         sql = sql.trim();
         if (sql.endsWith(terminater)) {
-            String rear = sql.length() > 20 ? ": ..." + sql.substring(sql.length() - 20) : ".";
+            String rear = sql.length() > 30 ? ": ..." + sql.substring(sql.length() - 30) : ".";
             _log.info("...Removing terminater '" + terminater + "' for tools" + rear);
             sql = sql.substring(0, sql.length() - terminater.length());
         }
