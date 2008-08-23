@@ -346,8 +346,8 @@ public class DfOldClassHandler {
         info("// - - - - - - - - - -/");
         deleteOldCustomizeClass_for_BaseCustomizeEntity();
         deleteOldCustomizeClass_for_DBMeta();
-        deleteOldCustomizeClass_for_Cursor();
-        deleteOldCustomizeClass_for_CursorHandler();
+        deleteOldCustomizeClass_for_BaseCursor();
+        deleteOldCustomizeClass_for_BaseCursorHandler();
         deleteOldCustomizeClass_for_BaseParameterBean();
         deleteOldCustomizeClass_for_ExtendedCustomizeEntity();
         deleteOldCustomizeClass_for_ExtendedParameterBean();
@@ -386,7 +386,9 @@ public class DfOldClassHandler {
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
-    public void deleteOldCustomizeClass_for_Cursor() {
+    protected List<String> _deletedOldCustomizeBaseCursorList;
+
+    public void deleteOldCustomizeClass_for_BaseCursor() {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
         final String packagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
@@ -398,10 +400,13 @@ public class DfOldClassHandler {
         }
         final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, classSuffix,
                 notDeleteClassNameSet);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
+        _deletedOldCustomizeBaseCursorList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldCustomizeBaseCursorList);
     }
 
-    public void deleteOldCustomizeClass_for_CursorHandler() {
+    protected List<String> _deletedOldCustomizeBaseCursorHandlerList;
+
+    public void deleteOldCustomizeClass_for_BaseCursorHandler() {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
         final String packagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
@@ -413,7 +418,8 @@ public class DfOldClassHandler {
         }
         final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, classSuffix,
                 notDeleteClassNameSet);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
+        _deletedOldCustomizeBaseCursorHandlerList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(_deletedOldCustomizeBaseCursorHandlerList);
     }
 
     protected List<String> _deletedOldCustomizeBaseParameterBeanList;
@@ -446,6 +452,46 @@ public class DfOldClassHandler {
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldCustomizeBaseEntityList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldCustomizeClass_for_ExtendedCursor() {
+        if (_deletedOldCustomizeBaseCursorList == null || _deletedOldCustomizeBaseCursorList.isEmpty()) {
+            return;
+        }
+        final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
+        final String outputPath = _generator.getOutputPath();
+        final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
+        for (String baseClassName : _deletedOldCustomizeBaseCursorList) {
+            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
+            }
+        }
+    }
+
+    public void deleteOldCustomizeClass_for_ExtendedCursorHandler() {
+        if (_deletedOldCustomizeBaseCursorHandlerList == null || _deletedOldCustomizeBaseCursorHandlerList.isEmpty()) {
+            return;
+        }
+        final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
+        final String outputPath = _generator.getOutputPath();
+        final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
+        for (String baseClassName : _deletedOldCustomizeBaseCursorHandlerList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
             final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
