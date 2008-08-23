@@ -21,7 +21,7 @@ import org.seasar.dbflute.velocity.DfGenerator;
  * @author jflute
  * @since 0.7.8 (2008/08/23 Saturday)
  */
-public class DfOldTableClassHandler {
+public class DfOldClassHandler {
 
     // ===================================================================================
     //                                                                          Definition
@@ -41,7 +41,7 @@ public class DfOldTableClassHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOldTableClassHandler(DfGenerator generator, DfBasicProperties basicProperties,
+    public DfOldClassHandler(DfGenerator generator, DfBasicProperties basicProperties,
             DfGeneratedClassPackageProperties packageProperties,
             DfLittleAdjustmentProperties littleAdjustmentProperties, List<Table> tableList) {
         _generator = generator;

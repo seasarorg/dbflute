@@ -72,7 +72,7 @@ import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.deletefile.DfOldTableClassHandler;
+import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
@@ -544,7 +544,7 @@ public class Database {
         if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
             return;
         }
-        final DfOldTableClassHandler handler = new DfOldTableClassHandler(getGeneratorInstance(), getBasicProperties(),
+        final DfOldClassHandler handler = new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(),
                 getProperties().getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(),
                 getTableList());
         handler.deleteOldTableClass();
