@@ -350,6 +350,8 @@ public class DfOldClassHandler {
         deleteOldCustomizeClass_for_BaseCursorHandler();
         deleteOldCustomizeClass_for_BaseParameterBean();
         deleteOldCustomizeClass_for_ExtendedCustomizeEntity();
+        deleteOldCustomizeClass_for_ExtendedCursor();
+        deleteOldCustomizeClass_for_ExtendedCursorHandler();
         deleteOldCustomizeClass_for_ExtendedParameterBean();
         info("");
     }
