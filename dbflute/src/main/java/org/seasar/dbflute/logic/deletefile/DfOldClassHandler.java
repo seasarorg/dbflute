@@ -52,8 +52,8 @@ public class DfOldClassHandler {
     }
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                     Old Table Class
+    //                                                                     ===============
     public void deleteOldTableClass() {
         info("// /- - - - - - - - - - - - -");
         info("// Delete old table classes!");
