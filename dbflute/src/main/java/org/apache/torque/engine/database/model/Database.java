@@ -544,10 +544,22 @@ public class Database {
         if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
             return;
         }
-        final DfOldClassHandler handler = new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(),
-                getProperties().getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(),
-                getTableList());
+        final DfOldClassHandler handler = createOldClassHandler();
         handler.deleteOldTableClass();
+    }
+
+    public void deleteOldCustomizeClass() {
+        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            return;
+        }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.setPmbMetaDataMap(_pmbMetaDataMap);
+        handler.deleteOldCustomizeClass();
+    }
+
+    protected DfOldClassHandler createOldClassHandler() {
+        return new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(), getProperties()
+                .getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(), getTableList());
     }
 
     // ===================================================================================

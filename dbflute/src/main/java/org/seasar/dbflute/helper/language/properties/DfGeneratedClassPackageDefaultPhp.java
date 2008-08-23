@@ -14,10 +14,22 @@ public class DfGeneratedClassPackageDefaultPhp implements DfGeneratedClassPackag
         return "bsdao";
     }
 
+    public String getCursorSimplePackageName() {
+        return "cursor";
+    }
+
+    public String getParameterBeanSimplePackageName() {
+        return "pmbean";
+    }
+
     public String getBaseEntityPackage() {
         return "bsentity";
     }
-    
+
+    public String getCustomizeEntitySimplePackageName() {
+        return "customize";
+    }
+
     public String getDBMetaSimplePackageName() {
         return "dbmeta";
     }

@@ -7,7 +7,13 @@ public interface DfGeneratedClassPackageDefault {
 
     public String getBaseDaoPackage();
 
+    public String getCursorSimplePackageName();
+    
+    public String getParameterBeanSimplePackageName();
+    
     public String getBaseEntityPackage();
+    
+    public String getCustomizeEntitySimplePackageName();
     
     public String getDBMetaSimplePackageName();
 

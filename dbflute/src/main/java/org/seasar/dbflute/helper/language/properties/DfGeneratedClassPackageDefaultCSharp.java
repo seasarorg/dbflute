@@ -12,11 +12,23 @@ public class DfGeneratedClassPackageDefaultCSharp implements DfGeneratedClassPac
     public String getBaseDaoPackage() {
         return "BsDao";
     }
+    
+    public String getCursorSimplePackageName() {
+        return "Cursor";
+    }
+
+    public String getParameterBeanSimplePackageName() {
+        return "PmBean";
+    }
 
     public String getBaseEntityPackage() {
         return "BsEntity";
     }
-    
+
+    public String getCustomizeEntitySimplePackageName() {
+        return "Customize";
+    }
+
     public String getDBMetaSimplePackageName() {
         return "Dbm";
     }

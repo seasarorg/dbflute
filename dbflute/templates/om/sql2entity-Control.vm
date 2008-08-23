@@ -142,6 +142,11 @@ targetdatabase = $targetDatabase
     #set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
     $database.makeDirectory($path)
 
+    ##
+    ## Delete old customize classes.
+    ##
+    $database.deleteOldCustomizeClass();
+	
     $database.debug("public void parseCustomizeEntity() {")
     $database.debug("    final List<String> tableNameList = getTableList();")
     $database.debug("    for (String tableName : tableNameList) {")
