@@ -835,8 +835,9 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 #if ($database.isDatabaseDB2())
     // [DBFlute-0.7.9]
     // ===================================================================================
-    //                                                                 Database Dependency
-    //                                                                 ===================
+    //                                                                     Isolation Level
+    //                                                                     ===============
+    // *Database Dependency
     public void lockWithRR() {
         if (helpIsSqlClauseDb2()) {
             helpGettingSqlClauseDb2().lockWithRR();
