@@ -54,7 +54,6 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -86,7 +85,6 @@ import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefini
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.torque.DfAdditionalPrimaryKeyInitializer;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 

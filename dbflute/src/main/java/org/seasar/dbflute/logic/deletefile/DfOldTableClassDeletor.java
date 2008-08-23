@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.filedelete;
+package org.seasar.dbflute.logic.deletefile;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -42,6 +42,9 @@ public class DfOldTableClassDeletor {
     protected String _classExtension;
     protected Set<String> notDeleteClassNameSet;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfOldTableClassDeletor(DfGenerator generator, DfPackagePathHandler packagePathHandler) {
         _generator = generator;
         _packagePathHandler = packagePathHandler;

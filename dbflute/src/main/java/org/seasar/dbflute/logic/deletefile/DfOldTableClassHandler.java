@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.io.filedelete.DfOldTableClassDeletor;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
