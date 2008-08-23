@@ -465,7 +465,7 @@ public class DfOldClassHandler {
         final String packagePath = getExtendedDaoPackage() + "." + parameterBeanPackageName;
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
-        for (String baseClassName : _deletedOldCustomizeBaseEntityList) {
+        for (String baseClassName : _deletedOldCustomizeBaseParameterBeanList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
             final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
