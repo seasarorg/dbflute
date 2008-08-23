@@ -76,6 +76,7 @@ public class DfOldClassHandler {
         deleteOldTableClass_for_ExtendedBehavior();
         deleteOldTableClass_for_ExtendedDao();
         deleteOldTableClass_for_ExtendedEntity();
+        info("");
     }
 
     protected List<String> _deletedOldTableBaseBehaviorList;
@@ -350,6 +351,7 @@ public class DfOldClassHandler {
         deleteOldCustomizeClass_for_BaseParameterBean();
         deleteOldCustomizeClass_for_ExtendedCustomizeEntity();
         deleteOldCustomizeClass_for_ExtendedParameterBean();
+        info("");
     }
 
     protected List<String> _deletedOldCustomizeBaseEntityList;
