@@ -2029,7 +2029,6 @@ targetdatabase = $targetDatabase
     ##
     ## Loop by tables.
     ##
-    $database.info(" ")
     $database.info("/* * * * * * * * * * * * * * {Table Class}")
     #foreach ($table in $database.tables)
       #if (!$table.isForReferenceOnly())
