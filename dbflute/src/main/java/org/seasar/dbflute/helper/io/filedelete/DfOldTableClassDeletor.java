@@ -22,24 +22,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
  * @author jflute
  * @since 0.7.0 (2008/05/07 Wednesday)
  */
-public class OldTableClassDeletor {
+public class DfOldTableClassDeletor {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected DfGenerator _generator;
+    protected DfPackagePathHandler _packagePathHandler;
     protected String _packagePath;
     protected String _classPrefix;
     protected String _classSuffix;
     protected String _classExtension;
     protected Set<String> notDeleteClassNameSet;
 
+    public DfOldTableClassDeletor(DfGenerator generator, DfPackagePathHandler packagePathHandler) {
+        _generator = generator;
+        _packagePathHandler = packagePathHandler;
+    }
+    
     // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
@@ -65,8 +72,8 @@ public class OldTableClassDeletor {
      * @return The list of package files. (NotNull)
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
-        final String dirPath = getGeneratorHandler().getOutputPath() + "/"
-                + DfStringUtil.replace(packagePath, ".", "/");
+        final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
+        final String dirPath = getGeneratorInstance().getOutputPath() + "/" + packageAsPath;
         final File dir = new File(dirPath);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -88,11 +95,11 @@ public class OldTableClassDeletor {
         };
         return Arrays.asList(dir.listFiles(filter));
     }
-    
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    public DfGenerator getGeneratorHandler() {
+    public DfGenerator getGeneratorInstance() {
         return DfGenerator.getInstance();
     }
 
