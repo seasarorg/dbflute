@@ -1475,6 +1475,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
     }
 
+    public boolean isAvailableDatabaseDependency() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
+    }
+    
     public boolean isCompatibleVersionNoAutoIncrementOnMemory() {// This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleVersionNoAutoIncrementOnMemory();
     }

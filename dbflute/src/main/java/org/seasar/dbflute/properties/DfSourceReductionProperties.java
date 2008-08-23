@@ -57,7 +57,6 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     public boolean isMakeFlatExpansion() {
         return booleanProp("torque.isMakeFlatExpansion", false);
     }
-    
 
     // ===================================================================================
     //                                                                              DBMeta

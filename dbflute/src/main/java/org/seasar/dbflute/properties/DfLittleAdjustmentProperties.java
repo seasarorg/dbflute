@@ -47,6 +47,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+    public boolean isAvailableDatabaseDependency() {
+        return booleanProp("torque.isAvailableDatabaseDependency", false);
+    }
+    
+    // ===================================================================================
     //                                              ToLower in Generator Underscore Method
     //                                              ======================================
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {

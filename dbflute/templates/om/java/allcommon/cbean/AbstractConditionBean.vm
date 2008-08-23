@@ -831,6 +831,45 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isFormatSql() {
         return getSqlClause().isFormatClauseEffective();
     }
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseDB2())
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+    public void lockWithRR() {
+        if (helpIsSqlClauseDb2()) {
+            helpGettingSqlClauseDb2().lockWithRR();
+        }
+    }
+
+    public void lockWithRS() {
+        if (helpIsSqlClauseDb2()) {
+            helpGettingSqlClauseDb2().lockWithRS();
+        }
+    }
+
+    public void lockWithCS() {
+        if (helpIsSqlClauseDb2()) {
+            helpGettingSqlClauseDb2().lockWithCS();
+        }
+    }
+
+    public void lockWithUR() {
+        if (helpIsSqlClauseDb2()) {
+            helpGettingSqlClauseDb2().lockWithUR();
+        }
+    }
+
+    protected boolean helpIsSqlClauseDb2() {
+        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2;
+    }
+
+    protected ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2 helpGettingSqlClauseDb2() {
+        return (${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2)getSqlClause();
+    }
+#end
+#end
 
     // ===================================================================================
     //                                                                       Assist Helper
