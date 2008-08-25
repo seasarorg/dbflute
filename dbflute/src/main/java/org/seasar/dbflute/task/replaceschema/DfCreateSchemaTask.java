@@ -7,8 +7,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.taskdefs.SQLExec.OnError;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
@@ -67,53 +70,106 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Initialize Schema *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        final DfSchemaInitializer initializer;
-        if (basicProperties.isDatabaseMySQL()) {
-            initializer = createSchemaInitializerMySQL();
-        } else if (basicProperties.isDatabaseSqlServer()) {
-            initializer = createSchemaInitializerSqlServer();
-        } else if (basicProperties.isDatabaseDB2()) {
-            initializer = createSchemaInitializerDB2();
-        } else {
-            initializer = createSchemaInitializerJdbc();
-        }
+        final DfSchemaInitializer initializer = createSchemaInitializer(false);
         if (initializer != null) {
             initializer.initializeSchema();
         }
-        if (_log.isInfoEnabled()) {
-            _log.info("");
+        _log.info("");
+        initializeSchemaOnceMore();
+    }
+
+    protected void initializeSchemaOnceMore() {
+        final String schema = getMyProperties().getAdditionalDropDefinitionSchema();
+        if (schema == null || schema.trim().length() == 0) {
+            return;
         }
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * *");
+        _log.info("*                             *");
+        _log.info("* Initialize Schema Once More *");
+        _log.info("*                             *");
+        _log.info("* * * * * * * * * * * * * * * *");
+        final DfSchemaInitializer initializer = createSchemaInitializer(true);
+        if (initializer != null) {
+            initializer.initializeSchema();
+        }
+        _log.info("");
     }
 
-    protected DfSchemaInitializer createSchemaInitializerMySQL() {// TODO: @jflute -- Shift to JDBC?
-        final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
-        initializer.setDataSource(getDataSource());
-        return initializer;
+    protected DfSchemaInitializer createSchemaInitializer(boolean onceMore) {
+        final DfSchemaInitializerFactory factory = createSchemaInitializerFactory(onceMore);
+        return factory.createSchemaInitializer();
     }
 
-    protected DfSchemaInitializer createSchemaInitializerSqlServer() {// TODO: @jflute -- Shift to JDBC?
-        final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
-        initializer.setDataSource(getDataSource());
-        return initializer;
+    protected DfSchemaInitializerFactory createSchemaInitializerFactory(boolean onceMore) {
+        return new DfSchemaInitializerFactory(getDataSource(), getBasicProperties(), getMyProperties(), onceMore);
     }
 
-    protected DfSchemaInitializer createSchemaInitializerDB2() {
-        final DfSchemaInitializerDB2 initializer = new DfSchemaInitializerDB2();
-        setupSchemaInitializerJdbcProperties(initializer);
-        return initializer;
-    }
+    protected static class DfSchemaInitializerFactory {
+        protected DataSource _dataSource;
+        protected DfBasicProperties _basicProperties;
+        protected DfReplaceSchemaProperties _replaceSchemaProperties;
+        protected boolean _onceMore;
 
-    protected DfSchemaInitializer createSchemaInitializerJdbc() {
-        final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
-        setupSchemaInitializerJdbcProperties(initializer);
-        return initializer;
-    }
+        public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
+                DfReplaceSchemaProperties replaceSchemaProperties, boolean onceMore) {
+            _dataSource = dataSource;
+            _basicProperties = basicProperties;
+            _replaceSchemaProperties = replaceSchemaProperties;
+            _onceMore = onceMore;
+        }
 
-    protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
-        initializer.setDataSource(getDataSource());
-        initializer.setSchema(getBasicProperties().getDatabaseSchema());
-        initializer.setDropTargetDatabaseTypeList(getMyProperties().getDropTargetDatabaseTypeList());
+        protected DfSchemaInitializer createSchemaInitializer() {
+            final DfSchemaInitializer initializer;
+            if (_basicProperties.isDatabaseMySQL()) {
+                initializer = createSchemaInitializerMySQL();
+            } else if (_basicProperties.isDatabaseSqlServer()) {
+                initializer = createSchemaInitializerSqlServer();
+            } else if (_basicProperties.isDatabaseDB2()) {
+                initializer = createSchemaInitializerDB2();
+            } else {
+                initializer = createSchemaInitializerJdbc();
+            }
+            return initializer;
+        }
+
+        protected DfSchemaInitializer createSchemaInitializerMySQL() {// TODO: @jflute -- Shift to JDBC?
+            final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
+            initializer.setDataSource(_dataSource);
+            return initializer;
+        }
+
+        protected DfSchemaInitializer createSchemaInitializerSqlServer() {// TODO: @jflute -- Shift to JDBC?
+            final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
+            initializer.setDataSource(_dataSource);
+            return initializer;
+        }
+
+        protected DfSchemaInitializer createSchemaInitializerDB2() {
+            final DfSchemaInitializerDB2 initializer = new DfSchemaInitializerDB2();
+            setupSchemaInitializerJdbcProperties(initializer);
+            return initializer;
+        }
+
+        protected DfSchemaInitializer createSchemaInitializerJdbc() {
+            final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
+            setupSchemaInitializerJdbcProperties(initializer);
+            return initializer;
+        }
+
+        protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
+            initializer.setDataSource(_dataSource);
+            if (_onceMore) {
+                final String schema = _replaceSchemaProperties.getAdditionalDropDefinitionSchema();
+                final List<String> databaseTypeList = _replaceSchemaProperties
+                        .getAdditionalDropDefinitionTargetDatabaseTypeList();
+                initializer.setSchema(schema);
+                initializer.setDropTargetDatabaseTypeList(databaseTypeList);
+            } else {
+                // Normal
+                initializer.setSchema(_basicProperties.getDatabaseSchema());
+            }
+        }
     }
 
     // --------------------------------------------

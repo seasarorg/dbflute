@@ -1,6 +1,7 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -60,7 +61,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return propString;
     }
-    
+
     // ===================================================================================
     //                                                                      Callback Class
     //                                                                      ==============
@@ -105,7 +106,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return "UTF-8";
         }
     }
-    
+
     public String getSkipSheet() {
         final String skipSheet = (String) getReplaceSchemaDefinitionMap().get("skipSheet");
         if (skipSheet != null && skipSheet.trim().length() != 0) {
@@ -114,15 +115,43 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return null;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public List<String> getDropTargetDatabaseTypeList() {
-        final List<String> dropTargetDatabaseTypeList = (List<String>) getReplaceSchemaDefinitionMap().get("dropTargetDatabaseTypeList");
-        if (dropTargetDatabaseTypeList != null) {
-            return dropTargetDatabaseTypeList;
+    protected Map<String, Object> getAdditionalDropDefinitionMap() {
+        final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
+                "additionalDropDefinitionMap");
+        if (map != null) {
+            return map;
         } else {
+            return new HashMap<String, Object>();
+        }
+    }
+
+    public String getAdditionalDropDefinitionSchema() {
+        final Map<String, Object> map = getAdditionalDropDefinitionMap();
+        final Object obj = map.get("schema");
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            String msg = "The schema should be String: schema=" + obj + " type=" + obj.getClass();
+            throw new IllegalStateException(msg);
+        }
+        return (String) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getAdditionalDropDefinitionTargetDatabaseTypeList() {
+        final Map<String, Object> map = getAdditionalDropDefinitionMap();
+        final Object obj = map.get("targetDatabaseTypeList");
+        if (obj == null) {
             return new ArrayList<String>();
         }
+        if (!(obj instanceof List)) {
+            String msg = "The schema should be List<String>: targetDatabaseTypeList=" + obj + " type=" + obj.getClass();
+            throw new IllegalStateException(msg);
+        }
+        return (List<String>) obj;
     }
 
     // ===================================================================================
