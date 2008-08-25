@@ -404,8 +404,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
         final DfFlexibleNameMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
         final DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
-        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap);
-        xlsReader.setSkipSheetPattern(_skipSheetPattern);// since 0.7.9 for [DBFLUTE-251]
+        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap, _skipSheetPattern);
         if (tableNameMap != null && !tableNameMap.isEmpty()) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
             _log.info("tableNameMap = " + tableNameMap);

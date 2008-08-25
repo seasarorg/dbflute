@@ -77,14 +77,15 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     //                                                                         Constructor
     //                                                                         ===========
     public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap,
-            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
-        this(FileInputStreamUtil.create(file), tableNameMap, notTrimTableColumnMap);
+            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+        this(FileInputStreamUtil.create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
     }
 
     public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap,
-            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
+            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
         this._tableNameMap = tableNameMap;
         this._notTrimTableColumnMap = notTrimTableColumnMap;
+        this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
     }
 
@@ -370,16 +371,5 @@ public class DfXlsReader implements DataReader, DataSetConstants {
             return false;
         }
         return _skipSheetPattern.matcher(sheetName).matches();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public Pattern getSkipSheetPattern() {
-        return _skipSheetPattern;
-    }
-
-    public void setSkipSheetPattern(Pattern skipSheetPattern) {
-        this._skipSheetPattern = skipSheetPattern;
     }
 }

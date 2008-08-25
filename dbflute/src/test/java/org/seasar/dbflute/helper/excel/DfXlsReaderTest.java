@@ -20,7 +20,7 @@ public class DfXlsReaderTest {
     @Test
     public void test_DfXlsDataHandlerImpl_isCommentOutSheet() {
         // ## Arrange ##
-        final DfXlsReader reader = createXlsReader();
+        final DfXlsReader reader = createXlsReader(null);
 
         // ## Act & Assert ##
         assertTrue(reader.isCommentOutSheet("#MST_STATUS"));
@@ -30,8 +30,7 @@ public class DfXlsReaderTest {
     @Test
     public void test_DfXlsDataHandlerImpl_isSkipSheet() {
         // ## Arrange ##
-        final DfXlsReader reader = createXlsReader();
-        reader.setSkipSheetPattern(Pattern.compile("MST.+"));
+        final DfXlsReader reader = createXlsReader(Pattern.compile("MST.+"));
 
         // ## Act & Assert ##
         assertTrue(reader.isSkipSheet("MST_STATUS"));
@@ -43,16 +42,16 @@ public class DfXlsReaderTest {
         assertFalse(reader.isSkipSheet("#MST_STATUS"));
     }
 
-    protected DfXlsReader createXlsReader() {
+    protected DfXlsReader createXlsReader(Pattern skipSheetPattern) {
         return new DfXlsReaderEmpty(new DfFlexibleNameMap<String, String>(),
-                new DfFlexibleNameMap<String, List<String>>());
+                new DfFlexibleNameMap<String, List<String>>(), skipSheetPattern);
     }
 
     protected static class DfXlsReaderEmpty extends DfXlsReader {
 
         public DfXlsReaderEmpty(DfFlexibleNameMap<String, String> tableNameMap,
-                DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
-            super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap);
+                DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+            super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
         }
 
         @Override
