@@ -128,12 +128,18 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         final DataTable table = _dataSet.addTable(tableName);
         // --------------------/
 
-        int rowCount = sheet.getLastRowNum();
+        final int rowCount = sheet.getLastRowNum();
+        final HSSFRow nameRow = sheet.getRow(0);
+        if (nameRow == null) {
+            String msg = "The first row of the sheet should be column definition but it is null:";
+            msg = msg + " sheet=" + tableName;
+            throw new IllegalStateException(msg);
+        }
         if (rowCount > 0) {
-            setupColumns(table, sheet.getRow(0), sheet.getRow(1));
+            setupColumns(table, nameRow, sheet.getRow(1));
             setupRows(table, sheet);
         } else if (rowCount == 0) {
-            setupColumns(table, sheet.getRow(0), null);
+            setupColumns(table, nameRow, null);
         }
         return table;
     }
