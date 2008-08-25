@@ -578,7 +578,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             }
             final Object value = dataRow.getValue(k);
             final String columnName = dataColumn.getColumnName();
-            container.addColumnValue(columnName, value != null ? value.toString() : null);
+            container.addColumnValue(columnName, value != null ? value : null);
             container.addColumnObject(columnName, dataColumn);
         }
         return container;
