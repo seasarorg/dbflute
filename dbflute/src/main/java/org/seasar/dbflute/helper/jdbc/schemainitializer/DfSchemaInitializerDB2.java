@@ -32,7 +32,8 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     @Override
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
         if (metaInfo.isTableTypeAlias()) {
-            sb.append("drop alias ").append(metaInfo.getTableName());
+            final String tableName = filterTableName(metaInfo.getTableName());
+            sb.append("drop alias ").append(tableName);
         } else {
             super.setupDropTable(sb, metaInfo);
         }
