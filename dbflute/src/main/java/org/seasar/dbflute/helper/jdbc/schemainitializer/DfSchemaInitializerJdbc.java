@@ -50,6 +50,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected String _schema;
 
+    protected boolean _tableNameWithSchema;
+
     protected List<String> _dropTargetDatabaseTypeList;
 
     // ===================================================================================
@@ -97,7 +99,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
             public String buildTruncateTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
-                sb.append("truncate table ").append(metaInfo.getTableName());
+                sb.append("truncate table ").append(filterTableName(metaInfo.getTableName()));
                 return sb.toString();
             }
         };
@@ -138,7 +140,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
             public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
-                final String localTableName = metaInfo.getLocalTableName();
+                final String localTableName = filterTableName(metaInfo.getLocalTableName());
                 final StringBuilder sb = new StringBuilder();
                 sb.append("alter table ").append(localTableName).append(" drop constraint ").append(foreignKeyName);
                 return sb.toString();
@@ -210,11 +212,19 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
+        final String tableName = filterTableName(metaInfo.getTableName());
         if (metaInfo.isTableTypeView()) {
-            sb.append("drop view ").append(metaInfo.getTableName());
+            sb.append("drop view ").append(tableName);
         } else {
-            sb.append("drop table ").append(metaInfo.getTableName());
+            sb.append("drop table ").append(tableName);
         }
+    }
+
+    protected String filterTableName(String tableName) {
+        if (_tableNameWithSchema) {
+            tableName = _schema + "." + tableName;
+        }
+        return tableName;
     }
 
     protected static interface DfDropTableByJdbcCallback {
@@ -280,5 +290,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setDropTargetDatabaseTypeList(List<String> dropTargetDatabaseTypeList) {
         this._dropTargetDatabaseTypeList = dropTargetDatabaseTypeList;
+    }
+
+    public boolean isTableNameWithSchema() {
+        return _tableNameWithSchema;
+    }
+
+    public void setTableNameWithSchema(boolean tableNameWithSchema) {
+        this._tableNameWithSchema = tableNameWithSchema;
     }
 }

@@ -175,6 +175,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             }
             final List<String> targetDatabaseTypeList = getOnceMoreTargetDatabaseTypeList();
             initializer.setSchema(schema);
+            initializer.setTableNameWithSchema(true);
             initializer.setDropTargetDatabaseTypeList(targetDatabaseTypeList);
         }
 
