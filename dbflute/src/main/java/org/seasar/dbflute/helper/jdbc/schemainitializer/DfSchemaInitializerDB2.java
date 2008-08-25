@@ -25,6 +25,11 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
 
     @Override
+    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
+        return tableMetaInfo.isTableTypeAlias();
+    }
+    
+    @Override
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
         if (metaInfo.isTableTypeAlias()) {
             sb.append("drop alias ").append(metaInfo.getTableName());

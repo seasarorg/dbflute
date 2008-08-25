@@ -146,6 +146,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         try {
             statement = connection.createStatement();
             for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
+                if (isSkipDropForeignKey(tableMetaInfo)) {
+                    continue;
+                }
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler();
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
                 final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(
@@ -171,6 +174,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
+    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {// for sub class.
+        return false;
+    }
+
     // ===================================================================================
     //                                                                          Drop Table
     //                                                                          ==========
@@ -190,7 +197,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         };
         callbackDropTableByJdbc(connection, tableMetaInfoList, callback);
     }
-    
+
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
         if (metaInfo.isTableTypeView()) {
             sb.append("drop view ").append(metaInfo.getTableName());
