@@ -83,7 +83,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         if (schema == null || schema.trim().length() == 0) {
             return;
         }
-        _log.info("");
         _log.info("* * * * * * * * * * * * * * * *");
         _log.info("*                             *");
         _log.info("* Initialize Schema Once More *");
