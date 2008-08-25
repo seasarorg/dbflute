@@ -283,14 +283,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            try {
-                final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-                final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-                if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
-                    return false;
-                }
-            } catch (UnsupportedOperationException e) {
-                _log.info("*The column type of '" + columnName + "' is unsupported: " + e.getMessage());
+            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
+            final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+            if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
+                return false;
             }
         }
         if (!isTimestampValue(value)) {
@@ -308,14 +304,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            try {
-                final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-                final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-                if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
-                    return false;
-                }
-            } catch (UnsupportedOperationException e) {
-                _log.info("*The column type of '" + columnName + "' is unsupported: " + e.getMessage());
+            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
+            final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+            if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
+                return false;
             }
         }
         if (!isBigDecimalValue(value)) {
