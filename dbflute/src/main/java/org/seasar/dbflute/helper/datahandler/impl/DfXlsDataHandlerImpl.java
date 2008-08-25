@@ -282,17 +282,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo == null) {
-            return false;
-        }
-        final int jdbcType = columnMetaInfo.getJdbcType();
-        final String torqueType = TypeMap.getTorqueType(jdbcType);
-        final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-        if (columnType == null) {
-            return false;
-        }
-        if (!java.util.Date.class.isAssignableFrom(columnType)) {
-            return false;
+        if (columnMetaInfo != null) {
+            try {
+                final int jdbcType = columnMetaInfo.getJdbcType();
+                final String torqueType = TypeMap.getTorqueType(jdbcType);
+                final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+                if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
+                    return false;
+                }
+            } catch (UnsupportedOperationException e) {
+                _log.info("*The column type of '" + columnName + "' is unsupported: " + e.getMessage());
+            }
         }
         if (!isTimestampValue(value)) {
             return false;
@@ -308,17 +308,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo == null) {
-            return false;
-        }
-        final int jdbcType = columnMetaInfo.getJdbcType();
-        final String torqueType = TypeMap.getTorqueType(jdbcType);
-        final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-        if (columnType == null) {
-            return false;
-        }
-        if (!Number.class.isAssignableFrom(columnType)) {
-            return false;
+        if (columnMetaInfo != null) {
+            try {
+                final int jdbcType = columnMetaInfo.getJdbcType();
+                final String torqueType = TypeMap.getTorqueType(jdbcType);
+                final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+                if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
+                    return false;
+                }
+            } catch (UnsupportedOperationException e) {
+                _log.info("*The column type of '" + columnName + "' is unsupported: " + e.getMessage());
+            }
         }
         if (!isBigDecimalValue(value)) {
             return false;
