@@ -86,13 +86,13 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected DfSchemaInitializer createSchemaInitializerMySQL() {
+    protected DfSchemaInitializer createSchemaInitializerMySQL() {// TODO: @jflute -- Shift to JDBC?
         final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
         initializer.setDataSource(getDataSource());
         return initializer;
     }
 
-    protected DfSchemaInitializer createSchemaInitializerSqlServer() {
+    protected DfSchemaInitializer createSchemaInitializerSqlServer() {// TODO: @jflute -- Shift to JDBC?
         final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
         initializer.setDataSource(getDataSource());
         return initializer;
@@ -100,16 +100,20 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     protected DfSchemaInitializer createSchemaInitializerDB2() {
         final DfSchemaInitializerDB2 initializer = new DfSchemaInitializerDB2();
-        initializer.setDataSource(getDataSource());
-        initializer.setSchema(getBasicProperties().getDatabaseSchema());
+        setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
 
     protected DfSchemaInitializer createSchemaInitializerJdbc() {
         final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
+        setupSchemaInitializerJdbcProperties(initializer);
+        return initializer;
+    }
+
+    protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
         initializer.setDataSource(getDataSource());
         initializer.setSchema(getBasicProperties().getDatabaseSchema());
-        return initializer;
+        initializer.setDropTargetDatabaseTypeList(getMyProperties().getDropTargetDatabaseTypeList());
     }
 
     // --------------------------------------------

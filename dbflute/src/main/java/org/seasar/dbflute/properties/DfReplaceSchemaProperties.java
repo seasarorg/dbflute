@@ -1,5 +1,7 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -110,6 +112,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return skipSheet;
         } else {
             return null;
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getDropTargetDatabaseTypeList() {
+        final List<String> dropTargetDatabaseTypeList = (List<String>) getReplaceSchemaDefinitionMap().get("dropTargetDatabaseTypeList");
+        if (dropTargetDatabaseTypeList != null) {
+            return dropTargetDatabaseTypeList;
+        } else {
+            return new ArrayList<String>();
         }
     }
 

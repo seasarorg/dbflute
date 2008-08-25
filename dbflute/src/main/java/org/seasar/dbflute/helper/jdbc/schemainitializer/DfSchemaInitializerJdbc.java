@@ -50,6 +50,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected String _schema;
 
+    protected List<String> _dropTargetDatabaseTypeList;
+
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
@@ -60,7 +62,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final List<DfTableMetaInfo> tableMetaInfoList;
             try {
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
-                final DfTableHandler tableNameHandler = new DfTableHandler();
+                final DfTableHandler tableNameHandler = new DfTableHandler() {
+                    @Override
+                    protected String[] getDatabaseTypeStringArray() {
+                        if (_dropTargetDatabaseTypeList != null && !_dropTargetDatabaseTypeList.isEmpty()) {
+                            return _dropTargetDatabaseTypeList.toArray(new String[] {});
+                        } else {
+                            return super.getDatabaseTypeStringArray();
+                        }
+                    }
+                };
                 tableMetaInfoList = tableNameHandler.getTableList(dbMetaData, _schema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -261,5 +272,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setSchema(String schema) {
         _schema = schema;
+    }
+
+    public List<String> getDropTargetDatabaseTypeList() {
+        return _dropTargetDatabaseTypeList;
+    }
+
+    public void setDropTargetDatabaseTypeList(List<String> dropTargetDatabaseTypeList) {
+        this._dropTargetDatabaseTypeList = dropTargetDatabaseTypeList;
     }
 }
