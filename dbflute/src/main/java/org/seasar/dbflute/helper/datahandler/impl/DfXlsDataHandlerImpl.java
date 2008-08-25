@@ -74,6 +74,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected boolean _loggingInsertSql;
     protected String _schemaName;
     protected Pattern _skipSheetPattern;
+    protected DfColumnHandler _columnHandler = new DfColumnHandler();// as helper.
 
     // ===================================================================================
     //                                                                                Read
@@ -248,9 +249,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected DfFlexibleNameMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
         final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
         try {
-            final DfColumnHandler columnHandler = new DfColumnHandler();
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            final List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
+            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumns(metaData, _schemaName,
                     tableName, true);
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
@@ -284,8 +284,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             try {
-                final int jdbcType = columnMetaInfo.getJdbcType();
-                final String torqueType = TypeMap.getTorqueType(jdbcType);
+                final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
                 final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
                 if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
@@ -310,8 +309,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             try {
-                final int jdbcType = columnMetaInfo.getJdbcType();
-                final String torqueType = TypeMap.getTorqueType(jdbcType);
+                final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
                 final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
                 if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
                     return false;
