@@ -109,14 +109,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             for (int i = 0; i < dataSet.getTableSize(); i++) {
                 final DataTable dataTable = dataSet.getTable(i);
                 final String tableName = dataTable.getTableName();
-                if (isCommentOutSheet(tableName)) {// since 0.7.8 
-                    _log.info("*The sheet has comment-out mark so skip it: " + tableName);
-                    continue;
-                }
-                if (isSkipSheet(tableName)) {// since 0.7.8 for [DBFLUTE-251]
-                    _log.info("*The sheet name matched skip-sheet specification so skip it: " + tableName);
-                    continue;
-                }
                 if (dataTable.getRowSize() == 0) {
                     _log.info("*Not found row at the table: " + tableName);
                     continue;
@@ -259,17 +251,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    protected boolean isCommentOutSheet(String sheetName) {
-        return sheetName.startsWith("#");
-    }
-
-    protected boolean isSkipSheet(String sheetName) {
-        if (_skipSheetPattern == null) {
-            return false;
-        }
-        return _skipSheetPattern.matcher(sheetName).matches();
     }
 
     protected boolean isNotNullNotString(Object obj) {
@@ -424,6 +405,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final DfFlexibleNameMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
         final DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
         final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap);
+        xlsReader.setSkipSheetPattern(_skipSheetPattern);// since 0.7.9 for [DBFLUTE-251]
         if (tableNameMap != null && !tableNameMap.isEmpty()) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
             _log.info("tableNameMap = " + tableNameMap);

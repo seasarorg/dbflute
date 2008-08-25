@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +71,8 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     protected DfFlexibleNameMap<String, List<String>> _notTrimTableColumnMap;
 
+    protected Pattern _skipSheetPattern;// Not Required
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -82,6 +85,10 @@ public class DfXlsReader implements DataReader, DataSetConstants {
             DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
         this._tableNameMap = tableNameMap;
         this._notTrimTableColumnMap = notTrimTableColumnMap;
+        setupWorkbook(in);
+    }
+
+    protected void setupWorkbook(InputStream in) {
         try {
             _workbook = new HSSFWorkbook(in);
         } catch (IOException ex) {
@@ -90,7 +97,16 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         _dataFormat = _workbook.createDataFormat();
         _dataSet = new DataSetImpl();
         for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
-            createTable(_workbook.getSheetName(i), _workbook.getSheetAt(i));
+            final String sheetName = _workbook.getSheetName(i);
+            if (isCommentOutSheet(sheetName)) {// since 0.7.9
+                _log.info("*The sheet has comment-out mark so skip it: " + sheetName);
+                continue;
+            }
+            if (isSkipSheet(sheetName)) {// since 0.7.9 for [DBFLUTE-251]
+                _log.info("*The sheet name matched skip-sheet specification so skip it: " + sheetName);
+                continue;
+            }
+            createTable(sheetName, _workbook.getSheetAt(i));
         }
     }
 
@@ -226,6 +242,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
     }
+
     // --------------------/
 
     // ===================================================================================
@@ -296,6 +313,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         }
         return false;
     }
+
     // --------------------/
 
     protected ColumnType getColumnType(HSSFCell cell) {
@@ -341,5 +359,27 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     protected boolean isInt(final double numericCellValue) {
         return ((int) numericCellValue) == numericCellValue;
+    }
+
+    protected boolean isCommentOutSheet(String sheetName) {
+        return sheetName.startsWith("#");
+    }
+
+    protected boolean isSkipSheet(String sheetName) {
+        if (_skipSheetPattern == null) {
+            return false;
+        }
+        return _skipSheetPattern.matcher(sheetName).matches();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Pattern getSkipSheetPattern() {
+        return _skipSheetPattern;
+    }
+
+    public void setSkipSheetPattern(Pattern skipSheetPattern) {
+        this._skipSheetPattern = skipSheetPattern;
     }
 }
