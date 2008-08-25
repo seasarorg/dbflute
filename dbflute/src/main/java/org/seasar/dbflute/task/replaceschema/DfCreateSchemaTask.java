@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.taskdefs.SQLExec.OnError;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
@@ -79,9 +78,16 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void initializeSchemaOnceMore() {
-        final String schema = getMyProperties().getAdditionalDropDefinitionSchema();
+        final String schema = getMyProperties().getOnceMoreDropDefinitionSchema();
         if (schema == null || schema.trim().length() == 0) {
             return;
+        }
+        // /= = = = = = = = = = = = = = = = = 
+        // Unsupported at MySQL and SQLServer
+        // = = = = = = = = = =/
+        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
+            String msg = "OnceMoreDropDefinitionSchema is unsupported at MySQL and SQLServer!";
+            throw new UnsupportedOperationException(msg);
         }
         _log.info("* * * * * * * * * * * * * * * *");
         _log.info("*                             *");
@@ -132,13 +138,13 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             return initializer;
         }
 
-        protected DfSchemaInitializer createSchemaInitializerMySQL() {// TODO: @jflute -- Shift to JDBC?
+        protected DfSchemaInitializer createSchemaInitializerMySQL() {
             final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
             initializer.setDataSource(_dataSource);
             return initializer;
         }
 
-        protected DfSchemaInitializer createSchemaInitializerSqlServer() {// TODO: @jflute -- Shift to JDBC?
+        protected DfSchemaInitializer createSchemaInitializerSqlServer() {
             final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
             initializer.setDataSource(_dataSource);
             return initializer;
@@ -158,16 +164,22 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
         protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
             initializer.setDataSource(_dataSource);
-            if (_onceMore) {
-                final String schema = _replaceSchemaProperties.getAdditionalDropDefinitionSchema();
-                final List<String> databaseTypeList = _replaceSchemaProperties
-                        .getAdditionalDropDefinitionTargetDatabaseTypeList();
-                initializer.setSchema(schema);
-                initializer.setDropTargetDatabaseTypeList(databaseTypeList);
-            } else {
+            if (!_onceMore) {
                 // Normal
                 initializer.setSchema(_basicProperties.getDatabaseSchema());
             }
+            final String schema = getOnceMoreSchema();
+            final List<String> targetDatabaseTypeList = getOnceMoreTargetDatabaseTypeList();
+            initializer.setSchema(schema);
+            initializer.setDropTargetDatabaseTypeList(targetDatabaseTypeList);
+        }
+
+        protected String getOnceMoreSchema() {
+            return _replaceSchemaProperties.getOnceMoreDropDefinitionSchema();
+        }
+
+        protected List<String> getOnceMoreTargetDatabaseTypeList() {
+            return _replaceSchemaProperties.getOnceMoreDropDefinitionTargetDatabaseTypeList();
         }
     }
 

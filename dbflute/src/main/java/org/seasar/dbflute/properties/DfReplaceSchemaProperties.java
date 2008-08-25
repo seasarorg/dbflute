@@ -117,9 +117,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getAdditionalDropDefinitionMap() {
+    protected Map<String, Object> getOnceMoreDropDefinitionMap() {
         final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
-                "additionalDropDefinitionMap");
+                "onceMoreDropDefinitionMap");
         if (map != null) {
             return map;
         } else {
@@ -127,8 +127,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
     }
 
-    public String getAdditionalDropDefinitionSchema() {
-        final Map<String, Object> map = getAdditionalDropDefinitionMap();
+    public String getOnceMoreDropDefinitionSchema() {
+        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
         final Object obj = map.get("schema");
         if (obj == null) {
             return null;
@@ -141,8 +141,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getAdditionalDropDefinitionTargetDatabaseTypeList() {
-        final Map<String, Object> map = getAdditionalDropDefinitionMap();
+    public List<String> getOnceMoreDropDefinitionTargetDatabaseTypeList() {
+        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
         final Object obj = map.get("targetDatabaseTypeList");
         if (obj == null) {
             return new ArrayList<String>();
