@@ -164,11 +164,15 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
         protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
             initializer.setDataSource(_dataSource);
-            if (!_onceMore) {
-                // Normal
+            if (!_onceMore) {// Normal
                 initializer.setSchema(_basicProperties.getDatabaseSchema());
+                return;
             }
             final String schema = getOnceMoreSchema();
+            if (schema == null || schema.trim().length() == 0) {
+                String msg = "Once More Schema should not be null or empty: schema=" + schema;
+                throw new IllegalStateException(msg);
+            }
             final List<String> targetDatabaseTypeList = getOnceMoreTargetDatabaseTypeList();
             initializer.setSchema(schema);
             initializer.setDropTargetDatabaseTypeList(targetDatabaseTypeList);
