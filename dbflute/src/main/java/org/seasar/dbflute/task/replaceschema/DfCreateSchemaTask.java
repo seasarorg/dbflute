@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerDB2;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
@@ -72,6 +73,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             initializer = createSchemaInitializerMySQL();
         } else if (basicProperties.isDatabaseSqlServer()) {
             initializer = createSchemaInitializerSqlServer();
+        } else if (basicProperties.isDatabaseDB2()) {
+            initializer = createSchemaInitializerDB2();
         } else {
             initializer = createSchemaInitializerJdbc();
         }
@@ -92,6 +95,13 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
         final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
         initializer.setDataSource(getDataSource());
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerDB2() {
+        final DfSchemaInitializerDB2 initializer = new DfSchemaInitializerDB2();
+        initializer.setDataSource(getDataSource());
+        initializer.setSchema(getBasicProperties().getDatabaseSchema());
         return initializer;
     }
 
@@ -143,6 +153,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
             }
+
             @Override
             protected String getTerminater4Tool() {
                 return resolveTerminater4Tool();

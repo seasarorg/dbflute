@@ -178,11 +178,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfDropTableByJdbcCallback callback = new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
-                if (metaInfo.isTableTypeView()) {
-                    sb.append("drop view ").append(metaInfo.getTableName());
-                } else {
-                    sb.append("drop table ").append(metaInfo.getTableName());
-                }
+                setupDropTable(sb, metaInfo);
                 return sb.toString();
             }
 
@@ -193,6 +189,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             }
         };
         callbackDropTableByJdbc(connection, tableMetaInfoList, callback);
+    }
+    
+    protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
+        if (metaInfo.isTableTypeView()) {
+            sb.append("drop view ").append(metaInfo.getTableName());
+        } else {
+            sb.append("drop table ").append(metaInfo.getTableName());
+        }
     }
 
     protected static interface DfDropTableByJdbcCallback {

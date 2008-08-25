@@ -40,6 +40,10 @@ public class DfTableMetaInfo {
     public boolean isTableTypeView() {
         return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
     }
+    
+    public boolean isTableTypeAlias() {
+        return _tableType != null ? _tableType.equalsIgnoreCase("ALIAS") : false;
+    }
 
     // ===================================================================================
     //                                                                        Name Builder
