@@ -220,13 +220,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected String filterTableName(String tableName) {
-        if (_tableNameWithSchema) {
-            tableName = _schema + "." + tableName;
-        }
-        return tableName;
-    }
-
     protected static interface DfDropTableByJdbcCallback {
         public String buildDropTableSql(DfTableMetaInfo metaInfo);
 
@@ -271,6 +264,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String filterTableName(String tableName) {
+        if (_tableNameWithSchema) {
+            tableName = _schema + "." + tableName;
+        }
+        return tableName;
     }
 
     // ===================================================================================
