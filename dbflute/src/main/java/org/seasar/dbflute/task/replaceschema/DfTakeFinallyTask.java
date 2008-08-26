@@ -74,10 +74,6 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         return getMyProperties().getSqlFileEncoding();
     }
 
-    protected String getEnvironmentType() {
-        return getMyProperties().getEnvironmentType();
-    }
-
     public boolean isLoggingInsertSql() {
         return getMyProperties().isLoggingInsertSql();
     }

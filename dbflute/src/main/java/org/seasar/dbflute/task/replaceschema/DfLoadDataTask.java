@@ -51,8 +51,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         return validTaskEndInformation;
     }
     
-    protected String getEnvironmentType() {
-        return getMyProperties().getEnvironmentType();
+    protected String getDataLoadingType() {
+        return getMyProperties().getDataLoadingType();
     }
 
     public boolean isLoggingInsertSql() {
@@ -71,8 +71,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromSeparatedFileAsAdditionalData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getEnvironmentType(), typeName),
-                getEnvironmentType());
+        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getDataLoadingType(), typeName),
+                getDataLoadingType());
     }
 
     protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath, String location) {
@@ -127,7 +127,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromXlsAsAdditionalData() {
-        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"), getEnvironmentType());
+        writeDbFromXls(getAdditionalDataDirectoryPath(getDataLoadingType(), "xls"), getDataLoadingType());
     }
 
     protected void writeDbFromXls(String directoryPath, String typeName) {
