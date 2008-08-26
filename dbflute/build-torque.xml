@@ -131,6 +131,7 @@
     <torque-jdbc-transform
       contextProperties="${torque.contextProperties}"
       outputFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
+      environmentType="${dfenv}"
     >
     </torque-jdbc-transform>
   </target>
@@ -176,7 +177,8 @@
       outputFile="report.${torque.project}.om.generation"
       targetDatabase="${torque.database}"
       targetPackage="${torque.targetPackage}"
-      useClasspath="${torque.useClasspath}">
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
       <fileset dir="${torque.schema.dir}"
         includes="${torque.schema.om.includes}"
         excludes="${torque.schema.om.excludes}"
@@ -192,7 +194,8 @@
       outputFile="report.${torque.project}.om.generation"
       targetDatabase="${torque.database}"
       targetPackage="${torque.targetPackage}"
-      templatePath="${torque.templatePath}">
+      templatePath="${torque.templatePath}"
+      environmentType="${dfenv}">
       <fileset dir="${torque.schema.dir}"
         includes="${torque.schema.om.includes}"
         excludes="${torque.schema.om.excludes}"
@@ -226,7 +229,8 @@
       outputFormat="${torque.doc.format}"
       sqldbmap="${torque.sql.dir}/sqldb.map"
       templatePath="${torque.templatePath}"
-      useClasspath="${torque.useClasspath}">
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
       <fileset dir="${torque.schema.dir}"
         includes="${torque.schema.doc.includes}"
         excludes="${torque.schema.doc.excludes}"
@@ -271,11 +275,20 @@
       <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
     </tstamp>
 
-    <torque-create-schema contextProperties="${torque.contextProperties}" validTaskEndInformation="false">
+    <torque-create-schema
+        contextProperties="${torque.contextProperties}"
+  	    validTaskEndInformation="false"
+        environmentType="${dfenv}">
     </torque-create-schema>
-    <torque-load-data contextProperties="${torque.contextProperties}" validTaskEndInformation="false">
+    <torque-load-data
+        contextProperties="${torque.contextProperties}"
+        validTaskEndInformation="false"
+        environmentType="${dfenv}">
     </torque-load-data>
-    <torque-take-finally contextProperties="${torque.contextProperties}" beforeTimestamp="${now.date}">
+    <torque-take-finally
+        contextProperties="${torque.contextProperties}"
+        beforeTimestamp="${now.date}"
+        environmentType="${dfenv}">
     </torque-take-finally>
   </target>
 
@@ -287,7 +300,7 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
   	
-    <torque-outside-sql-test contextProperties="${torque.contextProperties}">
+    <torque-outside-sql-test contextProperties="${torque.contextProperties}" environmentType="${dfenv}">
     </torque-outside-sql-test>
   </target>
 
@@ -306,6 +319,7 @@
       outputFile="report.${torque.project}.sql2entity.generation"
       targetDatabase="${torque.database}"
       templatePath="${torque.templatePath}"
+      environmentType="${dfenv}"
     >
     </torque-sql2entity>
   </target>

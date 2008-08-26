@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -36,6 +37,9 @@ import org.seasar.dbflute.torque.DfAntTaskUtil;
  */
 public abstract class DfAbstractTask extends Task {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfAbstractTask.class);
 
     // ===================================================================================
@@ -47,11 +51,11 @@ public abstract class DfAbstractTask extends Task {
     /** DB URL. */
     protected String _url;
 
-    /** User name. */
-    protected String _userId;
-
     /** Schema name. */
     protected String _schema;
+
+    /** User name. */
+    protected String _userId;
 
     /** Password */
     protected String _password;
@@ -83,9 +87,17 @@ public abstract class DfAbstractTask extends Task {
         } finally {
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
-                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+                _log.info("");
+                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
                 _log.info("[Task End: " + getPerformanceView(after - before) + "]");
-                _log.info("_/_/_/_/_/");
+                _log.info("");
+                _log.info("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+                _log.info("    driver = " + _driver);
+                _log.info("    url    = " + _url);
+                _log.info("    schema = " + _schema);
+                _log.info("    user   = " + _userId);
+                _log.info("    props  = " + _connectionProperties);
+                _log.info("_/_/_/_/_/_/_/_/_/_/");
             }
             _log.info("");
         }
@@ -203,5 +215,12 @@ public abstract class DfAbstractTask extends Task {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setEnvironmentType(String environmentType) {
+        DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
     }
 }

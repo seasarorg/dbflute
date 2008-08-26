@@ -42,6 +42,7 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -73,11 +74,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     /** DB URL. */
     protected String _url;
 
-    /** User name. */
-    protected String _userId;
-
     /** Schema name. */
     protected String _schema;
+    
+    /** User name. */
+    protected String _userId;
 
     /** Password */
     protected String _password;
@@ -115,9 +116,17 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             throw e;
         } finally {
             long after = System.currentTimeMillis();
-            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            _log.info("");
+            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
             _log.info("[Task End: " + getPerformanceView(after - before) + "]");
-            _log.info("_/_/_/_/_/");
+            _log.info("");
+            _log.info("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+            _log.info("    driver = " + _driver);
+            _log.info("    url    = " + _url);
+            _log.info("    schema = " + _schema);
+            _log.info("    user   = " + _userId);
+            _log.info("    props  = " + _connectionProperties);
+            _log.info("_/_/_/_/_/_/_/_/_/_/");
             _log.info("");
         }
     }
@@ -520,5 +529,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     public void setTargetDatabase(String v) {
         _targetDatabase = v;
+    }
+    
+    public void setEnvironmentType(String environmentType) {
+        DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
     }
 }

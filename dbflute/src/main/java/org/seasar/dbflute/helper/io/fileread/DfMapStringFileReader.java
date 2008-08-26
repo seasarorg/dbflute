@@ -39,6 +39,11 @@ public class DfMapStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
+    /**
+     * @param path The file path. (NotNull)
+     * @param encoding The file encoding. (NotNull)
+     * @return The read map. (NotNull)
+     */
     public Map<String, Object> readMap(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();

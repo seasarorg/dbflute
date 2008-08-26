@@ -8,9 +8,9 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.io.fileread.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
-import org.seasar.dbflute.helper.io.fileread.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -88,10 +88,6 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringProp(String key) {
         try {
-            final String outsidePropString = getOutsidePropString(key);
-            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
-                return outsidePropString;
-            }
             return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
@@ -108,10 +104,6 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringProp(String key, String defaultValue) {
         try {
-            final String outsidePropString = getOutsidePropString(key);
-            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
-                return outsidePropString;
-            }
             return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
@@ -130,10 +122,6 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringPropNoEmpty(String key, String defaultValue) {
         try {
-            final String outsidePropString = getOutsidePropString(key);
-            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
-                return outsidePropString;
-            }
             final String value = DfPropertyUtil.stringProp(_buildProperties, key);
             if (value != null && value.trim().length() != 0) {
                 return value;
@@ -315,22 +303,34 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    protected String getOutsidePropString(String key) {
-        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        final DfStringFileReader reader = new DfStringFileReader();
-        return reader.readString("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
-    }
-
     protected Map<String, Object> getOutsidePropMap(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final String encoding = "UTF-8";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        return reader.readMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+        if (!DfEnvironmentType.getInstance().isDefault()) {
+            final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+            final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
+            final Map<String, Object> map = reader.readMap(path, encoding);
+            if (!map.isEmpty()) {
+                return map;
+            }
+        }
+        return reader.readMap("./dfprop/" + filteredKey + ".dfprop", encoding);
     }
 
     protected List<Object> getOutsidePropList(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final String encoding = "UTF-8";
         final DfListStringFileReader reader = new DfListStringFileReader();
-        return reader.readList("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+        if (!DfEnvironmentType.getInstance().isDefault()) {
+            final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+            final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
+            List<Object> list = reader.readList(path, encoding);
+            if (!list.isEmpty()) {
+                return list;
+            }
+        }
+        return reader.readList("./dfprop/" + filteredKey + ".dfprop", encoding);
     }
 
     // ===============================================================================
@@ -358,7 +358,7 @@ public abstract class DfAbstractHelperProperties {
     public String removeNewLine(String str) {
         return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
-    
+
     protected boolean processBooleanString(String value) {
         return value != null && value.trim().equalsIgnoreCase("true");
     }

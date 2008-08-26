@@ -61,7 +61,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return propString;
     }
-
+    
     // ===================================================================================
     //                                                                      Callback Class
     //                                                                      ==============
