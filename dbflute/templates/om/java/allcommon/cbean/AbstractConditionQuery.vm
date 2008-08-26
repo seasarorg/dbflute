@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glConditionQueryAbstractName}")
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
@@ -1123,10 +1124,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         try {
             return cq.getClass().getMethod(methodName, argTypes);
         } catch (NoSuchMethodException e) {
-            String msg = "The property is not existing in the table:";
+            String msg = "The method is not existing:";
+            msg = msg + " methodName=" + methodName;
+            msg = msg + " argTypes=" + Arrays.asList(argTypes);
             msg = msg + " tableName=" + cq.getTableDbName();
             msg = msg + " property=" + property;
-            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
