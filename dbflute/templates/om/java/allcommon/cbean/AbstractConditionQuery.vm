@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
@@ -496,8 +498,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
-        java.lang.reflect.Method method = null;
+        final String methodName = "set" + columnCapPropName + "_LikeSearch";
+        Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
         } catch (NoSuchMethodException e) {
@@ -509,7 +511,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             method.invoke(this, new Object[]{value, option});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
     }
@@ -1021,119 +1023,121 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                              ======
     /**
      * ${database.ImplementComment}
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
      */
     public ${glConditionValueName} invokeValue(String columnFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        String methodName = "get" + columnCapPropName;
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            final Object result = method.invoke(this, new Object[]{});
-            return (${glConditionValueName})result;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        final String methodName = "get" + columnCapPropName;
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, columnFlexibleName);
+        return (${glConditionValueName})helpInvokingCQMethod(this, method, new Object[]{});
     }
 
     /**
-     * Invoke setting query.
-     * 
-     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * ${database.ImplementComment}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
      * @param conditionKeyName The name of the conditionKey. (NotNull)
      * @param value The value of the condition. (NotNull)
      */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", conditionKeyName);
         if (value == null) {
             return;
         }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{value.getClass()});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            method.invoke(this, new Object[]{value});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
+        final String propertyName = container.getPropertyName();
+        final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{value.getClass()}, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[]{value});
     }
 
     /**
      * ${database.ImplementComment}
-     * 
-     * @param columnFlexibleName The flexible name of a column. (NotNull and NotEmpty)
+     * @param columnFlexibleName The flexible name of a column allowed to contain relations. (NotNull and NotEmpty)
      * @param isAsc Is it ascend?
      */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
-        String ascDesc = null;
-        if (isAsc) {
-            ascDesc = "Asc";
-        } else {
-            ascDesc = "Desc";
-        }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
+        final String propertyName = container.getPropertyName();
+        final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        final String ascDesc = isAsc ? "Asc" : "Desc";
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{}, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[]{});
     }
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty)
      * @return The conditionQuery of foreign as interface. (NotNull)
      */
     public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
-        final String methodName = "query" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final String methodName = "query" + initCap(foreignPropertyName);
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
+        return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
+    }
+
+    private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
+        final String[] strings = name.split("\\.");
+        final int length = strings.length;
+        String propertyName = null;
+        ${glConditionQueryInterfaceName} cq = this;
+        int index = 0;
+        for (String element : strings) {
+            if (length == (index+1)) {// at last loop!
+                propertyName = element;
+                break;
+            }
+            cq = cq.invokeForeignCQ(element);
+            ++index;
         }
+        return new PropertyNameCQContainer(propertyName, cq);
+    }
+
+    private static class PropertyNameCQContainer {
+        protected String _propertyName;
+        protected ${glConditionQueryInterfaceName} _cq;
+        public PropertyNameCQContainer(String propertyName, ${glConditionQueryInterfaceName} cq) {
+            this._propertyName = propertyName;
+            this._cq = cq;
+        }
+        public String getPropertyName() {
+            return _propertyName;
+        }
+        public ${glConditionQueryInterfaceName} getConditionQuery() {
+            return _cq;
+        }
+    }
+
+    private Method helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Class<?>[] argTypes, String property) {
         try {
-            return (${glConditionQueryInterfaceName})method.invoke(this, new Object[]{});
+            return cq.getClass().getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException e) {
+            String msg = "The property is not existing in the table:";
+            msg = msg + " tableName=" + cq.getTableDbName();
+            msg = msg + " property=" + property;
+            msg = msg + " methodName=" + methodName;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, Method method, Object[] args) {
+        try {
+            return method.invoke(cq, args);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            throw new IllegalStateException(e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(e.getCause());
         }
     }
 
