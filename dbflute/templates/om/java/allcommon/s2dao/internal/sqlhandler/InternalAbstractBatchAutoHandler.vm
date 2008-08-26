@@ -110,11 +110,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     // ===================================================================================
     //                                                                      JDBC Delegator
     //                                                                      ==============
-    protected int[] executeBatch(PreparedStatement ps, Object resource) {
+    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
         try {
             return ps.executeBatch();
         } catch (SQLException e) {
-            handleSQLException(e, ps, true, resource);
+            handleSQLException(e, ps, true, list);
             return null;// Unreachable!
         }
     }

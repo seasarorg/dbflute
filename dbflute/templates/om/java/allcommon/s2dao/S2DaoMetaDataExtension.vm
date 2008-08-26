@@ -10,6 +10,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,6 +68,8 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
@@ -82,6 +85,9 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCo
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractBatchAutoHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateBatchAutoHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalDeleteBatchAutoHandler};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -413,34 +419,22 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
         return new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
             @Override
-            public Object execute(Object[] args) {
-                final Object result = super.execute(args);
-                handleBatchUpdateResultWithOptimisticLock(args, result, method);
-                return result;
+            protected ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler() {
+                return new ${glInternalUpdateBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes()) {
+                    @Override
+                    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
+                        final int[] result = super.executeBatch(ps, list);
+                        try {
+                            handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
+                        } catch (SQLException e) {
+                            handleSQLException(e, ps, false, list);
+                            return null;// Unreachable!
+                        }
+                        return result;
+                    }
+                };
             }
         };
-    }
-
-    protected void handleBatchUpdateResultWithOptimisticLock(Object[] args, Object result, Method method) {
-        if (args.length == 0) {
-            return;// for Safety!
-        }
-        if (result instanceof int[]) {
-            final int[] updatedCountArray = (int[])result;
-            int index = 0;
-            for (int updatedCount : updatedCountArray) {
-                if (updatedCount == 0) {
-                    if (args.length <= index) {
-                        return;// for Safety!
-                    }
-                    if (isNonstrictMethod(method)) {
-                        throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}("The entity=" + args[index]);
-                    } else {
-                        throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(args[index], updatedCount);
-                    }
-                }
-            }
-        }
     }
 
     // -----------------------------------------------------
@@ -477,10 +471,20 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
         return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
             @Override
-            public Object execute(Object[] args) {
-                final Object result = super.execute(args);
-                handleBatchUpdateResultWithOptimisticLock(args, result, method);
-                return result;
+            protected ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler() {
+                return new ${glInternalDeleteBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes()) {
+                    @Override
+                    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
+                        final int[] result = super.executeBatch(ps, list);
+                        try {
+                            handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
+                        } catch (SQLException e) {
+                            handleSQLException(e, ps, false, list);
+                            return null;// Unreachable!
+                        }
+                        return result;
+                    }
+                };
             }
         };
     }
@@ -528,7 +532,59 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final Class<?>[] pmbTypes = method.getParameterTypes();
         return pmbTypes.length > 0 && ${glConditionBeanInterfaceName}.class.isAssignableFrom(pmbTypes[0]);
     }
-    
+
+    protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result, Method method) throws SQLException {
+        if (${glConditionBeanContextName}.isOracle()) {
+            final int updateCount = ps.getUpdateCount();
+            handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount, method);
+        } else {
+            handleBatchUpdateResultWithOptimisticLockByResult(list, result, method);
+        }
+    }
+
+    protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount, Method method) {
+        if (list.isEmpty()) {
+            return;// for Safety!
+        }
+        if (updateCount < 0) {
+            return;// for Safety!
+        }
+        final int entityCount = list.size();
+        if (updateCount < entityCount) {
+            String msg = "updateCount=" + updateCount + " entityCount=" + entityCount;
+            if (isNonstrictMethod(method)) {
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            } else {
+                throw new ${glEntityAlreadyUpdatedException}(list.get(0), updateCount);
+            }
+        }
+    }
+
+    protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, Object result, Method method) {
+        if (list.isEmpty()) {
+            return;// for Safety!
+        }
+        if (!(result instanceof int[])) {
+            return;// for Safety!
+        }
+        final int[] updatedCountArray = (int[])result;
+        final int entityCount = list.size();
+        int index = 0;
+        for (int updatedCount : updatedCountArray) {
+            if (updatedCount == 0) {
+                if (entityCount <= index) {
+                    return;// for Safety!
+                }
+                if (isNonstrictMethod(method)) {
+                    String msg = "The entity=" + list.get(index);
+                    throw new ${glEntityAlreadyDeletedException}(msg);
+                } else {
+                    throw new ${glEntityAlreadyUpdatedException}(list.get(index), updatedCount);
+                }
+            }
+        }
+    }
+
     // ===================================================================================
     //                                                                 OutsideSql Override
     //                                                                 ===================
