@@ -50,13 +50,13 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
             }
 			return new int[0];
 		}
-        Connection connection = getConnection();
+        final Connection connection = getConnection();
         try {
-            PreparedStatement ps = prepareStatement(connection);
+            final PreparedStatement ps = prepareStatement(connection);
             try {
                 for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
-                    Object bean = (Object) iter.next();
-                    execute(ps, bean);
+                    final Object bean = (Object) iter.next();
+                    prepareBatchElement(ps, bean);
                 }
                 return executeBatch(ps, list);
             } finally {
@@ -100,7 +100,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         return execute(list);
     }
 
-    protected void execute(PreparedStatement ps, Object bean) {
+    protected void prepareBatchElement(PreparedStatement ps, Object bean) {
         setupBindVariables(bean);
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
         bindArgs(ps, getBindVariables(), getBindVariableValueTypes());
