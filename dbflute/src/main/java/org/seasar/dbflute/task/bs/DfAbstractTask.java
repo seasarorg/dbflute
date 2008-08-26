@@ -91,6 +91,11 @@ public abstract class DfAbstractTask extends Task {
                 _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
                 _log.info("[Task End: " + getPerformanceView(after - before) + "]");
                 _log.info("");
+                _log.info("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
+                _log.info("    database  = " + getBasicProperties().getDatabaseName());
+                _log.info("    language  = " + getBasicProperties().getTargetLanguage());
+                _log.info("    container = " + getBasicProperties().getTargetContainerName());
+                _log.info("");
                 _log.info("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
                 _log.info("    driver = " + _driver);
                 _log.info("    url    = " + _url);
