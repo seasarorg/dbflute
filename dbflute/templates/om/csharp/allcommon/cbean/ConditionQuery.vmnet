@@ -28,6 +28,14 @@ public interface ${glConditionQueryInterfaceName} {
 	int getSubQueryLevel();
 	String getForeignPropertyName();
     String getRelationPath();
+	
+    // ===================================================================================
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
+    ${glConditionValueName} invokeValue(String columnFlexibleName);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+    void invokeOrderBy(String columnFlexibleName, bool isAsc);
+    ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName);
 }
 
 }

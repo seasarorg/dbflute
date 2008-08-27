@@ -93,8 +93,8 @@ public interface ${glConditionQueryInterfaceName} {
     public String getRelationPath();
 
     // ===================================================================================
-    //                                                                              Invoke
-    //                                                                              ======
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
     /**
      * Invoke getting value.
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)

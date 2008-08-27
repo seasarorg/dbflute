@@ -599,6 +599,109 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
     // ===================================================================================
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
+    public ${glConditionValueName} invokeValue(String columnFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(getTableDbName());
+        String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
+        String methodName = columnCapPropName;
+        MethodInfo method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, columnFlexibleName);
+        return (${glConditionValueName})helpInvokingCQMethod(this, method, new Object[]{});
+    }
+
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", conditionKeyName);
+        if (value == null) {
+            return;
+        }
+        PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
+        String propertyName = container.getPropertyName();
+        ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
+        Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{value.getClass()}, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[]{value});
+    }
+
+    public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
+        String propertyName = container.getPropertyName();
+        ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        String ascDesc = isAsc ? "Asc" : "Desc";
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
+        Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{}, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[]{});
+    }
+
+    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String methodName = "query" + initCap(foreignPropertyName);
+        Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
+        return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
+    }
+
+    private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
+        String[] strings = name.split("\\.");
+        int length = strings.length;
+        String propertyName = null;
+        ${glConditionQueryInterfaceName} cq = this;
+        int index = 0;
+        for (String element : strings) {
+            if (length == (index+1)) {// at last loop!
+                propertyName = element;
+                break;
+            }
+            cq = cq.invokeForeignCQ(element);
+            ++index;
+        }
+        return new PropertyNameCQContainer(propertyName, cq);
+    }
+
+    private static class PropertyNameCQContainer {
+        protected String _propertyName;
+        protected ${glConditionQueryInterfaceName} _cq;
+        public PropertyNameCQContainer(String propertyName, ${glConditionQueryInterfaceName} cq) {
+            this._propertyName = propertyName;
+            this._cq = cq;
+        }
+        public String getPropertyName() {
+            return _propertyName;
+        }
+        public ${glConditionQueryInterfaceName} getConditionQuery() {
+            return _cq;
+        }
+    }
+
+    private Method helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Class<?>[] argTypes, String property) {
+        try {
+            return cq.getClass().getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException e) {
+            String msg = "The method is not existing:";
+            msg = msg + " methodName=" + methodName;
+            msg = msg + " argTypes=" + Arrays.asList(argTypes);
+            msg = msg + " tableName=" + cq.getTableDbName();
+            msg = msg + " property=" + property;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, Method method, Object[] args) {
+        try {
+            return method.invoke(cq, args);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(e.getCause());
+        }
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected String fRES(String value) {

@@ -1020,8 +1020,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // ===================================================================================
-    //                                                                              Invoke
-    //                                                                              ======
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
     /**
      * ${database.ImplementComment}
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
