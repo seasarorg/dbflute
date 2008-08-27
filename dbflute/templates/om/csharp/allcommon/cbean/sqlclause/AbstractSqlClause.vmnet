@@ -1456,7 +1456,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         }
     }
 
-    protected bool isUpdateSubQueryUseLocalTableSupported() {
+    protected virtual bool isUpdateSubQueryUseLocalTableSupported() {
         return true;
     }
     

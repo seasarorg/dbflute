@@ -572,8 +572,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // ===================================================================================
-    //                                                                       Query  Update
-    //                                                                       =============
+    //                                                                        Query Update
+    //                                                                        ============
 #if (${table.hasOnlyOnePrimaryKey()})
     /**
      * Query update the several entities. {NoConcurrencyControl}

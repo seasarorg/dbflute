@@ -1,0 +1,57 @@
+
+using System;
+using System.Data;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Framework.Log;
+using Seasar.Framework.Util;
+
+using ${glPackageBaseCommon};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
+
+public class ${glInternalCommandContextHandler} extends BasicHandler {
+
+// ...Making
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ICommandContext commandContext;
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalCommandContextHandler}(IDataSource dataSource, ICommandFactory commandFactory, ICommandContext commandContext)
+        : base(dataSource, commandContext.getSql(), commandFactory) {
+        this.commandContext = commandContext;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public int Execute(Object[] args) {
+        IDbConnection connection = Connection;
+        try {
+            return execute(connection, commandContext);
+        } finally {
+            DataSource.CloseConnection(connection);
+        }
+    }
+
+    protected int Execute(IDbConnection connection, ICommandContext context) {
+        logSql(context.getBindVariables(), getArgTypes(context.BindVariables));
+        IDbCommand cmd = Command(connection);
+        int ret = -1;
+        try {
+            
+            BindArgs(cmd, context.BindVariables, context.BindVariableTypes);
+            ret = ExecuteUpdate(cmd, context);
+        } finally {
+            CommandUtil.Close(cmd);
+        }
+        return ret;
+    }
+}
+
+}

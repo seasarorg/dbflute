@@ -312,6 +312,23 @@ namespace ${glPackageExtendedBhv} {
 #end
 
         // ===============================================================================
+        //                                                                    Query Update
+        //                                                                    ============
+#if (${table.hasOnlyOnePrimaryKey()})
+//        public int QueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
+//            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertConditionBeanNotNull(cb);
+//            SetupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
+//            FilterEntityOfUpdate(${myEntityVariableName}); AssertEntityOfUpdate(${myEntityVariableName});
+//            return this.Dao.UpdateByQuery(cb, ${myEntityVariableName});
+//        }
+//
+//        public int QueryDelete(${myConditionBeanClassName} cb) {
+//            AssertConditionBeanNotNull(cb);
+//            return this.Dao.DeleteByQuery(cb);
+//        }
+#end
+
+        // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
         #region Delegate Method
