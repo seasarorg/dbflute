@@ -1,18 +1,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
+import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
+
 /**
  * The exception of when the entity has already been updated by other thread.
- * 
  * @author ${database.ClassAuthor}
  */
-public class ${glEntityAlreadyUpdatedException} extends org.seasar.dao.NotSingleRowUpdatedRuntimeException {
+public class ${glEntityAlreadyUpdatedException} extends NotSingleRowUpdatedRuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param bean Bean. (NotNull)
      * @param rows Rows.
      */
@@ -22,10 +25,9 @@ public class ${glEntityAlreadyUpdatedException} extends org.seasar.dao.NotSingle
 
     /**
      * Constructor.
-     * 
      * @param e NotSingleRowUpdatedRuntimeException. (NotNull)
      */
-    public ${glEntityAlreadyUpdatedException}(org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+    public ${glEntityAlreadyUpdatedException}(NotSingleRowUpdatedRuntimeException e) {
         super(e.getBean(), e.getRows());
     }
 }

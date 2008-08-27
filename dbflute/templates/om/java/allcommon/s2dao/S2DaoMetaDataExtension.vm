@@ -69,7 +69,8 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
-import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
+import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
+import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
@@ -551,11 +552,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         final int entityCount = list.size();
         if (updateCount < entityCount) {
-            String msg = "updateCount=" + updateCount + " entityCount=" + entityCount;
             if (isNonstrictMethod(method)) {
+                String msg = "The entity have already deleted:";
+                msg = msg + " updateCount=" + updateCount;
+                msg = msg + " entityCount=" + entityCount;
+                msg = msg + " allEntities=" + list;
                 throw new ${glEntityAlreadyDeletedException}(msg);
             } else {
-                throw new ${glEntityAlreadyUpdatedException}(list.get(0), updateCount);
+                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(0), 0, updateCount);
             }
         }
     }
@@ -570,18 +574,41 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final int[] updatedCountArray = (int[])result;
         final int entityCount = list.size();
         int index = 0;
-        for (int updatedCount : updatedCountArray) {
-            if (updatedCount == 0) {
+        boolean alreadyUpdated = false;
+        for (int oneUpdateCount : updatedCountArray) {
+            if (oneUpdateCount == 0) {
                 if (entityCount <= index) {
                     return;// for Safety!
                 }
                 if (isNonstrictMethod(method)) {
-                    String msg = "The entity=" + list.get(index);
+                    int updateCount = 0;
+                    for (int oneUpdateCount : updatedCountArray) {
+                        updateCount = updateCount + oneUpdateCount;
+                    }
+                    String msg = "The entity have already deleted:";
+                    msg = msg + " entity=" + list.get(index);
+                    msg = msg + " updateCount=" + updateCount;
+                    msg = msg + " allEntities=" + list;
                     throw new ${glEntityAlreadyDeletedException}(msg);
                 } else {
-                    throw new ${glEntityAlreadyUpdatedException}(list.get(index), updatedCount);
+                    alreadyUpdated = true;
+                    break;
                 }
+            } else if (oneUpdateCount > 1) {
+                String msg = "The entity updated two or more records in batch update:";
+                msg = msg + " entity=" + list.get(index);
+                msg = msg + " updatedCount=" + oneUpdateCount;
+                msg = msg + " allEntities=" + list;
+                throw new ${glEntityDuplicatedException}(msg);
             }
+            ++index;
+        }
+        if (alreadyUpdated) {
+            int updateCount = 0;
+            for (int oneUpdateCount : updatedCountArray) {
+                updateCount = updateCount + oneUpdateCount;
+            }
+            throw new ${glBatchEntityAlreadyUpdatedException}(list.get(index), 0, updateCount);
         }
     }
 

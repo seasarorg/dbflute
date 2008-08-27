@@ -232,6 +232,7 @@ targetdatabase = $targetDatabase
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
     ## [Allcommon-Exception]
+    #set ($glBatchEntityAlreadyUpdatedException = "${glProjectPrefix}BatchEntityAlreadyUpdatedException")
     #set ($glBindVariableCommentNotFoundPropertyException = "${glProjectPrefix}BindVariableCommentNotFoundPropertyException")
     #set ($glBindVariableParameterNullValueException = "${glProjectPrefix}BindVariableParameterNullValueException")
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
@@ -1211,6 +1212,10 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.info("public void parseExceptionClass() {")
+
+    $database.info("    parse('BatchEntityAlreadyUpdatedException');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glBatchEntityAlreadyUpdatedException}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/exception/BatchEntityAlreadyUpdatedException.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('BindVariableCommentNotFoundPropertyException');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glBindVariableCommentNotFoundPropertyException}.${glClassFileExtension}" )

@@ -12,7 +12,6 @@ public class ${glEntityDuplicatedException} extends ${glRecordHasOverlappedExcep
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message.
      */
     public ${glEntityDuplicatedException}(String msg) {
@@ -21,7 +20,6 @@ public class ${glEntityDuplicatedException} extends ${glRecordHasOverlappedExcep
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message.
      * @param cause Throwable.
      */

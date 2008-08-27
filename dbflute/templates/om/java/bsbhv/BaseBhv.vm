@@ -517,7 +517,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException} When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
@@ -547,7 +547,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException} When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
