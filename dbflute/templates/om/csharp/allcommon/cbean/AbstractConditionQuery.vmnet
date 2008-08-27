@@ -621,8 +621,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
-        String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{value.getClass()}, propertyName);
+        String methodName = "Set" + columnCapPropName + "_" + initCap(conditionKeyName);
+        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{value.GetType()}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[]{value});
     }
 
@@ -634,25 +634,25 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         String ascDesc = isAsc ? "Asc" : "Desc";
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
-        String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{}, propertyName);
+        String methodName = "AddOrderBy_" + columnCapPropName + "_" + ascDesc;
+        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[]{});
     }
 
     public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         String methodName = "query" + initCap(foreignPropertyName);
-        Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
+        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
         return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
-        String[] strings = name.split("\\.");
-        int length = strings.length;
+        String[] strings = name.Split('.');
+        int length = strings.Length;
         String propertyName = null;
         ${glConditionQueryInterfaceName} cq = this;
         int index = 0;
-        for (String element : strings) {
+        foreach (String element in strings) {
             if (length == (index+1)) {// at last loop!
                 propertyName = element;
                 break;
@@ -663,7 +663,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return new PropertyNameCQContainer(propertyName, cq);
     }
 
-    private static class PropertyNameCQContainer {
+    private class PropertyNameCQContainer {
         protected String _propertyName;
         protected ${glConditionQueryInterfaceName} _cq;
         public PropertyNameCQContainer(String propertyName, ${glConditionQueryInterfaceName} cq) {
@@ -678,9 +678,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
 
-    private Method helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Class<?>[] argTypes, String property) {
+    private MethodInfo helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Type[] argTypes, String property) {
         try {
-            return cq.getClass().getMethod(methodName, argTypes);
+            return cq.GetType().getMethod(methodName, argTypes);
         } catch (NoSuchMethodException e) {
             String msg = "The method is not existing:";
             msg = msg + " methodName=" + methodName;
@@ -691,7 +691,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
 
-    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, Method method, Object[] args) {
+    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, MethodInfo method, Object[] args) {
         try {
             return method.invoke(cq, args);
         } catch (IllegalAccessException e) {
