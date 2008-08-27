@@ -189,6 +189,15 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
 		
+//        protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
+//            if (IsFirstArgumentConditionBean(mi)) {
+//                SqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+//                _sqlCommands.Add(mi.Name, cmd);
+//                return;
+//            }
+//            base.SetupUpdateMethodByAuto(mi);
+//        }
+        
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
@@ -196,6 +205,15 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
+
+//        protected override void SetupDeleteMethodByAuto(MethodInfo mi) {
+//            if (IsFirstArgumentConditionBean(mi)) {
+//                SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+//                _sqlCommands.Add(mi.Name, cmd);
+//                return;
+//            }
+//            base.SetupDeleteMethodByAuto(mi);
+//        }
 
         protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
@@ -209,6 +227,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             } else {
                 return this.BeanMetaData;
             }
+        }
+
+        protected boolean IsFirstArgumentConditionBean(MethodInfo mi) {
+            Type[] pmbTypes = MethodUtil.GetParameterTypes(mi);
+            return pmbTypes.Length > 0 && typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(pmbTypes[0]);
         }
 
         // ===============================================================================

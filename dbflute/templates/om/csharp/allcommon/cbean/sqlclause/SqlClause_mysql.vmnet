@@ -49,6 +49,14 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
     protected override String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
+    
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                               Query Update Override
+    //                                                               =====================
+    protected override bool isUpdateSubQueryUseLocalTableSupported() {
+        return false;
+    }
 }
 	
 }
