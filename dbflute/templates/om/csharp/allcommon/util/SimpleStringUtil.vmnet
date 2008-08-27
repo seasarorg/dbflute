@@ -23,7 +23,7 @@ namespace ${glPackageBaseCommonUtil} {
         // -----------------------------------------------------
         //                                         Assert Object
         //                                         -------------
-        public static void AssertObjectNotNull(String variableName, Object value) {
+        protected static void AssertObjectNotNull(String variableName, Object value) {
             if (variableName == null) {
                 String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
                 throw new SystemException(msg);

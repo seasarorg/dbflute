@@ -1375,7 +1375,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         ${glDBMetaInterfaceName} dbmeta = findDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
-            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);
         }
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
@@ -1413,7 +1413,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
-            subQuery = subQuery.substring(subQuery.indexOf("where "));
+            subQuery = subQuery.Substring(subQuery.IndexOf("where "));
             sb.append(" ").append(subQuery);
             return sb.toString();
         }
@@ -1424,7 +1424,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         ${glDBMetaInterfaceName} dbmeta = findDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryDelete() should have only one primary key:";
-            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);
         }
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
@@ -1451,7 +1451,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
-            subQuery = subQuery.substring(subQuery.indexOf("from "));
+            subQuery = subQuery.Substring(subQuery.IndexOf("from "));
             return "delete " + subQuery;
         }
     }
@@ -1479,6 +1479,10 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 
+    protected String toStringView(Object obj) {
+	    return ${glTraceViewUtilName}.ToStringView(obj);
+    }
+    
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

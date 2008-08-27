@@ -47,12 +47,11 @@ public class ${glSimpleStringUtil} {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
      */
-    public static void assertObjectNotNull(String variableName, Object value) {
+    protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
