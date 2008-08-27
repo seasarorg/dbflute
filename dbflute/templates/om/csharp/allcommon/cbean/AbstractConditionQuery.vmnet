@@ -607,7 +607,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
         String propertyName = columnCapPropName;
         PropertyInfo property = helpGettingCQProperty(this, propertyName);
-        return (${glConditionValueName})helpInvokingCQProperty(cq, property);
+        return (${glConditionValueName})helpInvokingCQProperty(this, property);
     }
 
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
@@ -683,7 +683,6 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         if (property == null) {
             String msg = "The property is not existing:";
             msg = msg + " propertyName=" + propertyName;
-            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
             msg = msg + " tableName=" + cq.getTableDbName();
             throw new IllegalStateException(msg);
         }
@@ -702,7 +701,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
             msg = msg + " tableName=" + cq.getTableDbName();
             msg = msg + " property=" + property;
-            throw new IllegalStateException(msg, e);
+            throw new IllegalStateException(msg);
         }
         return method;
     }

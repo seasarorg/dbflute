@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glConditionQueryAbstractName}")
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
  * The abstract class of condition-query.
@@ -1126,7 +1126,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         } catch (NoSuchMethodException e) {
             String msg = "The method is not existing:";
             msg = msg + " methodName=" + methodName;
-            msg = msg + " argTypes=" + Arrays.asList(argTypes);
+            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
             msg = msg + " tableName=" + cq.getTableDbName();
             msg = msg + " property=" + property;
             throw new IllegalStateException(msg, e);
@@ -1235,7 +1235,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
-        
+
+    protected String convertObjectArrayToStringView(Object[] objArray) {
+	    return ${glTraceViewUtilName}.convertObjectArrayToStringView(objArray);
+    }
+
     // -----------------------------------------------------
     //                                  Collection Generator
     //                                  --------------------
