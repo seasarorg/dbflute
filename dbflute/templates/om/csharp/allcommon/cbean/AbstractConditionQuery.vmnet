@@ -605,9 +605,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
-        String methodName = columnCapPropName;
-        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, columnFlexibleName);
-        return (${glConditionValueName})helpInvokingCQMethod(this, method, new Object[]{});
+        String propertyName = columnCapPropName;
+        PropertyInfo property = helpGettingCQProperty(this, propertyName);
+        return (${glConditionValueName})helpInvokingCQProperty(cq, property);
     }
 
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
@@ -676,6 +676,22 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         public ${glConditionQueryInterfaceName} getConditionQuery() {
             return _cq;
         }
+    }
+
+    private PropertyInfo helpGettingCQProperty(${glConditionQueryInterfaceName} cq, String propertyName) {
+        PropertyInfo property = cq.GetType().GetProperty(propertyName);
+        if (property == null) {
+            String msg = "The property is not existing:";
+            msg = msg + " propertyName=" + propertyName;
+            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
+            msg = msg + " tableName=" + cq.getTableDbName();
+            throw new IllegalStateException(msg);
+        }
+        return property;
+    }
+
+    private Object helpInvokingCQProperty(${glConditionQueryInterfaceName} cq, PropertyInfo property) {
+        return property.GetValue(cq, null);
     }
 
     private MethodInfo helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Type[] argTypes, String property) {
@@ -759,7 +775,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-	    return ${glTraceViewUtil}.ConvertObjectArrayToStringView(objArray);
+	    return ${glTraceViewUtilName}.ConvertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------
