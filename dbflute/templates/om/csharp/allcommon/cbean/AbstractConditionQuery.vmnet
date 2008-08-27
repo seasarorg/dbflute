@@ -641,7 +641,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        String methodName = "query" + initCap(foreignPropertyName);
+        String methodName = "Query" + initCap(foreignPropertyName);
         MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
         return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
     }
