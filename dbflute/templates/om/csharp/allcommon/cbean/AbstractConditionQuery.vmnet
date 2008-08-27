@@ -606,7 +606,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
         String methodName = columnCapPropName;
-        MethodInfo method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, columnFlexibleName);
+        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, columnFlexibleName);
         return (${glConditionValueName})helpInvokingCQMethod(this, method, new Object[]{});
     }
 
@@ -619,21 +619,21 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         String propertyName = container.getPropertyName();
         ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
-        String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(cq.getTableDbName());
+        String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "Set" + columnCapPropName + "_" + initCap(conditionKeyName);
         MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{value.GetType()}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[]{value});
     }
 
-    public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
+    public void invokeOrderBy(String columnFlexibleName, bool isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         String propertyName = container.getPropertyName();
         ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
         String ascDesc = isAsc ? "Asc" : "Desc";
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
-        String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(cq.getTableDbName());
+        String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "AddOrderBy_" + columnCapPropName + "_" + ascDesc;
         MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[]{});
@@ -679,26 +679,20 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
     private MethodInfo helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Type[] argTypes, String property) {
-        try {
-            return cq.GetType().getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException e) {
+        MethodInfo method = cq.GetType().GetMethod(methodName, argTypes);
+        if (method == null) {
             String msg = "The method is not existing:";
             msg = msg + " methodName=" + methodName;
-            msg = msg + " argTypes=" + Arrays.asList(argTypes);
+            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
             msg = msg + " tableName=" + cq.getTableDbName();
             msg = msg + " property=" + property;
             throw new IllegalStateException(msg, e);
         }
+        return method;
     }
 
     private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, MethodInfo method, Object[] args) {
-        try {
-            return method.invoke(cq, args);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
-        }
+        return method.Invoke(cq, args);
     }
 
     // ===================================================================================
@@ -762,6 +756,10 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.InitCap(str);
+    }
+
+    protected String convertObjectArrayToStringView(Object[] objArray) {
+	    return ${glTraceViewUtil}.ConvertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------
