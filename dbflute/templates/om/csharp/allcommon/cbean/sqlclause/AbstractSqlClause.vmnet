@@ -1363,9 +1363,114 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
     }
 
+    // [DBFlute-0.7.9]
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                        Query Update
+    //                                                                        ============
+    public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+        if (columnParameterMap.isEmpty()) {
+            return null;
+        }
+        String aliasName = getLocalTableAliasName();
+        ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.HasTwoOrMorePrimaryKeys) {
+            String msg = "The target table of queryUpdate() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
+        String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+
+        StringBuilder sb = new StringBuilder();
+        String ln = "";
+        if (isFormatClauseEffective()) {
+            ln = getLineSeparator();
+        }
+        sb.append("update ").append(_tableName).append(ln);
+        int index = 0;
+        // It is guaranteed that the map has one or more elements.
+        foreach (String columnName in columnParameterMap.keySet()) {
+            String parameter = columnParameterMap.get(columnName); 
+            if (index == 0) {
+                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+            } else {
+                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+            }
+            ++index;
+        }
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("where "));
+            sb.append(" ").append(subQuery);
+            return sb.toString();
+        }
+    }
+
+    public String getClauseQueryDelete() {
+        String aliasName = getLocalTableAliasName();
+        ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.HasTwoOrMorePrimaryKeys) {
+            String msg = "The target table of queryDelete() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
+        String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+        
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            StringBuilder sb = new StringBuilder();
+            String ln = "";
+            if (isFormatClauseEffective()) {
+                ln = getLineSeparator();
+            }
+            sb.append("delete from ").append(_tableName).append(ln);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("from "));
+            return "delete " + subQuery;
+        }
+    }
+
+    protected boolean isUpdateSubQueryUseLocalTableSupported() {
+        return true;
+    }
+    
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected ${glDBMetaInterfaceName} findDBMeta() {
+        return ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName); 
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
 	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }

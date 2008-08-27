@@ -431,14 +431,14 @@ public interface ${myClassName} {
 	public String getUnionWhereClauseMark();
 	public String getUnionWhereFirstConditionMark();
 	
-    // =====================================================================================
-    //                                                            Where Clause Simple Filter
-    //                                                            ==========================
+    // ===================================================================================
+    //                                                          Where Clause Simple Filter
+    //                                                          ==========================
     public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
 	
-    // =====================================================================================
-    //                                                                 Selected Foreign Info
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                               Selected Foreign Info
+    //                                                               =====================
 	public boolean hasSelectedForeignInfo(String relationPath);
 	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 	

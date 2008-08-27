@@ -197,6 +197,13 @@ public interface ${glSqlClauseInterfaceName} {
     bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
     void clearSpecifiedSelectColumn();
+    
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+    String getClauseQueryDelete();
 }
 
 }
