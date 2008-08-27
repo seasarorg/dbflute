@@ -9,6 +9,7 @@ import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.dao.DaoMetaData;
 import org.seasar.dao.DaoMetaDataFactory;
 import org.seasar.dao.SqlCommand;
+import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 
 import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -20,6 +21,7 @@ import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
@@ -146,8 +148,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         Object ret = null;
         try {
             ret = cmd.execute(invocation.getArguments());
-        } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException notSingleRow) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(notSingleRow);
         } catch (Exception e) {
             if (isLogEnabled()) {
                 final Class<?> targetType = getTargetClass(invocation);
@@ -158,6 +158,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 sb.append("  method = " + invocation.getMethod()).append(getLineSeparator());
                 sb.append("  args   = " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
                 log(sb.toString());
+            }
+            if (e.getClass().equals(NotSingleRowUpdatedRuntimeException.class)) {
+                throw new ${glEntityAlreadyUpdatedException}((NotSingleRowUpdatedRuntimeException)e);
             }
             throw e;
         } finally {

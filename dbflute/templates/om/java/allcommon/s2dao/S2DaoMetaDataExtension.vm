@@ -576,24 +576,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         int index = 0;
         boolean alreadyUpdated = false;
         for (int oneUpdateCount : updatedCountArray) {
+            if (entityCount <= index) {
+                break;// for Safety!
+            }
             if (oneUpdateCount == 0) {
-                if (entityCount <= index) {
-                    return;// for Safety!
-                }
-                if (isNonstrictMethod(method)) {
-                    int updateCount = 0;
-                    for (int oneUpdateCount : updatedCountArray) {
-                        updateCount = updateCount + oneUpdateCount;
-                    }
-                    String msg = "The entity have already deleted:";
-                    msg = msg + " entity=" + list.get(index);
-                    msg = msg + " updateCount=" + updateCount;
-                    msg = msg + " allEntities=" + list;
-                    throw new ${glEntityAlreadyDeletedException}(msg);
-                } else {
-                    alreadyUpdated = true;
-                    break;
-                }
+                alreadyUpdated = true;
+                break;
             } else if (oneUpdateCount > 1) {
                 String msg = "The entity updated two or more records in batch update:";
                 msg = msg + " entity=" + list.get(index);
@@ -608,7 +596,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             for (int oneUpdateCount : updatedCountArray) {
                 updateCount = updateCount + oneUpdateCount;
             }
-            throw new ${glBatchEntityAlreadyUpdatedException}(list.get(index), 0, updateCount);
+            if (isNonstrictMethod(method)) {
+                String msg = "The entity have already deleted:";
+                msg = msg + " entity=" + list.get(index);
+                msg = msg + " updateCount=" + updateCount;
+                msg = msg + " allEntities=" + list;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            } else {
+                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(index), 0, updateCount);
+            }
         }
     }
 
