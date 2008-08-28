@@ -112,6 +112,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return CommandFactory.ExecuteNonQuery(DataSource, cmd);
         }
 
+        protected virtual void Close(IDbConnection conn) {
+            DataSource.CloseConnection(conn);
+        }
+
+        protected virtual void Close(IDbCommand cmd) {
+            CommandUtil.Close(cmd);
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============

@@ -14,8 +14,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
 public class ${glInternalCommandContextHandler} : ${glInternalBasicHandler} {
 
-// ...Making
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -33,11 +31,11 @@ public class ${glInternalCommandContextHandler} : ${glInternalBasicHandler} {
     //                                                                             Execute
     //                                                                             =======
     public int Execute(Object[] args) {
-        IDbConnection connection = Connection;
+        IDbConnection conn = Connection;
         try {
-            return Execute(connection, commandContext);
+            return Execute(conn, commandContext);
         } finally {
-            DataSource.CloseConnection(connection);
+            Close(conn);
         }
     }
 
@@ -49,7 +47,7 @@ public class ${glInternalCommandContextHandler} : ${glInternalBasicHandler} {
             BindArgs(cmd, context.BindVariables, context.BindVariableTypes);
             ret = ExecuteUpdate(cmd, context);
         } finally {
-            CommandUtil.Close(cmd);
+            Close(cmd);
         }
         return ret;
     }
