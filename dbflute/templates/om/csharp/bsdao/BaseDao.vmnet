@@ -35,8 +35,8 @@ namespace ${myExtendedDaoPackageName} {
         ${myExtendedObjectClassName} GetEntity(${table.PrimaryKeyArgsString});
 #end
         
-        int SelectCount(${myAttachedCBArgsString});
-        IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
+        int SelectCount(${myConditionBeanClassName} cb);
+        IList<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb);
 
 #if ($table.hasPrimaryKey())
         int Insert(${myExtendedObjectClassName} entity);

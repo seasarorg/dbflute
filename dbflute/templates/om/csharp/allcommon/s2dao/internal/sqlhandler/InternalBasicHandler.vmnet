@@ -17,14 +17,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         private ICommandFactory _commandFactory = BasicCommandFactory.INSTANCE;
         private int _commandTimeout = -1;
 
-        public BasicHandler() {
+        public ${glInternalBasicHandler}() {
         }
 
-        public BasicHandler(IDataSource ds, string sql)
+        public ${glInternalBasicHandler}(IDataSource ds, string sql)
             : this(ds, sql, BasicCommandFactory.INSTANCE) {
         }
 
-        public BasicHandler(IDataSource ds, string sql, ICommandFactory commandFactory) {
+        public ${glInternalBasicHandler}(IDataSource ds, string sql, ICommandFactory commandFactory) {
             DataSource = ds;
             Sql = sql;
             CommandFactory = commandFactory;
