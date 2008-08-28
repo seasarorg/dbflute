@@ -52,10 +52,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return Execute(args, GetArgTypes(args));
         }
 
-        public virtual object Execute(object[] args, Type[] argTypes) {
-            if (${glQLog}.IsLogEnabled()) {
-                ${glQLog}.Log(GetCompleteSql(args));
-            }
+        public virtual Object Execute(object[] args, Type[] argTypes) {
+            LogSql(args, argTypes);
             IDbConnection con = Connection;
             try {
                 return Execute(con, args, argTypes);
@@ -64,7 +62,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        public virtual object Execute(object[] args, Type[] argTypes, string[] argNames) {
+        public virtual Object Execute(object[] args, Type[] argTypes, string[] argNames) {
             return Execute(args, argTypes);
         }
 
@@ -80,19 +78,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual object Execute(IDbCommand cmd) {
-            if (_dataReaderHandler == null)
-            {
+            if (_dataReaderHandler == null) {
                 throw new EmptyRuntimeException("dataReaderHandler");
             }
             IDataReader dataReader = null;
-            try
-            {
-                if (_dataReaderHandler is ObjectDataReaderHandler)
-                {
+            try {
+                if (_dataReaderHandler is ObjectDataReaderHandler) {
                     return CommandFactory.ExecuteScalar(DataSource, cmd);
-                }
-                else
-                {
+                } else {
                     dataReader = CreateDataReader(cmd);
                     return _dataReaderHandler.Handle(dataReader);
                 }

@@ -96,24 +96,24 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return _commandFactory.GetCompleteSql(_sql, args);
         }
 
-        // At the future, go to InternalBasicHandler
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
             if (QLog.IsLogEnabled()) {
                 String completeSql = GetCompleteSql(args);
                 if (IsContainsLineSeparatorInSql()) {
-                    QLog.Log(getLineSeparator() + completeSql);
+                    QLog.Log(GetLineSeparator() + completeSql);
                 } else {
                     QLog.Log(completeSql);
                 }
             }
         }
 
-        // At the future, go to InternalBasicHandler
         protected bool IsContainsLineSeparatorInSql() {
-            return Sql != null ? Sql.Contains(getLineSeparator()) : false;
+            return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
 
-        // At the future, go to InternalBasicHandler
+        // ===============================================================================
+        //                                                               ADO.NET Delegator
+        //                                                               =================
         protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
             return CommandFactory.ExecuteNonQuery(DataSource, cmd);
         }
@@ -121,8 +121,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
-        // At the future, go to InternalBasicHandler
-        protected String getLineSeparator() {
+        protected String GetLineSeparator() {
             return SimpleSystemUtil.GetLineSeparator();
         }
     }

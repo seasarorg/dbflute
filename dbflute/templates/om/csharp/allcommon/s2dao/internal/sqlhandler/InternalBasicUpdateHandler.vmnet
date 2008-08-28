@@ -32,9 +32,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         public virtual int Execute(object[] args, Type[] argTypes) {
-            if (${glQLog}.IsLogEnabled()) {
-                ${glQLog}.Log(GetCompleteSql(args));
-            }
+            LogSql(args, argTypes);
             IDbConnection con = Connection;
             try {
                 return Execute(con, args, argTypes);
@@ -49,13 +47,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         protected virtual int Execute(IDbConnection connection, object[] args, Type[] argTypes) {
             IDbCommand cmd = Command(connection);
-            try
-            {
+            try {
                 BindArgs(cmd, args, argTypes);
-                return CommandFactory.ExecuteNonQuery(DataSource, cmd);
-            }
-            finally
-            {
+                return ExecuteUpdate(cmd, args);
+            } finally {
                 CommandUtil.Close(cmd);
             }
         }
