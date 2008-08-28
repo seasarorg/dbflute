@@ -3,7 +3,6 @@ using System;
 using Seasar.Dao;
 using Seasar.Dao.Context;
 
-
 namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 
     public class ${glInternalCommandContextCreator} {
