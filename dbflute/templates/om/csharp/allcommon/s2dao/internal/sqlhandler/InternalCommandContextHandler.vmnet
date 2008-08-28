@@ -1,16 +1,18 @@
 
 using System;
 using System.Data;
+
+using Seasar.Dao;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
-using Seasar.Framework.Log;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-public class ${glInternalCommandContextHandler} extends BasicHandler {
+public class ${glInternalCommandContextHandler} : BasicHandler {
 
 // ...Making
 
@@ -23,7 +25,7 @@ public class ${glInternalCommandContextHandler} extends BasicHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalCommandContextHandler}(IDataSource dataSource, ICommandFactory commandFactory, ICommandContext commandContext)
-        : base(dataSource, commandContext.getSql(), commandFactory) {
+        : base(dataSource, commandContext.Sql, commandFactory) {
         this.commandContext = commandContext;
     }
 
@@ -33,24 +35,53 @@ public class ${glInternalCommandContextHandler} extends BasicHandler {
     public int Execute(Object[] args) {
         IDbConnection connection = Connection;
         try {
-            return execute(connection, commandContext);
+            return Execute(connection, commandContext);
         } finally {
             DataSource.CloseConnection(connection);
         }
     }
 
     protected int Execute(IDbConnection connection, ICommandContext context) {
-        logSql(context.getBindVariables(), getArgTypes(context.BindVariables));
+        LogSql(context.BindVariables, GetArgTypes(context.BindVariables));
         IDbCommand cmd = Command(connection);
         int ret = -1;
         try {
-            
             BindArgs(cmd, context.BindVariables, context.BindVariableTypes);
             ret = ExecuteUpdate(cmd, context);
         } finally {
             CommandUtil.Close(cmd);
         }
         return ret;
+    }
+
+    // At the future, go to InternalBasicHandler
+    protected virtual void LogSql(Object[] args, Type[] argTypes) {
+        if (QLog.IsLogEnabled()) {
+            String completeSql = GetCompleteSql(args);
+            if (IsContainsLineSeparatorInSql()) {
+                QLog.Log(getLineSeparator() + completeSql);
+            } else {
+                QLog.Log(completeSql);
+            }
+        }
+    }
+
+    // At the future, go to InternalBasicHandler
+    protected bool IsContainsLineSeparatorInSql() {
+        return Sql != null ? Sql.Contains(getLineSeparator()) : false;
+    }
+
+    // At the future, go to InternalBasicHandler
+    protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
+        return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    // At the future, go to InternalBasicHandler
+    protected String getLineSeparator() {
+        return SimpleSystemUtil.GetLineSeparator();
     }
 }
 

@@ -1,13 +1,12 @@
 
 using System;
-using System.Text;
 using Seasar.Extension.ADO;
 using Seasar.Dao;
-using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommonS2DaoInternalSqlParser};
 using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
@@ -45,7 +44,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
     protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
         if (args == null || args.Length == 0) {
             String msg = "The arguments should have one argument! But:";
-            msg = msg + " args=" + (args != null ? args.Length : null);
+            msg = msg + " args=" + (args != null ? "" + args.Length : "null");
             throw new IllegalArgumentException(msg);
         }
         Object fisrtArg = args[0];
@@ -57,12 +56,12 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         return (${glConditionBeanInterfaceName}) fisrtArg;
     }
     
-    protected ${glInternalCommandContextHandler} createCommandContextHandler(CommandContext context) {
+    protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
         return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
     }
 
     protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
-        return cb.getSqlClause().getClauseQueryDelete();
+        return cb.SqlClause.getClauseQueryDelete();
     }
     
     protected ICommandContext createCommandContext(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
