@@ -322,10 +322,10 @@ namespace ${glPackageExtendedBhv} {
 //            return this.Dao.UpdateByQuery(cb, ${myEntityVariableName});
 //        }
 //
-//        public int QueryDelete(${myConditionBeanClassName} cb) {
-//            AssertConditionBeanNotNull(cb);
-//            return this.Dao.DeleteByQuery(cb);
-//        }
+        public int QueryDelete(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.Dao.DeleteByQuery(cb);
+        }
 #end
 
         // ===============================================================================

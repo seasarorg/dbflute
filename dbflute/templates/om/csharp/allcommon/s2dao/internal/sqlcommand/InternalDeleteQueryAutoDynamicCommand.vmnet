@@ -83,3 +83,5 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 }
+
+}

@@ -206,14 +206,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 
-//        protected override void SetupDeleteMethodByAuto(MethodInfo mi) {
-//            if (IsFirstArgumentConditionBean(mi)) {
-//                SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _commandFactory);
-//                _sqlCommands.Add(mi.Name, cmd);
-//                return;
-//            }
-//            base.SetupDeleteMethodByAuto(mi);
-//        }
+        protected override void SetupDeleteMethodByAuto(MethodInfo mi) {
+            if (IsFirstArgumentConditionBean(mi)) {
+                SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+                _sqlCommands.Add(mi.Name, cmd);
+                return;
+            }
+            base.SetupDeleteMethodByAuto(mi);
+        }
 
         protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
