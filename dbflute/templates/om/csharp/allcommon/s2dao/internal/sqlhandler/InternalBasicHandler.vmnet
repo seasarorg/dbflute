@@ -7,6 +7,7 @@ using Seasar.Framework.Exceptions;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
@@ -14,15 +15,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         private IDataSource _dataSource;
         private string _sql;
-        private ICommandFactory _commandFactory = BasicCommandFactory.INSTANCE;
+        private ICommandFactory _commandFactory;
         private int _commandTimeout = -1;
-
-        public ${glInternalBasicHandler}() {
-        }
-
-        public ${glInternalBasicHandler}(IDataSource ds, string sql)
-            : this(ds, sql, BasicCommandFactory.INSTANCE) {
-        }
 
         public ${glInternalBasicHandler}(IDataSource ds, string sql, ICommandFactory commandFactory) {
             DataSource = ds;

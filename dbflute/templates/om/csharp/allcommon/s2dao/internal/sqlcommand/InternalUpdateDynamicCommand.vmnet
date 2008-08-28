@@ -22,7 +22,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                         =======
         public override object Execute(object[] args) {
             ICommandContext ctx = Apply(args);
-            IUpdateHandler handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
+            ${glInternalBasicUpdateHandler} handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
             return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
         }
 	}

@@ -191,7 +191,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 		
 //        protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
 //            if (IsFirstArgumentConditionBean(mi)) {
-//                SqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+//                ISqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
 //                _sqlCommands.Add(mi.Name, cmd);
 //                return;
 //            }
@@ -208,7 +208,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected override void SetupDeleteMethodByAuto(MethodInfo mi) {
             if (IsFirstArgumentConditionBean(mi)) {
-                SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+                ISqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _commandFactory);
                 _sqlCommands.Add(mi.Name, cmd);
                 return;
             }

@@ -54,11 +54,10 @@ namespace ${myExtendedDaoPackageName} {
 #if (${table.hasOnlyOnePrimaryKey()})
         int DeleteByQuery(${myConditionBeanClassName} cb);// {DBFlute-0.7.9}
 #end
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+
+// This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int InsertList(IList<${myExtendedObjectClassName}> entityList);
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int UpdateList(IList<${myExtendedObjectClassName}> entityList);
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int DeleteList(IList<${myExtendedObjectClassName}> entityList);
 
 #end
