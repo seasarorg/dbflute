@@ -14,11 +14,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
     public class ${glInternalBasicSelectHandler} : ${glInternalBasicHandler} {
 
         // ===============================================================================
-        //                                                                      Definition
-        //                                                                      ==========
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		
-        // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
         protected IDataReaderFactory _dataReaderFactory = BasicDataReaderFactory.INSTANCE;
@@ -54,11 +49,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         public virtual Object Execute(object[] args, Type[] argTypes) {
             LogSql(args, argTypes);
-            IDbConnection con = Connection;
+            IDbConnection conn = Connection;
             try {
-                return Execute(con, args, argTypes);
+                return Execute(conn, args, argTypes);
             } finally {
-                DataSource.CloseConnection(con);
+                Close(conn);
             }
         }
 
@@ -66,14 +61,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return Execute(args, argTypes);
         }
 
-        protected virtual object Execute(IDbConnection connection, object[] args, Type[] argTypes) {
+        protected virtual object Execute(IDbConnection conn, object[] args, Type[] argTypes) {
             IDbCommand cmd = null;
             try {
-                cmd = Command(connection);
+                cmd = Command(conn);
                 BindArgs(cmd, args, argTypes);
                 return Execute(cmd);
             } finally {
-                CommandUtil.Close(cmd);
+                Close(cmd);
             }
         }
 
@@ -83,14 +78,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             IDataReader dataReader = null;
             try {
-                if (_dataReaderHandler is ObjectDataReaderHandler) {
+                if (_dataReaderHandler is ObjectDataReaderHandler) {// CSharp specific
                     return CommandFactory.ExecuteScalar(DataSource, cmd);
                 } else {
                     dataReader = CreateDataReader(cmd);
                     return _dataReaderHandler.Handle(dataReader);
                 }
             } finally {
-                DataReaderUtil.Close(dataReader);
+                Close(dataReader);
             }
         }
 

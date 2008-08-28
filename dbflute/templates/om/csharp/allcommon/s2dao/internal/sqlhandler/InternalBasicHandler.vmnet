@@ -120,6 +120,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             CommandUtil.Close(cmd);
         }
 
+        protected virtual void Close(IDataReader dataReader) {
+            DataReaderUtil.Close(dataReader);
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============

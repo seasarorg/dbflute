@@ -33,11 +33,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         public virtual int Execute(object[] args, Type[] argTypes) {
             LogSql(args, argTypes);
-            IDbConnection con = Connection;
+            IDbConnection conn = Connection;
             try {
-                return Execute(con, args, argTypes);
+                return Execute(conn, args, argTypes);
             } finally {
-                DataSource.CloseConnection(con);
+                Close(conn);
             }
         }
 
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 BindArgs(cmd, args, argTypes);
                 return ExecuteUpdate(cmd, args);
             } finally {
-                CommandUtil.Close(cmd);
+                Close(cmd);
             }
         }
     }
