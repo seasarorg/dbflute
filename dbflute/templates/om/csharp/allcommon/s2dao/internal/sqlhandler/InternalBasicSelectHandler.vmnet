@@ -11,7 +11,7 @@ using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-    public class ${glInternalBasicSelectHandler} : BasicHandler, ISelectHandler {
+    public class ${glInternalBasicSelectHandler} : ${glInternalBasicHandler} {
 
         // ===============================================================================
         //                                                                      Definition

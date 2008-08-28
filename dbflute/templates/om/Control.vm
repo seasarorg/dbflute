@@ -1918,6 +1918,10 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalAbstractAutoHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalAbstractAutoHandler.${glTemplateFileExtension}",$path,"", "")
 
+      $database.info("    parse('InternalBasicHandler');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalBasicHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalBasicHandler.${glTemplateFileExtension}",$path,"", "")
+
       $database.info("    parse('InternalBasicSelectHandler');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalBasicSelectHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalBasicSelectHandler.${glTemplateFileExtension}",$path,"", "")
