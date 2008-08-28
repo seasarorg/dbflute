@@ -12,7 +12,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-public class ${glInternalCommandContextHandler} : BasicHandler {
+public class ${glInternalCommandContextHandler} : ${glInternalBasicHandler} {
 
 // ...Making
 
@@ -52,36 +52,6 @@ public class ${glInternalCommandContextHandler} : BasicHandler {
             CommandUtil.Close(cmd);
         }
         return ret;
-    }
-
-    // At the future, go to InternalBasicHandler
-    protected virtual void LogSql(Object[] args, Type[] argTypes) {
-        if (QLog.IsLogEnabled()) {
-            String completeSql = GetCompleteSql(args);
-            if (IsContainsLineSeparatorInSql()) {
-                QLog.Log(getLineSeparator() + completeSql);
-            } else {
-                QLog.Log(completeSql);
-            }
-        }
-    }
-
-    // At the future, go to InternalBasicHandler
-    protected bool IsContainsLineSeparatorInSql() {
-        return Sql != null ? Sql.Contains(getLineSeparator()) : false;
-    }
-
-    // At the future, go to InternalBasicHandler
-    protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
-        return CommandFactory.ExecuteNonQuery(DataSource, cmd);
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    // At the future, go to InternalBasicHandler
-    protected String getLineSeparator() {
-        return SimpleSystemUtil.GetLineSeparator();
     }
 }
 

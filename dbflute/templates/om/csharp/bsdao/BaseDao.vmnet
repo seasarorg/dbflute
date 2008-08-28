@@ -9,6 +9,7 @@ using Seasar.Dao.Attrs;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonS2Dao};
 using ${myExtendedEntityPackageName};
+using ${glPackageCB};
 #set ($InterfaceName = "")
 #if ($table.hasPrimaryKey())
   #set ($InterfaceName = "${glDaoWritableInterfaceName}")
