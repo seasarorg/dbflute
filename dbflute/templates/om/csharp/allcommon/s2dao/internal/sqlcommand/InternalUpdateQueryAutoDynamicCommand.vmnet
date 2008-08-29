@@ -1,5 +1,7 @@
 
 using System;
+using System.Reflection;
+
 using Seasar.Extension.ADO;
 using Seasar.Dao;
 
@@ -61,7 +63,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         assertArgument(args);
         Object secondArg = args[1];
         if (!(secondArg is ${glEntityInterfaceName})) {
-            String msg = "The type of second argument should be " + ${glEntityInterfaceName}.class + "! But:";
+            String msg = "The type of second argument should be " + typeof(${glEntityInterfaceName}) + "! But:";
             msg = msg + " type=" + secondArg.GetType();
             throw new IllegalArgumentException(msg);
         }
@@ -133,8 +135,8 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
         msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
         msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+        msg = msg + "    before (x) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3" + getLineSeparator();
+        msg = msg + "    after  (o) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3/*END*/" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Doubtful Property Name]" + getLineSeparator() + propertyName + getLineSeparator();
         msg = msg + "[ConditionBean]" + getLineSeparator() + cb + getLineSeparator();

@@ -34,6 +34,12 @@ namespace ${glPackageBaseCommon} {
         ${glDBMetaInterfaceName} DBMeta { get; }
 
         // ===============================================================================
+        //                                                             Modified Properties
+        //                                                             ===================
+        IDictionary<String, Object> ModifiedPropertyNames { get; }
+        void ClearModifiedPropertyNames();
+
+        // ===============================================================================
         //                                                                   Determination
         //                                                                   =============
         /// <summary>
