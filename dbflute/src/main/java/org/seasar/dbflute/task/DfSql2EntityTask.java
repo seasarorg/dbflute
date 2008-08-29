@@ -50,13 +50,12 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureMet
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSQLExecutionFailureException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
@@ -150,35 +149,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected List<File> collectSqlFileList() {
         final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final List<File> sqlFileList = collectSqlFile(sqlDirectory);
-        if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
-            return sqlFileList;
-        }
-        final String srcMainResources = DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-        try {
-            final List<File> resourcesSqlFileList = collectSqlFile(srcMainResources);
-            sqlFileList.addAll(resourcesSqlFileList);
-        } catch (Exception e) {
-            _log.debug("Not found SQL directory on resources: " + srcMainResources);
-        }
-        return sqlFileList;
-    }
-
-    protected List<File> collectSqlFile(String sqlDirectory) {
-        return createSqlFileGetter().getSqlFileList(sqlDirectory);
-    }
-
-    protected DfSqlFileGetter createSqlFileGetter() {
-        final DfLanguageDependencyInfo dependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return new DfSqlFileGetter() {
-            @Override
-            protected boolean acceptSqlFile(File file) {
-                if (!dependencyInfo.isCompileTargetFile(file)) {
-                    return false;
-                }
-                return super.acceptSqlFile(file);
-            }
-        };
+        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        return sqlFileCollector.collectSqlFileList();
     }
 
     /**

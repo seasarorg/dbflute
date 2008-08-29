@@ -21,10 +21,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -68,35 +66,8 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
     @Override
     protected List<File> getSqlFileList() {
         final String sqlDirectory = getSqlDirectory();
-        final List<File> sqlFileList = collectSqlFile(sqlDirectory);
-        if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
-            return sqlFileList;
-        }
-        final String srcMainResources = DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-        try {
-            final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
-            sqlFileList.addAll(resourcesSqlFileList);
-        } catch (Exception e) {
-            _log.debug("Not found sql directory on resources: " + srcMainResources);
-        }
-        return sqlFileList;
-    }
-
-    protected List<File> collectSqlFile(String sqlDirectory) {
-        return createSqlFileGetter().getSqlFileList(sqlDirectory);
-    }
-
-    protected DfSqlFileGetter createSqlFileGetter() {
-        final DfLanguageDependencyInfo dependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return new DfSqlFileGetter() {
-            @Override
-            protected boolean acceptSqlFile(File file) {
-                if (!dependencyInfo.isCompileTargetFile(file)) {
-                    return false;
-                }
-                return super.acceptSqlFile(file);
-            }
-        };
+        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        return sqlFileCollector.collectSqlFileList();
     }
 
     @Override
