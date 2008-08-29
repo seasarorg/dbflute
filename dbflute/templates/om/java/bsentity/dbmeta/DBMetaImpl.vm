@@ -161,7 +161,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-	    return cfi("${foreignKeys.foreignJavaBeansRulePropertyName}", ${table.DBMetaClassName}.getInstance(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
+	    return cfi("${foreignKeys.foreignJavaBeansRulePropertyName}", this, ${foreignKeys.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
     }
 #end
 #foreach ($referrer in $table.referrers)
@@ -179,7 +179,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-	    return cfi("${referrer.refererJavaBeansRulePropertyNameAsOne}", ${referrer.foreignTableDBMetaClassName}.getInstance(), ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+	    return cfi("${referrer.refererJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
     }
 #end
 #end
@@ -199,7 +199,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
 #end
-	    return cri("${referrer.referrerJavaBeansRulePropertyName}", ${referrer.foreignTableDBMetaClassName}.getInstance(), ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${referrer.isOneToOne()});
+	    return cri("${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${referrer.isOneToOne()});
     }
 #end
 #end
