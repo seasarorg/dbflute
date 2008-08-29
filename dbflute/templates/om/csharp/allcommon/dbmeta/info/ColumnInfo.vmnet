@@ -46,14 +46,14 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                          Finder
         //                                                                          ======
         public PropertyInfo FindProperty() {
-            return FindProperty(dbmeta.EntityType, propertyName, new Type[] { propertyType });
+            return FindProperty(dbmeta.EntityType, propertyName);
         }
 
         // ===============================================================================
         //                                                                 Internal Helper
         //                                                                 ===============
-        protected virtual PropertyInfo FindProperty(Type clazz, String methodName, Type[] argTypes) {
-            return clazz.GetProperty(methodName, argTypes);
+        protected virtual PropertyInfo FindProperty(Type clazz, String propertyName) {
+            return clazz.GetProperty(propertyName);
         }
 
         // ===============================================================================

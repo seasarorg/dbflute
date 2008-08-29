@@ -154,8 +154,11 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
         msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Doubtful Property Name]" + getLineSeparator() + propertyName + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[ConditionBean]" + getLineSeparator() + cb + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[Entity]" + getLineSeparator() + entity + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new QueryUpdateFailureException(msg, e);
