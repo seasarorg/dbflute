@@ -220,7 +220,6 @@ public class ${glOutsideSqlContextName} {
 	    if (!isBehaviorQueryPathEnabled()) {
 		    return;
 		}
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
 		if (_outsideSqlPath.contains(":")) {
 		    final String subDirectoryValue = _outsideSqlPath.substring(0, _outsideSqlPath.lastIndexOf(":"));
 		    final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
@@ -233,21 +232,21 @@ public class ${glOutsideSqlContextName} {
             _outsideSqlPath = replaceString(buildBehaviorSqlPackageName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
 		}
     }
-        
+
     protected String buildBehaviorSqlPackageName() {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String outsideSqlPackage = ${glDBFluteConfig}.getInstance().getOutsideSqlPackage();
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
-            final String behaviorClassName = behaviorTypeName.substring(behaviorClassPath.lastIndexOf(".") + ".".length());
-            String tmp = behaviorTypeName.Substring(0, behaviorTypeName.lastIndexOf("."));
-            final String exbhvName = tmp.contains(".") ? tmp.substring(behaviorTypeName.lastIndexOf(".") + ".".length()) : tmp;
+            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
+            String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));
+            final String exbhvName = tmp.contains(".") ? tmp.substring(tmp.lastIndexOf(".") + ".".length()) : tmp;
             return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
         } else {
             return behaviorTypeName;
         }
     }
-        
+
     protected boolean isBehaviorQueryPathEnabled() {
         if (isProcedure()) {// [DBFlute-0.7.5]
             return false;

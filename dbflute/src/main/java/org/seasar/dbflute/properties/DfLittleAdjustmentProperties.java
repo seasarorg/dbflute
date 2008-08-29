@@ -81,6 +81,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public void checkDirectoryPackage() {
+        final String flatDirectoryPackage = getFlatDirectoryPackage();
+        final String omitDirectoryPackage = getOmitDirectoryPackage();
+        if (flatDirectoryPackage == null && omitDirectoryPackage == null) {
+            return;
+        }
         final DfOutsideSqlProperties outsideSqlProperties = DfBuildProperties.getInstance().getOutsideSqlProperties();
         if (!outsideSqlProperties.isSqlPackageValid()) {
             String msg = "You should set sqlPackage of outsideSqlDefinitionMap.dfprop";

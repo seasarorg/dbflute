@@ -207,15 +207,15 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 _outsideSqlPath = BuildBehaviorSqlPackageName() + "_" + _outsideSqlPath + ".sql";
             }
         }
-        
+
         protected String BuildBehaviorSqlPackageName() {
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
             String behaviorTypeName = dbmeta.BehaviorTypeName;
             String outsideSqlPackage = ${glDBFluteConfig}.GetInstance().OutsideSqlPackage;
             if (outsideSqlPackage != null && outsideSqlPackage.Trim().Length > 0) {
-                String behaviorClassName = behaviorTypeName.Substring(behaviorClassPath.LastIndexOf(".") + ".".Length);
+                String behaviorClassName = behaviorTypeName.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length);
                 String tmp = behaviorTypeName.Substring(0, behaviorTypeName.LastIndexOf("."));
-                String exbhvName = tmp.Contains(".") ? tmp.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length) : tmp;
+                String exbhvName = tmp.Contains(".") ? tmp.Substring(tmp.LastIndexOf(".") + ".".Length) : tmp;
                 return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
             } else {
                 return behaviorTypeName;
