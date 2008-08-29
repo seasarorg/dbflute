@@ -296,7 +296,7 @@ namespace ${myExtendedEntityPackageName} {
         }
 
         public override int GetHashCode() {
-            int result = 0;
+            int result = 17;
 #foreach ($col in $table.primaryKey)
 #if (!${col.isJavaNativeNumberObject()})
             if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
@@ -318,7 +318,7 @@ namespace ${myExtendedEntityPackageName} {
         }
 
         public override int GetHashCode() {
-            int result = 0;
+            int result = 17;
 #foreach ($col in $table.Columns)
 #if (!${col.isJavaNativeNumberObject()})
             if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
