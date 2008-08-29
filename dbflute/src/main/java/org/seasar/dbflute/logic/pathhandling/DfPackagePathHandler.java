@@ -36,6 +36,10 @@ public class DfPackagePathHandler {
     //                                                                                Main
     //                                                                                ====
     public String getPackageAsPath(String pckge) {
+        final String omitDirectoryPackage = _littleAdjustmentProperties.getOmitDirectoryPackage();
+        if (omitDirectoryPackage != null && omitDirectoryPackage.trim().length() > 0) {
+            pckge = removeOmitPackage(pckge, omitDirectoryPackage);
+        }
         final String flatDirectoryPackage = _littleAdjustmentProperties.getFlatDirectoryPackage();
         if (flatDirectoryPackage == null || flatDirectoryPackage.trim().length() == 0) {
             return resolvePackageAsPath(pckge);
@@ -49,11 +53,24 @@ public class DfPackagePathHandler {
         pckge = DfStringUtil.replace(pckge, flatMark, flatDirectoryPackage);
         return pckge;
     }
+    
+    protected String removeOmitPackage(String pckge, String omitName) {
+        if (pckge.startsWith(omitName)) {
+            return replaceString(pckge, omitName + ".", "");
+        } else if (pckge.endsWith(omitName)) {
+            return replaceString(pckge, "." + omitName, "");
+        } else {
+            return replaceString(pckge, "." + omitName + ".", ".");
+        }
+    }
 
     protected String resolvePackageAsPath(String pckge) {
         return pckge.replace('.', File.separator.charAt(0)) + File.separator;
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     // -----------------------------------------------------
     //                                               Logging
     //                                               -------
@@ -63,5 +80,11 @@ public class DfPackagePathHandler {
 
     public void debug(String msg) {
         _log.debug(msg);
+    }
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    public String replaceString(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
     }
 }
