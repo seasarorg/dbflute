@@ -94,7 +94,9 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                            Optimistic Lock Info
         //                                                            ====================
         bool HasVersionNo { get; }
+        ${glColumnInfoName} VersionNoColumnInfo { get; }
         bool HasUpdateDate { get; }
+        ${glColumnInfoName} UpdateDateColumnInfo { get; }
 
         // ===============================================================================
         //                                                              Common Column Info

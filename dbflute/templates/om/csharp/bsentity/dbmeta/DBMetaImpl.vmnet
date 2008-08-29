@@ -287,24 +287,18 @@ namespace ${myDBMetaPackageName} {
         }}
 #end
 
-        // -------------------------------------------------
-        //                                    Relation Trace
-        //                                    --------------
-
         // ===============================================================================
-        //                                                                   Sequence Info
-        //                                                                   =============
+        //                                                                    Various Info
+        //                                                                    ============
         public override bool HasSequence { get { return ${table.isUseSequence()}; } }
-
-        // ===============================================================================
-        //                                                            Optimistic Lock Info
-        //                                                            ====================
-        public override bool HasVersionNo { get { return ${table.isUseVersionNo()}; } }
+#if ($table.isUseVersionNo())
+        public override bool HasVersionNo { get { return true; } }
+        public override ${glColumnInfoName} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
+#end
+#if ($table.isUseUpdateDate())
         public override bool HasUpdateDate { get { return ${table.isUseUpdateDate()}; } }
-
-        // ===============================================================================
-        //                                                              Common Column Info
-        //                                                              ==================
+        public override ${glColumnInfoName} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
+#end
         public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
 
         // ===============================================================================

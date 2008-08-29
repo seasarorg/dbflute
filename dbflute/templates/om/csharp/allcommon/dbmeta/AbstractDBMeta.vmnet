@@ -208,8 +208,10 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
-        public abstract bool HasVersionNo { get; }
-        public abstract bool HasUpdateDate { get; }
+        public virtual bool HasVersionNo { get { return false; } }
+        public virtual ${glColumnInfoName} VersionNoColumnInfo { get { return null; } }
+        public virtual bool HasUpdateDate { get { return false; } }
+        public virtual ${glColumnInfoName} UpdateDateColumnInfo { get { return null; } }
 
         // ===============================================================================
         //                                                              Common Column Info
