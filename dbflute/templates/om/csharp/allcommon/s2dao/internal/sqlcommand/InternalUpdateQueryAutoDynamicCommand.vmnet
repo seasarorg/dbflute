@@ -47,7 +47,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
         assertArgument(args);
         Object fisrtArg = args[0];
-        if (!(fisrtArg instanceof ${glConditionBeanInterfaceName})) {
+        if (!(fisrtArg is ${glConditionBeanInterfaceName})) {
             String msg = "The type of first argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
             msg = msg + " type=" + fisrtArg.getClass();
             throw new IllegalArgumentException(msg);
@@ -58,7 +58,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected ${glEntityInterfaceName} extractEntityWithCheck(Object[] args) {
         assertArgument(args);
         Object secondArg = args[1];
-        if (!(secondArg instanceof ${glEntityInterfaceName})) {
+        if (!(secondArg is ${glEntityInterfaceName})) {
             String msg = "The type of second argument should be " + ${glEntityInterfaceName}.class + "! But:";
             msg = msg + " type=" + secondArg.getClass();
             throw new IllegalArgumentException(msg);
@@ -67,9 +67,9 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     }
 	
     protected void assertArgument(Object[] args) {
-        if (args == null || args.length <= 1) {
+        if (args == null || args.Length <= 1) {
             String msg = "The arguments should have two argument! But:";
-            msg = msg + " args=" + (args != null ? args.length : null);
+            msg = msg + " args=" + (args != null ? args.Length : null);
             throw new IllegalArgumentException(msg);
         }
     }
@@ -86,7 +86,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(entity.getTableDbName());
-        IList<String> modifiedPropertyNames = entity.ModifiedPropertyNames;
+        System.Collections.Generic.IList<String> modifiedPropertyNames = entity.ModifiedPropertyNames;
         if (modifiedPropertyNames.Count == 0) {
             return null;
         }
@@ -96,8 +96,8 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
                 currentPropertyName = propertyName;
                 ${glColumnInfoName} columnInfo = dbmeta.FindColumnInfo(propertyName);
                 String columnName = columnInfo.ColumnDbName;
-                MethodInfo getter = columnInfo.FindGetter();
-                Object value = getter.invoke(entity, (Object[])null);
+                PropertyInfo getter = columnInfo.FindProperty();
+                Object value = getter.GetValue(entity, null);
                 if (value != null) {
                     columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
                 } else {
@@ -110,20 +110,16 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
                 columnParameterMap.put(columnName, columnName + " + 1");
             }
             if (dbmeta.HasUpdateDate) {
-                ${glColumnInfoName} columnInfo = dbmeta.getUpdateDateColumnInfo();
-                Method setter = columnInfo.findSetter();
-                if (Timestamp.class.isAssignableFrom(columnInfo.getPropertyType())) {
-                    setter.invoke(entity, new Timestamp(System.currentTimeMillis()));
-                } else {
-                    setter.invoke(entity, new Date());
-                }
+                ${glColumnInfoName} columnInfo = dbmeta.UpdateDateColumnInfo;
+                PropertyInfo setter = columnInfo.FindProperty();
+                setter.SetValue(entity, DateTime.Now, null);
                 String columnName = columnInfo.ColumnDbName;
                 columnParameterMap.put(columnName, "/*entity." + columnInfo.PropertyName + "*/null");
             }
         } catch (Exception e) {
             throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
         }
-        return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
+        return cb.SqlClause.getClauseQueryUpdate(columnParameterMap);
     }
     
     protected void throwQueryUpdateFailureException(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity, String propertyName, Exception e) {
