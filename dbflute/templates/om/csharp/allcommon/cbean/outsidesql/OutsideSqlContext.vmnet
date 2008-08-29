@@ -202,7 +202,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 String behaviorPackagePath = behaviorClassPath.Substring(0, behaviorClassPath.LastIndexOf("/"));
                 String behaviorClassName = behaviorClassPath.Substring(behaviorClassPath.LastIndexOf("/") + "/".Length);
                 _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
-                _outsideSqlPath = _outsideSqlPath.Replace("/", ".");
+                _outsideSqlPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             } else {
                 _outsideSqlPath = BuildBehaviorSqlPackageName() + "_" + _outsideSqlPath + ".sql";
             }

@@ -6,6 +6,7 @@ import org.seasar.framework.util.InputStreamReaderUtil;
 import org.seasar.framework.util.ReaderUtil;
 import org.seasar.framework.util.ResourceUtil;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
@@ -224,15 +225,29 @@ public class ${glOutsideSqlContextName} {
 		    final String subDirectoryValue = _outsideSqlPath.substring(0, _outsideSqlPath.lastIndexOf(":"));
 		    final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
 			final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
-			final String behaviorClassPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/");
+			final String behaviorClassPath = replaceString(buildBehaviorSqlPackageName(), ".", "/");
 			final String behaviorPackagePath = behaviorClassPath.substring(0, behaviorClassPath.lastIndexOf("/"));
 			final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/") + "/".length());
             _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
 		} else {
-            _outsideSqlPath = replaceString(dbmeta.getBehaviorTypeName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
+            _outsideSqlPath = replaceString(buildBehaviorSqlPackageName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
 		}
     }
-
+        
+    protected String buildBehaviorSqlPackageName() {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+        final String behaviorTypeName = dbmeta.getBehaviorTypeName();
+        final String outsideSqlPackage = ${glDBFluteConfig}.getInstance().getOutsideSqlPackage();
+        if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
+            final String behaviorClassName = behaviorTypeName.substring(behaviorClassPath.lastIndexOf(".") + ".".length());
+            String tmp = behaviorTypeName.Substring(0, behaviorTypeName.lastIndexOf("."));
+            final String exbhvName = tmp.contains(".") ? tmp.substring(behaviorTypeName.lastIndexOf(".") + ".".length()) : tmp;
+            return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
+        } else {
+            return behaviorTypeName;
+        }
+    }
+        
     protected boolean isBehaviorQueryPathEnabled() {
         if (isProcedure()) {// [DBFlute-0.7.5]
             return false;
