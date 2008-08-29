@@ -168,10 +168,10 @@ namespace ${glPackageBaseCommonDBMeta} {
             return (${glForeignInfoName})propertyInfo.GetValue(this, null);
         }
     
-        protected ${glForeignInfoName} CraeteForeignInfo(String propName
-                                              , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
-                                              , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
-                                              , int relNo, bool oneToOne) {
+        protected ${glForeignInfoName} cfi(String propName
+                                , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+                                , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+                                , int relNo, bool oneToOne) {
             ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
             foreignInfo.ForeignPropertyName = propName;
             foreignInfo.LocalDBMeta = localDbm;
@@ -207,10 +207,10 @@ namespace ${glPackageBaseCommonDBMeta} {
             return (${glReferrerInfoName})propertyInfo.GetValue(this, null);
         }
 
-        protected ${glReferrerInfoName} CraeteReferrerInfo(String propName
-                                                , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
-                                                , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
-                                                , bool oneToOne) {
+        protected ${glReferrerInfoName} cri(String propName
+                                 , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                                 , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                                 , bool oneToOne) {
             ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
             referrerInfo.ReferrerPropertyName = propName;
             referrerInfo.LocalDBMeta = localDbm;

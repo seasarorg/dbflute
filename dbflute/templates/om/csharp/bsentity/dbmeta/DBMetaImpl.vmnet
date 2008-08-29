@@ -235,7 +235,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($column in $foreignKeys.localColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return CraeteForeignInfo("${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}", ${table.DBMetaClassName}.GetInstance(), ${foreignKeys.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
+            return cfi("${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}", ${table.DBMetaClassName}.GetInstance(), ${foreignKeys.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
         }}
 #end
 
@@ -247,7 +247,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return craeteForeignInfo("${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}", ${referrer.foreignTableDBMetaClassName}.GetInstance(), ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+            return cfi("${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}", ${referrer.foreignTableDBMetaClassName}.GetInstance(), ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
         }}
 #end
 #end
@@ -263,7 +263,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return craeteReferrerInfo("${referrer.referrerJavaBeansRulePropertyNameInitCap}", ${referrer.foreignTableDBMetaClassName}.GetInstance(), ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
+            return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", ${referrer.foreignTableDBMetaClassName}.GetInstance(), ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
         }}
 #end
 

@@ -262,10 +262,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
     
-    protected ${glForeignInfoName} craeteForeignInfo(String propName
-	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
-												   , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
-												   , int relNo, boolean oneToOne) {
+    protected ${glForeignInfoName} cfi(String propName
+                            , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+                            , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+                            , int relNo, boolean oneToOne) {// createForeignInfo()
         final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
         foreignInfo.setForeignPropertyName(propName);
         foreignInfo.setLocalDBMeta(localDbm);
@@ -322,10 +322,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    protected ${glReferrerInfoName} craeteReferrerInfo(String propName
-                                                     , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
-                                                     , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
-                                                     , boolean oneToOne) {
+    protected ${glReferrerInfoName} cri(String propName
+                             , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                             , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                             , boolean oneToOne) {// createReferrerInfo()
         final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
         referrerInfo.setReferrerPropertyName(propName);
         referrerInfo.setLocalDBMeta(localDbm);
