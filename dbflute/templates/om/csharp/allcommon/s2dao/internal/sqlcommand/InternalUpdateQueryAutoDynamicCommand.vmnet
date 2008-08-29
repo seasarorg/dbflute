@@ -6,6 +6,8 @@ using Seasar.Dao;
 using ${glPackageBaseCommonS2DaoInternalSqlParser};
 using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
@@ -48,8 +50,8 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         assertArgument(args);
         Object fisrtArg = args[0];
         if (!(fisrtArg is ${glConditionBeanInterfaceName})) {
-            String msg = "The type of first argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
-            msg = msg + " type=" + fisrtArg.getClass();
+            String msg = "The type of first argument should be " + typeof(${glConditionBeanInterfaceName}) + "! But:";
+            msg = msg + " type=" + fisrtArg.GetType();
             throw new IllegalArgumentException(msg);
         }
         return (${glConditionBeanInterfaceName}) fisrtArg;
@@ -60,7 +62,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         Object secondArg = args[1];
         if (!(secondArg is ${glEntityInterfaceName})) {
             String msg = "The type of second argument should be " + ${glEntityInterfaceName}.class + "! But:";
-            msg = msg + " type=" + secondArg.getClass();
+            msg = msg + " type=" + secondArg.GetType();
             throw new IllegalArgumentException(msg);
         }
         return (${glEntityInterfaceName}) secondArg;
@@ -69,13 +71,13 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected void assertArgument(Object[] args) {
         if (args == null || args.Length <= 1) {
             String msg = "The arguments should have two argument! But:";
-            msg = msg + " args=" + (args != null ? args.Length : null);
+            msg = msg + " args=" + (args != null ? "" + args.Length : "null");
             throw new IllegalArgumentException(msg);
         }
     }
     
-    protected ${glInternalCommandContextHandler} createCommandContextHandler(CommandContext context) {
-        return new ${glInternalCommandContextHandler}(dataSource, statementFactory, context);
+    protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
+        return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
     }
 
     /**
@@ -85,7 +87,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
      */
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(entity.getTableDbName());
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(entity.TableDbName);
         System.Collections.Generic.IList<String> modifiedPropertyNames = entity.ModifiedPropertyNames;
         if (modifiedPropertyNames.Count == 0) {
             return null;
@@ -137,7 +139,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         msg = msg + "[Doubtful Property Name]" + getLineSeparator() + propertyName + getLineSeparator();
         msg = msg + "[ConditionBean]" + getLineSeparator() + cb + getLineSeparator();
         msg = msg + "[Entity]" + getLineSeparator() + entity + getLineSeparator();
-        msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+        msg = msg + "[Exception Message]" + getLineSeparator() + e.Message + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new QueryUpdateFailureException(msg, e);
     }
