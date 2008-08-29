@@ -529,12 +529,16 @@ public class Database {
     // ===================================================================================
     //                                                                    Check Properties
     //                                                                    ================
+    /**
+     * Check properties as mutually related validation.
+     */
     public void checkProperties() {
         getProperties().getSequenceIdentityProperties().checkSequenceDefinitionMap(new SequenceDefinitionMapChecker() {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }
         });
+        getProperties().getLittleAdjustmentProperties().checkDirectoryPackage();
     }
 
     // ===================================================================================
@@ -1326,9 +1330,17 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
-    // ===============================================================================
-    //                                                         Properties - sql2entity
-    //                                                         =======================
+    // ===================================================================================
+    //                                                             Properties - OutsideSql
+    //                                                             =======================
+    public boolean isOutsideSqlPackageValid() {
+        return getProperties().getOutsideSqlProperties().isSqlPackageValid();
+    }
+    
+    public String getOutsideSqlPackage() {
+        return getProperties().getOutsideSqlProperties().getSqlPackage();
+    }
+    
     public boolean isSql2EntityPlainEntity() {
         return false;
     }

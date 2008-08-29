@@ -29,6 +29,11 @@ public class ${myClassName} {
 	protected boolean _sqlExceptionOldStyleHandling = ${database.isCompatibleSQLExceptionHandlingOldStyle()};// This is for compatibility!
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
+#if ($database.isOutsideSqlPackageValid())
+    protected String _outsideSqlPackage = "${database.outsideSqlPackage}";
+#else
+    protected String _outsideSqlPackage;
+#end
 	protected boolean _internalDebug;
 	protected boolean _locked = true;
 	
@@ -203,6 +208,21 @@ public class ${myClassName} {
 	    _logTimestampFormat = logTimestampFormat;
 	}
 	
+    // ===================================================================================
+    //                                                                  OutsideSql Package
+    //                                                                  ==================
+	public String getOutsideSqlPackage() {
+	    return _outsideSqlPackage;
+	}
+	
+	public void setOutsideSqlPackage(String outsideSqlPackage) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
+		}
+	    _outsideSqlPackage = outsideSqlPackage;
+	}
+    
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============

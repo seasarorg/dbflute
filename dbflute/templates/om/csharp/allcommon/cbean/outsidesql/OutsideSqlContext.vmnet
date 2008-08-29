@@ -8,6 +8,7 @@ using System.Threading;
 
 using Seasar.Framework.Util;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonUtil};
@@ -21,7 +22,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                      ==========
         /** Log instance. */
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-		
+        
         // ===============================================================================
         //                                                                    Thread Local
         //                                                                    ============
@@ -51,10 +52,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                      Unique Key
         //                                                                      ==========
         public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
-		    String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
-			String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
-			String tableDbName = option.TableDbName;
-			String generatedUniqueKey = option.GenerateUniqueKey();
+            String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
+            String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
+            String tableDbName = option.TableDbName;
+            String generatedUniqueKey = option.GenerateUniqueKey();
             return methodName + "():" + tableDbName + ":" + path + ":" + pmbKey + ":" + generatedUniqueKey + resultKey;
         }
 
@@ -76,11 +77,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected static String GetLineSeparator() {
-		    return ${glSimpleSystemUtil}.GetLineSeparator();
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
 
         protected static String ReplaceString(String text, String fromText, String toText) {
-    	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+            return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
 
         // ===============================================================================
@@ -106,7 +107,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected Object _resultTypeSpecification;
 
         protected String _methodName;
-		
+        
         protected ${glStatementConfig} _statementConfig;
 
         protected String _tableDbName;
@@ -114,15 +115,15 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                        Read SQL
         //                                                                        ========
-    	public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-    	    String sql = ReadOutsideSql(sqlFileEncoding, dbmsSuffix);
-			sql = ReplaceOutsideSqlBindCharacterOnLineComment(sql);
-    		return ReplaceOldStypePagingDeterminationForCompatible(sql);
-    	}
-		
-		protected String ReplaceOldStypePagingDeterminationForCompatible(String sql) {
-		    return sql.Replace("/*IF pmb.Paging*/", "/*IF pmb.IsPaging*/");
-		}
+        public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+            String sql = ReadOutsideSql(sqlFileEncoding, dbmsSuffix);
+            sql = ReplaceOutsideSqlBindCharacterOnLineComment(sql);
+            return ReplaceOldStypePagingDeterminationForCompatible(sql);
+        }
+        
+        protected String ReplaceOldStypePagingDeterminationForCompatible(String sql) {
+            return sql.Replace("/*IF pmb.Paging*/", "/*IF pmb.IsPaging*/");
+        }
     
         protected String ReplaceOutsideSqlBindCharacterOnLineComment(String sql) {
             String bindCharacter = "?";
@@ -150,7 +151,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     sb.Append(line).Append(lineSeparator);
                     continue;
                 }
-    			
+                
                 if (_log.IsDebugEnabled) {
                     _log.Debug("...Replacing bind character on line comment: " + lineComment);
                 }
@@ -159,7 +160,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             }
             return sb.ToString();
         }
-	
+    
         public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
             String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
@@ -189,28 +190,41 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                     Set up Path
         //                                                                     ===========
-	    public void SetupBehaviorQueryPathIfNeeds() {
-		    if (!IsBehaviorQueryPathEnabled) {
-			    return;
-			}
-	        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
-    		if (_outsideSqlPath.Contains(":")) {
-    		    String subDirectoryValue = _outsideSqlPath.Substring(0, _outsideSqlPath.LastIndexOf(":"));
-    		    String subDirectoryPath = subDirectoryValue.Replace(":", "/");
-    			String behaviorQueryPath = _outsideSqlPath.Substring(_outsideSqlPath.LastIndexOf(":") + ":".Length);
-    			String behaviorClassPath = dbmeta.BehaviorTypeName.Replace(".", "/");
-				String behaviorPackagePath = behaviorClassPath.Substring(0, behaviorClassPath.LastIndexOf("/"));
-    			String behaviorClassName = behaviorClassPath.Substring(behaviorClassPath.LastIndexOf("/") + "/".Length);
+        public void SetupBehaviorQueryPathIfNeeds() {
+            if (!IsBehaviorQueryPathEnabled) {
+                return;
+            }
+            if (_outsideSqlPath.Contains(":")) {
+                String subDirectoryValue = _outsideSqlPath.Substring(0, _outsideSqlPath.LastIndexOf(":"));
+                String subDirectoryPath = subDirectoryValue.Replace(":", "/");
+                String behaviorQueryPath = _outsideSqlPath.Substring(_outsideSqlPath.LastIndexOf(":") + ":".Length);
+                String behaviorClassPath = BuildBehaviorSqlPackageName().Replace(".", "/");
+                String behaviorPackagePath = behaviorClassPath.Substring(0, behaviorClassPath.LastIndexOf("/"));
+                String behaviorClassName = behaviorClassPath.Substring(behaviorClassPath.LastIndexOf("/") + "/".Length);
                 _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
-				_outsideSqlPath = _outsideSqlPath.Replace("/", ".");
-			} else {
-		        _outsideSqlPath = dbmeta.BehaviorTypeName + "_" + _outsideSqlPath + ".sql";
-			}
-	    }
-		
-		protected bool IsBehaviorQueryPathEnabled {
-		    get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
-		}
+                _outsideSqlPath = _outsideSqlPath.Replace("/", ".");
+            } else {
+                _outsideSqlPath = BuildBehaviorSqlPackageName() + "_" + _outsideSqlPath + ".sql";
+            }
+        }
+        
+        protected String BuildBehaviorSqlPackageName() {
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
+            String behaviorTypeName = dbmeta.BehaviorTypeName;
+            String outsideSqlPackage = ${glDBFluteConfig}.GetInstance().OutsideSqlPackage;
+            if (outsideSqlPackage != null && outsideSqlPackage.Trim().Length > 0) {
+                String behaviorClassName = behaviorTypeName.Substring(behaviorClassPath.LastIndexOf(".") + ".".Length);
+                String tmp = behaviorTypeName.Substring(0, behaviorTypeName.LastIndexOf("."));
+                String exbhvName = tmp.Contains(".") ? tmp.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length) : tmp;
+                return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
+            } else {
+                return behaviorTypeName;
+            }
+        }
+
+        protected bool IsBehaviorQueryPathEnabled {
+            get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
+        }
 
         // ===============================================================================
         //                                                                   Determination

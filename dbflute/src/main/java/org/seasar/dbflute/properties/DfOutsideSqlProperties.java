@@ -73,7 +73,12 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          SqlPackage
     //                                                                          ==========
-    protected String getSqlPackage() {
+    public boolean isSqlPackageValid() {
+        final String sqlPackage = getSqlPackage();
+        return sqlPackage != null && sqlPackage.trim().length() > 0  && !sqlPackage.trim().equals("null");
+    }
+    
+    public String getSqlPackage() {
         String sqlPackage = (String) getOutsideSqlDefinitionMap().get("sqlPackage");
         if (sqlPackage == null || sqlPackage.trim().length() == 0) {
             sqlPackage = getDefaultSqlPackage();

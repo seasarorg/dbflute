@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
@@ -52,14 +53,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableDatabaseDependency() {
         return booleanProp("torque.isAvailableDatabaseDependency", false);
     }
-    
+
     // ===================================================================================
     //                                              ToLower in Generator Underscore Method
     //                                              ======================================
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return booleanProp("torque.isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
-    
+
     // ===================================================================================
     //                                                              Flat Directory Package
     //                                                              ======================
@@ -70,18 +71,38 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public String getFlatDirectoryPackage() {
         return stringProp("torque.flatDirectoryPackage", null);
     }
-    
+
+    /**
+     * Get the package for omit directory. Normally, this property is only for C#.
+     * @return The package for omit directory. (Nullable)
+     */
+    public String getOmitDirectoryPackage() {
+        return stringProp("torque.omitDirectoryPackage", null);
+    }
+
+    public void checkDirectoryPackage() {
+        final DfOutsideSqlProperties outsideSqlProperties = DfBuildProperties.getInstance().getOutsideSqlProperties();
+        if (!outsideSqlProperties.isSqlPackageValid()) {
+            String msg = "You should set sqlPackage of outsideSqlDefinitionMap.dfprop";
+            msg = msg + " if you use flatDirectoryPackage or omitDirectoryPackage,";
+            msg = msg + " because behavior packages is different from sql packages:";
+            msg = msg + " flatDirectoryPackage=" + getFlatDirectoryPackage();
+            msg = msg + " omitDirectoryPackage=" + getOmitDirectoryPackage();
+            throw new IllegalStateException(msg);
+        }
+    }
+
     // ===================================================================================
     //                                                                       Compatibility
     //                                                                       =============
     public boolean isCompatibleVersionNoAutoIncrementOnMemory() {
         return booleanProp("torque.isCompatibleVersionNoAutoIncrementOnMemory", false);
     }
-    
+
     public boolean isCompatibleSQLExceptionHandlingOldStyle() {
         return booleanProp("torque.isCompatibleSQLExceptionHandlingOldStyle", false);
     }
-    
+
     // ===================================================================================
     //                                                                  Friendly Framework 
     //                                                                  ==================
