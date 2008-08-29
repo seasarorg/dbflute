@@ -52,8 +52,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                 Internal Helper
         //                                                                 ===============
-        protected virtual PropertyInfo FindProperty(Type clazz, String propertyName) {
-            return clazz.GetProperty(propertyName);
+        protected virtual PropertyInfo FindProperty(Type clazz, String name) {
+            return clazz.GetProperty(name);
         }
 
         // ===============================================================================
