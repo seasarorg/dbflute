@@ -169,9 +169,9 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
     
         protected ${glForeignInfoName} CraeteForeignInfo(String propName
-    	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
-	    											   , IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
-	    											   , int relNo, bool oneToOne) {
+                                              , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+                                              , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+                                              , int relNo, bool oneToOne) {
             ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
             foreignInfo.ForeignPropertyName = propName;
             foreignInfo.LocalDBMeta = localDbm;
@@ -208,9 +208,9 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         protected ${glReferrerInfoName} CraeteReferrerInfo(String propName
-                                                         , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
-                                                         , IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
-                                                         , bool oneToOne) {
+                                                , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                                                , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                                                , bool oneToOne) {
             ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
             referrerInfo.ReferrerPropertyName = propName;
             referrerInfo.LocalDBMeta = localDbm;

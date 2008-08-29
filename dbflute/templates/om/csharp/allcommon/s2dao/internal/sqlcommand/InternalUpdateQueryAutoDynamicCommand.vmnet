@@ -90,13 +90,13 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(entity.TableDbName);
-        System.Collections.Generic.IList<String> modifiedPropertyNames = entity.ModifiedPropertyNames;
+        System.Collections.Generic.IDictionary<String, Object> modifiedPropertyNames = entity.ModifiedPropertyNames;
         if (modifiedPropertyNames.Count == 0) {
             return null;
         }
         String currentPropertyName = null;
         try {
-            foreach (String propertyName in modifiedPropertyNames) {
+            foreach (String propertyName in modifiedPropertyNames.Keys) {
                 currentPropertyName = propertyName;
                 ${glColumnInfoName} columnInfo = dbmeta.FindColumnInfo(propertyName);
                 String columnName = columnInfo.ColumnDbName;
@@ -169,4 +169,6 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
+}
+
 }
