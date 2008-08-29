@@ -189,14 +189,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
 		
-//        protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
-//            if (IsFirstArgumentConditionBean(mi)) {
-//                ISqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
-//                _sqlCommands.Add(mi.Name, cmd);
-//                return;
-//            }
-//            base.SetupUpdateMethodByAuto(mi);
-//        }
+        protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
+            if (IsFirstArgumentConditionBean(mi)) {
+                ISqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
+                _sqlCommands.Add(mi.Name, cmd);
+                return;
+            }
+            base.SetupUpdateMethodByAuto(mi);
+        }
         
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);

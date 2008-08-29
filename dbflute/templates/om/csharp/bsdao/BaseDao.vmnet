@@ -45,7 +45,7 @@ namespace ${myExtendedDaoPackageName} {
         int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
-//        int UpdateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);// {DBFlute-0.7.9}
+        int UpdateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);// {DBFlute-0.7.9}
 #end
         int Delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
