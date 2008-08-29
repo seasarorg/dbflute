@@ -296,7 +296,7 @@ namespace ${myDBMetaPackageName} {
         public override ${glColumnInfoName} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
 #end
 #if ($table.isUseUpdateDate())
-        public override bool HasUpdateDate { get { return ${table.isUseUpdateDate()}; } }
+        public override bool HasUpdateDate { get { return true; } }
         public override ${glColumnInfoName} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
 #end
         public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
