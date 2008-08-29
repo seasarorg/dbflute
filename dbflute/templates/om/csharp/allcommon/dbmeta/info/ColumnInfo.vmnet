@@ -125,12 +125,12 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { primary = value; }
         }
 
-        public Nullable<int> ColumnSize {
+        public int? ColumnSize {
             get { return columnSize; }
             set { columnSize = value; }
         }
 
-        public Nullable<int> ColumnDecimalDigits {
+        public int? ColumnDecimalDigits {
             get { return columnDecimalDigits; }
             set { columnDecimalDigits = value; }
         }
