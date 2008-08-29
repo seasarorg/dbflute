@@ -167,6 +167,20 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             return (${glForeignInfoName})propertyInfo.GetValue(this, null);
         }
+    
+        protected ${glForeignInfoName} CraeteForeignInfo(String propName
+    	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+	    											   , IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+	    											   , int relNo, bool oneToOne) {
+            ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
+            foreignInfo.ForeignPropertyName = propName;
+            foreignInfo.LocalDBMeta = localDbm;
+            foreignInfo.ForeignDBMeta = foreignDbm;
+            foreignInfo.LocalForeignColumnInfoMap = localForeignColumnInfoMap;
+            foreignInfo.RelationNo = relNo;
+            foreignInfo.IsOneToOne = oneToOne;
+            return foreignInfo;
+        }
 
         // -------------------------------------------------
         //                                  Referrer Element
@@ -193,9 +207,22 @@ namespace ${glPackageBaseCommonDBMeta} {
             return (${glReferrerInfoName})propertyInfo.GetValue(this, null);
         }
 
+        protected ${glReferrerInfoName} CraeteReferrerInfo(String propName
+                                                         , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                                                         , IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                                                         , bool oneToOne) {
+            ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
+            referrerInfo.ReferrerPropertyName = propName;
+            referrerInfo.LocalDBMeta = localDbm;
+            referrerInfo.ReferrerDBMeta = referrerDbm;
+            referrerInfo.LocalReferrerColumnInfoMap = localReferrerColumnInfoMap;
+            referrerInfo.IsOneToOne = oneToOne;
+            return referrerInfo;
+        }
+
         // -------------------------------------------------
-        //                                     Common Helper
-        //                                     -------------
+        //                                      Common Logic
+        //                                      ------------
         protected static String BuildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
             return targetName + relationPropertyName.Substring(0, 1).ToUpper() + relationPropertyName.Substring(1);
         }

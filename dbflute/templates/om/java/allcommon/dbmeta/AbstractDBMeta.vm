@@ -322,14 +322,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
-        return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
-    }
-    
     protected ${glReferrerInfoName} craeteReferrerInfo(String propName
-	                                               , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
-												   , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
-												   , boolean oneToOne) {
+                                                     , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                                                     , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                                                     , boolean oneToOne) {
         final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
         referrerInfo.setReferrerPropertyName(propName);
         referrerInfo.setLocalDBMeta(localDbm);
@@ -337,7 +333,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         referrerInfo.setLocalReferrerColumnInfoMap(localReferrerColumnInfoMap);
         referrerInfo.setOneToOne(oneToOne);
         return referrerInfo;
-		
+    }
+
+    // -----------------------------------------------------
+    //                                          Common Logic
+    //                                          ------------
+    protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
+        return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
     }
 	
     // -----------------------------------------------------
