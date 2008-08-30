@@ -107,12 +107,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
-        protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
-            return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+        protected virtual Object ExecuteScalar(IDbCommand cmd, Object resource) {
+            return CommandFactory.ExecuteScalar(DataSource, cmd);
         }
 
-        protected virtual Object ExecuteScalar(IDbCommand cmd, Object resource) {
-            return CommandFactory.ExecuteScalar(DataSource, cmd);;
+        protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
+            return CommandFactory.ExecuteNonQuery(DataSource, cmd);
         }
 
         protected virtual void Close(IDbConnection conn) {

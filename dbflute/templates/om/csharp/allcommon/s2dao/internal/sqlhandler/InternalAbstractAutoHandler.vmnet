@@ -15,12 +15,12 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-    public abstract class ${glInternalAbstractAutoHandler} : BasicHandler, IUpdateHandler {
+    public abstract class ${glInternalAbstractAutoHandler} : ${glInternalBasicHandler} {
 
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // ===============================================================================
         //                                                                       Attribute
@@ -80,9 +80,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int ret = -1;
             try {
                 BindArgs(cmd, _bindVariables, _bindVariableTypes);
-                ret = CommandFactory.ExecuteNonQuery(DataSource, cmd);
+                ret = ExecuteUpdate(cmd, _bindVariables);
             } finally {
-                CommandUtil.Close(cmd);
+                Close(cmd);
             }
             PostUpdateBean(bean);
             return ret;
@@ -95,12 +95,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-        protected virtual void PreUpdateBean(object bean)
-        {
+        protected virtual void PreUpdateBean(object bean) {
         }
 
-        protected virtual void PostUpdateBean(object bean)
-        {
+        protected virtual void PostUpdateBean(object bean) {
         }
 
         protected abstract void SetupBindVariables(object bean);
@@ -257,37 +255,31 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        public IBeanMetaData BeanMetaData
-        {
+        public IBeanMetaData BeanMetaData {
             get { return _beanMetaData; }
         }
 
-        protected object[] BindVariables
-        {
+        protected object[] BindVariables {
             get { return _bindVariables; }
             set { _bindVariables = value; }
         }
 
-        protected Type[] BindVariableTypes
-        {
+        protected Type[] BindVariableTypes {
             get { return _bindVariableTypes; }
             set { _bindVariableTypes = value; }
         }
 
-        protected DateTime Timestamp
-        {
+        protected DateTime Timestamp {
             get { return _timestamp; }
             set { _timestamp = value; }
         }
 
-        protected int VersionNo
-        {
+        protected int VersionNo {
             get { return _versionNo; }
             set { _versionNo = value; }
         }
 
-        protected IPropertyType[] PropertyTypes
-        {
+        protected IPropertyType[] PropertyTypes {
             get { return _propertyTypes; }
             set { _propertyTypes = value; }
         }
