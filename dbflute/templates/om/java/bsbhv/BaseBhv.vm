@@ -234,7 +234,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                       Load Referrer
     //                                                                       =============
 #foreach ($referrer in $table.refererList)
-#set ($referrerTable = $referrer.Table)
+#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")

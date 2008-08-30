@@ -61,25 +61,25 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return Execute(args, argTypes);
         }
 
-        protected virtual object Execute(IDbConnection conn, object[] args, Type[] argTypes) {
+        protected virtual Object Execute(IDbConnection conn, object[] args, Type[] argTypes) {
             IDbCommand cmd = null;
             try {
                 cmd = Command(conn);
                 BindArgs(cmd, args, argTypes);
-                return Execute(cmd);
+                return Execute(cmd args);
             } finally {
                 Close(cmd);
             }
         }
 
-        protected virtual object Execute(IDbCommand cmd) {
+        protected virtual Object Execute(IDbCommand cmd, Object[] args) {
             if (_dataReaderHandler == null) {
                 throw new EmptyRuntimeException("dataReaderHandler");
             }
             IDataReader dataReader = null;
             try {
                 if (_dataReaderHandler is ObjectDataReaderHandler) {// CSharp specific
-                    return CommandFactory.ExecuteScalar(DataSource, cmd);
+                    return ExecuteScalar(cmd, args);
                 } else {
                     dataReader = CreateDataReader(cmd);
                     return _dataReaderHandler.Handle(dataReader);

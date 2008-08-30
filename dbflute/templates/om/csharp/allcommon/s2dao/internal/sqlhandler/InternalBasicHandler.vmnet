@@ -65,8 +65,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 IValueType valueType = ValueTypes.GetValueType(argTypes[i]);
                 try {
                     valueType.BindValue(command, argNames[i], args[i]);
-                } catch (Exception ex) {
-                    throw new SQLRuntimeException(ex);
+                } catch (Exception e) {
+                    throw new SQLRuntimeException(e);
                 }
             }
         }
@@ -109,6 +109,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                               =================
         protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
             return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+        }
+
+        protected virtual Object ExecuteScalar(IDbCommand cmd, Object resource) {
+            return CommandFactory.ExecuteScalar(DataSource, cmd);;
         }
 
         protected virtual void Close(IDbConnection conn) {

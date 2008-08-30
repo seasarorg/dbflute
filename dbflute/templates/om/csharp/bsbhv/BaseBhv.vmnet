@@ -132,17 +132,6 @@ namespace ${glPackageExtendedBhv} {
             AssertEntitySelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
-
-#if ($table.hasPrimaryKey())
-// TODO: @jflute
-//        public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-//            ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-//            ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-//            ${myConditionBeanClassName} cb = NewMyConditionBean();
-//            cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-//            return this.SelectEntityWithDeletedCheck(cb);
-//        }
-#end
         #endregion
 
         // ===============================================================================
@@ -195,7 +184,6 @@ namespace ${glPackageExtendedBhv} {
         //                                                                   =============
         #region Load Referrer
 #foreach ($referer in $table.refererList)
-#if (!${referrer.isOneToOne()})
 #set ($refererTable = $referer.table)
 #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
 #set ($refererDaoClassName = "${refererEntityClassName}Dao")
@@ -206,6 +194,7 @@ namespace ${glPackageExtendedBhv} {
 #set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${refererEntityClassName}>")
+#if (!${referrer.isOneToOne()})
         public virtual void Load${referer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (ls.Count == 0) { return; }
