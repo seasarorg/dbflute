@@ -36,8 +36,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public override object Execute(object[] args)
-        {
+        public override object Execute(object[] args) {
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler();
             handler.Sql = Sql;
             int rows = handler.Execute(args);
@@ -45,8 +44,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             return rows;
         }
 
-        protected IPropertyType[] PropertyTypes
-        {
+        protected IPropertyType[] PropertyTypes {
             get { return propertyTypes; }
             set { propertyTypes = value; }
         }
@@ -57,8 +55,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
         protected void SetupInsertPropertyTypes(string[] propertyNames) {
             ArrayList types = new ArrayList();
-            for (int i = 0; i < propertyNames.Length; ++i)
-            {
+            for (int i = 0; i < propertyNames.Length; ++i) {
                 IPropertyType pt = BeanMetaData.GetPropertyType(propertyNames[i]);
                 if (pt.IsPrimaryKey && !BeanMetaData.IdentifierGenerator.IsSelfGenerate)
                     continue;
@@ -69,8 +66,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
         protected void SetupUpdatePropertyTypes(string[] propertyNames) {
             ArrayList types = new ArrayList();
-            for (int i = 0; i < propertyNames.Length; ++i)
-            {
+            for (int i = 0; i < propertyNames.Length; ++i) {
                 IPropertyType pt = BeanMetaData.GetPropertyType(propertyNames[i]);
                 if (pt.IsPrimaryKey) continue;
                 types.Add(pt);
@@ -89,8 +85,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             sb.Append("INSERT INTO ");
             sb.Append(bmd.TableName);
             sb.Append(" (");
-            for (int i = 0; i < propertyTypes.Length; ++i)
-            {
+            for (int i = 0; i < propertyTypes.Length; ++i) {
                 IPropertyType pt = propertyTypes[i];
                 sb.Append(pt.ColumnName);
                 sb.Append(", ");
@@ -125,8 +120,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             Sql = sb.ToString();
         }
 
-        protected void SetupDeleteSql()
-        {
+        protected void SetupDeleteSql() {
             CheckPrimaryKey();
             StringBuilder sb = new StringBuilder(100);
             sb.Append("DELETE FROM ");
@@ -135,32 +129,28 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             Sql = sb.ToString();
         }
 
-        protected void CheckPrimaryKey()
-        {
+        protected void CheckPrimaryKey() {
             IBeanMetaData bmd = BeanMetaData;
-            if (bmd.PrimaryKeySize == 0)
+            if (bmd.PrimaryKeySize == 0) {
                 throw new PrimaryKeyNotFoundRuntimeException(bmd.BeanType);
+            }
         }
 
-        protected void SetupUpdateWhere(StringBuilder sb)
-        {
+        protected void SetupUpdateWhere(StringBuilder sb) {
             IBeanMetaData bmd = BeanMetaData;
             sb.Append(" WHERE ");
-            for (int i = 0; i < bmd.PrimaryKeySize; ++i)
-            {
+            for (int i = 0; i < bmd.PrimaryKeySize; ++i) {
                 sb.Append(bmd.GetPrimaryKey(i));
                 sb.Append(" = ? AND ");
             }
             sb.Length = sb.Length - 5;
-            if (bmd.HasVersionNoPropertyType)
-            {
+            if (bmd.HasVersionNoPropertyType) {
                 IPropertyType pt = bmd.VersionNoPropertyType;
                 sb.Append(" AND ");
                 sb.Append(pt.ColumnName);
                 sb.Append(" = ?");
             }
-            if (bmd.HasTimestampPropertyType)
-            {
+            if (bmd.HasTimestampPropertyType) {
                 IPropertyType pt = bmd.TimestampPropertyType;
                 sb.Append(" AND ");
                 sb.Append(pt.ColumnName);
