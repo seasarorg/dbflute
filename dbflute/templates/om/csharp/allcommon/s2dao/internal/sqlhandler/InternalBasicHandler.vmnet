@@ -3,7 +3,6 @@ using System;
 using System.Data;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Types;
-using Seasar.Framework.Exceptions;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
@@ -42,7 +41,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected IDbConnection Connection {
             get {
                 if (_dataSource == null) {
-                    throw new EmptyRuntimeException("_dataSource");
+                    throw new SystemException("The dataSource should not be null at InternalBasicHandler!");
                 }
                 return DataSourceUtil.GetConnection(_dataSource);
             }
@@ -50,7 +49,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         protected virtual IDbCommand Command(IDbConnection connection) {
             if (_sql == null) {
-                throw new EmptyRuntimeException("_sql");
+                throw new SystemException("The sql should not be null at InternalBasicHandler!!");
             }
             IDbCommand cmd = _commandFactory.CreateCommand(connection, _sql);
             if (_commandTimeout > -1) {
