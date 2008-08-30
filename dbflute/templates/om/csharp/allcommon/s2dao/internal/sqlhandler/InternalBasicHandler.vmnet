@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Types;
+using Seasar.Framework.Exceptions;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
@@ -13,7 +14,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
     public class ${glInternalBasicHandler} {
 
         private IDataSource _dataSource;
-        private string _sql;
+        private String _sql;
         private ICommandFactory _commandFactory;
         private int _commandTimeout = -1;
 
@@ -28,7 +29,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             set { _dataSource = value; }
         }
 
-        public string Sql {
+        public String Sql {
             get { return _sql; }
             set { _sql = value; }
         }
