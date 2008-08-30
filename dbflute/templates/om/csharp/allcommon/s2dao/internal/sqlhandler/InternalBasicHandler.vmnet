@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         private ICommandFactory _commandFactory;
         private int _commandTimeout = -1;
 
-        public ${glInternalBasicHandler}(IDataSource ds, string sql, ICommandFactory commandFactory) {
+        public ${glInternalBasicHandler}(IDataSource ds, String sql, ICommandFactory commandFactory) {
             DataSource = ds;
             Sql = sql;
             CommandFactory = commandFactory;
