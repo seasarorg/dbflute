@@ -256,6 +256,7 @@ namespace ${myDBMetaPackageName} {
         //                                  Referrer Element
         //                                  ----------------
 #foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #set ($referrerTable = $referrer.table)
         public ${glReferrerInfoName} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
@@ -265,6 +266,7 @@ namespace ${myDBMetaPackageName} {
 #end
             return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
         }}
+#end
 #end
 
         // ===============================================================================

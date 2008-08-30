@@ -230,6 +230,7 @@ namespace ${myExtendedEntityPackageName} {
         //                                                               =================
         #region Referrer Property
 #foreach ($referrer in $table.referrerList)
+#if (!${referrer.isOneToOne()})
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.ReferrerPropertyNameInitCap}")
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -240,7 +241,7 @@ namespace ${myExtendedEntityPackageName} {
             get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }
         }
-
+#end
 #end
 
         #endregion

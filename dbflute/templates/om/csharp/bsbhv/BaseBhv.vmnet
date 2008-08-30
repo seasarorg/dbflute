@@ -194,23 +194,18 @@ namespace ${glPackageExtendedBhv} {
         //                                                                   Load Referrer
         //                                                                   =============
         #region Load Referrer
-  #foreach ($referer in $table.refererList)
-    #set ($refererTable = $referer.Table)
-    #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
-    #set ($refererDaoClassName = "${refererEntityClassName}Dao")
-    #set ($refererBhvClassName = "")
-    #set ($refererBhvClassName = "${refererEntityClassName}Bhv")
-    #set ($refererCBClassName = "${refererEntityClassName}${glConditionBeanInitialName}")
-    #set ($refererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
-    #set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
-    #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${refererEntityClassName}>")
-
-        // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   ReferrerTable    = [${referer.table.name}]
-        //   ReferrerProperty = [${referer.reffererPropertyNameInitCap}]
-        // * * * * * * * * */
-
+#foreach ($referer in $table.refererList)
+#if (!${referrer.isOneToOne()})
+#set ($refererTable = $referer.table)
+#set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
+#set ($refererDaoClassName = "${refererEntityClassName}Dao")
+#set ($refererBhvClassName = "")
+#set ($refererBhvClassName = "${refererEntityClassName}Bhv")
+#set ($refererCBClassName = "${refererEntityClassName}${glConditionBeanInitialName}")
+#set ($refererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
+#set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${refererEntityClassName}>")
         public virtual void Load${referer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (ls.Count == 0) { return; }
@@ -251,8 +246,8 @@ namespace ${glPackageExtendedBhv} {
             }
         }
 
-  #end
-
+#end
+#end
         #endregion
 #end
 
