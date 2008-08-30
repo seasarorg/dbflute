@@ -60,9 +60,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
@@ -115,42 +112,4 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
-
-    /**
-     * Collect SQL files the list.
-     * @return The list of SQL files. (NotNull)
-     */
-    protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final List<File> sqlFileList = collectSqlFile(sqlDirectory);
-        if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
-            return sqlFileList;
-        }
-        final String srcMainResources = DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-        try {
-            final List<File> resourcesSqlFileList = collectSqlFile(srcMainResources);
-            sqlFileList.addAll(resourcesSqlFileList);
-        } catch (Exception e) {
-            _log.debug("Not found sql directory on resources: " + srcMainResources);
-        }
-        return sqlFileList;
-    }
-
-    protected List<File> collectSqlFile(String sqlDirectory) {
-        return createSqlFileGetter().getSqlFileList(sqlDirectory);
-    }
-
-    protected DfSqlFileGetter createSqlFileGetter() {
-        final DfLanguageDependencyInfo dependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return new DfSqlFileGetter() {
-            @Override
-            protected boolean acceptSqlFile(File file) {
-                if (!dependencyInfo.isCompileTargetFile(file)) {
-                    return false;
-                }
-                return super.acceptSqlFile(file);
-            }
-        };
-    }
-
 }

@@ -45,6 +45,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
@@ -76,7 +77,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     /** Schema name. */
     protected String _schema;
-    
+
     /** User name. */
     protected String _userId;
 
@@ -400,6 +401,19 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     // ===================================================================================
+    //                                                                 SQL File Collecting
+    //                                                                 ===================
+    /**
+     * Collect SQL files the list.
+     * @return The list of SQL files. (NotNull)
+     */
+    protected List<File> collectSqlFileList() {
+        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
+        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        return sqlFileCollector.collectSqlFileList();
+    }
+
+    // ===================================================================================
     //                                                                    Refresh Resource
     //                                                                    ================
     protected void refreshResources() {
@@ -535,7 +549,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     public void setTargetDatabase(String v) {
         _targetDatabase = v;
     }
-    
+
     public void setEnvironmentType(String environmentType) {
         DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
     }

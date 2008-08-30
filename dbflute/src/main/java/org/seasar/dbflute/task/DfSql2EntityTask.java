@@ -55,7 +55,6 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
@@ -143,16 +142,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
-    /**
-     * Collect SQL files the list.
-     * @return The list of SQL files. (NotNull)
-     */
-    protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
-        return sqlFileCollector.collectSqlFileList();
-    }
-
     /**
      * Create SQL file runner.
      * @param runInfo Run information. (NotNull)

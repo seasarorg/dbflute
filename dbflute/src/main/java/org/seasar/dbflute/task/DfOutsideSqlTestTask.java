@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -65,9 +64,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
     @Override
     protected List<File> getSqlFileList() {
-        final String sqlDirectory = getSqlDirectory();
-        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
-        return sqlFileCollector.collectSqlFileList();
+        return collectSqlFileList();
     }
 
     @Override

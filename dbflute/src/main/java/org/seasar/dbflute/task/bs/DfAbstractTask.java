@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.task.bs;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -28,6 +30,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
@@ -220,6 +223,19 @@ public abstract class DfAbstractTask extends Task {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    // ===================================================================================
+    //                                                                 SQL File Collecting
+    //                                                                 ===================
+    /**
+     * Collect SQL files the list.
+     * @return The list of SQL files. (NotNull)
+     */
+    protected List<File> collectSqlFileList() {
+        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
+        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        return sqlFileCollector.collectSqlFileList();
     }
 
     // ===================================================================================
