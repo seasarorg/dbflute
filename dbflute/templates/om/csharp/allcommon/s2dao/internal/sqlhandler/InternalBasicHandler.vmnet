@@ -13,52 +13,25 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
     public class ${glInternalBasicHandler} {
 
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         private IDataSource _dataSource;
         private String _sql;
         private ICommandFactory _commandFactory;
-        private int _commandTimeout = -1;
 
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${glInternalBasicHandler}(IDataSource ds, String sql, ICommandFactory commandFactory) {
             DataSource = ds;
             Sql = sql;
             CommandFactory = commandFactory;
         }
 
-        public IDataSource DataSource {
-            get { return _dataSource; }
-            set { _dataSource = value; }
-        }
-
-        public String Sql {
-            get { return _sql; }
-            set { _sql = value; }
-        }
-
-        public ICommandFactory CommandFactory {
-            get { return _commandFactory; }
-            set { _commandFactory = value; }
-        }
-
-        protected IDbConnection Connection {
-            get {
-                if (_dataSource == null) {
-                    throw new SystemException("The dataSource should not be null at InternalBasicHandler!");
-                }
-                return DataSourceUtil.GetConnection(_dataSource);
-            }
-        }
-
-        protected virtual IDbCommand Command(IDbConnection connection) {
-            if (_sql == null) {
-                throw new SystemException("The sql should not be null at InternalBasicHandler!!");
-            }
-            IDbCommand cmd = _commandFactory.CreateCommand(connection, _sql);
-            if (_commandTimeout > -1) {
-                cmd.CommandTimeout = _commandTimeout;
-            }
-            return cmd;
-        }
-
+        // ===============================================================================
+        //                                                                    Common Logic
+        //                                                                    ============
         protected virtual void BindArgs(IDbCommand command, object[] args, Type[] argTypes) {
             if (args == null) return;
             string[] argNames = _commandFactory.GetArgNames(command, args);
@@ -128,11 +101,45 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             DataReaderUtil.Close(dataReader);
         }
 
+        protected IDbConnection Connection {
+            get {
+                if (_dataSource == null) {
+                    throw new SystemException("The dataSource should not be null at InternalBasicHandler!");
+                }
+                return DataSourceUtil.GetConnection(_dataSource);
+            }
+        }
+
+        protected virtual IDbCommand Command(IDbConnection connection) {
+            if (_sql == null) {
+                throw new SystemException("The sql should not be null at InternalBasicHandler!!");
+            }
+            return _commandFactory.CreateCommand(connection, _sql);
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
         protected String GetLineSeparator() {
             return SimpleSystemUtil.GetLineSeparator();
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDataSource DataSource {
+            get { return _dataSource; }
+            set { _dataSource = value; }
+        }
+
+        public String Sql {
+            get { return _sql; }
+            set { _sql = value; }
+        }
+
+        public ICommandFactory CommandFactory {
+            get { return _commandFactory; }
+            set { _commandFactory = value; }
         }
     }
 }

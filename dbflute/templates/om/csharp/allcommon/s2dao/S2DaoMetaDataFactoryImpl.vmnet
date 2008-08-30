@@ -58,8 +58,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             set { _sqlFileEncoding = value; }
         }
 
-        #region IDaoMetaDataFactory メンバ
-
         public IDaoMetaData GetDaoMetaData(Type daoType) {
             lock (this) {
                 string key = daoType.FullName;
@@ -72,8 +70,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return dmd;
             }
         }
-
-        #endregion
 
         protected virtual IDaoMetaData CreateDaoMetaData(Type daoType) {
             ${glS2DaoMetaDataExtension} dmd = NewDaoMetaDataExtension();
@@ -122,12 +118,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return CreateBeanDataTableMetaDataDataReaderHandler(bmd, retType);
             } else if (retType.IsArray) {
                 Type elementType = retType.GetElementType();
-                if (AssignTypeUtil.IsSimpleType(elementType))
-                {
+                if (AssignTypeUtil.IsSimpleType(elementType)) {
                     return CreateObjectArrayDataReaderHandler(elementType);
-                }
-                else
-                {
+                } else {
                     return CreateBeanArrayMetaDataDataReaderHandler(bmd);
                 }
             } else if (AssignTypeUtil.IsList(retType)) {
