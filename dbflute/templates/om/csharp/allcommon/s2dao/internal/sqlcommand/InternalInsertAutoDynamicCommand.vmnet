@@ -34,8 +34,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public override object Execute(object[] args)
-        {
+        public override object Execute(object[] args) {
             object bean = args[0];
             IBeanMetaData bmd = BeanMetaData;
             string[] propertyNames = PropertyNames;

@@ -198,12 +198,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             base.SetupUpdateMethodByAuto(mi);
         }
         
-        protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            ${glInternalUpdateAutoDynamicCommand} cmd = new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            cmd.VersionNoAutoIncrementOnMemory = IsUpdateVersionNoAutoIncrementOnMemory(method);
+            return cmd;
         }
 		
-        protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            ${glInternalUpdateModifiedOnlyCommand} cmd = new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            cmd.VersionNoAutoIncrementOnMemory = IsUpdateVersionNoAutoIncrementOnMemory(method);
+            return cmd;
         }
 
         protected override void SetupDeleteMethodByAuto(MethodInfo mi) {
@@ -219,8 +223,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
 		
+        // -------------------------------------------------
+        //                                     Common Helper
+        //                                     -------------
         protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(MethodInfo method) {
-            if (method.Name.Contains("Nonstrict")) {
+            if (IsNonstrictMethod(method)) {
                 BeanMetaDataForUpdateNonConcurrency bmdNonConcurrency = new BeanMetaDataForUpdateNonConcurrency(_beanType, _annotationReaderFactory, false);
                 bmdNonConcurrency.Initialize(_dbMetaData, _dbms);
                 return bmdNonConcurrency;
@@ -229,10 +236,17 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
+        protected bool IsUpdateVersionNoAutoIncrementOnMemory(MethodInfo mi) {
+            return !IsNonstrictMethod(mi);
+        }
+
+        protected bool IsNonstrictMethod(MethodInfo mi) {
+            return mi.Name.Contains("Nonstrict");
+        }
+
         protected bool IsFirstArgumentConditionBean(MethodInfo mi) {
             Type[] pmbTypes = MethodUtil.GetParameterTypes(mi);
             return pmbTypes.Length > 0 && typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(pmbTypes[0]);
-        }
 
         // ===============================================================================
         //                                                             OutsideSql Override

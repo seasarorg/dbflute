@@ -31,6 +31,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected DateTime _timestamp = DateTime.MinValue;
         protected Int32 _versionNo = Int32.MinValue;
         protected IPropertyType[] _propertyTypes;
+        protected bool _versionNoAutoIncrementOnMemory = true;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -151,7 +152,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected bool IsVersionNoAutoIncrementOnMemory() {
-            return false;
+            return _versionNoAutoIncrementOnMemory;
         }
 
         protected void SetupDeleteBindVariables(object bean) {
@@ -282,6 +283,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected IPropertyType[] PropertyTypes {
             get { return _propertyTypes; }
             set { _propertyTypes = value; }
+        }
+
+        public bool VersionNoAutoIncrementOnMemory {
+            set { _versionNoAutoIncrementOnMemory = value; }
         }
     }
 }

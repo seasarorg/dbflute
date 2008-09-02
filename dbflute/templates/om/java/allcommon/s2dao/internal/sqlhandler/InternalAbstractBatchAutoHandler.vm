@@ -65,6 +65,8 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         } finally {
             close(connection);
         }
+        // Reflection to bean is unsupported at batch update.
+        // postBatchUpdateBean(...);
     }
 	
     public int execute(Object[] args) {
@@ -125,13 +127,5 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         } catch (SQLException e) {
             handleSQLException(e, ps);
         }
-    }
-
-    // ===================================================================================
-    //                                                                            Override
-    //                                                                            ========
-    @Override
-    protected boolean isVersionNoAutoIncrementOnMemory() {
-        return false;// Always On Query because of executeBatch()!
     }
 }

@@ -21,11 +21,16 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHan
 public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInternalAbstractStaticCommand} {
 
 	// ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final boolean DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY = true;
+
+	// ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private PropertyType[] propertyTypes;
-
     private boolean checkSingleRowUpdate = true;
+    protected boolean versionNoAutoIncrementOnMemory = DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY;
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -33,7 +38,14 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
             String[] propertyNames) {
+        this(dataSource, statementFactory, beanMetaData, propertyNames, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
+    }
+
+    public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData);
+        this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
         setupPropertyTypes(propertyNames);
         setupSql();
     }
@@ -154,7 +166,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
         String versionNoPropertyName = getBeanMetaData().getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
             PropertyType pt = propertyTypes[i];
-            if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+            if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName) && !versionNoAutoIncrementOnMemory) {
                 sb.append(pt.getColumnName()).append(" = ").append(pt.getColumnName()).append(" + 1, ");
                 continue;
             }

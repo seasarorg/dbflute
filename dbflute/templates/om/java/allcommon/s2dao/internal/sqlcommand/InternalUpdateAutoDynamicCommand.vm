@@ -12,7 +12,6 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
 
@@ -35,6 +34,7 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     private BeanMetaData beanMetaData;
     private String[] propertyNames;
     private boolean checkSingleRowUpdate = true;
+    private boolean versionNoAutoIncrementOnMemory = true;
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -66,7 +66,9 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     }
 
     protected ${glInternalUpdateAutoHandler} createInternalUpdateAutoHandler(BeanMetaData bmd, PropertyType[] propertyTypes) {
-        return new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
+        ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+        return handler;
     }
 
     protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
@@ -169,7 +171,11 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     }
 
     protected boolean isVersionNoAutoIncrementOnMemory() {
-        return ${glDBFluteConfig}.getInstance().isVersionNoAutoIncrementOnMemory();
+        return versionNoAutoIncrementOnMemory;
+    }
+
+    public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
+        this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
     
     protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {

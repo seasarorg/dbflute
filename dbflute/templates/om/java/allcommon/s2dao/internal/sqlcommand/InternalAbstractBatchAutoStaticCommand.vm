@@ -23,7 +23,13 @@ public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glIn
     public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
             String[] propertyNames, boolean returningRows) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames);
+        this(dataSource, statementFactory, beanMetaData, propertyNames, returningRows, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
+    }
+
+    public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames, boolean returningRows, boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, versionNoAutoIncrementOnMemory);
         this.returningRows = returningRows;
     }
 

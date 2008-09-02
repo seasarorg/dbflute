@@ -23,6 +23,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                       =========
         protected readonly IBeanMetaData _beanMetaData;
         protected readonly String[] _propertyNames;
+        protected bool _versionNoAutoIncrementOnMemory = true;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -68,7 +69,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 		
         protected virtual ${glInternalAbstractAutoHandler} CreateInternalAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
-            return new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
+            ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
+            handler.VersionNoAutoIncrementOnMemory = _versionNoAutoIncrementOnMemory;
+            return handler;
         }
 
         protected virtual String CreateUpdateSql(IBeanMetaData bmd, IPropertyType[] propertyTypes, Object bean) {
@@ -116,7 +119,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         }
 
         protected bool IsVersionNoAutoIncrementOnMemory() {
-            return false;
+            return _versionNoAutoIncrementOnMemory;
         }
 
         protected void SetupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {
@@ -163,6 +166,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
         public string[] PropertyNames {
             get { return _propertyNames; }
+        }
+
+        public bool VersionNoAutoIncrementOnMemory {
+            set { _versionNoAutoIncrementOnMemory = value; }
         }
 	}
 }

@@ -17,8 +17,6 @@ import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.IntegerConversionUtil;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
-
 /**
  * @author ${database.ClassAuthor}
  */
@@ -33,6 +31,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     private Timestamp timestamp;
     private Integer versionNo;
     private PropertyType[] propertyTypes;
+    private boolean versionNoAutoIncrementOnMemory = true;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -151,10 +150,6 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
-    protected boolean isVersionNoAutoIncrementOnMemory() {
-        return ${glDBFluteConfig}.getInstance().isVersionNoAutoIncrementOnMemory();
-    }
-
     protected void setupDeleteBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
         final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
@@ -244,5 +239,13 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
 
     protected void setPropertyTypes(PropertyType[] propertyTypes) {
         this.propertyTypes = propertyTypes;
+    }
+
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return versionNoAutoIncrementOnMemory;
+    }
+
+    public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
+        this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
 }

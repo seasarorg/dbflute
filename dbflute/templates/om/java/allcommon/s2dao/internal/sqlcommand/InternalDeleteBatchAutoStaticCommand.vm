@@ -33,6 +33,10 @@ public class ${glInternalDeleteBatchAutoStaticCommand} extends ${glInternalAbstr
 
 	@Override
     protected ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler() {
+        return newInternalBatchAutoHandler();
+    }
+
+    protected ${glInternalDeleteBatchAutoHandler} newInternalBatchAutoHandler() {
         return new ${glInternalDeleteBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 

@@ -19,8 +19,8 @@ public class ${glInternalUpdateBatchAutoStaticCommand} extends ${glInternalAbstr
     //                                                                         ===========
     public ${glInternalUpdateBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean returningRows) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, returningRows);
+            String[] propertyNames, boolean returningRows, boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, returningRows, versionNoAutoIncrementOnMemory);
     }
 
 	// ===================================================================================
@@ -33,6 +33,12 @@ public class ${glInternalUpdateBatchAutoStaticCommand} extends ${glInternalAbstr
 
 	@Override
     protected ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler() {
+        ${glInternalUpdateBatchAutoHandler} handler = newInternalBatchAutoHandler();
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+        return handler;
+    }
+
+    protected ${glInternalUpdateBatchAutoHandler} newInternalBatchAutoHandler() {
         return new ${glInternalUpdateBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 

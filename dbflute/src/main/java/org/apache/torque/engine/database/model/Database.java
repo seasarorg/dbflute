@@ -1257,10 +1257,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
-    public boolean isCompatibleVersionNoAutoIncrementOnMemory() {// This is for compatibility!
-        return getProperties().getLittleAdjustmentProperties().isCompatibleVersionNoAutoIncrementOnMemory();
-    }
-
     public boolean isCompatibleSQLExceptionHandlingOldStyle() {// This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
     }

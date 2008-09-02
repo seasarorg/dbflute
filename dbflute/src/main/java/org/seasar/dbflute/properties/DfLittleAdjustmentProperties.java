@@ -107,10 +107,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                       Compatibility
     //                                                                       =============
-    public boolean isCompatibleVersionNoAutoIncrementOnMemory() {
-        return booleanProp("torque.isCompatibleVersionNoAutoIncrementOnMemory", false);
-    }
-
     public boolean isCompatibleSQLExceptionHandlingOldStyle() {
         return booleanProp("torque.isCompatibleSQLExceptionHandlingOldStyle", false);
     }
