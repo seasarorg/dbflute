@@ -237,7 +237,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         // It is unnecessary of filtering about flat directory package.
         public String FilterAboutOmit(String pckge) { // CSharp only
-            String OmitDirectoryPackage = ${glDBFluteConfig}.GetInstance().OmitDirectoryPackage;
+            String omitDirectoryPackage = ${glDBFluteConfig}.GetInstance().OmitDirectoryPackage;
             if (omitDirectoryPackage != null && omitDirectoryPackage.Trim().Length > 0) {
                 pckge = RemoveOmitPackage(pckge, omitDirectoryPackage);
             }
