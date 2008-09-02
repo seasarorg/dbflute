@@ -72,4 +72,8 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         }
         return true;
     }
+    
+    public boolean isFlatOrOmitDirectorySupported() {
+        return true;
+    }
 }

@@ -75,9 +75,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                          ==========
     public boolean isSqlPackageValid() {
         final String sqlPackage = getSqlPackage();
-        return sqlPackage != null && sqlPackage.trim().length() > 0  && !sqlPackage.trim().equals("null");
+        return sqlPackage != null && sqlPackage.trim().length() > 0 && !sqlPackage.trim().equals("null");
     }
-    
+
     public String getSqlPackage() {
         String sqlPackage = (String) getOutsideSqlDefinitionMap().get("sqlPackage");
         if (sqlPackage == null || sqlPackage.trim().length() == 0) {
@@ -94,6 +94,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         DfGeneratedClassPackageProperties packageProperties = getBasicProperties().getGeneratedClassPackageProperties();
         String packageBase = packageProperties.getPackageBase();
         return DfStringUtil.replace(sqlPackage, "$$PACKAGE_BASE$$", packageBase);
+    }
+
+    // ===================================================================================
+    //                                                                      DefaultPackage
+    //                                                                      ==============
+    public boolean isDefaultPackageValid() { // C# only
+        return getDefaultPackage() != null && getDefaultPackage().trim().length() > 0
+                && getDefaultPackage().trim().equals("null");
+    }
+
+    public String getDefaultPackage() { // C# only
+        return (String) getOutsideSqlDefinitionMap().get("defaultPackage");
     }
 
     // ===================================================================================

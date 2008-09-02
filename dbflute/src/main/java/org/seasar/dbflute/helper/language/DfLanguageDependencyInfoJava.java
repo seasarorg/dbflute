@@ -71,6 +71,10 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         return true;
     }
     
+    public boolean isFlatOrOmitDirectorySupported() {
+        return false;
+    }
+    
     public static boolean containsSrcMainJava(String path) {
         return path.contains(PATH_MAVEN_SRC_MAIN_JAVA);
     }

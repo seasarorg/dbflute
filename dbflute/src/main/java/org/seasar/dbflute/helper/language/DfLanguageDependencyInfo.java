@@ -75,4 +75,9 @@ public interface DfLanguageDependencyInfo {
      * @return Is the file compile target?
      */
     public boolean isCompileTargetFile(File file);
+    
+    /**
+     * @return Is the flat or omit directory supported?
+     */
+    public boolean isFlatOrOmitDirectorySupported();
 }

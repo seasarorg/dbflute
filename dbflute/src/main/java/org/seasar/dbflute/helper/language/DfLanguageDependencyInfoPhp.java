@@ -68,4 +68,8 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
     public boolean isCompileTargetFile(File file) {
         return true;
     }
+    
+    public boolean isFlatOrOmitDirectorySupported() {
+        return false;
+    }
 }

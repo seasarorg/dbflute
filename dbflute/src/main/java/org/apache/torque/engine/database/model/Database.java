@@ -1341,6 +1341,14 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getSqlPackage();
     }
     
+    public boolean isDefaultPackageValid() {
+        return getProperties().getOutsideSqlProperties().isDefaultPackageValid();
+    }
+    
+    public String getDefaultPackage() {
+        return getProperties().getOutsideSqlProperties().getDefaultPackage();
+    }
+    
     public boolean isSql2EntityPlainEntity() {
         return false;
     }

@@ -216,9 +216,18 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 String behaviorClassName = behaviorTypeName.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length);
                 String tmp = behaviorTypeName.Substring(0, behaviorTypeName.LastIndexOf("."));
                 String exbhvName = tmp.Contains(".") ? tmp.Substring(tmp.LastIndexOf(".") + ".".Length) : tmp;
-                return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
+                return FilterAboutDefaultPackage(outsideSqlPackage + "." + exbhvName + "." + behaviorClassName);
             } else {
-                return behaviorTypeName;
+                return FilterAboutDefaultPackage(behaviorTypeName);
+            }
+        }
+
+        protected String FilterAboutDefaultPackage(String pckge) { // CSharp only
+            String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
+            if (defaultPackage != null && defaultPackage.Trim().Length > 0) {;
+                return defaultPackage + "." + pckge;
+            } else {
+                return pckge;
             }
         }
 

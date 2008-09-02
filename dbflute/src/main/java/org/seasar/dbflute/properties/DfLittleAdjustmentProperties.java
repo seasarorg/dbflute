@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 
 /**
  * @author jflute
@@ -93,6 +94,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             msg = msg + " because behavior packages is different from sql packages:";
             msg = msg + " flatDirectoryPackage=" + getFlatDirectoryPackage();
             msg = msg + " omitDirectoryPackage=" + getOmitDirectoryPackage();
+            throw new IllegalStateException(msg);
+        }
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        if (!languageDependencyInfo.isFlatOrOmitDirectorySupported()) {
+            String msg = "The language does not support flatDirectoryPackage or omitDirectoryPackage:";
+            msg = msg + " language=" + getBasicProperties().getTargetLanguage();
             throw new IllegalStateException(msg);
         }
     }
