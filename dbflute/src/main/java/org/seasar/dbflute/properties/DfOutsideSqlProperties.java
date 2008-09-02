@@ -101,7 +101,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                      ==============
     public boolean isDefaultPackageValid() { // C# only
         return getDefaultPackage() != null && getDefaultPackage().trim().length() > 0
-                && getDefaultPackage().trim().equals("null");
+                && !getDefaultPackage().trim().equals("null");
     }
 
     public String getDefaultPackage() { // C# only
