@@ -216,10 +216,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 String behaviorClassName = behaviorTypeName.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length);
                 String tmp = behaviorTypeName.Substring(0, behaviorTypeName.LastIndexOf("."));
                 String exbhvName = tmp.Contains(".") ? tmp.Substring(tmp.LastIndexOf(".") + ".".Length) : tmp;
-                return FilterAboutDefaultPackage(outsideSqlPackage + "." + exbhvName + "." + behaviorClassName);
+                return FilterBehaviorSqlPackageName(outsideSqlPackage + "." + exbhvName + "." + behaviorClassName);
             } else {
-                return FilterAboutDefaultPackage(behaviorTypeName);
+                return FilterBehaviorSqlPackageName(behaviorTypeName);
             }
+        }
+
+        protected String FilterBehaviorSqlPackageName(String name) { // CSharp only
+            return FilterAboutDefaultPackage(FilterAboutOmit(name));
         }
 
         protected String FilterAboutDefaultPackage(String pckge) { // CSharp only
@@ -231,6 +235,25 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             }
         }
 
+        // It is unnecessary of filtering about flat directory package.
+        public String FilterAboutOmit(String pckge) { // CSharp only
+            String OmitDirectoryPackage = ${glDBFluteConfig}.GetInstance().OmitDirectoryPackage;
+            if (omitDirectoryPackage != null && omitDirectoryPackage.Trim().Length > 0) {
+                pckge = RemoveOmitPackage(pckge, omitDirectoryPackage);
+            }
+            return pckge;
+        }
+
+        protected String RemoveOmitPackage(String pckge, String omitName) { // CSharp only
+            if (pckge.StartsWith(omitName)) {
+                return pckge.Replace(omitName + ".", "");
+            } else if (pckge.EndsWith(omitName)) {
+                return pckge.Replace("." + omitName, "");
+            } else {
+                return pckge.Replace("." + omitName + ".", ".");
+            }
+        }
+	
         protected bool IsBehaviorQueryPathEnabled {
             get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
         }

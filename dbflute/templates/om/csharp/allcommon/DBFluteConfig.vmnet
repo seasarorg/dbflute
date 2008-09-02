@@ -32,6 +32,11 @@ public class ${myClassName} {
 #else
     protected String _defaultPackage;
 #end
+#if ($database.isOmitDirectoryPackageValid())
+    protected String _omitDirectoryPackage = "${database.omitDirectoryPackage}";
+#else
+    protected String _omitDirectoryPackage;
+#end
 	protected bool _internalDebug;
 	protected bool _locked = true;
 
@@ -145,6 +150,22 @@ public class ${myClassName} {
 		        _log.Info("...Setting defaultPackage: " + value);
 		    }
 	        _defaultPackage = value;
+		}
+	}
+	
+    // ===================================================================================
+    //                                                              Omit Directory Package
+    //                                                              ======================
+	public String OmitDirectoryPackage { // CSharp only
+	    get {
+	        return _omitDirectoryPackage;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting omitDirectoryPackage: " + value);
+		    }
+	        _omitDirectoryPackage = value;
 		}
 	}
 	

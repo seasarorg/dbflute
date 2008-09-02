@@ -73,6 +73,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return stringProp("torque.flatDirectoryPackage", null);
     }
 
+    public boolean isOmitDirectoryPackageValid() {
+        final String str = getOmitDirectoryPackage();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
     /**
      * Get the package for omit directory. Normally, this property is only for C#.
      * @return The package for omit directory. (Nullable)

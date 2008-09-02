@@ -1345,6 +1345,14 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getDefaultPackage();
     }
     
+    public boolean isOmitDirectoryPackageValid() {
+        return getProperties().getLittleAdjustmentProperties().isOmitDirectoryPackageValid();
+    }
+    
+    public String getOmitDirectoryPackage() {
+        return getProperties().getLittleAdjustmentProperties().getOmitDirectoryPackage();
+    }
+    
     public boolean isSql2EntityPlainEntity() {
         return false;
     }

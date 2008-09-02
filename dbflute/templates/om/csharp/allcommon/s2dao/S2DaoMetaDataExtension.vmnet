@@ -247,6 +247,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool IsFirstArgumentConditionBean(MethodInfo mi) {
             Type[] pmbTypes = MethodUtil.GetParameterTypes(mi);
             return pmbTypes.Length > 0 && typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(pmbTypes[0]);
+        }
 
         // ===============================================================================
         //                                                             OutsideSql Override
