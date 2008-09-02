@@ -39,8 +39,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
+import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -58,6 +60,7 @@ public class DfBehaviorQueryPathSetupper {
     //                                                                           Attribute
     //                                                                           =========
     protected DfBuildProperties _buildProperties;
+    protected String _flatDirectoryPackage;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -144,7 +147,11 @@ public class DfBehaviorQueryPathSetupper {
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String basePrefix = getBasicProperties().getBasePrefix();
         final String bsbhvPackage = prop.getBaseBehaviorPackage();
-        final String bsbhvPathBase = outputDir + "/" + DfStringUtil.replace(bsbhvPackage, ".", "/");
+
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getLittleAdjustmentProperties());
+        packagePathHandler.setFileSeparatorSlash(true);
+        final String bsbhvPathBase = outputDir + "/" + packagePathHandler.getPackageAsPath(bsbhvPackage);
+
         final File bsbhvDir = new File(bsbhvPathBase);
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
@@ -395,5 +402,17 @@ public class DfBehaviorQueryPathSetupper {
 
     protected DfBasicProperties getBasicProperties() {
         return _buildProperties.getBasicProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
+    public String getFlatDirectoryPackage() {
+        return _flatDirectoryPackage;
+    }
+
+    public void setFlatDirectoryPackage(String flatDirectoryPackage) {
+        this._flatDirectoryPackage = flatDirectoryPackage;
     }
 }

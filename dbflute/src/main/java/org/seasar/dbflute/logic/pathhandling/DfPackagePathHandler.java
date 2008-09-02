@@ -24,6 +24,7 @@ public class DfPackagePathHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected DfLittleAdjustmentProperties _littleAdjustmentProperties;
+    protected boolean _fileSeparatorSlash;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -53,7 +54,7 @@ public class DfPackagePathHandler {
         pckge = DfStringUtil.replace(pckge, flatMark, flatDirectoryPackage);
         return pckge;
     }
-    
+
     protected String removeOmitPackage(String pckge, String omitName) {
         if (pckge.startsWith(omitName)) {
             return replaceString(pckge, omitName + ".", "");
@@ -65,7 +66,11 @@ public class DfPackagePathHandler {
     }
 
     protected String resolvePackageAsPath(String pckge) {
-        return pckge.replace('.', File.separator.charAt(0)) + File.separator;
+        if (_fileSeparatorSlash) {
+            return pckge.replace('.', '/') + "/";
+        } else {
+            return pckge.replace('.', File.separator.charAt(0)) + File.separator;
+        }
     }
 
     // ===================================================================================
@@ -81,10 +86,19 @@ public class DfPackagePathHandler {
     public void debug(String msg) {
         _log.debug(msg);
     }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     public String replaceString(String text, String fromText, String toText) {
         return DfStringUtil.replace(text, fromText, toText);
+    }
+
+    public boolean isFileSeparatorSlash() {
+        return _fileSeparatorSlash;
+    }
+
+    public void setFileSeparatorSlash(boolean fileSeparatorSlash) {
+        this._fileSeparatorSlash = fileSeparatorSlash;
     }
 }
