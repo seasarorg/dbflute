@@ -27,15 +27,20 @@ public class ${myClassName} {
 #else
     protected String _outsideSqlPackage;
 #end
+#if ($database.isOmitDirectoryPackageValid())
+    protected String _omitDirectoryPackage = "${database.omitDirectoryPackage}";
+#else
+    protected String _omitDirectoryPackage;
+#end
 #if ($database.isDefaultPackageValid())
     protected String _defaultPackage = "${database.defaultPackage}";
 #else
     protected String _defaultPackage;
 #end
-#if ($database.isOmitDirectoryPackageValid())
-    protected String _omitDirectoryPackage = "${database.omitDirectoryPackage}";
+#if ($database.isOmitResourcePathPackageValid())
+    protected String _omitResourcePathPackage = "${database.omitResourcePathPackage}";
 #else
-    protected String _omitDirectoryPackage;
+    protected String _omitResourcePathPackage;
 #end
 	protected bool _internalDebug;
 	protected bool _locked = true;
@@ -138,6 +143,22 @@ public class ${myClassName} {
 	}
 	
     // ===================================================================================
+    //                                                              Omit Directory Package
+    //                                                              ======================
+	public String OmitDirectoryPackage { // CSharp only
+	    get {
+	        return _omitDirectoryPackage;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting omitDirectoryPackage: " + value);
+		    }
+	        _omitDirectoryPackage = value;
+		}
+	}
+
+    // ===================================================================================
     //                                                                     Default Package
     //                                                                     ===============
 	public String DefaultPackage { // CSharp only
@@ -152,20 +173,20 @@ public class ${myClassName} {
 	        _defaultPackage = value;
 		}
 	}
-	
+
     // ===================================================================================
-    //                                                              Omit Directory Package
-    //                                                              ======================
-	public String OmitDirectoryPackage { // CSharp only
+    //                                                          Omit Resource Path Package
+    //                                                          ==========================
+	public String OmitResourcePathPackage { // CSharp only
 	    get {
-	        return _omitDirectoryPackage;
+	        return _omitResourcePathPackage;
 		}
 		set {
 	        AssertNotLocked();
 		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting omitDirectoryPackage: " + value);
+		        _log.Info("...Setting omitResourcePathPackage: " + value);
 		    }
-	        _omitDirectoryPackage = value;
+	        _omitResourcePathPackage = value;
 		}
 	}
 	

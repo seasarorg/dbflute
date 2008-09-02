@@ -223,23 +223,22 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected String FilterBehaviorSqlPackageName(String name) { // CSharp only
-            return FilterAboutDefaultPackage(FilterAboutOmit(name));
-        }
-
-        protected String FilterAboutDefaultPackage(String pckge) { // CSharp only
-            String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
-            if (defaultPackage != null && defaultPackage.Trim().Length > 0) {;
-                return defaultPackage + "." + pckge;
-            } else {
-                return pckge;
-            }
+            return FilterAboutDefaultPackage(FilterAboutOmitResourcePathPackage(FilterAboutOmitDirectoryPackage(name)));
         }
 
         // It is unnecessary of filtering about flat directory package.
-        public String FilterAboutOmit(String pckge) { // CSharp only
+        public String FilterAboutOmitDirectoryPackage(String pckge) { // CSharp only
             String omitDirectoryPackage = ${glDBFluteConfig}.GetInstance().OmitDirectoryPackage;
             if (omitDirectoryPackage != null && omitDirectoryPackage.Trim().Length > 0) {
                 pckge = RemoveOmitPackage(pckge, omitDirectoryPackage);
+            }
+            return pckge;
+        }
+
+        public String FilterAboutOmitResourcePathPackage(String pckge) { // CSharp only
+            String omitResourcePathPackage = ${glDBFluteConfig}.GetInstance().OmitResourcePathPackage;
+            if (omitResourcePathPackage != null && omitResourcePathPackage.Trim().Length > 0) {
+                pckge = RemoveOmitPackage(pckge, omitResourcePathPackage);
             }
             return pckge;
         }
@@ -251,6 +250,15 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return pckge.Replace("." + omitName, "");
             } else {
                 return pckge.Replace("." + omitName + ".", ".");
+            }
+        }
+
+        protected String FilterAboutDefaultPackage(String pckge) { // CSharp only
+            String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
+            if (defaultPackage != null && defaultPackage.Trim().Length > 0) {;
+                return defaultPackage + "." + pckge;
+            } else {
+                return pckge;
             }
         }
 	

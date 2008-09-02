@@ -3,7 +3,6 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 
@@ -91,15 +90,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         final String omitDirectoryPackage = getOmitDirectoryPackage();
         if (flatDirectoryPackage == null && omitDirectoryPackage == null) {
             return;
-        }
-        final DfOutsideSqlProperties outsideSqlProperties = DfBuildProperties.getInstance().getOutsideSqlProperties();
-        if (!outsideSqlProperties.isSqlPackageValid()) {
-            String msg = "You should set sqlPackage of outsideSqlDefinitionMap.dfprop";
-            msg = msg + " if you use flatDirectoryPackage or omitDirectoryPackage,";
-            msg = msg + " because behavior packages is different from sql packages:";
-            msg = msg + " flatDirectoryPackage=" + getFlatDirectoryPackage();
-            msg = msg + " omitDirectoryPackage=" + getOmitDirectoryPackage();
-            throw new IllegalStateException(msg);
         }
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         if (!languageDependencyInfo.isFlatOrOmitDirectorySupported()) {
