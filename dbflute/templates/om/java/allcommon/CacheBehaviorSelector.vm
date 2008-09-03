@@ -39,21 +39,19 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
         final Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
         final Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
         long before = 0;
-	    if (_log.isDebugEnabled()) {
+	    if (_log.isInfoEnabled()) {
 		    before = System.currentTimeMillis();
-		    _log.debug("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
+		    _log.info("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
 		}
         for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
 		    ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
             final ${glDaoReadableInterfaceName} dao = bhv.getDaoReadable();
-		    if (_log.isDebugEnabled()) {
-			    _log.debug("[" + dbmeta.getTableDbName() + "]");
-			}
 			dao.initializeDaoMetaData("selectList");
         }
-	    if (_log.isDebugEnabled()) {
+	    if (_log.isInfoEnabled()) {
 		    long after = System.currentTimeMillis();
-		    _log.debug("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
+		    _log.info("Initialized Count: " + dbmetas.size());
+		    _log.info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
 		}
 	}
 	

@@ -68,10 +68,23 @@ public class ${myClassName} {
     }
 
     /**
-     * @return The map that contains instances of dbmeta. (NotNull & NotEmpty)
+     * @return The initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
      */
     public static Map<String, ${glDBMetaInterfaceName}> getDBMetaMap() {
+        initializeDBMetaMap();
         return _tableDbNameInstanceMap;
+    }
+    
+    protected static void initializeDBMetaMap() {
+        final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
+        for (String tableDbName : tableDbNameSet) {
+            findDBMeta(tableDbName); // Initialize!
+        }
+        if (_tableDbNameInstanceMap.isEmpty()) {
+            String msg = "Failed to initialize tableDbNameInstanceMap:";
+            msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
