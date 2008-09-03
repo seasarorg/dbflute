@@ -69,14 +69,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected virtual int Execute(IDbConnection connection, object bean) {
             PreUpdateBean(bean);
             SetupBindVariables(bean);
-            if (${glQLog}.IsLogEnabled()) {
-			    String completeSql = GetCompleteSql(_bindVariables);
-			    if (IsContainsLineSeparatorInSql()) {
-			        ${glQLog}.Log(GetLineSeparator() + completeSql);
-			    } else {
-			        ${glQLog}.Log(completeSql);
-			    }
-			}
+            LogSql(_bindVariables, _bindVariableTypes);
             IDbCommand cmd = Command(connection);
             int ret = -1;
             try {
@@ -87,10 +80,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             PostUpdateBean(bean);
             return ret;
-        }
-
-        protected bool IsContainsLineSeparatorInSql() {
-            return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
 
         // ===============================================================================
@@ -233,13 +222,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         protected void SetupVersionNoPropertyInfo(PropertyInfo pi, object bean) {
             pi.SetValue(bean, ConversionUtil.ConvertTargetType(VersionNo, pi.PropertyType), null);
-        }
-
-        // ===============================================================================
-        //                                                                  General Helper
-        //                                                                  ==============
-        protected String GetLineSeparator() {
-            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
 
         // ===============================================================================
