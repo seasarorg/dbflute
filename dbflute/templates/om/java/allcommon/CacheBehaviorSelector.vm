@@ -44,7 +44,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
 		    _log.info("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
 		}
         for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
-		    ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
+		    final ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
             final ${glDaoReadableInterfaceName} dao = bhv.getDaoReadable();
 			dao.initializeDaoMetaData("selectList");
         }

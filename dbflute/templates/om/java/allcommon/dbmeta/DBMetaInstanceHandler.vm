@@ -1,10 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInstanceHandlerName}")
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
@@ -76,15 +76,22 @@ public class ${myClassName} {
     }
     
     protected static void initializeDBMetaMap() {
+        if (isInitialized()) {
+            return;
+        }
         final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
         for (String tableDbName : tableDbNameSet) {
             findDBMeta(tableDbName); // Initialize!
         }
-        if (_tableDbNameInstanceMap.isEmpty()) {
+        if (!isInitialized()) {
             String msg = "Failed to initialize tableDbNameInstanceMap:";
             msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
             throw new IllegalStateException(msg);
         }
+    }
+
+    protected static boolean isInitialized() {
+        return _tableDbNameInstanceMap.size() == _tableDbNameClassNameMap.size();
     }
 
     // ===================================================================================
