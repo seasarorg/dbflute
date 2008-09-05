@@ -50,7 +50,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             return ls[0];
         }
 
-        protected <ENTITY> String BuildSearch4LogString(String path, PARAMETER_BEAN pmb) {
+        protected String BuildSearch4LogString<ENTITY>(String path, PARAMETER_BEAN pmb) {
             Type entityType = typeof(ENTITY);
             String tmp = "Table  = " + _outsideSqlOption.TableDbName + GetLineSeparator();
             tmp = tmp + "Path   = " + path + GetLineSeparator();

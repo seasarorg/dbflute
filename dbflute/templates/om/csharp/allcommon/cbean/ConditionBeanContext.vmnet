@@ -137,7 +137,7 @@ namespace ${glPackageBaseCommonCBean} {
     	// ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
-        protected static String GetLineSeparator() {
+        private static String GetLineSeparator() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
