@@ -44,6 +44,10 @@ public class DfTableMetaInfo {
     public boolean isTableTypeAlias() {
         return _tableType != null ? _tableType.equalsIgnoreCase("ALIAS") : false;
     }
+    
+    public boolean isTableTypeSynonym() {
+        return _tableType != null ? _tableType.equalsIgnoreCase("SYNONYM") : false;
+    }
 
     // ===================================================================================
     //                                                                        Name Builder

@@ -17,6 +17,7 @@ import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerDB2;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -130,6 +131,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 initializer = createSchemaInitializerMySQL();
             } else if (_basicProperties.isDatabaseSqlServer()) {
                 initializer = createSchemaInitializerSqlServer();
+            } else if (_basicProperties.isDatabaseOracle()) {
+                initializer = createSchemaInitializerOracle();
             } else if (_basicProperties.isDatabaseDB2()) {
                 initializer = createSchemaInitializerDB2();
             } else {
@@ -150,6 +153,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             return initializer;
         }
 
+        protected DfSchemaInitializer createSchemaInitializerOracle() {
+            final DfSchemaInitializerOracle initializer = new DfSchemaInitializerOracle();
+            setupSchemaInitializerJdbcProperties(initializer);
+            return initializer;
+        }
+        
         protected DfSchemaInitializer createSchemaInitializerDB2() {
             final DfSchemaInitializerDB2 initializer = new DfSchemaInitializerDB2();
             setupSchemaInitializerJdbcProperties(initializer);
