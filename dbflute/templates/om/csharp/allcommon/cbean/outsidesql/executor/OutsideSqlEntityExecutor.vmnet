@@ -55,7 +55,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             String tmp = "Table  = " + _outsideSqlOption.TableDbName + GetLineSeparator();
             tmp = tmp + "Path   = " + path + GetLineSeparator();
             tmp = tmp + "Pmb    = " + (pmb != null ? pmb.GetType().ToString() : "null") + ":" + pmb + GetLineSeparator();
-            tmp = tmp + "Entity = " + entityType != null ? entityType.ToString() : "null" + GetLineSeparator();
+            tmp = tmp + "Entity = " + (entityType != null ? entityType.ToString() : "null") + GetLineSeparator();
             tmp = tmp + "Option = " + _outsideSqlOption;
             return tmp;
         }
