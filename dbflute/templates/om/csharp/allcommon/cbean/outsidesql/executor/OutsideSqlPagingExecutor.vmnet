@@ -28,26 +28,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
-        [System.Obsolete("Use the method 'SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb)'")]
-        public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb, Type entityType) {
-            return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
-        }
-		
         public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
         }
 
-        [System.Obsolete("Use the method 'SelectPage<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb)'")]
-        public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path
-                                                                  , ${glPagingBeanInterfaceName} pmb
-                                                                  , Type entityType) {
-            ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
-            ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
-            DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, entityType, countExecutor, this);
-            ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
-            return invoker.InvokePaging(handler);
-        }
-		
         public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path
                                                                   , ${glPagingBeanInterfaceName} pmb) {
             ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();

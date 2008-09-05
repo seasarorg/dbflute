@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * Condition-Bean context.
@@ -337,6 +338,6 @@ public class ${glConditionBeanContextName} {
      * @return The value of line separator. (NotNull)
      */
     protected static String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 }

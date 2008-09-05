@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
@@ -27,41 +28,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
-		[System.Obsolete("Use the method 'SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb)'")]
-        public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
-            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
-            if (ls.Count == 0) {
-                return default(ENTITY);
-            }
-            if (ls.Count > 1) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
-            }
-            return ls[0];
-        }
-		
         public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb) {
             IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
             if (ls.Count == 0) {
                 return default(ENTITY);
             }
             if (ls.Count > 1) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
-            }
-            return ls[0];
-        }
-
-		[System.Obsolete("Use the method 'SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb)'")]
-        public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
-            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
-            if (ls == null || ls.Count == 0) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityAlreadyDeletedException(searchKey4Log);
-            }
-            if (ls.Count > 1) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+                ThrowEntityDuplicatedException(ls.Count + "", BuildSearch4LogString<ENTITY>(path, pmb), null);
             }
             return ls[0];
         }
@@ -69,14 +42,22 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb) {
             IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
             if (ls == null || ls.Count == 0) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityAlreadyDeletedException(searchKey4Log);
+                ThrowEntityAlreadyDeletedException(BuildSearch4LogString<ENTITY>(path, pmb));
             }
             if (ls.Count > 1) {
-                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+                ThrowEntityDuplicatedException(ls.Count + "", BuildSearch4LogString<ENTITY>(path, pmb), null);
             }
             return ls[0];
+        }
+
+        protected <ENTITY> String BuildSearch4LogString(String path, PARAMETER_BEAN pmb) {
+            Type entityType = typeof(ENTITY);
+            String tmp = "Table  = " + _outsideSqlOption.TableDbName + GetLineSeparator();
+            tmp = tmp + "Path   = " + path + GetLineSeparator();
+            tmp = tmp + "Pmb    = " + (pmb != null ? pmb.GetType().ToString() : "null") + ":" + pmb + GetLineSeparator();
+            tmp = tmp + "Entity = " + entityType != null ? entityType.ToString() : "null" + GetLineSeparator();
+            tmp = tmp + "Option = " + _outsideSqlOption;
+            return tmp;
         }
 
         // -------------------------------------------------
@@ -96,6 +77,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> DynamicBinding() {
             _outsideSqlOption.DynamicBinding();
             return this;
+        }
+	
+    	// ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected static String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 }

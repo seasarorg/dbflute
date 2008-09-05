@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 
 using ${glPackageBaseCommonS2DaoInternalSqlParser};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBean} {
 
@@ -136,8 +137,8 @@ namespace ${glPackageBaseCommonCBean} {
     	// ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
-        private static String GetLineSeparator() {
-            return Environment.NewLine;
+        protected static String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 }

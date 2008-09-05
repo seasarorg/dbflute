@@ -6,6 +6,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The cursor executor of outside-sql.
@@ -50,8 +51,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
             return null;
         }
         if (ls.size() > 1) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
+            throwEntityDuplicatedException(ls.size() + "", buildSearch4LogString(path, pmb, entityType), null);
         }
         return ls.get(0);
     }
@@ -71,14 +71,21 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
         if (ls == null || ls.isEmpty()) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityAlreadyDeletedException(searchKey4Log);
+            throwEntityAlreadyDeletedException(buildSearch4LogString(path, pmb, entityType));
         }
         if (ls.size() > 1) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
+            throwEntityDuplicatedException(ls.size() + "", buildSearch4LogString(path, pmb, entityType), null);
         }
         return ls.get(0);
+    }
+
+    protected <ENTITY> String buildSearch4LogString(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        String tmp = "Table  = " + _outsideSqlOption.getTableDbName() + getLineSeparator();
+        tmp = tmp + "Path   = " + path + getLineSeparator();
+        tmp = tmp + "Pmb    = " + (pmb != null ? pmb.getClass().getSimpleName() : "null") + ":" + pmb + getLineSeparator();
+        tmp = tmp + "Entity = " + (entityType != null ? entityType.getSimpleName() : "null")  + getLineSeparator();
+        tmp = tmp + "Option = " + _outsideSqlOption;
+        return tmp;
     }
 
     // -----------------------------------------------------
@@ -103,5 +110,16 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 }
