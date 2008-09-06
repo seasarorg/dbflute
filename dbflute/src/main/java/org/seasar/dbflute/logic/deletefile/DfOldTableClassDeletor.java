@@ -49,7 +49,7 @@ public class DfOldTableClassDeletor {
         _generator = generator;
         _packagePathHandler = packagePathHandler;
     }
-    
+
     // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
@@ -78,6 +78,9 @@ public class DfOldTableClassDeletor {
         final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
         final String dirPath = getGeneratorInstance().getOutputPath() + "/" + packageAsPath;
         final File dir = new File(dirPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            return new ArrayList<File>();
+        }
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 if (!name.endsWith(_classExtension)) {
@@ -96,7 +99,11 @@ public class DfOldTableClassDeletor {
                 return true;
             }
         };
-        return Arrays.asList(dir.listFiles(filter));
+        final File[] listFiles = dir.listFiles(filter);
+        if (listFiles == null || listFiles.length == 0) {
+            return new ArrayList<File>();
+        }
+        return Arrays.asList(listFiles);
     }
 
     // ===================================================================================
