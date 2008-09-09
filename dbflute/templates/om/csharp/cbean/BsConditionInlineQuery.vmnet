@@ -139,7 +139,7 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
@@ -159,7 +159,7 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("NotExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
@@ -242,7 +242,7 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
@@ -262,7 +262,7 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("NotExistsSubQuery at inline() is unsupported! Sorry!");
             // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
