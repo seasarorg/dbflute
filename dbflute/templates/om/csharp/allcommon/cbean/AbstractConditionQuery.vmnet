@@ -228,7 +228,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
-        registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);// If C#, The property of 'Union' should be 'InitCap'.
+        registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);// If CSharp, The property of 'Union' should be 'InitCap'.
     }
 	
     abstract public void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
@@ -350,7 +350,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If C#, it is necessary to use capPropName!
+            key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
@@ -362,7 +362,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If C#, it is necessary to use capPropName!
+            key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
@@ -541,7 +541,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
         fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, ".ConditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important! CSharp InitCap!
         
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         String firstConditionAfter = " and ";
@@ -649,13 +649,13 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
-        key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If C#, it is necessary to use capPropName!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key)); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If C#, it is necessary to use capPropName!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 	
