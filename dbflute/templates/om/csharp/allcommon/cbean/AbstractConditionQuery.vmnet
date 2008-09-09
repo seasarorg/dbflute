@@ -503,16 +503,16 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                         , String columnName, String relatedColumnName
                                         , String propertyName, String aliasName) {
         assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
-        final String realColumnName = getDeriveSubQueryRealColumnName(columnName);
-        final String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
-        final String clause;
+        String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+        String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
+        String clause;
         if (getSqlClause().isFormatClauseEffective()) {
-            final String ln = getLineSeparator();
-            final int subQueryLevel = subQuery.getSubQueryLevel();
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final String endIndent = "       ";
+            String ln = getLineSeparator();
+            int subQueryLevel = subQuery.getSubQueryLevel();
+            String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String endIndent = "       ";
             clause = "(" + beginMark + subQueryClause + ln + endIndent + ") as " + aliasName + endMark;
         } else {
             clause = "(" + subQueryClause + ") as " + aliasName;
@@ -527,23 +527,23 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected String getDeriveSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
                                         , String realColumnName, String relatedColumnName
                                         , String propertyName, String aliasName) {
-        final int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.getSubQueryLevel();
         if (_subQueryLevel <= subQueryLevel) {
             _subQueryLevel = subQueryLevel + 1;
         }
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwDeriveReferrerInvalidColumnSpecificationException(function, aliasName);
         }
         assertDeriveReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
-        final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+        String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
         fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
         fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
         
-        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+        String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         String firstConditionAfter = " and ";
         if (getSqlClause().isFormatClauseEffective()) {
             firstConditionAfter = getLineSeparator() + "   and ";
@@ -610,8 +610,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
     
     protected void assertDeriveReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
-        final Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
+        Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
                 throwDeriveReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
@@ -619,7 +619,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
 
-    protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+    protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
@@ -634,7 +634,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + getLineSeparator();
         msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
+        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.Name + ")" + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new DeriveReferrerUnmatchedColumnTypeException(msg);
     }

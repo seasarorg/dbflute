@@ -120,6 +120,11 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { propertyName = value; }
         }
 
+        public String PropertyType {
+            get { return propertyType; }
+            set { propertyType = value; }
+        }
+
         public bool IsPrimary {
             get { return primary; }
             set { primary = value; }
