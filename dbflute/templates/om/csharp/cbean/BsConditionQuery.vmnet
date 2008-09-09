@@ -120,6 +120,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($referrer in $col.singleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
