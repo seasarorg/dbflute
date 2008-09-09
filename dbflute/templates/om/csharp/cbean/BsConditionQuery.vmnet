@@ -236,6 +236,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($referrer in $col.singleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
@@ -246,9 +247,15 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-        protected ${relatedCQClassName} _${subQueryPropertyName};
-        public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
+        public Map<${subQueryKeepMapGeneric}> ${subQueryPropertyNameInitCap} { get {
+            return _${subQueryPropertyName}Map;
+        }}
+        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+            String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+            _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
+        }
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
