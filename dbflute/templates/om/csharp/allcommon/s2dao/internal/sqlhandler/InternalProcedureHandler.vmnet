@@ -34,14 +34,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                         Execute
         //                                                                         =======
         protected override Object Execute(IDbConnection conn, Object[] args, Type[] argTypes) {
-            Object dto = null;// getArgumentDto(args);
+            Object dto = GetArgumentDto(args);
             LogSql(args, argTypes);
-            int additionalParamCount = 0;
             IDbCommand dbCommand = null;
             try {
                 dbCommand = PrepareCallableStatement(conn, this.Sql);
                 Type returnType = null; // _procedureMetaData.
-                Object returnValue = null; // _procedureMetaData.
+                Object returnValue = null;
+                int additionalParamCount = 0;
                 if (_procedureMetaData.HasReturnParameterType) {
                     String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
                     BindArgs(dbCommand, dto);
@@ -64,6 +64,19 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     Close(conn);
                 }
             }
+        }
+
+        protected Object GetArgumentDto(Object[] args) {
+            if (args.Length == 0) {
+                return null;
+            }
+            if (args.Length == 1) {
+                if (args[0] == null) {
+                    throw new IllegalArgumentException("args[0] should not be null!");
+                }
+                return args[0];
+            }
+            throw new IllegalArgumentException("args");
         }
 
         protected void HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
