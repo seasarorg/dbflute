@@ -517,9 +517,8 @@ namespace ${glPackageBaseCommonCBean} {
         }
     }
 
-    public interface RAQSetupper<REFERRER_CB, LOCAL_CQ> where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName} {
-        void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
-    }
+    public delegate void RAQSetupper<REFERRER_CB, LOCAL_CQ>(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName)
+            where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName};
     
     public class DeriveReferrerInvalidAliasNameException : SystemException {
         public DeriveReferrerInvalidAliasNameException(String msg) : base(msg) {
