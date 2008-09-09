@@ -165,19 +165,6 @@ namespace ${glPackageCIQ} {
         }
 #end
 #end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
-        }
-#end
-#end
-#end
 #end
 #if (${col.isJavaNativeNumberObject()})
 #if (${col.isSingleKeyForeignKey()})
@@ -268,31 +255,18 @@ namespace ${glPackageCIQ} {
         }
 #end
 #end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
-#if (!${referrer.isOneToOne()})
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
-        }
 #end
-#end
-#end
-#end
-#if (${col.isJavaNativeDateObject()})
-#end
-#if (${col.isJavaNativeBooleanObject()})
-#end
-#if (${col.isJavaNativeBinaryObject()})
-#end
-#if (!${col.isNotNull()})
-#end
-#if (!${col.isJavaNativeBinaryObject()})
-#end
-#end
+    #if (${col.isJavaNativeDateObject()})
+    #end
+    #if (${col.isJavaNativeBooleanObject()})
+    #end
+    #if (${col.isJavaNativeBinaryObject()})
+    #end
+    #if (!${col.isNotNull()})
+    #end
+    #if (!${col.isJavaNativeBinaryObject()})
+    #end
+  #end
 
     }
 }
