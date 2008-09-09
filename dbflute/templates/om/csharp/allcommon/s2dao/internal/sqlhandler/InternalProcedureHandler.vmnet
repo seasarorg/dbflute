@@ -9,7 +9,6 @@ using Seasar.Extension.ADO.Types;
 
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2Dao};
-using ${glPackageBaseCommonS2DaoInternalSqlCommand};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
@@ -53,7 +52,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     BindArgs(dbCommand, dto);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                 }
-                return HandleOutParameters(cs, dto, returnValue, additionalParamCount);
+                return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
             // } catch (Exception e) {
             //     handleSQLException(e, cs);
             //     return null;// Unreachable!
@@ -79,13 +78,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             throw new IllegalArgumentException("args");
         }
 
-        protected void HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
-            if (dto == null) { return; }
+        protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
+            if (dto == null) { return null; }
             // for (int i = 0; i < args.Length; i++) {
             //     if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
             //         // args[i] = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
             //     }
             // }
+            return null;
         }
 
         protected IDbCommand PrepareCallableStatement(IDbConnection conn, String sql) {
