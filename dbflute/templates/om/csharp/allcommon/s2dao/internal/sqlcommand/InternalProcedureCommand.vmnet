@@ -1,7 +1,7 @@
 
 using System;
-using System.Data;
 
+using Seasar.Extension.ADO;
 using Seasar.Dao;
 
 using ${glPackageBaseCommonJavaLike};
@@ -15,11 +15,11 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected IDataSource dataSource;
-        protected IDataReaderHandler dataReaderHandler;
-        protected ICommandFactory commandFactory;
-        protected IDataReaderFactory dataReaderFactory;
-        protected ProcedureMetaData procedureMetaData;
+        protected IDataSource _dataSource;
+        protected IDataReaderHandler _dataReaderHandler;
+        protected ICommandFactory _commandFactory;
+        protected IDataReaderFactory _dataReaderFactory;
+        protected ProcedureMetaData _procedureMetaData;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -27,11 +27,11 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         public ${glInternalProcedureCommand}(IDataSource dataSource, IDataReaderHandler dataReaderHandler,
                 ICommandFactory commandFactory, IDataReaderFactory dataReaderFactory,
                 ProcedureMetaData procedureMetaData) {
-            this.dataSource = dataSource;
-            this.dataReaderHandler = dataReaderHandler;
-            this.commandFactory = commandFactory;
-            this.dataReaderFactory = dataReaderFactory;
-            this.procedureMetaData = procedureMetaData;
+            this._dataSource = dataSource;
+            this._dataReaderHandler = dataReaderHandler;
+            this._commandFactory = commandFactory;
+            this._dataReaderFactory = dataReaderFactory;
+            this._procedureMetaData = procedureMetaData;
         }
 
 	    // ===============================================================================
@@ -44,8 +44,8 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
             return handler.Execute(new Object[]{pmb});
         }
         protected ${glInternalProcedureHandler} NewArgumentDtoProcedureHandler() {
-            return new ${glInternalProcedureHandler}(dataSource, CreateSql(procedureMetaData), dataReaderHandler,
-                    commandFactory, dataReaderFactory, procedureMetaData);
+            return new ${glInternalProcedureHandler}(_dataSource, CreateSql(_procedureMetaData), _dataReaderHandler,
+                    _commandFactory, _dataReaderFactory, _procedureMetaData);
         }
         protected String CreateSql(ProcedureMetaData procedureMetaData) {
             StringBuilder sb = new StringBuilder();
@@ -60,7 +60,7 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
                 sb.append("?, ");
             }
             if (size > 0) {
-                sb.setLength(sb.length() - 2);
+                sb = new StringBuilder().append(sb.toString().Substring(0, sb.length() - 2));
             }
             sb.append(")}");
             return sb.toString();
@@ -75,13 +75,14 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
             return procedureName;
         } set {
             procedureName = value;
-        }
-        }
+        }}
+        public int ParameterTypeSize { get {
+            return 0;
+        }}
         public bool HasReturnParameterType { get {
             return returnType;
         } set {
             returnType = value;
-        }
-        }
+        }}
     }
 }

@@ -1,0 +1,58 @@
+
+using System;
+
+using ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
+
+public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        private ProcedureMetaData _procedureMetaData;
+		
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalProcedureHandler}(IDataSource dataSource, String sql,
+                IDataReaderHandler dataReaderHandler, ICommandFactory commandFactory,
+                DataReaderFactory dataReaderFactory, ProcedureMetaData procedureMetaData)
+                : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
+            this._procedureMetaData = procedureMetaData;
+        }
+
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public Object execute(IDbConnection connection, Object[] args, Type[] argTypes) {
+            Object dto = getArgumentDto(args);
+            LogSql(args, argTypes);
+            CallableStatement cs = null;
+            try {
+                cs = prepareCallableStatement(connection);
+                bindArgs(cs, dto);
+                Object returnValue = null; 
+                if (cs.execute()) {
+                    final ResultSet resultSet = cs.getResultSet();
+                    if (resultSet != null) {
+                        IDataReaderHandler handler = createReturnResultSetHandler(resultSet);
+                        try {
+                            returnValue = handler.handle(resultSet);
+                        } finally {
+                            if (resultSet != null) {
+                                resultSet.close();
+                            }
+                        }
+                    }
+                }
+                return handleOutParameters(cs, dto, returnValue);
+            } catch (SQLException e) {
+                handleSQLException(e, cs);
+                return null;// Unreachable!
+            } finally {
+                close(cs);
+            }
+        }
+    }
+}
