@@ -121,6 +121,7 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
+                MoveNext();
                 return _target.Current;
             }
         }
@@ -203,6 +204,7 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
+                MoveNext();
                 return _target.Current;
             }
         }
@@ -284,6 +286,7 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
+                MoveNext();
                 return _target.get(_index);
             }
         }
