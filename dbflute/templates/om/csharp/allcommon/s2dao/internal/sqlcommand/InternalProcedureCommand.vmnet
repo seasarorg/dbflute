@@ -6,6 +6,7 @@ using Seasar.Dao;
 
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonS2Dao};
 using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
@@ -65,24 +66,5 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
             sb.append(")}");
             return sb.toString();
         }
-    }
-
-    public class ProcedureMetaData {
-        protected String procedureName;
-        // protected CaseInsensitiveMap parameterTypes = new CaseInsensitiveMap();
-        protected bool returnType;
-        public String ProcedureName { get {
-            return procedureName;
-        } set {
-            procedureName = value;
-        }}
-        public int ParameterTypeSize { get {
-            return 0;
-        }}
-        public bool HasReturnParameterType { get {
-            return returnType;
-        } set {
-            returnType = value;
-        }}
     }
 }

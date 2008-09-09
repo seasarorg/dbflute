@@ -8,11 +8,12 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Types;
 
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonS2Dao};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
-public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
+    public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
 
         // ===============================================================================
         //                                                                       Attribute

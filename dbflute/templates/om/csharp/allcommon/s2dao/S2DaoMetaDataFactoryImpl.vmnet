@@ -195,4 +195,23 @@ namespace ${glPackageBaseCommonS2Dao} {
             return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
         }
     }
+
+    public class ProcedureMetaData {
+        protected String procedureName;
+        // protected CaseInsensitiveMap parameterTypes = new CaseInsensitiveMap();
+        protected bool returnType;
+        public String ProcedureName { get {
+            return procedureName;
+        } set {
+            procedureName = value;
+        }}
+        public int ParameterTypeSize { get {
+            return 0;
+        }}
+        public bool HasReturnParameterType { get {
+            return returnType;
+        } set {
+            returnType = value;
+        }}
+    }
 }
