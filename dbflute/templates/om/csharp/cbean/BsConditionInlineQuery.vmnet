@@ -172,7 +172,7 @@ namespace ${glPackageCIQ} {
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
         }
 #end

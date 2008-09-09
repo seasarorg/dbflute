@@ -814,8 +814,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 throwDeriveReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
-        
-        // @jflute -- At the future, I'll refactor this logic. 
     }
 
     protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {

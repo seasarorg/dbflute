@@ -495,6 +495,155 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 		return selectClause + " " + fromWhereClause;
     }
 
+    // [DBFlute-0.7.9]
+    // -----------------------------------------------------
+    //                                        DeriveSubQuery
+    //                                        --------------
+    protected void registerDeriveSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+                                        , String columnName, String relatedColumnName
+                                        , String propertyName, String aliasName) {
+        assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
+        final String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+        final String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
+        final String clause;
+        if (getSqlClause().isFormatClauseEffective()) {
+            final String ln = getLineSeparator();
+            final int subQueryLevel = subQuery.getSubQueryLevel();
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final String endIndent = "       ";
+            clause = "(" + beginMark + subQueryClause + ln + endIndent + ") as " + aliasName + endMark;
+        } else {
+            clause = "(" + subQueryClause + ") as " + aliasName;
+        }
+        getSqlClause().specifyDeriveSubQuery(aliasName, clause);
+    }
+
+    protected String getDeriveSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    protected String getDeriveSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+                                        , String realColumnName, String relatedColumnName
+                                        , String propertyName, String aliasName) {
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        if (_subQueryLevel <= subQueryLevel) {
+            _subQueryLevel = subQueryLevel + 1;
+        }
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
+            throwDeriveReferrerInvalidColumnSpecificationException(function, aliasName);
+        }
+        assertDeriveReferrerColumnType(function, subQuery, deriveColumnName);
+        subQuery.getSqlClause().clearSpecifiedSelectColumn();
+        final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
+        fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        
+        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+        String firstConditionAfter = " and ";
+        if (getSqlClause().isFormatClauseEffective()) {
+            firstConditionAfter = getLineSeparator() + "   and ";
+        }
+        
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        
+        return selectClause + " " + fromWhereClause;
+    }
+
+    protected void throwDeriveReferrerInvalidColumnSpecificationException(String function, String aliasName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The specified the column for derive-referrer was Invalid!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            // *No! It's empty!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Good!]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new DeriveReferrerInvalidColumnSpecificationException(msg);
+    }
+
+    public class DeriveReferrerInvalidColumnSpecificationException : SystemException {
+        public DeriveReferrerInvalidColumnSpecificationException(String msg) : base(msg) {
+        }
+    }
+    
+    protected void assertDeriveReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
+        final Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
+        if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
+            if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
+                throwDeriveReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+            }
+        }
+    }
+
+    protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
+        msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
+        msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
+        msg = msg + "    sum()   : Number" + getLineSeparator();
+        msg = msg + "    avg()   : Number" + getLineSeparator();
+        msg = msg + "    count() : String, Number, Date" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new DeriveReferrerUnmatchedColumnTypeException(msg);
+    }
+
+    public class DeriveReferrerUnmatchedColumnTypeException : SystemException {
+        public DeriveReferrerUnmatchedColumnTypeException(String msg) : base(msg) {
+        }
+    }
+
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
