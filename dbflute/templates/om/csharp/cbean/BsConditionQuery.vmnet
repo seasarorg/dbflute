@@ -170,7 +170,7 @@ namespace ${glPackageBaseCQ} {
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new LinkedHashMap<${subQueryKeepMapGeneric}>(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-           _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
+           _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
         }
 #end
 #end
@@ -279,7 +279,7 @@ namespace ${glPackageBaseCQ} {
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new LinkedHashMap<${subQueryKeepMapGeneric}>(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
-            _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
+            _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
         }
 #end
 #end
