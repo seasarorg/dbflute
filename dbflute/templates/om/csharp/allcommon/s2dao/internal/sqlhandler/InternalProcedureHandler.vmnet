@@ -36,7 +36,7 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
             Object dto = null;// getArgumentDto(args);
             LogSql(args, argTypes);
             Object ret = null;
-            int count = 0;
+            int additionalParamCount = 0;
             IDbCommand dbCommand = null;
             try {
                 dbCommand = PrepareCallableStatement(conn, this.Sql);
@@ -47,21 +47,34 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     ret = param.Value;
-                    count = 1;
+                    additionalParamCount = 1;
                 } else {
                     BindArgs(dbCommand, dto);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                 }
-                // return handleOutParameters(cs, dto, returnValue);
-                return ret;
-            } catch (Exception e) {
-                // handleSQLException(e, cs);
-                return null;// Unreachable!
+                for (int i = 0; i < args.Length; i++) {
+                    if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
+                        args[i] = ((IDataParameter) cmd.Parameters[i+cnt]).Value;
+                    }
+                }
+                return HandleOutParameters(cs, dto, returnValue, additionalParamCount);
+            // } catch (Exception e) {
+            //     handleSQLException(e, cs);
+            //     return null;// Unreachable!
             } finally {
                 try {
                     Close(dbCommand);
                 } finally {
                     Close(conn);
+                }
+            }
+        }
+
+        protected void HandleOutParameters(IDbCommand, dbCommand, Object dto, Object returnValue, int additionalParamCount) {
+            if (dto == null) { return; }
+            for (int i = 0; i < args.Length; i++) {
+                if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
+                    // args[i] = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
                 }
             }
         }
