@@ -36,27 +36,22 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected override Object Execute(IDbConnection conn, Object[] args, Type[] argTypes) {
             Object dto = null;// getArgumentDto(args);
             LogSql(args, argTypes);
-            Object ret = null;
             int additionalParamCount = 0;
             IDbCommand dbCommand = null;
             try {
                 dbCommand = PrepareCallableStatement(conn, this.Sql);
-                Object returnValue = null; 
+                Type returnType = null; // _procedureMetaData.
+                Object returnValue = null; // _procedureMetaData.
                 if (_procedureMetaData.HasReturnParameterType) {
                     String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
                     BindArgs(dbCommand, dto);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
-                    ret = param.Value;
+                    returnValue = param.Value;
                     additionalParamCount = 1;
                 } else {
                     BindArgs(dbCommand, dto);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
-                }
-                for (int i = 0; i < args.Length; i++) {
-                    if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
-                        args[i] = ((IDataParameter) cmd.Parameters[i+cnt]).Value;
-                    }
                 }
                 return HandleOutParameters(cs, dto, returnValue, additionalParamCount);
             // } catch (Exception e) {
@@ -71,13 +66,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        protected void HandleOutParameters(IDbCommand, dbCommand, Object dto, Object returnValue, int additionalParamCount) {
+        protected void HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
             if (dto == null) { return; }
-            for (int i = 0; i < args.Length; i++) {
-                if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
-                    // args[i] = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
-                }
-            }
+            // for (int i = 0; i < args.Length; i++) {
+            //     if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
+            //         // args[i] = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
+            //     }
+            // }
         }
 
         protected IDbCommand PrepareCallableStatement(IDbConnection conn, String sql) {
