@@ -106,7 +106,6 @@ namespace ${glPackageBaseCommonJavaLike} {
         }
         protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
             protected IEnumerator<ELEMENT> _target;
-            protected int _index;
             public MyEmumerator(ArrayList<ELEMENT> target) {
                 _target = target.getCollection().GetEnumerator();
             }
@@ -120,8 +119,8 @@ namespace ${glPackageBaseCommonJavaLike} {
             public bool hasNext() {
                 return MoveNext();
             }
-            public ELEMENT next() {
-                return _target.Current; // Not moving because hasNext() does it.
+            public ELEMENT next() { // Not moving because hasNext() does it.
+                return _target.Current;
             }
         }
 		public String toString() {
@@ -202,8 +201,8 @@ namespace ${glPackageBaseCommonJavaLike} {
             public bool hasNext() {
                 return MoveNext();
             }
-            public ELEMENT next() {
-                return _target.Current; // Not moving because hasNext() does it.
+            public ELEMENT next() { // Not moving because hasNext() does it.
+                return _target.Current;
             }
         }
 		public String toString() {
@@ -283,9 +282,9 @@ namespace ${glPackageBaseCommonJavaLike} {
             public bool hasNext() {
                 return MoveNext();
             }
-            public ELEMENT next() {
+            public ELEMENT next() { // Not moving because hasNext() does it.
                 if (_index == -1) { MoveNext(); } // For getting first element.
-                return _target.get(_index); // Not moving because hasNext() does it.
+                return _target.get(_index);
             }
         }
 		public String toString() {
