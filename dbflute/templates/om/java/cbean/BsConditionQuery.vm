@@ -326,15 +326,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #end
-    #end
-    #if (${col.isJavaNativeDateObject()})
-    #end
-    #if (${col.isJavaNativeBooleanObject()})
-    #end
-    #if (${col.isJavaNativeBinaryObject()})
-    #end
-    #if (!${col.isNotNull()})
-    #end
+#end
 
     public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { regOBA("${col.name}"); return this; }
     public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}"); return this; }
