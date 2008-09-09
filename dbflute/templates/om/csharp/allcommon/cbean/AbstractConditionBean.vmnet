@@ -402,23 +402,23 @@ namespace ${glPackageBaseCommonCBean} {
         }
         public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
-            _querySetupper.setup("max", subQuery, _localCQ, aliasName.Trim());
+            _querySetupper.Invoke("max", subQuery, _localCQ, aliasName.Trim());
         }
         public void Min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
-            _querySetupper.setup("min", subQuery, _localCQ, aliasName.Trim());
+            _querySetupper.Invoke("min", subQuery, _localCQ, aliasName.Trim());
         }
         public void Sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
-            _querySetupper.setup("sum", subQuery, _localCQ, aliasName.Trim());
+            _querySetupper.Invoke("sum", subQuery, _localCQ, aliasName.Trim());
         }
         public void Avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
-            _querySetupper.setup("avg", subQuery, _localCQ, aliasName.Trim());
+            _querySetupper.Invoke("avg", subQuery, _localCQ, aliasName.Trim());
         }
         public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
-            _querySetupper.setup("count", subQuery, _localCQ, aliasName.Trim());
+            _querySetupper.Invoke("count", subQuery, _localCQ, aliasName.Trim());
         }
 
         protected void assertAliasName(String aliasName) {
