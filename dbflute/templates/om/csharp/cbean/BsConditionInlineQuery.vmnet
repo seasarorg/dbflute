@@ -172,9 +172,9 @@ namespace ${glPackageCIQ} {
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-    public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
-    }
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+        }
 #end
 #end
 #end
@@ -275,9 +275,9 @@ namespace ${glPackageCIQ} {
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-    public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
-    }
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+        }
 #end
 #end
 #end

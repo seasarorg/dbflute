@@ -476,7 +476,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
