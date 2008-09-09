@@ -1,0 +1,87 @@
+
+using System;
+using System.Data;
+
+using Seasar.Dao;
+
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+public class ${glInternalProcedureCommand} : ISqlCommand {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected IDataSource dataSource;
+        protected IDataReaderHandler dataReaderHandler;
+        protected ICommandFactory statementFactory;
+        protected IDataReaderFactory dataReaderFactory;
+        protected ProcedureMetaData procedureMetaData;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalProcedureCommand}(DataSource dataSource, ResultSetHandler dataReaderHandler,
+                StatementFactory statementFactory, IDataReaderFactory dataReaderFactory,
+                ProcedureMetaData procedureMetaData) {
+            this.dataSource = dataSource;
+            this.dataReaderHandler = dataReaderHandler;
+            this.statementFactory = statementFactory;
+            this.dataReaderFactory = dataReaderFactory;
+            this.procedureMetaData = procedureMetaData;
+        }
+
+	    // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public Object Execute(Object[] args) {
+            ${glInternalProcedureHandler} handler = NewArgumentDtoProcedureHandler();
+            ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            Object pmb = outsideSqlContext.ParameterBean;
+            return handler.Execute(new Object[]{pmb});
+        }
+        protected ${glInternalProcedureHandler} NewArgumentDtoProcedureHandler() {
+            return new ${glInternalProcedureHandler}(dataSource, CreateSql(procedureMetaData), dataReaderHandler,
+                    statementFactory, dataReaderFactory, procedureMetaData);
+        }
+        protected String CreateSql(ProcedureMetaData procedureMetaData) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+           int size = procedureMetaData.ParameterTypeSize;
+            if (procedureMetaData.HasReturnParameterType) {
+                sb.append("? = ");
+                size--;
+            }
+            sb.append("call ").append(procedureMetaData.ProcedureName).append("(");
+            for (int i = 0; i < size; i++) {
+                sb.append("?, ");
+            }
+            if (size > 0) {
+                sb.setLength(sb.length() - 2);
+            }
+            sb.append(")}");
+            return sb.toString();
+        }
+    }
+
+    public class ProcedureMetaData {
+        protected String procedureName;
+        // protected CaseInsensitiveMap parameterTypes = new CaseInsensitiveMap();
+        protected bool returnType;
+        public String ProcedureName { get {
+            return procedureName;
+        } set {
+            procedureName = value;
+        }
+        }
+        public bool HasReturnParameterType { get {
+            return returnType;
+        } set {
+            returnType = value;
+        }
+        }
+    }
+}

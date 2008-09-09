@@ -1764,7 +1764,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalInsertBatchAutoStaticCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalInsertBatchAutoStaticCommand.${glTemplateFileExtension}",$path,"", "")
 
-      ## [DBFlute-0.7.5]
       $database.info("    parse('InternalProcedureCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalProcedureCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalProcedureCommand.${glTemplateFileExtension}",$path,"", "")
@@ -1785,7 +1784,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalUpdateModifiedOnlyCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalUpdateModifiedOnlyCommand.${glTemplateFileExtension}",$path,"", "")
 
-      ## {DBFlute-0.7.5}
       $database.info("    parse('InternalUpdateQueryAutoDynamicCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalUpdateQueryAutoDynamicCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalUpdateQueryAutoDynamicCommand.${glTemplateFileExtension}",$path,"", "")
@@ -1833,7 +1831,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalInsertBatchAutoHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalInsertBatchAutoHandler.${glTemplateFileExtension}",$path,"", "")
 
-      ## [DBFlute-0.7.5]
       $database.info("    parse('InternalProcedureHandler');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalProcedureHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalProcedureHandler.${glTemplateFileExtension}",$path,"", "")
@@ -1898,6 +1895,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalInsertAutoDynamicCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalInsertAutoDynamicCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalInsertAutoDynamicCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalProcedureCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalProcedureCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalProcedureCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('InternalUpdateAutoDynamicCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalUpdateAutoDynamicCommand}.${glClassFileExtension}" )
