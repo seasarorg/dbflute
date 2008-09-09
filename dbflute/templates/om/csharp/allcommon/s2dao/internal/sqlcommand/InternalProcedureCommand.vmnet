@@ -17,19 +17,19 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         //                                                                       =========
         protected IDataSource dataSource;
         protected IDataReaderHandler dataReaderHandler;
-        protected ICommandFactory statementFactory;
+        protected ICommandFactory commandFactory;
         protected IDataReaderFactory dataReaderFactory;
         protected ProcedureMetaData procedureMetaData;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glInternalProcedureCommand}(DataSource dataSource, ResultSetHandler dataReaderHandler,
-                StatementFactory statementFactory, IDataReaderFactory dataReaderFactory,
+        public ${glInternalProcedureCommand}(IDataSource dataSource, IDataReaderHandler dataReaderHandler,
+                ICommandFactory commandFactory, IDataReaderFactory dataReaderFactory,
                 ProcedureMetaData procedureMetaData) {
             this.dataSource = dataSource;
             this.dataReaderHandler = dataReaderHandler;
-            this.statementFactory = statementFactory;
+            this.commandFactory = commandFactory;
             this.dataReaderFactory = dataReaderFactory;
             this.procedureMetaData = procedureMetaData;
         }
@@ -45,7 +45,7 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         }
         protected ${glInternalProcedureHandler} NewArgumentDtoProcedureHandler() {
             return new ${glInternalProcedureHandler}(dataSource, CreateSql(procedureMetaData), dataReaderHandler,
-                    statementFactory, dataReaderFactory, procedureMetaData);
+                    commandFactory, dataReaderFactory, procedureMetaData);
         }
         protected String CreateSql(ProcedureMetaData procedureMetaData) {
             StringBuilder sb = new StringBuilder();
