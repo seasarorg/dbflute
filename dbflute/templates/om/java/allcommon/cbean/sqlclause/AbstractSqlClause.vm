@@ -1360,15 +1360,15 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             _specifiedSelectColumnMap.put(tableAliasName, new HashMap<String, String>());
         }
         Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnName, null);
-        _specifiedSelectColumnMap.put(tableAliasName, elementMap);// The value is dummy for extension at the future.
+        elementMap.put(columnName, null); // The value is dummy for extension at the future.
+        _specifiedSelectColumnMap.put(tableAliasName, elementMap);
     }
 
     public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {
         if (_specifiedDeriveSubQueryMap == null) {
             _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
         }
-        _specifiedDeriveSubQueryMap.put(aliasName, deriveSubQuery);// The value is dummy for extension at the future.
+        _specifiedDeriveSubQueryMap.put(aliasName, deriveSubQuery);
     }
 
     public boolean hasSpecifiedDeriveSubQuery(String aliasName) {

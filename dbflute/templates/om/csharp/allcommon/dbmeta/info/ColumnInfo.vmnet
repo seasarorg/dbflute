@@ -120,7 +120,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { propertyName = value; }
         }
 
-        public String PropertyType {
+        public Type PropertyType {
             get { return propertyType; }
             set { propertyType = value; }
         }
