@@ -135,7 +135,7 @@ namespace ${glPackageBaseCQ} {
         public Map<${subQueryKeepMapGeneric}> ${subQueryPropertyNameInitCap} { get {
             return _${subQueryPropertyName}Map;
         }}
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new LinkedHashMap<${subQueryKeepMapGeneric}>(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
             _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCQ} {
         public Map<${subQueryKeepMapGeneric}> ${subQueryPropertyNameInitCap} { get {
             return _${subQueryPropertyName}Map;
         }}
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new LinkedHashMap<${subQueryKeepMapGeneric}>(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
             _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
@@ -258,7 +258,7 @@ namespace ${glPackageBaseCQ} {
         public Map<${subQueryKeepMapGeneric}> ${subQueryPropertyNameInitCap} { get {
             return _${subQueryPropertyName}Map;
         }}
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
             _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
@@ -284,7 +284,7 @@ namespace ${glPackageBaseCQ} {
         public Map<${subQueryKeepMapGeneric}> ${subQueryPropertyNameInitCap} { get {
             return _${subQueryPropertyName}Map;
         }}
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
             String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
             _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyNameInitCap}." + key;
