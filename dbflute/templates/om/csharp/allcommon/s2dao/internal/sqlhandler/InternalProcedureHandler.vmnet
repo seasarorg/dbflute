@@ -1,8 +1,11 @@
 
 using System;
 using System.Data;
-
+using System.Data.OleDb;
+using System.Data.SqlClient;
+using Seasar.Framework.Util;
 using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Types;
 
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
@@ -33,21 +36,21 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
             Object dto = null;// getArgumentDto(args);
             LogSql(args, argTypes);
             Object ret = null;
-            int count = null;
+            int count = 0;
             IDbCommand dbCommand = null;
             try {
                 dbCommand = PrepareCallableStatement(conn, this.Sql);
                 Object returnValue = null; 
                 if (_procedureMetaData.HasReturnParameterType) {
-                    String returnParamName = BindReturnValues(cmd, "RetValue", GetDbValueType(returnType));
+                    String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
                     BindArgs(dbCommand, dto);
-                    CommandFactory.ExecuteNonQuery(this.DataSource, cs);
-                    IDbDataParameter param = (IDbDataParameter)cmd.Parameters[returnParamName]
+                    CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
+                    IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     ret = param.Value;
                     count = 1;
                 } else {
                     BindArgs(dbCommand, dto);
-                    CommandFactory.ExecuteNonQuery(this.DataSource, cs);
+                    CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                 }
                 // return handleOutParameters(cs, dto, returnValue);
                 return ret;
@@ -62,15 +65,105 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
                 }
             }
         }
-        protected IDbCommand PrepareCallableStatement(Connection conn, String sql) {
+
+        protected IDbCommand PrepareCallableStatement(IDbConnection conn, String sql) {
             if (this.Sql == null) { throw new IllegalStateException("The SQL should not be null!"); }
             IDbCommand dbCommand = CommandFactory.CreateCommand(conn, sql);
             dbCommand.CommandType = CommandType.StoredProcedure;
             return dbCommand;
         }
-        protected void BindArgs(IDbCommand dbCommand, Object dto)
+
+        protected void BindArgs(IDbCommand dbCommand, Object dto) {
             if (dto == null) { return; }
             return; // TODO: @jflute -- Not Implemented
+        }
+
+        protected void BindParamters(IDbCommand command, object[] args, Type[] argTypes,
+                                     String[] argNames, ParameterDirection[] argDirection) {
+            if (args == null) return;
+            for (int i = 0; i < args.Length; ++i) {
+                String columnName = argNames[i];
+                BindVariableType vt = DataProviderUtil.GetBindVariableType(command);
+                switch (vt) {
+                    case BindVariableType.QuestionWithParam:
+                        columnName = "?" + columnName;
+                        break;
+                    case BindVariableType.ColonWithParam:
+                        if ("OracleCommand".Equals(command.GetType().Name)) {
+                            columnName = string.Empty + columnName;
+                        } else {
+                            columnName = ":" + columnName;
+                        }
+                        break;
+                    default:
+                        columnName = "@" + columnName;
+                        break;
+                }
+
+                DbType dbType = GetDbValueType(argTypes[i]);
+                IDbDataParameter parameter = command.CreateParameter();
+                parameter.ParameterName = columnName;
+                parameter.Direction = argDirection[i];
+                parameter.Value = args[i];
+                parameter.DbType = dbType;
+                parameter.Size = 4096;
+                if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                    OleDbParameter oleDbParam = parameter as OleDbParameter;
+                    oleDbParam.OleDbType = OleDbType.VarChar;
+                } else if ("SqlCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                    SqlParameter sqlDbParam = parameter as SqlParameter;
+                    sqlDbParam.SqlDbType = SqlDbType.VarChar;
+                }
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        protected String BindReturnValues(IDbCommand command, string parameterName, DbType dbType) {
+            IDbDataParameter parameter = command.CreateParameter();
+            parameter.ParameterName = parameterName;
+            parameter.Direction = ParameterDirection.ReturnValue;
+            parameter.DbType = dbType;
+            parameter.Size = 4096;
+            if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                OleDbParameter oleDbParam = parameter as OleDbParameter;
+                oleDbParam.OleDbType = OleDbType.VarChar;
+            } else if ("SqlDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                SqlParameter sqlDbParam = parameter as SqlParameter;
+                sqlDbParam.SqlDbType = SqlDbType.VarChar;
+            }
+            command.Parameters.Add(parameter);
+            return parameter.ParameterName;
+        }
+
+        protected DbType GetDbValueType(Type type) {
+            if (type == typeof(Byte) || type.FullName == "System.Byte&")
+                return DbType.Byte;
+            if (type == typeof(SByte) || type.FullName == "System.SByte&")
+                return DbType.SByte;
+            if (type == typeof(Int16) || type.FullName == "System.Int16&")
+                return DbType.Int16;
+            if (type == typeof(Int32) || type.FullName == "System.Int32&")
+                return DbType.Int32;
+            if (type == typeof(Int64) || type.FullName == "System.Int64&")
+                return DbType.Int64;
+            if (type == typeof(Single) || type.FullName == "System.Single&")
+                return DbType.Single;
+            if (type == typeof(Double) || type.FullName == "System.Double&")
+                return DbType.Double;
+            if (type == typeof(Decimal) || type.FullName == "System.Decimal&")
+                return DbType.Decimal;
+            if (type == typeof(DateTime) || type.FullName == "System.DateTime&")
+                return DbType.DateTime;
+            if (type == ValueTypes.BYTE_ARRAY_TYPE)
+                return DbType.Binary;
+            if (type == typeof(String) || type.FullName == "System.String&")
+                return DbType.String;
+            if (type == typeof(Boolean) || type.FullName == "System.Boolean&")
+                return DbType.Boolean;
+            if (type == typeof(Guid) || type.FullName == "System.Guid&")
+                return DbType.Guid;
+            else
+                return DbType.Object;
         }
     }
 }
