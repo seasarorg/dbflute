@@ -413,6 +413,24 @@ namespace ${glPackageBaseCQ} {
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+
+    public void xderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDeriveReferrer(); subQuery.Invoke(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
+        registerDeriveSubQuery(function, cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+    }
+    abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#end
 #end
 #if (${col.isJavaNativeDateObject()})
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
