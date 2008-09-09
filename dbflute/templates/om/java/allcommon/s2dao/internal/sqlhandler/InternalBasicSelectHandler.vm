@@ -46,20 +46,20 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
 
     @SuppressWarnings("unchecked")
     public Object execute(Object[] args, Class[] argTypes) {
-        Connection con = getConnection();
+        Connection conn = getConnection();
         try {
-            return execute(con, args, argTypes);
+            return execute(conn, args, argTypes);
         } finally {
-            close(con);
+            close(conn);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Object execute(Connection connection, Object[] args, Class[] argTypes) {
+    public Object execute(Connection conn, Object[] args, Class[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = null;
         try {
-            ps = prepareStatement(connection);
+            ps = prepareStatement(conn);
             bindArgs(ps, args, argTypes);
             return execute(ps);
         } catch (SQLException e) {
@@ -70,12 +70,12 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         }
     }
 
-    protected Object[] setup(Connection con, Object[] args) {
+    protected Object[] setup(Connection conn, Object[] args) {
         return args;
     }
 
-    protected PreparedStatement prepareStatement(Connection connection) {
-        PreparedStatement ps = super.prepareStatement(connection);
+    protected PreparedStatement prepareStatement(Connection conn) {
+        PreparedStatement ps = super.prepareStatement(conn);
         if (fetchSize > -1) {
             setFetchSize(ps, fetchSize);
         }

@@ -1,6 +1,10 @@
 
 using System;
+using System.Data;
 
+using Seasar.Extension.ADO;
+
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
@@ -17,7 +21,7 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
         //                                                                     ===========
         public ${glInternalProcedureHandler}(IDataSource dataSource, String sql,
                 IDataReaderHandler dataReaderHandler, ICommandFactory commandFactory,
-                DataReaderFactory dataReaderFactory, ProcedureMetaData procedureMetaData)
+                IDataReaderFactory dataReaderFactory, ProcedureMetaData procedureMetaData)
                 : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
             this._procedureMetaData = procedureMetaData;
         }
@@ -25,34 +29,48 @@ public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public Object execute(IDbConnection connection, Object[] args, Type[] argTypes) {
-            Object dto = getArgumentDto(args);
+        protected override Object Execute(IDbConnection conn, Object[] args, Type[] argTypes) {
+            Object dto = null;// getArgumentDto(args);
             LogSql(args, argTypes);
-            CallableStatement cs = null;
+            Object ret = null;
+            int count = null;
+            IDbCommand dbCommand = null;
             try {
-                cs = prepareCallableStatement(connection);
-                bindArgs(cs, dto);
+                dbCommand = PrepareCallableStatement(conn, this.Sql);
                 Object returnValue = null; 
-                if (cs.execute()) {
-                    final ResultSet resultSet = cs.getResultSet();
-                    if (resultSet != null) {
-                        IDataReaderHandler handler = createReturnResultSetHandler(resultSet);
-                        try {
-                            returnValue = handler.handle(resultSet);
-                        } finally {
-                            if (resultSet != null) {
-                                resultSet.close();
-                            }
-                        }
-                    }
+                if (_procedureMetaData.HasReturnParameterType) {
+                    String returnParamName = BindReturnValues(cmd, "RetValue", GetDbValueType(returnType));
+                    BindArgs(dbCommand, dto);
+                    CommandFactory.ExecuteNonQuery(this.DataSource, cs);
+                    IDbDataParameter param = (IDbDataParameter)cmd.Parameters[returnParamName]
+                    ret = param.Value;
+                    count = 1;
+                } else {
+                    BindArgs(dbCommand, dto);
+                    CommandFactory.ExecuteNonQuery(this.DataSource, cs);
                 }
-                return handleOutParameters(cs, dto, returnValue);
-            } catch (SQLException e) {
-                handleSQLException(e, cs);
+                // return handleOutParameters(cs, dto, returnValue);
+                return ret;
+            } catch (Exception e) {
+                // handleSQLException(e, cs);
                 return null;// Unreachable!
             } finally {
-                close(cs);
+                try {
+                    Close(dbCommand);
+                } finally {
+                    Close(conn);
+                }
             }
+        }
+        protected IDbCommand PrepareCallableStatement(Connection conn, String sql) {
+            if (this.Sql == null) { throw new IllegalStateException("The SQL should not be null!"); }
+            IDbCommand dbCommand = CommandFactory.CreateCommand(conn, sql);
+            dbCommand.CommandType = CommandType.StoredProcedure;
+            return dbCommand;
+        }
+        protected void BindArgs(IDbCommand dbCommand, Object dto)
+            if (dto == null) { return; }
+            return; // TODO: @jflute -- Not Implemented
         }
     }
 }
