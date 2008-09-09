@@ -9,7 +9,6 @@ using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonSqlClause};
-using ${glPackageBaseCommonJavaLike};
 using ${glPackageCQ};
 using ${glPackageCIQ};
 
@@ -264,20 +263,41 @@ namespace ${glPackageBaseCQ} {
         public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
 #end
 #end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
+    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new LinkedHashMap<${subQueryKeepMapGeneric}>(); }
+        String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
+    }
 #end
-    #if (${col.isJavaNativeDateObject()})
-    #end
-    #if (${col.isJavaNativeBooleanObject()})
-    #end
-    #if (${col.isJavaNativeBinaryObject()})
-    #end
-    #if (!${col.isNotNull()})
-    #end
+#end
+#end
+#end
+#if (${col.isJavaNativeDateObject()})
+#end
+#if (${col.isJavaNativeBooleanObject()})
+#end
+#if (${col.isJavaNativeBinaryObject()})
+#end
+#if (!${col.isNotNull()})
+#end
 
         public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true);return this; }
         public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false);return this; }
 
-  #end
+#end
 
         // ===============================================================================
         //                                                                     Union Query
