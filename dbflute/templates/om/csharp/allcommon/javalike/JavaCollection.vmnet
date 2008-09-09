@@ -121,8 +121,7 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
-                MoveNext();
-                return _target.Current;
+                return _target.Current; // Not moving because hasNext() does it.
             }
         }
 		public String toString() {
@@ -204,8 +203,7 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
-                MoveNext();
-                return _target.Current;
+                return _target.Current; // Not moving because hasNext() does it.
             }
         }
 		public String toString() {
@@ -286,8 +284,8 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return MoveNext();
             }
             public ELEMENT next() {
-                MoveNext();
-                return _target.get(_index);
+                if (_index == -1) { MoveNext(); } // For getting first element.
+                return _target.get(_index); // Not moving because hasNext() does it.
             }
         }
 		public String toString() {
