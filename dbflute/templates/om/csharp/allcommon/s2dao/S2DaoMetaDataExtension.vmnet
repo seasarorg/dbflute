@@ -529,19 +529,30 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
         protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
-            string columnName = _beanAnnotationReader.GetColumn(pi);
-            if (columnName == null) {
+            if (IsRelationProperty(pi)) {
                 return null;
             }
+            String columnName = GetPropertyTypeColumnName(pi);
             IValueType valueType = ValueTypes.GetValueType(pi.PropertyType);
             IPropertyType pt = new PropertyTypeImpl(pi, valueType, columnName);
-            pt.IsPersistent = true;
             if (dbmeta.HasPrimaryKey && dbmeta.HasColumn(pt.ColumnName)) {
                 if (dbmeta.FindColumnInfo(pt.ColumnName).IsPrimary) {
                     pt.IsPrimaryKey = true;
                 }
             }
+            pt.IsPersistent = IsPersistentProperty(pi);
             return pt;
+        }
+        protected String GetPropertyTypeColumnName(PropertyInfo pi) {
+            String columnName = _beanAnnotationReader.GetColumn(pi);
+            columnName = (columnName != null ? columnName : pi.PropertyName);
+            return columnName;
+        }
+        protected bool IsRelationProperty(PropertyInfo pi) {
+            return _beanAnnotationReader.HasRelationNo(pi);
+        }
+        protected bool IsPersistentProperty(PropertyInfo pi) {
+            return _beanAnnotationReader.GetColumn(pi) != null;
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
