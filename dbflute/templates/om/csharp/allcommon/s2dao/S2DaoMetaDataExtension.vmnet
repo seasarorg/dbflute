@@ -529,7 +529,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
         protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
-            if (IsRelationProperty(pi)) {
+            if (IsRelationProperty(pi, dbmeta)) {
                 return null;
             }
             String columnName = GetPropertyTypeColumnName(pi);
@@ -540,7 +540,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     pt.IsPrimaryKey = true;
                 }
             }
-            pt.IsPersistent = IsPersistentProperty(pi);
+            pt.IsPersistent = IsPersistentProperty(pi, dbmeta);
             return pt;
         }
         protected String GetPropertyTypeColumnName(PropertyInfo pi) {
@@ -549,25 +549,32 @@ namespace ${glPackageBaseCommonS2Dao} {
             return columnName;
         }
         protected bool IsRelationProperty(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
-            if (_dbmeta.HasForeign(propertyName) || _dbmeta.HasReferrer(propertyName)) {
+            String propertyName = pi.Name;
+            if (dbmeta.HasForeign(propertyName) || dbmeta.HasReferrer(propertyName)) {
                 return true;
             }
             return _beanAnnotationReader.GetRelnoAttribute(pi) != null;
         }
-        protected bool IsPersistentProperty(PropertyInfo pi) {
-            if (!dbmeta.HasColumn(pi.Name) && _beanAnnotationReader.GetColumn(pi) == null) {
-                return false;
+        protected bool IsPersistentProperty(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
+            String propertyName = pi.Name;
+            if (dbmeta.HasColumn(propertyName) || _beanAnnotationReader.GetColumn(pi) != null) {
+                if (!IsElementOfNoPersistentProps(pi)) {
+                    return true;
+                }
             }
+            return false;
+        }
+        protected bool IsElementOfNoPersistentProps(PropertyInfo pi) {
+            String propertyName = pi.Name;
             String[] props = _beanAnnotationReader.GetNoPersisteneProps();
             if (props != null && props.Length >= 0) {
-                String propertyName = pi.Name;
                 for (int i = 0; i < props.Length; ++i) {
                     if (props[i].Equals(propertyName)) {
-                        return false;
+                        return true;
                     }
                 }
             }
-            return true;
+            return false;
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
