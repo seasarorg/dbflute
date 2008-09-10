@@ -21,16 +21,13 @@ import java.util.Set;
 import java.util.Stack;
 import javax.sql.DataSource;
 
-import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ColumnNaming;
-import org.seasar.dao.Dbms;
 import org.seasar.dao.IllegalParameterTypeRuntimeException;
 import org.seasar.dao.ProcedureMetaData;
 import org.seasar.dao.ProcedureParameterType;
-import org.seasar.dao.PropertyTypeFactory;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
@@ -44,7 +41,6 @@ import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.ProcedureMetaDataImpl;
 import org.seasar.dao.impl.ProcedureParameterTypeImpl;
-import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.ResultSetHandlerFactoryImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
@@ -852,7 +848,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
-        originalBmdFactory.setPropertyTypeFactoryBuilder(newOutsideSqlPropertyTypeFactoryBuilderImpl());
+        originalBmdFactory.setPropertyTypeFactoryBuilder(createOutsideSqlPropertyTypeFactoryBuilder());
         originalBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         originalBmdFactory.setTableNaming(this.tableNaming);
         originalBmdFactory.setDataSource(this.dataSource);
@@ -869,23 +865,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // Though nothing to override, it uses original class just in case.
     }
 
-    protected PropertyTypeFactoryBuilderImpl newOutsideSqlPropertyTypeFactoryBuilderImpl() {
-        final PropertyTypeFactoryBuilderImpl impl = new OutsideSqlPropertyTypeFactoryBuilderExtension();
+    protected ${glDaoPropertyTypeFactoryBuilderExtension} createOutsideSqlPropertyTypeFactoryBuilder() {
+        final ${glDaoPropertyTypeFactoryBuilderExtension} impl = new ${glDaoPropertyTypeFactoryBuilderExtension}();
         if (columnNaming == null) {
             String msg = "Internal Error! The columnNaming should not be null! {Failed to Injection!}";
             throw new IllegalStateException(msg);
         }
         impl.setColumnNaming(columnNaming);
-        impl.setDaoNamingConvention(daoNamingConvention);
         impl.setValueTypeFactory(valueTypeFactory);
         return impl;
-    }
-
-    protected static class OutsideSqlPropertyTypeFactoryBuilderExtension extends PropertyTypeFactoryBuilderImpl {
-        @Override
-        public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
-            return new ${glDaoPropertyTypeFactoryBuilderExtension}.FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
-        }
     }
 
     protected Class getOutsideSqlDefaultBeanClass(Method method) {

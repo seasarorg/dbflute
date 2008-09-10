@@ -9,7 +9,6 @@ import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.ColumnNaming;
-import org.seasar.dao.DaoNamingConvention;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.PropertyTypeFactory;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
@@ -49,21 +48,25 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyType
     protected static class FastPropertyTypeFactoryExtension extends AbstractPropertyTypeFactory {
 
         protected ${glDBMetaInterfaceName} _dbmeta;
+        protected String[] _noPersisteneProps;
 
         public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
                 ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming) {
             super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming);
-            if (isEntity()) {
-                _dbmeta = findDBMeta();
-            }
+            initializeResources();
         }
 
         public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
                 ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming, Dbms dbms) {
             super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, dbms);
+            initializeResources();
+        }
+
+        protected void initializeResources() {
             if (isEntity()) {
                 _dbmeta = findDBMeta();
             }
+            _noPersisteneProps = beanAnnotationReader.getNoPersisteneProps();
         }
 
         protected boolean isEntity() {
@@ -85,15 +88,17 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyType
             final BeanDesc beanDesc = getBeanDesc();
             for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
                 final PropertyDesc pd = beanDesc.getPropertyDesc(i);
-                
-                // Read-only property is unnecessary! {DBFlute Original Extension}
+
+                // Read-only property is unnecessary!
                 if (!pd.hasWriteMethod()) {
                     continue;
                 }
-                
+
+                // Relation property is unnecessary!
                 if (isRelation(pd)) {
                     continue;
                 }
+
                 final PropertyType pt = createPropertyType(pd);
                 pt.setPrimaryKey(isPrimaryKey(pd));
                 pt.setPersistent(isPersistent(pt));
@@ -120,8 +125,8 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyType
             if (beanAnnotationReader.getColumnAnnotation(propertyType.getPropertyDesc()) == null) {
                 return false;
             }
-            final String[] props = beanAnnotationReader.getNoPersisteneProps();
-            if (props != null) {
+            final String[] props = _noPersisteneProps;
+            if (props != null && props.length >= 0) {
                 String propertyName = propertyType.getPropertyName();
                 for (int i = 0; i < props.length; ++i) {
                     if (props[i].equals(propertyName)) {
