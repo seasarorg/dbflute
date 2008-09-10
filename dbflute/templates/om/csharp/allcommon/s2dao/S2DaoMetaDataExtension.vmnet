@@ -545,14 +545,26 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected String GetPropertyTypeColumnName(PropertyInfo pi) {
             String columnName = _beanAnnotationReader.GetColumn(pi);
-            columnName = (columnName != null ? columnName : pi.PropertyName);
+            columnName = (columnName != null ? columnName : pi.Name);
             return columnName;
         }
         protected bool IsRelationProperty(PropertyInfo pi) {
-            return _beanAnnotationReader.HasRelationNo(pi);
+            return _beanAnnotationReader.GetRelnoAttribute(pi) != null;
         }
         protected bool IsPersistentProperty(PropertyInfo pi) {
-            return _beanAnnotationReader.GetColumn(pi) != null;
+            if (_beanAnnotationReader.GetColumn(pi) == null) {
+                return false;
+            }
+            String[] props = _beanAnnotationReader.GetNoPersisteneProps();
+            if (props != null && props.Length >= 0) {
+                String propertyName = pi.Name;
+                for (int i = 0; i < props.Length; ++i) {
+                    if (props[i].Equals(propertyName)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
@@ -591,11 +603,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
         public override IDictionary GetModifiedPropertyNames(object bean) {
-            string propertyNames = _modifiedPropertyNamesPropertyName;
+            String propertyName = _modifiedPropertyNamesPropertyName;
             if (!HasModifiedPropertyNamesPropertyName) {
-                throw new NotFoundModifiedPropertiesRuntimeException(bean.GetType().Name, propertyNames);
+                throw new NotFoundModifiedPropertiesRuntimeException(bean.GetType().Name, propertyName);
             }
-            PropertyInfo modifiedPropertyType = BeanType.GetProperty(propertyNames);
+            PropertyInfo modifiedPropertyType = BeanType.GetProperty(propertyName);
             object value = modifiedPropertyType.GetValue(bean, null);
             IDictionary names = (IDictionary)value;
             return names;

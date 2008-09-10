@@ -1,42 +1,52 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.sql.DatabaseMetaData;
 
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.DaoNamingConvention;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.PropertyTypeFactory;
+import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.ValueTypeFactory;
-import org.seasar.dao.impl.FastPropertyTypeFactory;
-import org.seasar.dao.impl.FastPropertyTypeFactoryBuilder;
-import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.dao.impl.AbstractPropertyTypeFactory;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
- * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47} <br />
- * 
+ * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47}
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTypeFactoryBuilder {
+public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyTypeFactoryBuilder {
 
-    @Override
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ValueTypeFactory valueTypeFactory;
+
+    protected ColumnNaming columnNaming;
+
+    // ===================================================================================
+    //                                                                               Build
+    //                                                                               =====
     public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader) {
         return new FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming);
     }
 
-    @Override
     public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
-        return new FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+        return new FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, dbms);
     }
 
-    protected static class FastPropertyTypeFactoryExtension extends FastPropertyTypeFactory {
+    // ===================================================================================
+    //                                                                     Extension Class
+    //                                                                     ===============
+    protected static class FastPropertyTypeFactoryExtension extends AbstractPropertyTypeFactory {
 
         protected ${glDBMetaInterfaceName} _dbmeta;
 
@@ -49,9 +59,8 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTyp
         }
 
         public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
-                ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming, DaoNamingConvention daoNamingConvention,
-                Dbms dbms) {
-            super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+                ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming, Dbms dbms) {
+            super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, dbms);
             if (isEntity()) {
                 _dbmeta = findDBMeta();
             }
@@ -71,24 +80,13 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTyp
             }
         }
 
-        @Override
-        protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
-            if (isEntity() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyDesc.getPropertyName())) {
-                if (_dbmeta.findColumnInfo(propertyDesc.getPropertyName()).isPrimary()) {
-                    return true;
-                }
-            }
-            return super.isPrimaryKey(propertyDesc);
-        }
-
-        @Override
         public PropertyType[] createBeanPropertyTypes(String tableName) {
             final List<PropertyType> list = new ArrayList<PropertyType>();
             final BeanDesc beanDesc = getBeanDesc();
             for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
                 final PropertyDesc pd = beanDesc.getPropertyDesc(i);
                 
-                // Read-only property is unnecessary! {Extension of S2Dao}
+                // Read-only property is unnecessary! {DBFlute Original Extension}
                 if (!pd.hasWriteMethod()) {
                     continue;
                 }
@@ -103,17 +101,67 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTyp
             }
             return list.toArray(new PropertyType[list.size()]);
         }
-		
+
+        @Override
+        protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
+            if (isEntity() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyDesc.getPropertyName())) {
+                if (_dbmeta.findColumnInfo(propertyDesc.getPropertyName()).isPrimary()) {
+                    return true;
+                }
+            }
+            return super.isPrimaryKey(propertyDesc); // by ID annotation.
+        }
+
         @Override
         protected boolean isPersistent(PropertyType propertyType) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // The columns that has column annotation are persistent.
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            // It determines by the column annotation and the no-persistent-props annotation.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
             if (beanAnnotationReader.getColumnAnnotation(propertyType.getPropertyDesc()) == null) {
                 return false;
             }
-			
-            return super.isPersistent(propertyType);
+            final String[] props = beanAnnotationReader.getNoPersisteneProps();
+            if (props != null) {
+                String propertyName = propertyType.getPropertyName();
+                for (int i = 0; i < props.length; ++i) {
+                    if (props[i].equals(propertyName)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
+
+        protected boolean isNoPersistentProperty(PropertyType propertyType) {
+            final String[] props = beanAnnotationReader.getNoPersisteneProps();
+            if (props != null) {
+                String propertyName = propertyType.getPropertyName();
+                for (int i = 0; i < props.length; ++i) {
+                    if (props[i].equals(propertyName)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ValueTypeFactory getValueTypeFactory() {
+        return valueTypeFactory;
+    }
+
+    public void setValueTypeFactory(ValueTypeFactory valueTypeFactory) {
+        this.valueTypeFactory = valueTypeFactory;
+    }
+
+    public ColumnNaming getColumnNaming() {
+        return columnNaming;
+    }
+
+    public void setColumnNaming(ColumnNaming columnNaming) {
+        this.columnNaming = columnNaming;
     }
 }
