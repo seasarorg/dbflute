@@ -108,39 +108,55 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyType
         }
 
         @Override
+        protected boolean isRelation(PropertyDesc propertyDesc) {
+            final String propertyName = propertyDesc.getPropertyName();
+            if (isEntity() && (_dbmeta.hasForeign(propertyName) || _dbmeta.hasReferrer(propertyName))) {
+                return true;
+            }
+            return hasRelationNoAnnotation(propertyDesc);
+        }
+
+        protected boolean hasRelationNoAnnotation(PropertyDesc propertyDesc) {
+            return beanAnnotationReader.hasRelationNo(propertyDesc);
+        }
+
+        @Override
         protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
-            if (isEntity() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyDesc.getPropertyName())) {
-                if (_dbmeta.findColumnInfo(propertyDesc.getPropertyName()).isPrimary()) {
+            final String propertyName = propertyDesc.getPropertyName();
+            if (isEntity() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyName)) {
+                if (_dbmeta.findColumnInfo(propertyName).isPrimary()) {
                     return true;
                 }
             }
-            return super.isPrimaryKey(propertyDesc); // by ID annotation.
+            return hasIdAnnotation(propertyDesc);
+        }
+
+        protected boolean hasIdAnnotation(PropertyDesc propertyDesc) {
+            final Dbms dbms = getDbms();
+            return beanAnnotationReader.getId(propertyDesc, dbms) != null;
         }
 
         @Override
         protected boolean isPersistent(PropertyType propertyType) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-            // It determines by the column annotation and the no-persistent-props annotation.
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-            if (beanAnnotationReader.getColumnAnnotation(propertyType.getPropertyDesc()) == null) {
+            final String propertyName = propertyType.getPropertyName();
+            final PropertyDesc propertyDesc = propertyType.getPropertyDesc();
+            if (!_dbmeta.hasColumn(propertyName) && !hasColumnAnnotation(propertyDesc)) {
                 return false;
             }
-            final String[] props = _noPersisteneProps;
-            if (props != null && props.length >= 0) {
-                String propertyName = propertyType.getPropertyName();
-                for (int i = 0; i < props.length; ++i) {
-                    if (props[i].equals(propertyName)) {
-                        return false;
-                    }
-                }
+            if (isElementOfNoPersistentProps(propertyDesc)) {
+                return false;
             }
             return true;
         }
 
-        protected boolean isNoPersistentProperty(PropertyType propertyType) {
-            final String[] props = beanAnnotationReader.getNoPersisteneProps();
-            if (props != null) {
-                String propertyName = propertyType.getPropertyName();
+        protected boolean hasColumnAnnotation(PropertyDesc propertyDesc) {
+            return beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
+        }
+
+        protected boolean isElementOfNoPersistentProps(PropertyDesc propertyDesc) {
+            final String propertyName = propertyDesc.getPropertyName();
+            final String[] props = _noPersisteneProps;
+            if (props != null && props.length >= 0) {
                 for (int i = 0; i < props.length; ++i) {
                     if (props[i].equals(propertyName)) {
                         return true;

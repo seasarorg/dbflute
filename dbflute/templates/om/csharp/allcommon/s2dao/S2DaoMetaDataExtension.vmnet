@@ -548,11 +548,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             columnName = (columnName != null ? columnName : pi.Name);
             return columnName;
         }
-        protected bool IsRelationProperty(PropertyInfo pi) {
+        protected bool IsRelationProperty(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
+            if (_dbmeta.HasForeign(propertyName) || _dbmeta.HasReferrer(propertyName)) {
+                return true;
+            }
             return _beanAnnotationReader.GetRelnoAttribute(pi) != null;
         }
         protected bool IsPersistentProperty(PropertyInfo pi) {
-            if (_beanAnnotationReader.GetColumn(pi) == null) {
+            if (!dbmeta.HasColumn(pi.Name) && _beanAnnotationReader.GetColumn(pi) == null) {
                 return false;
             }
             String[] props = _beanAnnotationReader.GetNoPersisteneProps();

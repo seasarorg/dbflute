@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.lang.reflect.Method;
 
@@ -1091,14 +1093,20 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // -----------------------------------------------------
     //                                   Reflection Handling
     //                                   -------------------
+    private Set<String> _cachedMethodNames = new HashSet<String>(); // for performance
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        try {
-            this.getClass().getMethod(methodName, new Class[]{});
-            return true;
-        } catch (NoSuchMethodException ignored) {
-            return false;
+        if (_cachedMethodNames.isEmpty()) {
+            synchronized (_cachedMethodNames) {
+                if (_cachedMethodNames.isEmpty()) {
+                    final Method[] methods = this.getClass().getMethods();
+                    for (Method method : methods) {
+                        _cachedMethodNames.add(method.getName());
+                    }
+                }
+            }
         }
+        return _cachedMethodNames.contains(methodName);
     }
 	
     // -----------------------------------------------------
