@@ -8,6 +8,7 @@ using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonUtil};
+using ${glPackageBaseCommonS2DaoInternalUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
@@ -60,7 +61,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual string GetCompleteSql(object[] args) {
-            return _commandFactory.GetCompleteSql(_sql, args);
+            return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
+        }
+
+        protected virtual String getBindVariableText(Object bindVariable) {
+            return ${glInternalBindVariableUtil}.GetBindVariableText(bindVariable);
         }
 
         protected virtual void LogSql(Object[] args, Type[] argTypes) {

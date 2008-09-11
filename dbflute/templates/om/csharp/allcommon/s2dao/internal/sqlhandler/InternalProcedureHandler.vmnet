@@ -78,6 +78,33 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             throw new IllegalArgumentException("args");
         }
 
+        protected override String GetCompleteSql(Object[] args) {// for Procedure Call
+            String sql = this.Sql;
+            Object dto = GetArgumentDto(args);
+            if (args == null || dto == null) {
+                return sql;
+            }
+            StringBuilder sb = new StringBuilder(100);
+            int pos = 0;
+            int pos2 = 0;
+            int size = _procedureMetaData.ParameterTypeSize;
+            for (int i = 0; i < size; i++) {
+                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                if ((pos2 = sql.IndexOf('?', pos)) < 0) {
+                    break;
+                }
+                sb.append(sql.Substring(pos, pos2));
+                pos = pos2 + 1;
+                if (ppt.IsInType) {
+                    sb.append(GetBindVariableText(ppt.GetValue(dto)));
+                } else {
+                    sb.append(sql.Substring(pos2, pos));
+                }
+            }
+            sb.append(sql.Substring(pos));
+            return sb.toString();
+        }
+
         protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
             if (dto == null) {
                 return null;
