@@ -38,18 +38,18 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             IDbCommand dbCommand = null;
             try {
                 dbCommand = PrepareCallableStatement(conn, this.Sql);
-                Type returnType = null; // _procedureMetaData.
                 Object returnValue = null;
                 int additionalParamCount = 0;
                 if (_procedureMetaData.HasReturnParameterType) {
+                    Type returnType = _procedureMetaData.ReturnParameterType;
                     String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
-                    BindArgs(dbCommand, dto);
+                    BindParamters(dbCommand);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     returnValue = param.Value;
                     additionalParamCount = 1;
                 } else {
-                    BindArgs(dbCommand, dto);
+                    BindParamters(dbCommand);
                     CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
                 }
                 return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
@@ -79,13 +79,32 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
-            if (dto == null) { return null; }
-            // for (int i = 0; i < args.Length; i++) {
-            //     if (ArgumentDirection[i] == ParameterDirection.InputOutput || ArgumentDirection[i] == ParameterDirection.Output) {
-            //         // args[i] = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
-            //     }
-            // }
-            return null;
+            if (dto == null) {
+                return null;
+            }
+            int size = _procedureMetaData.ParameterTypeSize;
+            for (int i = 0; i < size; i++) {
+                ProcedureParameterType ppt = procedureMetaData.GetParameterType(i);
+                if (ppt.IsOutType) {
+                    Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
+                    // Not support yet
+                    // if (value is IDataReader) {
+                    //     IDataReader resultSet = (IDataReader) value;
+                    //     ResultSetHandler handler = createOutParameterResultSetHandler(ppt, resultSet);
+                    //     try {
+                    //         value = handler.handle(resultSet);
+                    //     } finally {
+                    //         if (resultSet != null) {
+                    //             resultSet.close();
+                    //         }
+                    //     }
+                    // }
+                    ppt.SetValue(dto, value);
+                } else if (ppt.IsReturnType) {
+                    ppt.SetValue(dto, returnValue);
+                }
+            }
+            return dto;
         }
 
         protected IDbCommand PrepareCallableStatement(IDbConnection conn, String sql) {
@@ -95,37 +114,33 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return dbCommand;
         }
 
-        protected void BindArgs(IDbCommand dbCommand, Object dto) {
-            if (dto == null) { return; }
-            return; // TODO: @jflute -- Not Implemented
-        }
-
-        protected void BindParamters(IDbCommand command, object[] args, Type[] argTypes,
-                                     String[] argNames, ParameterDirection[] argDirection) {
+        protected void BindParamters(IDbCommand command) {
             if (args == null) return;
-            for (int i = 0; i < args.Length; ++i) {
-                String columnName = argNames[i];
+            int size = _procedureMetaData.ParameterTypeSize;
+            for (int i = 0; i < size; i++) {
+                ProcedureParameterType ppt = procedureMetaData.GetParameterType(i);
+                String parameterName = ppt.ParameterName;
                 BindVariableType vt = DataProviderUtil.GetBindVariableType(command);
                 switch (vt) {
                     case BindVariableType.QuestionWithParam:
-                        columnName = "?" + columnName;
+                        parameterName = "?" + parameterName;
                         break;
                     case BindVariableType.ColonWithParam:
                         if ("OracleCommand".Equals(command.GetType().Name)) {
-                            columnName = string.Empty + columnName;
+                            parameterName = string.Empty + columnName;
                         } else {
-                            columnName = ":" + columnName;
+                            parameterName = ":" + parameterName;
                         }
                         break;
                     default:
-                        columnName = "@" + columnName;
+                        parameterName = "@" + parameterName;
                         break;
                 }
 
-                DbType dbType = GetDbValueType(argTypes[i]);
+                DbType dbType = GetDbValueType(ppt.ParameterPropertyType);
                 IDbDataParameter parameter = command.CreateParameter();
-                parameter.ParameterName = columnName;
-                parameter.Direction = argDirection[i];
+                parameter.ParameterName = parameterName;
+                parameter.Direction = ppt.GetParameterDirection();
                 parameter.Value = args[i];
                 parameter.DbType = dbType;
                 parameter.Size = 4096;

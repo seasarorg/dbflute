@@ -199,7 +199,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     public class ProcedureMetaData {
         protected String _procedureName;
         protected LinkedHashMap<String, ProcedureParameterType> parameterTypeMap = new LinkedHashMap<String, ProcedureParameterType>();
-        protected bool _returnType;
+        protected Type _returnType;
         public String ProcedureName { get {
             return _procedureName;
         } set {
@@ -215,15 +215,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             return parameterTypeMap.size();
         }}
         public bool HasReturnParameterType { get {
+            return _returnType != null;
+        }}
+        public Type ReturnParameterType { get {
             return _returnType;
-        } set {
-            _returnType = value;
         }}
         public void addParameterType(ProcedureParameterType parameterType) {
             String name = parameterType.ParameterName;
             parameterTypeMap.put(name.ToLower(), parameterType);
             if (parameterType.IsReturnType) {
-                _returnType = true;
+                _returnType = parameterType.ParameterPropertyType;
             }
         }
     }
@@ -231,15 +232,34 @@ namespace ${glPackageBaseCommonS2Dao} {
     public class ProcedureParameterType {
         protected String _parameterName;
         protected PropertyInfo _parameterProperty;
-        protected IValueType _valueType;
+        protected Type _parameterPropertyType;
         protected bool _inType;
         protected bool _outType;
+        protected bool _inOutType;
         protected bool _returnType;
+        public void SetValue(Object dto, Object value) {
+            _parameterProperty.SetValue(dto, value, null);
+        }
+        public ParameterDirection GetParameterDirection() {
+            if (IsInType) {
+                return ParameterDirection.Input;
+            } else if (IsOutType) {
+                return ParameterDirection.Output;
+            } else if (IsInOutType) {
+                return ParameterDirection.InputOutput;
+            } else if (IsReturnType) {
+                return ParameterDirection.ReturnValue;
+            } else {
+                String msg = "Unknown type. All type determinations are false.";
+                throw new IllegalStateException(msg);
+            }
+        }
         public String ParameterName { get { return _parameterName; } set { _parameterName = value; } }
         public PropertyInfo ParameterProperty { get { return _parameterProperty; } set { _parameterProperty = value; } }
-        public IValueType ValueType { get { return _valueType; } set { _valueType = value; } }
+        public Type ParameterPropertyType { get { return _parameterPropertyType; } set { _parameterPropertyType = value; } }
         public bool IsInType { get { return _inType; } set { _inType = value; } }
         public bool IsOutType { get { return _outType; } set { _outType = value; } }
+        public bool IsInOutType { get { return _inOutType; } set { _inOutType = value; } }
         public bool IsReturnType { get { return _returnType; } set { _returnType = value; } }
     }
 }
