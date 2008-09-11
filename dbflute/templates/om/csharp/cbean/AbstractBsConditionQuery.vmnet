@@ -131,8 +131,8 @@ namespace ${glPackageBaseCQ} {
         public void InScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
+            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -153,8 +153,8 @@ namespace ${glPackageBaseCQ} {
         public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -176,8 +176,8 @@ namespace ${glPackageBaseCQ} {
         public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -316,8 +316,8 @@ namespace ${glPackageBaseCQ} {
         public void InScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
+            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -338,8 +338,8 @@ namespace ${glPackageBaseCQ} {
         public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -361,8 +361,8 @@ namespace ${glPackageBaseCQ} {
         public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
