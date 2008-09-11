@@ -3,6 +3,10 @@
 
 using System;
 using System.Text;
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
+using ${glPackageBaseCommonCBeanOutsidesql};
+#end
 
 namespace ${glPackageExtendedParameterBean} {
 
