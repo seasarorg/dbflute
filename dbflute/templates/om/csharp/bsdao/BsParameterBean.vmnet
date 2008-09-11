@@ -60,6 +60,31 @@ namespace ${glPackageExtendedParameterBean} {
 
 #end
         // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        protected String ConvertEmptyToNullIfString(String value) {
+            return FilterRemoveEmptyString(value);
+        }
+
+        protected String FilterRemoveEmptyString(String value) {
+            return ((value != null && !"".Equals(value)) ? value : null);
+        }
+
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        public override String ToString() {
+            String delimiter = ",";
+            StringBuilder sb = new StringBuilder();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+            sb.Append(delimiter).Append(_${propertyName});
+#end
+            sb.Remove(0, delimiter.Length);
+            sb.Insert(0, "{").Append("}");
+            return sb.ToString();
+        }
+
+        // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
@@ -93,28 +118,5 @@ namespace ${glPackageExtendedParameterBean} {
 #end
 
 #end
-
-        protected String ConvertEmptyToNullIfString(String value) {
-            return FilterRemoveEmptyString(value);
-        }
-
-        protected String FilterRemoveEmptyString(String value) {
-            return ((value != null && !"".Equals(value)) ? value : null);
-        }
-
-        // ===============================================================================
-        //                                                                  Basic Override
-        //                                                                  ==============
-        public override String ToString() {
-            String delimiter = ",";
-            StringBuilder sb = new StringBuilder();
-#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-            sb.Append(delimiter).Append(_${propertyName});
-#end
-            sb.Remove(0, delimiter.Length);
-            sb.Insert(0, "{").Append("}");
-            return sb.ToString();
-
-        }
     }
 }
