@@ -105,36 +105,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return sb.toString();
         }
 
-        protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
-            if (dto == null) {
-                return null;
-            }
-            int size = _procedureMetaData.ParameterTypeSize;
-            for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
-                if (ppt.IsOutType) {
-                    Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
-                    // Not support yet
-                    if (value is IDataReader) {
-                        IDataReader reader = (IDataReader) value;
-                        throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
-                    //     ResultSetHandler handler = createOutParameterResultSetHandler(ppt, resultSet);
-                    //     try {
-                    //         value = handler.handle(resultSet);
-                    //     } finally {
-                    //         if (resultSet != null) {
-                    //             resultSet.close();
-                    //         }
-                    //     }
-                    }
-                    ppt.SetValue(dto, value);
-                } else if (ppt.IsReturnType) {
-                    ppt.SetValue(dto, returnValue);
-                }
-            }
-            return dto;
-        }
-
         protected IDbCommand PrepareCallableStatement(IDbConnection conn, String sql) {
             if (this.Sql == null) { throw new IllegalStateException("The SQL should not be null!"); }
             IDbCommand dbCommand = CommandFactory.CreateCommand(conn, sql);
@@ -228,6 +198,41 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 return DbType.Guid;
             else
                 return DbType.Object;
+        }
+
+        protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
+            if (dto == null) {
+                return null;
+            }
+            int size = _procedureMetaData.ParameterTypeSize;
+            for (int i = 0; i < size; i++) {
+                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                if (ppt.IsOutType) {
+                    Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
+                    // Not support yet
+                    if (value is IDataReader) {
+                        IDataReader reader = (IDataReader) value;
+                        throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
+                    //     IDataReaderHandler handler = CreateOutParameterResultSetHandler(ppt, reader);
+                    //     try {
+                    //         value = handler.Handle(reader);
+                    //     } finally {
+                    //         if (reader != null) {
+                    //             reader.Close();
+                    //         }
+                    //     }
+                    }
+                    ppt.SetValue(dto, value);
+                } else if (ppt.IsReturnType) {
+                    ppt.SetValue(dto, returnValue);
+                }
+            }
+            return dto;
+        }
+
+        protected IDataReaderHandler CreateOutParameterResultSetHandler(ProcedureParameterType ppt, IDataReader reader) {
+            // return new InternalMapListResultSetHandler();
+            return null;
         }
     }
 }

@@ -238,7 +238,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool _inOutType;
         protected bool _returnType;
         public Object GetValue(Object dto) {
-            _parameterProperty.GetValue(dto, null);
+            return _parameterProperty.GetValue(dto, null);
         }
         public void SetValue(Object dto, Object value) {
             _parameterProperty.SetValue(dto, value, null);

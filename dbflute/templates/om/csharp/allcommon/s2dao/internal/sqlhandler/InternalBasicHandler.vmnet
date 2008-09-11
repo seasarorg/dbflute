@@ -64,7 +64,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
         }
 
-        protected virtual String getBindVariableText(Object bindVariable) {
+        protected virtual String GetBindVariableText(Object bindVariable) {
             return ${glInternalBindVariableUtil}.GetBindVariableText(bindVariable);
         }
 

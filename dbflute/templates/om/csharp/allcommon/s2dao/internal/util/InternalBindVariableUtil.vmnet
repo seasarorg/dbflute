@@ -37,7 +37,7 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
             return ReplaceSql(sql, args);
         }
 
-        protected static string ReplaceSql(string sql, object[] args) {
+        protected static String ReplaceSql(string sql, object[] args) {
             StringBuilder text = new StringBuilder(sql);
             for (int startIndex = 0, argsIndex = 0; argsIndex < args.Length; ++argsIndex) {
                 Match match = _parser.Match(text.ToString(), startIndex);
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
             return text.ToString();
         }
 
-        protected static string GetBindVariableText(Object bindVariable) {
+        public static String GetBindVariableText(Object bindVariable) {
             if (bindVariable is INullable) {
                 INullable nullable = bindVariable as INullable;
                 if (nullable.IsNull) {
