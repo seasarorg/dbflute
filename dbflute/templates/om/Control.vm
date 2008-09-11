@@ -940,11 +940,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOptionName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlOption.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('ProcedurePmb');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glProcedurePmbName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/ProcedurePmb.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parse('ProcedurePmb');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glProcedurePmbName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/ProcedurePmb.${glTemplateFileExtension}",$path ,"", "")
 
     #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor}))
     $database.makeDirectory($path)

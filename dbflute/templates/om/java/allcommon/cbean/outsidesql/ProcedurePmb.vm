@@ -6,5 +6,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
  */
 public interface ${glProcedurePmbName} {
 
+    /**
+     * Get the value of procedure name.
+     * @return The value of procedure name. (NotNull)
+     */
     public String getProcedureName();
 }

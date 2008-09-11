@@ -25,13 +25,13 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
-    public static String ${propertyName}_PROCEDURE_PARAMETER = "in";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "in";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
-    public static String ${propertyName}_PROCEDURE_PARAMETER = "out";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "out";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
-    public static String ${propertyName}_PROCEDURE_PARAMETER = "inout";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "inout";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
-    public static String ${propertyName}_PROCEDURE_PARAMETER = "return";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "return";
 #end
 #end
 #end

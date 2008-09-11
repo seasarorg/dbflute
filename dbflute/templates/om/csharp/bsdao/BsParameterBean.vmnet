@@ -11,7 +11,32 @@ namespace ${glPackageExtendedParameterBean} {
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [System.Serializable]
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+    public partial class ${myClassName} : ${glProcedurePmbName} {
+#else
     public partial class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        // -------------------------------------------------
+        //                               Procedure Parameter
+        //                               -------------------
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "in";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "out";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "inout";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "return";
+#end
+#end
+#end
 
         // ===============================================================================
         //                                                                       Attribute
