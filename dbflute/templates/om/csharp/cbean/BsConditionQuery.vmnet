@@ -1,11 +1,9 @@
 #set ($myClassName = "${myBaseConditionQueryClassName}")
 
 using System;
-using System.Collections;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
-using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJavaLike};

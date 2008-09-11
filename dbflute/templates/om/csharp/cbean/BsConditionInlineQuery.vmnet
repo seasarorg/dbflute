@@ -2,9 +2,7 @@
 #set ($myCQClassName = "${myBaseConditionQueryClassName}")
 
 using System;
-using System.Collections;
 
-using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCOption};
