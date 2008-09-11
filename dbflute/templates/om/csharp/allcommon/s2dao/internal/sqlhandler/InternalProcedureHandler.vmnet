@@ -115,8 +115,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 if (ppt.IsOutType) {
                     Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
                     // Not support yet
-                    // if (value is IDataReader) {
-                    //     IDataReader resultSet = (IDataReader) value;
+                    if (value is IDataReader) {
+                        IDataReader reader = (IDataReader) value;
+                        throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
                     //     ResultSetHandler handler = createOutParameterResultSetHandler(ppt, resultSet);
                     //     try {
                     //         value = handler.handle(resultSet);
@@ -125,7 +126,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     //             resultSet.close();
                     //         }
                     //     }
-                    // }
+                    }
                     ppt.SetValue(dto, value);
                 } else if (ppt.IsReturnType) {
                     ppt.SetValue(dto, returnValue);
