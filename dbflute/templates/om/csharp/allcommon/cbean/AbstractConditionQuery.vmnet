@@ -712,11 +712,76 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 	public void WithNullsLast() {// is User Public!
 	    getSqlClause().addNullsLastToPreviousOrderBy();
 	}
-	
+
+    protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
+        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+            throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
+        }
+        getSqlClause().registerOrderBy(aliasName, null, true);
+    }
+
+    protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
+        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+            throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
+        }
+        getSqlClause().registerOrderBy(aliasName, null, false);
+    }
+
+    protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The aliasName was Not Found in specified alias names." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "You should specified an alias name that is the same as one in specify-derived-referrer." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"WRONG_NAME_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Good!]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Not Found Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
+    }
+
+    public static class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
     public void registerOrderBy(String columnName, bool ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
     }
-	
+
+    protected void regOBA(String columnName) {
+        registerOrderBy(columnName, true);
+    }
+
+    protected void regOBD(String columnName) {
+        registerOrderBy(columnName, false);
+    }
+
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============

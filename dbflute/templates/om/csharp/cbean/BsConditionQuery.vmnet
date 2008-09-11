@@ -314,10 +314,15 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true);return this; }
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false);return this; }
-
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { regOBA("${col.name}");return this; }
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}");return this; }
 #end
+
+        // ===============================================================================
+        //                                                       Specified Derived OrderBy
+        //                                                       =========================
+        public ${myClassName} AddSpecifiedDerivedOrderBy_Asc(String aliasName) { registerSpecifiedDerivedOrderBy_Asc(aliasName); return this; }
+        public ${myClassName} AddSpecifiedDerivedOrderBy_Desc(String aliasName) { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
 
         // ===============================================================================
         //                                                                     Union Query
