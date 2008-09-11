@@ -233,9 +233,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String _parameterName;
         protected PropertyInfo _parameterProperty;
         protected Type _parameterPropertyType;
+        protected ParameterDirection _parameterDirectionType;
         protected bool _inType;
         protected bool _outType;
-        protected bool _inOutType;
         protected bool _returnType;
         public Object GetValue(Object dto) {
             return _parameterProperty.GetValue(dto, null);
@@ -243,26 +243,12 @@ namespace ${glPackageBaseCommonS2Dao} {
         public void SetValue(Object dto, Object value) {
             _parameterProperty.SetValue(dto, value, null);
         }
-        public ParameterDirection GetParameterDirection() {
-            if (IsInType) {
-                return ParameterDirection.Input;
-            } else if (IsOutType) {
-                return ParameterDirection.Output;
-            } else if (IsInOutType) {
-                return ParameterDirection.InputOutput;
-            } else if (IsReturnType) {
-                return ParameterDirection.ReturnValue;
-            } else {
-                String msg = "Unknown type. All type determinations are false.";
-                throw new IllegalStateException(msg);
-            }
-        }
         public String ParameterName { get { return _parameterName; } set { _parameterName = value; } }
         public PropertyInfo ParameterProperty { get { return _parameterProperty; } set { _parameterProperty = value; } }
         public Type ParameterPropertyType { get { return _parameterPropertyType; } set { _parameterPropertyType = value; } }
+        public ParameterDirection ParameterDirectionType { get { return _parameterDirectionType; } set { _parameterDirectionType = value; } }
         public bool IsInType { get { return _inType; } set { _inType = value; } }
         public bool IsOutType { get { return _outType; } set { _outType = value; } }
-        public bool IsInOutType { get { return _inOutType; } set { _inOutType = value; } }
         public bool IsReturnType { get { return _returnType; } set { _returnType = value; } }
     }
 }
