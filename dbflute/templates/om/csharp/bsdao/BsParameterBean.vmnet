@@ -20,6 +20,10 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         protected ${propertyType} _${propertyName};
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+        protected ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} _${propertyName}InternalLikeSearchOption;
+
+#end
 #end
         #endregion
 
@@ -29,7 +33,6 @@ namespace ${glPackageExtendedParameterBean} {
         #region Accessor
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-
         public ${propertyType} ${database.initCap($propertyName)} {
 #if ($propertyType.endsWith("String"))
             get { return ($propertyType)ConvertEmptyToNullIfString(_${propertyName}); }
@@ -38,6 +41,26 @@ namespace ${glPackageExtendedParameterBean} {
 #end
             set { _${propertyName} = value; }
         }
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${propertyName}Option) {
+            this.${database.initCap($propertyName)} = ${propertyName};
+            _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
+        }
+        public ${propertyType}${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
+            return _${propertyName}InternalLikeSearchOption;
+        }}
+#end
+#if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
+#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
+#foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
+            this.${database.initCap($propertyName)} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};
+        }
+#end
+#end
+
 #end
 
         protected String ConvertEmptyToNullIfString(String value) {

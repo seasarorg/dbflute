@@ -158,8 +158,8 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
         _${propertyName} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};
     }
+#end
+#end
 
-#end
-#end
 #end
 }
