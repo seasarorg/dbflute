@@ -197,21 +197,49 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
     public class ProcedureMetaData {
-        protected String procedureName;
-        // protected CaseInsensitiveMap parameterTypes = new CaseInsensitiveMap();
-        protected bool returnType;
+        protected String _procedureName;
+        protected LinkedHashMap<String, ProcedureParameterType> parameterTypeMap = new LinkedHashMap<String, ProcedureParameterType>();
+        protected bool _returnType;
         public String ProcedureName { get {
-            return procedureName;
+            return _procedureName;
         } set {
-            procedureName = value;
+            _procedureName = value;
         }}
+        public ProcedureParameterType GetParameterType(int index) {
+            return parameterTypeMap.get(index);
+        }
+        public ProcedureParameterType GetParameterType(String parameterName) {
+            return parameterTypeMap.get(parameterName.ToLower());
+        }
         public int ParameterTypeSize { get {
-            return 0;
+            return parameterTypeMap.size();
         }}
         public bool HasReturnParameterType { get {
-            return returnType;
+            return _returnType;
         } set {
-            returnType = value;
+            _returnType = value;
         }}
+        public void addParameterType(ProcedureParameterType parameterType) {
+            String name = parameterType.ParameterName;
+            parameterTypeMap.put(name.ToLower(), parameterType);
+            if (parameterType.IsReturnType) {
+                _returnType = true;
+            }
+        }
+    }
+
+    public class ProcedureParameterType {
+        protected String _parameterName;
+        protected PropertyInfo _parameterProperty;
+        protected IValueType _valueType;
+        protected bool _inType;
+        protected bool _outType;
+        protected bool _returnType;
+        public String ParameterName { get { return _parameterName; } set { _parameterName = value; } }
+        public PropertyInfo ParameterProperty { get { return _parameterProperty; } set { _parameterProperty = value; } }
+        public IValueType ValueType { get { return _valueType; } set { _valueType = value; } }
+        public bool IsInType { get { return _inType; } set { _inType = value; } }
+        public bool IsOutType { get { return _outType; } set { _outType = value; } }
+        public bool IsReturnType { get { return _returnType; } set { _returnType = value; } }
     }
 }

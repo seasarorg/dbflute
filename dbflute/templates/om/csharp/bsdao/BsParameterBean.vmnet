@@ -103,6 +103,7 @@ namespace ${glPackageExtendedParameterBean} {
             this.${database.initCap($propertyName)} = ${propertyName};
             _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
         }
+
         public ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
             return _${propertyName}InternalLikeSearchOption;
         }}

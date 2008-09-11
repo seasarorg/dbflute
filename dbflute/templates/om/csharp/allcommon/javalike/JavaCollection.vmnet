@@ -384,6 +384,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         public VALUE get(KEY key) {
             return _res.containsKey(key) ? _res.get(key) : default(VALUE);
         }
+        public VALUE get(int index) {
+            return _res.get(_seq.get(index));
+        }
         public VALUE put(KEY key, VALUE value) {
             VALUE result = default(VALUE);
             if (_res.containsKey(key)) {
