@@ -332,10 +332,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
                 }
 			}
-			// [UnderReview]: NotImplement
-            // if (valueAndType.IsValidRearOption()) {
-            //     ctx.AddSql(valueAndType.BuildRearOptionOnSql());
-            // }
+            if (valueAndType.IsValidRearOption()) {
+                ctx.AddSql(valueAndType.BuildRearOptionOnSql());
+            }
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
@@ -450,10 +449,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     ctx.AddSql(valueAndType.TargetValue.ToString());
                 }
 			}
-			// [UnderReview]: NotImplement
-            // if (valueAndType.IsValidRearOption()) {
-            //     ctx.AddSql(valueAndType.BuildRearOptionOnSql());
-            // }
+            if (valueAndType.IsValidRearOption()) {
+                ctx.AddSql(valueAndType.BuildRearOptionOnSql());
+            }
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
@@ -531,8 +529,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
     //                                        Value and Type
     //                                        --------------
     public class InternalValueAndType {
-        public Object _value;
-        public Type _type;
+        protected Object _value;
+        protected Type _type;
+        protected String _rearOption;
+        public bool IsValidRearOption() {
+            return _targetValue != null && _rearOption != null && _rearOption.Trim().Length > 0;
+        }
+        public String BuildRearOptionOnSql() {
+            return " " + _rearOption.Rrim() + " ";
+        }
         public Object TargetValue {
             get { return _value; }
             set { _value = value; }
@@ -540,6 +545,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         public Type TargetType {
             get { return _type; }
             set { _type = value; }
+        }
+        public String RearOption {
+            get { return _rearOption; }
+            set { _rearOption = value; }
         }
     }
 
@@ -558,32 +567,49 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         public void SetupValueAndType(InternalValueAndType valueAndType) {
             Object value = valueAndType.TargetValue;
             Type type = valueAndType.TargetType;
+
+            // LikeSearchOption handling here is for OutsideSql.
+            ${glConditionOptionLikeSearchName} likeSearchOption = null;
+            String rearOption = null;
+
             for (int pos = 1; pos < _names.Length; ++pos) {
                 if (value == null) {
                     break;
                 }
+                String currentName = _names[pos];
+                if (pos == 1) {// at the First Loop
+                    if (HasLikeSearchOption(type, currentName)) {
+                        likeSearchOption = GetLikeSearchOption(type, currentName, value);
+                    }
+                }
                 if (value is System.Collections.IDictionary) {
                     System.Collections.IDictionary map = (System.Collections.IDictionary) value;
                     value = map[_names[pos]];
-                    if (value == null) {
-                        break;
+                    if (IsLastLoop4LikeSearch(pos, likeSearchOption) && IsValidStringValue(value)) {// at the Last Loop
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
                     }
-                    type = value.GetType();
+                    type = (value != null ? value.GetType() : type);
                     continue;
                 }
                 if (value is NgMap) {
                     NgMap map = (NgMap) value;
                     value = map.getAsNg(_names[pos]);
-                    if (value == null) {
-                        break;
+                    if (IsLastLoop4LikeSearch(pos, likeSearchOption) && IsValidStringValue(value)) {// at the Last Loop
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
                     }
-                    type = value.GetType();
+                    type = (value != null ? value.GetType() : type);
                     continue;
                 }
                 String currentName = _names[pos];
                 PropertyInfo pi = type.GetProperty(currentName);
                 if (pi != null) {
                     value = pi.GetValue(value, null);
+                    if (IsLastLoop4LikeSearch(pos, likeSearchOption) && IsValidStringValue(value)) {// at the Last Loop
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
+                    }
                     type = (value != null ? value.GetType() : pi.PropertyType);
                     continue;
                 }
@@ -601,6 +627,82 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             }
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
+            valueAndType.RearOption = rearOption;
+        }
+
+        // for OutsideSql
+        protected bool IsLastLoop4LikeSearch(int pos, ${glConditionOptionLikeSearchName} likeSearchOption) {
+            return _names.Length == (pos + 1) && likeSearchOption != null;
+        }
+
+        protected IsValidStringValue(Object value) {
+            return value != null && value is String && ((String) value).Length > 0;
+        }
+
+        // for OutsideSql
+        protected bool HasLikeSearchOption(Type type, String currentName) {
+            return type.GetProperty(currentName + "InternalLikeSearchOption") != null;
+        }
+
+        // for OutsideSql
+        protected ${glConditionOptionLikeSearchName} GetLikeSearchOption(Type type, String currentName, Object resourceBean) {
+            PropertyInfo pi = type.GetProperty(currentName + "InternalLikeSearchOption");
+            ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName})pi.GetValue(resourceBean, null);
+			if (option == null) {
+			    ThrowLikeSearchOptionNotFoundException(resourceBean, currentName);
+			}
+			if (option.isSplit()) {
+			    ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
+			}
+            return option;
+        }
+
+        protected void ThrowLikeSearchOptionNotFoundException(Object resourceBean, String currentName) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm your method call:"  + GetLineSeparator();
+			String beanName = resourceBean.GetType().Name;
+			String methodName = "set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            msg = msg + "    " + beanName + "." + methodName + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Target ParameterBean]" + GetLineSeparator() + resourceBean + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+
+        // for OutsideSql
+        protected void ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(LikeSearchOption option, Object resourceBean, String currentName) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm your method call:"  + GetLineSeparator();
+            msg = msg + "  For example:"  + GetLineSeparator();
+            msg = msg + "    before (x):" + GetLineSeparator();
+            String beanName = resourceBean.GetType().Name;
+            String methodName = "set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + GetLineSeparator();
+            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + GetLineSeparator();
+            msg = msg + "      likeSearchOption.splitBySpace(); // *No! Don't invoke this!"  + GetLineSeparator();
+            msg = msg + "      pmb." + methodName + GetLineSeparator();
+            msg = msg + "    after  (o):" + GetLineSeparator();
+            msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + GetLineSeparator();
+            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + GetLineSeparator();
+            msg = msg + "      pmb." + methodName + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Target LikeSearchOption]" + GetLineSeparator() + option + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Target ParameterBean]" + GetLineSeparator() + resourceBean + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new UnsupportedOperationException(msg);
+        }
+
+        protected String InitCap(String name) {
+            return ${glSimpleStringUtil}.InitCap(name);
         }
 
         protected virtual void ThrowBindOrEmbeddedCommentNotFoundPropertyException(String expression, Type targetType, String notFoundProperty, String specifiedSql, bool bind) {
@@ -625,7 +727,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         protected String GetLineSeparator() {
-            return Environment.NewLine;
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 	
