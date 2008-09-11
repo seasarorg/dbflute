@@ -16,7 +16,6 @@ namespace ${glPackageExtendedParameterBean} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        #region Attribute
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         protected ${propertyType} _${propertyName};
@@ -25,12 +24,19 @@ namespace ${glPackageExtendedParameterBean} {
 
 #end
 #end
-        #endregion
+    
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+        // ===============================================================================
+        //                                                                       Procedure
+        //                                                                       =========
+        public String ProcedureName { get {
+            return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
+        }}
 
+#end
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        #region Accessor
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         public ${propertyType} ${database.initCap($propertyName)} {
@@ -70,7 +76,6 @@ namespace ${glPackageExtendedParameterBean} {
         protected String FilterRemoveEmptyString(String value) {
             return ((value != null && !"".Equals(value)) ? value : null);
         }
-        #endregion
 
         // ===============================================================================
         //                                                                  Basic Override

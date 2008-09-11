@@ -12,6 +12,7 @@ using Seasar.Dao.Parser;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalUtil};
@@ -533,10 +534,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         protected Type _type;
         protected String _rearOption;
         public bool IsValidRearOption() {
-            return _targetValue != null && _rearOption != null && _rearOption.Trim().Length > 0;
+            return _value != null && _rearOption != null && _rearOption.Trim().Length > 0;
         }
         public String BuildRearOptionOnSql() {
-            return " " + _rearOption.Rrim() + " ";
+            return " " + _rearOption.Trim() + " ";
         }
         public Object TargetValue {
             get { return _value; }
@@ -584,7 +585,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 }
                 if (value is System.Collections.IDictionary) {
                     System.Collections.IDictionary map = (System.Collections.IDictionary) value;
-                    value = map[_names[pos]];
+                    value = map[currentName];
                     if (IsLastLoop4LikeSearch(pos, likeSearchOption) && IsValidStringValue(value)) {// at the Last Loop
                         value = likeSearchOption.generateRealValue((String) value);
                         rearOption = likeSearchOption.getRearOption();
@@ -594,7 +595,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 }
                 if (value is NgMap) {
                     NgMap map = (NgMap) value;
-                    value = map.getAsNg(_names[pos]);
+                    value = map.getAsNg(currentName);
                     if (IsLastLoop4LikeSearch(pos, likeSearchOption) && IsValidStringValue(value)) {// at the Last Loop
                         value = likeSearchOption.generateRealValue((String) value);
                         rearOption = likeSearchOption.getRearOption();
@@ -602,7 +603,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     type = (value != null ? value.GetType() : type);
                     continue;
                 }
-                String currentName = _names[pos];
                 PropertyInfo pi = type.GetProperty(currentName);
                 if (pi != null) {
                     value = pi.GetValue(value, null);
@@ -635,7 +635,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             return _names.Length == (pos + 1) && likeSearchOption != null;
         }
 
-        protected IsValidStringValue(Object value) {
+        protected bool IsValidStringValue(Object value) {
             return value != null && value is String && ((String) value).Length > 0;
         }
 
