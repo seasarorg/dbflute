@@ -84,7 +84,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = procedureMetaData.GetParameterType(i);
+                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if (ppt.IsOutType) {
                     Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
                     // Not support yet
@@ -115,10 +115,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected void BindParamters(IDbCommand command) {
-            if (args == null) return;
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = procedureMetaData.GetParameterType(i);
+                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 String parameterName = ppt.ParameterName;
                 BindVariableType vt = DataProviderUtil.GetBindVariableType(command);
                 switch (vt) {
@@ -127,7 +126,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                         break;
                     case BindVariableType.ColonWithParam:
                         if ("OracleCommand".Equals(command.GetType().Name)) {
-                            parameterName = string.Empty + columnName;
+                            parameterName = string.Empty + parameterName;
                         } else {
                             parameterName = ":" + parameterName;
                         }
@@ -141,7 +140,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 IDbDataParameter parameter = command.CreateParameter();
                 parameter.ParameterName = parameterName;
                 parameter.Direction = ppt.GetParameterDirection();
-                parameter.Value = args[i];
+                parameter.Value = GetDbValueType(ppt.ParameterPropertyType);
                 parameter.DbType = dbType;
                 parameter.Size = 4096;
                 if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
