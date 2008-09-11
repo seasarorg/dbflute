@@ -2,7 +2,6 @@
 
 using System;
 
-using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
