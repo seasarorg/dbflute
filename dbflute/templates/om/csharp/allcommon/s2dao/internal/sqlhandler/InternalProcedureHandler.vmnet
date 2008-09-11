@@ -207,7 +207,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
                 ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
-                if (ppt.IsOutType) {
+                if (ppt.IsOutType || ppt.IsInOutType) {
                     Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
                     // Not support yet
                     if (value is IDataReader) {
