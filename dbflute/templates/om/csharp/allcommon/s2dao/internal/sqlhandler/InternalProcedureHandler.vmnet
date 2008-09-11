@@ -17,7 +17,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        private ProcedureMetaData _procedureMetaData;
+        protected readonly ProcedureMetaData _procedureMetaData;
 		
         // ===============================================================================
         //                                                                     Constructor
