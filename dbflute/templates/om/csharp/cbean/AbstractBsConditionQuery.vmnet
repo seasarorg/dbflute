@@ -134,7 +134,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
             registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
@@ -156,7 +156,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -179,7 +179,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -319,7 +319,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
             registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.SingleKeyReferrers)
@@ -341,7 +341,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -364,7 +364,7 @@ namespace ${glPackageBaseCQ} {
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
-        public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
