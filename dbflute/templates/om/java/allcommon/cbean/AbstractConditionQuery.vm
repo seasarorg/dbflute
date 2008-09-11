@@ -962,8 +962,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
     }
 
-    public class SpecifiedDerivedOrderByAliasNameNotFoundException : SystemException {
-        public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) : base(msg) {
+    public static class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) {
+            super(msg);
         }
     }
 
