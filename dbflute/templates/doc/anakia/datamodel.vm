@@ -15,19 +15,19 @@
       <th>OM Class</th>
       <th>Description</th>
     </tr>
-  #foreach ($tbl in $database.tables)
+#foreach ($tbl in $database.tables)
     <tr>
       <td><a href="#$tbl.Name">$tbl.Name</a></td>
       <td>$tbl.JavaName</td>
       <td>$!tbl.Description</td>
     </tr>
-  #end
+#end
   </table>
   <p/>
 
-  #foreach ($tbl in $database.tables)
-    $generator.parse("doc/anakia/table.vm",$outFile,"table",$tbl)
-  #end
+#foreach ($tbl in $database.tables)
+$generator.parse("doc/anakia/table.vm", null, "table", $tbl)
+#end
 
   </section>
 </body>
