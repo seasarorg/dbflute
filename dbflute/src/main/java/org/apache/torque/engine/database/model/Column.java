@@ -844,7 +844,7 @@ public class Column {
     //                                                                      Column Comment
     //                                                                      ==============
     public String getComment() {
-        return _comment;
+        return _comment != null ? _comment : "";
     }
 
     public void setComment(String comment) {
