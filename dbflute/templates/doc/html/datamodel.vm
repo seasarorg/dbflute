@@ -21,7 +21,7 @@ ${database.initializeClassificationDeployment()}
       <th class="normalFont">Referrer Table</th>
       <th class="normalFont">Comment</th>
     </tr>
-  #foreach ($tbl in $database.tables)
+#foreach ($tbl in $database.tables)
     <tr>
       <td class="normalFont"><a href="#$tbl.Name">$tbl.Name</a></td>
       <td class="normalFont">$tbl.javaName</td>
@@ -29,12 +29,12 @@ ${database.initializeClassificationDeployment()}
       <td class="normalFont">$tbl.referrerTableNameCommaStringWithHtmlHref</td>
       <td class="normalFont">$tbl.comment</td>
     </tr>
-  #end
+#end
   </table>
 
-  #foreach ($tbl in $database.tables)
-    $generator.parse("doc/html/table.vm",$outFile,"table",$tbl)
-  #end
+#foreach ($tbl in $database.tables)
+$generator.parse("doc/html/table.vm", null, "table", $tbl)
+#end
 
 #if ($database.hasClassificationDefinitionMap())
   <p/>
