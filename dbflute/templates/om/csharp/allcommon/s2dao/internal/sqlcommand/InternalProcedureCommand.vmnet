@@ -49,22 +49,25 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
                     _commandFactory, _dataReaderFactory, _procedureMetaData);
         }
         protected String CreateSql(ProcedureMetaData procedureMetaData) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("{");
-           int size = procedureMetaData.ParameterTypeSize;
-            if (procedureMetaData.HasReturnParameterType) {
-                sb.append("? = ");
-                size--;
-            }
-            sb.append("call ").append(procedureMetaData.ProcedureName).append("(");
-            for (int i = 0; i < size; i++) {
-                sb.append("?, ");
-            }
-            if (size > 0) {
-                sb = new StringBuilder().append(sb.toString().Substring(0, sb.length() - 2));
-            }
-            sb.append(")}");
-            return sb.toString();
+            // StringBuilder sb = new StringBuilder();
+            // sb.append("{");
+            // int size = procedureMetaData.ParameterTypeSize;
+            // if (procedureMetaData.HasReturnParameterType) {
+            //     sb.append("? = ");
+            //     size--;
+            // }
+            // sb.append("call ").append(procedureMetaData.ProcedureName).append("(");
+            // for (int i = 0; i < size; i++) {
+            //     sb.append("?, ");
+            // }
+            // if (size > 0) {
+            //     sb = new StringBuilder().append(sb.toString().Substring(0, sb.length() - 2));
+            // }
+            // sb.append(")}");
+            // return sb.toString();
+
+            // The procedure name is SQL at CSharp!
+            return procedureMetaData.ProcedureName;
         }
     }
 }

@@ -18,6 +18,7 @@ $!table.Description
     <th class="normalFont" bgcolor="#CCCCCC">PropertyName</th>
     <th class="normalFont" bgcolor="#CCCCCC">${table.database.targetLanguageInitCap}Type</th>
     <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Comment</th>
   </tr>
 #foreach ($col in $table.columns)
   <tr>
@@ -34,6 +35,7 @@ $!table.Description
     <td class="normalFont">${col.javaBeansRulePropertyName}</td>
     <td class="normalFont">${col.javaNative}</td>
     <td class="normalFont">#if ($col.hasClassification()==true)<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
+    <td class="normalFont">${col.comment}</td>
   </tr>
 #end
 </table>

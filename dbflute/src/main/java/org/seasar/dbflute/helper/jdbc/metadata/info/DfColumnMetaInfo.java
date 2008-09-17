@@ -29,8 +29,18 @@ public class DfColumnMetaInfo {
     protected int columnSize;
     protected int decimalDigits;
     protected boolean required;
+    protected String columnComment;
     protected String defaultValue;
     protected String sql2entityTableName;
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcType + ", "
+                + required + ", " + columnComment + ", " + defaultValue + "}";
+    }
 
     // ===================================================================================
     //                                                                            Accessor
@@ -91,17 +101,19 @@ public class DfColumnMetaInfo {
         this.dbTypeName = dbTypeName;
     }
 
+    public String getColumnComment() {
+        return columnComment;
+    }
+
+    public void setColumnComment(String columnComment) {
+        this.columnComment = columnComment;
+    }
+
     public String getSql2EntityableName() {
         return sql2entityTableName;
     }
 
     public void setSql2EntityTableName(String sql2entityTableName) {
         this.sql2entityTableName = sql2entityTableName;
-    }
-
-    @Override
-    public String toString() {
-        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcType + ", "
-                + required + ", " + defaultValue + "}";
     }
 }

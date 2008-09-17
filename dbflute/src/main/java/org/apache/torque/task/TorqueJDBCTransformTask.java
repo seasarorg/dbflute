@@ -247,6 +247,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     columnElement.setAttribute("primaryKey", "true");
                 }
 
+                final String columnComment = columnMetaInfo.getColumnComment();
+                if (columnComment != null) {
+                    columnElement.setAttribute("comment", columnComment);
+                }
+                
                 String defaultValue = columnMetaInfo.getDefaultValue();
                 if (defaultValue != null) {
                     // trim out parens & quotes out of def value.

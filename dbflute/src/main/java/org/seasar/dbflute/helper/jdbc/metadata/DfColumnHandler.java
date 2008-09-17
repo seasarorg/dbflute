@@ -110,6 +110,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             final Integer columnSize = new Integer(columnResultSet.getInt(7));
             final Integer decimalDigits = columnResultSet.getInt(9);
             final Integer nullType = new Integer(columnResultSet.getInt(11));
+            final String columnComment = columnResultSet.getString(12);
             final String defaultValue = columnResultSet.getString(13);
 
             final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
@@ -119,6 +120,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             columnMetaInfo.setColumnSize(columnSize);
             columnMetaInfo.setDecimalDigits(decimalDigits);
             columnMetaInfo.setRequired(nullType == 0);
+            columnMetaInfo.setColumnComment(columnComment);
             columnMetaInfo.setDefaultValue(defaultValue);
             columns.add(columnMetaInfo);
         }

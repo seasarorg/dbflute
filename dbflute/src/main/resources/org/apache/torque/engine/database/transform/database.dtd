@@ -95,6 +95,7 @@ Java class or method name.
   dbType CDATA #IMPLIED
   javaType CDATA #IMPLIED
   size CDATA #IMPLIED
+  comment CDATA #IMPLIED
   default CDATA #IMPLIED
   autoIncrement (true|false) "false"
   inheritance (single|false) "false"

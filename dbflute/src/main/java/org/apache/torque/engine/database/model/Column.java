@@ -103,6 +103,8 @@ public class Column {
     private boolean _isAutoIncrement = false;
 
     private String _defaultValue;
+    
+    private String _comment;
 
     // -----------------------------------------------------
     //                                                  Type
@@ -198,7 +200,7 @@ public class Column {
     }
 
     public void loadFromXML(Attributes attrib) {
-        //Name
+        // Name
         _name = attrib.getValue("name");
 
         _javaName = attrib.getValue("javaName");
@@ -214,7 +216,7 @@ public class Column {
             _javaNamingMethod = _table.getDatabase().getDefaultJavaNamingMethod();
         }
 
-        //Primary Key
+        // Primary Key
         {
             final String primaryKey = attrib.getValue("primaryKey");
             _isPrimaryKey = ("true".equals(primaryKey));
@@ -225,11 +227,14 @@ public class Column {
         final String notNull = attrib.getValue("required");
         _isNotNull = (notNull != null && "true".equals(notNull));
 
-        //AutoIncrement/Sequences
+        // AutoIncrement/Sequences
         final String autoIncrement = attrib.getValue("autoIncrement");
         _isAutoIncrement = ("true".equals(autoIncrement));
 
-        //Default column value.
+        // Column comment.
+        _comment = attrib.getValue("comment");
+        
+        // Default column value.
         _defaultValue = attrib.getValue("default");
 
         _columnSize = attrib.getValue("size");
@@ -835,6 +840,17 @@ public class Column {
                         .equals("CHAR"));
     }
 
+    // ===================================================================================
+    //                                                                      Column Comment
+    //                                                                      ==============
+    public String getComment() {
+        return _comment;
+    }
+
+    public void setComment(String comment) {
+        this._comment = comment;
+    }
+    
     // ===================================================================================
     //                                                                       Default Value
     //                                                                       =============
