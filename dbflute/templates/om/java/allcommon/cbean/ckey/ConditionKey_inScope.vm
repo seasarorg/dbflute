@@ -43,7 +43,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
         if (value instanceof java.util.List) {
             if (conditionValue.hasInScope()) {
                 if (conditionValue.equalInScope(((java.util.List<?>)value))) {
-                    _log.warn("The value has already registered at " + callerName + ": value=" + value);
+                    _log.debug("The value has already registered at " + callerName + ": value=" + value);
                     return false;
                 } else {
                     conditionValue.overrideInScope(((java.util.List<?>)value));

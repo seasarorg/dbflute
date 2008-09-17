@@ -40,7 +40,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
         }
         if (conditionValue.hasLessThan()) {
             if (conditionValue.equalLessThan(value)) {
-                _log.warn("The value has already registered at " + callerName + ": value=" + value);
+                _log.debug("The value has already registered at " + callerName + ": value=" + value);
                 return false;
             } else {
                 conditionValue.overrideLessThan(value);

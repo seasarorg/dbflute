@@ -20,7 +20,7 @@ public class ${myClassName} : ${glConditionKeyName} {
     public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
         Object valueObject = conditionValue.IsNotNull;
         if (valueObject != null) {
-            _log.Warn("The value has already registered at " + _conditionKey + ": " + valueObject + " = " + value);
+            _log.Debug("The value has already registered at " + _conditionKey + ": " + valueObject + " = " + value);
             return false;
         }
         return true;

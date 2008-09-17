@@ -36,7 +36,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
      */
     public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
         if (conditionValue.hasIsNotNull()) {
-            _log.warn("The value has already registered at " + callerName);
+            _log.debug("The value has already registered at " + callerName);
             return false;
         }
         return true;
