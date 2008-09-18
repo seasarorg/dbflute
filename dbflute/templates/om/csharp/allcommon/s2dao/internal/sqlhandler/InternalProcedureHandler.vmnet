@@ -147,7 +147,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 parameter.Direction = ppt.ParameterDirectionType;
                 parameter.Value = ppt.GetValue(dto);
                 parameter.DbType = dbType;
-                parameter.Size = 4096;
+
+                // [Under Review]: @jflute -- If this is valid, the exception occured on MySQL.
+                // parameter.Size = 4096;
+
                 if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
                     OleDbParameter oleDbParam = parameter as OleDbParameter;
                     oleDbParam.OleDbType = OleDbType.VarChar;
