@@ -259,7 +259,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     if (!(value is DBNull)) {
                         ppt.SetValue(dto, value);
                     }
-                    // @jflute -- If DBNull, what can I do for it?
+                    // [Under Review]: @jflute -- If it's DBNull, what can I do for you?
                 } else if (ppt.IsReturnType) {
                     ppt.SetValue(dto, returnValue);
                 }
