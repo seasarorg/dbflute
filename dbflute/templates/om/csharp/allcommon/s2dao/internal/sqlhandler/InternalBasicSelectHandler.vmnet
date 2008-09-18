@@ -48,7 +48,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         public virtual Object Execute(object[] args, Type[] argTypes) {
-            LogSql(args, argTypes);
             IDbConnection conn = Connection;
             try {
                 return Execute(conn, args, argTypes);

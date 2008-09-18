@@ -88,9 +88,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             StringBuilder tmpSb = new StringBuilder();
             for (int i = 0; i < size; i++) {
-                tmpSb.Append(", ?");
+                tmpSb.append(", ?");
             }
-            tmpSb.Remove(0, ", ".Length);
+            tmpSb.delete(0, ", ".Length);
             sql = "call " + sql + "(" + tmpSb + ")"; // Because the procedure name is SQL at CSharp!
             int pos = 0;
             int pos2 = 0;

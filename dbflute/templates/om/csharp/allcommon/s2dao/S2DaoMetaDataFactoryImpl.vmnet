@@ -284,7 +284,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
         protected InternalProcedureParameterType GetProcedureParameterType(Type pmbType, PropertyInfo property) {
-            String type = _annotationReader.getProcedureParameter(pmbType, property);
+            String type = _annotationReader.GetProcedureParameter(pmbType, property);
             if (type == null) {
                 return null;
             }
@@ -315,10 +315,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         public InternalFieldProcedureAnnotationReader() {
             PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
         }
-        public String getProcedureParameter(Type pmbType, PropertyInfo property) {
+        public String GetProcedureParameter(Type pmbType, PropertyInfo property) {
             String propertyName = property.Name;
             String annotationName = InitUncap(propertyName) + PROCEDURE_PARAMETER_SUFFIX;
-            FieldInfo field = pmbType.GetField(annotationName, BindingFlags.Static);
+            FieldInfo field = pmbType.GetField(annotationName, BindingFlags.Public | BindingFlags.Static);
             if (field != null) {
                 return (String)field.GetValue(null);
             } else {
