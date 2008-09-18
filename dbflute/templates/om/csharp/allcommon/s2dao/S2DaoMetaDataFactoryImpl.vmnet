@@ -322,9 +322,15 @@ namespace ${glPackageBaseCommonS2Dao} {
             String annotationName = InitUncap(propertyName) + PROCEDURE_PARAMETER_SUFFIX;
             FieldInfo field = pmbType.GetField(annotationName, BindingFlags.Public | BindingFlags.Static);
             if (field != null) {
-                String value = (String)field.GetValue(null);
+                String annotationValue = (String)field.GetValue(null);
                 InternalProcedureParameterInfo info = new InternalProcedureParameterInfo();
-                String[] values = value.Split[0];
+                String[] values = annotationValue.Split(",");
+                if (values.Length != 1) {
+                    String msg = "The value of annotation is wrong.";
+                    msg = msg + " You should set '[parameterName], [parameterType]'.";
+                    msg = msg + " But: annotation=" + annotationName + " value=" + annotationValue;
+                    throw new IllegalStateException(msg);
+                }
                 info.ParameterName = values[0].Trim();
                 info.ParameterType = values[1].Trim();
                 return info;
