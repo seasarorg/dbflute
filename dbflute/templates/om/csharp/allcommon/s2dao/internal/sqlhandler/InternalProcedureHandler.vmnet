@@ -123,12 +123,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 String parameterName = ppt.ParameterName;
-                BindVariableType vt = DataProviderUtil.GetBindVariableType(command);
+                InternalBindVariableType vt = GetBindVariableType(command);
                 switch (vt) {
-                    case BindVariableType.QuestionWithParam:
+                    case InternalBindVariableType.QuestionWithParam:
                         parameterName = "?" + parameterName;
                         break;
-                    case BindVariableType.ColonWithParam:
+                    case InternalBindVariableType.ColonWithParam:
                         if ("OracleCommand".Equals(command.GetType().Name)) {
                             parameterName = string.Empty + parameterName;
                         } else {
@@ -156,6 +156,31 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 }
                 command.Parameters.Add(parameter);
             }
+        }
+
+        protected InternalBindVariableType GetBindVariableType(IDbCommand cmd) {
+            String name = cmd.GetType().Name;
+            if ("SqlCommand".Equals(name) || "DB2Command".Equals(name)) {
+                return InternalBindVariableType.AtmarkWithParam;
+            } else if ("OracleCommand".Equals(name)) {
+                return InternalBindVariableType.ColonWithParam;
+            } else if ("MySqlCommand".Equals(name)) {
+                return InternalBindVariableType.QuestionWithParam;
+            } else if ("NpgsqlCommand".Equals(name)) {
+                return InternalBindVariableType.ColonWithParam;
+            } else if ("FbCommand".Equals(name)) {
+                return InternalBindVariableType.Question;
+            } else {
+                return InternalBindVariableType.Question;
+            }
+        }
+
+        public enum InternalBindVariableType {
+            None,
+            AtmarkWithParam,
+            Question,
+            QuestionWithParam,
+            ColonWithParam
         }
 
         protected String BindReturnValues(IDbCommand command, string parameterName, DbType dbType) {
