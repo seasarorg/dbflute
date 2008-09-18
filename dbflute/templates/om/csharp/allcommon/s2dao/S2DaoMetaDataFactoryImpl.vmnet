@@ -294,16 +294,20 @@ namespace ${glPackageBaseCommonS2Dao} {
             InternalProcedureParameterType ppt = new InternalProcedureParameterType(name, property);
             if (type.Equals("in")) {
                 ppt.IsInType = true;
+                ppt.ParameterDirectionType = ParameterDirection.Input;
             } else if (type.Equals("out")) {
                 ppt.IsOutType = true;
+                ppt.ParameterDirectionType = ParameterDirection.Output;
             } else if (type.Equals("inout")) {
                 ppt.IsInType = true;
                 ppt.IsOutType = true;
+                ppt.ParameterDirectionType = ParameterDirection.InputOutput;
             } else if (type.Equals("return")) {
                 ppt.IsOutType = true;
                 ppt.IsReturnType = true;
+                ppt.ParameterDirectionType = ParameterDirection.ReturnValue;
             } else {
-                throw new IllegalStateException(type);
+                throw new IllegalStateException("The parameter type is wrong: type=" + type);
             }
             return ppt;
         }
