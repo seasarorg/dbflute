@@ -595,7 +595,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         protected String superClassName;
         protected Map<String, String> propertyNameTypeMap;
         protected Map<String, String> propertyNameOptionMap;
-        protected String procedureName;// Only when this is for procedure
+        protected Map<String, String> propertyNameColumnNameMap; // Only when this is for procedure
+        protected String procedureName; // Only when this is for procedure
 
         @Override
         public String toString() {
@@ -639,6 +640,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         public void setPropertyNameOptionMap(Map<String, String> propertyNameOptionMap) {
             this.propertyNameOptionMap = propertyNameOptionMap;
         }
+        
+        public Map<String, String> getPropertyNameColumnNameMap() {
+            return propertyNameColumnNameMap;
+        }
+        
+        public void setPropertyNameColumnNameMap(Map<String, String> propertyNameColumnNameMap) {
+            this.propertyNameColumnNameMap = propertyNameColumnNameMap;
+        }
 
         public String getProcedureName() {
             return procedureName;
@@ -677,6 +686,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
                 final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
                 final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
+                final Map<String, String> propertyNameColumnNameMap = new LinkedHashMap<String, String>();
                 final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
                         .getProcedureColumnMetaInfoList();
                 int index = 0;
@@ -690,12 +700,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     continue;
                 }
                 for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
+                    String columnName = columnMetaInfo.getColumnName();
+                    if (columnName == null || columnName.trim().length() == 0) {
+                        columnName = "arg" + (index + 1);
+                    }
                     final String propertyName;
                     {
-                        String columnName = columnMetaInfo.getColumnName();
-                        if (columnName == null || columnName.trim().length() == 0) {
-                            columnName = "arg" + (index + 1);
-                        }
                         propertyName = convertColumnNameToPropertyName(columnName);
                     }
                     final String propertyType = getProcedureColumnPropertyType(columnMetaInfo);
@@ -704,6 +714,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
                     propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
 
+                    propertyNameColumnNameMap.put(propertyName, columnName);
+                    
                     String msg = "    " + propertyType + " " + propertyName + ";";
                     msg = msg + " // " + columnMetaInfo.getProcedureColumnType();
                     msg = msg + "(" + columnMetaInfo.getJdbcType() + ", " + columnMetaInfo.getDbTypeName() + ")";
@@ -713,6 +725,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 parameterBeanMetaData.setClassName(pmbName);
                 parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
+                parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
                 parameterBeanMetaData.setProcedureName(procedureName);
                 _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             }

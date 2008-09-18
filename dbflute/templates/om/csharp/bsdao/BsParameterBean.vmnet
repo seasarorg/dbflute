@@ -30,14 +30,15 @@ namespace ${glPackageExtendedParameterBean} {
         //                               -------------------
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($columnName = $database.getPmbMetaDataPropertyColumnName($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "in";
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, in";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "out";
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, out";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "inout";
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, inout";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "return";
+        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, return";
 #end
 #end
 #end

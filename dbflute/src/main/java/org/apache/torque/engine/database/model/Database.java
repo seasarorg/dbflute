@@ -350,6 +350,12 @@ public class Database {
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameTypeMap();
     }
+    
+    public Map<String, String> getPmbMetaDataPropertyNameColumnNameMap(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        return metaData.getPropertyNameColumnNameMap();
+    }
 
     public Map<String, String> getPmbMetaDataPropertyNameOptionMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
@@ -379,6 +385,12 @@ public class Database {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
+    }
+    
+    public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassName(className);
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        return getPmbMetaDataPropertyNameColumnNameMap(className).get(propertyName);
     }
 
     protected String findPmbMetaDataPropertyOption(String className, String propertyName) {

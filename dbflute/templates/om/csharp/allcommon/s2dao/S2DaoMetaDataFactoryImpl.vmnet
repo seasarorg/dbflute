@@ -240,8 +240,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool _inType;
         protected bool _outType;
         protected bool _returnType;
-        public InternalProcedureParameterType(PropertyInfo parameterProperty) {
-            _parameterName = parameterProperty.Name;
+        public InternalProcedureParameterType(String parameterName, PropertyInfo parameterProperty) {
+            _parameterName = parameterName;
             _parameterProperty = parameterProperty;
             _parameterPropertyType = parameterProperty.PropertyType;
         }
@@ -284,12 +284,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
         protected InternalProcedureParameterType GetProcedureParameterType(Type pmbType, PropertyInfo property) {
-            String type = _annotationReader.GetProcedureParameter(pmbType, property);
+            InternalProcedureParameterInfo info = _annotationReader.GetProcedureParameter(pmbType, property);
+            String name = info.ParameterName;
+            String type = info.ParameterType;
             if (type == null) {
                 return null;
             }
             type = type.ToLower();
-            InternalProcedureParameterType ppt = new InternalProcedureParameterType(property);
+            InternalProcedureParameterType ppt = new InternalProcedureParameterType(name, property);
             if (type.Equals("in")) {
                 ppt.IsInType = true;
             } else if (type.Equals("out")) {
@@ -315,12 +317,17 @@ namespace ${glPackageBaseCommonS2Dao} {
         public InternalFieldProcedureAnnotationReader() {
             PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
         }
-        public String GetProcedureParameter(Type pmbType, PropertyInfo property) {
+        public InternalProcedureParameterInfo GetProcedureParameter(Type pmbType, PropertyInfo property) {
             String propertyName = property.Name;
             String annotationName = InitUncap(propertyName) + PROCEDURE_PARAMETER_SUFFIX;
             FieldInfo field = pmbType.GetField(annotationName, BindingFlags.Public | BindingFlags.Static);
             if (field != null) {
-                return (String)field.GetValue(null);
+                String value = (String)field.GetValue(null);
+                InternalProcedureParameterInfo info = new InternalProcedureParameterInfo();
+                String[] values = value.Split[0];
+                info.ParameterName = values[0].Trim();
+                info.ParameterType = values[1].Trim();
+                return info;
             } else {
                 return null;
             }
@@ -328,5 +335,12 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String InitUncap(String str) {
             return str.Substring(0, 1).ToLower() + str.Substring(1);
         }
+    }
+
+    public class InternalProcedureParameterInfo {
+        protected String _parameterName;
+        protected String _parameterType;
+        public String ParameterName { get { return _parameterName; } set { _parameterName = value; } }
+        public String ParameterType { get { return _parameterType; } set { _parameterType = value; } }
     }
 }
