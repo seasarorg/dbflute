@@ -280,7 +280,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         // [DBFlute-0.8.0]
         public bool IsProcedure {
-            get { return _methodName != null && _methodName.startsWith("Call"); }
+            get { return _methodName != null && _methodName.StartsWith("Call"); }
         }
 
         // ===============================================================================
