@@ -223,7 +223,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         public Type ReturnParameterType { get {
             return _returnType;
         }}
-        public void addParameterType(InternalProcedureParameterType parameterType) {
+        public void AddParameterType(InternalProcedureParameterType parameterType) {
             String name = parameterType.ParameterName;
             parameterTypeMap.put(name.ToLower(), parameterType);
             if (parameterType.IsReturnType) {
@@ -280,7 +280,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (ppt == null) {
                     continue;
                 }
-                metaData.addParameterType(ppt);
+                metaData.AddParameterType(ppt);
             }
         }
         protected InternalProcedureParameterType GetProcedureParameterType(Type pmbType, PropertyInfo property) {
