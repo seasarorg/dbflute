@@ -263,7 +263,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 	
         protected bool IsBehaviorQueryPathEnabled {
-            get { return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
+            get {
+                if (IsProcedure) {// [DBFlute-0.8.0]
+                    return false;
+                }
+                return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
+            }
         }
 
         // ===============================================================================
@@ -271,6 +276,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                   =============
         public bool IsSpecifiedOutsideSql {
             get { return _outsideSqlPath != null; }
+        }
+
+        // [DBFlute-0.8.0]
+        public bool IsProcedure {
+            get { return _methodName != null && _methodName.startsWith("Call"); }
         }
 
         // ===============================================================================
