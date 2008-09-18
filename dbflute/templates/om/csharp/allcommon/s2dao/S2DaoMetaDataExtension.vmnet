@@ -92,6 +92,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (method != null && method.IsAbstract) {
                 if (IsOutsideSqlDaoMethodSelect(method)) {
                     SetupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
+                if (IsOutsideSqlDaoMethodCall(method)) {
+                    SetupSpecifiedOutsideSqlCallCommand(sqlCommandKey, method, outsideSqlContext);
                 } else {
                     SetupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
                 }
@@ -108,6 +110,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool IsOutsideSqlDaoMethodSelect(MethodInfo method) {
             return method.Name.StartsWith("Select");
+        }
+
+        protected bool IsOutsideSqlDaoMethodCall(MethodInfo method) {
+            return method.Name.StartsWith("Call");
         }
 
         // ===============================================================================
@@ -418,7 +424,31 @@ namespace ${glPackageBaseCommonS2Dao} {
 				return base.Execute(new Object[]{arg});
             }
         }
-		
+
+        // - - - - - - - - - - - -
+        //          Call Procedure
+        //           - - - - - - -
+        protected void SetupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, OutsideSqlContext outsideSqlContext) {
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            // The attribute of Specified-OutsideSqlContext.
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            Object pmb = outsideSqlContext.ParameterBean;
+            String procedureName = outsideSqlContext.OutsideSqlPath;
+
+            // - - - - - - - - - - - - - - -
+            // The attribute of SqlCommand.
+            // - - - - - - - - - - - - - - -
+            InternalProcedureMetaDataFactory myProcedureMetaDataFactory = new InternalProcedureMetaDataFactory();
+            Type pmbType = pmb != null ? pmb.GetType() : null;
+            ProcedureMetaData metaData = myProcedureMetaDataFactory.CreateProcedureMetaData(procedureName, pmbType);
+            InternalProcedureCommand cmd = CreateInternalProcedureCommand(method, metaData);
+            _sqlCommands.Add(sqlCommandKey, cmd);
+        }
+
+        protected InternalProcedureCommand CreateInternalProcedureCommand(Method method, ProcedureMetaData metaData) {
+            return new InternalProcedureCommand(dataSource, dataReaderHandler, commandFactory, dataReaderFactory, metaData);
+        }
+
         // -------------------------------------------------
         //                              Common of OutsideSql
         //                              --------------------
