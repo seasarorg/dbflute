@@ -190,29 +190,42 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
-        final Object firstArg = args[0];
-        final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
+        final Object firstArg;
+        if (outsideSqlContext.isSpecifiedOutsideSql()) {
+            final Object parameterBean = outsideSqlContext.getParameterBean();
+            firstArg = parameterBean;
+        } else {
+            firstArg = args[0];
+        }
         String filteredSql = getSql();
+        if (firstArg != null) {
+            final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Resolve embedded comment for parsing bind variable comment in embedded comment.
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
-            final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
-            final Class propertyType = propertyDesc.getPropertyType();
-            if (!propertyType.equals(String.class)) {
-                continue;
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Resolve embedded comment for parsing bind variable comment in embedded comment.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
+                final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
+                final Class propertyType = propertyDesc.getPropertyType();
+                if (!propertyType.equals(String.class)) {
+                    continue;
+                }
+                final String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
+                if (outsideSqlPiece == null) {
+                    continue;
+                }
+                final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
+                filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
             }
-            final String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
-            if (outsideSqlPiece == null) {
-                continue;
-            }
-            final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
-            filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
         }
         final ${glSelectDynamicCommand} outsideSqlCommand = createMySelectDynamicCommand();
-        outsideSqlCommand.setArgNames(getArgNames());
-        outsideSqlCommand.setArgTypes(getArgTypes());
+        if (outsideSqlContext.isSpecifiedOutsideSql()) {
+            outsideSqlCommand.setArgNames(new String[]{"pmb"});
+            outsideSqlCommand.setArgTypes(new Class<?>[]{firstArg != null ? firstArg.getClass() : Object.class});
+        } else {
+            outsideSqlCommand.setArgNames(getArgNames());
+            outsideSqlCommand.setArgTypes(getArgTypes());
+        }
         outsideSqlCommand.setSql(filteredSql);
 
         // - - - - - - - - - - - - - - - - -
