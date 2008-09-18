@@ -83,7 +83,9 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
             sb.Append(delimiter).Append(_${propertyName});
 #end
-            sb.Remove(0, delimiter.Length);
+            if (sb.Length > 0)
+                sb.Remove(0, delimiter.Length);
+            }
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }

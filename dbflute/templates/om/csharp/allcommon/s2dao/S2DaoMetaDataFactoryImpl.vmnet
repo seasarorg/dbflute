@@ -268,7 +268,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return metaData;
             } else {
                 if (!IsDtoType(pmbType)) {
-                    throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.Name);
+                    throw new IllegalStateException("The pmb type is Not DTO type: " + pmbType.Name);
                 }
             }
             RegisterParameterType(metaData, pmbType, pmbType.GetProperties());
@@ -306,7 +306,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return ppt;
         }
         protected bool IsDtoType(Type clazz) {
-            return false; // No check because no time.
+            return true; // No check because no time.
         }
     }
 

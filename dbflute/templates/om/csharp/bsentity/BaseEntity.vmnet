@@ -337,7 +337,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($col in $table.columns)
             sb.Append(delimiter).Append(this.${col.javaName});
 #end
-            sb.Remove(0, delimiter.Length);
+            if (sb.Length > 0) { sb.Remove(0, delimiter.Length); }
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }

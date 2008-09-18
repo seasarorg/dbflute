@@ -446,7 +446,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ${glInternalProcedureCommand} CreateInternalProcedureCommand(MethodInfo method, InternalProcedureMetaData metaData) {
-            return new ${glInternalProcedureCommand}(_dataSource, null, _commandFactory, _dataReaderFactory, metaData);
+            return new ${glInternalProcedureCommand}(_dataSource, CreateDataReaderHandler(method), _commandFactory, _dataReaderFactory, metaData);
         }
 
         // -------------------------------------------------

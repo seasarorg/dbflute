@@ -401,7 +401,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
+        $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
 #end
@@ -461,14 +461,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The view string of columns. (NotNull)
      */
     public String toString() {
-        final String delimiter = ",";
-        final StringBuilder sb = new StringBuilder();
-
+        String delimiter = ",";
+        StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
         sb.append(delimiter).append(get${col.javaName}());
 #end
-
-        sb.delete(0, delimiter.length());
+        if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
