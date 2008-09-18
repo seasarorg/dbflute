@@ -260,7 +260,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         public bool IsReturnType { get { return _returnType; } set { _returnType = value; } }
     }
 
-    public class InternalInternalProcedureMetaDataFactory {
+    public class InternalProcedureMetaDataFactory {
         protected InternalFieldProcedureAnnotationReader _annotationReader = new InternalFieldProcedureAnnotationReader();
         public InternalProcedureMetaData CreateInternalProcedureMetaData(String procedureName, Type pmbType) {
             InternalProcedureMetaData metaData = new InternalProcedureMetaData(procedureName);
@@ -283,7 +283,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 metaData.addParameterType(ppt);
             }
         }
-        protected InternalProcedureParameterType GetInternalProcedureParameterType(Type pmbType, PropertyInfo property) {
+        protected InternalProcedureParameterType GetProcedureParameterType(Type pmbType, PropertyInfo property) {
             String type = _annotationReader.getProcedureParameter(pmbType, property);
             if (type == null) {
                 return null;
