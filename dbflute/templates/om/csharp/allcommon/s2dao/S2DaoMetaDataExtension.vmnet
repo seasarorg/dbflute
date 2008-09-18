@@ -92,7 +92,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (method != null && method.IsAbstract) {
                 if (IsOutsideSqlDaoMethodSelect(method)) {
                     SetupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
-                if (IsOutsideSqlDaoMethodCall(method)) {
+                } else if (IsOutsideSqlDaoMethodCall(method)) {
                     SetupSpecifiedOutsideSqlCallCommand(sqlCommandKey, method, outsideSqlContext);
                 } else {
                     SetupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
@@ -428,7 +428,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - - - -
         //          Call Procedure
         //           - - - - - - -
-        protected void SetupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, OutsideSqlContext outsideSqlContext) {
+        protected void SetupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - - - - - - - -
             // The attribute of Specified-OutsideSqlContext.
             // - - - - - - - - - - - - - - - - - - - - - - -
@@ -440,13 +440,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             // - - - - - - - - - - - - - - -
             InternalProcedureMetaDataFactory myProcedureMetaDataFactory = new InternalProcedureMetaDataFactory();
             Type pmbType = pmb != null ? pmb.GetType() : null;
-            ProcedureMetaData metaData = myProcedureMetaDataFactory.CreateProcedureMetaData(procedureName, pmbType);
-            InternalProcedureCommand cmd = CreateInternalProcedureCommand(method, metaData);
+            InternalProcedureMetaData metaData = myProcedureMetaDataFactory.CreateProcedureMetaData(procedureName, pmbType);
+            ${glInternalProcedureCommand} cmd = CreateInternalProcedureCommand(method, metaData);
             _sqlCommands.Add(sqlCommandKey, cmd);
         }
 
-        protected InternalProcedureCommand CreateInternalProcedureCommand(Method method, ProcedureMetaData metaData) {
-            return new InternalProcedureCommand(dataSource, dataReaderHandler, commandFactory, dataReaderFactory, metaData);
+        protected ${glInternalProcedureCommand} CreateInternalProcedureCommand(MethodInfo method, InternalProcedureMetaData metaData) {
+            return new ${glInternalProcedureCommand}(dataSource, dataReaderHandler, commandFactory, dataReaderFactory, metaData);
         }
 
         // -------------------------------------------------
