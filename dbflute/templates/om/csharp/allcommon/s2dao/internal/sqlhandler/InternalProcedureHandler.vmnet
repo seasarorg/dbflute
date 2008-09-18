@@ -91,12 +91,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 tmpSb.append(", ?");
             }
             tmpSb.delete(0, ", ".Length);
-            sql = "call " + sql + "(" + tmpSb + ")"; // Because the procedure name is SQL at CSharp!
+            sql = "call " + sql + "(" + tmpSb.toString() + ")"; // Because the procedure name is SQL at CSharp!
             int pos = 0;
             int pos2 = 0;
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
-                if ((pos2 = sql.IndexOf('?', pos)) < 0) {
+                pos2 = sql.IndexOf('?', pos);
+                if (pos2 < 0) {
                     break;
                 }
                 sb.append(sql.Substring(pos, (pos2 - pos)));
