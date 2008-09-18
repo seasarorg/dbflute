@@ -196,19 +196,22 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class ProcedureMetaData {
+    public class InternalProcedureMetaData {
         protected String _procedureName;
-        protected LinkedHashMap<String, ProcedureParameterType> parameterTypeMap = new LinkedHashMap<String, ProcedureParameterType>();
+        protected LinkedHashMap<String, InternalProcedureParameterType> parameterTypeMap = new LinkedHashMap<String, InternalProcedureParameterType>();
         protected Type _returnType;
+        public InternalProcedureMetaData(String procedureName) {
+            _procedureName = procedureName;
+        }
         public String ProcedureName { get {
             return _procedureName;
         } set {
             _procedureName = value;
         }}
-        public ProcedureParameterType GetParameterType(int index) {
+        public InternalProcedureParameterType GetParameterType(int index) {
             return parameterTypeMap.get(index);
         }
-        public ProcedureParameterType GetParameterType(String parameterName) {
+        public InternalProcedureParameterType GetParameterType(String parameterName) {
             return parameterTypeMap.get(parameterName.ToLower());
         }
         public int ParameterTypeSize { get {
@@ -220,7 +223,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         public Type ReturnParameterType { get {
             return _returnType;
         }}
-        public void addParameterType(ProcedureParameterType parameterType) {
+        public void addParameterType(InternalProcedureParameterType parameterType) {
             String name = parameterType.ParameterName;
             parameterTypeMap.put(name.ToLower(), parameterType);
             if (parameterType.IsReturnType) {
@@ -229,7 +232,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class ProcedureParameterType {
+    public class InternalProcedureParameterType {
         protected String _parameterName;
         protected PropertyInfo _parameterProperty;
         protected Type _parameterPropertyType;
@@ -237,18 +240,124 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool _inType;
         protected bool _outType;
         protected bool _returnType;
+        public InternalProcedureParameterType(PropertyInfo parameterProperty) {
+            _parameterName = parameterProperty.Name;
+            _parameterProperty = parameterProperty;
+            _parameterPropertyType = parameterProperty.PropertyType;
+        }
         public Object GetValue(Object dto) {
             return _parameterProperty.GetValue(dto, null);
-        }
         public void SetValue(Object dto, Object value) {
             _parameterProperty.SetValue(dto, value, null);
         }
-        public String ParameterName { get { return _parameterName; } set { _parameterName = value; } }
-        public PropertyInfo ParameterProperty { get { return _parameterProperty; } set { _parameterProperty = value; } }
-        public Type ParameterPropertyType { get { return _parameterPropertyType; } set { _parameterPropertyType = value; } }
+        public String ParameterName { get { return _parameterName; } }
+        public PropertyInfo ParameterProperty { get { return _parameterProperty; } }
+        public Type ParameterPropertyType { get { return _parameterPropertyType; } }
         public ParameterDirection ParameterDirectionType { get { return _parameterDirectionType; } set { _parameterDirectionType = value; } }
         public bool IsInType { get { return _inType; } set { _inType = value; } }
         public bool IsOutType { get { return _outType; } set { _outType = value; } }
         public bool IsReturnType { get { return _returnType; } set { _returnType = value; } }
+    }
+
+    public class InternalInternalProcedureMetaDataFactory {
+        protected InternalFieldProcedureAnnotationReader _annotationReader = new InternalFieldProcedureAnnotationReader();
+        public InternalProcedureMetaData CreateInternalProcedureMetaData(String procedureName, Type pmbType) {
+            InternalProcedureMetaData metaData = new InternalProcedureMetaData(procedureName);
+            if (pmbType == null) {
+                return metaData;
+            } else {
+                if (!IsDtoType(pmbType)) {
+                    throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.Name);
+                }
+            }
+            RegisterParameterType(metaData, pmbType, pmbType.GetProperties());
+            return metaData;
+        }
+        protected void RegisterParameterType(InternalProcedureMetaData metaData, Type pmbType, PropertyInfo[] properties) {
+            foreach (PropertyInfo property in properties) {
+                InternalProcedureParameterType ppt = GetInternalProcedureParameterType(pmbType, property);
+                if (ppt == null) {
+                    continue;
+                }
+                metaData.addParameterType(ppt);
+            }
+        }
+        protected InternalProcedureParameterType GetInternalProcedureParameterType(Type pmbType, PropertyInfo property) {
+            String type = _annotationReader.getProcedureParameter(pmbType, property);
+            if (type == null) {
+                return null;
+            }
+            type = type.ToLower();
+            InternalProcedureParameterType ppt = new InternalProcedureParameterType(property);
+            if (type.Equals("in")) {
+                ppt.IsInType = true;
+            } else if (type.Equals("out")) {
+                ppt.IsOutType = true;
+            } else if (type.Equals("inout")) {
+                ppt.IsInType = true;
+                ppt.IsOutType = true;
+            } else if (type.Equals("return")) {
+                ppt.IsOutType = true;
+                ppt.IsReturnType = true;
+            } else {
+                throw new IllegalStateException(type);
+            }
+            return ppt;
+        }
+        protected bool IsDtoType(Type clazz) {
+            return false; // No check because no time.
+        }
+    }
+
+    protected class InternalFieldProcedureAnnotationReader {
+        protected String PROCEDURE_PARAMETER_SUFFIX;
+        protected String VALUE_TYPE_SUFFIX;
+        public InternalFieldProcedureAnnotationReader() {
+            PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
+            VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
+        }
+        public String getProcedureParameter(BeanDesc dtoDesc, Field field) {
+            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
+            String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
+            if (dtoDesc.hasField(annotationName)) {
+                Field f = dtoDesc.getField(annotationName);
+                return (String)FieldUtil.get(f, null);
+            } else {
+                return null;
+            }
+        }
+        public String getValueType(BeanDesc dtoDesc, Field field) {
+            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
+            String annotationName = fieldName + VALUE_TYPE_SUFFIX;
+            if (dtoDesc.hasField(annotationName)) {
+                Field f = dtoDesc.getField(annotationName);
+                return (String)FieldUtil.get(f, null);
+            } else {
+                return null;
+            }
+        }
+        protected String removeInstanceVariablePrefix(String fieldName) {
+            return fieldName.startsWith("_") ? fieldName.substring("_".length()) : fieldName;
+        }
+    }
+
+    public class InternalFieldProcedureAnnotationReader {
+        protected String PROCEDURE_PARAMETER_SUFFIX;
+        public InternalFieldProcedureAnnotationReader() {
+            PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
+        }
+        public String getProcedureParameter(Type pmbType, PropertyInfo property) {
+            String propertyName = property.Name;
+            String annotationName = InitUncap(propertyName) + PROCEDURE_PARAMETER_SUFFIX;
+            FieldInfo field = pmbType.GetField(annotationName, BindingFlags.Static);
+            if (field != null) {
+                return (String)field.GetValue(null);
+            } else {
+                return null;
+            }
+        }
+        protected String InitUncap(String str) {
+            return str.Substring(0, 1).ToLower() + str.Substring(1);
+        }
     }
 }

@@ -20,14 +20,14 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         protected IDataReaderHandler _dataReaderHandler;
         protected ICommandFactory _commandFactory;
         protected IDataReaderFactory _dataReaderFactory;
-        protected ProcedureMetaData _procedureMetaData;
+        protected InternalProcedureMetaData _procedureMetaData;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalProcedureCommand}(IDataSource dataSource, IDataReaderHandler dataReaderHandler,
                 ICommandFactory commandFactory, IDataReaderFactory dataReaderFactory,
-                ProcedureMetaData procedureMetaData) {
+                InternalProcedureMetaData procedureMetaData) {
             this._dataSource = dataSource;
             this._dataReaderHandler = dataReaderHandler;
             this._commandFactory = commandFactory;
@@ -48,7 +48,7 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
             return new ${glInternalProcedureHandler}(_dataSource, CreateSql(_procedureMetaData), _dataReaderHandler,
                     _commandFactory, _dataReaderFactory, _procedureMetaData);
         }
-        protected String CreateSql(ProcedureMetaData procedureMetaData) {
+        protected String CreateSql(InternalProcedureMetaData procedureMetaData) {
             // StringBuilder sb = new StringBuilder();
             // sb.append("{");
             // int size = procedureMetaData.ParameterTypeSize;

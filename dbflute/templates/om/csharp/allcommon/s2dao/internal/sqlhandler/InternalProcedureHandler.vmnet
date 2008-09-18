@@ -17,14 +17,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected readonly ProcedureMetaData _procedureMetaData;
+        protected readonly InternalProcedureMetaData _procedureMetaData;
 		
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalProcedureHandler}(IDataSource dataSource, String sql,
                 IDataReaderHandler dataReaderHandler, ICommandFactory commandFactory,
-                IDataReaderFactory dataReaderFactory, ProcedureMetaData procedureMetaData)
+                IDataReaderFactory dataReaderFactory, InternalProcedureMetaData procedureMetaData)
                 : base(dataSource, sql, dataReaderHandler, commandFactory, dataReaderFactory) {
             this._procedureMetaData = procedureMetaData;
         }
@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int pos2 = 0;
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if ((pos2 = sql.IndexOf('?', pos)) < 0) {
                     break;
                 }
@@ -115,7 +115,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected void BindParamters(IDbCommand command) {
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 String parameterName = ppt.ParameterName;
                 BindVariableType vt = DataProviderUtil.GetBindVariableType(command);
                 switch (vt) {
@@ -206,7 +206,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
-                ProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if (ppt.IsOutType) {
                     Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
                     // Not support yet
@@ -230,7 +230,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return dto;
         }
 
-        protected IDataReaderHandler CreateOutParameterResultSetHandler(ProcedureParameterType ppt, IDataReader reader) {
+        protected IDataReaderHandler CreateOutParameterResultSetHandler(InternalProcedureParameterType ppt, IDataReader reader) {
             // return new InternalMapListResultSetHandler();
             return null;
         }
