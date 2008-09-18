@@ -267,7 +267,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 if (IsProcedure) {// [DBFlute-0.8.0]
                     return false;
                 }
-                return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null; }
+                return _outsideSqlPath != null && !_outsideSqlPath.Contains("/") && !_outsideSqlPath.Contains(".") && _tableDbName != null;
             }
         }
 
