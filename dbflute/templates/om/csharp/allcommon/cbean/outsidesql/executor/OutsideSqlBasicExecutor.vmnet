@@ -49,8 +49,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                  Procedure Call
         //                                                                  ==============
-        public void call(${glProcedurePmbName} pmb) {
-            if (pmb == null) { throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!"); }
+        public void Call(${glProcedurePmbName} pmb) {
+            if (pmb == null) { throw new ArgumentNullException("The argument of call() 'pmb' should not be null!"); }
             _outsideSqlDao.Call(pmb.ProcedureName, pmb, CreateOutsideSqlOption());
         }
 

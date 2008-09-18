@@ -262,7 +262,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class InternalProcedureMetaDataFactory {
         protected InternalFieldProcedureAnnotationReader _annotationReader = new InternalFieldProcedureAnnotationReader();
-        public InternalProcedureMetaData CreateInternalProcedureMetaData(String procedureName, Type pmbType) {
+        public InternalProcedureMetaData CreateProcedureMetaData(String procedureName, Type pmbType) {
             InternalProcedureMetaData metaData = new InternalProcedureMetaData(procedureName);
             if (pmbType == null) {
                 return metaData;
@@ -276,7 +276,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected void RegisterParameterType(InternalProcedureMetaData metaData, Type pmbType, PropertyInfo[] properties) {
             foreach (PropertyInfo property in properties) {
-                InternalProcedureParameterType ppt = GetInternalProcedureParameterType(pmbType, property);
+                InternalProcedureParameterType ppt = GetProcedureParameterType(pmbType, property);
                 if (ppt == null) {
                     continue;
                 }
