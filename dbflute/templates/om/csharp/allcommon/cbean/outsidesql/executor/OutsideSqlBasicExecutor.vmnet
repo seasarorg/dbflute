@@ -45,6 +45,15 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //        // return _outsideSqlDao.batchExecute(path, pmb, CreateOutsideSqlOption());
         //    }
 
+        // [DBFlute-0.8.0]
+        // ===============================================================================
+        //                                                                  Procedure Call
+        //                                                                  ==============
+        public void call(${glProcedurePmbName} pmb) {
+            if (pmb == null) { throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!"); }
+            _outsideSqlDao.Call(pmb.ProcedureName, pmb, CreateOutsideSqlOption());
+        }
+
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======

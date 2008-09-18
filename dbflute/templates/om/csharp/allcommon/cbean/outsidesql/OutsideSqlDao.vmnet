@@ -27,6 +27,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
 		// Not implemented yet!
         // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
+
+        // [DBFlute-0.8.0]
+        // ===================================================================================
+        //                                                                                Call
+        //                                                                                ====
+        void Call(String path, Object pmb, ${glOutsideSqlOptionName} option);
     }
 
     public class OutsideSqlDaoDummyEntity {
