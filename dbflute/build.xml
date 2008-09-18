@@ -104,9 +104,6 @@
             <exclude name="**/*---.txt"/>
         </zipfileset>
         <zipfileset prefix="ant" dir="ant"/>
-    	<zipfileset prefix="ant/bin" dir="ant/bin"/>
-        <zipfileset prefix="ant/etc" dir="ant/etc"/>
-    	<zipfileset prefix="ant/lib" dir="ant/lib"/>
         <zipfileset prefix="" dir="">
             <include name="build-torque.xml"/>
         </zipfileset>
