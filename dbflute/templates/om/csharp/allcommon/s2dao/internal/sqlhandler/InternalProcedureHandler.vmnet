@@ -240,8 +240,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if (ppt.IsOutType) {
                     Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
-                    // Not support yet
-                    if (value is IDataReader) {
+                    if (value is IDataReader) {// Not support yet
                         IDataReader reader = (IDataReader) value;
                         throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
                     //     IDataReaderHandler handler = CreateOutParameterResultSetHandler(ppt, reader);
@@ -253,7 +252,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     //         }
                     //     }
                     }
-                    ppt.SetValue(dto, value);
+                    if (!(value is DBNull)) {
+                        ppt.SetValue(dto, value);
+                    }
+                    // @jflute -- If DBNull, what can I do for it?
                 } else if (ppt.IsReturnType) {
                     ppt.SetValue(dto, returnValue);
                 }
