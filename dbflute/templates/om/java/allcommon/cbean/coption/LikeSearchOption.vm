@@ -204,6 +204,10 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
             String tmp = replace(value, _escape, _escape + _escape);
             tmp = replace(tmp, "%", _escape + "%");
             tmp = replace(tmp, "_", _escape + "_");
+#if ($database.isDatabaseOracle())
+            tmp = replace(tmp, "¥uff05", _escape + "¥uff05");
+            tmp = replace(tmp, "¥uff3f", _escape + "¥uff3f");
+#end
             value = tmp;
         }
         final String wildCard = "${database.wildCard}";
