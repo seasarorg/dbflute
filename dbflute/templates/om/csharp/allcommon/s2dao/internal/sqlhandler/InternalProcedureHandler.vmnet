@@ -145,9 +145,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 IDbDataParameter parameter = command.CreateParameter();
                 parameter.ParameterName = parameterName;
                 parameter.Direction = ppt.ParameterDirectionType;
-                if (ppt.IsInType) {
-                    parameter.Value = ppt.GetValue(dto);
-                }
+                parameter.Value = ppt.GetValue(dto);
                 parameter.DbType = dbType;
                 parameter.Size = 4096;
                 if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
