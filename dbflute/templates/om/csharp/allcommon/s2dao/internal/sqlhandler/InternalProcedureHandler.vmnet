@@ -99,12 +99,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 if ((pos2 = sql.IndexOf('?', pos)) < 0) {
                     break;
                 }
-                sb.append(sql.Substring(pos, pos2));
+                sb.append(sql.Substring(pos, (pos2 - pos)));
                 pos = pos2 + 1;
                 if (ppt.IsInType) {
                     sb.append(GetBindVariableText(ppt.GetValue(dto)));
                 } else {
-                    sb.append(sql.Substring(pos2, pos));
+                    sb.append(sql.Substring(pos2, 1));
                 }
             }
             sb.append(sql.Substring(pos));
