@@ -285,11 +285,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected InternalProcedureParameterType GetProcedureParameterType(Type pmbType, PropertyInfo property) {
             InternalProcedureParameterInfo info = _annotationReader.GetProcedureParameter(pmbType, property);
-            String name = info.ParameterName;
-            String type = info.ParameterType;
-            if (type == null) {
+            if (info == null) {
                 return null;
             }
+            String name = info.ParameterName;
+            String type = info.ParameterType;
             type = type.ToLower();
             InternalProcedureParameterType ppt = new InternalProcedureParameterType(name, property);
             if (type.Equals("in")) {
@@ -324,8 +324,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (field != null) {
                 String annotationValue = (String)field.GetValue(null);
                 InternalProcedureParameterInfo info = new InternalProcedureParameterInfo();
-                String[] values = annotationValue.Split(",");
-                if (values.Length != 1) {
+                String[] values = annotationValue.Split(',');
+                if (values.Length != 2) {
                     String msg = "The value of annotation is wrong.";
                     msg = msg + " You should set '[parameterName], [parameterType]'.";
                     msg = msg + " But: annotation=" + annotationName + " value=" + annotationValue;
