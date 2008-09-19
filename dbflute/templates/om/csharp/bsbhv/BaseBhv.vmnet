@@ -264,7 +264,7 @@ namespace ${glPackageExtendedBhv} {
 #end
 
         public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
-            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(entity, new MyInternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(this));
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(entity, new MyInternalInsertOrUpdateCallback(this));
         }
         protected class MyInternalInsertOrUpdateCallback : InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {
             protected ${myClassName} _bhv;
@@ -282,11 +282,11 @@ namespace ${glPackageExtendedBhv} {
 #if ($table.hasOptimisticLock())
 
         public void InsertOrUpdateNonstrict(${myExtendedObjectClassName} entity) {
-            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}>(entity, new MyInternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>(this));
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}>(entity, new MyInternalInsertOrUpdateNonstrictCallback(this));
         }
         protected class MyInternalInsertOrUpdateNonstrictCallback : InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv;
-            public MyInternalInsertOrUpdateCallback(${myClassName} bhv) { _bhv = bhv; }
+            public MyInternalInsertOrUpdateNonstrictCallback(${myClassName} bhv) { _bhv = bhv; }
             public void CallbackInsert(${myExtendedObjectClassName} entity) { _bhv.Insert(entity); }
             public void CallbackUpdateNonstrict(${myExtendedObjectClassName} entity) { _bhv.UpdateNonstrict(entity); }
         }
