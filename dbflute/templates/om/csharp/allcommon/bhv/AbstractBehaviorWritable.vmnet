@@ -260,7 +260,7 @@ namespace ${glPackageBaseCommonBhv} {
                     }
                 } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
                     exception = e;
-                } catch (IllegalStateException e) {
+                } catch (Exception e) {
                     exception = e;
                 }
                 if (exception != null) {
@@ -283,7 +283,7 @@ namespace ${glPackageBaseCommonBhv} {
             int CallbackSelectCount(CB_TYPE cb);
         }
 
-        protected void HelpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
+        protected void HelpInsertOrUpdateInternally<ENTITY_TYPE, CB_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
                 where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {

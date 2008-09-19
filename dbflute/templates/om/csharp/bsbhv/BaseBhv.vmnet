@@ -254,8 +254,8 @@ namespace ${glPackageExtendedBhv} {
             int updatedCount = this.DelegateUpdate(entity);
             AssertUpdatedEntity(entity, updatedCount);
         }
-
 #if ($table.hasOptimisticLock())
+
         public virtual void UpdateNonstrict(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdateNonstrict(entity);
@@ -263,20 +263,30 @@ namespace ${glPackageExtendedBhv} {
         }
 #end
 
-// TODO: @jflute - In development
-//        public virtual void InsertOrUpdate(${myExtendedObjectClassName} entity) {
-//            AssertEntityNotNull(entity);
-//            if (!entity.HasPrimaryKeyValue) {
-//                this.Insert(entity);
-//                return;
-//            }
-//            try {
-//                this.Update(entity);
-//            } catch (Exception) {
-//                this.Insert(entity);
-//                return;
-//            }
-//        }
+        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
+            HelpInsertOrUpdateInternally(${myEntityVariableName}, new MyInternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>());
+        }
+        protected class MyInternalInsertOrUpdateCallback : InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { Insert(entity); }
+            public void CallbackUpdate(${myExtendedObjectClassName} entity) { Update(entity); }
+            public ${myConditionBeanClassName} CallbackNewMyConditionBean() { return NewMyConditionBean(); }
+            public void CallbackSetupPrimaryKeyCondition(CB_TYPE cb, ENTITY_TYPE entity) {
+#foreach ($col in $table.primaryKey)
+                cb.Query().Set${col.javaName}_Equal(entity.${col.javaName});
+#end
+            }
+            public int CallbackSelectCount(${myConditionBeanClassName} cb) { return SelectCount(cb); }
+        }
+#if ($table.hasOptimisticLock())
+
+        public void InsertOrUpdateNonstrict(${myExtendedObjectClassName} entity) {
+            HelpInsertOrUpdateInternally(${myEntityVariableName}, new MyInternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>());
+        }
+        protected class MyInternalInsertOrUpdateNonstrictCallback : InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}> {
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { Insert(entity); }
+            public void CallbackUpdateNonstrict(${myExtendedObjectClassName} entity) { UpdateNonstrict(entity); }
+        }
+#end
 
         public virtual void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);

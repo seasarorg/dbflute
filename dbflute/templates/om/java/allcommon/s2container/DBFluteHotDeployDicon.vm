@@ -44,6 +44,7 @@
 #if ($database.isVersionAfter1046())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
 #end
+	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
 
     <!-- Behavior selector. -->
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
