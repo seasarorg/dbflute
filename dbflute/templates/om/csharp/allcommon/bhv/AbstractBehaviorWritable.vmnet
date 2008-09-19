@@ -241,5 +241,65 @@ namespace ${glPackageBaseCommonBhv} {
                 return false;
             }
         }
+        
+        // -------------------------------------------------
+        //                                    InsertOrUpdate
+        //                                    --------------
+        protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            void helpInsertOrUpdateInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
+            assertEntityNotNull(entity);
+            if (!entity.hasPrimaryKeyValue()) {
+                callback.callbackInsert(entity);
+            } else {
+                RuntimeException exception = null;
+                try {
+                   callback.callbackUpdate(entity);
+                } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                    if (e.getRows() == 0) {
+                        exception = e;
+                    }
+                } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                    exception = e;
+                } catch (IllegalStateException e) {
+                    exception = e;
+                }
+                if (exception != null) {
+                    final CB_TYPE cb = callback.callbackNewMyConditionBean();
+                    cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+                    if (callback.callbackSelectCount(cb) == 0) {
+                        callback.callbackInsert(entity);
+                    } else {
+                        throw exception;
+                    }
+                }
+            }
+        }
+
+        protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+            public void callbackInsert(ENTITY_TYPE entity);
+            public void callbackUpdate(ENTITY_TYPE entity);
+            public CB_TYPE callbackNewMyConditionBean();
+            public int callbackSelectCount(CB_TYPE cb);
+        }
+
+        protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+            assertEntityNotNull(entity);
+            if (!entity.hasPrimaryKeyValue()) {
+                callback.callbackInsert(entity);
+            } else {
+                try {
+                    callback.callbackUpdateNonstrict(entity);
+                } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                    callback.callbackInsert(entity);
+                } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                    callback.callbackInsert(entity);
+                }
+            }
+        }
+
+        protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+            public void callbackInsert(ENTITY_TYPE entity);
+            public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+        }
     }
 }
