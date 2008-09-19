@@ -283,7 +283,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected void HelpInsertOrUpdateInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
-                where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+                where ENTITY_TYPE : ${glEntityInterfaceName} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 callback.CallbackInsert(entity);
