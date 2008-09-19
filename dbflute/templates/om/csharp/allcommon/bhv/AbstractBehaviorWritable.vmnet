@@ -245,17 +245,17 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                    InsertOrUpdate
         //                                    --------------
-        protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
-            void helpInsertOrUpdateInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
-            assertEntityNotNull(entity);
-            if (!entity.hasPrimaryKeyValue()) {
-                callback.callbackInsert(entity);
+        protected void HelpInsertOrUpdateInternally<ENTITY_TYPE, CB_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback)
+                    where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                callback.CallbackInsert(entity);
             } else {
-                RuntimeException exception = null;
+                Exception exception = null;
                 try {
-                   callback.callbackUpdate(entity);
+                   callback.CallbackUpdate(entity);
                 } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                    if (e.getRows() == 0) {
+                    if (e.Rows == 0) {
                         exception = e;
                     }
                 } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
@@ -264,10 +264,10 @@ namespace ${glPackageBaseCommonBhv} {
                     exception = e;
                 }
                 if (exception != null) {
-                    final CB_TYPE cb = callback.callbackNewMyConditionBean();
-                    cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-                    if (callback.callbackSelectCount(cb) == 0) {
-                        callback.callbackInsert(entity);
+                    CB_TYPE cb = callback.CallbackNewMyConditionBean();
+                    callback.CallbackSetupPrimaryKeyCondition(cb, entity);
+                    if (callback.CallbackSelectCount(cb) == 0) {
+                        callback.CallbackInsert(entity);
                     } else {
                         throw exception;
                     }
@@ -275,31 +275,33 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
-            public void callbackInsert(ENTITY_TYPE entity);
-            public void callbackUpdate(ENTITY_TYPE entity);
-            public CB_TYPE callbackNewMyConditionBean();
-            public int callbackSelectCount(CB_TYPE cb);
+        protected interface InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+            void CallbackInsert(ENTITY_TYPE entity);
+            void CallbackUpdate(ENTITY_TYPE entity);
+            CB_TYPE CallbackNewMyConditionBean();
+            void CallbackSetupPrimaryKeyCondition(CB_TYPE cb, ENTITY_TYPE entity);
+            int CallbackSelectCount(CB_TYPE cb);
         }
 
-        protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
-            assertEntityNotNull(entity);
-            if (!entity.hasPrimaryKeyValue()) {
-                callback.callbackInsert(entity);
+        protected void HelpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
+                where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                callback.CallbackInsert(entity);
             } else {
                 try {
-                    callback.callbackUpdateNonstrict(entity);
+                    callback.CallbackUpdateNonstrict(entity);
                 } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                    callback.callbackInsert(entity);
+                    callback.CallbackInsert(entity);
                 } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-                    callback.callbackInsert(entity);
+                    callback.CallbackInsert(entity);
                 }
             }
         }
 
-        protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-            public void callbackInsert(ENTITY_TYPE entity);
-            public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+        protected interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+            void CallbackInsert(ENTITY_TYPE entity);
+            void CallbackUpdateNonstrict(ENTITY_TYPE entity);
         }
     }
 }
