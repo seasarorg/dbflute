@@ -6,7 +6,6 @@ using System.Collections;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
-using ${glPackageBaseCommonHelper};
 using ${glPackageBaseCommonException};
 
 namespace ${glPackageBaseCommonBhv} {
@@ -254,11 +253,11 @@ namespace ${glPackageBaseCommonBhv} {
                 Exception exception = null;
                 try {
                    callback.CallbackUpdate(entity);
-                } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                } catch (${glEntityAlreadyUpdatedException} e) {
                     if (e.Rows == 0) {
                         exception = e;
                     }
-                } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                } catch (${glEntityAlreadyDeletedException} e) {
                     exception = e;
                 } catch (Exception e) {
                     exception = e;
@@ -283,7 +282,7 @@ namespace ${glPackageBaseCommonBhv} {
             int CallbackSelectCount(CB_TYPE cb);
         }
 
-        protected void HelpInsertOrUpdateInternally<ENTITY_TYPE, CB_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
+        protected void HelpInsertOrUpdateInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
                 where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
@@ -291,9 +290,9 @@ namespace ${glPackageBaseCommonBhv} {
             } else {
                 try {
                     callback.CallbackUpdateNonstrict(entity);
-                } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                } catch (${glEntityAlreadyUpdatedException}) {
                     callback.CallbackInsert(entity);
-                } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                } catch (${glEntityAlreadyDeletedException}) {
                     callback.CallbackInsert(entity);
                 }
             }

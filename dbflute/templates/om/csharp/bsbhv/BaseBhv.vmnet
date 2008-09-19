@@ -264,27 +264,31 @@ namespace ${glPackageExtendedBhv} {
 #end
 
         public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
-            HelpInsertOrUpdateInternally(entity, new MyInternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>());
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(entity, new MyInternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(this));
         }
         protected class MyInternalInsertOrUpdateCallback : InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {
-            public void CallbackInsert(${myExtendedObjectClassName} entity) { Insert(entity); }
-            public void CallbackUpdate(${myExtendedObjectClassName} entity) { Update(entity); }
-            public ${myConditionBeanClassName} CallbackNewMyConditionBean() { return NewMyConditionBean(); }
+            protected ${myClassName} _bhv;
+            public MyInternalInsertOrUpdateCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { _bhv.Insert(entity); }
+            public void CallbackUpdate(${myExtendedObjectClassName} entity) { _bhv.Update(entity); }
+            public ${myConditionBeanClassName} CallbackNewMyConditionBean() { return _bhv.NewMyConditionBean(); }
             public void CallbackSetupPrimaryKeyCondition(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity) {
 #foreach ($col in $table.primaryKey)
                 cb.Query().Set${col.javaName}_Equal(entity.${col.javaName});
 #end
             }
-            public int CallbackSelectCount(${myConditionBeanClassName} cb) { return SelectCount(cb); }
+            public int CallbackSelectCount(${myConditionBeanClassName} cb) { return _bhv.SelectCount(cb); }
         }
 #if ($table.hasOptimisticLock())
 
         public void InsertOrUpdateNonstrict(${myExtendedObjectClassName} entity) {
-            HelpInsertOrUpdateInternally(entity, new MyInternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>());
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}>(entity, new MyInternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>(this));
         }
         protected class MyInternalInsertOrUpdateNonstrictCallback : InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}> {
-            public void CallbackInsert(${myExtendedObjectClassName} entity) { Insert(entity); }
-            public void CallbackUpdateNonstrict(${myExtendedObjectClassName} entity) { UpdateNonstrict(entity); }
+            protected ${myClassName} _bhv;
+            public MyInternalInsertOrUpdateCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { _bhv.Insert(entity); }
+            public void CallbackUpdateNonstrict(${myExtendedObjectClassName} entity) { _bhv.UpdateNonstrict(entity); }
         }
 #end
 
