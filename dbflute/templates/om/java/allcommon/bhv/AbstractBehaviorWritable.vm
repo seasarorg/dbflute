@@ -268,6 +268,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         } else if (deletedCount > 1) {
             String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
             msg = msg + ": entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
@@ -284,6 +285,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         } else if (deletedCount > 1) {
             String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
             msg = msg + ": entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
@@ -299,6 +301,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         } else if (deletedCount > 1) {
             String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
             msg = msg + ": entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
