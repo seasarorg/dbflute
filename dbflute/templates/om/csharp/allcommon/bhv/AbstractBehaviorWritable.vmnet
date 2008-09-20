@@ -7,6 +7,7 @@ using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonException};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonBhv} {
 

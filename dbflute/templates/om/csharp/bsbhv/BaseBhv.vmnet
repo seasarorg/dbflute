@@ -334,7 +334,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                            ====================
         protected override bool HasVersionNoValue(${glEntityInterfaceName} entity) {
 #if ($table.isUseVersionNo())
-            return Downcast(entity).get${table.versionNoJavaName}() != null;
+            return Downcast(entity).${table.versionNoJavaName} != null;
 #else
             return false;
 #end
@@ -342,7 +342,7 @@ namespace ${glPackageExtendedBhv} {
 
         protected override bool HasUpdateDateValue(${glEntityInterfaceName} entity) {
 #if ($table.isUseUpdateDate())
-            return Downcast(entity).get${table.updateDateJavaName}() != null;
+            return Downcast(entity).${table.updateDateJavaName} != null;
 #else
             return false;
 #end
@@ -352,7 +352,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                          Helper
         //                                                                          ======
         protected ${myExtendedObjectClassName} Downcast(${glEntityInterfaceName} entity) {
-            return ${myExtendedObjectClassName}entity; // [Under Review]: At the future handling exception.
+            return (${myExtendedObjectClassName})entity;
         }
 
         // ===============================================================================
