@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 #if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 #end
 #if ($database.isTargetContainerSpring())
 import org.springframework.context.ApplicationContext;
@@ -32,7 +33,19 @@ public abstract class ${glCacheAbstractSelector} {
 		assertObjectNotNull("componentType", componentType);
 		assertObjectNotNull("_container", _container);
 #if ($database.isTargetContainerSeasar())
-		return (COMPONENT)_container.getComponent(componentType);
+        try {
+		    return (COMPONENT)_container.getComponent(componentType);
+		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
+		    final COMPONENT component;
+		    try {
+		        // for HotDeploy Mode
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
+		    } catch (ComponentNotFoundRuntimeException ignored) {
+		        throw e;
+		    }
+		    _container = _container.getRoot(); // Change container.
+		    return component;
+		}
 #end
 #if ($database.isTargetContainerSpring())
 		return (COMPONENT)_container.getBean(initUncap(componentType.getSimpleName()));
