@@ -877,7 +877,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
-    public static class OptimisticLockColumnValueNullException extends IllegalStateException {
+    public static class OptimisticLockColumnValueNullException extends RuntimeException {
         private static final long serialVersionUID = 1L;
         public OptimisticLockColumnValueNullException(String msg) {
             super(msg);
