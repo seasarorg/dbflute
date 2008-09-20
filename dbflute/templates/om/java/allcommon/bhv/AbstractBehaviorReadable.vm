@@ -697,7 +697,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                              ======
     /**
      * To lower case if the type is String.
-     * 
      * @param obj Object. (Nullable)
      * @return Lower object. (Nullable)
      */
@@ -710,7 +709,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Get the value of line separator.
-     * 
      * @return The value of line separator. (NotNull)
      */
     protected String getLineSeparator() {
@@ -733,7 +731,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                    -------------
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -751,7 +748,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the entity is not null.
-     * 
      * @param entity Entity. (NotNull)
      */
     protected void assertEntityNotNull(${glEntityInterfaceName} entity) {
@@ -760,7 +756,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the condition-bean is not null.
-     * 
      * @param cb Condition-bean. (NotNull)
      */
     protected void assertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
@@ -769,7 +764,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the entity has primary-key value.
-     * 
      * @param entity Entity. (NotNull)
      */
     protected void assertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
@@ -785,7 +779,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                    -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */
@@ -803,7 +796,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                      -----------
     /**
      * Assert that the list is empty.
-     * 
      * @param ls List. (NotNull)
      */
     protected void assertListNotNullAndEmpty(java.util.List ls) {
@@ -816,7 +808,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the list is not empty.
-     * 
      * @param ls List. (NotNull)
      */
     protected void assertListNotNullAndNotEmpty(java.util.List ls) {
@@ -829,7 +820,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Assert that the list having only one.
-     * 
      * @param ls List. (NotNull)
      */
     protected void assertListNotNullAndHasOnlyOne(java.util.List ls) {
@@ -845,7 +835,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                            ========
     /**
      * Get the selector of behavior.
-     * 
      * @return The select of behavior. (Nullable: But normally NotNull)
      */
     protected ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
@@ -854,7 +843,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /**
      * Set the selector of behavior.
-     * 
      * @param behaviorSelector The selector of behavior. (NotNull)
      */
     public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} behaviorSelector) {
@@ -862,18 +850,16 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     /**
-     * Get the selector of dao.
-     * 
-     * @return The select of behavior. (Nullable: But normally NotNull)
+     * Get the selector of DAO.
+     * @return The select of DAO. (Nullable: But normally NotNull)
      */
     protected ${glDaoSelectorInterfaceName} getDaoSelector() {
         return _daoSelector;
     }
 
     /**
-     * Set the selector of dao.
-     * 
-     * @param daoSelector The selector of dao. (NotNull)
+     * Set the selector of DAO.
+     * @param daoSelector The selector of DAO. (NotNull)
      */
     public void setDaoSelector(${glDaoSelectorInterfaceName} daoSelector) {
         _daoSelector = daoSelector;

@@ -154,6 +154,12 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         // ===============================================================================
+        //                                                            Optimistic Lock Info
+        //                                                            ====================
+        protected abstract bool HasVersionNoValue(${glEntityInterfaceName} entity);
+        protected abstract bool HasUpdateDateValue(${glEntityInterfaceName} entity);
+
+        // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
         protected int CallGetCountAll() { return DoCallGetCountAll(); }

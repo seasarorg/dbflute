@@ -251,6 +251,8 @@ namespace ${glPackageExtendedBhv} {
 
         public virtual void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
+            AssertEntityHasVersionNoValue(entity);
+            AssertEntityHasUpdateDateValue(entity);
             int updatedCount = this.DelegateUpdate(entity);
             AssertUpdatedEntity(entity, updatedCount);
         }
@@ -294,6 +296,8 @@ namespace ${glPackageExtendedBhv} {
 
         public virtual void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
+            AssertEntityHasVersionNoValue(entity);
+            AssertEntityHasUpdateDateValue(entity);
             int deletedCount = this.DelegateDelete(entity);
             AssertUpdatedEntity(entity, deletedCount);
         }
@@ -324,6 +328,32 @@ namespace ${glPackageExtendedBhv} {
             return this.Dao.DeleteByQuery(cb);
         }
 #end
+
+        // ===============================================================================
+        //                                                            Optimistic Lock Info
+        //                                                            ====================
+        protected override bool HasVersionNoValue(${glEntityInterfaceName} entity) {
+#if ($table.isUseVersionNo())
+            return Downcast(entity).get${table.versionNoJavaName}() != null;
+#else
+            return false;
+#end
+        }
+
+        protected override bool HasUpdateDateValue(${glEntityInterfaceName} entity) {
+#if ($table.isUseUpdateDate())
+            return Downcast(entity).get${table.updateDateJavaName}() != null;
+#else
+            return false;
+#end
+        }
+
+        // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        protected ${myExtendedObjectClassName} Downcast(${glEntityInterfaceName} entity) {
+            return ${myExtendedObjectClassName}entity; // [Under Review]: At the future handling exception.
+        }
 
         // ===============================================================================
         //                                                                 Delegate Method
