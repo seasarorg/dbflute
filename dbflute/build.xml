@@ -28,6 +28,7 @@
   <property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
   <property name="dbflute.gihyojp.example.dir" value="${workspace.base}/dbflute-gihyojp-example"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
+  <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
   <property name="dbflute.pbasic.example.dir" value="${workspace.base}/dbflute-pbasic-example"/>
 
   <target name="clean">
@@ -208,6 +209,12 @@
 
   <target name="reflect-win-limit-nbasic" description="==> reflect to test application">
     <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+
+  <target name="reflect-win-limit-noracle" description="==> reflect to test application">
+    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
