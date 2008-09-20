@@ -83,6 +83,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
@@ -162,7 +163,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 xmlSerializer = new XMLSerializer(printWriter, outputFormar);
             }
             xmlSerializer.serialize(_doc);
-            
+
             _log.info("$ * * * * * * * * */");
             _log.info("$ ");
 
@@ -251,7 +252,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 if (columnComment != null) {
                     columnElement.setAttribute("comment", columnComment);
                 }
-                
+
                 String defaultValue = columnMetaInfo.getDefaultValue();
                 if (defaultValue != null) {
                     // trim out parens & quotes out of def value.
@@ -329,52 +330,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
             _databaseNode.appendChild(tableElement);
         }
+        setupAddtionalTableIfNeeds(); // since 0.8.0
         _doc.appendChild(_databaseNode);
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
-    }
-
-    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final DfColumnHandler columnHandler = new DfColumnHandler();
-        return columnHandler.getColumnTorqueType(columnMetaInfo);
-    }
-
-    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final String jdbcType = getColumnTorqueType(columnMetaInfo);
-        final int columnSize = columnMetaInfo.getColumnSize();
-        final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
-                decimalDigits > 0 ? decimalDigits : null);
-        columnElement.setAttribute("javaType", javaNative);
-    }
-
-    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
-    }
-
-    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int jdbcType = columnMetaInfo.getJdbcType();
-        final int columnSize = columnMetaInfo.getColumnSize();
-        final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
-            if (decimalDigits > 0) {
-                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
-            } else {
-                columnElement.setAttribute("size", String.valueOf(columnSize));
-            }
-        }
-    }
-
-    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
-        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
-                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
-    }
-
+    //                                                                   Meta Data Handler
+    //                                                                   =================
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param dbMeta JDBC meta data.
@@ -446,6 +408,91 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         return _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
+    }
+
+    // ===================================================================================
+    //                                                                    Additional Table
+    //                                                                    ================
+    protected void setupAddtionalTableIfNeeds() { // since 0.8.0
+        final String tableType = "TABLE";
+        final DfAdditionalTableProperties prop = new DfAdditionalTableProperties(getProperties().getProperties());
+        final Map<String, Object> tableMap = prop.getAdditionalTableMap();
+        final Set<String> tableNameKey = tableMap.keySet();
+        for (String tableName : tableNameKey) {
+            _log.info("...Processing additional table: " + tableName + "(" + tableType + ")");
+            final Element tableElement = _doc.createElement("table");
+            tableElement.setAttribute("name", tableName);
+            tableElement.setAttribute("type", tableType);
+
+            final Map<String, Map<String, String>> columnMap = prop.findColumnMap(tableName);
+            final Set<String> columnNameKey = columnMap.keySet();
+            for (String columnName : columnNameKey) {
+                final Element columnElement = _doc.createElement("column");
+                columnElement.setAttribute("name", columnName);
+
+                final String columnType = prop.findColumnType(tableName, columnName);
+                final String columnSize = prop.findColumnSize(tableName, columnName);
+                final boolean required = prop.isColumnRequired(tableName, columnName);
+                final boolean primaryKey = prop.isColumnPrimaryKey(tableName, columnName);
+                final boolean autoIncrement = prop.isColumnAutoIncrement(tableName, columnName);
+                columnElement.setAttribute("type", columnType);
+                columnElement.setAttribute("required", String.valueOf(required));
+                if (columnSize != null && columnSize.trim().length() > 0) {
+                    columnElement.setAttribute("size", columnSize);
+                }
+                if (primaryKey) {
+                    columnElement.setAttribute("primaryKey", String.valueOf(primaryKey));
+                }
+                if (autoIncrement) {
+                    columnElement.setAttribute("autoIncrement", String.valueOf(autoIncrement));
+                }
+                tableElement.appendChild(columnElement);
+            }
+            _databaseNode.appendChild(tableElement);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
+    }
+
+    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+        final DfColumnHandler columnHandler = new DfColumnHandler();
+        return columnHandler.getColumnTorqueType(columnMetaInfo);
+    }
+
+    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final String jdbcType = getColumnTorqueType(columnMetaInfo);
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
+                decimalDigits > 0 ? decimalDigits : null);
+        columnElement.setAttribute("javaType", javaNative);
+    }
+
+    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
+    }
+
+    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final int jdbcType = columnMetaInfo.getJdbcType();
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
+            if (decimalDigits > 0) {
+                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
+            } else {
+                columnElement.setAttribute("size", String.valueOf(columnSize));
+            }
+        }
+    }
+
+    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
+        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
+                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
     }
 
     // ===================================================================================

@@ -42,11 +42,11 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
                     msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
                     throw new IllegalStateException(msg);
                 }
-                final Map<?, ?> ForeignDefinitionMap = (Map<?, ?>) firstValue;
-                final Set<?> secondKeySet = ForeignDefinitionMap.keySet();
+                final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
+                final Set<?> secondKeySet = foreignDefinitionMap.keySet();
                 final Map<String, String> genericForeignDefinitiontMap = new LinkedHashMap<String, String>();
                 for (Object componentName : secondKeySet) {// PK Component Loop!
-                    final Object secondValue = ForeignDefinitionMap.get(componentName);
+                    final Object secondValue = foreignDefinitionMap.get(componentName);
                     if (secondValue == null) {
                         continue;
                     }
