@@ -79,7 +79,7 @@ namespace ${glPackageBaseCommonBhv} {
                     }
                 } catch (${glEntityAlreadyDeletedException} e) {
                     exception = e;
-                } catch (Exception e) {
+                } catch (OptimisticLockColumnValueNullException e) {
                     exception = e;
                 }
                 if (exception != null) {
