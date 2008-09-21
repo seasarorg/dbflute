@@ -72,7 +72,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return cmd;
             }
             if (_log.IsDebugEnabled) {
-                _log.Debug("...Initializing sqlCommand for " + methodName + ".");
+                _log.Debug("...Initializing sqlCommand for " + methodName + "().");
             }
             return InitializeSqlCommand(methodName);
         }

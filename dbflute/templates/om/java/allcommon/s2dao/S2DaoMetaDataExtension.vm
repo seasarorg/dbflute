@@ -179,7 +179,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return cmd;
             }
             if (_log.isDebugEnabled()) {
-                _log.debug("...Initializing sqlCommand for " + methodName + ".");
+                _log.debug("...Initializing sqlCommand for " + methodName + "().");
             }
             cmd = initializeSqlCommand(methodName);
         }
