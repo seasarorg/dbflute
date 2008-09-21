@@ -11,6 +11,9 @@ namespace ${glPackageBaseCommonCValue} {
 [System.Serializable]
 public class ${myClassName} {
 
+    // ===============================================================================
+    //                                                                           Equal
+    //                                                                           =====
     protected Object _equalValue;
 
     public Object Equal {

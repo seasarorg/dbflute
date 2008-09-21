@@ -13,7 +13,6 @@ using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
-using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2Dao} {
@@ -172,7 +171,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return;
                 } else {
                     String msg = "The method should have one string argument as method name: " + invocation;
-                    throw new IllegalStateException(msg);
+                    throw new SystemException(msg);
                 }
             }
         }
