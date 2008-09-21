@@ -166,7 +166,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             set { propertyTypes = value; }
         }
 
-        protected bool IsCheckSingleRowUpdate {
+        public bool IsCheckSingleRowUpdate {
             get { return checkSingleRowUpdate; }
             set { checkSingleRowUpdate = value; }
         }

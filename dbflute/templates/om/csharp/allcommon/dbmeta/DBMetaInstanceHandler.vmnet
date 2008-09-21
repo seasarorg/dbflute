@@ -71,6 +71,31 @@ namespace ${glPackageBaseCommonDBMeta} {
             return type;
         }
 
+       // Returns the initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
+        public static Map<String, ${glDBMetaInterfaceName}> GetDBMetaMap() {
+            InitializeDBMetaMap();
+            return _tableDbNameInstanceMap;
+        }
+    
+        protected static void InitializeDBMetaMap() {
+            if (IsInitialized) {
+                return;
+            }
+            Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
+            foreach (String tableDbName in tableDbNameSet) {
+                FindDBMeta(tableDbName); // Initialize!
+            }
+            if (!IsInitialized) {
+                String msg = "Failed to initialize tableDbNameInstanceMap:";
+                msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+                throw new IllegalStateException(msg);
+            }
+        }
+
+        protected static bool IsInitialized { get {
+            return _tableDbNameInstanceMap.size() == _tableDbNameClassNameMap.size();
+        }}
+
         // ===============================================================================
         //                                                                     Main Method
         //                                                                     ===========
