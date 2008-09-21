@@ -300,7 +300,7 @@ namespace ${glPackageExtendedBhv} {
         protected class MyInternalDeleteCallback : InternalDeleteCallback<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv;
             public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
-            public int CallbackDelegateDelete(${myExtendedObjectClassName} entity) { _bhv.DelegateDelete(entity); }
+            public int CallbackDelegateDelete(${myExtendedObjectClassName} entity) { return _bhv.DelegateDelete(entity); }
         }
 #if ($table.hasOptimisticLock())
 
@@ -310,7 +310,7 @@ namespace ${glPackageExtendedBhv} {
         protected class MyInternalDeleteNonstrictCallback : InternalDeleteNonstrictCallback<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv;
             public MyInternalDeleteNonstrictCallback(${myClassName} bhv) { _bhv = bhv; }
-            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { _bhv.DelegateDeleteNonstrict(entity); }
+            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return _bhv.DelegateDeleteNonstrict(entity); }
         }
 
         public virtual void DeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} entity) {
@@ -319,7 +319,7 @@ namespace ${glPackageExtendedBhv} {
         protected class MyInternalDeleteNonstrictIgnoreDeletedCallback : InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv;
             public MyInternalDeleteNonstrictIgnoreDeletedCallback(${myClassName} bhv) { _bhv = bhv; }
-            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { _bhv.DelegateDeleteNonstrict(entity); }
+            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return _bhv.DelegateDeleteNonstrict(entity); }
         }
 #end
         #endregion

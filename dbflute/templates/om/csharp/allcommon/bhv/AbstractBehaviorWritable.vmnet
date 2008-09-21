@@ -152,7 +152,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected interface InternalDeleteNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
-            public int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+            int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
         }
 
         protected void HelpDeleteNonstrictIgnoreDeletedInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
