@@ -111,8 +111,8 @@ public class ${myClassName} {
     }
 
     // ==================================================================================
-    //                                                                           LessThan
-    //                                                                           ========
+    //                                                                          Less Than
+    //                                                                          =========
     protected Object _lessThanValue;
 
     public Object LessThan {
@@ -120,16 +120,16 @@ public class ${myClassName} {
         set { _lessThanValue = value; }
     }
 
-    public bool HasGreaterThan { get {
-        return _greaterThanValue != null;
+    public bool HasLessThan { get {
+        return _lessThanValue != null;
     }}
 
-    public bool EqualGreaterThan(Object value) {
-        return HasGreaterThan ? _greaterThanValue.Equals(value) : value == null;
+    public bool EqualLessThan(Object value) {
+        return HasLessThan ? _lessThanValue.Equals(value) : value == null;
     }
 
-    public ${myClassName} OverrideGreaterThan(Object value) {
-        _greaterThanValue = value; return this;
+    public ${myClassName} OverrideLessThan(Object value) {
+        _lessThanValue = value; return this;
     }
 
     protected String _lessThanLocation;
@@ -144,13 +144,25 @@ public class ${myClassName} {
     }
 
     // ==================================================================================
-    //                                                                       GreaterEqual
-    //                                                                       ============
+    //                                                                      Greater Equal
+    //                                                                      =============
     protected Object _greaterEqualValue;
 
     public Object GreaterEqual {
         get { return _greaterEqualValue; }
         set { _greaterEqualValue = value; }
+    }
+
+    public bool HasGreaterEqual { get {
+        return _greaterEqualValue != null;
+    }}
+
+    public bool EqualGreaterEqual(Object value) {
+        return HasGreaterEqual ? _greaterEqualValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideGreaterEqual(Object value) {
+        _greaterEqualValue = value; return this;
     }
 
     protected String _greaterEqualLocation;
@@ -165,13 +177,25 @@ public class ${myClassName} {
     }
 
     // ==================================================================================
-    //                                                                          LessEqual
-    //                                                                          =========
+    //                                                                         Less Equal
+    //                                                                         ==========
     protected Object _lessEqualValue;
 
     public Object LessEqual {
         get { return _lessEqualValue; }
         set { _lessEqualValue = value; }
+    }
+
+    public bool HasLessEqual { get {
+        return _lessEqualValue != null;
+    }}
+
+    public bool EqualLessEqual(Object value) {
+        return HasLessEqual ? _lessEqualValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideLessEqual(Object value) {
+        _lessEqualValue = value; return this;
     }
 
     protected String _lessEqualLocation;

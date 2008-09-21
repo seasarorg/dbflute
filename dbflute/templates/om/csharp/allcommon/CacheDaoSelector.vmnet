@@ -25,13 +25,6 @@ namespace ${glPackageBaseCommon} {
             return InternalSelect<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
         }
 
-        [System.Obsolete("Please use Select<DAO>()")]
-        public virtual DAO Select<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName} {
-            QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
-            DAO dao = (DAO)component.GetComponentObject(daoType);
-            return dao;
-        }
-
         protected virtual DAO InternalSelect<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
             DAO dao = (DAO)component.GetComponentObject(daoType);

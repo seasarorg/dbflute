@@ -9,8 +9,5 @@ namespace ${glPackageBaseCommon} {
     public interface ${glDaoSelectorInterfaceName} {
         DAO Select<DAO>() where DAO : ${glDaoReadableInterfaceName};
         ${glDaoReadableInterfaceName} ByName(String tableFlexibleName);
-
-        [System.Obsolete("Please use Select<DAO>()")]
-        DAO Select<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName};
     }
 }
