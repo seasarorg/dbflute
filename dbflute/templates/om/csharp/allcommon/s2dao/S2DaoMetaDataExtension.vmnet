@@ -31,6 +31,11 @@ namespace ${glPackageBaseCommonS2Dao} {
     public class ${glDaoMetaDataExtension} : Seasar.Dao.Impl.DaoMetaDataImpl {
 
         // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
         protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
@@ -65,6 +70,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             ISqlCommand cmd = (ISqlCommand)_sqlCommands[methodName];
             if (cmd != null) {
                 return cmd;
+            }
+            if (_log.IsDebugEnabled()) {
+                _log.Debug("...Initializing sqlCommand.");
             }
             return InitializeSqlCommand(methodName);
         }

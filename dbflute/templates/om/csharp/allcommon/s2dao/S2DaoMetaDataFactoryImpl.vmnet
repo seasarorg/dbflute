@@ -17,6 +17,14 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glS2DaoMetaDataFactoryImpl} : Seasar.Dao.IDaoMetaDataFactory {
 
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         private readonly Hashtable _daoMetaDataCache = new Hashtable();
         protected readonly IDataSource _dataSource;
         protected readonly ICommandFactory _commandFactory;
@@ -29,6 +37,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected string[] _deletePrefixes;
 		protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
 
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${glS2DaoMetaDataFactoryImpl}(IDataSource dataSource,
             ICommandFactory commandFactory, IAnnotationReaderFactory readerFactory,
             IDataReaderFactory dataReaderFactory) {
@@ -38,32 +49,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             _dataReaderFactory = dataReaderFactory;
         }
 
-        public IDatabaseMetaData DBMetaData {
-            set { _dbMetaData = value; }
-        }
-
-        public string[] InsertPrefixes {
-            set { _insertPrefixes = value; }
-        }
-
-        public string[] UpdatePrefixes {
-            set { _updatePrefixes = value; }
-        }
-
-        public string[] DeletePrefixes {
-            set { _deletePrefixes = value; }
-        }
-
-        public string SqlFileEncoding {
-            set { _sqlFileEncoding = value; }
-        }
-
+        // ===============================================================================
+        //                                                                  Implementation
+        //                                                                  ==============
         public IDaoMetaData GetDaoMetaData(Type daoType) {
             lock (this) {
                 string key = daoType.FullName;
                 IDaoMetaData dmd = (IDaoMetaData)_daoMetaDataCache[key];
                 if (dmd != null) {
                     return dmd;
+                }
+                if (_log.IsDebugEnabled()) {
+                    _log.Debug("...Creating daoMetaData for '" + daoType.Name + "'.");
                 }
                 dmd = CreateDaoMetaData(daoType);
                 _daoMetaDataCache[key] = dmd;
@@ -193,6 +190,29 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
             return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDatabaseMetaData DBMetaData {
+            set { _dbMetaData = value; }
+        }
+
+        public string[] InsertPrefixes {
+            set { _insertPrefixes = value; }
+        }
+
+        public string[] UpdatePrefixes {
+            set { _updatePrefixes = value; }
+        }
+
+        public string[] DeletePrefixes {
+            set { _deletePrefixes = value; }
+        }
+
+        public string SqlFileEncoding {
+            set { _sqlFileEncoding = value; }
         }
     }
 
