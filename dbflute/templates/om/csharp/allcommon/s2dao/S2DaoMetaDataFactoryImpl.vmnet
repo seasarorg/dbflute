@@ -59,7 +59,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (dmd != null) {
                     return dmd;
                 }
-                if (_log.IsDebugEnabled()) {
+                if (_log.IsDebugEnabled) {
                     _log.Debug("...Creating daoMetaData for '" + daoType.Name + "'.");
                 }
                 dmd = CreateDaoMetaData(daoType);
@@ -103,6 +103,29 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected virtual InternalDataReaderHandlerFactory CreateInternalDataReaderHandlerFactory() {
             return new InternalDataReaderHandlerFactory();
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDatabaseMetaData DBMetaData {
+            set { _dbMetaData = value; }
+        }
+
+        public string[] InsertPrefixes {
+            set { _insertPrefixes = value; }
+        }
+
+        public string[] UpdatePrefixes {
+            set { _updatePrefixes = value; }
+        }
+
+        public string[] DeletePrefixes {
+            set { _deletePrefixes = value; }
+        }
+
+        public string SqlFileEncoding {
+            set { _sqlFileEncoding = value; }
         }
     }
 	
@@ -190,29 +213,6 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
             return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
-        }
-
-        // ===============================================================================
-        //                                                                        Accessor
-        //                                                                        ========
-        public IDatabaseMetaData DBMetaData {
-            set { _dbMetaData = value; }
-        }
-
-        public string[] InsertPrefixes {
-            set { _insertPrefixes = value; }
-        }
-
-        public string[] UpdatePrefixes {
-            set { _updatePrefixes = value; }
-        }
-
-        public string[] DeletePrefixes {
-            set { _deletePrefixes = value; }
-        }
-
-        public string SqlFileEncoding {
-            set { _sqlFileEncoding = value; }
         }
     }
 
