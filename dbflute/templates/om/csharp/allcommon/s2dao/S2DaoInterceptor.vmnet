@@ -207,7 +207,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void LogInvocation(IMethodInvocation invocation) {
             StackTrace stackTrace = new StackTrace();
             MethodBase method = invocation.Method;
-            bool behaviorName = true;
             InvokeNameExtractingResult result = null;
             try {
                 result = extractBehaviorInvokeName(stackTrace);
@@ -216,7 +215,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             String invokeName = null;
             if (result != null && result.getSimpleClassName() != null) {
-                invokeName = result.getSimpleClassName() + "." + result.getMethodName();
+                invokeName = buildInvocationExpressionWithoutKakko(invocation, result.getSimpleClassName(), result.getMethodName());
             } else {
                 invokeName = BuildSimpleExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
             }
@@ -243,6 +242,18 @@ namespace ${glPackageBaseCommonS2Dao} {
 				}
                 Log("option: " + GetOutsideSqlOption(args));
             }
+        }
+
+        protected String buildInvocationExpressionWithoutKakko(IMethodInvocation invocation, String invokeClassName, String invokeMethodName) {
+            String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
+            if ("SelectPage".Equals(invokeMethodName)) { // Special Handling!
+                if (invocation.Method.ReturnType.Equals(int.class)) {
+                    invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():count";
+                } else {
+                    invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():paging";
+                }
+            }
+            return invocationExpressionWithoutKakko;
         }
 
         protected String BuildSimpleExpressionFromDaoName(String name) {
@@ -278,13 +289,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             protected bool isClassNameEndsWith(String className) {
-                String[] suffixArray = new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker"};
+                String[] suffixArray = new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable"};
                 foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
                 return false;
             }
 
             protected bool isClassNameContains(String className) {
-                String[] keywordArray = new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"};
+                String[] keywordArray = new String[]{"PagingInvoker", "InternalSelectPagingHandler"};
                 foreach (String keyword in keywordArray) { if (className.Contains(keyword)) { return true; } }
                 return false;
             }

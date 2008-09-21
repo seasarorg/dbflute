@@ -256,9 +256,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             invokeClassName = extractInvocationExpression(method);
             invokeMethodName = method.getName();
         }
-        final String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
-        final String equalBorder = buildFitBorder("", "=", invocationExpressionWithoutKakko, false);
-        final String invocationExpression = invocationExpressionWithoutKakko + "()";
+        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(invocation, invokeClassName, invokeMethodName);
+        final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
+        final String invocationExpression = expWithoutKakko + "()";
 
         log("/=====================================================" + equalBorder + "==");
         log("                                                      " + invocationExpression);
@@ -279,6 +279,18 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 log("option: " + getOutsideSqlOption(args));
             }
         }
+    }
+
+    protected String buildInvocationExpressionWithoutKakko(MethodInvocation invocation, String invokeClassName, String invokeMethodName) {
+        String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
+        if ("selectPage".equals(invokeMethodName)) { // Special Handling!
+            if (invocation.getMethod().getReturnType().equals(int.class)) {
+                invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():count";
+            } else {
+                invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():paging";
+            }
+        }
+        return invocationExpressionWithoutKakko;
     }
 
     protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, InvokeNameExtractingResult behaviorResult) {
