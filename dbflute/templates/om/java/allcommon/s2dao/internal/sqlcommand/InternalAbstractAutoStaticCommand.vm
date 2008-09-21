@@ -13,6 +13,7 @@ import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.framework.exception.SRuntimeException;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHandler};
 
 /**
@@ -76,7 +77,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     }
 
     protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
-        return new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(bean, rows);
+        return new ${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected PropertyType[] getPropertyTypes() {

@@ -203,16 +203,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             base.SetupUpdateMethodByAuto(mi);
         }
-        
+
         protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             ${glInternalUpdateAutoDynamicCommand} cmd = new ${glInternalUpdateAutoDynamicCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
             cmd.VersionNoAutoIncrementOnMemory = IsUpdateVersionNoAutoIncrementOnMemory(method);
+            cmd.IsCheckSingleRowUpdate = !IsNonstrictMethod(method);
             return cmd;
         }
-		
+
         protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             ${glInternalUpdateModifiedOnlyCommand} cmd = new ${glInternalUpdateModifiedOnlyCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
             cmd.VersionNoAutoIncrementOnMemory = IsUpdateVersionNoAutoIncrementOnMemory(method);
+            cmd.IsCheckSingleRowUpdate = !IsNonstrictMethod(method);
             return cmd;
         }
 
@@ -226,7 +228,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
-            return new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            ${glInternalDeleteAutoStaticCommand} cmd = new ${glInternalDeleteAutoStaticCommand}(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            cmd.IsCheckSingleRowUpdate = !IsNonstrictMethod(method);
+            return cmd;
         }
 		
         // -------------------------------------------------

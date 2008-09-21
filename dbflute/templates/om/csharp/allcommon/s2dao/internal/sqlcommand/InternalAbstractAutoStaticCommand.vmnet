@@ -7,6 +7,7 @@ using Seasar.Dao;
 using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
@@ -22,6 +23,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                       Attribute
         //                                                                       =========
         private IPropertyType[] propertyTypes;
+        private bool checkSingleRowUpdate = true;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -40,19 +42,17 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler();
             handler.Sql = Sql;
             int rows = handler.Execute(args);
-            if (rows != 1) throw new NotSingleRowUpdatedRuntimeException(args[0], rows);
+            if (IsCheckSingleRowUpdate && rows != 1) throw new ${glEntityAlreadyUpdatedException}(args[0], rows);
             return rows;
-        }
-
-        protected IPropertyType[] PropertyTypes {
-            get { return propertyTypes; }
-            set { propertyTypes = value; }
         }
 
         protected abstract ${glInternalAbstractAutoHandler} CreateAutoHandler();
 
         protected abstract void SetupPropertyTypes(string[] propertyNames);
 
+        // ===============================================================================
+        //                                                                        Setupper
+        //                                                                        ========
         protected void SetupInsertPropertyTypes(string[] propertyNames) {
             ArrayList types = new ArrayList();
             for (int i = 0; i < propertyNames.Length; ++i) {
@@ -156,6 +156,19 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                 sb.Append(pt.ColumnName);
                 sb.Append(" = ?");
             }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        protected IPropertyType[] PropertyTypes {
+            get { return propertyTypes; }
+            set { propertyTypes = value; }
+        }
+
+        protected bool IsCheckSingleRowUpdate {
+            get { return checkSingleRowUpdate; }
+            set { checkSingleRowUpdate = value; }
         }
     }
 }
