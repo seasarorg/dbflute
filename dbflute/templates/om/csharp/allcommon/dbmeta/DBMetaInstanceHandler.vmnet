@@ -71,7 +71,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return type;
         }
 
-       // Returns the initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
+        // Returns the initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
         public static Map<String, ${glDBMetaInterfaceName}> GetDBMetaMap() {
             InitializeDBMetaMap();
             return _tableDbNameInstanceMap;

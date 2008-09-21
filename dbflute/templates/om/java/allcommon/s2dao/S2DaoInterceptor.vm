@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.util.Arrays;
 import java.util.List;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
@@ -93,7 +94,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      */
     protected Object dispatchInvoking(MethodInvocation invocation) throws Throwable {
         final Method method = invocation.getMethod();
-        if (!org.seasar.framework.util.MethodUtil.isAbstract(method)) {
+        if (!isAbstract(method)) {
             return invocation.proceed();
         }
         
@@ -894,6 +895,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    /**
+     * Is the method abstract?
+     * @return Determination. (NotNull)
+     */
+    public boolean isAbstract(Method method) {
+        final int mod = method.getModifiers();
+        return Modifier.isAbstract(mod);
+    }
+
     /**
      * Get the value of line separator.
      * @return The value of line separator. (NotNull)

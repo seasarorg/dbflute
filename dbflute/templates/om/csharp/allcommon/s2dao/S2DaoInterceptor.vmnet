@@ -6,12 +6,14 @@ using System.Text;
 
 using Seasar.Framework.Aop;
 using Seasar.Framework.Aop.Interceptors;
+using Seasar.Framework.Beans;
 using Seasar.Dao;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2Dao} {
@@ -26,13 +28,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        private IDaoMetaDataFactory daoMetaDataFactory_;
+        private IDaoMetaDataFactory _daoMetaDataFactory;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glDaoInterceptor}(IDaoMetaDataFactory daoMetaDataFactory) {
-            daoMetaDataFactory_ = daoMetaDataFactory;
+            _daoMetaDataFactory = daoMetaDataFactory;
         }
 		
         // ===============================================================================
@@ -62,6 +64,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             MethodBase method = invocation.Method;
             if (!method.IsAbstract) {
                 return invocation.Proceed();
+            }
+        
+            // - - - - - - - - - - - - -
+            // Initialize DAO meta data
+            // - - - - - - - - - - - - -
+            if (method.Name.Equals("InitializeDaoMetaData")) {
+                InitializeSqlCommand(invocation);
+                return null;// The end! (Initilization Only)
             }
 
             // - - - - - - - - - - -
@@ -142,10 +152,35 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                      SqlCommand
         //                                                                      ==========
+        protected void InitializeSqlCommand(IMethodInvocation invocation) {
+            Type targetType = GetComponentDef(invocation).ComponentType;
+            IDaoMetaData dmd = _daoMetaDataFactory.GetDaoMetaData(targetType);
+            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(targetType)) {
+                return;// Do nothing!
+            } else {
+                Object[] arguments = invocation.Arguments;
+                if (arguments != null && arguments.Length > 0 && arguments[0] is String) {
+                    String methodName = (String)arguments[0];
+                    try {
+                        dmd.GetSqlCommand(methodName);
+                    } catch (MethodNotFoundRuntimeException ignored) {
+                        // Do nothing!
+                        if (IsLogEnabled()) {
+                            Log("Not Found the method: " + methodName + " msg=" + ignored.Message);
+                        }
+                    }
+                    return;
+                } else {
+                    String msg = "The method should have one string argument as method name: " + invocation;
+                    throw new IllegalStateException(msg);
+                }
+            }
+        }
+
         protected ISqlCommand FindSqlCommand(IMethodInvocation invocation) {
             ISqlCommand cmd;
             Type targetType = GetComponentDef(invocation).ComponentType;
-            IDaoMetaData dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
+            IDaoMetaData dmd = _daoMetaDataFactory.GetDaoMetaData(targetType);
             if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(targetType)) {
                 cmd = dmd.GetSqlCommand(GenerateSpecifiedOutsideSqlUniqueKey(invocation));
             } else {

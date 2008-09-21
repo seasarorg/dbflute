@@ -1,6 +1,5 @@
 
 using System;
-using System.Collections;
 
 namespace ${glPackageBaseCommon} {
 
@@ -9,8 +8,6 @@ namespace ${glPackageBaseCommon} {
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public interface ${glDaoReadableInterfaceName} {
-        // [Developer's comment] (2006/06/08)
-        // It cannot be done for the convenience of s2dao though I want to define methods for condition-bean here.
-        // DTO argument as Interface is not accepted.
+        void InitializeDaoMetaData(String methodName);// Very Internal Method!
     }
 }

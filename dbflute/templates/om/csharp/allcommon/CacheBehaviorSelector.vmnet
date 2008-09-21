@@ -15,27 +15,25 @@ namespace ${glPackageBaseCommon} {
         // ===================================================================================
         //                                                                          Initialize
         //                                                                          ==========
-        // public void InitializeConditionBeanMetaData() {
-        //     Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
-        //     Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
-        //     DateTime before = 0;
-        //     if (_log.IsDebugEnabled) {
-        //         before = DateTime.Now;
-        //         _log.Debug("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
-        //     }
-        //     for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
-        //         ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
-        //         ${glDaoReadableInterfaceName} dao = bhv.getDaoReadable();
-        //         if (_log.IsDebugEnabled) {
-        //             _log.Debug("[" + dbmeta.TableDbName + "]");
-        //         }
-        //         dao.InitializeDaoMetaData("selectList");
-        //     }
-        //     if (_log.IsDebugEnabled) {
-        //         DateTime after = DateTime.Now;
-        //         _log.Debug("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
-        //     }
-        // }
+        public void InitializeConditionBeanMetaData() {
+            Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
+            Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
+            DateTime before = 0;
+            if (_log.IsInfoEnabled) {
+                before = DateTime.Now;
+                _log.Info("/= = = = = = = = = = = = = = = = = InitializeConditionBeanMetaData()");
+            }
+            foreach (${glDBMetaInterfaceName} dbmeta in dbmetas) {
+                ${glBehaviorReadableInterfaceName} bhv = ByName(dbmeta.TableDbName);
+                ${glDaoReadableInterfaceName} dao = bhv.DaoReadable;
+                dao.InitializeDaoMetaData("SelectList");
+            }
+            if (_log.IsInfoEnabled) {
+                DateTime after = DateTime.Now;
+                _log.Info("Initialized Count: " + dbmetas.size());
+                _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(after - before) + "]");
+            }
+        }
     
         // ===============================================================================
         //                                                                  Implementation
