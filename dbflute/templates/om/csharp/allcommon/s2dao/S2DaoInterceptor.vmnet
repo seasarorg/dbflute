@@ -228,8 +228,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             Log("                                                      " + invokeName + "()");
             Log("                                                      " + sb.ToString() + "=/");
 
-            // [Under Review]: Not imelemented yet!
-            // LogPath(invocation, stackTrace, behaviorResult);
+            LogPath(invocation, stackTrace, behaviorResult);
 
             // Specified OutsideSql
             if (IsSpecifiedOutsideSql(invocation)) {
@@ -258,6 +257,64 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected String BuildSimpleExpressionFromDaoName(String name) {
     		return InvokeNameStringUtil.removeBasePrefixFromSimpleClassName(name);
+        }
+
+        protected InvokeNameExtractingResult extractClientInvokeName(StackTrace stackTrace, int startIndex, int loopSize) {
+            InvokeNameExtractingCallback callback = new ClientInvokeNameExtractingCallback();
+            return extractInvokeName(callback, stackTrace);
+        }
+
+        protected class ClientInvokeNameExtractingCallback : InvokeNameExtractingCallback {
+            public bool isTargetElement(String className, String methodName) {
+                return isClassNameEndsWith(className, suffixList);
+            }
+            public String filterSimpleClassName(String simpleClassName) {
+                return simpleClassName;
+            }
+            public bool isUseAdditionalInfo() {
+                return true;
+            }
+            public int getStartIndex() {
+                return startIndex;
+            }
+            public int getLoopSize() {
+                return 25;
+            }
+
+            protected bool isClassNameEndsWith(String className) {
+                String[] suffixArray = new String[]{"Page", "Action"};
+                foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
+                return false;
+            }
+        }
+
+        protected InvokeNameExtractingResult extractByPassInvokeName(StackTrace stackTrace, int startIndex, int loopSize) {
+            InvokeNameExtractingCallback callback = new ByPassInvokeNameExtractingCallback();
+            return extractInvokeName(callback, stackTrace);
+        }
+
+        protected class ByPassInvokeNameExtractingCallback : InvokeNameExtractingCallback {
+            public bool isTargetElement(String className, String methodName) {
+                return isClassNameEndsWith(className, suffixList);
+            }
+            public String filterSimpleClassName(String simpleClassName) {
+                return simpleClassName;
+            }
+            public bool isUseAdditionalInfo() {
+                return true;
+            }
+            public int getStartIndex() {
+                return startIndex;
+            }
+            public int getLoopSize() {
+                return loopSize >= 0 ? loopSize : 25;
+            }
+
+            protected bool isClassNameEndsWith(String className) {
+                String[] suffixArray = new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"};
+                foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
+                return false;
+            }
         }
 
         protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTrace stackTrace) {
@@ -437,6 +494,24 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return simpleClassName;
                 }
                 return "${glProjectPrefix}" + simpleClassName.Substring(prefixLength);
+            }
+        }
+
+        protected void LogPath(IMethodInvocation invocation, StackTrace stackTrace, InvokeNameExtractingResult behaviorResult) {
+            try {
+                int bhvNextIndex = behaviorResult.getNextStartIndex();
+                InvokeNameExtractingResult clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
+                int clientFirstIndex = clientResult.getFoundFirstIndex();
+                InvokeNameExtractingResult byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+                String clientInvokeName = clientResult.getInvokeName();
+                String byPassInvokeName = byPassResult.getInvokeName();
+                String behaviorInvokeName = behaviorResult.getInvokeName();
+                if (clientInvokeName.Trim().Length == 0 && byPassInvokeName.Trim().Length == 0) {
+                    return;
+                }
+                Log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
+            } catch (Exception ignored) {
+                Log("Failed to extract client or by-pass name: " + ignored.Message);
             }
         }
 
