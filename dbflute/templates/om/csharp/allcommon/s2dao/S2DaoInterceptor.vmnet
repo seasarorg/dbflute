@@ -205,8 +205,21 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                  Log Invocation
         //                                                                  ==============
         protected void LogInvocation(IMethodInvocation invocation) {
+            StackTrace stackTrace = new StackTrace();
             MethodBase method = invocation.Method;
-            String invokeName = BuildEntityExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
+            bool behaviorName = true;
+            InvokeNameExtractingResult result = null;
+            try {
+                result = extractBehaviorInvokeName(stackTrace);
+            } catch (Exception ignored) {
+                Log("Failed to extract behavior name: msg=" + ignored.Message);
+            }
+            String invokeName = null;
+            if (result != null && result.getSimpleClassName() != null) {
+                invokeName = result.getSimpleClassName() + "." + result.getMethodName();
+            } else {
+                invokeName = BuildSimpleExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
+            }
             int length = invokeName.Length;
             StringBuilder sb = new StringBuilder();
             for (int i=0; i < length; i++) {
@@ -215,7 +228,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             Log("/=====================================================" + sb.ToString() + "==");
             Log("                                                      " + invokeName + "()");
             Log("                                                      " + sb.ToString() + "=/");
-			
+
+            // [Under Review]: Not imelemented yet!
+            // LogPath(invocation, stackTrace, behaviorResult);
+
             // Specified OutsideSql
             if (IsSpecifiedOutsideSql(invocation)) {
                 Object[] args = invocation.Arguments;
@@ -229,23 +245,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        protected String BuildEntityExpressionFromDaoName(String name) {
-		    // Commented out because of still thinking.
-    	    // if (name.EndsWith("Dao")) {
-    		//     name = name.Substring(0, name.Length - "Dao".Length);
-    		// }
-            if (!name.StartsWith("${glProjectPrefix}${glBasePrefix}")) {
-                return name;
-            }
-            int prefixLength = "${glProjectPrefix}${glBasePrefix}".Length;
-			// I want someone to teach me how to do this by CSharp!
-            // if (!Character.isUpperCase(name.substring(prefixLength).charAt(0))) {
-            //     return name;
-            // }
-            if (name.Length <= prefixLength) {
-                return name;
-            }
-            return "${glProjectPrefix}" + name.Substring(prefixLength);
+        protected String BuildSimpleExpressionFromDaoName(String name) {
+    		return InvokeNameStringUtil.removeBasePrefixFromSimpleClassName(name);
         }
 
         protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTrace stackTrace) {
@@ -255,10 +256,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected class BehaviorInvokeNameExtractingCallback : InvokeNameExtractingCallback {
             public bool isTargetElement(String className, String methodName) {
-                if (isClassNameEndsWith(className, suffixList)) {
+                if (isClassNameEndsWith(className)) {
                     return true;
                 }
-                if (isClassNameContains(className, keywordList)) {
+                if (isClassNameContains(className)) {
                     return true;
                 }
                 return false;
@@ -276,33 +277,21 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return 25;
             }
 
-            protected bool isClassNameEndsWith(String className, IList<String> suffixList) {
+            protected bool isClassNameEndsWith(String className) {
                 String[] suffixArray = new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker"};
                 foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
                 return false;
             }
 
-            protected bool isClassNameContains(String className, IList<String> keywordList) {
+            protected bool isClassNameContains(String className) {
                 String[] keywordArray = new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"};
                 foreach (String keyword in keywordArray) { if (className.Contains(keyword)) { return true; } }
                 return false;
             }
 
             protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
-                if (!simpleClassName.StartsWith("${glProjectPrefix}${glBasePrefix}")) {
-                    return simpleClassName;
-                }
-                int prefixLength = "${glProjectPrefix}${glBasePrefix}".length();
-                // [Under Review]: I want someone to teach me how to do this by CSharp!
-                // if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
-                //     return simpleClassName;
-                // }
-                if (simpleClassName.Length <= prefixLength) {
-                    return simpleClassName;
-                }
-                return "${glProjectPrefix}" + simpleClassName.Substring(prefixLength);
+                return InvokeNameStringUtil.removeBasePrefixFromSimpleClassName(simpleClassName);
             }
-
         }
 
         protected InvokeNameExtractingResult extractInvokeName(InvokeNameExtractingCallback callback, StackTrace stackTrace) {
@@ -324,7 +313,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (i > callback.getStartIndex() + callback.getLoopSize()) {
                     break;
                 }
-                if (className.StartsWith("System.")) {
+                if (className.StartsWith("System.")) { // This is system package of CSharp.
                     if (onTarget) {
                         break;
                     }
@@ -420,6 +409,23 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             public void setFoundFirstIndex(int foundFirstIndex) {
                 _foundFirstIndex = foundFirstIndex;
+            }
+        }
+
+        protected static class InvokeNameStringUtil {
+            public static String removeBasePrefixFromSimpleClassName(String simpleClassName) {
+                if (!simpleClassName.StartsWith("${glProjectPrefix}${glBasePrefix}")) {
+                    return simpleClassName;
+                }
+                int prefixLength = "${glProjectPrefix}${glBasePrefix}".Length;
+                // [Under Review]: I want someone to teach me how to do this by CSharp!
+                // if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
+                //     return simpleClassName;
+                // }
+                if (simpleClassName.Length <= prefixLength) {
+                    return simpleClassName;
+                }
+                return "${glProjectPrefix}" + simpleClassName.Substring(prefixLength);
             }
         }
 
