@@ -240,7 +240,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of lessThan.
-     * 
      * @return The value of lessThan. (Nullable)
      */
     public Object getLessThan() {
@@ -249,7 +248,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of lessThan.
-     * 
      * @param value The value of lessThan. (Nullable)
      * @return this. (NotNull)
      */
@@ -260,7 +258,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of lessThan?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasLessThan() {
@@ -269,7 +266,6 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of lessThan?
-     * 
      * @param value The value of lessThan. (Nullable)
      * @return Determination. (NotNull)
      */
@@ -279,7 +275,6 @@ public class ${myClassName} {
 
     /**
      * Override the value of lessThan.
-     * 
      * @param value The value of lessThan. (Nullable)
      * @return this. (NotNull)
      */
@@ -293,7 +288,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of lessThan.
-     * 
      * @return The location of lessThan. (Nullable)
      */
     public String getLessThanLocation() {
@@ -302,7 +296,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of lessThan.
-     * 
      * @param location The location of lessThan. (Nullable)
      * @return this. (NotNull)
      */
@@ -319,7 +312,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of greaterEqual.
-     * 
      * @return The value of greaterEqual. (Nullable)
      */
     public Object getGreaterEqual() {
@@ -328,7 +320,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of greaterEqual.
-     * 
      * @param value The value of greaterEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -339,7 +330,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of greaterEqual?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasGreaterEqual() {
@@ -348,7 +338,6 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of greaterEqual?
-     * 
      * @param value The value of greaterEqual. (Nullable)
      * @return Determination. (NotNull)
      */
@@ -358,7 +347,6 @@ public class ${myClassName} {
 
     /**
      * Override the value of greaterEqual.
-     * 
      * @param value The value of greaterEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -372,7 +360,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of greaterEqual.
-     * 
      * @return The location of greaterEqual. (Nullable)
      */
     public String getGreaterEqualLocation() {
@@ -381,7 +368,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of greaterEqual.
-     * 
      * @param location The location of greaterEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -398,7 +384,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of lessEqual.
-     * 
      * @return The value of lessEqual. (Nullable)
      */
     public Object getLessEqual() {
@@ -407,7 +392,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of lessEqual.
-     * 
      * @param value The value of lessEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -418,7 +402,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of lessEqual?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasLessEqual() {
@@ -427,7 +410,6 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of lessEqual?
-     * 
      * @param value The value of lessEqual. (Nullable)
      * @return Determination. (NotNull)
      */
@@ -437,7 +419,6 @@ public class ${myClassName} {
 
     /**
      * Override the value of lessEqual.
-     * 
      * @param value The value of lessEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -451,7 +432,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of lessEqual.
-     * 
      * @return The location of lessEqual. (Nullable)
      */
     public String getLessEqualLocation() {
@@ -460,7 +440,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of lessEqual.
-     * 
      * @param location The location of lessEqual. (Nullable)
      * @return this. (NotNull)
      */
@@ -477,7 +456,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of prefixSearch.
-     * 
      * @return The value of prefixSearch. (Nullable)
      */
     public Object getPrefixSearch() {
@@ -486,7 +464,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of prefixSearch.
-     * 
      * @param value The value of prefixSearch. (Nullable)
      * @return this. (NotNull)
      */
@@ -497,7 +474,6 @@ public class ${myClassName} {
 
     /**
      * Does it has the value of prefixSearch?
-     * 
      * @return Determination. (NotNull)
      */
     public boolean hasPrefixSearch() {
@@ -506,7 +482,6 @@ public class ${myClassName} {
 
     /**
      * Does the value equal the value of prefixSearch?
-     * 
      * @param value The value of prefixSearch. (Nullable)
      * @return Determination. (NotNull)
      */
@@ -516,7 +491,6 @@ public class ${myClassName} {
 
     /**
      * Override the value of prefixSearch.
-     * 
      * @param value The value of prefixSearch. (Nullable)
      * @return this. (NotNull)
      */
@@ -530,7 +504,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of prefixSearch.
-     * 
      * @return The location of prefixSearch. (Nullable)
      */
     public String getPrefixSearchLocation() {
@@ -539,7 +512,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of prefixSearch.
-     * 
      * @param location The location of prefixSearch. (Nullable)
      * @return this. (NotNull)
      */
@@ -559,7 +531,6 @@ public class ${myClassName} {
 
     /**
      * Get the value of likeSearch.
-     * 
      * @return The value of likeSearch. (Nullable)
      */
     public String getLikeSearch() {
@@ -577,7 +548,6 @@ public class ${myClassName} {
 
     /**
      * Set the value of likeSearch.
-     * 
      * @param value The value of likeSearch. (Nullable)
      * @param option The option of likeSearch. (Nullable)
      * @return this. (NotNull)
@@ -603,7 +573,6 @@ public class ${myClassName} {
 
     /**
      * Get the location of likeSearch.
-     * 
      * @return The location of likeSearch. (Nullable)
      */
     public String getLikeSearchLocation() {
@@ -612,7 +581,6 @@ public class ${myClassName} {
 
     /**
      * Set the location of likeSearch.
-     * 
      * @param location The location of likeSearch. (Nullable)
      * @return this. (NotNull)
      */

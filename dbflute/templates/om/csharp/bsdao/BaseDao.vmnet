@@ -23,6 +23,7 @@ namespace ${myExtendedDaoPackageName} {
     [S2Dao(typeof(${glS2DaoSetting}))]
     [Bean(typeof(${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
+		void InitializeDaoMetaData(String methodName);// Very Internal Method!
 
         [Sql("select count(*) from ${table.Name}")]
         int GetCountAll();

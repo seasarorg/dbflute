@@ -219,6 +219,18 @@ public class ${myClassName} {
         set { _prefixSearch = value; }
     }
 
+    public bool HasPrefixSearch { get {
+        return _prefixSearch != null;
+    }}
+
+    public bool EqualPrefixSearch(Object value) {
+        return HasPrefixSearch ? _prefixSearch.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverridePrefixSearch(Object value) {
+        _prefixSearch = value; return this;
+    }
+
     protected String _prefixSearchLocation;
 
     public String getPrefixSearchLocation() {
@@ -307,6 +319,18 @@ public class ${myClassName} {
         set { _inScope = value; }
     }
 
+    public bool HasInScope { get {
+        return _inScope != null;
+    }}
+
+    public bool EqualInScope(Object value) {
+        return HasInScope ? _inScope.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideInScope(Object value) {
+        _inScope = value; return this;
+    }
+
     protected String _inScopeLocation;
 
     public String getInScopeLocation() {
@@ -318,11 +342,26 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                        Not In Scope
+    //                                                                        ============
     protected System.Collections.IList _notInScope;
 
     public System.Collections.IList NotInScope {
         get { return _notInScope; }
         set { _notInScope = value; }
+    }
+
+    public bool HasNotInScope { get {
+        return _notInScope != null;
+    }}
+
+    public bool EqualNotInScope(Object value) {
+        return HasNotInScope ? _notInScope.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideNotInScope(Object value) {
+        _notInScope = value; return this;
     }
 
     protected String _notInScopeLocation;
@@ -336,12 +375,19 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                             Is Null
+    //                                                                             =======
     protected Object _isNullValue;
 
     public Object IsNull {
         get { return _isNullValue; }
         set { _isNullValue = value; }
     }
+
+    public bool HasIsNull { get {
+        return _isNullValue != null;
+    }}
 
     protected String _isNullLocation;
 
@@ -354,12 +400,19 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                         Is Not Null
+    //                                                                         ===========
     protected Object _isNotNullValue;
 
     public Object IsNotNull {
         get { return _isNotNullValue; }
         set { _isNotNullValue = value; }
     }
+
+    public bool HasIsNotNull { get {
+        return _isNotNullValue != null;
+    }}
 
     protected String _isNotNullLocation;
 

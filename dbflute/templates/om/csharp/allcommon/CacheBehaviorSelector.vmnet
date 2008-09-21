@@ -35,7 +35,11 @@ namespace ${glPackageBaseCommon} {
             }
             foreach (${glDBMetaInterfaceName} dbmeta in dbmetas) {
                 ${glDaoReadableInterfaceName} dao = DaoSelector.ByName(dbmeta.TableDbName);
-                dao.InitializeDaoMetaData("SelectList");
+                MethodInfo method = dao.GetType().GetMethod("InitializeDaoMetaData");
+                if (methodInfo == null) {
+                    continue;
+                }
+                method.Invoke(dao, "SelectList");
             }
             if (_log.IsInfoEnabled) {
                 DateTime after = DateTime.Now;
@@ -83,8 +87,7 @@ namespace ${glPackageBaseCommon} {
                 String msg = "The dbmeta.BehaviorTypeName should not return null: dbmeta=" + dbmeta;
                 throw new SystemException(msg);
             }
-            Seasar.Framework.Xml.S2Section config = Seasar.Framework.Xml.S2SectionHandler.GetS2Section();
-            return ForName(behaviorTypeName, config.Assemblys);
+            return ForName(behaviorTypeName, AppDomain.CurrentDomain.GetAssemblies());
         }
 
         protected static Type ForName(string className, System.Collections.IList assemblys) {

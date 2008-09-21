@@ -40,8 +40,7 @@ namespace ${glPackageBaseCommon} {
                 String msg = "The dbmeta.DaoTypeName should not return null: dbmeta=" + dbmeta;
                 throw new SystemException(msg);
             }
-            Seasar.Framework.Xml.S2Section config = Seasar.Framework.Xml.S2SectionHandler.GetS2Section();
-            return ForName(daoTypeName, config.Assemblys);
+            return ForName(daoTypeName, AppDomain.CurrentDomain.GetAssemblies());
         }
 
         protected static Type ForName(string className, System.Collections.IList assemblys) {
