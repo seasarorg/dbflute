@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,8 +21,6 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
     //                                                                           =========
 	private ResultSetFactory resultSetFactory;
     private ResultSetHandler resultSetHandler;
-    private int fetchSize = 100;
-    private int maxRows = -1;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -70,21 +67,6 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         }
     }
 
-    protected Object[] setup(Connection conn, Object[] args) {
-        return args;
-    }
-
-    protected PreparedStatement prepareStatement(Connection conn) {
-        PreparedStatement ps = super.prepareStatement(conn);
-        if (fetchSize > -1) {
-            setFetchSize(ps, fetchSize);
-        }
-        if (maxRows > -1) {
-            setMaxRows(ps, maxRows);
-        }
-        return ps;
-    }
-
     protected Object execute(PreparedStatement ps) throws SQLException {
         if (resultSetHandler == null) {
             throw new IllegalStateException("The resultSetHandler should not be null!");
@@ -96,9 +78,6 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         } finally {
             close(resultSet);
         }
-    }
-
-    protected void setupDatabaseMetaData(DatabaseMetaData dbMetaData) {
     }
 
     protected ResultSet createResultSet(PreparedStatement ps) {
@@ -122,21 +101,5 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
 
     public void setResultSetHandler(ResultSetHandler resultSetHandler) {
         this.resultSetHandler = resultSetHandler;
-    }
-
-    public int getFetchSize() {
-        return fetchSize;
-    }
-	
-    public void setFetchSize(int fetchSize) {
-        this.fetchSize = fetchSize;
-    }
-
-    public int getMaxRows() {
-        return maxRows;
-    }
-
-    public void setMaxRows(int maxRows) {
-        this.maxRows = maxRows;
     }
 }

@@ -19,6 +19,8 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * SelectDynamicCommand for DBFlute.
@@ -215,7 +217,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
                     continue;
                 }
                 final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
-                filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
+                filteredSql = replaceString(filteredSql, embeddedComment, outsideSqlPiece);
             }
         }
         final ${glSelectDynamicCommand} outsideSqlCommand = createMySelectDynamicCommand();
@@ -339,9 +341,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     }
 
     protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
-        final ${glInternalBasicSelectHandler} selectHandler = newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
-        selectHandler.setFetchSize(-1);
-        return selectHandler;
+        return newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
     }
 
     protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
@@ -407,87 +407,13 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    /**
-     * Get the value of line separator.
-     * 
-     * @return The value of line separator. (NotNull)
-     */
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
-    }
-    
+    //                                                                      General Helper
+    //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
-            return null;
-        StringBuffer buf = new StringBuffer(100);
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else
-            if(pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                return buf.toString();
-            }
-        } while(true);
+        return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
 
-    // -----------------------------------------------------
-    //                                            StringUtil
-    //                                            ----------
-    protected static class InternalStringUtil {
-
-        public static final String[] EMPTY_STRINGS = new String[0];
-        private InternalStringUtil() {
-        }
-
-        public static final boolean isEmpty(String text) {
-            return text == null || text.length() == 0;
-        }
-
-        public static final String replace(String text, String fromText,  String toText) {
-            if (text == null || fromText == null || toText == null) {
-                return null;
-            }
-            StringBuffer buf = new StringBuffer(100);
-            int pos = 0;
-            int pos2 = 0;
-            while (true) {
-                pos = text.indexOf(fromText, pos2);
-                if (pos == 0) {
-                    buf.append(toText);
-                    pos2 = fromText.length();
-                } else if (pos > 0) {
-                    buf.append(text.substring(pos2, pos));
-                    buf.append(toText);
-                    pos2 = pos + fromText.length();
-                } else {
-                    buf.append(text.substring(pos2));
-                    break;
-                }
-            }
-            return buf.toString();
-        }
-
-        public static String[] split(String str, String delim) {
-            if (str == null) {
-                return EMPTY_STRINGS;
-            }
-            java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
-            java.util.StringTokenizer st = new java.util.StringTokenizer(str, delim);
-            while (st.hasMoreElements()) {
-                list.add(st.nextToken());
-            }
-            return (String[]) list.toArray(new String[list.size()]);
-        }
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 }

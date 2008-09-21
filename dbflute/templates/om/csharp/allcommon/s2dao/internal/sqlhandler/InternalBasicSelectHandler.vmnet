@@ -31,23 +31,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             DataReaderHandler = dataReaderHandler;
             DataReaderFactory = dataReaderFactory;
         }
-		
 
-        public IDataReaderFactory DataReaderFactory {
-            get { return _dataReaderFactory; }
-            set { _dataReaderFactory = value; }
-        }
-
-        public IDataReaderHandler DataReaderHandler {
-            get { return _dataReaderHandler; }
-            set { _dataReaderHandler = value; }
-        }
-
-        public virtual object Execute(object[] args) {
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public virtual object Execute(Object[] args) {
             return Execute(args, GetArgTypes(args));
         }
 
-        public virtual Object Execute(object[] args, Type[] argTypes) {
+        public virtual Object Execute(Object[] args, Type[] argTypes) {
             IDbConnection conn = Connection;
             try {
                 return Execute(conn, args, argTypes);
@@ -56,11 +48,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        public virtual Object Execute(object[] args, Type[] argTypes, string[] argNames) {
+        public virtual Object Execute(Object[] args, Type[] argTypes, String[] argNames) {
             return Execute(args, argTypes);
         }
 
         protected virtual Object Execute(IDbConnection conn, object[] args, Type[] argTypes) {
+            LogSql(args, argTypes);
             IDbCommand cmd = null;
             try {
                 cmd = Command(conn);
@@ -90,6 +83,19 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         protected virtual IDataReader CreateDataReader(IDbCommand cmd) {
             return _dataReaderFactory.CreateDataReader(DataSource, cmd);
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDataReaderFactory DataReaderFactory {
+            get { return _dataReaderFactory; }
+            set { _dataReaderFactory = value; }
+        }
+
+        public IDataReaderHandler DataReaderHandler {
+            get { return _dataReaderHandler; }
+            set { _dataReaderHandler = value; }
         }
     }
 }

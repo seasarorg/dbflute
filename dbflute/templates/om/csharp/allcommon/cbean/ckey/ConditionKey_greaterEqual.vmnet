@@ -21,10 +21,14 @@ public class ${myClassName} : ${glConditionKeyName} {
         if (value == null) {
             return false;
         }
-        Object valueObject = conditionValue.GreaterEqual;
-        if (valueObject != null && valueObject.Equals(value)) {
-            _log.Debug("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
-            return false;
+        if (conditionValue.HasGreaterEqual) {
+            if (conditionValue.EqualGreaterEqual(value)) {
+                _log.Debug("The value has already registered at " + callerName + ": value=" + value);
+                return false;
+            } else {
+                conditionValue.OverrideGreaterEqual(value);
+                return false;
+            }
         }
         return true;
     }
