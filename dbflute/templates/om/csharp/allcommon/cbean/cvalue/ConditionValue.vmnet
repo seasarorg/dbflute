@@ -11,9 +11,9 @@ namespace ${glPackageBaseCommonCValue} {
 [System.Serializable]
 public class ${myClassName} {
 
-    // ===============================================================================
-    //                                                                           Equal
-    //                                                                           =====
+    // ==================================================================================
+    //                                                                              Equal
+    //                                                                              =====
     protected Object _equalValue;
 
     public Object Equal {
@@ -32,6 +32,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                           NotEqual
+    //                                                                           ========
     protected Object _notEqualValue;
 
     public Object NotEqual {
@@ -50,6 +53,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                        GreaterThan
+    //                                                                        ===========
     protected Object _greaterThanValue;
 
     public Object GreaterThan {
@@ -68,6 +74,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                           LessThan
+    //                                                                           ========
     protected Object _lessThanValue;
 
     public Object LessThan {
@@ -86,6 +95,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                       GreaterEqual
+    //                                                                       ============
     protected Object _greaterEqualValue;
 
     public Object GreaterEqual {
@@ -104,6 +116,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                          LessEqual
+    //                                                                          =========
     protected Object _lessEqualValue;
 
     public Object LessEqual {
@@ -122,6 +137,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ==================================================================================
+    //                                                                      Prefix Search
+    //                                                                      =============
     protected Object _prefixSearch;
 
     public Object PrefixSearch {

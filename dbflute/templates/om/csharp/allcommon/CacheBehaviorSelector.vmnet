@@ -12,26 +12,35 @@ namespace ${glPackageBaseCommon} {
 
     public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
 
-        // ===================================================================================
-        //                                                                          Initialize
-        //                                                                          ==========
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glDaoSelectorInterfaceName} _daoSelector;
+
+        // ===============================================================================
+        //                                                                      Initialize
+        //                                                                      ==========
         public void InitializeConditionBeanMetaData() {
-            Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
+            Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.GetDBMetaMap();
             Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
-            DateTime before = 0;
+            DateTime? before = null;
             if (_log.IsInfoEnabled) {
                 before = DateTime.Now;
                 _log.Info("/= = = = = = = = = = = = = = = = = InitializeConditionBeanMetaData()");
             }
             foreach (${glDBMetaInterfaceName} dbmeta in dbmetas) {
-                ${glBehaviorReadableInterfaceName} bhv = ByName(dbmeta.TableDbName);
-                ${glDaoReadableInterfaceName} dao = bhv.DaoReadable;
+                ${glDaoReadableInterfaceName} dao = DaoSelector.ByName(dbmeta.TableDbName);
                 dao.InitializeDaoMetaData("SelectList");
             }
             if (_log.IsInfoEnabled) {
                 DateTime after = DateTime.Now;
                 _log.Info("Initialized Count: " + dbmetas.size());
-                _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(after - before) + "]");
+                _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + "]");
             }
         }
     
@@ -132,6 +141,14 @@ namespace ${glPackageBaseCommon} {
                 String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
                 throw new SystemException(msg);
             }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public ${glDaoSelectorInterfaceName} DaoSelector {
+            get { return _daoSelector; }
+            set { _daoSelector = value; }
         }
     }
 }
