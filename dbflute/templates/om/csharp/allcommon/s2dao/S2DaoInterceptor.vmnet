@@ -216,7 +216,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             String invokeName = null;
             if (behaviorResult != null && behaviorResult.getSimpleClassName() != null) {
                 String invokeClassName = behaviorResult.getSimpleClassName();
-                String invokeMethodName = behaviorResult.getMethodName());
+                String invokeMethodName = behaviorResult.getMethodName();
                 invokeName = buildInvocationExpressionWithoutKakko(invocation, invokeClassName, invokeMethodName);
             } else {
                 invokeName = BuildSimpleExpressionFromDaoName(method.DeclaringType.Name) + "." + method.Name;
@@ -286,7 +286,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected class ClientInvokeNameExtractingCallback : InvokeNameExtractingCallback {
             protected int _startIndex;
-            public ByPassInvokeNameExtractingCallback(int startIndex) {
+            public ClientInvokeNameExtractingCallback(int startIndex) {
                 _startIndex = startIndex;
             }
             public bool isTargetElement(String className, String methodName) {
@@ -400,19 +400,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             int foundFirstIndex = -1;// The minus one means 'Not Found'.
             bool onTarget = false;
             for (int i = 0; i < stackTrace.FrameCount; i++) {
-                StackFrame stackFrame = stackTrace.GetFrame(i);
+                StackFrame stackFrame = stackTrace.GetFrame(i); // The inner class is not appeared.
                 MethodBase method = stackFrame.GetMethod();
                 if (method == null) {
                     break; // End
                 }
-                String className = method.DeclaringType.Name;
+                String className = method.DeclaringType.Name; // This is simple class name at CSharp.
                 String methodName = method.Name;
 
                 if (i > callback.getStartIndex() + callback.getLoopSize()) {
                     break;
                 }
                 if (className.StartsWith("System.")) { // This is system package of CSharp.
-                    if (onTarget) {
+                    if (onTarget) { // But the class name is simple so this 'if' statement is waste... 
                         break;
                     }
                     continue;
