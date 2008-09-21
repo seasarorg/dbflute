@@ -126,7 +126,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Delete
         //                                            ------
-        protected <ENTITY_TYPE> void HelpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
             AssertEntityNotNull(entity);
             AssertEntityHasVersionNoValue(entity);
             AssertEntityHasUpdateDateValue(entity);
@@ -138,7 +138,7 @@ namespace ${glPackageBaseCommonBhv} {
             int CallbackDelegateDelete(ENTITY_TYPE entity);
         }
 
-        protected <ENTITY_TYPE> void HelpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteNonstrictInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
             AssertEntityNotNull(entity);
             int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
             if (deletedCount == 0) {
@@ -155,7 +155,7 @@ namespace ${glPackageBaseCommonBhv} {
             public int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
         }
 
-        protected <ENTITY_TYPE> void HelpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteNonstrictIgnoreDeletedInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
             AssertEntityNotNull(entity);
             int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
             if (deletedCount == 0) {
