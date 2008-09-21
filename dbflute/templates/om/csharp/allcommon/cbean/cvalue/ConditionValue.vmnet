@@ -21,6 +21,18 @@ public class ${myClassName} {
         set { _equalValue = value; }
     }
 
+    public bool HasEqual { get {
+        return _equalValue != null;
+    }}
+
+    public bool EqualEqual(Object value) {
+        return HasEqual ? _equalValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideEqual(Object value) {
+        _equalValue = value; return this;
+    }
+
     protected String _equalLocation;
 
     public String getEqualLocation() {
@@ -33,13 +45,25 @@ public class ${myClassName} {
     }
 
     // ==================================================================================
-    //                                                                           NotEqual
-    //                                                                           ========
+    //                                                                          Not Equal
+    //                                                                          =========
     protected Object _notEqualValue;
 
     public Object NotEqual {
         get { return _notEqualValue; }
         set { _notEqualValue = value; }
+    }
+
+    public bool HasNotEqual { get {
+        return _notEqualValue != null;
+    }}
+
+    public bool EqualNotEqual(Object value) {
+        return HasNotEqual ? _notEqualValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideNotEqual(Object value) {
+        _notEqualValue = value; return this;
     }
 
     protected String _notEqualLocation;
@@ -63,6 +87,18 @@ public class ${myClassName} {
         set { _greaterThanValue = value; }
     }
 
+    public bool HasGreaterThan { get {
+        return _greaterThanValue != null;
+    }}
+
+    public bool EqualGreaterThan(Object value) {
+        return HasGreaterThan ? _greaterThanValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideGreaterThan(Object value) {
+        _greaterThanValue = value; return this;
+    }
+
     protected String _greaterThanLocation;
 
     public String getGreaterThanLocation() {
@@ -82,6 +118,18 @@ public class ${myClassName} {
     public Object LessThan {
         get { return _lessThanValue; }
         set { _lessThanValue = value; }
+    }
+
+    public bool HasGreaterThan { get {
+        return _greaterThanValue != null;
+    }}
+
+    public bool EqualGreaterThan(Object value) {
+        return HasGreaterThan ? _greaterThanValue.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideGreaterThan(Object value) {
+        _greaterThanValue = value; return this;
     }
 
     protected String _lessThanLocation;

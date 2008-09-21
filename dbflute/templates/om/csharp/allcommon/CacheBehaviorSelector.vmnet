@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommon} {
             if (_log.IsInfoEnabled) {
                 DateTime after = DateTime.Now;
                 _log.Info("Initialized Count: " + dbmetas.size());
-                _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + "]");
+                _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before.Value, after) + "]");
             }
         }
     
