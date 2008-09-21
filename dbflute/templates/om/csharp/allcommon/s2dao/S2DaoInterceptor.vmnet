@@ -1,7 +1,8 @@
 
 using System;
-using System.Reflection;
 using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 using Seasar.Framework.Aop;
@@ -246,7 +247,125 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             return "${glProjectPrefix}" + name.Substring(prefixLength);
         }
-	
+
+        protected InvokeNameExtractingResult extractInvokeName(InvokeNameExtractingCallback callback, StackTrace stackTrace) {
+            StackTrace stackTrace = new StackTrace();
+            String targetSimpleClassName = null;
+            String targetMethodName = null;
+            int lineNumber = 0;
+            int foundIndex = -1;// The minus one means 'Not Found'.
+            int foundFirstIndex = -1;// The minus one means 'Not Found'.
+            bool onTarget = false;
+            for (int i = 0; i < stackTrace.FrameCount; i++) {
+                StackFrame stackFrame = trace.GetFrame(i);
+                MethodBase method = stackFrame.GetMethod();
+                if (method == null) {
+                    break; // End
+                }
+                String className = method.DeclaringType.Name;
+                String methodName = method.Name;
+
+                if (i > callback.getStartIndex() + callback.getLoopSize()) {
+                    break;
+                }
+                if (className.StartsWith("System.")) {
+                    if (onTarget) {
+                        break;
+                    }
+                    continue;
+                }
+                if (callback.isTargetElement(className, methodName)) {
+                    if (methodName.Equals("Invoke")) {
+                        continue;
+                    }
+                    targetSimpleClassName = className.Substring(className.LastIndexOf(".") + 1);
+                    targetMethodName = methodName;
+                    if (callback.isUseAdditionalInfo()) {
+                        try {
+                            lineNumber = stackFrame.GetFileLineNumber();
+                        } catch (Exception) {
+                            // Ignored
+                        }
+                    }
+                    foundIndex = i;
+                    if (foundFirstIndex == -1) {
+                        foundFirstIndex = i;
+                    }
+                    onTarget = true;
+                    continue;
+                }
+                if (onTarget) {
+                    break;
+                }
+            }
+            InvokeNameExtractingResult result = new InvokeNameExtractingResult();
+            if (targetSimpleClassName == null) {
+                result.setInvokeName("");// Not Found! It sets empty string as default.
+                return result;
+            }
+            String filteredClassName = callback.filterSimpleClassName(targetSimpleClassName);
+            result.setSimpleClassName(callback.filterSimpleClassName(targetSimpleClassName));
+            result.setMethodName(targetMethodName);
+            if (lineNumber > 0) {
+                result.setInvokeName(filteredClassName + "." + targetMethodName + "():" + lineNumber + " --> ");
+            } else {
+                result.setInvokeName(filteredClassName + "." + targetMethodName + "() --> ");
+            }
+            result.setFoundIndex(foundIndex);
+            result.setFoundFirstIndex(foundFirstIndex);
+        }
+
+        protected interface InvokeNameExtractingCallback {
+            bool isTargetElement(String className, String methodName);
+            String filterSimpleClassName(String simpleClassName);
+            bool isUseAdditionalInfo();
+            int getStartIndex();
+            int getLoopSize();
+        }
+
+        protected class InvokeNameExtractingResult {
+            protected String _simpleClassName;
+            protected String _methodName;
+            protected String _invokeName;
+            protected int _foundIndex;
+            protected int _foundFirstIndex;
+
+            public int getNextStartIndex() {
+                return _foundIndex + 1;
+            }
+
+            public String getSimpleClassName() {
+                return _simpleClassName;
+            }
+            public void setSimpleClassName(String simpleClassName) {
+                _simpleClassName = simpleClassName;
+            }
+            public String getMethodName() {
+                return _methodName;
+            }
+            public void setMethodName(String methodName) {
+                _methodName = methodName;
+            }
+            public String getInvokeName() {
+                return _invokeName;
+            }
+            public void setInvokeName(String invokeName) {
+                _invokeName = invokeName;
+            }
+            public int getFoundIndex() {
+                return _foundIndex;
+            }
+            public void setFoundIndex(int foundIndex) {
+                _foundIndex = foundIndex;
+            }
+            public int getFoundFirstIndex() {
+                return _foundFirstIndex;
+            }
+            public void setFoundFirstIndex(int foundFirstIndex) {
+                _foundFirstIndex = foundFirstIndex;
+            }
+        }
+
         // ===============================================================================
         //                                                                  Log SqlCommand
         //                                                                  ==============
