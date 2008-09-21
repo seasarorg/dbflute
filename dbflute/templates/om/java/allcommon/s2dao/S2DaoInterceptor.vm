@@ -897,6 +897,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                      ==============
     /**
      * Is the method abstract?
+     * @param method Method. (NotNull)
      * @return Determination. (NotNull)
      */
     public boolean isAbstract(Method method) {

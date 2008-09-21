@@ -248,8 +248,64 @@ namespace ${glPackageBaseCommonS2Dao} {
             return "${glProjectPrefix}" + name.Substring(prefixLength);
         }
 
+        protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTrace stackTrace) {
+            InvokeNameExtractingCallback callback = new BehaviorInvokeNameExtractingCallback();
+            return extractInvokeName(callback, stackTrace);
+        }
+
+        protected class BehaviorInvokeNameExtractingCallback : InvokeNameExtractingCallback {
+            public bool isTargetElement(String className, String methodName) {
+                if (isClassNameEndsWith(className, suffixList)) {
+                    return true;
+                }
+                if (isClassNameContains(className, keywordList)) {
+                    return true;
+                }
+                return false;
+            }
+            public String filterSimpleClassName(String simpleClassName) {
+                return removeBasePrefixFromSimpleClassName(simpleClassName);
+            }
+            public bool isUseAdditionalInfo() {
+                return false;
+            }
+            public int getStartIndex() {
+                return 0;
+            }
+            public int getLoopSize() {
+                return 25;
+            }
+
+            protected bool isClassNameEndsWith(String className, IList<String> suffixList) {
+                String[] suffixArray = new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker"};
+                foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
+                return false;
+            }
+
+            protected bool isClassNameContains(String className, IList<String> keywordList) {
+                String[] keywordArray = new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"};
+                foreach (String keyword in keywordArray) { if (className.Contains(keyword)) { return true; } }
+                return false;
+            }
+
+            protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
+                if (!simpleClassName.StartsWith("${glProjectPrefix}${glBasePrefix}")) {
+                    return simpleClassName;
+                }
+                int prefixLength = "${glProjectPrefix}${glBasePrefix}".length();
+                // [Under Review]: I want someone to teach me how to do this by CSharp!
+                // if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
+                //     return simpleClassName;
+                // }
+                if (simpleClassName.Length <= prefixLength) {
+                    return simpleClassName;
+                }
+                return "${glProjectPrefix}" + simpleClassName.Substring(prefixLength);
+            }
+
+        }
+
         protected InvokeNameExtractingResult extractInvokeName(InvokeNameExtractingCallback callback, StackTrace stackTrace) {
-            StackTrace stackTrace = new StackTrace();
             String targetSimpleClassName = null;
             String targetMethodName = null;
             int lineNumber = 0;
@@ -257,7 +313,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             int foundFirstIndex = -1;// The minus one means 'Not Found'.
             bool onTarget = false;
             for (int i = 0; i < stackTrace.FrameCount; i++) {
-                StackFrame stackFrame = trace.GetFrame(i);
+                StackFrame stackFrame = stackTrace.GetFrame(i);
                 MethodBase method = stackFrame.GetMethod();
                 if (method == null) {
                     break; // End
@@ -313,6 +369,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             result.setFoundIndex(foundIndex);
             result.setFoundFirstIndex(foundFirstIndex);
+            return result;
         }
 
         protected interface InvokeNameExtractingCallback {
