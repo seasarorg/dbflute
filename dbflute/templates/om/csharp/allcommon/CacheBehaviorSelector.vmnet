@@ -1,5 +1,7 @@
 
 using System;
+using System.Reflection;
+
 using Seasar.Quill;
 
 using ${glPackageBaseCommon};
@@ -36,10 +38,10 @@ namespace ${glPackageBaseCommon} {
             foreach (${glDBMetaInterfaceName} dbmeta in dbmetas) {
                 ${glDaoReadableInterfaceName} dao = DaoSelector.ByName(dbmeta.TableDbName);
                 MethodInfo method = dao.GetType().GetMethod("InitializeDaoMetaData");
-                if (methodInfo == null) {
+                if (method == null) {
                     continue;
                 }
-                method.Invoke(dao, "SelectList");
+                method.Invoke(dao, new Object[] {"SelectList"});
             }
             if (_log.IsInfoEnabled) {
                 DateTime after = DateTime.Now;

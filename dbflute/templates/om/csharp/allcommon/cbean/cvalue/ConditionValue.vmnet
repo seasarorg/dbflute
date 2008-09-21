@@ -323,11 +323,11 @@ public class ${myClassName} {
         return _inScope != null;
     }}
 
-    public bool EqualInScope(Object value) {
+    public bool EqualInScope(System.Collections.IList value) {
         return HasInScope ? _inScope.Equals(value) : value == null;
     }
 
-    public ${myClassName} OverrideInScope(Object value) {
+    public ${myClassName} OverrideInScope(System.Collections.IList value) {
         _inScope = value; return this;
     }
 
@@ -356,11 +356,11 @@ public class ${myClassName} {
         return _notInScope != null;
     }}
 
-    public bool EqualNotInScope(Object value) {
+    public bool EqualNotInScope(System.Collections.IList value) {
         return HasNotInScope ? _notInScope.Equals(value) : value == null;
     }
 
-    public ${myClassName} OverrideNotInScope(Object value) {
+    public ${myClassName} OverrideNotInScope(System.Collections.IList value) {
         _notInScope = value; return this;
     }
 
