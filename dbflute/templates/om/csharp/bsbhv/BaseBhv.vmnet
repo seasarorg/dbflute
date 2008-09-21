@@ -295,18 +295,31 @@ namespace ${glPackageExtendedBhv} {
 #end
 
         public virtual void Delete(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNull(entity);
-            AssertEntityHasVersionNoValue(entity);
-            AssertEntityHasUpdateDateValue(entity);
-            int deletedCount = this.DelegateDelete(entity);
-            AssertUpdatedEntity(entity, deletedCount);
+            HelpDeleteInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteCallback(this));
+        }
+        protected class MyInternalDeleteCallback : InternalDeleteCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackDelegateDelete(${myExtendedObjectClassName} entity) { _bhv.DelegateDelete(entity); }
+        }
+#if ($table.hasOptimisticLock())
+
+        public virtual void DeleteNonstrict(${myExtendedObjectClassName} entity) {
+            HelpDeleteNonstrictInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteNonstrictCallback(this));
+        }
+        protected class MyInternalDeleteNonstrictCallback : InternalDeleteNonstrictCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { _bhv.DelegateDeleteNonstrict(entity); }
         }
 
-#if ($table.hasOptimisticLock())
-        public virtual void DeleteNonstrict(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNull(entity);
-            int deletedCount = this.DelegateDeleteNonstrict(entity);
-            AssertUpdatedEntity(entity, deletedCount);
+        public virtual void DeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} entity) {
+            HelpDeleteNonstrictIgnoreDeletedInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteNonstrictIgnoreDeletedCallback(this));
+        }
+        protected class MyInternalDeleteNonstrictIgnoreDeletedCallback : InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { _bhv.DelegateDeleteNonstrict(entity); }
         }
 #end
         #endregion

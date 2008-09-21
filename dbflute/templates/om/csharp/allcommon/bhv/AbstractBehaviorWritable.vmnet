@@ -123,6 +123,54 @@ namespace ${glPackageBaseCommonBhv} {
             void CallbackUpdateNonstrict(ENTITY_TYPE entity);
         }
 
+        // -------------------------------------------------
+        //                                            Delete
+        //                                            ------
+        protected <ENTITY_TYPE> void HelpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+            AssertEntityNotNull(entity);
+            AssertEntityHasVersionNoValue(entity);
+            AssertEntityHasUpdateDateValue(entity);
+            int deletedCount = callback.CallbackDelegateDelete(entity);
+            AssertUpdatedEntity(entity, deletedCount);
+        }
+
+        protected interface InternalDeleteCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+            int CallbackDelegateDelete(ENTITY_TYPE entity);
+        }
+
+        protected <ENTITY_TYPE> void HelpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+            AssertEntityNotNull(entity);
+            int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
+            if (deletedCount == 0) {
+                String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            } else if (deletedCount > 1) {
+                String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
+        }
+
+        protected interface InternalDeleteNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+            public int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+        }
+
+        protected <ENTITY_TYPE> void HelpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+            AssertEntityNotNull(entity);
+            int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
+            if (deletedCount == 0) {
+                return;
+            } else if (deletedCount > 1) {
+                String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
+       }
+
+        protected interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+            int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+        }
+
         // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
