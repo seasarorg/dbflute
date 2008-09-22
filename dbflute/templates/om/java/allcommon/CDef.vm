@@ -28,9 +28,7 @@ public class ${myClassName} {
         ,
 #end
 #if ($classificationMap.containsKey('comment'))
-        /**
-         * ${classificationMap.get('comment')}
-         */
+        /** ${classificationMap.get('comment')} */
 #end
 #if ($classificationMap.containsKey('alias'))
         ${classificationMap.get('name')}("${classificationMap.get('code')}", "${classificationMap.get('alias')}")
@@ -40,13 +38,14 @@ public class ${myClassName} {
 #set ($count = $count + 1)
 #end
         ;
-        private String _code;
-        private String _alias;
-        private ${classificationName}(String code, String alias) {
-            _code = code; _alias = alias;
+        private String _code; private String _alias;
+        private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
+        public String code() { return _code; } public String alias() { return _alias; }
+        public static ${classificationName} codeOf(String code) {
+            if (code == null) { return null; }
+            for (${classificationName} value : values()) { if (code.equals(value.code())) { return value; } }
+            return null;
         }
-        public String code() { return _code; }
-        public String alias() { return _alias; }
     }
 
 #end

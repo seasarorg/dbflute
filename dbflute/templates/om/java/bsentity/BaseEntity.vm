@@ -154,8 +154,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void classify${col.JavaName}${classificationMap.get('name')}() {
-        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')};
-        set${col.JavaName}(new ${col.JavaNative}(code));
+        String cd = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')};
+        set${col.JavaName}(new ${col.JavaNative}(cd));
     }
     #end
   #end
@@ -178,16 +178,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        return helpEqualingIgnoreCaseClassification(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+        return helpEqCls(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
     #end
   #end
 #end
 
 #if (${table.hasClassification()})
-    private boolean helpEqualingIgnoreCaseClassification(Object value, String code) {
+    private boolean helpEqCls(Object value, String code) {
         if (value == null) { return false; }
-        return code.equalsIgnoreCase(value.toString());
+        return code.equals(value.toString());
     }
 #end
 
@@ -205,7 +205,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.uncapitalisedJavaName}' as classification-name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName});
+        return helpClsMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName});
     }
     #end
     #if (${col.hasClassificationAlias()})
@@ -216,14 +216,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.UncapitalisedJavaName}' as classification-alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName});
+        return helpClsMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName});
     }
     #end
   #end
 #end
 
 #if (${isUseHelpGettingFromClassificationMap})
-    private String helpGettingFromClassificationMap(Object key, java.util.Map<String, String> map) {
+    private String helpClsMap(Object key, java.util.Map<String, String> map) {
         if (key == null) { return null; }
         return map.get(key.toString()); 
     }

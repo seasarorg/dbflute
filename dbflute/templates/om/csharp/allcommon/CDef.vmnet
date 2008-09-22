@@ -25,9 +25,7 @@ namespace ${glPackageBaseCommon} {
             ,
 #end
 #if ($classificationMap.containsKey('comment'))
-            /**
-             * ${classificationMap.get('comment')}
-             */
+            /** ${classificationMap.get('comment')} */
 #end
 #if ($classificationMap.containsKey('alias'))
             ${classificationMap.get('name')}
