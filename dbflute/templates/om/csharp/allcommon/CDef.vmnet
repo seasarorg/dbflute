@@ -1,0 +1,44 @@
+#set ($myClassName = "${glCDef}")
+
+namespace ${glPackageBaseCommon} {
+
+    public class ${myClassName} {
+
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+  #set ($existTop = true)
+#else
+  #set ($existTop = false)
+#end
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+        /**
+         * $classificationTopMap.get('topComment')
+         */
+#end
+        public enum ${classificationName} {
+#set ($count = 0)
+#foreach ($classificationMap in $classificationMapList)
+#if ($count != 0)
+            ,
+#end
+#if ($classificationMap.containsKey('comment'))
+            /**
+             * ${classificationMap.get('comment')}
+             */
+#end
+#if ($classificationMap.containsKey('alias'))
+            ${classificationMap.get('name')}
+#else
+            ${classificationMap.get('name')}
+#end
+#set ($count = $count + 1)
+#end
+        }
+
+#end
+    }
+
+}

@@ -99,6 +99,7 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Base-ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+    #set ($glCDef = "${glProjectPrefix}CDef")
 
     ## [Allcommon-Base-Log]
     #set ($glQLog = "${glProjectPrefix}QLog")
@@ -1450,9 +1451,15 @@ targetdatabase = $targetDatabase
 
     #if ($database.hasClassificationDefinitionMap())
       $database.info("parseAllcommonClassification() {")
+
       $database.info("    parse('ClassificationDefinition');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.info("    parse('CDef');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
+
       $database.info("}")
     #end
 

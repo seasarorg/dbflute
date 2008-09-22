@@ -1,0 +1,53 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($myClassName = "${glCDef}")
+
+/**
+ * The definition class that has classification.
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+  #set ($existTop = true)
+#else
+  #set ($existTop = false)
+#end
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+    /**
+     * $classificationTopMap.get('topComment')
+     */
+#end
+    public enum ${classificationName} {
+#set ($count = 0)
+#foreach ($classificationMap in $classificationMapList)
+#if ($count != 0)
+        ,
+#end
+#if ($classificationMap.containsKey('comment'))
+        /**
+         * ${classificationMap.get('comment')}
+         */
+#end
+#if ($classificationMap.containsKey('alias'))
+        ${classificationMap.get('name')}("${classificationMap.get('code')}", "${classificationMap.get('alias')}")
+#else
+        ${classificationMap.get('name')}("${classificationMap.get('code')}", null)
+#end
+#set ($count = $count + 1)
+#end
+        ;
+        private String _code;
+        private String _alias;
+        private ${classificationName}(String code, String alias) {
+            _code = code; _alias = alias;
+        }
+        public String code() { return _code; }
+        public String alias() { return _alias; }
+    }
+
+#end
+}
