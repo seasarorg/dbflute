@@ -18,6 +18,7 @@ package org.seasar.dbflute.helper.jdbc.metadata;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,13 +105,28 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             throws SQLException {
         while (columnRs.next()) {
             final String columnName = columnRs.getString("COLUMN_NAME");
-            final Integer procedureColumnType = new Integer(columnRs.getString("COLUMN_TYPE"));
-            final Integer jdbcType = new Integer(columnRs.getString("DATA_TYPE"));
+            final Integer procedureColumnType;
+            {
+                final String columnType = columnRs.getString("COLUMN_TYPE");
+                final int unknowType = DatabaseMetaData.procedureColumnUnknown;
+                procedureColumnType = columnType != null ? new Integer(columnType) : unknowType;
+            }
+            final Integer jdbcType;
+            {
+                final String dataType = columnRs.getString("DATA_TYPE");
+                jdbcType = dataType != null ? new Integer(dataType) : Types.OTHER;
+            }
             final String dbTypeName = columnRs.getString("TYPE_NAME");
-            final String length = columnRs.getString("LENGTH");
-            final Integer columnSize = length != null ? new Integer(length) : null;
-            final String precision = columnRs.getString("PRECISION");
-            final Integer decimalDigits = precision != null ? new Integer(precision) : null;
+            final Integer columnSize;
+            {
+                final String length = columnRs.getString("LENGTH");
+                columnSize = length != null ? new Integer(length) : null;
+            }
+            final Integer decimalDigits;
+            {
+                final String precision = columnRs.getString("PRECISION");
+                decimalDigits = precision != null ? new Integer(precision) : null;
+            }
             final String columnComment = columnRs.getString("REMARKS");
 
             final DfProcedureColumnMetaInfo procedureColumnMetaInfo = new DfProcedureColumnMetaInfo();
