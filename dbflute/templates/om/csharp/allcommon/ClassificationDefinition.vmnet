@@ -17,15 +17,14 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationName in $database.ClassificationNameList)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 #foreach ($classificationMap in $classificationMapList)
-
         /// <summary>
         /// The classification code of ${classificationMap.get('name')}.
         /// ${classificationMap.get('comment')}
         /// </summary>
         public const String CODE_${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
-#end
-#end
 
+#end
+#end
         // ===============================================================================
         //                                           Classification CodeNameMap Definition
         //                                           =====================================
@@ -34,14 +33,15 @@ namespace ${glPackageBaseCommon} {
         /** The classification code-name map of ${classificationName}. */
         public static readonly IDictionary<String, String> CODE_NAME_MAP_${classificationName};
         public static String Find${classificationName}Name(String code) { return FindByCode(code, CODE_NAME_MAP_${classificationName}); }
+
 #end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
         /** The classification code-alias map of ${classificationName}. */
         public static readonly IDictionary<String, String> CODE_ALIAS_MAP_${classificationName};
         public static String Find${classificationName}Alias(String code) { return FindByCode(code, CODE_ALIAS_MAP_${classificationName}); }
-#end
 
+#end
         // ===============================================================================
         //                                                              Static Initializer
         //                                                              ==================

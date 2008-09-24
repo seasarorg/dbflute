@@ -62,7 +62,6 @@ public class ${myClassName} {
     //                                                          ==========================
 #foreach ($classificationName in $database.ClassificationNameListValidNameOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
-
     /** The classification code-name map of ${classificationName}. */
     public static final Map<String, String> CODE_NAME_MAP_${classificationName};
     static {
@@ -73,11 +72,10 @@ public class ${myClassName} {
         CODE_NAME_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
     public static String find${classificationName}Name(String code) { return findByCode(code, CODE_NAME_MAP_${classificationName}); }
-#end
 
+#end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
-
     /** The classification code-alias map of ${classificationName}. */
     public static final Map<String, String> CODE_ALIAS_MAP_${classificationName};
     static {
@@ -88,8 +86,8 @@ public class ${myClassName} {
         CODE_ALIAS_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
     public static String find${classificationName}Alias(String code) { return findByCode(code, CODE_ALIAS_MAP_${classificationName}); }
-#end
 
+#end
     protected static String findByCode(String code, Map<String, String> map) {
         for (String key : map.keySet()) {
             if (code.equalsIgnoreCase(key)) {
