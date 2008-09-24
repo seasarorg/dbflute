@@ -69,7 +69,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         } finally {
             close(ps);
         }
-        postUpdateBean(bean);
+        postUpdateBean(bean, ret);
         return ret;
     }
 

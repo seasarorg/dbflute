@@ -10,9 +10,7 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
-import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 
-import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
 
 /**

@@ -48,7 +48,7 @@ public class ${glInternalInsertAutoHandler} extends ${glInternalAbstractAutoHand
     }
 	
 	@Override
-    protected void postUpdateBean(Object bean) {
+    protected void postUpdateBean(Object bean, int ret) {
         BeanMetaData bmd = getBeanMetaData();
 #if ($database.isVersionAfter1047())
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {

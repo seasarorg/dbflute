@@ -38,7 +38,7 @@ public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHand
 	@Override
     protected void postUpdateBean(Object bean, int ret) {
         if (isCheckSingleRowUpdate() && ret < 1) {
-            throw createOptimisticLockException(bean, ret);
+            throw createEntityAlreadyUpdatedException(bean, ret);
         }
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
