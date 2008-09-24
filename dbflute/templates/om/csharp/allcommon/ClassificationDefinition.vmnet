@@ -68,7 +68,7 @@ namespace ${glPackageBaseCommon} {
 #end
         }
 
-        protected static String FindByCode(String code, IDictionary<String, String> map) {
+        private static String FindByCode(String code, IDictionary<String, String> map) {
             foreach (String key in map.Keys) {
                 if (code.ToLower().Equals(key.ToLower())) {
                     return map[key];
