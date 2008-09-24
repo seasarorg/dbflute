@@ -156,8 +156,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Runtime Exception]" + getLineSeparator();
-        msg = msg + "Exception Class   = " + e.getClass() + getLineSeparator();
-        msg = msg + "Exception Message = " + e.getMessage() + getLineSeparator();
+        msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
+        msg = msg + "exception message = " + e.getMessage() + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
