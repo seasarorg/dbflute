@@ -16,6 +16,12 @@ public class ${myClassName} {
 #else
   #set ($existTop = false)
 #end
+#if ($database.isInitNumber($classificationName))
+    // The classification name that its initial character is number is unsupported!
+    // public enum ${classificationName} {
+    // }
+
+#else
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
     /**
      * $classificationTopMap.get('topComment')
@@ -43,10 +49,11 @@ public class ${myClassName} {
         public String code() { return _code; } public String alias() { return _alias; }
         public static ${classificationName} codeOf(String code) {
             if (code == null) { return null; }
-            for (${classificationName} value : values()) { if (code.equals(value.code())) { return value; } }
+            for (${classificationName} value : values()) { if (code.equalsIgnoreCase(value.code())) { return value; } }
             return null;
         }
     }
 
+#end
 #end
 }

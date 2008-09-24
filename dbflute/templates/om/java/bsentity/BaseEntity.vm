@@ -146,9 +146,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                          Classification Classifying
     //                                                          ==========================
 #foreach ($col in $table.columns)
-  #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.classificationMapList)
-
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
      * ${database.getMapValue($classificationMap, 'comment')}
@@ -157,17 +156,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         String cd = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')};
         set${col.JavaName}(new ${col.JavaNative}(cd));
     }
-    #end
-  #end
-#end
 
+#end
+#end
+#end
     // ===================================================================================
     //                                                        Classification Determination
     //                                                        ============================
 #foreach ($col in $table.columns)
-  #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.classificationMapList)
-
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
     /**
      * Is the value of the column '${col.UncapitalisedJavaName}' '${classificationMap.get('name')}'? <br />
      * ${database.getMapValue($classificationMap, 'comment')}
@@ -180,55 +178,45 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
         return helpEqCls(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
-    #end
-  #end
+
+#end
+#end
 #end
 
 #if (${table.hasClassification()})
     private boolean helpEqCls(Object value, String code) {
         if (value == null) { return false; }
-        return code.equals(value.toString());
+        return code.equalsIgnoreCase(value.toString());
     }
 #end
-
     // ===================================================================================
     //                                                           Classification Name/Alias
     //                                                           =========================
 #set ($isUseHelpGettingFromClassificationMap = false)
 #foreach ($col in $table.Columns)
-  #if (${col.hasClassification()})
-    #if (${col.hasClassificationName()})
-      #set ($isUseHelpGettingFromClassificationMap = true)
-
+#if (${col.hasClassification()})
+#if (${col.hasClassificationName()})
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification-name.
      * @return The value of the column '${col.uncapitalisedJavaName}' as classification-name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        return helpClsMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName});
+        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Name(_${col.UncapitalisedJavaName});
     }
-    #end
-    #if (${col.hasClassificationAlias()})
-      #set ($isUseHelpGettingFromClassificationMap = true)
 
+#end
+#if (${col.hasClassificationAlias()})
     /**
      * Get the value of the column '${col.UncapitalisedJavaName}' as classification-alias.
      * @return The value of the column '${col.UncapitalisedJavaName}' as classification-alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        return helpClsMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName});
+        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Alias(_${col.UncapitalisedJavaName});
     }
-    #end
-  #end
-#end
 
-#if (${isUseHelpGettingFromClassificationMap})
-    private String helpClsMap(Object key, java.util.Map<String, String> map) {
-        if (key == null) { return null; }
-        return map.get(key.toString()); 
-    }
 #end
-
+#end
+#end
     // ===================================================================================
     //                                                                    Foreign Property
     //                                                                    ================

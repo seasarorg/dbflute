@@ -13,6 +13,12 @@ namespace ${glPackageBaseCommon} {
 #else
   #set ($existTop = false)
 #end
+#if ($database.isInitNumber($classificationName))
+        // The classification name that its initial character is number is unsupported!
+        // public enum ${classificationName} {
+        // }
+
+#else
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
         /**
          * $classificationTopMap.get('topComment')
@@ -36,6 +42,7 @@ namespace ${glPackageBaseCommon} {
 #end
         }
 
+#end
 #end
     }
 

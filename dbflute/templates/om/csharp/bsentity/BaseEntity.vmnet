@@ -102,9 +102,8 @@ namespace ${myExtendedEntityPackageName} {
         //                                                      ==========================
         #region Classify Method
 #foreach ($col in $table.Columns)
-  #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.ClassificationMapList)
-
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
         /// Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}.
         /// <![CDATA[
@@ -120,8 +119,9 @@ namespace ${myExtendedEntityPackageName} {
             ${col.javaName} = ${col.javaNativeRemovedCSharpNullable}.Parse(code);
         }
 #end
-    #end
-  #end
+
+#end
+#end
 #end
 
         #endregion
@@ -131,9 +131,8 @@ namespace ${myExtendedEntityPackageName} {
         //                                                    ============================
         #region Classification Determination
 #foreach ($col in $table.columns)
-  #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.ClassificationMapList)
-
+#if (${col.hasClassification()})
+ #foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
         /// Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// <![CDATA[
@@ -149,8 +148,9 @@ namespace ${myExtendedEntityPackageName} {
                 return code.ToLower().Equals(_${col.uncapitalisedJavaName}.ToString().ToLower());
             }
         }
-    #end
-  #end
+
+#end
+#end
 #end
 
         #endregion
@@ -160,30 +160,24 @@ namespace ${myExtendedEntityPackageName} {
         //                                                       =========================
         #region Classification Name/Alias
 #foreach ($col in $table.Columns)
-  #if (${col.hasClassification()})
-    #if (${col.hasClassificationName()})
-
+#if (${col.hasClassification()})
+#if (${col.hasClassificationName()})
         public String ${col.javaName}Name {
             get {
-                if (_${col.uncapitalisedJavaName} == null) { return null; }
-                IDictionary<String, String> map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
-                return map[_${col.uncapitalisedJavaName}.ToString()];
+                return ${glPackageBaseCommon}.${glClassificationDefinition}.Find${col.classificationName}Name(_${col.UncapitalisedJavaName});
             }
         }
-    #end
-    #if (${col.hasClassificationAlias()})
-
+#end
+#if (${col.hasClassificationAlias()})
         public String ${col.javaName}Alias {
             get {
-                if (_${col.uncapitalisedJavaName} == null) { return null; }
-                IDictionary<String, String> map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
-                return map[_${col.uncapitalisedJavaName}.ToString()];
+                return ${glPackageBaseCommon}.${glClassificationDefinition}.Find${col.classificationName}Alias(_${col.UncapitalisedJavaName});
             }
         }
-    #end
-  #end
-#end
 
+#end
+#end
+#end
         #endregion
 
         // ===============================================================================

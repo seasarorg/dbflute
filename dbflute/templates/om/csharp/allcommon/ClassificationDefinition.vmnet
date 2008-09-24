@@ -33,11 +33,13 @@ namespace ${glPackageBaseCommon} {
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
         /** The classification code-name map of ${classificationName}. */
         public static readonly IDictionary<String, String> CODE_NAME_MAP_${classificationName};
+        public static String Find${classificationName}Name(String code) { return FindByCode(code, CODE_NAME_MAP_${classificationName}); }
 #end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
         /** The classification code-alias map of ${classificationName}. */
         public static readonly IDictionary<String, String> CODE_ALIAS_MAP_${classificationName};
+        public static String Find${classificationName}Alias(String code) { return FindByCode(code, CODE_ALIAS_MAP_${classificationName}); }
 #end
 
         // ===============================================================================
@@ -51,7 +53,7 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationMap in $classificationMapList)
                 map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
 #end
-                CODE_NAME_MAP_${classificationName} = map;//java.util.Collections.unmodifiableMap(map);
+                CODE_NAME_MAP_${classificationName} = map; //java.util.Collections.unmodifiableMap(map);
             }
 #end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
@@ -61,9 +63,18 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationMap in $classificationMapList)
                 map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
 #end
-                CODE_ALIAS_MAP_${classificationName} = map;//java.util.Collections.unmodifiableMap(map);
+                CODE_ALIAS_MAP_${classificationName} = map; //java.util.Collections.unmodifiableMap(map);
             }
 #end
+        }
+
+        protected static String FindByCode(String code, IDictionary<String, String> map) {
+            foreach (String key in map.Keys) {
+                if (code.ToLower().Equals(key.ToLower())) {
+                    return map[key];
+                }
+            }
+            return null;
         }
     }
 }

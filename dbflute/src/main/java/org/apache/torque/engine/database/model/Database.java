@@ -350,7 +350,7 @@ public class Database {
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameTypeMap();
     }
-    
+
     public Map<String, String> getPmbMetaDataPropertyNameColumnNameMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
@@ -386,7 +386,7 @@ public class Database {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
     }
-    
+
     public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
@@ -1344,35 +1344,35 @@ public class Database {
     public boolean isOutsideSqlPackageValid() {
         return getProperties().getOutsideSqlProperties().isSqlPackageValid();
     }
-    
+
     public String getOutsideSqlPackage() {
         return getProperties().getOutsideSqlProperties().getSqlPackage();
     }
-    
+
     public boolean isDefaultPackageValid() {
         return getProperties().getOutsideSqlProperties().isDefaultPackageValid();
     }
-    
+
     public String getDefaultPackage() {
         return getProperties().getOutsideSqlProperties().getDefaultPackage();
     }
-    
+
     public boolean isOmitResourcePathPackageValid() {
         return getProperties().getOutsideSqlProperties().isOmitResourcePathPackageValid();
     }
-    
+
     public String getOmitResourcePathPackage() {
         return getProperties().getOutsideSqlProperties().getOmitResourcePathPackage();
     }
-    
+
     public boolean isOmitDirectoryPackageValid() {
         return getProperties().getLittleAdjustmentProperties().isOmitDirectoryPackageValid();
     }
-    
+
     public String getOmitDirectoryPackage() {
         return getProperties().getLittleAdjustmentProperties().getOmitDirectoryPackage();
     }
-    
+
     public boolean isSql2EntityPlainEntity() {
         return false;
     }
@@ -1705,6 +1705,22 @@ public class Database {
         char chars[] = javaName.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
+    }
+
+    public boolean isInitNumber(String str) {
+        if (str == null) {
+            String msg = "Argument[str] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (str.length() == 0) {
+            return false;
+        }
+        try {
+            Integer.valueOf(str.substring(0, 1));
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     // -----------------------------------------------------
