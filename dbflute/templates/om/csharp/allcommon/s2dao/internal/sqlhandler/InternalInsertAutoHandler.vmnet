@@ -22,18 +22,18 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                        Override
         //                                                                        ========
-        protected override void SetupBindVariables(object bean) {
+        protected override void SetupBindVariables(Object bean) {
             SetupInsertBindVariables(bean);
         }
 
-        protected override void PreUpdateBean(object bean) {
+        protected override void PreUpdateBean(Object bean) {
             IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
             if (generator.IsSelfGenerate) {
                 generator.SetIdentifier(bean, DataSource);
             }
         }
 
-        protected override void PostUpdateBean(object bean) {
+        protected override void PostUpdateBean(Object bean, int ret) {
             IIdentifierGenerator generator = BeanMetaData.IdentifierGenerator;
             if (!generator.IsSelfGenerate) {
                 generator.SetIdentifier(bean, DataSource);
