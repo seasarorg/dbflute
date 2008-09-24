@@ -640,11 +640,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         public void setPropertyNameOptionMap(Map<String, String> propertyNameOptionMap) {
             this.propertyNameOptionMap = propertyNameOptionMap;
         }
-        
+
         public Map<String, String> getPropertyNameColumnNameMap() {
             return propertyNameColumnNameMap;
         }
-        
+
         public void setPropertyNameColumnNameMap(Map<String, String> propertyNameColumnNameMap) {
             this.propertyNameColumnNameMap = propertyNameColumnNameMap;
         }
@@ -680,58 +680,55 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
         final List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
         _log.info(" ");
-        _log.info("...Analyzing procedures");
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureName = metaInfo.getProcedureName();
             _procedureMap.put(procedureName, metaInfo);
 
-            if (generateProcedureParameterBean) {
-                final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
-                final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
-                final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-                final Map<String, String> propertyNameColumnNameMap = new LinkedHashMap<String, String>();
-                final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
-                        .getProcedureColumnMetaInfoList();
-                int index = 0;
-                final String pmbName = convertProcedureNameToPmbName(procedureName);
-                _log.info("[" + pmbName + "]: " + metaInfo.getProcedureType());
-                if (procedureColumnMetaInfoList.isEmpty()) {
-                    _log.info("    *No Parameter");
-                }
-                if (_pmbMetaDataMap.containsKey(pmbName)) {
-                    _log.info("    *It was found the same name of parameter bean, so skip and continue!");
-                    continue;
-                }
-                for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
-                    String columnName = columnMetaInfo.getColumnName();
-                    if (columnName == null || columnName.trim().length() == 0) {
-                        columnName = "arg" + (index + 1);
-                    }
-                    final String propertyName;
-                    {
-                        propertyName = convertColumnNameToPropertyName(columnName);
-                    }
-                    final String propertyType = getProcedureColumnPropertyType(columnMetaInfo);
-                    propertyNameTypeMap.put(propertyName, propertyType);
-
-                    DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
-                    propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
-
-                    propertyNameColumnNameMap.put(propertyName, columnName);
-                    
-                    String msg = "    " + propertyType + " " + propertyName + ";";
-                    msg = msg + " // " + columnMetaInfo.getProcedureColumnType();
-                    msg = msg + "(" + columnMetaInfo.getJdbcType() + ", " + columnMetaInfo.getDbTypeName() + ")";
-                    _log.info(msg);
-                    ++index;
-                }
-                parameterBeanMetaData.setClassName(pmbName);
-                parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
-                parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
-                parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
-                parameterBeanMetaData.setProcedureName(procedureName);
-                _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
+            final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
+            final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+            final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
+            final Map<String, String> propertyNameColumnNameMap = new LinkedHashMap<String, String>();
+            final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
+                    .getProcedureColumnMetaInfoList();
+            int index = 0;
+            final String pmbName = convertProcedureNameToPmbName(procedureName);
+            _log.info("[" + pmbName + "]: " + metaInfo.getProcedureType());
+            if (procedureColumnMetaInfoList.isEmpty()) {
+                _log.info("    *No Parameter");
             }
+            if (_pmbMetaDataMap.containsKey(pmbName)) {
+                _log.info("    *It was found the same name of parameter bean, so skip and continue!");
+                continue;
+            }
+            for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
+                String columnName = columnMetaInfo.getColumnName();
+                if (columnName == null || columnName.trim().length() == 0) {
+                    columnName = "arg" + (index + 1);
+                }
+                final String propertyName;
+                {
+                    propertyName = convertColumnNameToPropertyName(columnName);
+                }
+                final String propertyType = getProcedureColumnPropertyType(columnMetaInfo);
+                propertyNameTypeMap.put(propertyName, propertyType);
+
+                DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
+                propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
+
+                propertyNameColumnNameMap.put(propertyName, columnName);
+
+                String msg = "    " + propertyType + " " + propertyName + ";";
+                msg = msg + " // " + columnMetaInfo.getProcedureColumnType();
+                msg = msg + "(" + columnMetaInfo.getJdbcType() + ", " + columnMetaInfo.getDbTypeName() + ")";
+                _log.info(msg);
+                ++index;
+            }
+            parameterBeanMetaData.setClassName(pmbName);
+            parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
+            parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
+            parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
+            parameterBeanMetaData.setProcedureName(procedureName);
+            _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
         }
         _log.info(" ");
     }
