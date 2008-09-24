@@ -201,7 +201,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.uncapitalisedJavaName}' as classification-name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Name(_${col.UncapitalisedJavaName});
+        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Name(_${col.UncapitalisedJavaName} + "");
     }
 
 #end
@@ -211,7 +211,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.UncapitalisedJavaName}' as classification-alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Alias(_${col.UncapitalisedJavaName});
+        return ${glPackageBaseCommon}.${glClassificationDefinition}.find${col.ClassificationName}Alias(_${col.UncapitalisedJavaName} + "");
     }
 
 #end
