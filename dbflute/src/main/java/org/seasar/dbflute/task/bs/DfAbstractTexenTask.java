@@ -113,7 +113,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 closingDataSource();
             }
         } catch (RuntimeException e) {
-            _log.error("execute() threw the exception!", e);
+            try {
+                logRuntimeException(e);
+            } catch (RuntimeException ignored) {
+                _log.warn("Ignored exception occured!", ignored);
+                _log.error("Failed to execute DBFlute Task!", e);
+            }
             throw e;
         } finally {
             long after = System.currentTimeMillis();
@@ -135,6 +140,26 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.info("_/_/_/_/_/_/_/_/_/_/");
             _log.info("");
         }
+    }
+
+    protected void logRuntimeException(RuntimeException e) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Failed to execute DBFlute Task!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Basic Properties]" + getLineSeparator();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Database Properties]" + getLineSeparator();
+        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Runtime Exception]" + getLineSeparator();
+        msg = msg + "Exception Class   = " + e.getClass() + getLineSeparator();
+        msg = msg + "Exception Message = " + e.getMessage() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        _log.error(msg, e);
     }
 
     protected void initializeDatabaseInfo() {
