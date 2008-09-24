@@ -47,9 +47,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             ${glInternalAbstractAutoHandler} handler = CreateInternalAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
             handler.Sql = CreateUpdateSql(bmd, propertyTypes, bean);
             int i = handler.Execute(args);
-            if (IsCheckSingleRowUpdate && i < 1) {
-                throw new NotSingleRowUpdatedRuntimeException(args[0], i);
-            }
+
+            // [Comment Out]: This statement moved to the handler at DBFlute-0.8.0.
+            // if (IsCheckSingleRowUpdate && i < 1) {
+            //     throw new NotSingleRowUpdatedRuntimeException(args[0], i);
+            // }
+
             return i;
         }
 		
@@ -72,6 +75,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
             handler.VersionNoAutoIncrementOnMemory = _versionNoAutoIncrementOnMemory;
+            handler.IsCheckSingleRowUpdate = IsCheckSingleRowUpdate; // [DBFlute-0.8.0]
             return handler;
         }
 

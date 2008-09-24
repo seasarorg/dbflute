@@ -6,10 +6,17 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
+
 /**
  * @author ${database.ClassAuthor}
  */
 public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHandler} {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    private boolean checkSingleRowUpdate = true;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -29,8 +36,26 @@ public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHand
     }
 
 	@Override
-    protected void postUpdateBean(Object bean) {
+    protected void postUpdateBean(Object bean, int ret) {
+        if (isCheckSingleRowUpdate() && ret < 1) {
+            throw createOptimisticLockException(bean, ret);
+        }
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
+    }
+
+    protected ${glEntityAlreadyUpdatedException} createEntityAlreadyUpdatedException(Object bean, int rows) {
+        return new ${glEntityAlreadyUpdatedException}(bean, rows);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isCheckSingleRowUpdate() {
+        return checkSingleRowUpdate;
+    }
+
+    public void setCheckSingleRowUpdate(boolean resultCheck) {
+        this.checkSingleRowUpdate = resultCheck;
     }
 }

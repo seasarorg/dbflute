@@ -73,17 +73,17 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             } finally {
                 Close(cmd);
             }
-            PostUpdateBean(bean);
+            PostUpdateBean(bean, ret);
             return ret;
         }
 
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-        protected virtual void PreUpdateBean(object bean) {
+        protected virtual void PreUpdateBean(Object bean) {
         }
 
-        protected virtual void PostUpdateBean(object bean) {
+        protected virtual void PostUpdateBean(Object bean, int ret) {
         }
 
         protected abstract void SetupBindVariables(object bean);

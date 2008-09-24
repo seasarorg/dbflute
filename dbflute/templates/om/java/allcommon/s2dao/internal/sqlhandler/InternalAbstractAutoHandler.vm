@@ -90,7 +90,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     protected void preUpdateBean(Object bean) {
     }
 
-    protected void postUpdateBean(Object bean) {
+    protected void postUpdateBean(Object bean, int ret) {
     }
 
     protected abstract void setupBindVariables(Object bean);

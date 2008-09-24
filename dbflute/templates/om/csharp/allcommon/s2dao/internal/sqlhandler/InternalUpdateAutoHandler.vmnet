@@ -8,9 +8,16 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
 using Seasar.Dao;
 
+using ${glPackageBaseCommonException};
+
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
     public class ${glInternalUpdateAutoHandler} : ${glInternalAbstractAutoHandler} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected bool checkSingleRowUpdate = true;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -22,12 +29,28 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                        Override
         //                                                                        ========
-        protected override void SetupBindVariables(object bean) {
+        protected override void SetupBindVariables(Object bean) {
             SetupUpdateBindVariables(bean);
         }
-        protected override void PostUpdateBean(object bean) {
+
+        protected override void PostUpdateBean(Object bean, int ret) {
+            if (IsCheckSingleRowUpdate && ret < 1) {
+                throw CreateEntityAlreadyUpdatedException(bean, ret);
+            }
             UpdateVersionNoIfNeed(bean);
             UpdateTimestampIfNeed(bean);
+        }
+
+        protected virtual ${glEntityAlreadyUpdatedException} CreateEntityAlreadyUpdatedException(Object bean, int rows) {
+            return new ${glEntityAlreadyUpdatedException}(bean, rows);
+        }
+        
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public bool IsCheckSingleRowUpdate {
+            get { return checkSingleRowUpdate; }
+            set { checkSingleRowUpdate = value; }
         }
     }
 }

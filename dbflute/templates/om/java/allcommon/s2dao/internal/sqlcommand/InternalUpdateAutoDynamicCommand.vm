@@ -59,20 +59,20 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
         ${glInternalUpdateAutoHandler} handler = createInternalUpdateAutoHandler(bmd, propertyTypes);
         handler.setSql(createUpdateSql(bmd, propertyTypes, bean));
         int i = handler.execute(args);
-        if (isCheckSingleRowUpdate() && i < 1) {
-            throw createNotSingleRowUpdatedRuntimeException(args[0], i);
-        }
+
+        // [Comment Out]: This statement moved to the handler at [DBFlute-0.8.0].
+        // if (isCheckSingleRowUpdate() && i < 1) {
+        //     throw createNotSingleRowUpdatedRuntimeException(args[0], i);
+        // }
+
         return new Integer(i);
     }
 
     protected ${glInternalUpdateAutoHandler} createInternalUpdateAutoHandler(BeanMetaData bmd, PropertyType[] propertyTypes) {
         ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+        handler.setCheckSingleRowUpdate(isCheckSingleRowUpdate()); // [DBFlute-0.8.0]
         return handler;
-    }
-
-    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
-        return new ${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected PropertyType[] createUpdatePropertyTypes(BeanMetaData bmd, Object bean, String[] propertyNames) {
