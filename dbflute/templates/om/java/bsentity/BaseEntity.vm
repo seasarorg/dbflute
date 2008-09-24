@@ -182,12 +182,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 #end
 #end
-
 #if (${table.hasClassification()})
     private boolean helpEqCls(Object value, String code) {
         if (value == null) { return false; }
         return code.equalsIgnoreCase(value.toString());
     }
+
 #end
     // ===================================================================================
     //                                                           Classification Name/Alias
