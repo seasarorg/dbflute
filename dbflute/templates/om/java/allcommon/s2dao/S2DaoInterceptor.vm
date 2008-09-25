@@ -286,6 +286,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected String buildInvocationExpressionWithoutKakko(MethodInvocation invocation, String invokeClassName, String invokeMethodName) {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
             try {
+                final String originalName = invokeClassName;
                 if (isSpecifiedOutsideSql()) {
                     final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                     final String tableDbName = outsideSqlContext.getTableDbName();
@@ -293,6 +294,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     final String behaviorTypeName = dbmeta.getBehaviorTypeName();
                     final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
                     invokeClassName = behaviorClassName + ".outsideSql()";
+                    if (originalName.endsWith("OutsideSqlEntityExecutor")) {
+                        invokeClassName = invokeClassName + ".entityHandling()";
+                    } else if (originalName.endsWith("OutsideSqlPagingExecutor")) {
+                        if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+                            invokeClassName = invokeClassName + ".autoPaging()";
+                        } else {
+                            invokeClassName = invokeClassName + ".manualPaging()";
+                        }
+                    } else if (originalName.endsWith("OutsideSqlCursorExecutor")) {
+                        invokeClassName = invokeClassName + ".cursorHandling()";
+                    }
                 } else {
                     invokeClassName = "OutsideSql";
                 }
