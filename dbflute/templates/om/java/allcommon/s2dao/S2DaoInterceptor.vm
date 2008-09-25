@@ -22,6 +22,8 @@ import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
@@ -282,9 +284,36 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected String buildInvocationExpressionWithoutKakko(MethodInvocation invocation, String invokeClassName, String invokeMethodName) {
+        if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
+            try {
+                if (isSpecifiedOutsideSql()) {
+                    final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+                    final String tableDbName = outsideSqlContext.getTableDbName();
+                    final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
+                    final String behaviorTypeName = dbmeta.getBehaviorTypeName();
+                    final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
+                    invokeClassName = behaviorClassName + ".outsideSql()";
+                } else {
+                    invokeClassName = "OutsideSql";
+                }
+            } catch (RuntimeException ignored) {
+                log("Ignored exception occurred: msg=" + ignored.getMessage());
+            }
+        }
         String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
-            if ("selectCount".equals(invocation.getMethod().getName())) {
+            boolean resultTypeInteger = false;
+            if (isSpecifiedOutsideSql()) {
+                final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+                final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
+                if (resultTypeSpecification != null && resultTypeSpecification instanceof Class<?>) {
+                    final Class<?> resultType = (Class<?>)resultTypeSpecification;
+                    if (Integer.class.isAssignableFrom(resultType)) {
+                        resultTypeInteger = true;
+                    }
+                }
+            }
+            if (resultTypeInteger || "selectCount".equals(invocation.getMethod().getName())) {
                 invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():count";
             } else {
                 invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():paging";
@@ -369,14 +398,21 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker"});
+        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable" , "PagingInvoker"});
         final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
+        final List<String> ousideSql1List = Arrays.asList(new String[]{"OutsideSql"});
+        final List<String> ousideSql2List = Arrays.asList(new String[]{"Executor"});
+        final List<String> ousideSql3List = Arrays.asList(new String[]{"Executor$"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
                 if (isClassNameEndsWith(className, suffixList)) {
                     return true;
                 }
                 if (isClassNameContains(className, keywordList)) {
+                    return true;
+                }
+                if (isClassNameContains(className, ousideSql1List)
+                        && (isClassNameEndsWith(className, ousideSql2List) || isClassNameContains(className, ousideSql3List))) {
                     return true;
                 }
                 return false;

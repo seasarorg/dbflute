@@ -117,7 +117,6 @@ public class ${glOutsideSqlPagingExecutorName} {
             }
             public java.util.List<ENTITY> paging() {
                 pmb.xsetPaging(true);
-				setupScrollableCursorIfNeeds();
                 return selectList(path, pmb, entityType);
             }
         };

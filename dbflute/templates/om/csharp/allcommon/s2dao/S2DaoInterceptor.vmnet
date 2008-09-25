@@ -246,9 +246,36 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected String buildInvocationExpressionWithoutKakko(IMethodInvocation invocation, String invokeClassName, String invokeMethodName) {
+            if (invokeClassName.Contains("OutsideSql") && invokeClassName.EndsWith("Executor")) { // OutsideSql Executor Handling
+                try {
+                    if (isSpecifiedOutsideSql()) {
+                        ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                        String tableDbName = outsideSqlContext.TableDbName;
+                        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableDbName);
+                        String behaviorTypeName = dbmeta.BehaviorTypeName;
+                        String behaviorClassName = behaviorTypeName.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length);
+                        invokeClassName = behaviorClassName + ".OutsideSql()";
+                    } else {
+                        invokeClassName = "OutsideSql";
+                    }
+                } catch (Exception ignored) {
+                    Log("Ignored exception occurred: msg=" + ignored.Message);
+                }
+            }
             String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
             if ("SelectPage".Equals(invokeMethodName)) { // Special Handling!
-                if ("SelectCount".Equals(invocation.Method.Name)) {
+                bool resultTypeInteger = false;
+                if (IsSpecifiedOutsideSql()) {
+                    ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                    Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
+                    if (resultTypeSpecification != null && resultTypeSpecification is Type) {
+                        Type resultType = (Type)resultTypeSpecification;
+                        if (typeof(int).IsAssignableFrom(resultType)) {
+                            resultTypeInteger = true;
+                        }
+                    }
+                }
+                if (resultTypeInteger || "SelectCount".Equals(invocation.Method.Name)) {
                     invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():count";
                 } else {
                     invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():paging";
@@ -360,6 +387,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (isClassNameContains(className)) {
                     return true;
                 }
+                if (isClassNameOutsideSqlExecutor(className)) {
+                    return true;
+                }
                 return false;
             }
             public String filterSimpleClassName(String simpleClassName) {
@@ -382,9 +412,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             protected bool isClassNameContains(String className) {
-                String[] keywordArray = new String[]{"PagingInvoker", "InternalSelectPagingHandler"};
+                String[] keywordArray = new String[]{"PagingInvoker"};
                 foreach (String keyword in keywordArray) { if (className.Contains(keyword)) { return true; } }
                 return false;
+            }
+
+            protected bool isClassNameOutsideSqlExecutor(String className) {
+                String[] keywordArray1 = new String[]{"OutsideSql"};
+                String[] keywordArray2 = new String[]{"Executor"};
+                bool containsOutsideSql = false;
+                bool endsWithExecutor = false;
+                foreach (String keyword in keywordArray1) { if (className.Contains(keyword)) { containsOutsideSql = true; break; } }
+                foreach (String keyword in keywordArray2) { if (className.EndsWith(keyword)) { endsWithExecutor = true; break; } }
+                return containsOutsideSql && endsWithExecutor;
             }
 
             protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
