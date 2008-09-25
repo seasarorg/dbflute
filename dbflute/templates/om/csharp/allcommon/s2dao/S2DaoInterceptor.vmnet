@@ -247,7 +247,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected String buildInvocationExpressionWithoutKakko(IMethodInvocation invocation, String invokeClassName, String invokeMethodName) {
-            if (invokeClassName.Contains("OutsideSql") && invokeClassName.EndsWith("Executor")) { // OutsideSql Executor Handling
+            if (invokeClassName.Contains("OutsideSql") && invokeClassName.Contains("Executor")) { // OutsideSql Executor Handling
                 try {
                     String originalName = invokeClassName;
                     if (IsSpecifiedOutsideSql()) {
@@ -434,10 +434,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String[] keywordArray1 = new String[]{"OutsideSql"};
                 String[] keywordArray2 = new String[]{"Executor"};
                 bool containsOutsideSql = false;
-                bool endsWithExecutor = false;
+                bool containsExecutor = false;
                 foreach (String keyword in keywordArray1) { if (className.Contains(keyword)) { containsOutsideSql = true; break; } }
-                foreach (String keyword in keywordArray2) { if (className.EndsWith(keyword)) { endsWithExecutor = true; break; } }
-                return containsOutsideSql && endsWithExecutor;
+                foreach (String keyword in keywordArray2) { if (className.Contains(keyword)) { containsExecutor = true; break; } } // CSharp Only Contains
+                return containsOutsideSql && containsExecutor;
             }
 
             protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
