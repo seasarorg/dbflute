@@ -13,6 +13,7 @@ using Seasar.Dao;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonUtil};
 
@@ -248,7 +249,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String buildInvocationExpressionWithoutKakko(IMethodInvocation invocation, String invokeClassName, String invokeMethodName) {
             if (invokeClassName.Contains("OutsideSql") && invokeClassName.EndsWith("Executor")) { // OutsideSql Executor Handling
                 try {
-                    if (isSpecifiedOutsideSql()) {
+                    if (IsSpecifiedOutsideSql()) {
                         ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
                         String tableDbName = outsideSqlContext.TableDbName;
                         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableDbName);
