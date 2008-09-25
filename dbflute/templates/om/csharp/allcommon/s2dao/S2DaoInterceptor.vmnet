@@ -434,9 +434,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String[] keywordArray1 = new String[]{"OutsideSql"};
                 String[] keywordArray2 = new String[]{"Executor"};
                 bool containsOutsideSql = false;
-                bool containsExecutor = false;
+                bool containsExecutor = false; // CSharp Only Contains because of unknown suffix found
                 foreach (String keyword in keywordArray1) { if (className.Contains(keyword)) { containsOutsideSql = true; break; } }
-                foreach (String keyword in keywordArray2) { if (className.Contains(keyword)) { containsExecutor = true; break; } } // CSharp Only Contains
+                foreach (String keyword in keywordArray2) { if (className.Contains(keyword)) { containsExecutor = true; break; } }
                 return containsOutsideSql && containsExecutor;
             }
 
