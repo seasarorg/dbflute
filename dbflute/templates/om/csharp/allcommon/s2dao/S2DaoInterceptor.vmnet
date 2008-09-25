@@ -247,7 +247,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected String buildInvocationExpressionWithoutKakko(IMethodInvocation invocation, String invokeClassName, String invokeMethodName) {
-            if (invokeClassName.Contains("OutsideSql") && invokeClassName.Contains("Executor")) { // OutsideSql Executor Handling
+            if (invokeClassName.Contains("OutsideSql") && invokeClassName.Contains("Executor")) { // OutsideSql Executor Handling and CSharp Only Contains
                 try {
                     String originalName = invokeClassName;
                     if (IsSpecifiedOutsideSql()) {
@@ -257,15 +257,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                         String behaviorTypeName = dbmeta.BehaviorTypeName;
                         String behaviorClassName = behaviorTypeName.Substring(behaviorTypeName.LastIndexOf(".") + ".".Length);
                         invokeClassName = behaviorClassName + ".OutsideSql()";
-                        if (originalName.EndsWith("OutsideSqlEntityExecutor")) {
+                        if (originalName.Contains("OutsideSqlEntityExecutor")) { // CSharp Only Contains
                             invokeClassName = invokeClassName + ".EntityHandling()";
-                        } else if (originalName.EndsWith("OutsideSqlPagingExecutor")) {
+                        } else if (originalName.Contains("OutsideSqlPagingExecutor")) { // CSharp Only Contains
                             if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
                                 invokeClassName = invokeClassName + ".AutoPaging()";
                             } else {
                                 invokeClassName = invokeClassName + ".ManualPaging()";
                             }
-                        } else if (originalName.EndsWith("OutsideSqlCursorExecutor")) {
+                        } else if (originalName.Contains("OutsideSqlCursorExecutor")) { // CSharp Only Contains
                             invokeClassName = invokeClassName + ".CursorHandling()";
                         }
                     } else {
