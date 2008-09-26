@@ -69,12 +69,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
-            if (QLog.IsLogEnabled()) {
+            if (${glQLog}.IsLogEnabled()) {
                 String completeSql = GetCompleteSql(args);
                 if (IsContainsLineSeparatorInSql()) {
-                    QLog.Log(GetLineSeparator() + completeSql);
+                    ${glQLog}.Log(GetLineSeparator() + completeSql);
                 } else {
-                    QLog.Log(completeSql);
+                    ${glQLog}.Log(completeSql);
                 }
             }
         }
@@ -126,7 +126,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                  General Helper
         //                                                                  ==============
         protected String GetLineSeparator() {
-            return SimpleSystemUtil.GetLineSeparator();
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
 
         // ===============================================================================

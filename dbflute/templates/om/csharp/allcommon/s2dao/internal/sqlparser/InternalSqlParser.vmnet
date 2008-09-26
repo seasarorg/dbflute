@@ -670,7 +670,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + GetLineSeparator();
             msg = msg + "[Target ParameterBean]" + GetLineSeparator() + resourceBean + GetLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new RequiredOptionNotFoundException(msg);
+            throw new ${glRequiredOptionNotFoundException}(msg);
         }
 
         // for OutsideSql
