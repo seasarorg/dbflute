@@ -674,7 +674,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected void ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(LikeSearchOption option, Object resourceBean, String currentName) {
+        protected void ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(${glConditionOptionLikeSearchName} option, Object resourceBean, String currentName) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
             msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + GetLineSeparator();
