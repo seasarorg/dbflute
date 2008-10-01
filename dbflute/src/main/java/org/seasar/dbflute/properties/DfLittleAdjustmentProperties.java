@@ -64,6 +64,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                              Flat Directory Package
     //                                                              ======================
+    public boolean isFlatDirectoryPackageValid() {
+        final String str = getFlatDirectoryPackage();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+    
     /**
      * Get the package for flat directory. Normally, this property is only for C#.
      * @return The package for flat directory. (Nullable)

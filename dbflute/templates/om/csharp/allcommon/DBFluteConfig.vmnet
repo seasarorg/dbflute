@@ -42,6 +42,11 @@ public class ${myClassName} {
 #else
     protected String _omitResourcePathPackage;
 #end
+#if ($database.isFlatDirectoryPackageValid())
+    protected String _flatDirectoryPackage = "${database.flatDirectoryPackage}";
+#else
+    protected String _flatDirectoryPackage;
+#end
 	protected bool _internalDebug;
 	protected bool _locked = true;
 
@@ -187,6 +192,22 @@ public class ${myClassName} {
 		        _log.Info("...Setting omitResourcePathPackage: " + value);
 		    }
 	        _omitResourcePathPackage = value;
+		}
+	}
+
+    // ===================================================================================
+    //                                                              Flat Directory Package
+    //                                                              ======================
+	public String FlatDirectoryPackage { // CSharp only
+	    get {
+	        return _flatDirectoryPackage;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting flatDirectoryPackage: " + value);
+		    }
+	        _flatDirectoryPackage = value;
 		}
 	}
 	

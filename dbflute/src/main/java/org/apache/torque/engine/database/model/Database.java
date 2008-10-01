@@ -1372,6 +1372,14 @@ public class Database {
     public String getOmitDirectoryPackage() {
         return getProperties().getLittleAdjustmentProperties().getOmitDirectoryPackage();
     }
+    
+    public boolean isFlatDirectoryPackageValid() {
+        return getProperties().getLittleAdjustmentProperties().isFlatDirectoryPackageValid();
+    }
+    
+    public String getFlatDirectoryPackage() {
+        return getProperties().getLittleAdjustmentProperties().getFlatDirectoryPackage();
+    }
 
     public boolean isSql2EntityPlainEntity() {
         return false;

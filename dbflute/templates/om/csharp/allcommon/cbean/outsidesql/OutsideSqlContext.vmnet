@@ -308,7 +308,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {;
                 path = path.Substring(defaultPackage.Length + ".".Length);
             }
-            String flatDirectory = null; // ${glDBFluteConfig}.GetInstance().FlatDirectory;
+            String flatDirectory = ${glDBFluteConfig}.GetInstance().FlatDirectoryPackage;
             if (flatDirectory != null && flatDirectory.Trim().Length > 0) {
                 String front = path.Substring(0, path.IndexOf(flatDirectory));
                 String rear = path.Substring(path.IndexOf(flatDirectory) + flatDirectory.Length);
