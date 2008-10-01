@@ -299,7 +299,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected String BuildFileSystemPath(String path) {
-            String fileSeparator = "\\";
+            String fileSeparator = "/";
             String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
             if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {
                 path = path.Substring(defaultPackage.Length + ".".Length);
