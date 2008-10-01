@@ -319,7 +319,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 path = path.Replace(".", fileSeparator);
             }
             if (path.EndsWith(fileSeparator + "sql")) {
-                path = path.Replace(fileSeparator + "sql", ".sql")
+                path = path.Replace(fileSeparator + "sql", ".sql");
             }
             if (!File.Exists(path)) {
                 if (_log.IsDebugEnabled) {
