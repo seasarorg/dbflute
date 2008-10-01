@@ -22,14 +22,18 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     // -----------------------------------------------------
     //                                   Procedure Parameter
     //                                   -------------------
+#set ($procedureParameterIndex = 0)
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "in";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "in, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "out";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "out, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "inout";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "inout, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
     public static final String ${propertyName}_PROCEDURE_PARAMETER = "return";
 #end
