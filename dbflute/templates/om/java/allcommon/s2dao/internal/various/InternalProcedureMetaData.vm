@@ -44,21 +44,21 @@ public class ${glInternalProcedureMetaData} {
             final ${glInternalProcedureParameterType} parameterType1 = unorderedMap.get(o1);
             final ${glInternalProcedureParameterType} parameterType2 = unorderedMap.get(o2);
             if (parameterType1.isReturnType()) {
-                return twoGreaterThanOne;
+                return twoGreaterThanOne; // Return type is prior
             }
             if (parameterType2.isReturnType()) {
-                return oneGreaterThanTwo;
+                return oneGreaterThanTwo; // Return type is prior
             }
             final Integer parameterIndex1 = parameterType1.getParameterIndex();
             final Integer parameterIndex2 = parameterType2.getParameterIndex();
             if (parameterIndex1 == null && parameterIndex2 == null) {
-                return oneGreaterThanTwo;
+                return oneGreaterThanTwo; // No changes
             }
             if (parameterIndex1 != null && parameterIndex2 == null) {
-                return oneGreaterThanTwo;
+                return twoGreaterThanOne; // Not null is prior
             }
             if (parameterIndex1 == null && parameterIndex2 != null) {
-                return twoGreaterThanOne;
+                return oneGreaterThanTwo; // Not null is prior
             }
             return parameterIndex1.compareTo(parameterIndex2);
         }
