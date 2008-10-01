@@ -72,7 +72,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             msg = msg + "And please confirm the file name and the file path STRICTLY!" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified OutsideSql Path]" + GetLineSeparator() + path + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException}(msg);
         }
 
@@ -259,7 +259,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         protected String FilterAboutDefaultPackage(String pckge) { // CSharp only
             String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
-            if (defaultPackage != null && defaultPackage.Trim().Length > 0) {;
+            if (defaultPackage != null && defaultPackage.Trim().Length > 0) {
                 return defaultPackage + "." + pckge;
             } else {
                 return pckge;
@@ -276,37 +276,18 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         // ===============================================================================
-        //                                                                   Determination
-        //                                                                   =============
-        public bool IsSpecifiedOutsideSql {
-            get { return _outsideSqlPath != null; }
-        }
-
-        // [DBFlute-0.8.0]
-        public bool IsProcedure {
-            get { return _methodName != null && _methodName.StartsWith("Call"); }
-        }
-
-        // ===============================================================================
-        //                                                                  General Helper
-        //                                                                  ==============
-        protected virtual bool IsExistResource(String path, Assembly asm) {
-            return ResourceUtil.IsExist(path, asm);
-        }
-
-        protected virtual String ReadText(String path, String sqlFileEncoding, Assembly asm) {
-            using (Stream stream = ResourceUtil.GetResourceAsStream(path, asm)) {
-                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
-
+        //                                                                     File System
+        //                                                                     ===========
         protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding) {
             path = BuildFileSystemPath(path);
             if (!File.Exists(path)) {
                 if (_log.IsDebugEnabled) {
-                    _log.Debug("*The SQL file was not found in File System: path=" + path);
+                    String msg = "Look! Read the DEBUG message below." + GetLineSeparator();
+                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+                    msg = msg + "The outsideSql was Not Found in File System!" + GetLineSeparator();
+                    msg = msg + "  path = " + path + GetLineSeparator();
+                    msg = msg + "* * * * * * * * * */";
+                    _log.Debug(msg);
                 }
                 return null;
             }
@@ -337,6 +318,33 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 path = path.Replace(fileSeparator + "sql", ".sql");
             }
             return path;
+        }
+
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
+        public bool IsSpecifiedOutsideSql {
+            get { return _outsideSqlPath != null; }
+        }
+
+        // [DBFlute-0.8.0]
+        public bool IsProcedure {
+            get { return _methodName != null && _methodName.StartsWith("Call"); }
+        }
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected virtual bool IsExistResource(String path, Assembly asm) {
+            return ResourceUtil.IsExist(path, asm);
+        }
+
+        protected virtual String ReadText(String path, String sqlFileEncoding, Assembly asm) {
+            using (Stream stream = ResourceUtil.GetResourceAsStream(path, asm)) {
+                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
+                    return reader.ReadToEnd();
+                }
+            }
         }
 
         // ===============================================================================
