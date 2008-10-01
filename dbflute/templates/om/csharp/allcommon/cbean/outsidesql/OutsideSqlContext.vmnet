@@ -303,9 +303,24 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding) {
-            String fileSeparator = "/";
+            path = BuildFileSystemPath(path);
+            if (!File.Exists(path)) {
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("*The SQL file was not found in File System: path=" + path);
+                }
+                return null;
+            }
+            using (Stream stream = new FileStream(path, FileMode.Open)) {
+                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        protected String BuildFileSystemPath(String path) {
+            String fileSeparator = "\\";
             String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
-            if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {;
+            if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {
                 path = path.Substring(defaultPackage.Length + ".".Length);
             }
             String flatDirectory = ${glDBFluteConfig}.GetInstance().FlatDirectoryPackage;
@@ -321,17 +336,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             if (path.EndsWith(fileSeparator + "sql")) {
                 path = path.Replace(fileSeparator + "sql", ".sql");
             }
-            if (!File.Exists(path)) {
-                if (_log.IsDebugEnabled) {
-                    _log.Debug("*The SQL file was not found in File System: path=" + path);
-                }
-                return null;
-            }
-            using (Stream stream = new FileStream(path, FileMode.Open)) {
-                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
-                    return reader.ReadToEnd();
-                }
-            }
+            return path;
         }
 
         // ===============================================================================
