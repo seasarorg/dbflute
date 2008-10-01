@@ -1,18 +1,16 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import javax.sql.DataSource;
 
-import org.seasar.dao.ProcedureMetaData;
-import org.seasar.dao.ProcedureParameterType;
+import org.seasar.framework.util.CaseInsensitiveMap;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -20,7 +18,9 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.framework.util.CaseInsensitiveMap;
+
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureParameterType};
 
 /**
  * @author ${database.ClassAuthor}
@@ -30,14 +30,14 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private ProcedureMetaData procedureMetaData;
+    private ${glInternalProcedureMetaData} procedureMetaData;
 		
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalProcedureHandler}(final DataSource dataSource, final String sql,
             final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
-            final ResultSetFactory resultSetFactory, final ProcedureMetaData procedureMetaData) {
+            final ResultSetFactory resultSetFactory, final ${glInternalProcedureMetaData} procedureMetaData) {
         super(dataSource, sql, resultSetHandler, statementFactory, resultSetFactory);
         this.procedureMetaData = procedureMetaData;
     }
@@ -92,7 +92,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         int pos2 = 0;
         int size = procedureMetaData.getParameterTypeSize();
         for (int i = 0; i < size; i++) {
-            ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
             if ((pos2 = sql.indexOf('?', pos)) < 0) {
                 break;
             }
@@ -117,7 +117,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         if (dto == null) { return; }
         final int size = procedureMetaData.getParameterTypeSize();
         for (int i = 0; i < size; i++) {
-            final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            final ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 valueType.registerOutParameter(cs, i + 1);
@@ -145,7 +145,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         }
         final int size = procedureMetaData.getParameterTypeSize();
         for (int i = 0; i < size; i++) {
-            final ProcedureParameterType ppt = procedureMetaData.getParameterType(i);
+            final ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 Object value = valueType.getValue(cs, i + 1);
@@ -181,7 +181,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         throw new IllegalArgumentException("args");
     }
 
-    protected ResultSetHandler createOutParameterResultSetHandler(ProcedureParameterType ppt, ResultSet resultSet) {
+    protected ResultSetHandler createOutParameterResultSetHandler(${glInternalProcedureParameterType} ppt, ResultSet resultSet) {
         return new InternalMapListResultSetHandler();
     }
 

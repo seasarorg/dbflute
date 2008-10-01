@@ -1,33 +1,28 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
 import javax.sql.DataSource;
 
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ColumnNaming;
-import org.seasar.dao.IllegalParameterTypeRuntimeException;
-import org.seasar.dao.ProcedureMetaData;
-import org.seasar.dao.ProcedureParameterType;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
@@ -35,27 +30,21 @@ import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
 import org.seasar.dao.SqlCommand;
 import org.seasar.dao.TableNaming;
-import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.dbms.DbmsManager;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.ProcedureMetaDataImpl;
-import org.seasar.dao.impl.ProcedureParameterTypeImpl;
 import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.ResultSetHandlerFactoryImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
-import org.seasar.dao.util.TypeUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
-import org.seasar.framework.util.FieldUtil;
 import org.seasar.framework.util.MethodUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -86,6 +75,8 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAuto
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateBatchAutoHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalDeleteBatchAutoHandler};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -825,15 +816,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // - - - - - - - - - - - - - - -
         // The attribute of SqlCommand.
         // - - - - - - - - - - - - - - -
-        final InternalProcedureMetaDataFactory myProcedureMetaDataFactory = new InternalProcedureMetaDataFactory();
-        myProcedureMetaDataFactory.setValueTypeFactory(valueTypeFactory);
+        final ${glInternalProcedureMetaDataFactory} factory = createInternalProcedureMetaDataFactory();
+        factory.setValueTypeFactory(valueTypeFactory);
         final Class<?> pmbType = pmb != null ? pmb.getClass() : null;
-        final ProcedureMetaData metaData = myProcedureMetaDataFactory.createProcedureMetaData(procedureName, pmbType);
+        final ${glInternalProcedureMetaData} metaData = factory.createProcedureMetaData(procedureName, pmbType);
         final ${glInternalProcedureCommand} cmd = createInternalProcedureCommand(method, metaData);
         putSqlCommand(sqlCommandKey, cmd);
     }
 
-    protected ${glInternalProcedureCommand} createInternalProcedureCommand(Method method, ProcedureMetaData metaData) {
+    protected ${glInternalProcedureMetaDataFactory} createInternalProcedureMetaDataFactory() {
+        return new ${glInternalProcedureMetaDataFactory}();
+    }
+
+    protected ${glInternalProcedureCommand} createInternalProcedureCommand(Method method, ${glInternalProcedureMetaData} metaData) {
         final ResultSetHandler resultSetHandler = createResultSetHandler(method);
         return new ${glInternalProcedureCommand}(dataSource, resultSetHandler, statementFactory, resultSetFactory, metaData);
     }
@@ -1455,136 +1450,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         
         protected void restoreRelationNoSuffixExtension() {
             setRelationNoSuffix(backupRelationSuffix.pop());
-        }
-    }
-
-    // ===================================================================================
-    //                                                                           Procedure
-    //                                                                           =========
-    protected static class InternalProcedureMetaDataFactory {
-        protected ValueTypeFactory valueTypeFactory;
-        protected InternalFieldProcedureAnnotationReader annotationReader = new InternalFieldProcedureAnnotationReader();
-        public ProcedureMetaData createProcedureMetaData(final String procedureName, final Class<?> pmbType) {
-            final ProcedureMetaDataImpl metaData = new ProcedureMetaDataImpl(procedureName);
-            if (pmbType == null) {
-                return metaData;
-            } else {
-                if (!isDtoType(pmbType)) {
-                    throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.getName());
-                }
-            }
-            final BeanDesc pmbDesc = BeanDescFactory.getBeanDesc(pmbType);
-
-            // *Point
-            final Stack<Class<?>> stack = new Stack<Class<?>>();
-            for (Class<?> clazz = pmbType; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
-                stack.push(clazz);
-            }
-            for ( ; !stack.isEmpty() ;) {
-                final Class<?> clazz = stack.pop();
-                registerParameterType(metaData, pmbDesc, clazz.getDeclaredFields());
-            }
-
-            return metaData;
-        }
-        protected void registerParameterType(ProcedureMetaDataImpl metaData, BeanDesc pmbDesc, Field[] fields) {
-            for (Field field : fields) {
-                if (!isInstanceField(field)) {
-                    continue;
-                }
-                final ProcedureParameterType ppt = getProcedureParameterType(pmbDesc, field);
-                if (ppt == null) {
-                    continue;
-                }
-                metaData.addParameterType(ppt);
-            }
-        }
-        protected ProcedureParameterType getProcedureParameterType(final BeanDesc dtoDesc, final Field field) {
-            final String type = annotationReader.getProcedureParameter(dtoDesc, field);
-            if (type == null) {
-                return null;
-            }
-            field.setAccessible(true);
-            final ProcedureParameterType ppt = new ProcedureParameterTypeImpl(field);
-            if (type.equalsIgnoreCase("in")) {
-                ppt.setInType(true);
-            } else if (type.equalsIgnoreCase("out")) {
-                ppt.setOutType(true);
-            } else if (type.equalsIgnoreCase("inout")) {
-                ppt.setInType(true);
-                ppt.setOutType(true);
-            } else if (type.equalsIgnoreCase("return")) {
-                ppt.setOutType(true);
-                ppt.setReturnType(true);
-            } else {
-                throw new IllegalParameterTypeRuntimeException(type);
-            }
-            final ValueType valueType = getValueType(dtoDesc, field);
-            ppt.setValueType(valueType);
-            return ppt;
-        }
-        protected ValueType getValueType(final BeanDesc dtoDesc, final Field field) {
-            final String name = annotationReader.getValueType(dtoDesc, field);
-            if (name != null) {
-                return valueTypeFactory.getValueTypeByName(name);
-            }
-            final Class type = field.getType();
-            if (List.class.isAssignableFrom(type)) {// is for out parameter cursor.
-                if (${glConditionBeanContextName}.isOracle()) {
-                    return ValueTypes.ORACLE_RESULT_SET;
-                } else if (${glConditionBeanContextName}.isPostgreSql()) {
-                    return ValueTypes.POSTGRE_RESULT_SET;
-                } else {
-                    return ValueTypes.SERIALIZABLE_BYTE_ARRAY;
-                }
-            }
-            return valueTypeFactory.getValueTypeByClass(type);
-        }
-        protected boolean isInstanceField(final Field field) {
-            final int mod = field.getModifiers();
-            return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
-        }
-        protected boolean isDtoType(final Class clazz) {
-            return !TypeUtil.isSimpleType(clazz) && !isContainerType(clazz);
-        }
-        protected boolean isContainerType(final Class clazz) {
-            if (clazz == null) { throw new NullPointerException("clazz"); }
-            return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz) || clazz.isArray();
-        }
-        public void setValueTypeFactory(final ValueTypeFactory valueTypeFactory) {
-            this.valueTypeFactory = valueTypeFactory;
-        }
-    }
-
-    protected static class InternalFieldProcedureAnnotationReader {
-        protected String PROCEDURE_PARAMETER_SUFFIX;
-        protected String VALUE_TYPE_SUFFIX;
-        public InternalFieldProcedureAnnotationReader() {
-            PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
-            VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
-        }
-        public String getProcedureParameter(BeanDesc dtoDesc, Field field) {
-            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
-            String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
-            if (dtoDesc.hasField(annotationName)) {
-                Field f = dtoDesc.getField(annotationName);
-                return (String) FieldUtil.get(f, null);
-            } else {
-                return null;
-            }
-        }
-        public String getValueType(BeanDesc dtoDesc, Field field) {
-            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
-            String annotationName = fieldName + VALUE_TYPE_SUFFIX;
-            if (dtoDesc.hasField(annotationName)) {
-                Field f = dtoDesc.getField(annotationName);
-                return (String) FieldUtil.get(f, null);
-            } else {
-                return null;
-            }
-        }
-        protected String removeInstanceVariablePrefix(String fieldName) {
-            return fieldName.startsWith("_") ? fieldName.substring("_".length()) : fieldName;
         }
     }
 

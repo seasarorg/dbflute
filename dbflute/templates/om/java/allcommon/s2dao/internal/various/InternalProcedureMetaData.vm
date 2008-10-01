@@ -1,0 +1,54 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
+
+import org.seasar.framework.util.CaseInsensitiveMap;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalProcedureMetaData} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private String procedureName;
+    private CaseInsensitiveMap parameterTypes = new CaseInsensitiveMap();
+    private boolean returnType;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalProcedureMetaData}(final String procedureName) {
+        this.procedureName = procedureName;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getProcedureName() {
+        return procedureName;
+    }
+
+    public ${glInternalProcedureParameterType} getParameterType(final int index) {
+        return (${glInternalProcedureParameterType}) parameterTypes.get(index);
+    }
+
+    public ${glInternalProcedureParameterType} getParameterType(final String parameterName) {
+        return (${glInternalProcedureParameterType}) parameterTypes.get(parameterName);
+    }
+
+    public int getParameterTypeSize() {
+        return parameterTypes.size();
+    }
+
+    public boolean hasReturnParameterType() {
+        return returnType;
+    }
+
+    public void addParameterType(final ${glInternalProcedureParameterType} parameterType) {
+        final String name = parameterType.getParameterName();
+        parameterTypes.put(name, parameterType);
+        if (parameterType.isReturnType()) {
+            returnType = true;
+        }
+    }
+}

@@ -374,6 +374,11 @@ targetdatabase = $targetDatabase
     #set ($glInternalSqlTokenizer = "${glProjectPrefix}InternalSqlTokenizer")
     #set ($glInternalBindVariableUtil = "${glProjectPrefix}InternalBindVariableUtil")
 
+    ## [Allcommon-S2Dao-Internal-Various]
+    #set ($glInternalProcedureMetaData = "${glProjectPrefix}InternalProcedureMetaData")
+    #set ($glInternalProcedureMetaDataFactory = "${glProjectPrefix}InternalProcedureMetaDataFactory")
+    #set ($glInternalProcedureParameterType = "${glProjectPrefix}InternalProcedureParameterType")
+
     ## [Allcommon-Util]
     #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
     #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
@@ -436,6 +441,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
     #set ($glPackageBaseCommonS2DaoInternal = "${database.baseCommonPackage}.s2dao.internal")
+    #set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.s2dao.internal.various")
     #set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.s2dao.internal.rshandler")
     #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.s2dao.internal.sqlcommand")
     #set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.s2dao.internal.sqlhandler")
@@ -486,6 +492,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+      #set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.S2Dao.Internal.Various")
       #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.S2Dao.Internal.SqlCommand")
       #set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.S2Dao.Internal.SqlHandler")
       #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
@@ -1880,6 +1887,21 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalBindVariableUtil');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
+      
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('InternalProcedureMetaData');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalProcedureMetaData}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalProcedureMetaData.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalProcedureMetaDataFactory');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalProcedureMetaDataFactory}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalProcedureMetaDataFactory.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalProcedureParameterType');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalProcedureParameterType}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalProcedureParameterType.${glTemplateFileExtension}",$path,"", "")
     #end
     #if ($database.isTargetLanguageCSharp())
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand}))

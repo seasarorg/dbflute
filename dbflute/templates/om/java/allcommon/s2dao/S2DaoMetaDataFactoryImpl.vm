@@ -1,16 +1,22 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.sql.PreparedStatement;
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.seasar.framework.util.Disposable;
+import org.seasar.framework.util.DisposableUtil;
+import org.seasar.extension.jdbc.ResultSetFactory;
+import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.AnnotationReaderFactory;
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaDataFactory;
@@ -28,12 +34,6 @@ import org.seasar.dao.TableNaming;
 import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.pager.PagingSqlRewriter;
-import org.seasar.extension.jdbc.ResultSetFactory;
-import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
-import org.seasar.framework.util.Disposable;
-import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};

@@ -3,12 +3,13 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlComman
 import javax.sql.DataSource;
 
 import org.seasar.dao.SqlCommand;
-import org.seasar.dao.ProcedureMetaData;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
+
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalProcedureHandler};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 
 /**
  * @author ${database.ClassAuthor}
@@ -22,14 +23,14 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
     protected ResultSetHandler resultSetHandler;
     protected StatementFactory statementFactory;
     protected ResultSetFactory resultSetFactory;
-    protected ProcedureMetaData procedureMetaData;
+    protected ${glInternalProcedureMetaData} procedureMetaData;
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalProcedureCommand}(DataSource dataSource, ResultSetHandler resultSetHandler,
             StatementFactory statementFactory, ResultSetFactory resultSetFactory,
-            ProcedureMetaData procedureMetaData) {
+            ${glInternalProcedureMetaData} procedureMetaData) {
         this.dataSource = dataSource;
         this.resultSetHandler = resultSetHandler;
         this.statementFactory = statementFactory;
@@ -50,7 +51,7 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
         return new ${glInternalProcedureHandler}(dataSource, createSql(procedureMetaData), resultSetHandler,
                 statementFactory, resultSetFactory, procedureMetaData);
     }
-    protected String createSql(final ProcedureMetaData procedureMetaData) {
+    protected String createSql(final ${glInternalProcedureMetaData} procedureMetaData) {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
         int size = procedureMetaData.getParameterTypeSize();
