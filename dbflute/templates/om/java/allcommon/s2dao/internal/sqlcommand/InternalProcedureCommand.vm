@@ -54,7 +54,7 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
     protected String createSql(final ${glInternalProcedureMetaData} procedureMetaData) {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int size = procedureMetaData.getParameterTypeSize();
+        int size = procedureMetaData.parameterTypes().size();
         if (procedureMetaData.hasReturnParameterType()) {
             sb.append("? = ");
             size--;

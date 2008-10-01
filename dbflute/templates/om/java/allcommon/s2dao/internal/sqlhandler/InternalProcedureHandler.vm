@@ -90,9 +90,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         StringBuilder sb = new StringBuilder(100);
         int pos = 0;
         int pos2 = 0;
-        int size = procedureMetaData.getParameterTypeSize();
-        for (int i = 0; i < size; i++) {
-            ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
+        for (${glInternalProcedureParameterType} ppt : procedureMetaData.parameterTypes()) {
             if ((pos2 = sql.indexOf('?', pos)) < 0) {
                 break;
             }
@@ -115,9 +113,8 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
 
     protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
         if (dto == null) { return; }
-        final int size = procedureMetaData.getParameterTypeSize();
-        for (int i = 0; i < size; i++) {
-            final ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
+        int i = 0;
+        for (${glInternalProcedureParameterType} ppt : procedureMetaData.parameterTypes()) {
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 valueType.registerOutParameter(cs, i + 1);
@@ -126,6 +123,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
                 final Object value = ppt.getValue(dto);
                 valueType.bindValue(cs, i + 1, value);
             }
+            ++i;
         }
     }
 
@@ -143,9 +141,8 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
         if (dto == null) {
             return null;
         }
-        final int size = procedureMetaData.getParameterTypeSize();
-        for (int i = 0; i < size; i++) {
-            final ${glInternalProcedureParameterType} ppt = procedureMetaData.getParameterType(i);
+        int i = 0;
+        for (${glInternalProcedureParameterType} ppt : procedureMetaData.parameterTypes()) {
             final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 Object value = valueType.getValue(cs, i + 1);
@@ -164,6 +161,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
             } else if (ppt.isReturnType()) {
                 ppt.setValue(dto, returnValue);
             }
+            ++i;
         }
         return dto;
     }
