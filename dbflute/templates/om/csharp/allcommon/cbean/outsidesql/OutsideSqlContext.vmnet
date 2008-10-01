@@ -170,6 +170,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             } else if (IsExistResource(standardPath, asm)) {
                 return ReadText(standardPath, sqlFileEncoding, asm);
             } else {
+                String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
+                if (text != null) {
+                    return text;
+                }
                 ThrowOutsideSqlNotFoundException(standardPath);
                 return null;// Non Reachable.
             }
@@ -292,6 +296,38 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         protected virtual String ReadText(String path, String sqlFileEncoding, Assembly asm) {
             using (Stream stream = ResourceUtil.GetResourceAsStream(path, asm)) {
+                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding) {
+            String fileSeparator = "/";
+            String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
+            if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {;
+                path = path.Substring(defaultPackage.Length + ".".Length);
+            }
+            String flatDirectory = null; // ${glDBFluteConfig}.GetInstance().FlatDirectory;
+            if (flatDirectory != null && flatDirectory.Trim().Length > 0) {
+                String front = path.Substring(0, path.IndexOf(flatDirectory));
+                String rear = path.Substring(path.IndexOf(flatDirectory) + flatDirectory.Length);
+                front = front.Replace(".", fileSeparator);
+                rear = rear.Replace(".", fileSeparator);
+                path = front + flatDirectory + rear;
+            } else {
+                path = path.Replace(".", fileSeparator);
+            }
+            if (path.EndsWith(fileSeparator + "sql")) {
+                path = path.Replace(fileSeparator + "sql", ".sql")
+            }
+            if (!File.Exists(path)) {
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("*The SQL file was not found in File System: path=" + path);
+                }
+                return null;
+            }
+            using (Stream stream = new FileStream(path, FileMode.Open)) {
                 using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
                     return reader.ReadToEnd();
                 }
