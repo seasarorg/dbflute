@@ -39,12 +39,17 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
     //                                                                         Constructor
     //                                                                         ===========
     protected ${glInternalRowCreator}() {}
+
+    /**
+     * @param beanClass The class of target bean to find DB-meta. (Nullable)
+     * @return The instance of internal row creator. (NotNull)
+     */
     public static ${glInternalRowCreator} createInternalRowCreator(Class<?> beanClass) {
-        final ${glInternalRowCreator} ext = new ${glInternalRowCreator}();
+        final ${glInternalRowCreator} rowCreator = new ${glInternalRowCreator}();
         if (beanClass != null) {
-            ext.setDBMeta(findDBMetaByClass(beanClass));
+            rowCreator.setDBMeta(findDBMetaByClass(beanClass));
         }
-        return ext;
+        return rowCreator;
     }
 
     // ===================================================================================
