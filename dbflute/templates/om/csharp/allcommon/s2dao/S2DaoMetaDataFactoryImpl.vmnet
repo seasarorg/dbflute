@@ -349,33 +349,64 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
 		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
-		    return EntityPropertySetupperHandler.FindCachedDBMeta(row);
+		    return DBMetaCacheHandler.FindDBMeta(row);
         }
     }
 
-	public class EntityPropertySetupperHandler {
+	public class DBMetaCacheHandler {
 	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
 		
-		public static ${glDBMetaInterfaceName} FindCachedDBMeta(Object row) {
+		public static ${glDBMetaInterfaceName} FindDBMeta(Object row) {
 		    if (!(row is ${glEntityInterfaceName})) {
 			    return null;
 			}
 			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
-            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
-			if (dbmetaCache == null) {
-			    dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMetaInterfaceName}>();
-				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
+            ${glDBMetaInterfaceName} dbmeta = FindCachedDBMeta(entity.GetType());
+			if (dbmeta != null) {
+			    return dbmeta;
 			}
-            ${glDBMetaInterfaceName} dbmeta = null;
-            if (dbmetaCache.ContainsKey(entity.GetType())) {
-                dbmeta = dbmetaCache[entity.GetType()];
-				if (dbmeta != null) {
-				    return dbmeta;
-				}
-            }
             dbmeta = entity.DBMeta;
-            dbmetaCache.Add(entity.GetType(), dbmeta);
+            CacheDBMeta(entity, dbmeta);
 		    return dbmeta;
+        }
+        
+        public static ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
+            ${glDBMetaInterfaceName} dbmeta = FindCachedDBMeta(rowType);
+            if (dbmeta != null) {
+                return dbmeta;
+            }
+            try {
+                dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableName);
+            } catch (DBMetaNotFoundException) {
+                return null;
+            }
+            CacheDBMeta(rowType, dbmeta);
+            return dbmeta;
+        }
+
+        protected static ${glDBMetaInterfaceName} FindCachedDBMeta(Class<?> rowType) {
+            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = FindDBMetaCache();
+            if (dbmetaCache == null) {
+                dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMetaInterfaceName}>();
+                ${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
+            }
+            if (dbmetaCache.ContainsKey(rowType)) {
+                return dbmetaCache[rowType];
+            }
+            return null;
+        }
+        
+        protected static void CacheDBMeta(${glEntityInterfaceName} entity, ${glDBMetaInterfaceName} dbmeta) {
+            cacheDBMeta(entity.GetType(), dbmeta);
+        }
+        
+        protected static void CacheDBMeta(Type type, ${glDBMetaInterfaceName} dbmeta) {
+            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = FindDBMetaCache();
+            dbmetaCache.Add(type, dbmeta);
+        }
+        
+        protected static System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> FindDBMetaCache() {
+            return (System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
         }
 	}
 	
@@ -426,7 +457,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 		
 		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
-		    return EntityPropertySetupperHandler.FindCachedDBMeta(row);
+		    return DBMetaCacheHandler.FindDBMeta(row);
         }
 		
         protected override void SetupPropertyCache(RelationRowCreationResource res) {

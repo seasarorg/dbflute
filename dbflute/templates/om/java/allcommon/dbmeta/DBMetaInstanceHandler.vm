@@ -126,12 +126,19 @@ public class ${myClassName} {
         if (dotLastIndex >= 0) {
             try {
                 return findDBMeta(tableFlexibleName.substring(dotLastIndex + 1));
-            } catch (IllegalStateException e) {
+            } catch (DBMetaNotFoundException e) {
                 // Nothing
             }
         }
         String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
-        throw new IllegalStateException(msg);
+        throw new DBMetaNotFoundException(msg);
+    }
+
+    public static class DBMetaNotFoundException extends IllegalStateException {
+        private static final long serialVersionUID = 1L;
+        public DBMetaNotFoundException(String msg) {
+            super(msg);
+        }
     }
 
     /**
@@ -144,7 +151,7 @@ public class ${myClassName} {
         ${glDBMetaInterfaceName} instance = getCachedDBMeta(tableDbName);
         if (instance == null) {
             String msg = "The instance map returned null by the key: key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
-            throw new IllegalStateException(msg);
+            throw new DBMetaNotFoundException(msg);
         }
         return instance;
     }

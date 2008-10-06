@@ -128,12 +128,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             if (dotLastIndex >= 0) {
                 try {
                     return FindDBMeta(tableFlexibleName.Substring(dotLastIndex + 1));
-                } catch (IllegalStateException) {
+                } catch (DBMetaNotFoundException) {
                     // Nothing
                 }
             }
             String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
-            throw new SystemException(msg);
+            throw new DBMetaNotFoundException(msg);
         }
 
         protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
@@ -176,5 +176,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
         }
+    }
+
+    public class DBMetaNotFoundException : SystemException {
+
+        public DBMetaNotFoundException(String msg)
+        : base(msg) {}
     }
 }
