@@ -378,6 +378,8 @@ targetdatabase = $targetDatabase
     #set ($glInternalProcedureMetaData = "${glProjectPrefix}InternalProcedureMetaData")
     #set ($glInternalProcedureMetaDataFactory = "${glProjectPrefix}InternalProcedureMetaDataFactory")
     #set ($glInternalProcedureParameterType = "${glProjectPrefix}InternalProcedureParameterType")
+    #set ($glInternalRowCreator = "${glProjectPrefix}InternalRowCreator")
+    #set ($glInternalRelationRowCreator = "${glProjectPrefix}InternalRelationRowCreator")
 
     ## [Allcommon-Util]
     #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
@@ -1902,6 +1904,14 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalProcedureParameterType');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalProcedureParameterType}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalProcedureParameterType.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalRowCreator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalRowCreator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalRowCreator.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalRelationRowCreator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalRelationRowCreator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalRelationRowCreator.${glTemplateFileExtension}",$path,"", "")
     #end
     #if ($database.isTargetLanguageCSharp())
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand}))

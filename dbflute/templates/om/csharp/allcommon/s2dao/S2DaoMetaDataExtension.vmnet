@@ -747,16 +747,23 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class RowCreatorExtension : Seasar.Dao.Impl.RowCreatorImpl {
 
-        public override object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
-            object row = NewBean(beanType);
+        public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
+            Object row = NewBean(beanType);
             ${glDBMetaInterfaceName} dbmeta = FindDBMeta(row);
-            foreach (IColumnMetaData column in columns) {
-                object value = column.ValueType.GetValue(reader, column.ColumnName);
-				if (dbmeta != null && dbmeta.HasEntityPropertySetupper(column.PropertyInfo.Name)) {
-				    dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value);
-					continue;
+            if (dbmeta != null) {
+                foreach (IColumnMetaData column in columns) {
+                    Object value = column.ValueType.GetValue(reader, column.ColumnName);
+			    	if (dbmeta.HasEntityPropertySetupper(column.PropertyInfo.Name)) {
+			    	    dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value);
+			    		continue;
+                    }
+                    column.PropertyInfo.SetValue(row, value, null);
                 }
-                column.PropertyInfo.SetValue(row, value, null);
+            } else {
+                foreach (IColumnMetaData column in columns) {
+                    Object value = column.ValueType.GetValue(reader, column.ColumnName);
+                    column.PropertyInfo.SetValue(row, value, null);
+                }
             }
             return row;
         }

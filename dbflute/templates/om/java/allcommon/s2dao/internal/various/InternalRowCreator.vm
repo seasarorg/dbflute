@@ -1,0 +1,220 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.dao.impl.RowCreatorImpl;
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalRowCreator} extends RowCreatorImpl {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalRowCreator}.class);
+
+    /** The key of DBMeta cache. */
+    protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glDBMetaInterfaceName} _dbmeta;
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected ${glInternalRowCreator}() {}
+    public static ${glInternalRowCreator} createInternalRowCreator(Class<?> beanClass) {
+        final ${glInternalRowCreator} ext = new ${glInternalRowCreator}();
+        if (beanClass != null) {
+            ext.setDBMeta(findDBMetaByClass(beanClass));
+        }
+        return ext;
+    }
+
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
+        final Set columnNameSet = propertyCache.keySet();
+        String columnName = null;
+        PropertyType pt = null;
+        String propertyName = null;
+        final Object row;
+        final ${glDBMetaInterfaceName} dbmeta;
+        if (_dbmeta != null) {
+            dbmeta = _dbmeta;
+            row = dbmeta.newEntity();
+        } else {
+            row = newBean(beanClass);
+            dbmeta = findDBMeta(row);
+        }
+        try {
+            if (dbmeta != null) {
+                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
+                    columnName = (String) ite.next();
+                    pt = (PropertyType) propertyCache.get(columnName);
+                    propertyName = pt.getPropertyName();
+                    if (dbmeta.hasEntityPropertySetupper(propertyName)) {
+                        final ValueType valueType = pt.getValueType();
+                        final Object value = valueType.getValue(rs, columnName);
+                        dbmeta.setupEntityProperty(propertyName, row, value);
+                    } else {
+                        registerValue(rs, row, pt, columnName);
+                    }
+                }
+            } else {
+                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
+                    columnName = (String) ite.next();
+                    pt = (PropertyType) propertyCache.get(columnName);
+                    propertyName = pt.getPropertyName();
+                    registerValue(rs, row, pt, columnName);
+                }
+            }
+            return row;
+        } catch (ClassCastException e) {
+            if (_log.isWarnEnabled()) {
+                String msg = ClassCastException.class.getSimpleName() + " occurred while ResultSet Handling:";
+                _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName + " dbmeta");
+            }
+            throwNonsenseClassCastException(row, dbmeta, e);
+            return null; // Unreachable!
+        } catch (SQLException e) {
+            if (_log.isWarnEnabled()) {
+                String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
+                _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
+            }
+            throw e;
+        }
+    }
+    
+    /**
+     * @param row The object of row. (NotNull)
+     * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
+     */
+    protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
+        return findDBMetaByRow(row);
+    }
+
+    protected void throwNonsenseClassCastException(Object entity, ${glDBMetaInterfaceName} dbmeta, ClassCastException e) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "This exception may be from ClassLoader Headache about HotDeploy." + getLineSeparator();
+        msg = msg + "Please add the ignore-package setting to convention.dicon like as follows:" + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    <initMethod name=”addIgnorePackageName”>" + getLineSeparator();
+        msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + getLineSeparator();
+        msg = msg + "    </initMethod>" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Target DBMeta]" + getLineSeparator() + dbmeta + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new NonsenseClassCastException(msg, e);
+    }
+
+    public static class NonsenseClassCastException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public NonsenseClassCastException(String msg, ClassCastException e) {
+            super(msg, e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    /**
+     * @param row The object of row. (NotNull)
+     * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
+     */
+    public static ${glDBMetaInterfaceName} findDBMetaByRow(Object row) {
+        return EntityPropertySetupperHandler.findCachedDBMeta(row);
+    }
+
+    /**
+     * The handler of setupper of entity property.
+     */
+    protected static class EntityPropertySetupperHandler {
+        
+        /** The key of DBMeta cache. */
+        protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
+
+        @SuppressWarnings("unchecked")
+        public static ${glDBMetaInterfaceName} findCachedDBMeta(Object row) {
+            if (!(row instanceof ${glEntityInterfaceName})) {
+                return null;
+            }
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) row;
+            Map<Class<?>, ${glDBMetaInterfaceName}> dbmetaCache = (Map<Class<?>, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
+            if (dbmetaCache == null) {
+                dbmetaCache = new HashMap<Class<?>, ${glDBMetaInterfaceName}>();
+                ${glInternalMapContextName}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
+            }
+            ${glDBMetaInterfaceName} dbmeta = dbmetaCache.get(entity.getClass());
+            if (dbmeta != null) {
+                return dbmeta;
+            }
+            dbmeta = entity.getDBMeta();
+            dbmetaCache.put(entity.getClass(), dbmeta);
+            return dbmeta;
+        }
+    }
+
+    protected static ${glDBMetaInterfaceName} findDBMetaByClass(Class<?> beanClass) {
+        final Object instance = newInstance(beanClass);
+        if (!(instance instanceof ${glEntityInterfaceName})) {
+            return null;
+        }
+        return ((${glEntityInterfaceName})instance).getDBMeta();
+    }
+
+    protected static Object newInstance(Class<?> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+        this._dbmeta = dbmeta;
+    }
+}

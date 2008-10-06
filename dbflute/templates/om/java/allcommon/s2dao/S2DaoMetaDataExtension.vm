@@ -10,12 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 import javax.sql.DataSource;
 
@@ -24,7 +19,6 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
-import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
@@ -33,28 +27,22 @@ import org.seasar.dao.TableNaming;
 import org.seasar.dao.dbms.DbmsManager;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.ResultSetHandlerFactoryImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
-import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
-import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.MethodUtil;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
 import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
@@ -77,7 +65,8 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateBatchAuto
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalDeleteBatchAutoHandler};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
-import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator};
 
 /**
  * The extension of DaoMetaDataImpl for DBFlute.
@@ -714,25 +703,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(clazz);
     }
 
-// [Unsupported]
-// The return type of method is unsupported!
-// Because the method of outside-sql that selects one entity is unnecessary!
-//
-//    /**
-//     * Create the handler of result set of specified outside-sql for customize bean.
-//     * 
-//     * @param specifiedBeanMetaData Specified bean meta data. (NotNull)
-//     * @param customizeEntityType The type of customize entity. (NotNull)
-//     * @return The handler of result set. (NotNull)
-//     */
-//    protected ResultSetHandler createSpecifiedOutsideSqlCustomizeBeanResultSetHandler(BeanMetaData specifiedBeanMetaData, Class<?> customizeEntityType) {
-//        final ValueType valueType = ValueTypes.getValueType(customizeEntityType);
-//        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
-//            return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();
-//        }
-//        return new org.seasar.dao.impl.BeanMetaDataResultSetHandler(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
-//    }
-
     /**
      * Create the handler of result set of specified outside-sql for the list of customize bean.
      * @param specifiedBeanMetaData Specified bean meta data. (NotNull)
@@ -744,7 +714,18 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
             return new InternalObjectListResultSetHandler(valueType);
         }
-        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
+        final ${glInternalRowCreator} rowCreator = createSpecifiedOutsideSqlInternalRowCreator(specifiedBeanMetaData);
+        final ${glInternalRelationRowCreator} relationRowCreator = createSpecifiedOutsideSqlInternalRelationRowCreator(specifiedBeanMetaData);
+        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, rowCreator, relationRowCreator);
+    }
+
+    protected ${glInternalRowCreator} createSpecifiedOutsideSqlInternalRowCreator(BeanMetaData bmd) {
+        final Class clazz = bmd.getBeanClass();
+        return ${glInternalRowCreator}.createInternalRowCreator(clazz);
+    }
+
+    protected ${glInternalRelationRowCreator} createSpecifiedOutsideSqlInternalRelationRowCreator(BeanMetaData bmd) {
+        return new ${glInternalRelationRowCreator}();
     }
 
     protected class InternalObjectListResultSetHandler implements ResultSetHandler {
@@ -1000,53 +981,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                                       Vert Internal
-    //                                                                       =============
-    protected static class InternalMethodUtil {
-        public static Class getElementTypeOfListFromReturnMethod(Method method) {
-            return InternalReflectionUtil.getElementTypeOfListFromReturnType(method);
-        }
-    }
-
-    protected static class InternalReflectionUtil {
-        public static Class<?> getElementTypeOfList(final Type parameterizedList) {
-            if (!(parameterizedList instanceof ParameterizedType)) {
-                return null;
-            }
-
-            final ParameterizedType parameterizedType = ParameterizedType.class.cast(parameterizedList);
-            final Type rawType = parameterizedType.getRawType();
-            if (!(rawType instanceof Class)) {
-                return null;
-            }
-
-            final Class<?> rawClass = Class.class.cast(rawType);
-            if (!rawClass.isAssignableFrom(List.class)) {
-                return null;
-            }
-
-            final Type[] actualTypeArgument = parameterizedType.getActualTypeArguments();
-            if (actualTypeArgument == null || actualTypeArgument.length != 1) {
-                return null;
-            }
-            if (!(actualTypeArgument[0] instanceof Class)) {
-                return null;
-            }
-
-            return Class.class.cast(actualTypeArgument[0]);
-        }
-
-        public static Class<?> getElementTypeOfListFromParameterType(final Method method, final int parameterPosition) {
-            final Type[] pmbTypes = method.getGenericParameterTypes();
-            return getElementTypeOfList(pmbTypes[parameterPosition]);
-        }
-
-        public static Class<?> getElementTypeOfListFromReturnType(final Method method) {
-            return getElementTypeOfList(method.getGenericReturnType());
-        }
-    }
-
-    // ===================================================================================
     //                                               ResultSetHandlerFactoryImpl Extension
     //                                               =====================================
     public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
@@ -1055,401 +989,76 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
 
         @Override
-        protected RowCreator createRowCreator() {// [DAO-118] (2007/08/25)
-            return new RowCreatorExtension();
+        protected RowCreator createRowCreator() { // [DAO-118] (2007/08/25)
+            return createInternalRowCreator(null);
         }
 
         @Override
         protected RelationRowCreator createRelationRowCreator() {
-            return new RelationRowCreatorExtension();
+            return createInternalRelationRowCreator(null);
         }
         
         @Override
-        protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData beanMetaData) {
-            return new ${glInternalBeanListMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+        protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData bmd) {
+            final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
+            final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
+            return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
         
         @Override
-        protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData beanMetaData) {
-            return new ${glInternalBeanArrayMetaDataResultSetHandler}(beanMetaData, createRowCreator(), createRelationRowCreator());
+        protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData bmd) {
+            final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
+            final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
+            return new ${glInternalBeanArrayMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
+        }
+
+        protected ${glInternalRowCreator} createInternalRowCreator(BeanMetaData bmd) {
+            final Class<?> clazz = bmd != null ? bmd.getBeanClass() : null;
+            return ${glInternalRowCreator}.createInternalRowCreator(clazz);
+        }
+
+        protected ${glInternalRelationRowCreator} createInternalRelationRowCreator(BeanMetaData bmd) {
+            return new ${glInternalRelationRowCreator}();
         }
     }
 
     // ===================================================================================
-    //                                                            RowCreatorImpl Extension
-    //                                                            ========================
-    protected static class RowCreatorExtension extends org.seasar.dao.impl.RowCreatorImpl {
-    
-        /** The key of DBMeta cache. */
-        protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
-
-        @Override
-        public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
-            final Object row = newBean(beanClass);
-            final ${glDBMetaInterfaceName} dbmeta = findDBMeta(row);
-            final Set columnNameSet = propertyCache.keySet();
-            String columnName = null;
-            PropertyType pt = null;
-            String propertyName = null;
-            try {
-                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = (String) ite.next();
-                    pt = (PropertyType) propertyCache.get(columnName);
-                    propertyName = pt.getPropertyName();
-                    if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final ValueType valueType = pt.getValueType();
-                        final Object value = valueType.getValue(rs, columnName);
-                        dbmeta.setupEntityProperty(propertyName, row, value);
-                    } else {
-                        registerValue(rs, row, pt, columnName);
-                    }
-                }
-            } catch (ClassCastException e) {
-                if (_log.isWarnEnabled()) {
-                    String msg = ClassCastException.class.getSimpleName() + " occurred while ResultSet Handling:";
-                    _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName + " dbmeta");
-                }
-                throwNonsenseClassCastException(row, dbmeta, e);
-            } catch (SQLException e) {
-                if (_log.isWarnEnabled()) {
-                    String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
-                    _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
-                }
-                throw e;
-            }
-            return row;
-        }
-
-        /**
-         * @param row The object of row. (NotNull)
-         * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
-         */
-        protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
-            return EntityPropertySetupperHandler.findCachedDBMeta(row);
-        }
-
-        protected void throwNonsenseClassCastException(Object entity, ${glDBMetaInterfaceName} dbmeta, ClassCastException e) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "This exception may be from ClassLoader Headache about HotDeploy." + getLineSeparator();
-            msg = msg + "Please add the ignore-package setting to convention.dicon like as follows:" + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    <initMethod name=”addIgnorePackageName”>" + getLineSeparator();
-            msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + getLineSeparator();
-            msg = msg + "    </initMethod>" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Target DBMeta]" + getLineSeparator() + dbmeta + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader() + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new NonsenseClassCastException(msg, e);
-        }
-        
-        protected String getLineSeparator() {
-            return ${glSimpleSystemUtil}.getLineSeparator();
+    //                                                                       Vert Internal
+    //                                                                       =============
+    protected static class InternalMethodUtil {
+        public static Class getElementTypeOfListFromReturnMethod(Method method) {
+            return InternalReflectionUtil.getElementTypeOfListFromReturnType(method);
         }
     }
-
-    public static class NonsenseClassCastException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public NonsenseClassCastException(String msg, ClassCastException e) {
-            super(msg, e);
-        }
-    }
-
-    /**
-     * The handler of setupper of entity property.
-     */
-    protected static class EntityPropertySetupperHandler {
-        
-        /** The key of DBMeta cache. */
-        protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
-        
-        public static ${glDBMetaInterfaceName} findCachedDBMeta(Object row) {
-            if (!(row instanceof ${glEntityInterfaceName})) {
+    protected static class InternalReflectionUtil {
+        public static Class<?> getElementTypeOfList(final Type parameterizedList) {
+            if (!(parameterizedList instanceof ParameterizedType)) {
                 return null;
             }
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) row;
-            Map<Class<?>, ${glDBMetaInterfaceName}> dbmetaCache = (Map<Class<?>, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
-            if (dbmetaCache == null) {
-                dbmetaCache = new HashMap<Class<?>, ${glDBMetaInterfaceName}>();
-                ${glInternalMapContextName}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
-            }
-            ${glDBMetaInterfaceName} dbmeta = dbmetaCache.get(entity.getClass());
-            if (dbmeta != null) {
-                return dbmeta;
-            }
-            dbmeta = entity.getDBMeta();
-            dbmetaCache.put(entity.getClass(), dbmeta);
-            return dbmeta;
-        }
-    }
-    
-    // ===================================================================================
-    //                                                    RelationRowCreatorImpl Extension
-    //                                                    ================================
-    protected static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
-    
-        @Override
-        protected Object createRelationRow(RelationRowCreationResource res)
-                throws SQLException {
-            // - - - - - - - - - - - 
-            // Recursive Call Point!
-            // - - - - - - - - - - -
-            if (!res.hasPropertyCacheElement()) {
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(parameterizedList);
+            final Type rawType = parameterizedType.getRawType();
+            if (!(rawType instanceof Class)) {
                 return null;
             }
-            setupRelationKeyValue(res);
-            setupRelationAllValue(res);
-            return res.getRow();
-        }
-    
-        @Override
-        protected void setupRelationKeyValue(RelationRowCreationResource res) {
-            final RelationPropertyType rpt = res.getRelationPropertyType();
-            final BeanMetaData bmd = rpt.getBeanMetaData();
-            for (int i = 0; i < rpt.getKeySize(); ++i) {
-                final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
-    
-                if (!res.containsColumnName(columnName)) {
-                    continue;
-                }
-                if (!res.hasRowInstance()) {
-                    res.setRow(newRelationRow(rpt));
-                }
-                if (!res.containsRelKeyValueIfExists(columnName)) {
-                    continue;
-                }
-                final Object value = res.extractRelKeyValue(columnName);
-                if (value == null) {
-                    continue;
-                }
-    
-                final String yourKey = rpt.getYourKey(i);
-                final PropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
-                final PropertyDesc pd = pt.getPropertyDesc();
-                pd.setValue(res.getRow(), value);
-                continue;
+            final Class<?> rawClass = Class.class.cast(rawType);
+            if (!rawClass.isAssignableFrom(List.class)) {
+                return null;
             }
-        }
-    
-        @Override
-        protected void setupRelationAllValue(RelationRowCreationResource res) throws SQLException {
-            final Map propertyCacheElement = res.extractPropertyCacheElement();
-            final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
-            for (final Iterator ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
-                final String columnName = (String) ite.next();
-                final PropertyType pt = (PropertyType) propertyCacheElement.get(columnName);
-                res.setCurrentPropertyType(pt);
-                if (!isValidRelationPerPropertyLoop(res)) {
-                    res.clearRowInstance();
-                    return;
-                }
-                setupRelationProperty(res);
+            final Type[] actualTypeArgument = parameterizedType.getActualTypeArguments();
+            if (actualTypeArgument == null || actualTypeArgument.length != 1) {
+                return null;
             }
-            if (!isValidRelationAfterPropertyLoop(res)) {
-                res.clearRowInstance();
-                return;
+            if (!(actualTypeArgument[0] instanceof Class)) {
+                return null;
             }
-            res.clearValidValueCount();
-            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-                setupNextRelationRow(res);
-            }
+            return Class.class.cast(actualTypeArgument[0]);
         }
-        
-        @Override
-        protected void registerRelationValue(RelationRowCreationResource res, String columnName) throws SQLException {
-            final PropertyType pt = res.getCurrentPropertyType();
-            Object value = null;
-            if (res.containsRelKeyValueIfExists(columnName)) {
-                value = res.extractRelKeyValue(columnName);
-            } else {
-                final ValueType valueType = pt.getValueType();
-                value = valueType.getValue(res.getResultSet(), columnName);
-            }
-            
-            if (value != null) {
-                res.incrementValidValueCount();
-                final ${glDBMetaInterfaceName} dbmeta = findDBMeta(res.getRow());
-                final String propertyName = pt.getPropertyName();
-                if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-                    dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
-                } else {
-                    final PropertyDesc pd = pt.getPropertyDesc();
-                    pd.setValue(res.getRow(), value);
-                }
-            }
+        public static Class<?> getElementTypeOfListFromParameterType(final Method method, final int parameterPosition) {
+            final Type[] pmbTypes = method.getGenericParameterTypes();
+            return getElementTypeOfList(pmbTypes[parameterPosition]);
         }
-        
-        /**
-         * @param row The object of row. (NotNull)
-         * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
-         */
-        protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
-            return EntityPropertySetupperHandler.findCachedDBMeta(row);
-        }
-        
-        @Override
-        protected void setupPropertyCache(RelationRowCreationResource res) throws SQLException {
-            // - - - - - - - - - - - 
-            // Recursive Call Point!
-            // - - - - - - - - - - -
-            res.initializePropertyCacheElement();
-    
-            // Do only selected foreign property for performance if condition-bean exists.
-            if (hasConditionBean(res)) {
-                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-                if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-                    return;
-                }
-            }
-            
-            // Set up property cache about current beanMetaData.
-            final BeanMetaData nextBmd = res.getRelationBeanMetaData();
-            for (int i = 0; i < nextBmd.getPropertyTypeSize(); ++i) {
-                final PropertyType pt = nextBmd.getPropertyType(i);
-                res.setCurrentPropertyType(pt);
-                if (!isTargetProperty(res)) {
-                    continue;
-                }
-                setupPropertyCacheElement(res);
-            }
-            
-            // Set up next relation.
-            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-                res.backupRelationPropertyType();
-                res.incrementCurrentRelationNestLevel();
-                try {
-                    setupNextPropertyCache(res, nextBmd);
-                } finally {
-                    res.restoreRelationPropertyType();
-                    res.decrementCurrentRelationNestLevel();
-                }
-            }
-        }
-    
-        @Override
-        protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource res) throws java.sql.SQLException {
-            final PropertyType pt = res.getCurrentPropertyType();
-            if (!pt.getPropertyDesc().hasWriteMethod()) {
-                return false;
-            }
-            if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected boolean isCreateDeadLink() {
-            return false;
-        }
-        
-        @Override
-        protected int getLimitRelationNestLevel() {
-            return 2;// for Compatible
-        }
-        
-        @Override
-        protected RelationRowCreationResource createResourceForRow(ResultSet rs,
-                RelationPropertyType rpt, Set columnNames, Map relKeyValues,
-                Map relationPropertyCache) throws SQLException {
-            final RelationRowCreationResource res = new RelationRowCreationResourceExtension();
-            res.setResultSet(rs);
-            res.setRelationPropertyType(rpt);
-            res.setColumnNames(columnNames);
-            res.setRelKeyValues(relKeyValues);
-            res.setRelationPropertyCache(relationPropertyCache);
-            res.setBaseSuffix("");// as Default
-            res.setRelationNoSuffix(buildRelationNoSuffix(rpt));
-            res.setLimitRelationNestLevel(getLimitRelationNestLevel());
-            res.setCurrentRelationNestLevel(1);// as Default
-            res.setCreateDeadLink(isCreateDeadLink());
-            return res;
-        }
-    
-        @Override
-        protected RelationRowCreationResource createResourceForPropertyCache(RelationPropertyType rpt, Set columnNames,
-                Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
-                throws SQLException {
-            final RelationRowCreationResource res = new RelationRowCreationResourceExtension();
-            res.setRelationPropertyType(rpt);
-            res.setColumnNames(columnNames);
-            res.setRelationPropertyCache(relationPropertyCache);
-            res.setBaseSuffix(baseSuffix);
-            res.setRelationNoSuffix(relationNoSuffix);
-            res.setLimitRelationNestLevel(limitRelationNestLevel);
-            res.setCurrentRelationNestLevel(1);// as Default
-            return res;
-        }
-        
-        protected boolean isConditionBeanSelectedRelation(RelationRowCreationResource res) {
-            if (hasConditionBean(res)) {
-                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-                if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        protected boolean hasConditionBean(RelationRowCreationResource res) {
-            return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
-        }
-    }
-    
-    protected static class RelationRowCreationResourceExtension extends RelationRowCreationResource {
-        protected Stack<RelationPropertyType> backupRelationPropertyType = new Stack<RelationPropertyType>();
-        protected Stack<String> backupBaseSuffix = new Stack<String>();
-        protected Stack<String> backupRelationSuffix = new Stack<String>();
-        
-        @Override
-        public void backupRelationPropertyType() {
-            backupRelationPropertyType.push(getRelationPropertyType());
-        }
-        
-        @Override
-        public void restoreRelationPropertyType() {
-            setRelationPropertyType(backupRelationPropertyType.pop());
-        }
-        
-        @Override
-        public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
-            backupBaseSuffixExtension();
-            backupRelationNoSuffixExtension();
-            setBaseSuffix(baseSuffix);
-            addRelationNoSuffix(additionalRelationNoSuffix);
-        }
-        
-        @Override
-        public void restoreSuffix() {
-            restoreBaseSuffixExtension();
-            restoreRelationNoSuffixExtension();
-        }
-        
-        protected void backupBaseSuffixExtension() {
-            backupBaseSuffix.push(getBaseSuffix());
-        }
-
-        protected void restoreBaseSuffixExtension() {
-            setBaseSuffix(backupBaseSuffix.pop());
-        }
-        
-        protected void backupRelationNoSuffixExtension() {
-            backupRelationSuffix.push(getRelationNoSuffix());
-        }
-        
-        protected void restoreRelationNoSuffixExtension() {
-            setRelationNoSuffix(backupRelationSuffix.pop());
+        public static Class<?> getElementTypeOfListFromReturnType(final Method method) {
+            return getElementTypeOfList(method.getGenericReturnType());
         }
     }
 

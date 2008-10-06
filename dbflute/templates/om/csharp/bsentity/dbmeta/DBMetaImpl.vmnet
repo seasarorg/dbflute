@@ -31,6 +31,7 @@ namespace ${myDBMetaPackageName} {
         private ${myClassName}() {
             InitializeColumnInfo();
             InitializeColumnInfoList();
+            InitializeEntityPropertySetupper();
         }
         public static ${myClassName} GetInstance() {
             return _instance;
@@ -293,20 +294,12 @@ namespace ${myDBMetaPackageName} {
             RegisterEntityPropertySetupper("$column.name", "$column.javaName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
 #end
         }
-        
+
         public override bool HasEntityPropertySetupper(String propertyName) {
-            if (_entityPropertySetupperMap.isEmpty()) {
-                InitializeEntityPropertySetupper();
-            }
             return _entityPropertySetupperMap.containsKey(propertyName);
         }
 
         public override void SetupEntityProperty(String propertyName, Object entity, Object value) {
-            if (!_entityPropertySetupperMap.containsKey(propertyName)) {
-                String msg = "The propertyName was Not Found in the map of setupper of entity property:";
-                msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.size()=" + _entityPropertySetupperMap.size();
-                throw new SystemException(msg);
-            }
             EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
             callback.Setup((${myExtendedObjectClassName})entity, value);
         }
