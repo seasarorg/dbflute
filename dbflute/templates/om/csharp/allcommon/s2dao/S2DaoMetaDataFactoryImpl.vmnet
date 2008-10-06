@@ -317,7 +317,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected static Object NewInstance(Type clazz) {
-            return clazz.NewInstance();
+            return ClassUtil.NewInstance(clazz);
         }
 
         public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
@@ -581,11 +581,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected InternalRowCreator CreateInternalRowCreator(IBeanMetaData bmd) {
-            Type clazz = bmd != null ? bmd.BeanClass : null;
+            Type clazz = bmd != null ? bmd.BeanType : null;
             return InternalRowCreator.CreateInternalRowCreator(clazz);
         }
 
-        protected InternalRelationRowCreator CreateInternalRelationRowCreator(BeanMetaData bmd) {
+        protected InternalRelationRowCreator CreateInternalRelationRowCreator(IBeanMetaData bmd) {
             return new InternalRelationRowCreator();
         }
     }
