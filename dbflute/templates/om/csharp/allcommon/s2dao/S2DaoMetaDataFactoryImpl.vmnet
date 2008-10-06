@@ -557,13 +557,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
-            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd); // For performance turning!
+            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
             return new BeanArrayMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
         }
 
         protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
-            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd); // For performance turning!
+            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
             return new BeanGenericListMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
         }
@@ -590,7 +590,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected InternalRelationRowCreator CreateInternalRelationRowCreator(IBeanMetaData bmd) {
-            return new InternalRelationRowCreator();
+            return new InternalRelationRowCreator(); // Not yet implemented about performance tuning!
         }
     }
 }

@@ -1018,7 +1018,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
 
         protected ${glInternalRelationRowCreator} createInternalRelationRowCreator(BeanMetaData bmd) {
-            return new ${glInternalRelationRowCreator}();
+            return new ${glInternalRelationRowCreator}(); // Not yet implemented about performance tuning!
         }
     }
 
