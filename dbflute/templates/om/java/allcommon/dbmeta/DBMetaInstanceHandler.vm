@@ -105,7 +105,8 @@ public class ${myClassName} {
      *     , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
      * </pre>
      * @param tableFlexibleName Table flexible-name. (NotNull)
-     * @return Instance. (NotNull)
+     * @return The instance of dbmeta. (NotNull)
+     * @exception DBMetaNotFoundException When the dbmeta is not found.
      */
     public static ${glDBMetaInterfaceName} findDBMeta(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
