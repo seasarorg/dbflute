@@ -348,8 +348,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             return row;
         }
 
-		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		public static ${glDBMetaInterfaceName} FindDBMeta(Object row) {
 		    return DBMetaCacheHandler.FindDBMeta(row);
+        }
+
+		public static ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
+		    return DBMetaCacheHandler.FindDBMeta(rowType, tableName);
         }
     }
 
@@ -415,7 +419,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override void SetupRelationKeyValue(RelationRowCreationResource res) {
             IRelationPropertyType rpt = res.RelationPropertyType;
             IBeanMetaData bmd = rpt.BeanMetaData;
-            ${glDBMetaInterfaceName} dbmeta = findDBMeta(bmd.BeanType, bmd.TableName);
+            ${glDBMetaInterfaceName} dbmeta = FindDBMeta(bmd.BeanType, bmd.TableName);
             for (int i = 0; i < rpt.KeySize; ++i) {
                 String columnName = rpt.GetMyKey(i) + res.BaseSuffix;
 
@@ -425,7 +429,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (!res.HasRowInstance()) {
                     Object row;
                     if (dbmeta != null) {
-                        row = dbmeta.newEntity();
+                        row = dbmeta.NewEntity();
                     } else {
                         row = NewRelationRow(rpt);
                     }
