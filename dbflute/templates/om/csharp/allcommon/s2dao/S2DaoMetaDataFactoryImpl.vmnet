@@ -363,7 +363,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
             System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
 			if (dbmetaCache == null) {
-			    dbmetaCache = new Dictionary<Type, ${glDBMetaInterfaceName}>();
+			    dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMetaInterfaceName}>();
 				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
 			}
             ${glDBMetaInterfaceName} dbmeta = null;
