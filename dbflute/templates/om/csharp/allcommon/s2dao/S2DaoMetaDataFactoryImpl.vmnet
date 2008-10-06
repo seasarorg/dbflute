@@ -384,7 +384,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return dbmeta;
         }
 
-        protected static ${glDBMetaInterfaceName} FindCachedDBMeta(Class<?> rowType) {
+        protected static ${glDBMetaInterfaceName} FindCachedDBMeta(Type rowType) {
             System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = FindDBMetaCache();
             if (dbmetaCache == null) {
                 dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMetaInterfaceName}>();
@@ -397,7 +397,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         
         protected static void CacheDBMeta(${glEntityInterfaceName} entity, ${glDBMetaInterfaceName} dbmeta) {
-            cacheDBMeta(entity.GetType(), dbmeta);
+            CacheDBMeta(entity.GetType(), dbmeta);
         }
         
         protected static void CacheDBMeta(Type type, ${glDBMetaInterfaceName} dbmeta) {
@@ -411,6 +411,52 @@ namespace ${glPackageBaseCommonS2Dao} {
 	}
 	
     public class InternalRelationRowCreator : RelationRowCreatorImpl {
+
+        protected override void SetupRelationKeyValue(RelationRowCreationResource res) {
+            IRelationPropertyType rpt = res.RelationPropertyType;
+            IBeanMetaData bmd = rpt.BeanMetaData;
+            ${glDBMetaInterfaceName} dbmeta = findDBMeta(bmd.BeanType, bmd.TableName);
+            for (int i = 0; i < rpt.KeySize; ++i) {
+                String columnName = rpt.GetMyKey(i) + res.BaseSuffix;
+
+                if (!res.ContainsColumnName(columnName)) {
+                    continue;
+                }
+                if (!res.HasRowInstance()) {
+                    Object row;
+                    if (dbmeta != null) {
+                        row = dbmeta.newEntity();
+                    } else {
+                        row = NewRelationRow(rpt);
+                    }
+                    res.Row = row;
+                }
+                if (!res.ContainsRelKeyValueIfExists(columnName)) {
+                    continue;
+                }
+                Object value = res.ExtractRelKeyValue(columnName);
+                if (value == null) {
+                    continue;
+                }
+
+                String yourKey = rpt.GetYourKey(i);
+                IPropertyType pt = bmd.GetPropertyTypeByColumnName(yourKey);
+                PropertyInfo pi = pt.PropertyInfo;
+                pi.SetValue(res.Row, value, null);
+                continue;
+            }
+        }
+
+        protected Object CreateRelationRowInstance(${glDBMetaInterfaceName} dbmeta) {
+            if (dbmeta != null) {
+                return dbmeta.NewEntity();
+            }
+            return null;
+        }
+
+        protected ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
+            return ${glInternalRowCreator}.FindDBMeta(rowType, tableName);
+        }
 
         protected override void SetupRelationAllValue(RelationRowCreationResource res) {
             System.Collections.Generic.IDictionary<String, IPropertyType> propertyCacheElement = res.ExtractPropertyCacheElement();
@@ -457,7 +503,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 		
 		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
-		    return DBMetaCacheHandler.FindDBMeta(row);
+		    return ${glInternalRowCreator}.FindDBMeta(row);
         }
 		
         protected override void SetupPropertyCache(RelationRowCreationResource res) {
