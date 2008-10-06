@@ -372,7 +372,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (valueType == null || !valueType.Equals(ValueTypes.OBJECT)) {
                 return new InternalObjectGenericListResultSetHandler(customizeEntityType, valueType);
             }
-            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, new RowCreatorExtension(), new RelationRowCreatorExtension());
+            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, new InternalRowCreator(), new InternalRelationRowCreator());
         }
 
         public class InternalObjectGenericListResultSetHandler : IDataReaderHandler {
@@ -387,7 +387,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Type constructed = generic.MakeGenericType(_beanType);
                 System.Collections.IList resultList = (System.Collections.IList) Activator.CreateInstance(constructed);
                 while (dataReader.Read()) {
-                    resultList.Add(_valueType.GetValue(dataReader, 0));// It's zero origin.
+                    resultList.Add(_valueType.GetValue(dataReader, 0)); // It's zero origin.
                 }
                 return resultList;
             }
@@ -510,12 +510,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, customizeResultSetFactory);
         }
 
-        protected override Seasar.Dao.IRowCreator CreateRowCreator() {
-            return new RowCreatorExtension();
+        protected override IRowCreator CreateRowCreator() {
+            return new InternalRowCreator();
         }
 
-        protected override Seasar.Dao.IRelationRowCreator CreateRelationRowCreator() {
-            return new RelationRowCreatorExtension();
+        protected override IRelationRowCreator CreateRelationRowCreator() {
+            return new InternalRelationRowCreator();
         }
 		
         // ===============================================================================

@@ -204,11 +204,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected virtual IRowCreator CreateRowCreator() {
-            return new RowCreatorExtension();
+            return new InternalRowCreator();
         }
 
         protected virtual IRelationRowCreator CreateRelationRowCreator() {
-            return new RelationRowCreatorExtension();
+            return new InternalRelationRowCreator();
         }
 
         protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
@@ -380,7 +380,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     // ===================================================================================
     //                                                                         Row Creator
     //                                                                         ===========
-    public class RowCreatorExtension : Seasar.Dao.Impl.RowCreatorImpl {
+    public class InternalRowCreator : RowCreatorImpl {
 
         public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
             Object row = NewBean(beanType);
@@ -434,7 +434,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 	}
 	
-    public class RelationRowCreatorExtension : Seasar.Dao.Impl.RelationRowCreatorImpl {
+    public class InternalRelationRowCreator : RelationRowCreatorImpl {
 
         protected override void SetupRelationAllValue(RelationRowCreationResource res) {
             IDictionary<String, IPropertyType> propertyCacheElement = res.ExtractPropertyCacheElement();
