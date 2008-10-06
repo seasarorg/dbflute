@@ -557,11 +557,15 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
-            return new BeanArrayMetaDataDataReaderHandler(bmd, CreateInternalRowCreator(bmd), CreateInternalRelationRowCreator(bmd));
+            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd); // For performance turning!
+            InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
+            return new BeanArrayMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
         }
 
         protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
-            return new BeanGenericListMetaDataDataReaderHandler(bmd, CreateInternalRowCreator(bmd), CreateInternalRelationRowCreator(bmd));
+            InternalRowCreator rowCreator = CreateInternalRowCreator(bmd); // For performance turning!
+            InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
+            return new BeanGenericListMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
         }
 
         protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {

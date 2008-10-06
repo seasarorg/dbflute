@@ -369,7 +369,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (valueType == null || !valueType.Equals(ValueTypes.OBJECT)) {
                 return new InternalObjectGenericListResultSetHandler(customizeEntityType, valueType);
             }
-            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, new InternalRowCreator(), new InternalRelationRowCreator());
+            InternalRowCreator rowCreator = CreateInternalRowCreator(specifiedBeanMetaData); // For performance turning!
+            InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(specifiedBeanMetaData);
+            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, rowCreator, relationRowCreator);
+        }
+
+        protected InternalRowCreator CreateInternalRowCreator(IBeanMetaData bmd) {
+            Type clazz = bmd != null ? bmd.BeanType : null;
+            return InternalRowCreator.CreateInternalRowCreator(clazz);
+        }
+
+        protected InternalRelationRowCreator CreateInternalRelationRowCreator(IBeanMetaData bmd) {
+            return new InternalRelationRowCreator();
         }
 
         public class InternalObjectGenericListResultSetHandler : IDataReaderHandler {
