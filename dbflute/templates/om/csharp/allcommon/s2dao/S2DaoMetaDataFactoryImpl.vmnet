@@ -11,6 +11,8 @@ using Seasar.Extension.ADO.Impl;
 using Seasar.Dao;
 using Seasar.Dao.Impl;
 
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonS2Dao} {
@@ -416,7 +418,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 			    return null;
 			}
 			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
-            IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
+            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
 			if (dbmetaCache == null) {
 			    dbmetaCache = new Dictionary<Type, ${glDBMetaInterfaceName}>();
 				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
@@ -437,8 +439,8 @@ namespace ${glPackageBaseCommonS2Dao} {
     public class InternalRelationRowCreator : RelationRowCreatorImpl {
 
         protected override void SetupRelationAllValue(RelationRowCreationResource res) {
-            IDictionary<String, IPropertyType> propertyCacheElement = res.ExtractPropertyCacheElement();
-            ICollection<String> columnNameCacheElementKeySet = propertyCacheElement.Keys;
+            System.Collections.Generic.IDictionary<String, IPropertyType> propertyCacheElement = res.ExtractPropertyCacheElement();
+            System.Collections.Generic.ICollection<String> columnNameCacheElementKeySet = propertyCacheElement.Keys;
             foreach (String columnName in columnNameCacheElementKeySet) {
                 IPropertyType pt = propertyCacheElement[columnName];
                 res.CurrentPropertyType = pt;

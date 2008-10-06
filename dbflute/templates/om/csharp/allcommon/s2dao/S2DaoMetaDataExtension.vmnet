@@ -1,20 +1,18 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Reflection;
 
+using Seasar.Framework.Beans;
+using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Extension.ADO.Types;
 using Seasar.Dao;
 using Seasar.Dao.Attrs;
 using Seasar.Dao.Dbms;
 using Seasar.Dao.Impl;
-using Seasar.Extension.ADO;
-using Seasar.Extension.ADO.Impl;
-using Seasar.Extension.ADO.Types;
-using Seasar.Framework.Beans;
-using Seasar.Framework.Util;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonAnnotation};
@@ -24,7 +22,6 @@ using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
-using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
