@@ -130,93 +130,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             set { _sqlFileEncoding = value; }
         }
     }
-	
-    public class InternalDataReaderHandlerFactory : IDataReaderHandlerFactory {
-        public virtual IDataReaderHandler GetResultSetHandler(Type beanType, IBeanMetaData bmd, MethodInfo mi) {
-            Type retType = mi.ReturnType;
-            if (typeof(DataSet).IsAssignableFrom(retType)) {
-                return CreateBeanDataSetMetaDataDataReaderHandler(bmd, retType);
-            } else if (typeof(DataTable).IsAssignableFrom(retType)) {
-                return CreateBeanDataTableMetaDataDataReaderHandler(bmd, retType);
-            } else if (retType.IsArray) {
-                Type elementType = retType.GetElementType();
-                if (AssignTypeUtil.IsSimpleType(elementType)) {
-                    return CreateObjectArrayDataReaderHandler(elementType);
-                } else {
-                    return CreateBeanArrayMetaDataDataReaderHandler(bmd);
-                }
-            } else if (AssignTypeUtil.IsList(retType)) {
-                if (AssignTypeUtil.IsSimpleType(beanType)) {
-                    return CreateObjectListDataReaderHandler();
-                } else {
-                    return CreateBeanListMetaDataDataReaderHandler(bmd);
-                }
-            } else if (IsBeanTypeAssignable(beanType, retType)) {
-                return CreateBeanMetaDataDataReaderHandler(bmd);
-            } else if (AssignTypeUtil.IsGenericList(retType)) {
-                Type elementType = retType.GetGenericArguments()[0];
-                if (AssignTypeUtil.IsSimpleType(elementType)) {
-                    return CreateObjectGenericListDataReaderHandler(elementType);
-                } else {
-                    return CreateBeanGenericListMetaDataDataReaderHandler(bmd);
-                }
-            } else {
-                return CreateObjectDataReaderHandler();
-            }
-        }
-
-        protected virtual ObjectGenericListDataReaderHandler CreateObjectGenericListDataReaderHandler(Type elementType) {
-            return new ObjectGenericListDataReaderHandler(elementType);
-        }
-
-        protected virtual ObjectListDataReaderHandler CreateObjectListDataReaderHandler() {
-            return new ObjectListDataReaderHandler();
-        }
-
-        protected virtual ObjectArrayDataReaderHandler CreateObjectArrayDataReaderHandler(Type elementType) {
-            return new ObjectArrayDataReaderHandler(elementType);
-        }
-
-        protected virtual BeanDataSetMetaDataDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
-            return new BeanDataSetMetaDataDataReaderHandler(returnType);
-        }
-
-        protected virtual BeanDataTableMetaDataDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
-            return new BeanDataTableMetaDataDataReaderHandler(returnType);
-        }
-
-        protected virtual BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
-        }
-
-        protected virtual BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
-        }
-
-        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanArrayMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
-        }
-
-        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanGenericListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
-        }
-
-        protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {
-            return new ObjectDataReaderHandler();
-        }
-
-        protected virtual IRowCreator CreateRowCreator() {
-            return new InternalRowCreator();
-        }
-
-        protected virtual IRelationRowCreator CreateRelationRowCreator() {
-            return new InternalRelationRowCreator();
-        }
-
-        protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
-            return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
-        }
-    }
 
     // ===================================================================================
     //                                                                           Procedure
@@ -384,9 +297,39 @@ namespace ${glPackageBaseCommonS2Dao} {
     //                                                                         ===========
     public class InternalRowCreator : RowCreatorImpl {
 
+        protected ${glDBMetaInterfaceName} _dbmeta;
+        public ${glDBMetaInterfaceName} DBMeta { set { _dbmeta = value; } }
+
+        public static InternalRowCreator CreateInternalRowCreator(Type beanClass) {
+            InternalRowCreator rowCreator = new InternalRowCreator();
+            if (beanClass != null) {
+                rowCreator.DBMeta = FindDBMetaByClass(beanClass);
+            }
+            return rowCreator;
+        }
+
+        protected static ${glDBMetaInterfaceName} FindDBMetaByClass(Type beanClass) {
+            Object instance = NewInstance(beanClass);
+            if (!(instance is ${glEntityInterfaceName})) {
+                return null;
+            }
+            return ((${glEntityInterfaceName})instance).DBMeta;
+        }
+
+        protected static Object NewInstance(Type clazz) {
+            return clazz.NewInstance();
+        }
+
         public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
-            Object row = NewBean(beanType);
-            ${glDBMetaInterfaceName} dbmeta = FindDBMeta(row);
+            Object row;
+            ${glDBMetaInterfaceName} dbmeta;
+            if (_dbmeta != null) {
+                dbmeta = _dbmeta;
+                row = dbmeta.NewEntity();
+            } else {
+                row = NewBean(beanType);
+                dbmeta = FindDBMeta(row);
+            }
             if (dbmeta != null) {
                 foreach (IColumnMetaData column in columns) {
                     Object value = column.ValueType.GetValue(reader, column.ColumnName);
@@ -545,6 +488,105 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool HasConditionBean(RelationRowCreationResource res) {
             return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                 Data Reader Handler
+    //                                                                 ===================
+    public class InternalDataReaderHandlerFactory : IDataReaderHandlerFactory {
+        public virtual IDataReaderHandler GetResultSetHandler(Type beanType, IBeanMetaData bmd, MethodInfo mi) {
+            Type retType = mi.ReturnType;
+            if (typeof(DataSet).IsAssignableFrom(retType)) {
+                return CreateBeanDataSetMetaDataDataReaderHandler(bmd, retType);
+            } else if (typeof(DataTable).IsAssignableFrom(retType)) {
+                return CreateBeanDataTableMetaDataDataReaderHandler(bmd, retType);
+            } else if (retType.IsArray) {
+                Type elementType = retType.GetElementType();
+                if (AssignTypeUtil.IsSimpleType(elementType)) {
+                    return CreateObjectArrayDataReaderHandler(elementType);
+                } else {
+                    return CreateBeanArrayMetaDataDataReaderHandler(bmd);
+                }
+            } else if (AssignTypeUtil.IsList(retType)) {
+                if (AssignTypeUtil.IsSimpleType(beanType)) {
+                    return CreateObjectListDataReaderHandler();
+                } else {
+                    return CreateBeanListMetaDataDataReaderHandler(bmd);
+                }
+            } else if (IsBeanTypeAssignable(beanType, retType)) {
+                return CreateBeanMetaDataDataReaderHandler(bmd);
+            } else if (AssignTypeUtil.IsGenericList(retType)) {
+                Type elementType = retType.GetGenericArguments()[0];
+                if (AssignTypeUtil.IsSimpleType(elementType)) {
+                    return CreateObjectGenericListDataReaderHandler(elementType);
+                } else {
+                    return CreateBeanGenericListMetaDataDataReaderHandler(bmd);
+                }
+            } else {
+                return CreateObjectDataReaderHandler();
+            }
+        }
+
+        protected virtual ObjectGenericListDataReaderHandler CreateObjectGenericListDataReaderHandler(Type elementType) {
+            return new ObjectGenericListDataReaderHandler(elementType);
+        }
+
+        protected virtual ObjectListDataReaderHandler CreateObjectListDataReaderHandler() {
+            return new ObjectListDataReaderHandler();
+        }
+
+        protected virtual ObjectArrayDataReaderHandler CreateObjectArrayDataReaderHandler(Type elementType) {
+            return new ObjectArrayDataReaderHandler(elementType);
+        }
+
+        protected virtual BeanDataSetMetaDataDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
+            return new BeanDataSetMetaDataDataReaderHandler(returnType);
+        }
+
+        protected virtual BeanDataTableMetaDataDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
+            return new BeanDataTableMetaDataDataReaderHandler(returnType);
+        }
+
+        protected virtual BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
+        }
+
+        protected virtual BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
+        }
+
+        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
+            return new BeanArrayMetaDataDataReaderHandler(bmd, CreateInternalRowCreator(bmd), CreateInternalRelationRowCreator(bmd));
+        }
+
+        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
+            return new BeanGenericListMetaDataDataReaderHandler(bmd, CreateInternalRowCreator(bmd), CreateInternalRelationRowCreator(bmd));
+        }
+
+        protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {
+            return new ObjectDataReaderHandler();
+        }
+
+        protected virtual IRowCreator CreateRowCreator() {
+            return CreateInternalRowCreator(null);
+        }
+
+        protected virtual IRelationRowCreator CreateRelationRowCreator() {
+            return CreateInternalRelationRowCreator(null);
+        }
+
+        protected virtual bool IsBeanTypeAssignable(Type beanType, Type type) {
+            return beanType.IsAssignableFrom(type) || type.IsAssignableFrom(beanType);
+        }
+
+        protected InternalRowCreator CreateInternalRowCreator(IBeanMetaData bmd) {
+            Type clazz = bmd != null ? bmd.BeanClass : null;
+            return InternalRowCreator.CreateInternalRowCreator(clazz);
+        }
+
+        protected InternalRelationRowCreator CreateInternalRelationRowCreator(BeanMetaData bmd) {
+            return new InternalRelationRowCreator();
         }
     }
 }

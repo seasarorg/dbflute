@@ -999,14 +999,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         
         @Override
-        protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData bmd) {
+        protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData bmd) { // DBFlute Target
             final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
             final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
             return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
         
         @Override
-        protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData bmd) {
+        protected ResultSetHandler createBeanArrayMetaDataResultSetHandler(BeanMetaData bmd) { // DBFlute Target
             final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
             final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
             return new ${glInternalBeanArrayMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
