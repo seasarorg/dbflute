@@ -150,13 +150,10 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
         res.initializePropertyCacheElement();
 
         // Do only selected foreign property for performance if condition-bean exists.
-        if (hasConditionBean(res)) {
-            final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-            if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-                return;
-            }
+        if (hasConditionBean(res) && !hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+            return;
         }
-        
+                
         // Set up property cache about current beanMetaData.
         final BeanMetaData nextBmd = res.getRelationBeanMetaData();
         for (int i = 0; i < nextBmd.getPropertyTypeSize(); ++i) {
@@ -251,7 +248,15 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     protected boolean hasConditionBean(RelationRowCreationResource res) {
         return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
     }
-
+    
+    protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
+            return true;
+        }
+        return false;
+    }
+    
     protected static class RelationRowCreationResourceExtension extends RelationRowCreationResource {
         protected Stack<RelationPropertyType> backupRelationPropertyType = new Stack<RelationPropertyType>();
         protected Stack<String> backupBaseSuffix = new Stack<String>();

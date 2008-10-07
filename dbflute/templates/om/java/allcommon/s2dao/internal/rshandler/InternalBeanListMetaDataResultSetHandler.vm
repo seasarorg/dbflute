@@ -1,16 +1,16 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalRsHandler};
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
@@ -18,6 +18,9 @@ import org.seasar.dao.RowCreator;
 import org.seasar.dao.impl.AbstractBeanMetaDataResultSetHandler;
 import org.seasar.dao.impl.RelationKey;
 import org.seasar.dao.impl.RelationRowCache;
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -45,14 +48,15 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
         Set columnNames = null;
 
         // Map<String(columnName), PropertyType>
-        Map propertyCache = null;// [DAO-118] (2007/08/26)
+        Map propertyCache = null; // [DAO-118] (2007/08/26)
 
         // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
-        Map relationPropertyCache = null;// [DAO-118] (2007/08/25)
+        Map relationPropertyCache = null; // [DAO-118] (2007/08/25)
 
         final List list = new ArrayList();
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
         final RelationRowCache relRowCache = new RelationRowCache(relSize);
+        final boolean hasCB = hasConditionBean();
 
         while (rs.next()) {
             // Lazy initialization because if the result is zero, the cache is unused.
@@ -70,16 +74,19 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
             final Object row = createRow(rs, propertyCache);
 
             for (int i = 0; i < relSize; ++i) {
-                RelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
+                final RelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
                 if (rpt == null) {
                     continue;
                 }
+
+                // Do only selected foreign property for performance if condition-bean exists.
+                if (hasCB && !hasSelectedForeignInfo(buildRelationNoSuffix(rpt))) {
+                    continue;
+                }
+
+                final Map relKeyValues = new HashMap();
+                final RelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues);
                 Object relationRow = null;
-                Map relKeyValues = new HashMap();
-				// /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-				// If it returns null at first record, may it be unnecessary after second records?
-				// - - - - - - - - - -/
-                RelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues);
                 if (relKey != null) {
                     relationRow = relRowCache.getRelationRow(i, relKey);
                     if (relationRow == null) {
@@ -88,7 +95,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
                     }
                 }
                 if (relationRow != null) {
-                    PropertyDesc pd = rpt.getPropertyDesc();
+                    final PropertyDesc pd = rpt.getPropertyDesc();
                     pd.setValue(row, relationRow);
                     postCreateRow(relationRow);
                 }
@@ -100,8 +107,8 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
     }
 
     protected RelationKey createRelationKey(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues) throws SQLException {
-        List keyList = new ArrayList();
-        BeanMetaData bmd = rpt.getBeanMetaData();
+        final List keyList = new ArrayList();
+        final BeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             /*
              * PropertyType pt = bmd
@@ -109,21 +116,21 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
              * valueType = pt.getValueType(); String columnName =
              * pt.getColumnName() + "_" + rpt.getRelationNo();
              */
-            ValueType valueType = null;
+            final ValueType valueType;
             String columnName = rpt.getMyKey(i);
             if (columnNames.contains(columnName)) {
                 PropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
                 valueType = pt.getValueType();
             } else {
                 PropertyType pt = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
-                columnName = pt.getColumnName() + "_" + rpt.getRelationNo();
+                columnName = pt.getColumnName() + buildRelationNoSuffix(rpt);
                 if (columnNames.contains(columnName)) {
                     valueType = pt.getValueType();
                 } else {
                     return null;
                 }
             }
-            Object value = valueType.getValue(rs, columnName);
+            final Object value = valueType.getValue(rs, columnName);
             if (value == null) {
                 return null;
             }
@@ -136,5 +143,24 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
         } else {
             return null;
         }
+    }
+    
+	// ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected boolean hasConditionBean() {
+        return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
+    }
+    
+    protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
+            return true;
+        }
+        return false;
+    }
+    
+    protected String buildRelationNoSuffix(RelationPropertyType rpt) {
+        return "_" + rpt.getRelationNo();
     }
 }
