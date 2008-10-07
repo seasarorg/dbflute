@@ -29,6 +29,9 @@ public class ${glOutsideSqlPagingExecutorName} {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
+    /** Is the count select executed after the paging select? */
+    protected boolean _countLater;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -121,12 +124,12 @@ public class ${glOutsideSqlPagingExecutorName} {
             }
         };
         final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
-#if ($database.isDatabaseMySQL())
-        invoker.countLater();
-#end
+        if (_countLater) {
+            invoker.countLater();
+        }
         return invoker.invokePaging(handler);
     }
-    
+
     protected void setupScrollableCursorIfNeeds() {
         if (!_outsideSqlOption.isAutoPaging()) {
             return;
@@ -149,10 +152,6 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
-    }
-	
     public ${glOutsideSqlPagingExecutorName} configure(${glStatementConfig} statementConfig) {
 		_outsideSqlOption.setStatementConfig(statementConfig);
         return this;
@@ -162,4 +161,19 @@ public class ${glOutsideSqlPagingExecutorName} {
         _outsideSqlOption.dynamicBinding();
         return this;
     }
+
+    public ${glOutsideSqlPagingExecutorName} countLater() {
+        _countLater = true;
+        return this;
+    }
+#if ($database.isMakeDeprecated())
+
+    /**
+     * @return The executor of cursor. (NotNull)
+     * @deprecated This method is no cop. This was implemented by mistake. 
+     */
+    public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> cursorHandling() {
+        return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
+    }
+#end
 }
