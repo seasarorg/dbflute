@@ -22,6 +22,7 @@ using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
+using ${glPackageBaseCommonS2DaoInternalRsHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -371,7 +372,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             InternalRowCreator rowCreator = CreateInternalRowCreator(specifiedBeanMetaData); // For performance turning!
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(specifiedBeanMetaData);
-            return new BeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData, rowCreator, relationRowCreator);
+            return new ${glInternalBeanGenericListMetaDataResultSetHandler}(specifiedBeanMetaData, rowCreator, relationRowCreator);
         }
 
         protected InternalRowCreator CreateInternalRowCreator(IBeanMetaData bmd) {

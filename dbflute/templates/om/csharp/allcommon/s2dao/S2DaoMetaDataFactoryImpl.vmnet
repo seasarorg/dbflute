@@ -14,6 +14,7 @@ using Seasar.Dao.Impl;
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonS2DaoInternalRsHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -637,16 +638,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new BeanMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
+        // DBFlute Target (but unused actually)
+        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
             InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
-            return new BeanArrayMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
+            return new ${glInternalBeanArrayMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
 
-        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) { // DBFlute Target
+        // DBFlute Target
+        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
             InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
-            return new BeanGenericListMetaDataDataReaderHandler(bmd, rowCreator, relationRowCreator);
+            return new ${glInternalBeanGenericListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
 
         protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {
