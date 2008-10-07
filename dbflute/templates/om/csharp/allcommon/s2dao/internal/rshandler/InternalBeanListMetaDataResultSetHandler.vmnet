@@ -136,7 +136,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         protected bool IsSelectedForeignInfoEmpty() {
             if (!HasConditionBean()) {
-                return false;
+                return true;
             }
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.SqlClause.isSelectedForeignInfoEmpty()) {

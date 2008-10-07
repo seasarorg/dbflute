@@ -155,7 +155,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
 
     protected boolean isSelectedForeignInfoEmpty() {
         if (!hasConditionBean()) {
-            return false;
+            return true;
         }
         ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().isSelectedForeignInfoEmpty()) {
