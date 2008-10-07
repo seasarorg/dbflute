@@ -10,6 +10,8 @@ import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
 
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -84,17 +86,26 @@ public abstract class ${glInternalAbstractBeanMetaDataResultSetHandler} extends 
      * @throws SQLException
      */
     protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-            Set columnNames, Map relKeyValues, Map relationPropertyCache)
-            throws SQLException {
+            Set columnNames, Map relKeyValues, Map relationPropertyCache) throws SQLException {
         return relationRowCreator.createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache);
     }
 
+    /**
+     * @param row The row of result list. (NotNull)
+     */
     protected void postCreateRow(final Object row) {
-        final BeanMetaData bmd = getBeanMetaData();
-        final Set names = bmd.getModifiedPropertyNames(row);
-        names.clear();
+        if (row instanceof ${glEntityInterfaceName}) {
+            ((${glEntityInterfaceName})row).clearModifiedPropertyNames();
+        } else {
+            final BeanMetaData bmd = getBeanMetaData();
+            final Set names = bmd.getModifiedPropertyNames(row);
+            names.clear();
+        }
     }
 
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public BeanMetaData getBeanMetaData() {
         return beanMetaData;
     }

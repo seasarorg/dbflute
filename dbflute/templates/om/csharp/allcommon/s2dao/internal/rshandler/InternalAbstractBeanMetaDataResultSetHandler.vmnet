@@ -18,18 +18,24 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         protected IRelationRowCreator _relationRowCreator; // [DAONET-56] (2007/08/29)
 
         // ===============================================================================
-        //                                                                      Definition
-        //                                                                      ==========
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${glInternalAbstractBeanMetaDataResultSetHandler}(IBeanMetaData beanMetaData, IRowCreator rowCreator, IRelationRowCreator relationRowCreator) {
             _beanMetaData = beanMetaData;
             _rowCreator = rowCreator;
             _relationRowCreator = relationRowCreator;
         }
 
-        public IBeanMetaData BeanMetaData {
-            get { return _beanMetaData; }
+        // ===============================================================================
+        //                                                                          Handle
+        //                                                                          ======
+        public virtual object Handle(IDataReader dataReader) {
+            return null;
         }
 
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected virtual IColumnMetaData[] CreateColumnMetaData(System.Collections.IList columnNames) {
             return _rowCreator.CreateColumnMetaData(columnNames, _beanMetaData);
         }
@@ -37,7 +43,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         protected virtual object CreateRow(IDataReader reader, IColumnMetaData[] columns) {
             object row = _rowCreator.CreateRow(reader, columns, _beanMetaData.BeanType);
             if (row != null) {
-                BeanMetaData.ClearModifiedPropertyNames(row);
+                PostCreateRow(row, BeanMetaData);
             }
             return row;
         }
@@ -50,8 +56,8 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues,
             IDictionary<String, IDictionary<String, IPropertyType>> relationColumnMetaDataCache) {
             object relationRow = _relationRowCreator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, relationColumnMetaDataCache);
-            if ( relationRow != null ) {
-                rpt.BeanMetaData.ClearModifiedPropertyNames(relationRow);
+            if (relationRow != null) {
+                PostCreateRow(relationRow, rpt.BeanMetaData);
             }
             return relationRow;
         }
@@ -73,8 +79,19 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return columnNames;
         }
 
-        public virtual object Handle(IDataReader dataReader) {
-            return null;
+        protected virtual void PostCreateRow(final Object row, IBeanMetaData bmd) {
+            if (row is ${glEntityInterfaceName}) {
+                ((${glEntityInterfaceName})row).ClearModifiedPropertyNames();
+            } else {
+                bmd.ClearModifiedPropertyNames(row);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IBeanMetaData BeanMetaData {
+            get { return _beanMetaData; }
         }
     }
 }
