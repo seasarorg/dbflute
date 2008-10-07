@@ -56,7 +56,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                         continue;
                     }
 
-                    object relRow = null;
+                    Object relRow = null;
                     System.Collections.Hashtable relKeyValues = new System.Collections.Hashtable();
                     RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues);
                     if (relKey != null) {
@@ -79,8 +79,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             IRelationPropertyType rpt, System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues) {
             System.Collections.ArrayList keyList = new System.Collections.ArrayList();
             IBeanMetaData bmd = rpt.BeanMetaData;
-            for (int i = 0; i < rpt.KeySize; ++i)
-            {
+            for (int i = 0; i < rpt.KeySize; ++i) {
                 IValueType valueType = null;
                 string columnName = rpt.GetMyKey(i);
                 IPropertyType pt;
