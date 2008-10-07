@@ -15,7 +15,7 @@ import org.seasar.dao.RowCreator;
  * @author ${database.ClassAuthor}
  */
 @SuppressWarnings("unchecked")
-public class ${glInternalAbstractDtoMetaDataResultSetHandler} implements ResultSetHandler {
+public abstract class ${glInternalAbstractDtoMetaDataResultSetHandler} implements ResultSetHandler {
 
 	// ===================================================================================
     //                                                                           Attribute
@@ -30,7 +30,7 @@ public class ${glInternalAbstractDtoMetaDataResultSetHandler} implements ResultS
      * @param dtoMetaData Dto meta data. (NotNull)
      * @param rowCreator Row creator. (NotNull)
      */
-    public AbstractDtoMetaDataResultSetHandler(DtoMetaData dtoMetaData, RowCreator rowCreator) {
+    public ${glInternalAbstractDtoMetaDataResultSetHandler}(DtoMetaData dtoMetaData, RowCreator rowCreator) {
         this.dtoMetaData = dtoMetaData;
         this.rowCreator = rowCreator;
     }
