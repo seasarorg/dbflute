@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
