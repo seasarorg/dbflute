@@ -75,7 +75,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
+        public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
             _outsideSqlOption.StatementConfig = statementConfig;
             return this;
         }

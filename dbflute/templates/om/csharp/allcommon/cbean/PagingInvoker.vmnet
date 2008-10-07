@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                       Attribute
         //                                                                       =========
         protected String _tableDbName;
-        protected String _countLater;
+        protected bool _countLater;
 
         // ===============================================================================
         //                                                                     Constructor
