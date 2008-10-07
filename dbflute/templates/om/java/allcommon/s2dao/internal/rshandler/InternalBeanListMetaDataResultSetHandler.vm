@@ -58,7 +58,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         final boolean hasCB = hasConditionBean();
 
         while (rs.next()) {
-            // Lazy initialization because if the result is zero, the cache is unused.
+            // Lazy initialization because if the result is zero, the resources are unused.
 			if (columnNames == null) {
 			    columnNames = createColumnNames(rs.getMetaData());
 			}

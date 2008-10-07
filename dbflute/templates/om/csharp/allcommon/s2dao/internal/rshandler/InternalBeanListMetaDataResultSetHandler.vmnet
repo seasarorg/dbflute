@@ -31,9 +31,8 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected void Handle(IDataReader dataReader, System.Collections.IList list) {
-            System.Collections.IList columnNames = CreateColumnNames(dataReader.GetSchemaTable());
-
-            IColumnMetaData[] columns = null; // [DAONET-56] (2007/08/29)
+            System.Collections.IList columnNames = null;
+            IColumnMetaData[] columns = null;
             IDictionary<String, IDictionary<String, IPropertyType>> relationPropertyCache = null;
 
             int relSize = BeanMetaData.RelationPropertyTypeSize;
@@ -41,7 +40,10 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             bool hasCB = HasConditionBean();
 
             while (dataReader.Read()) {
-                // Lazy initialization because if the result is zero, the cache is unused.
+                // Lazy initialization because if the result is zero, the resources are unused.
+                if (columnNames == null) {
+                    columnNames = CreateColumnNames(dataReader.GetSchemaTable());
+                }
                 if (columns == null) {
                     columns = CreateColumnMetaData(columnNames);
                 }
