@@ -88,15 +88,17 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
                 Object relationRow = null;
                 if (relKey != null) {
                     relationRow = relRowCache.getRelationRow(i, relKey);
-                    if (relationRow == null) {
+                    if (relationRow == null) { // when no cache
                         relationRow = createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache);
-                        relRowCache.addRelationRow(i, relKey, relationRow);
+                        if (relationRow != null) {
+                            relRowCache.addRelationRow(i, relKey, relationRow);
+                            postCreateRow(relationRow);
+                        }
                     }
                 }
                 if (relationRow != null) {
                     final PropertyDesc pd = rpt.getPropertyDesc();
                     pd.setValue(row, relationRow);
-                    postCreateRow(relationRow);
                 }
             }
             postCreateRow(row);

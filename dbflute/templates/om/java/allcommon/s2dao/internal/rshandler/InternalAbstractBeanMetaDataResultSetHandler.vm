@@ -94,9 +94,9 @@ public abstract class ${glInternalAbstractBeanMetaDataResultSetHandler} extends 
      * @param row The row of result list. (NotNull)
      */
     protected void postCreateRow(final Object row) {
-        if (row instanceof ${glEntityInterfaceName}) {
+        if (row instanceof ${glEntityInterfaceName}) { // DBFlute Target
             ((${glEntityInterfaceName})row).clearModifiedPropertyNames();
-        } else {
+        } else { // Basically Unreachable
             final BeanMetaData bmd = getBeanMetaData();
             final Set names = bmd.getModifiedPropertyNames(row);
             names.clear();

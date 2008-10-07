@@ -29,7 +29,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         // ===============================================================================
         //                                                                          Handle
         //                                                                          ======
-        public virtual object Handle(IDataReader dataReader) {
+        public virtual Object Handle(IDataReader dataReader) {
             return null;
         }
 
@@ -40,33 +40,25 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return _rowCreator.CreateColumnMetaData(columnNames, _beanMetaData);
         }
 
-        protected virtual object CreateRow(IDataReader reader, IColumnMetaData[] columns) {
-            object row = _rowCreator.CreateRow(reader, columns, _beanMetaData.BeanType);
-            if (row != null) {
-                PostCreateRow(row, BeanMetaData);
-            }
-            return row;
+        protected virtual Object CreateRow(IDataReader reader, IColumnMetaData[] columns) {
+            return _rowCreator.CreateRow(reader, columns, _beanMetaData.BeanType);
         }
 
         protected virtual IDictionary<string, IDictionary<string, IPropertyType>> CreateRelationPropertyCache(System.Collections.IList columnNames) {
             return _relationRowCreator.CreateRelationPropertyCache(columnNames, _beanMetaData);
         }
 
-        protected virtual object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt,
+        protected virtual Object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt,
             System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues,
             IDictionary<String, IDictionary<String, IPropertyType>> relationColumnMetaDataCache) {
-            object relationRow = _relationRowCreator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, relationColumnMetaDataCache);
-            if (relationRow != null) {
-                PostCreateRow(relationRow, rpt.BeanMetaData);
-            }
-            return relationRow;
+            return _relationRowCreator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, relationColumnMetaDataCache);
         }
 
         protected virtual bool IsTargetProperty(IPropertyType pt) { // [DAONET-56] (2007/08/29)
             return pt.PropertyInfo.CanWrite;
         }
 
-        protected virtual object CreateRelationRow(IRelationPropertyType rpt) {
+        protected virtual Object CreateRelationRow(IRelationPropertyType rpt) {
             return ClassUtil.NewInstance(rpt.PropertyInfo.PropertyType);
         }
 
@@ -80,9 +72,9 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected virtual void PostCreateRow(final Object row, IBeanMetaData bmd) {
-            if (row is ${glEntityInterfaceName}) {
+            if (row is ${glEntityInterfaceName}) { // DBFlute Target
                 ((${glEntityInterfaceName})row).ClearModifiedPropertyNames();
-            } else {
+            } else { // Basically Unreachable
                 bmd.ClearModifiedPropertyNames(row);
             }
         }

@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         // ===============================================================================
         //                                                                          Handle
         //                                                                          ======
-        public override object Handle(IDataReader dataReader) {
+        public override Object Handle(IDataReader dataReader) {
             System.Collections.ArrayList list = new System.Collections.ArrayList();
             Handle(dataReader, list);
             return list;
@@ -49,7 +49,9 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 Object row = CreateRow(dataReader, columns);
                 for (int i = 0; i < relSize; ++i) {
                     IRelationPropertyType rpt = BeanMetaData.GetRelationPropertyType(i);
-                    if (rpt == null) continue;
+                    if (rpt == null) {
+                        continue;
+                    }
 
                     // Do only selected foreign property for performance if condition-bean exists.
                     if (hasCB && !HasSelectedForeignInfo(BuildRelationNoSuffix(rpt))) {
@@ -63,7 +65,10 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                         relRow = relRowCache.GetRelationRow(i, relKey);
                         if (relRow == null) {
                             relRow = CreateRelationRow(dataReader, rpt, columnNames, relKeyValues, relationPropertyCache);
-                            relRowCache.AddRelationRow(i, relKey, relRow);
+                            if (relRow != null) {
+                                relRowCache.AddRelationRow(i, relKey, relRow);
+                                PostCreateRow(relationRow, rpt.BeanMetaData);
+                            }
                         }
                     }
                     if (relRow != null) {
@@ -71,6 +76,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                         pi.SetValue(row, relRow, null);
                     }
                 }
+                PostCreateRow(row, BeanMetaData);
                 list.Add(row);
             }
         }
