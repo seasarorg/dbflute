@@ -164,6 +164,12 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         return false;
     }
 
+    /**
+     * Has it selected foreign information?
+     * You should call hasConditionBean() before calling this!
+     * @param relationNoSuffix The suffix of relation NO. (NotNull)
+     * @return Determination.
+     */
     protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {

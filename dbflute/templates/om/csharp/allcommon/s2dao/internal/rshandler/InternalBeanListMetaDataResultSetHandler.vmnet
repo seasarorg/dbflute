@@ -145,6 +145,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return false;
         }
 
+        // You should call HasConditionBean() before calling this!
         protected bool HasSelectedForeignInfo(String relationNoSuffix) {
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.SqlClause.hasSelectedForeignInfo(relationNoSuffix)) {
