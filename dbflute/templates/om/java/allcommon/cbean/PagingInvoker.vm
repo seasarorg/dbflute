@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
+import java.util.List;
+
 /**
  * The invoker of paging.
  * @param <ENTITY> The type of entity.
@@ -38,7 +40,7 @@ public class ${glPagingInvokerName}<ENTITY> {
             throw new IllegalStateException(msg);
         }
         final int allRecordCount = handler.count();
-        final java.util.List<ENTITY> selectedList = handler.paging();
+        final List<ENTITY> selectedList = handler.paging();
         final ${glPagingResultBeanName}<ENTITY> rb = new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
         if (isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
