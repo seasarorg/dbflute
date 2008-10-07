@@ -439,6 +439,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                               Selected Foreign Info
     //                                                               =====================
+	public boolean isSelectedForeignInfoEmpty();
 	public boolean hasSelectedForeignInfo(String relationPath);
 	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 	

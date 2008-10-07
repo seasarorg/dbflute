@@ -56,6 +56,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
         final RelationRowCache relRowCache = new RelationRowCache(relSize);
         final boolean hasCB = hasConditionBean();
+        final boolean emptyRelation = isSelectedForeignInfoEmpty();
 
         while (rs.next()) {
             // Lazy initialization because if the result is zero, the resources are unused.
@@ -72,6 +73,11 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
             // Create row instance of base table by row property cache.
             final Object row = createRow(rs, propertyCache);
 
+            if (hasCB && emptyRelation) {
+                postCreateRow(row);
+                list.add(row);
+                continue;
+            }
             for (int i = 0; i < relSize; ++i) {
                 final RelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
                 if (rpt == null) {
@@ -146,7 +152,18 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     protected boolean hasConditionBean() {
         return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
     }
-    
+
+    protected boolean isSelectedForeignInfoEmpty() {
+        if (!hasConditionBean()) {
+            return false;
+        }
+        ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        if (cb.getSqlClause().isSelectedForeignInfoEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
     protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {

@@ -172,6 +172,7 @@ public interface ${glSqlClauseInterfaceName} {
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
+	bool isSelectedForeignInfoEmpty();
 	bool hasSelectedForeignInfo(String relationPath);
 	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 	

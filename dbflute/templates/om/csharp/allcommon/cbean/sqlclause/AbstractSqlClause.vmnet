@@ -1170,6 +1170,13 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
+	public bool isSelectedForeignInfoEmpty() {
+		if (_selectedForeignInfo == null) {
+		    return false;
+		}
+        return _selectedForeignInfo.isEmpty();
+	}
+
 	public bool hasSelectedForeignInfo(String relationPath) {
 		if (_selectedForeignInfo == null) {
 		    return false;
