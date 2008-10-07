@@ -150,7 +150,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
         res.initializePropertyCacheElement();
 
         // Do only selected foreign property for performance if condition-bean exists.
-        if (hasConditionBean(res) && !hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+        if (hasConditionBean(res) && !hasSelectedForeignInfo(res)) {
             return;
         }
 
@@ -179,7 +179,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     }
 
     @Override
-    protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource res) throws java.sql.SQLException {
+    protected boolean isTargetProperty(RelationRowCreationResource res) throws SQLException {
         final PropertyType pt = res.getCurrentPropertyType();
         if (!pt.getPropertyDesc().hasWriteMethod()) {
             return false;
@@ -249,9 +249,9 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
         return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
     }
     
-    protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
+    protected boolean hasSelectedForeignInfo(RelationRowCreationResource res) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
+        if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
             return true;
         }
         return false;

@@ -518,11 +518,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             res.InitializePropertyCacheElement();
 
             // Do only selected foreign property for performance if condition-bean exists.
-            if (HasConditionBean(res)) {
-                ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
-                if (!cb.SqlClause.hasSelectedForeignInfo(res.RelationNoSuffix)) {
-                    return;
-                }
+            if (HasConditionBean(res) && !HasSelectedForeignInfo(res)) {
+                return;
             }
 
             // Set up property cache about current beanMetaData.
@@ -570,6 +567,14 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool HasConditionBean(RelationRowCreationResource res) {
             return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+        }
+
+        protected bool HasSelectedForeignInfo(RelationRowCreationResource res) {
+            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            if (cb.SqlClause.hasSelectedForeignInfo(res.RelationNoSuffix)) {
+                return true;
+            }
+            return false;
         }
     }
 

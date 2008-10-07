@@ -145,7 +145,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends AbstractBeanM
         }
     }
     
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean hasConditionBean() {
