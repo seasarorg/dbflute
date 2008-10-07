@@ -32,12 +32,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
         }
 
-        public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path
-                                                                  , ${glPagingBeanInterfaceName} pmb) {
+        public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
             ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
             ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
             DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, typeof(ENTITY), countExecutor, this);
-            ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+            ${glPagingInvokerName}<ENTITY> invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+            if (pmb.IsCountLater) {
+                invoker.CountLater();
+            }
             return invoker.InvokePaging(handler);
         }
 
@@ -70,8 +72,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> CursorHandling() {
-            return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
+        public ${glOutsideSqlPagingExecutorName} Configure(${glStatementConfig} statementConfig) {
+            _outsideSqlOption.StatementConfig = statementConfig;
+            return this;
         }
 
         public ${glOutsideSqlPagingExecutorName} DynamicBinding() {

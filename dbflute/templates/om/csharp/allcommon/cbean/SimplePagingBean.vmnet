@@ -13,6 +13,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected readonly ${glSqlClauseName} _sqlClause;
         protected int _safetyMaxResultSize;
         protected bool _paging = true;
+        protected bool _countLater;
         protected bool _fetchNarrowing = true;
         protected IDictionary<String, Object> _parameterMap;
 
@@ -32,7 +33,12 @@ namespace ${glPackageBaseCommonCBean} {
         // * * * * * * * *
         // For SQL Comment
         // * * * * * * * *
-        public bool IsPaging { get { return _paging; } }
+        public virtual bool IsPaging { get { return _paging; } }
+
+        // * * * * * * * *
+        // For Framework
+        // * * * * * * * *
+        public virtual bool IsCountLater { get { return _countLater; } }
 
         // -------------------------------------------------
         //                                    Paging Setting

@@ -18,6 +18,15 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      */
     public boolean isPaging();
 
+    // * * * * * * * *
+    // For Framework
+    // * * * * * * * *
+    /**
+     * Is the count executed later?
+     * @return Determination.
+     */
+    public boolean isCountLater();
+
     // ===================================================================================
     //                                                                      Paging Setting
     //                                                                      ==============

@@ -10,6 +10,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                       Attribute
         //                                                                       =========
         protected String _tableDbName;
+        protected String _countLater;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -31,8 +32,15 @@ namespace ${glPackageBaseCommonCBean} {
                 msg = msg + " The paging bean is: " + pagingBean;
                 throw new SystemException(msg);
             }
-            int allRecordCount = handler.Count();
-            IList<ENTITY> selectedList = handler.Paging();
+            int allRecordCount;
+            IList<ENTITY> selectedList;
+            if (_countLater) {
+                selectedList = handler.Paging();
+                allRecordCount = handler.Count();
+            } else {
+                allRecordCount = handler.Count();
+                selectedList = handler.Paging();
+            }
             ${glPagingResultBeanName}<ENTITY> rb = new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, allRecordCount, selectedList);
             if (IsNecessaryToReadPageAgain(rb)) {
                 pagingBean.FetchPage(rb.AllPageCount);
@@ -46,6 +54,13 @@ namespace ${glPackageBaseCommonCBean} {
 
         protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
             return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glPagingInvokerName}<ENTITY> CountLater() {
+            _countLater = true; return this;
         }
 
         // ===============================================================================

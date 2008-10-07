@@ -29,9 +29,6 @@ public class ${glOutsideSqlPagingExecutorName} {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
-    /** Is the count select executed after the paging select? */
-    protected boolean _countLater;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -123,8 +120,8 @@ public class ${glOutsideSqlPagingExecutorName} {
                 return selectList(path, pmb, entityType);
             }
         };
-        final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
-        if (_countLater) {
+        final ${glPagingInvokerName}<ENTITY> invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+        if (pmb.isCountLater()) {
             invoker.countLater();
         }
         return invoker.invokePaging(handler);
@@ -159,11 +156,6 @@ public class ${glOutsideSqlPagingExecutorName} {
 
     public ${glOutsideSqlPagingExecutorName} dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
-        return this;
-    }
-
-    public ${glOutsideSqlPagingExecutorName} countLater() {
-        _countLater = true;
         return this;
     }
 #if ($database.isMakeDeprecated())

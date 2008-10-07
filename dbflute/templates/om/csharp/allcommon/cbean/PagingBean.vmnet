@@ -18,6 +18,11 @@ namespace ${glPackageBaseCommonCBean} {
         // * * * * * * * *
         bool IsPaging { get; }
 
+        // * * * * * * * *
+        // For Framework
+        // * * * * * * * *
+        bool IsCountLater { get; }
+
         // ===============================================================================
         //                                                                  Paging Setting
         //                                                                  ==============

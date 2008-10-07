@@ -32,6 +32,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
+        public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
+            _outsideSqlOption.StatementConfig = statementConfig;
+            return this;
+        }
+
         public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> DynamicBinding() {
             _outsideSqlOption.DynamicBinding();
             return this;

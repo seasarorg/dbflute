@@ -68,14 +68,12 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                                      ==============
     /**
      * Get condition query as interface. At the future, change public to protected.
-     * 
      * @return Instance of query as interface. (NotNull)
      */
     abstract public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return The conditionQuery of the local table as interface. (NotNull)
      */
     public ${glConditionQueryInterfaceName} localCQ() {
@@ -87,7 +85,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                                   =================
     /**
      * ${database.ImplementComment}
-     * 
      * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
@@ -160,6 +157,18 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * @return Determination.
      */
     public boolean isPaging() {
+        String msg = "This method is unsupported on ConditionBean!";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    // * * * * * * * *
+    // For Framework
+    // * * * * * * * *
+    /**
+     * ${database.ImplementComment}
+     * @return Determination.
+     */
+    public boolean isCountLater() {
         String msg = "This method is unsupported on ConditionBean!";
         throw new UnsupportedOperationException(msg);
     }

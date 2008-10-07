@@ -30,6 +30,9 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     /** Is the execution for paging(NOT count)? */
     protected boolean _paging = true;
 
+    /** Is the count executed later? */
+    protected boolean _countLater;
+
     /** Is fetch narrowing valid? */
     protected boolean _fetchNarrowing = true;
 
@@ -51,6 +54,17 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      */
     public boolean isPaging() {
         return _paging;
+    }
+
+    // * * * * * * * *
+    // For Framework
+    // * * * * * * * *
+    /**
+     * ${database.ImplementComment}
+     * @return Determination.
+     */
+    public boolean isCountLater() {
+        return _countLater;
     }
 
     // -----------------------------------------------------
@@ -83,10 +97,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                         Fetch Setting
     //                                         -------------
     /**
-     * Fetch first.
-     * <pre>
-     * If you invoke this, your SQL returns [fetch-size] records from first.
-     * </pre>
+     * ${database.ImplementComment}
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
@@ -96,10 +107,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     }
 
     /**
-     * Fetch scope.
-     * <pre>
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
-     * </pre>
+     * ${database.ImplementComment}
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
@@ -110,12 +118,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     }
 
     /**
-     * Fetch page.
-     * <pre>
-     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
-     *  But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
-     *  If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-     * </pre>
+     * ${database.ImplementComment}
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
@@ -169,7 +172,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Is fetch scope effective?
-     * 
      * @return Determination.
      */
     public boolean isFetchScopeEffective() {
@@ -181,7 +183,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                         -------------
     /**
      * Get select-hint. {select [select-hint] * from table...}
-     * 
      * @return Select-hint. (NotNull)
      */
     public String getSelectHint() {
@@ -271,7 +272,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Get safety max result size.
-     * 
      * @return Safety max result size.
      */
     public int getSafetyMaxResultSize() {
@@ -283,7 +283,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                                       =============================
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql component of order-by clause. (NotNull)
      */
     public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
@@ -292,7 +291,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Order-by clause. (NotNull)
      */
     public String getOrderByClause() {
@@ -301,7 +299,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} clearOrderBy() {
@@ -311,7 +308,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
@@ -321,7 +317,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
@@ -334,7 +329,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                                    ================================
     /**
      * Check safety result.
-     * 
      * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
@@ -346,7 +340,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                                  ==================================
     /**
      * Get the map of parameter.
-     * 
      * @return The map of parameter. (Nullable)
      */
     public Map<String, Object> getParameterMap() {
@@ -355,7 +348,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
 
     /**
      * Add the parameter to the map.
-     * 
      * @param key The key of parameter. (NotNull)
      * @param value The value of parameter. (Nullable)
      */
@@ -374,7 +366,6 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                             ---------
     /**
      * Get sqlClause.
-     * 
      * @return SqlClause. (NotNull)
      */
     protected ${glSqlClauseName} getSqlClause() {
