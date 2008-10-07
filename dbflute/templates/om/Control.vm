@@ -333,6 +333,8 @@ targetdatabase = $targetDatabase
     #set ($glS2DaoSetting = "${glProjectPrefix}S2DaoSetting")
 
     ## [Allcommon-S2Dao-Internal]
+    #set ($glInternalAbstractBeanMetaDataResultSetHandler = "${glProjectPrefix}InternalAbstractBeanMetaDataResultSetHandler")
+    #set ($glInternalAbstractDtoMetaDataResultSetHandler = "${glProjectPrefix}InternalAbstractDtoMetaDataResultSetHandler")
     #set ($glInternalBeanArrayMetaDataResultSetHandler = "${glProjectPrefix}InternalBeanArrayMetaDataResultSetHandler")
     #set ($glInternalBeanListMetaDataResultSetHandler = "${glProjectPrefix}InternalBeanListMetaDataResultSetHandler")
 
@@ -1722,13 +1724,21 @@ targetdatabase = $targetDatabase
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler}))
       $database.makeDirectory($path)
 
-      $database.info("    parse('InternalBeanListMetaDataResultSetHandler');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler})}${glInternalBeanListMetaDataResultSetHandler}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/rshandler/InternalBeanListMetaDataResultSetHandler.${glTemplateFileExtension}",$path,"", "")
+      $database.info("    parse('InternalAbstractDtoMetaDataResultSetHandler');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler})}${glInternalAbstractDtoMetaDataResultSetHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/rshandler/InternalAbstractDtoMetaDataResultSetHandler.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalAbstractBeanMetaDataResultSetHandler');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler})}${glInternalAbstractBeanMetaDataResultSetHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/rshandler/InternalAbstractBeanMetaDataResultSetHandler.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('InternalBeanArrayMetaDataResultSetHandler');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler})}${glInternalBeanArrayMetaDataResultSetHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/rshandler/InternalBeanArrayMetaDataResultSetHandler.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalBeanListMetaDataResultSetHandler');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler})}${glInternalBeanListMetaDataResultSetHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/rshandler/InternalBeanListMetaDataResultSetHandler.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand}))
       $database.makeDirectory($path)
