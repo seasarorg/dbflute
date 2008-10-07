@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Seasar.Extension.ADO;
+
 using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
 
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
@@ -71,7 +73,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return columnNames;
         }
 
-        protected virtual void PostCreateRow(final Object row, IBeanMetaData bmd) {
+        protected virtual void PostCreateRow(Object row, IBeanMetaData bmd) {
             if (row is ${glEntityInterfaceName}) { // DBFlute Target
                 ((${glEntityInterfaceName})row).ClearModifiedPropertyNames();
             } else { // Basically Unreachable

@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
  * The bean of paging.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInterfaceName}, ${glOrderByBeanInterfaceName} {
@@ -40,8 +39,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     //                                                                       =============
     /**
      * Fetch first. <br />
-     * If you invoke this, your SQL returns [fetch-size] records from first. <br />
-     * 
+     * If you invoke this, your SQL returns [fetch-size] records from first.
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
@@ -49,8 +47,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
 
     /**
      * Fetch scope. <br />
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index]. <br />
-     * 
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
@@ -61,8 +58,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      * Fetch page. <br />
      * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br />
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br />
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number]. <br />
-     * 
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
@@ -73,42 +69,36 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     //                                                                      ==============
     /**
      * Get fetch-start-index.
-     * 
      * @return Fetch-start-index.
      */
     public int getFetchStartIndex();
 
     /**
      * Get fetch-size.
-     * 
      * @return Fetch-size.
      */
     public int getFetchSize();
 
     /**
      * Get fetch-page-number.
-     * 
      * @return Fetch-page-number.
      */
     public int getFetchPageNumber();
 
     /**
      * Get page start index.
-     * 
      * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex();
 
     /**
      * Get page end index.
-     * 
      * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex();
 
     /**
      * Is fetch scope effective?
-     * 
      * @return Determination.
      */
     public boolean isFetchScopeEffective();
@@ -121,21 +111,18 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     // * * * * * * * *
     /**
      * Get select-hint. {select [select-hint] * from table...}
-     * 
      * @return Select-hint. (NotNull)
      */
     public String getSelectHint();
 
     /**
      * Get from-hint. {select * from table [from-hint] where ...}
-     * 
      * @return From-hint. (NotNull)
      */
     public String getFromHint();
 
     /**
      * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * 
      * @return Sql-suffix. (NotNull)
      */
     public String getSqlSuffix();

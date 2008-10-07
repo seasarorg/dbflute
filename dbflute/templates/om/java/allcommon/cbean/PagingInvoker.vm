@@ -13,6 +13,7 @@ public class ${glPagingInvokerName}<ENTITY> {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableDbName;
+    protected boolean _countLater;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -39,8 +40,15 @@ public class ${glPagingInvokerName}<ENTITY> {
             msg = msg + " The paging bean is: " + pagingBean;
             throw new IllegalStateException(msg);
         }
-        final int allRecordCount = handler.count();
-        final List<ENTITY> selectedList = handler.paging();
+        final int allRecordCount;
+        final List<ENTITY> selectedList;
+        if (_countLater) {
+            selectedList = handler.paging();
+            allRecordCount = handler.count();
+        } else {
+            allRecordCount = handler.count();
+            selectedList = handler.paging();
+        }
         final ${glPagingResultBeanName}<ENTITY> rb = new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
         if (isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
@@ -59,6 +67,13 @@ public class ${glPagingInvokerName}<ENTITY> {
      */
     protected boolean isNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
         return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public ${glPagingInvokerName}<ENTITY> countLater() {
+        _countLater = true; return this;
     }
 
     // ===================================================================================

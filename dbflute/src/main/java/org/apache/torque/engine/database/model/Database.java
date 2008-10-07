@@ -627,11 +627,15 @@ public class Database {
     public boolean isDatabaseOracle() {
         return getBasicProperties().isDatabaseOracle();
     }
-
+    
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
 
+    public boolean isDatabaseMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
+    }
+    
     // -----------------------------------------------------
     //                                              Language
     //                                              --------

@@ -1,6 +1,8 @@
-®
+
 using System.Collections;
 using System.Data;
+
+using Seasar.Dao;
 
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 

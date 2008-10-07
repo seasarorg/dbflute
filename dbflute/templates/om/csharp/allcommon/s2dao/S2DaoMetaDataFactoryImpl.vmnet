@@ -615,49 +615,49 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        protected virtual ObjectGenericListDataReaderHandler CreateObjectGenericListDataReaderHandler(Type elementType) {
+        protected virtual IDataReaderHandler CreateObjectGenericListDataReaderHandler(Type elementType) {
             return new ObjectGenericListDataReaderHandler(elementType);
         }
 
-        protected virtual ObjectListDataReaderHandler CreateObjectListDataReaderHandler() {
+        protected virtual IDataReaderHandler CreateObjectListDataReaderHandler() {
             return new ObjectListDataReaderHandler();
         }
 
-        protected virtual ObjectArrayDataReaderHandler CreateObjectArrayDataReaderHandler(Type elementType) {
+        protected virtual IDataReaderHandler CreateObjectArrayDataReaderHandler(Type elementType) {
             return new ObjectArrayDataReaderHandler(elementType);
         }
 
-        protected virtual BeanDataSetMetaDataDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
+        protected virtual IDataReaderHandler CreateBeanDataSetMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
             return new BeanDataSetMetaDataDataReaderHandler(returnType);
         }
 
-        protected virtual BeanDataTableMetaDataDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
+        protected virtual IDataReaderHandler CreateBeanDataTableMetaDataDataReaderHandler(IBeanMetaData bmd, Type returnType) {
             return new BeanDataTableMetaDataDataReaderHandler(returnType);
         }
 
-        protected virtual BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
+        protected virtual IDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanListMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
-        protected virtual BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
+        protected virtual IDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
             return new BeanMetaDataDataReaderHandler(bmd, CreateRowCreator(), CreateRelationRowCreator());
         }
 
         // DBFlute Target (but unused actually)
-        protected virtual BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
+        protected virtual IDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
             InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
             return new ${glInternalBeanArrayMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
 
         // DBFlute Target
-        protected virtual BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
+        protected virtual IDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
             InternalRowCreator rowCreator = CreateInternalRowCreator(bmd);
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(bmd);
             return new ${glInternalBeanGenericListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
         }
 
-        protected virtual ObjectDataReaderHandler CreateObjectDataReaderHandler() {
+        protected virtual IDataReaderHandler CreateObjectDataReaderHandler() {
             return new ObjectDataReaderHandler();
         }
 

@@ -103,8 +103,8 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @return The result bean of paging. (NotNull)
      */
     public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
-                                                               , final ${glPagingBeanInterfaceName} pmb
-                                                               , final Class<ENTITY> entityType) {
+                                                      , final ${glPagingBeanInterfaceName} pmb
+                                                      , final Class<ENTITY> entityType) {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
         final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
@@ -115,12 +115,15 @@ public class ${glOutsideSqlPagingExecutorName} {
                 pmb.xsetPaging(false);
                 return countExecutor.selectEntityWithDeletedCheck(path, pmb, Integer.class);
             }
-            public java.util.List<ENTITY> paging() {
+            public List<ENTITY> paging() {
                 pmb.xsetPaging(true);
                 return selectList(path, pmb, entityType);
             }
         };
         final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+#if ($database.isDatabaseMySQL())
+        invoker.countLater();
+#end
         return invoker.invokePaging(handler);
     }
     

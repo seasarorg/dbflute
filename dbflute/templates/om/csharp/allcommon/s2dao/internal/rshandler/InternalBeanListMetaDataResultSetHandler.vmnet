@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+
 using Seasar.Extension.ADO;
+using Seasar.Dao;
+using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommonCBean};
 
@@ -14,7 +17,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public BeanListMetaDataDataReaderHandler(IBeanMetaData beanMetaData, IRowCreator rowCreator, IRelationRowCreator relationRowCreator)
+        public ${glInternalBeanListMetaDataResultSetHandler}(IBeanMetaData beanMetaData, IRowCreator rowCreator, IRelationRowCreator relationRowCreator)
             : base(beanMetaData, rowCreator, relationRowCreator) {
         }
 
@@ -62,18 +65,18 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                     System.Collections.Hashtable relKeyValues = new System.Collections.Hashtable();
                     RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues);
                     if (relKey != null) {
-                        relRow = relRowCache.GetRelationRow(i, relKey);
-                        if (relRow == null) {
-                            relRow = CreateRelationRow(dataReader, rpt, columnNames, relKeyValues, relationPropertyCache);
-                            if (relRow != null) {
-                                relRowCache.AddRelationRow(i, relKey, relRow);
+                        relationRow = relRowCache.GetRelationRow(i, relKey);
+                        if (relationRow == null) {
+                            relationRow = CreateRelationRow(dataReader, rpt, columnNames, relKeyValues, relationPropertyCache);
+                            if (relationRow != null) {
+                                relRowCache.AddRelationRow(i, relKey, relationRow);
                                 PostCreateRow(relationRow, rpt.BeanMetaData);
                             }
                         }
                     }
-                    if (relRow != null) {
+                    if (relationRow != null) {
                         PropertyInfo pi = rpt.PropertyInfo;
-                        pi.SetValue(row, relRow, null);
+                        pi.SetValue(row, relationRow, null);
                     }
                 }
                 PostCreateRow(row, BeanMetaData);
