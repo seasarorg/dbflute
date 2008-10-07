@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
+import java.util.List;
+
 /**
  * The handler of paging.
  * @param <ENTITY> The type of entity.
@@ -23,5 +25,5 @@ public interface ${glPagingHandlerName}<ENTITY> {
      * Execute SQL for paging.
      * @return The list of entity. (NotNull)
      */
-    public java.util.List<ENTITY> paging();
+    public List<ENTITY> paging();
 }
