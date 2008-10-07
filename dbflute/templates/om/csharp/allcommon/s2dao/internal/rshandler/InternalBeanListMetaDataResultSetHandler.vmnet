@@ -61,7 +61,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                         continue;
                     }
 
-                    Object relRow = null;
+                    Object relationRow = null;
                     System.Collections.Hashtable relKeyValues = new System.Collections.Hashtable();
                     RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues);
                     if (relKey != null) {
