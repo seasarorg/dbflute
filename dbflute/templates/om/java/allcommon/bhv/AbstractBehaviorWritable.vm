@@ -159,7 +159,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY_TYPE entity, InternalUpdateCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY entity, InternalUpdateCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         assertEntityHasVersionNoValue(entity);
         assertEntityHasUpdateDateValue(entity);
@@ -174,11 +174,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateUpdate(ENTITY_TYPE entity);
+    protected static interface InternalUpdateCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdate(ENTITY entity);
     }
 
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY_TYPE entity, InternalUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY entity, InternalUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
         if (updatedCount == 0) {
@@ -190,15 +190,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateUpdateNonstrict(ENTITY_TYPE entity);
+    protected static interface InternalUpdateNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdateNonstrict(ENTITY entity);
     }
 
     // -----------------------------------------------------
     //                                        InsertOrUpdate
     //                                        --------------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
-            void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
@@ -227,14 +227,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
-        public void callbackInsert(ENTITY_TYPE entity);
-        public void callbackUpdate(ENTITY_TYPE entity);
+    protected static interface InternalInsertOrUpdateCallback<ENTITY extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+        public void callbackInsert(ENTITY entity);
+        public void callbackUpdate(ENTITY entity);
         public CB_TYPE callbackNewMyConditionBean();
         public int callbackSelectCount(CB_TYPE cb);
     }
 
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
@@ -249,15 +249,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public void callbackInsert(ENTITY_TYPE entity);
-        public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public void callbackInsert(ENTITY entity);
+        public void callbackUpdateNonstrict(ENTITY entity);
     }
 
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY entity, InternalDeleteCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         assertEntityHasVersionNoValue(entity);
         assertEntityHasUpdateDateValue(entity);
@@ -272,11 +272,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDelete(ENTITY_TYPE entity);
+    protected static interface InternalDeleteCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDelete(ENTITY entity);
     }
 
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY entity, InternalDeleteNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
@@ -289,11 +289,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+    protected static interface InternalDeleteNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) {
+    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
@@ -305,8 +305,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
 #set ($batchUpdateReturnType = "")

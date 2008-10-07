@@ -122,7 +122,6 @@ targetdatabase = $targetDatabase
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
     ## [Allcommon-Behavior-Load]
-    #set ($glLoadRefererOptionName = "${glProjectPrefix}LoadRefererOption")
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
 
     ## [Allcommon-Behavior-Setup]
@@ -612,10 +611,6 @@ targetdatabase = $targetDatabase
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
       $database.makeDirectory($path)
-
-      $database.info("    parseLoadRefererOption()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadRefererOptionName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/load/LoadRefererOption.${glTemplateFileExtension}",$path ,"", "")
 
       $database.info("    parse('LoadReferrerOption')")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReferrerOptionName}.${glClassFileExtension}" )
