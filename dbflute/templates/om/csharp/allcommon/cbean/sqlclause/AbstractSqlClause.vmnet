@@ -1172,7 +1172,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     //                                                                 =====================
 	public bool isSelectedForeignInfoEmpty() {
 		if (_selectedForeignInfo == null) {
-		    return false;
+		    return true;
 		}
         return _selectedForeignInfo.isEmpty();
 	}
