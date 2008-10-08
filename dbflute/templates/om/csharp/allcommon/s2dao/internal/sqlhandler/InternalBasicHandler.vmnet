@@ -246,7 +246,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
 	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
 	        // }
-	        ThrowSQLFailureException(e, cmd, resource, completeSql);
+	        ThrowSQLFailureException(e, cmd, completeSql);
 	    }
 
 	    protected bool IsUniqueConstraintException(DbException e) {
