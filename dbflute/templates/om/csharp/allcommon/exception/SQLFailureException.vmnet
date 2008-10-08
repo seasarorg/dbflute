@@ -9,7 +9,11 @@ namespace ${glPackageBaseCommonException} {
     /// </summary>
     public class ${glSQLFailureException} : SystemException {
 
+        protected Exception _sqlEx;
+
         public ${glSQLFailureException}(String msg, Exception e)
-        : base(msg,e) {}
+        : base(msg,e) { _sqlEx = e; }
+
+        public Exception FailureException { get { return _sqlEx; } }
     }
 }

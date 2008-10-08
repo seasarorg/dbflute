@@ -1,10 +1,17 @@
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Reflection;
 using System.Text;
 
+using Seasar.Framework.Exceptions;
+using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -27,8 +34,8 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @param ps Prepared statement.
          * @return Result set. (NotNull)
          */
-        public System.Data.IDataReader CreateDataReader(Seasar.Extension.ADO.IDataSource dataSource, System.Data.IDbCommand cmd) {
-            System.Data.IDataReader dataReader = Seasar.Framework.Util.CommandUtil.ExecuteReader(dataSource, cmd);
+        public IDataReader CreateDataReader(IDataSource dataSource, IDbCommand cmd) {
+            IDataReader dataReader = ExecuteReader(dataSource, cmd);
 
             if (!${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
                 return dataReader;// If the first argument is not condition-bean...
@@ -64,6 +71,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return true;
             }
             return false;
+        }
+
+        protected IDataReader ExecuteReader(IDataSource dataSource, IDbCommand cmd) {
+            try {
+                return CommandUtil.ExecuteReader(dataSource, cmd);
+            } catch (Exception e) {
+                new DbExceptionHandler().HandleDbException(e, cmd, false, null);
+                return null; // Unreachable!
+            }
         }
     }
 }

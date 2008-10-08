@@ -1,12 +1,19 @@
 
 using System;
 using System.Data;
-using Seasar.Extension.ADO;
-using Seasar.Extension.ADO.Types;
+using System.Data.Common;
+using System.Reflection;
+using System.Text;
+
 using Seasar.Framework.Exceptions;
 using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Types;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonUtil};
 using ${glPackageBaseCommonS2DaoInternalUtil};
 
@@ -41,7 +48,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 try {
                     valueType.BindValue(command, argNames[i], args[i]);
                 } catch (Exception e) {
-                    throw new SQLRuntimeException(e);
+                    HandleDbException(e, command, false, args);
                 }
             }
         }
@@ -83,27 +90,70 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
 
+
+        // ===============================================================================
+        //                                                               Exception Handler
+        //                                                               =================
+        protected void HandleDbException(Exception e, IDbCommand cmd) {
+            HandleDbException(e, cmd, false, null);
+        }
+
+        protected void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource) {
+            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, resource);
+        }
+
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
         protected virtual Object ExecuteScalar(IDbCommand cmd, Object resource) {
-            return CommandFactory.ExecuteScalar(DataSource, cmd);
+            try {
+                return CommandFactory.ExecuteScalar(DataSource, cmd);
+            } catch (Exception e) {
+                HandleDbException(e, cmd, false, resource);
+                return null; // Unreachable!
+            }
+        }
+
+        protected virtual Object ExecuteNonQuery(IDbCommand cmd, Object resource) {
+            try {
+                return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+            } catch (Exception e) {
+                HandleDbException(e, cmd, false, resource);
+                return null; // Unreachable!
+            }
         }
 
         protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
-            return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+            try {
+                return CommandFactory.ExecuteNonQuery(DataSource, cmd);
+            } catch (Exception e) {
+                HandleDbException(e, cmd, true, resource);
+                return 0; // Unreachable!
+            }
         }
 
         protected virtual void Close(IDbConnection conn) {
-            DataSource.CloseConnection(conn);
+            try {
+                DataSource.CloseConnection(conn);
+            } catch (Exception e) {
+                HandleDbException(e, null);
+            }
         }
 
         protected virtual void Close(IDbCommand cmd) {
-            CommandUtil.Close(cmd);
+            try {
+                CommandUtil.Close(cmd);
+            } catch (Exception e) {
+                HandleDbException(e, cmd);
+            }
         }
 
         protected virtual void Close(IDataReader dataReader) {
-            DataReaderUtil.Close(dataReader);
+            try {
+                DataReaderUtil.Close(dataReader);
+            } catch (Exception e) {
+                HandleDbException(e, null);
+            }
         }
 
         protected IDbConnection Connection {
@@ -111,7 +161,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 if (_dataSource == null) {
                     throw new SystemException("The dataSource should not be null at InternalBasicHandler!");
                 }
-                return DataSourceUtil.GetConnection(_dataSource);
+                try {
+                    return DataSourceUtil.GetConnection(_dataSource);
+                } catch (Exception e) {
+                    HandleDbException(e, null);
+                    return null; // Unreachable!
+                }
             }
         }
 
@@ -119,7 +174,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             if (_sql == null) {
                 throw new SystemException("The sql should not be null at InternalBasicHandler!!");
             }
-            return _commandFactory.CreateCommand(connection, _sql);
+            try {
+                return _commandFactory.CreateCommand(connection, _sql);
+            } catch (Exception e) {
+                HandleDbException(e, null);
+                return null; // Unreachable!
+            }
         }
 
         // ===============================================================================
@@ -145,6 +205,257 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         public ICommandFactory CommandFactory {
             get { return _commandFactory; }
             set { _commandFactory = value; }
+        }
+    }
+
+    public class DbExceptionHandler {
+
+	    public void HandleDbException(Exception e, IDbCommand cmd) {
+	        HandleDbException(e, cmd, false, null);
+	    }
+
+	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource) {
+            // [UnderReview]: How do I get unique constraint on ADO.NET?
+	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
+	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
+	        // }
+	        ThrowSQLFailureException(e, cmd, resource);
+	    }
+
+	    protected bool IsUniqueConstraintException(DbException e) {
+            // [UnderReview]: How do I get unique constraint on ADO.NET?
+	        // return ${glConditionBeanContextName}.IsUniqueConstraintException(ExtractSQLState(e), e.ErrorCode);
+	        return false;
+	    }
+
+	    // protected void ThrowEntityAlreadyExistsException(DbException e, IDbCommand cmd, Object resource) {
+	    //     String msg = "Look! Read the message below." + GetLineSeparator();
+	    //     msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+	    //     msg = msg + "The entity already exists on the database!" + GetLineSeparator();
+	    //     msg = msg + GetLineSeparator();
+	    //     msg = msg + "[Advice]" + GetLineSeparator();
+	    //     msg = msg + "Please confirm the primary key whether it already exists on the database." + GetLineSeparator();
+	    //     msg = msg + "And confirm the unique constraint for other columns." + GetLineSeparator();
+	    //     msg = msg + GetLineSeparator();
+	    //     if (cmd != null) {
+	    //         msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
+	    //         msg = msg + GetLineSeparator();
+	    //     }
+        //     if (resource != null) {
+	    //         msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().Name + GetLineSeparator();
+	    //         msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
+	    //         msg = msg + GetLineSeparator();
+        //     }
+	    //     // msg = msg + "[SQLState]" + GetLineSeparator() + ExtractSQLState(e) + GetLineSeparator();
+	    //     // msg = msg + GetLineSeparator();
+	    //     msg = msg + "[ErrorCode]" + GetLineSeparator() + e.ErrorCode + GetLineSeparator();
+	    //     msg = msg + GetLineSeparator();
+	    //     msg = msg + "[DbException]" + GetLineSeparator() + e.GetType().Name + GetLineSeparator();
+	    //     msg = msg + e.Message + GetLineSeparator();
+        //     Exception nextEx = e.InnerException;
+        //     if (nextEx != null) {
+	    //         msg = msg + GetLineSeparator();
+	    //         msg = msg + "[NextException]" + GetLineSeparator();
+        //         msg = msg + nextEx.GetType().Name + GetLineSeparator();
+	    //         msg = msg + nextEx.Message + GetLineSeparator();
+        //         Exception nextNextEx = nextEx.InnerException;
+        //         if (nextNextEx != null) {
+	    //             msg = msg + GetLineSeparator();
+	    //             msg = msg + "[NextNextException]" + GetLineSeparator();
+        //             msg = msg + nextNextEx.GetType().Name + GetLineSeparator();
+	    //             msg = msg + nextNextEx.Message + GetLineSeparator();
+        //         }
+        //     }
+	    //     msg = msg + "* * * * * * * * * */";
+	    //     throw new ${glEntityAlreadyExistsException}(msg, e);
+	    // }
+
+	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, Object resource) {
+	        String msg = "Look! Read the message below." + GetLineSeparator();
+	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+	        msg = msg + "The SQL failed to execute!" + GetLineSeparator();
+	        msg = msg + GetLineSeparator();
+	        msg = msg + "[Advice]" + GetLineSeparator();
+	        msg = msg + "Please confirm the Exception message." + GetLineSeparator();
+	        msg = msg + GetLineSeparator();
+	        // msg = msg + "[SQLState]" + GetLineSeparator() + ExtractSQLState(e) + GetLineSeparator();
+	        // msg = msg + GetLineSeparator();
+	        // msg = msg + "[ErrorCode]" + GetLineSeparator() + e.ErrorCode + GetLineSeparator();
+	        // msg = msg + GetLineSeparator();
+	        msg = msg + "[Exception]" + GetLineSeparator() + e.GetType().FullName + GetLineSeparator();
+	        msg = msg + e.Message + GetLineSeparator();
+	        int? errorCode = ExtractErrorCode(e);
+	        if (errorCode != null) {
+	            msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+	        }
+	        if (e is DbException) {
+	            msg = msg + "  HelpLink  = " + ((DbException)e).HelpLink + GetLineSeparator();
+	        }
+            Exception nextEx = e.InnerException;
+            if (nextEx != null) {
+	            msg = msg + GetLineSeparator();
+	            msg = msg + "[NextException]" + GetLineSeparator();
+                msg = msg + nextEx.GetType().FullName + GetLineSeparator();
+	            msg = msg + nextEx.Message + GetLineSeparator();
+	            errorCode = ExtractErrorCode(nextEx);
+	            if (errorCode != null) {
+	                msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+	            }
+	            if (nextEx is DbException) {
+	                msg = msg + "  HelpLink  = " + ((DbException)nextEx).HelpLink + GetLineSeparator();
+	            }
+                Exception nextNextEx = nextEx.InnerException;
+                if (nextNextEx != null) {
+	                msg = msg + GetLineSeparator();
+	                msg = msg + "[NextNextException]" + GetLineSeparator();
+                    msg = msg + nextNextEx.GetType().FullName + GetLineSeparator();
+	                msg = msg + nextNextEx.Message + GetLineSeparator();
+	                errorCode = ExtractErrorCode(nextNextEx);
+	                if (errorCode != null) {
+	                    msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+	                }
+	                if (nextNextEx is DbException) {
+	                    msg = msg + "  HelpLink  = " + ((DbException)nextNextEx).HelpLink + GetLineSeparator();
+	                }
+                }
+            }
+	        if (cmd != null) {
+	            msg = msg + GetLineSeparator();
+	            msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + GetLineSeparator();
+	            msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().FullName + GetLineSeparator();
+	            msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
+            }
+            Object invokeName = ${glInternalMapContextName}.GetObject("df:BehaviorInvokeName");
+            if (invokeName != null) {
+	            msg = msg + GetLineSeparator();
+                msg = msg + "[Behavior]" + GetLineSeparator();
+                msg = msg + invokeName + GetLineSeparator();
+            }
+            if (HasConditionBean()) {
+	            msg = msg + GetLineSeparator();
+                msg = msg + "[ConditionBean]" + GetLineSeparator();
+                msg = msg + GetConditionBean().GetType().FullName + GetLineSeparator();
+                msg = msg + GetConditionBean() + GetLineSeparator();
+            }
+            if (HasOutsideSqlContext()) {
+	            msg = msg + GetLineSeparator();
+                msg = msg + "[OutsideSql]" + GetLineSeparator();
+                msg = msg + GetOutsideSqlContext().OutsideSqlPath + GetLineSeparator();
+	            msg = msg + GetLineSeparator();
+                msg = msg + "[ParameterBean]" + GetLineSeparator();
+                Object pmb = GetOutsideSqlContext().ParameterBean;
+                if (pmb != null) {
+                    msg = msg + pmb.GetType().FullName + GetLineSeparator();
+                    msg = msg + pmb + GetLineSeparator();
+                } else {
+                    msg = msg + pmb + GetLineSeparator();
+                }
+            }
+            msg = msg + "* * * * * * * * * */";
+            throw new ${glSQLFailureException}(msg, e);
+        }
+
+        protected String BuildResourceDisplay(Object resource) {
+            if (resource == null) { return ""; }
+
+            // if (resource is CommandContext) {
+            //     CommandContext ctx = (CommandContext)resource;
+            //     Object[] variables = ctx.getBindVariables();
+            //     return BuildResourceDisplay(variables);
+
+            if (resource is Object[]) {
+                return BuildResourceDisplay((Object[])resource);
+            } else {
+                return resource.ToString();
+            }
+        }
+        
+        protected String BuildResourceDisplay(Object[] resources) {
+            if (resources == null) { return ""; }
+            if (resources.Length == 0) { return "{}"; }
+            StringBuilder sb = new StringBuilder();
+            foreach (Object resource in resources) {
+                sb.Append(", ").Append(resource);
+            }
+            sb.Remove(0, ", ".Length).Insert(0, "{").Append("}");
+            return sb.ToString();
+        }
+        
+        // protected String ExtractSQLState(DbException e) {
+            // return "" +  e.ErrorCode; // [UnderReview]: Where is SQLState?
+
+            // // Next
+            // DbException nextEx = e.InnerException;
+            // if (nextEx == null) {
+            //     return null;
+            // }
+            // sqlState = nextEx.getSQLState();
+            // if (sqlState != null) {
+            //     return sqlState;
+            // }
+
+            // // Next Next
+            // DbException nextNextEx = nextEx.InnerException;
+            // if (nextNextEx == null) {
+            //     return null;
+            // }
+            // sqlState = nextNextEx.getSQLState();
+            // if (sqlState != null) {
+            //     return sqlState;
+            // }
+
+            // // Next Next Next
+            // DbException nextNextNextEx = nextNextEx.InnerException;
+            // if (nextNextNextEx == null) {
+            //     return null;
+            // }
+            // sqlState = nextNextNextEx.getSQLState();
+            // if (sqlState != null) {
+            //     return sqlState;
+            // }
+
+            // // It doesn't use recursive call by design because JDBC is unpredictable fellow.
+            // return null;
+        // }
+
+        protected int? ExtractErrorCode(Exception e) {
+            if (e is DbException) {
+                return ((DbException)e).ErrorCode;
+            }
+            try {
+                PropertyInfo pi = e.GetType().GetProperty("Number"); // for MySQL
+                if (pi != null) {
+                    Object result = pi.GetValue(e, null);
+                    if (result != null && result is int) {
+                        return (int)result;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            return null;
+        }
+
+        protected bool HasConditionBean() {
+            return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+        }
+
+        protected ${glConditionBeanInterfaceName} GetConditionBean() {
+            return ${glConditionBeanContextName}.GetConditionBeanOnThread();
+        }
+
+        protected bool HasOutsideSqlContext() {
+            return ${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread();
+        }
+
+        protected ${glOutsideSqlContextName} GetOutsideSqlContext() {
+            return ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+        }
+
+        protected String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 }

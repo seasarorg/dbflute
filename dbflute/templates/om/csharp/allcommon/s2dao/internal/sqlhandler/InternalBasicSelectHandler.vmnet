@@ -74,7 +74,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     return ExecuteScalar(cmd, args);
                 } else {
                     dataReader = CreateDataReader(cmd);
-                    return _dataReaderHandler.Handle(dataReader);
+                    try {
+                        return _dataReaderHandler.Handle(dataReader);
+                    } catch (Exception e) {
+                        HandleDbException(e, cmd, false, args);
+                        return null; // Unreachable!
+                    }
                 }
             } finally {
                 Close(dataReader);

@@ -259,6 +259,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             invokeMethodName = method.getName();
         }
         final String expWithoutKakko = buildInvocationExpressionWithoutKakko(invocation, invokeClassName, invokeMethodName);
+
+        // Save behavior invoke name for error message.
+        ${glInternalMapContextName}.setObject("df:BehaviorInvokeName", expWithoutKakko + "()");
+
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String invocationExpression = expWithoutKakko + "()";
 

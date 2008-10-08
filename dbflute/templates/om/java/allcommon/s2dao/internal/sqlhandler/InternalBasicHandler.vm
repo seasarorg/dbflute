@@ -16,7 +16,10 @@ import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommon}.${glQLog};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 import ${glPackageBaseCommonException}.${glSQLFailureException};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
@@ -165,15 +168,6 @@ public class ${glInternalBasicHandler} {
 	        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
 	        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
 	        msg = msg + getLineSeparator();
-	        if (statement != null) {
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-	            msg = msg + getLineSeparator();
-	        }
-            if (resource != null) {
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-	            msg = msg + getLineSeparator();
-            }
 	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
@@ -194,6 +188,41 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
+	        if (statement != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
+            }
+            Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            if (invokeName != null) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[Behavior]" + getLineSeparator();
+                msg = msg + invokeName + getLineSeparator();
+            }
+            if (hasConditionBean()) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[ConditionBean]" + getLineSeparator();
+                msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
+                msg = msg + getConditionBean() + getLineSeparator();
+            }
+            if (hasOutsideSqlContext()) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[OutsideSql]" + getLineSeparator();
+                msg = msg + getOutsideSqlContext().getOutsideSqlPath() + getLineSeparator();
+	            msg = msg + getLineSeparator();
+                msg = msg + "[ParameterBean]" + getLineSeparator();
+                Object pmb = getOutsideSqlContext().getParameterBean();
+                if (pmb != null) {
+                    msg = msg + pmb.getClass().getName() + getLineSeparator();
+                    msg = msg + pmb + getLineSeparator();
+                } else {
+                    msg = msg + pmb + getLineSeparator();
+                }
+            }
 	        msg = msg + "* * * * * * * * * */";
 	        throw new ${glEntityAlreadyExistsException}(msg, e);
 	    }
@@ -206,15 +235,6 @@ public class ${glInternalBasicHandler} {
 	        msg = msg + "[Advice]" + getLineSeparator();
 	        msg = msg + "Please confirm the SQLException message." + getLineSeparator();
 	        msg = msg + getLineSeparator();
-	        if (statement != null) {
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-	            msg = msg + getLineSeparator();
-	        }
-            if (resource != null) {
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-	            msg = msg + getLineSeparator();
-            }
 	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
 	        msg = msg + getLineSeparator();
 	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
@@ -233,6 +253,41 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + "[NextNextException]" + getLineSeparator();
                     msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                }
+            }
+	        if (statement != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
+            }
+            Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            if (invokeName != null) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[Behavior]" + getLineSeparator();
+                msg = msg + invokeName + getLineSeparator();
+            }
+            if (hasConditionBean()) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[ConditionBean]" + getLineSeparator();
+                msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
+                msg = msg + getConditionBean() + getLineSeparator();
+            }
+            if (hasOutsideSqlContext()) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[OutsideSql]" + getLineSeparator();
+                msg = msg + getOutsideSqlContext().getOutsideSqlPath() + getLineSeparator();
+	            msg = msg + getLineSeparator();
+                msg = msg + "[ParameterBean]" + getLineSeparator();
+                Object pmb = getOutsideSqlContext().getParameterBean();
+                if (pmb != null) {
+                    msg = msg + pmb.getClass().getName() + getLineSeparator();
+                    msg = msg + pmb + getLineSeparator();
+                } else {
+                    msg = msg + pmb + getLineSeparator();
                 }
             }
             msg = msg + "* * * * * * * * * */";
@@ -254,6 +309,7 @@ public class ${glInternalBasicHandler} {
         
         protected String buildResourceDisplay(Object[] resources) {
             if (resources == null) { return ""; }
+            if (resources.length == 0) { return "{}"; }
             StringBuilder sb = new StringBuilder();
             for (Object resource : resources) {
                 sb.append(", ").append(resource);
@@ -300,6 +356,22 @@ public class ${glInternalBasicHandler} {
 
             // It doesn't use recursive call by design because JDBC is unpredictable fellow.
             return null;
+        }
+
+        protected boolean hasConditionBean() {
+            return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
+        }
+
+        protected ${glConditionBeanInterfaceName} getConditionBean() {
+            return ${glConditionBeanContextName}.getConditionBeanOnThread();
+        }
+
+        protected boolean hasOutsideSqlContext() {
+            return ${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread();
+        }
+
+        protected ${glOutsideSqlContextName} getOutsideSqlContext() {
+            return ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
         }
 
         protected String getLineSeparator() {

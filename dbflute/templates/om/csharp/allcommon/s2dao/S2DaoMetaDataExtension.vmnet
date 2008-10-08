@@ -21,6 +21,7 @@ using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 using ${glPackageBaseCommonS2DaoInternalSqlCommand};
 using ${glPackageBaseCommonS2DaoInternalRsHandler};
 
@@ -51,7 +52,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _daoInterface = GetDaoInterface(_daoType);
             _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
             _beanType = _annotationReader.GetBeanType();
-            _dbms = DbmsManager.GetDbms(_dataSource);
+            _dbms = GetDbms(_dataSource);
 			
 			// Initialize bean-meta-data!
             BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_beanMetaDataCacheMap);
@@ -63,7 +64,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // For lazy initializing methods!
             // SetupSqlCommand();
         }
-		
+
         public override ISqlCommand GetSqlCommand(String methodName) {
             ISqlCommand cmd = (ISqlCommand)_sqlCommands[methodName];
             if (cmd != null) {
@@ -527,6 +528,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new InternalRelationRowCreator();
         }
 		
+        // ===============================================================================
+        //                                                               ADO.NET Delegator
+        //                                                               =================
+		protected IDbms GetDbms(IDataSource dataSource) {
+		    try {
+		        return DbmsManager.GetDbms(dataSource);
+		    } catch (Exception e) {
+		        new DbExceptionHandler().HandleDbException(e, null);
+		        return null; // Unreachable!
+		    }
+		}
+
         // ===============================================================================
         //                                                                BeanMetaData Map
         //                                                                ================

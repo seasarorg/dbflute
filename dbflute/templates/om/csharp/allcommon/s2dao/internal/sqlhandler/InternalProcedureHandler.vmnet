@@ -37,25 +37,39 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             LogSql(args, argTypes);
             IDbCommand dbCommand = null;
             try {
-                dbCommand = PrepareCallableStatement(conn, this.Sql);
+                try {
+                    dbCommand = PrepareCallableStatement(conn, this.Sql);
+                } catch (Exception e) {
+                    HandleDbException(e, dbCommand, false, args);
+                }
                 Object returnValue = null;
                 int additionalParamCount = 0;
                 if (_procedureMetaData.HasReturnParameterType) {
                     Type returnType = _procedureMetaData.ReturnParameterType;
                     String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
-                    BindParamters(dbCommand, dto);
-                    CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
+                    try {
+                        BindParamters(dbCommand, dto);
+                    } catch (Exception e) {
+                        HandleDbException(e, dbCommand, false, args);
+                    }
+                    ExecuteNonQuery(dbCommand, args);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     returnValue = param.Value;
                     additionalParamCount = 1;
                 } else {
-                    BindParamters(dbCommand, dto);
-                    CommandFactory.ExecuteNonQuery(this.DataSource, dbCommand);
+                    try {
+                        BindParamters(dbCommand, dto);
+                    } catch (Exception e) {
+                        HandleDbException(e, dbCommand, false, args);
+                    }
+                    ExecuteNonQuery(dbCommand, args);
                 }
-                return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
-            // } catch (Exception e) {
-            //     handleSQLException(e, cs);
-            //     return null;// Unreachable!
+                try {
+                    return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
+                } catch (Exception e) {
+                    HandleDbException(e, dbCommand, false, args);
+                    return null; // Unreachable!
+                }
             } finally {
                 try {
                     Close(dbCommand);
