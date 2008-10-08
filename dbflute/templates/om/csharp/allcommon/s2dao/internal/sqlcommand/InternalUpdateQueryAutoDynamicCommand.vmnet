@@ -45,6 +45,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         }
         ICommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.LoggingMessageSqlArgs = context.BindVariables;
         return handler.Execute(args);
     }
     

@@ -37,6 +37,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         ICommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.LoggingMessageSqlArgs = context.BindVariables;
         int rows = handler.Execute(args);
         return rows;
     }

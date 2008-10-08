@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -251,6 +252,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 Velocity.setProperty("classpath.resource.loader.cache", "false");
                 Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
             }
+            Velocity.setProperty(VelocityEngine.RUNTIME_LOG, "./log/velocity.log");
             Velocity.init();
             final DfGenerator generator = getGeneratorHandler();
             generator.setOutputPath(outputDirectory);

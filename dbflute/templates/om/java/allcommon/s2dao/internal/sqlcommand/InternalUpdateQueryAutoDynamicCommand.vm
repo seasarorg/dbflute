@@ -55,6 +55,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
         }
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.setLoggingMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
         return new Integer(rows);
     }

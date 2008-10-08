@@ -8,6 +8,7 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
 using Seasar.Framework.Util;
 using Seasar.Dao;
+using Seasar.Dao.Impl;
 using Seasar.Dao.Node;
 using Seasar.Dao.Parser;
 
@@ -25,7 +26,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     /**
      * @author ${database.ClassAuthor}
      */
-    public class ${glSelectDynamicCommand} : Seasar.Dao.Impl.SelectDynamicCommand {
+    public class ${glSelectDynamicCommand} : SelectDynamicCommand {
 
         // ===============================================================================
         //                                                                      Definition
@@ -132,6 +133,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             bindVariableTypeList.CopyTo(bindVariableTypeArray, 0);
             String[] bindVariableNameArray = new String[bindVariableNameList.Count];
             bindVariableNameList.CopyTo(bindVariableNameArray, 0);
+            selectHandler.LoggingMessageSqlArgs = bindVariableArray;
             return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 
@@ -151,7 +153,9 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             ICommandContext ctx = Apply(filteredArgs);
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
-            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+            Object[] bindVariableArray = ctx.BindVariables;
+            selectHandler.LoggingMessageSqlArgs = bindVariableArray;
+            return selectHandler.Execute(bindVariableArray, ctx.BindVariableTypes);
         }
 
         // -------------------------------------------------
@@ -176,7 +180,9 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             ICommandContext ctx = Apply(filteredArgs);
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
-            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+            Object[] bindVariableArray = ctx.BindVariables;
+            selectHandler.LoggingMessageSqlArgs = bindVariableArray;
+            return selectHandler.Execute(bindVariableArray, ctx.BindVariableTypes);
         }
 
         protected Object ExecuteOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
@@ -234,6 +240,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             bindVariableTypeList.CopyTo(bindVariableTypeArray, 0);
             String[] bindVariableNameArray = new String[bindVariableNameList.Count];
             bindVariableNameList.CopyTo(bindVariableNameArray, 0);
+            selectHandler.LoggingMessageSqlArgs = bindVariableArray;
             return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 

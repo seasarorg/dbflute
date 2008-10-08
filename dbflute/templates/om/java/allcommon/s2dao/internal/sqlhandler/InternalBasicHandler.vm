@@ -37,6 +37,7 @@ public class ${glInternalBasicHandler} {
     private DataSource dataSource;
     private String sql;
     private StatementFactory statementFactory;
+    private Object[] loggingMessageSqlArgs;
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -124,7 +125,19 @@ public class ${glInternalBasicHandler} {
     }
 
     protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
-        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, resource);
+        String completeSql = buildLoggingMessageSql();
+        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, resource, completeSql);
+    }
+
+    protected String buildLoggingMessageSql() {
+        String completeSql = null;
+        if (sql != null) {
+            try {
+                completeSql = getCompleteSql(loggingMessageSqlArgs);
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return completeSql;
     }
 
     public static class SQLExceptionHandler {
@@ -134,13 +147,17 @@ public class ${glInternalBasicHandler} {
 	    }
 	    
 	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
+	        handleSQLException(e, statement, uniqueConstraintValid, resource, null);
+	    }
+	    
+	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource, String completeSql) {
 	        if (isSqlExceptionOldStyleHandling()) {
 	            throw new SQLRuntimeException(e);
 	        }
 	        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-	            throwEntityAlreadyExistsException(e, statement, resource);
+	            throwEntityAlreadyExistsException(e, statement, resource, completeSql);
 	        }
-	        throwSQLFailureException(e, statement, resource);
+	        throwSQLFailureException(e, statement, resource, completeSql);
 	    }
 	
 	    protected boolean isUniqueConstraintException(SQLException e) {
@@ -159,7 +176,7 @@ public class ${glInternalBasicHandler} {
 	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
 	    }
 	
-	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, Object resource) {
+	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, Object resource, String completeSql) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The entity already exists on the database!" + getLineSeparator();
@@ -207,7 +224,6 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[ConditionBean]" + getLineSeparator();
                 msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
-                msg = msg + getConditionBean() + getLineSeparator();
             }
             if (hasOutsideSqlContext()) {
 	            msg = msg + getLineSeparator();
@@ -223,11 +239,16 @@ public class ${glInternalBasicHandler} {
                     msg = msg + pmb + getLineSeparator();
                 }
             }
+            if (completeSql != null) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[Display SQL]" + getLineSeparator();
+                msg = msg + completeSql + getLineSeparator();
+            }
 	        msg = msg + "* * * * * * * * * */";
 	        throw new ${glEntityAlreadyExistsException}(msg, e);
 	    }
 	
-	    protected void throwSQLFailureException(SQLException e, Statement statement, Object resource) {
+	    protected void throwSQLFailureException(SQLException e, Statement statement, Object resource, String completeSql) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The SQL failed to execute!" + getLineSeparator();
@@ -274,7 +295,6 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[ConditionBean]" + getLineSeparator();
                 msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
-                msg = msg + getConditionBean() + getLineSeparator();
             }
             if (hasOutsideSqlContext()) {
 	            msg = msg + getLineSeparator();
@@ -289,6 +309,11 @@ public class ${glInternalBasicHandler} {
                 } else {
                     msg = msg + pmb + getLineSeparator();
                 }
+            }
+            if (completeSql != null) {
+	            msg = msg + getLineSeparator();
+                msg = msg + "[Display SQL]" + getLineSeparator();
+                msg = msg + completeSql + getLineSeparator();
             }
             msg = msg + "* * * * * * * * * */";
             throw new ${glSQLFailureException}(msg, e);
@@ -497,5 +522,9 @@ public class ${glInternalBasicHandler} {
 
     public void setStatementFactory(StatementFactory statementFactory) {
         this.statementFactory = statementFactory;
+    }
+
+    public void setLoggingMessageSqlArgs(String loggingMessageSqlArgs) {
+        this.loggingMessageSqlArgs = loggingMessageSqlArgs;
     }
 }

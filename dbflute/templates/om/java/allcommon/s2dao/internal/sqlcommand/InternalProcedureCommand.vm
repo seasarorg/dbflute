@@ -45,6 +45,8 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
         final ${glInternalProcedureHandler} handler = newArgumentDtoProcedureHandler();
         final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
         final Object pmb = outsideSqlContext.getParameterBean();
+        // The logging message SQL of procedure is unnecessary.
+        // handler.setLoggingMessageSqlArgs(...);
         return handler.execute(new Object[]{pmb});
     }
     protected ${glInternalProcedureHandler} newArgumentDtoProcedureHandler() {

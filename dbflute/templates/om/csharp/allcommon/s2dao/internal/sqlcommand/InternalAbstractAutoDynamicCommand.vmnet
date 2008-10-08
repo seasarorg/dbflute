@@ -35,19 +35,18 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             _propertyNames = propertyNames;
         }
 
-        public override object Execute(object[] args)
-        {
-            object bean = args[0];
+        public override Object Execute(Object[] args) {
+            Object bean = args[0];
             IBeanMetaData bmd = BeanMetaData;
             string[] propertyNames = PropertyNames;
             IPropertyType[] propertyTypes = CreateTargetPropertyTypes(bmd,
                 bean, propertyNames);
-            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false)
-            {
+            if (CanExecute(bean, bmd, propertyTypes, propertyNames) == false) {
                 return NO_UPDATE;
             }
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
             handler.Sql = SetupSql(bmd, propertyTypes);
+            handler.LoggingMessageSqlArgs = args;
             int i = handler.Execute(args);
             if (i < 1) {
                 throw new NotSingleRowUpdatedRuntimeException(args[0], i);

@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                       Attribute
         //                                                                       =========
         protected readonly IBeanMetaData _beanMetaData;
-        protected object[] _bindVariables;
+        protected Object[] _bindVariables;
         protected Type[] _bindVariableTypes;
         protected DateTime _timestamp = DateTime.MinValue;
         protected Int32 _versionNo = Int32.MinValue;
@@ -42,7 +42,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public int Execute(object[] args) {
+        public int Execute(Object[] args) {
             IDbConnection connection = Connection;
             try {
                 return Execute(connection, args[0]);
@@ -53,11 +53,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        public virtual int Execute(object[] args, Type[] argTypes) {
+        public virtual int Execute(Object[] args, Type[] argTypes) {
             return Execute(args);
         }
 
-        public virtual int Execute(object[] args, Type[] argTypes, string[] argNames) {
+        public virtual int Execute(Object[] args, Type[] argTypes, String[] argNames) {
             return Execute(args);
         }
 

@@ -52,6 +52,7 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
         final String sql = createInsertSql(bmd, propertyTypes);
         final ${glInternalInsertAutoHandler} handler = new ${glInternalInsertAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setSql(sql);
+        handler.setLoggingMessageSqlArgs(args);
         final int rows = handler.execute(args);
         if (isCheckSingleRowUpdate() && rows != 1) {
             throw new NotSingleRowUpdatedRuntimeException(args[0], rows);

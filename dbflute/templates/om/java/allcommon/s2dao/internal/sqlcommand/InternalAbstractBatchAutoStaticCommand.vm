@@ -43,6 +43,7 @@ public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glIn
 		// injectDaoClass(handler);
         
 		handler.setSql(getSql());
+        handler.setLoggingMessageSqlArgs(args);
         if (this.returningRows) {
             return handler.executeBatch(args);
         } else {

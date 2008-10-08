@@ -125,7 +125,9 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
         }
 
         final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
-        return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+        final Object[] bindVariableArray = bindVariableList.toArray();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
     }
 
     // -----------------------------------------------------
@@ -149,7 +151,9 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
 
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
         final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
-        return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
+        final Object[] bindVariableArray = ctx.getBindVariables();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
     }
 
     // -----------------------------------------------------
@@ -181,7 +185,9 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
 
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
         final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
-        return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
+        final Object[] bindVariableArray = ctx.getBindVariables();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
     }
 
     /**
@@ -251,7 +257,9 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
         final java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
-        return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+        final Object[] bindVariableArray = bindVariableList.toArray();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
     }
 
     protected Object[] filterArgumentsForResultSetHandler(Object[] args) {

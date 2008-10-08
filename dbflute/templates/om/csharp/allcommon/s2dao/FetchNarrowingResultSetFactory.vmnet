@@ -15,25 +15,11 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
-    /**
-     * Fetch page result set factory.
-     * 
-     * @author ${database.ClassAuthor}
-     */
-    public class ${glFetchNarrowingResultSetFactory} : Seasar.Extension.ADO.IDataReaderFactory {
+    public class ${glFetchNarrowingResultSetFactory} : IDataReaderFactory {
 
-        /**
-         * Constructor.
-         */
         public ${glFetchNarrowingResultSetFactory}() {
         }
 
-        /**
-         * Create result set.
-         * 
-         * @param ps Prepared statement.
-         * @return Result set. (NotNull)
-         */
         public IDataReader CreateDataReader(IDataSource dataSource, IDbCommand cmd) {
             IDataReader dataReader = ExecuteReader(dataSource, cmd);
 
@@ -74,12 +60,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected IDataReader ExecuteReader(IDataSource dataSource, IDbCommand cmd) {
-            try {
-                return CommandUtil.ExecuteReader(dataSource, cmd);
-            } catch (Exception e) {
-                new DbExceptionHandler().HandleDbException(e, cmd, false, null);
-                return null; // Unreachable!
-            }
+            return CommandUtil.ExecuteReader(dataSource, cmd);
         }
     }
 }

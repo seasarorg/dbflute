@@ -35,7 +35,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public virtual object Execute(Object[] args) {
+        public virtual Object Execute(Object[] args) {
             return Execute(args, GetArgTypes(args));
         }
 
@@ -73,8 +73,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 if (_dataReaderHandler is ObjectDataReaderHandler) {// CSharp specific
                     return ExecuteScalar(cmd, args);
                 } else {
-                    dataReader = CreateDataReader(cmd);
                     try {
+                        dataReader = CreateDataReader(cmd);
                         return _dataReaderHandler.Handle(dataReader);
                     } catch (Exception e) {
                         HandleDbException(e, cmd, false, args);

@@ -27,6 +27,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         private IDataSource _dataSource;
         private String _sql;
         private ICommandFactory _commandFactory;
+        private Object[] _loggingMessageSqlArgs;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -40,7 +41,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                    Common Logic
         //                                                                    ============
-        protected virtual void BindArgs(IDbCommand command, object[] args, Type[] argTypes) {
+        protected virtual void BindArgs(IDbCommand command, Object[] args, Type[] argTypes) {
+            if (_loggingMessageSqlArgs == null) { _loggingMessageSqlArgs = args; } // Save arguments for logging.
             if (args == null) return;
             string[] argNames = _commandFactory.GetArgNames(command, args);
             for (int i = 0; i < args.Length; ++i) {
@@ -53,7 +55,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        protected virtual Type[] GetArgTypes(object[] args) {
+        protected virtual Type[] GetArgTypes(Object[] args) {
             if (args == null) {
                 return null;
             }
@@ -67,7 +69,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return argTypes;
         }
 
-        protected virtual string GetCompleteSql(object[] args) {
+        protected virtual string GetCompleteSql(Object[] args) {
             return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
         }
 
@@ -99,9 +101,21 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource) {
-            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, resource);
+            String completeSql = BuildLoggingMessageSql();
+            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, resource, completeSql);
         }
 
+        protected virtual String BuildLoggingMessageSql() {
+            String completeSql = null;
+            if (_sql != null) {
+                try {
+                    completeSql = GetCompleteSql(_loggingMessageSqlArgs);
+                } catch (Exception) {
+                }
+            }
+            return completeSql;
+        }
+        
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
@@ -206,6 +220,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             get { return _commandFactory; }
             set { _commandFactory = value; }
         }
+
+        public Object[] LoggingMessageSqlArgs {
+            get { return _loggingMessageSqlArgs; }
+            set { _loggingMessageSqlArgs = value; }
+        }
     }
 
     public class DbExceptionHandler {
@@ -219,7 +238,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
 	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
 	        // }
-	        ThrowSQLFailureException(e, cmd, resource);
+	        HandleDbException(e, cmd, false, null, null);
+	    }
+
+	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource, String completeSql) {
+            // [UnderReview]: How do I get unique constraint on ADO.NET?
+	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
+	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
+	        // }
+	        ThrowSQLFailureException(e, cmd, resource, completeSql);
 	    }
 
 	    protected bool IsUniqueConstraintException(DbException e) {
@@ -270,7 +297,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	    //     throw new ${glEntityAlreadyExistsException}(msg, e);
 	    // }
 
-	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, Object resource) {
+	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, Object resource, String completeSql) {
 	        String msg = "Look! Read the message below." + GetLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
 	        msg = msg + "The SQL failed to execute!" + GetLineSeparator();
@@ -338,11 +365,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	            msg = msg + GetLineSeparator();
                 msg = msg + "[ConditionBean]" + GetLineSeparator();
                 msg = msg + GetConditionBean().GetType().FullName + GetLineSeparator();
-                msg = msg + GetConditionBean() + GetLineSeparator();
             }
             if (HasOutsideSqlContext()) {
 	            msg = msg + GetLineSeparator();
-                msg = msg + "[OutsideSql]" + GetLineSeparator();
+                msg = msg + "[OutsideSqlPath]" + GetLineSeparator();
                 msg = msg + GetOutsideSqlContext().OutsideSqlPath + GetLineSeparator();
 	            msg = msg + GetLineSeparator();
                 msg = msg + "[ParameterBean]" + GetLineSeparator();
@@ -353,6 +379,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 } else {
                     msg = msg + pmb + GetLineSeparator();
                 }
+            }
+            if (completeSql != null) {
+	            msg = msg + GetLineSeparator();
+                msg = msg + "[Display SQL]" + GetLineSeparator();
+                msg = msg + completeSql + GetLineSeparator();
             }
             msg = msg + "* * * * * * * * * */";
             throw new ${glSQLFailureException}(msg, e);
@@ -433,7 +464,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                         return (int)result;
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception) {
             }
             return null;
         }

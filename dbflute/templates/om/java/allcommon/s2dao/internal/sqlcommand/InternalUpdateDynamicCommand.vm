@@ -24,6 +24,8 @@ public class ${glInternalUpdateDynamicCommand} extends ${glInternalAbstractDynam
 	public Object execute(Object args[]) {
 		final CommandContext ctx = apply(args);
 		final ${glInternalBasicUpdateHandler} updateHandler = new ${glInternalBasicUpdateHandler}(getDataSource(), ctx.getSql(), getStatementFactory());
+		Object[] bindVariables = ctx.getBindVariables();
+        handler.setLoggingMessageSqlArgs(bindVariables);
 		return new Integer(updateHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes()));
 	}
 }

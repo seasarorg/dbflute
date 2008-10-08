@@ -57,10 +57,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     public Object execute(Object[] args) {
         ${glInternalAbstractAutoHandler} handler = createAutoHandler();
         handler.setSql(getSql());
-		
-		// It is unnecessary for DBFlute!
-        // injectDaoClass(handler);
-		
+        handler.setLoggingMessageSqlArgs(args);
         int rows = handler.execute(args);
         if (isCheckSingleRowUpdate() && rows != 1) {
             throw createNotSingleRowUpdatedRuntimeException(args[0], rows);

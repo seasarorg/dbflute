@@ -38,9 +38,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======
-        public override object Execute(object[] args) {
+        public override Object Execute(object[] args) {
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler();
             handler.Sql = Sql;
+            handler.LoggingMessageSqlArgs = args;
             int rows = handler.Execute(args);
             if (IsCheckSingleRowUpdate && rows != 1) throw new ${glEntityAlreadyUpdatedException}(args[0], rows);
             return rows;

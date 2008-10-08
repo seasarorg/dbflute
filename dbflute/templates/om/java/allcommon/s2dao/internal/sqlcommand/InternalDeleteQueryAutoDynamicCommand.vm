@@ -41,6 +41,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.setLoggingMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
         return new Integer(rows);
     }
