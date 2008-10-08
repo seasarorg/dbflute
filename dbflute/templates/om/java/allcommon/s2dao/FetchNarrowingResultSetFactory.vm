@@ -13,7 +13,7 @@ import org.seasar.extension.jdbc.ResultSetFactory;
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
- * Fetch narrowing result set factory.
+ * This is unused in DBFlute so this is very NORMAL result-set-factory for S2Dao.
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
