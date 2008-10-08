@@ -1,4 +1,5 @@
 
+using System;
 using System.Text;
 using Seasar.Extension.ADO;
 using Seasar.Dao;
@@ -23,7 +24,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         public override object Execute(object[] args) {
             ICommandContext ctx = Apply(args);
             ${glInternalBasicUpdateHandler} handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
-            return handler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+            Object[] bindVariables = ctx.BindVariables;
+            handler.LoggingMessageSqlArgs = bindVariables;
+            return handler.Execute(bindVariables, ctx.BindVariableTypes);
         }
 	}
 }

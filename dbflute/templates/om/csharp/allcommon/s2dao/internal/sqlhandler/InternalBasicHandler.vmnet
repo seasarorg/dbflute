@@ -50,7 +50,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 try {
                     valueType.BindValue(command, argNames[i], args[i]);
                 } catch (Exception e) {
-                    HandleDbException(e, command, false, args);
+                    HandleDbException(e, command);
                 }
             }
         }
@@ -119,29 +119,29 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
-        protected virtual Object ExecuteScalar(IDbCommand cmd, Object resource) {
+        protected virtual Object ExecuteScalar(IDbCommand cmd) {
             try {
                 return CommandFactory.ExecuteScalar(DataSource, cmd);
             } catch (Exception e) {
-                HandleDbException(e, cmd, false, resource);
+                HandleDbException(e, cmd);
                 return null; // Unreachable!
             }
         }
 
-        protected virtual Object ExecuteNonQuery(IDbCommand cmd, Object resource) {
+        protected virtual Object ExecuteNonQuery(IDbCommand cmd) {
             try {
                 return CommandFactory.ExecuteNonQuery(DataSource, cmd);
             } catch (Exception e) {
-                HandleDbException(e, cmd, false, resource);
+                HandleDbException(e, cmd);
                 return null; // Unreachable!
             }
         }
 
-        protected virtual int ExecuteUpdate(IDbCommand cmd, Object resource) {
+        protected virtual int ExecuteUpdate(IDbCommand cmd) {
             try {
                 return CommandFactory.ExecuteNonQuery(DataSource, cmd);
             } catch (Exception e) {
-                HandleDbException(e, cmd, true, resource);
+                HandleDbException(e, cmd, true, null);
                 return 0; // Unreachable!
             }
         }
@@ -346,15 +346,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	                }
                 }
             }
-	        if (cmd != null) {
-	            msg = msg + GetLineSeparator();
-	            msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
-	        }
-            if (resource != null) {
-	            msg = msg + GetLineSeparator();
-	            msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().FullName + GetLineSeparator();
-	            msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
-            }
             Object invokeName = ${glInternalMapContextName}.GetObject("df:BehaviorInvokeName");
             if (invokeName != null) {
 	            msg = msg + GetLineSeparator();
@@ -379,6 +370,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 } else {
                     msg = msg + pmb + GetLineSeparator();
                 }
+            }
+	        if (cmd != null) {
+	            msg = msg + GetLineSeparator();
+	            msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + GetLineSeparator();
+	            msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().FullName + GetLineSeparator();
+	            msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
             }
             if (completeSql != null) {
 	            msg = msg + GetLineSeparator();

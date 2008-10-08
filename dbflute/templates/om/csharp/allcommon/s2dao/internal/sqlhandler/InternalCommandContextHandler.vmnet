@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             IDbCommand cmd = Command(conn);
             try {
                 BindArgs(cmd, context.BindVariables, context.BindVariableTypes);
-                return ExecuteUpdate(cmd, context);
+                return ExecuteUpdate(cmd);
             } finally {
                 Close(cmd);
             }

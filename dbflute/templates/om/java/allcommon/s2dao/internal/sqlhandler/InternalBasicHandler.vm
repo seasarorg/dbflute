@@ -205,15 +205,6 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
-	        if (statement != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-	        }
-            if (resource != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-            }
             Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
             if (invokeName != null) {
 	            msg = msg + getLineSeparator();
@@ -238,6 +229,15 @@ public class ${glInternalBasicHandler} {
                 } else {
                     msg = msg + pmb + getLineSeparator();
                 }
+            }
+	        if (statement != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
             }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
@@ -276,15 +276,6 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
-	        if (statement != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
-	        }
-            if (resource != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-            }
             Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
             if (invokeName != null) {
 	            msg = msg + getLineSeparator();
@@ -309,6 +300,15 @@ public class ${glInternalBasicHandler} {
                 } else {
                     msg = msg + pmb + getLineSeparator();
                 }
+            }
+	        if (statement != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	        }
+            if (resource != null) {
+	            msg = msg + getLineSeparator();
+	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
+	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
             }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
@@ -426,11 +426,11 @@ public class ${glInternalBasicHandler} {
         return statementFactory.createPreparedStatement(conn, sql);
     }
 
-    protected int executeUpdate(PreparedStatement ps, Object resource) {
+    protected int executeUpdate(PreparedStatement ps) {
         try {
             return ps.executeUpdate();
         } catch (SQLException e) {
-            handleSQLException(e, ps, true, resource);
+            handleSQLException(e, ps, true, null);
             return 0;// Unreachable!
         }
     }

@@ -49,7 +49,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             IDbCommand cmd = Command(connection);
             try {
                 BindArgs(cmd, args, argTypes);
-                return ExecuteUpdate(cmd, args);
+                return ExecuteUpdate(cmd);
             } finally {
                 Close(cmd);
             }

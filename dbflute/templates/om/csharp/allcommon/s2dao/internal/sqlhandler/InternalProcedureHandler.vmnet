@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 try {
                     dbCommand = PrepareCallableStatement(conn, this.Sql);
                 } catch (Exception e) {
-                    HandleDbException(e, dbCommand, false, args);
+                    HandleDbException(e, dbCommand, false, null);
                 }
                 Object returnValue = null;
                 int additionalParamCount = 0;
@@ -50,9 +50,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     try {
                         BindParamters(dbCommand, dto);
                     } catch (Exception e) {
-                        HandleDbException(e, dbCommand, false, args);
+                        HandleDbException(e, dbCommand, false, null);
                     }
-                    ExecuteNonQuery(dbCommand, args);
+                    ExecuteNonQuery(dbCommand);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     returnValue = param.Value;
                     additionalParamCount = 1;
@@ -60,14 +60,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     try {
                         BindParamters(dbCommand, dto);
                     } catch (Exception e) {
-                        HandleDbException(e, dbCommand, false, args);
+                        HandleDbException(e, dbCommand, false, null);
                     }
-                    ExecuteNonQuery(dbCommand, args);
+                    ExecuteNonQuery(dbCommand);
                 }
                 try {
                     return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
                 } catch (Exception e) {
-                    HandleDbException(e, dbCommand, false, args);
+                    HandleDbException(e, dbCommand, false, null);
                     return null; // Unreachable!
                 }
             } finally {

@@ -31,6 +31,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                        ========
         protected override void SetupBindVariables(Object bean) {
             SetupUpdateBindVariables(bean);
+            LoggingMessageSqlArgs = _bindVariables;
         }
 
         protected override void PostUpdateBean(Object bean, int ret) {

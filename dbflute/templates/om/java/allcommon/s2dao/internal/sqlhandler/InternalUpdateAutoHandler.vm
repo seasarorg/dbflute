@@ -33,6 +33,7 @@ public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHand
 	@Override
     protected void setupBindVariables(Object bean) {
         setupUpdateBindVariables(bean);
+        setLoggingMessageSqlArgs(bindVariables);
     }
 
 	@Override

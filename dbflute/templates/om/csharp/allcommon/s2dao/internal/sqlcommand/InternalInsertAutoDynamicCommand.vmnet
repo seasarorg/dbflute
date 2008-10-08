@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             }
             ${glInternalAbstractAutoHandler} handler = CreateAutoHandler(DataSource, CommandFactory, bmd, propertyTypes);
             handler.Sql = SetupSql(bmd, propertyTypes);
-            handler.LoggingMessageSqlArgs = args;
+            handler.LoggingMessageSqlArgs = args; // Actually set up this property in the handler again.
             int i = handler.Execute(args);
             if (i < 1) {
                 throw new NotSingleRowUpdatedRuntimeException(args[0], i);

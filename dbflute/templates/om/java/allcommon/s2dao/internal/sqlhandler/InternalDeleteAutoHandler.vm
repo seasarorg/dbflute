@@ -26,5 +26,6 @@ public class ${glInternalDeleteAutoHandler} extends ${glInternalAbstractAutoHand
 	@Override
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
+        setLoggingMessageSqlArgs(bindVariables);
     }
 }

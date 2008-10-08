@@ -71,13 +71,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             IDataReader dataReader = null;
             try {
                 if (_dataReaderHandler is ObjectDataReaderHandler) {// CSharp specific
-                    return ExecuteScalar(cmd, args);
+                    return ExecuteScalar(cmd);
                 } else {
                     try {
                         dataReader = CreateDataReader(cmd);
                         return _dataReaderHandler.Handle(dataReader);
                     } catch (Exception e) {
-                        HandleDbException(e, cmd, false, args);
+                        HandleDbException(e, cmd);
                         return null; // Unreachable!
                     }
                 }

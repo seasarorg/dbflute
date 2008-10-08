@@ -27,6 +27,7 @@ public class ${glInternalInsertAutoHandler} extends ${glInternalAbstractAutoHand
 	@Override
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
+        setLoggingMessageSqlArgs(bindVariables);
     }
 
 	@Override

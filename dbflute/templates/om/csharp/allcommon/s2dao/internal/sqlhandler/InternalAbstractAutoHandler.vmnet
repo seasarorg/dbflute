@@ -69,7 +69,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int ret = -1;
             try {
                 BindArgs(cmd, _bindVariables, _bindVariableTypes);
-                ret = ExecuteUpdate(cmd, _bindVariables);
+                ret = ExecuteUpdate(cmd);
             } finally {
                 Close(cmd);
             }

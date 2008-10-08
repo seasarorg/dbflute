@@ -45,7 +45,7 @@ public class ${glInternalCommandContextHandler} extends ${glInternalBasicHandler
         int ret = -1;
         try {
             bindArgs(ps, context.getBindVariables(), context.getBindVariableTypes());
-            ret = executeUpdate(ps, context);
+            ret = executeUpdate(ps);
         } finally {
             close(ps);
         }
