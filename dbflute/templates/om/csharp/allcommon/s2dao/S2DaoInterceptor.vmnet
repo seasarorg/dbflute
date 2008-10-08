@@ -224,7 +224,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             // Save behavior invoke name for error message.
-            ${glInternalMapContextName}.SetObject("df:BehaviorInvokeName", invokeName + "()");
+            PutObjectToMapContext("df:BehaviorInvokeName", invokeName + "()");
 
             int length = invokeName.Length;
             StringBuilder sb = new StringBuilder();
@@ -828,6 +828,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool IsSpecifiedOutsideSql() {
             ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
             return outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql;
+        }
+
+        protected void PutObjectToMapContext(String key, Object value) {
+            ${glInternalMapContextName}.SetObject(key, value);
         }
 
         // ===============================================================================

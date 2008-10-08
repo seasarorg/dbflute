@@ -99,7 +99,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (!isAbstract(method)) {
             return invocation.proceed();
         }
-        
+
         // - - - - - - - - - - - - -
         // Initialize DAO meta data
         // - - - - - - - - - - - - -
@@ -261,7 +261,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final String expWithoutKakko = buildInvocationExpressionWithoutKakko(invocation, invokeClassName, invokeMethodName);
 
         // Save behavior invoke name for error message.
-        ${glInternalMapContextName}.setObject("df:BehaviorInvokeName", expWithoutKakko + "()");
+        putObjectToMapContext("df:BehaviorInvokeName", expWithoutKakko + "()");
 
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String invocationExpression = expWithoutKakko + "()";
@@ -941,6 +941,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected boolean isSpecifiedOutsideSql() {
         final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
         return outsideSqlContext != null && outsideSqlContext.isSpecifiedOutsideSql();
+    }
+
+    protected void putObjectToMapContext(String key, Object value) {
+        ${glInternalMapContextName}.setObject(key, value);
     }
 
     // ===================================================================================
