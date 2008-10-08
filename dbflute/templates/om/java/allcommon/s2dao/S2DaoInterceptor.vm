@@ -152,16 +152,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         try {
             ret = cmd.execute(invocation.getArguments());
         } catch (Exception e) {
-            if (isLogEnabled()) {
-                final Class<?> targetType = getTargetClass(invocation);
-                final StringBuilder sb = new StringBuilder();
-                sb.append(targetType.getSimpleName() + " was interrupted by " + e.getClass().getSimpleName()).append(getLineSeparator());
-                sb.append("[Interrupted Target]").append(getLineSeparator());
-                sb.append("  dao    = " + targetType.getSimpleName()).append(getLineSeparator());
-                sb.append("  method = " + invocation.getMethod()).append(getLineSeparator());
-                sb.append("  args   = " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
-                log(sb.toString());
-            }
             if (e.getClass().equals(NotSingleRowUpdatedRuntimeException.class)) {
                 throw new ${glEntityAlreadyUpdatedException}((NotSingleRowUpdatedRuntimeException)e);
             }

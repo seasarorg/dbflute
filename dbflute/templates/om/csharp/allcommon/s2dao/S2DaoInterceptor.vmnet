@@ -119,16 +119,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             try {
                 ret = cmd.Execute(invocation.Arguments);
             } catch (Exception e) {
-                if (IsLogEnabled()) {
-                    Type targetType = GetComponentDef(invocation).ComponentType;
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(targetType.Name + " was interrupted by " + e.GetType().Name).Append(GetLineSeparator());
-                    sb.Append("[Interrupted Target]").Append(GetLineSeparator());
-                    sb.Append("  dao    = " + targetType.Name).Append(GetLineSeparator());
-                    sb.Append("  method = " + invocation.Method).Append(GetLineSeparator());
-                    sb.Append("  args   = " + ${glTraceViewUtilName}.ConvertObjectArrayToStringView(invocation.Arguments));
-                    Log(sb.ToString());
-                }
                 if (e.GetType().Equals(typeof(NotSingleRowUpdatedRuntimeException))) {
                     throw new ${glEntityAlreadyUpdatedException}((NotSingleRowUpdatedRuntimeException)e);
                 }
