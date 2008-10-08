@@ -131,7 +131,7 @@ public class ${glInternalBasicHandler} {
 
     protected String buildLoggingMessageSql() {
         String completeSql = null;
-        if (sql != null) {
+        if (sql != null && loggingMessageSqlArgs != null) {
             try {
                 completeSql = getCompleteSql(loggingMessageSqlArgs);
             } catch (RuntimeException ignored) {
@@ -143,21 +143,21 @@ public class ${glInternalBasicHandler} {
     public static class SQLExceptionHandler {
 
 	    public void handleSQLException(SQLException e, Statement statement) {
-	        handleSQLException(e, statement, false, null);
+	        handleSQLException(e, statement, false);
 	    }
 	    
-	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
-	        handleSQLException(e, statement, uniqueConstraintValid, resource, null);
+	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
+	        handleSQLException(e, statement, uniqueConstraintValid, null);
 	    }
 	    
-	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource, String completeSql) {
+	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, String completeSql) {
 	        if (isSqlExceptionOldStyleHandling()) {
 	            throw new SQLRuntimeException(e);
 	        }
 	        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-	            throwEntityAlreadyExistsException(e, statement, resource, completeSql);
+	            throwEntityAlreadyExistsException(e, statement, completeSql);
 	        }
-	        throwSQLFailureException(e, statement, resource, completeSql);
+	        throwSQLFailureException(e, statement, completeSql);
 	    }
 	
 	    protected boolean isUniqueConstraintException(SQLException e) {
@@ -176,7 +176,7 @@ public class ${glInternalBasicHandler} {
 	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
 	    }
 	
-	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, Object resource, String completeSql) {
+	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The entity already exists on the database!" + getLineSeparator();
@@ -234,11 +234,6 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + getLineSeparator();
 	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
 	        }
-            if (resource != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-            }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[Display SQL]" + getLineSeparator();
@@ -248,7 +243,7 @@ public class ${glInternalBasicHandler} {
 	        throw new ${glEntityAlreadyExistsException}(msg, e);
 	    }
 	
-	    protected void throwSQLFailureException(SQLException e, Statement statement, Object resource, String completeSql) {
+	    protected void throwSQLFailureException(SQLException e, Statement statement, String completeSql) {
 	        String msg = "Look! Read the message below." + getLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
 	        msg = msg + "The SQL failed to execute!" + getLineSeparator();
@@ -305,11 +300,6 @@ public class ${glInternalBasicHandler} {
 	            msg = msg + getLineSeparator();
 	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
 	        }
-            if (resource != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Resource]" + getLineSeparator() + resource.getClass().getName() + getLineSeparator();
-	            msg = msg + buildResourceDisplay(resource) + getLineSeparator();
-            }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[Display SQL]" + getLineSeparator();
@@ -319,30 +309,6 @@ public class ${glInternalBasicHandler} {
             throw new ${glSQLFailureException}(msg, e);
         }
 
-        protected String buildResourceDisplay(Object resource) {
-            if (resource == null) { return ""; }
-            if (resource instanceof CommandContext) {
-                CommandContext ctx = (CommandContext)resource;
-                Object[] variables = ctx.getBindVariables();
-                return buildResourceDisplay(variables);
-            } else if (resource instanceof Object[]) {
-                return buildResourceDisplay((Object[])resource);
-            } else {
-                return resource.toString();
-            }
-        }
-        
-        protected String buildResourceDisplay(Object[] resources) {
-            if (resources == null) { return ""; }
-            if (resources.length == 0) { return "{}"; }
-            StringBuilder sb = new StringBuilder();
-            for (Object resource : resources) {
-                sb.append(", ").append(resource);
-            }
-            sb.delete(0, ", ".length()).insert(0, "{").append("}");
-            return sb.toString();
-        }
-        
         protected String extractSQLState(SQLException e) {
             String sqlState = e.getSQLState();
             if (sqlState != null) {
@@ -430,7 +396,7 @@ public class ${glInternalBasicHandler} {
         try {
             return ps.executeUpdate();
         } catch (SQLException e) {
-            handleSQLException(e, ps, true, null);
+            handleSQLException(e, ps, true);
             return 0;// Unreachable!
         }
     }

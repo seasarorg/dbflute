@@ -409,7 +409,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                         try {
                             handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
                         } catch (SQLException e) {
-                            handleSQLException(e, ps, false, list);
+                            handleSQLException(e, ps, false);
                             return null;// Unreachable!
                         }
                         return result;
@@ -461,7 +461,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                         try {
                             handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
                         } catch (SQLException e) {
-                            handleSQLException(e, ps, false, list);
+                            handleSQLException(e, ps, false);
                             return null;// Unreachable!
                         }
                         return result;

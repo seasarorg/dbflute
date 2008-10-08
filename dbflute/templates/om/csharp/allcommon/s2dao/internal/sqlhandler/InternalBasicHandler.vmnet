@@ -97,17 +97,17 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                               Exception Handler
         //                                                               =================
         protected void HandleDbException(Exception e, IDbCommand cmd) {
-            HandleDbException(e, cmd, false, null);
+            HandleDbException(e, cmd, false);
         }
 
-        protected void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource) {
+        protected void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid) {
             String completeSql = BuildLoggingMessageSql();
-            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, resource, completeSql);
+            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, completeSql);
         }
 
         protected virtual String BuildLoggingMessageSql() {
             String completeSql = null;
-            if (_sql != null) {
+            if (_sql != null && _loggingMessageSqlArgs != null) {
                 try {
                     completeSql = GetCompleteSql(_loggingMessageSqlArgs);
                 } catch (Exception) {
@@ -141,7 +141,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             try {
                 return CommandFactory.ExecuteNonQuery(DataSource, cmd);
             } catch (Exception e) {
-                HandleDbException(e, cmd, true, null);
+                HandleDbException(e, cmd, true);
                 return 0; // Unreachable!
             }
         }
@@ -230,18 +230,18 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
     public class DbExceptionHandler {
 
 	    public void HandleDbException(Exception e, IDbCommand cmd) {
-	        HandleDbException(e, cmd, false, null);
+	        HandleDbException(e, cmd, false);
 	    }
 
-	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource) {
+	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
 	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
 	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
 	        // }
-	        HandleDbException(e, cmd, false, null, null);
+	        HandleDbException(e, cmd, false, null);
 	    }
 
-	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, Object resource, String completeSql) {
+	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, String completeSql) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
 	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
 	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
@@ -255,49 +255,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	        return false;
 	    }
 
-	    // protected void ThrowEntityAlreadyExistsException(DbException e, IDbCommand cmd, Object resource) {
-	    //     String msg = "Look! Read the message below." + GetLineSeparator();
-	    //     msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-	    //     msg = msg + "The entity already exists on the database!" + GetLineSeparator();
-	    //     msg = msg + GetLineSeparator();
-	    //     msg = msg + "[Advice]" + GetLineSeparator();
-	    //     msg = msg + "Please confirm the primary key whether it already exists on the database." + GetLineSeparator();
-	    //     msg = msg + "And confirm the unique constraint for other columns." + GetLineSeparator();
-	    //     msg = msg + GetLineSeparator();
-	    //     if (cmd != null) {
-	    //         msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
-	    //         msg = msg + GetLineSeparator();
-	    //     }
-        //     if (resource != null) {
-	    //         msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().Name + GetLineSeparator();
-	    //         msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
-	    //         msg = msg + GetLineSeparator();
-        //     }
-	    //     // msg = msg + "[SQLState]" + GetLineSeparator() + ExtractSQLState(e) + GetLineSeparator();
-	    //     // msg = msg + GetLineSeparator();
-	    //     msg = msg + "[ErrorCode]" + GetLineSeparator() + e.ErrorCode + GetLineSeparator();
-	    //     msg = msg + GetLineSeparator();
-	    //     msg = msg + "[DbException]" + GetLineSeparator() + e.GetType().Name + GetLineSeparator();
-	    //     msg = msg + e.Message + GetLineSeparator();
-        //     Exception nextEx = e.InnerException;
-        //     if (nextEx != null) {
-	    //         msg = msg + GetLineSeparator();
-	    //         msg = msg + "[NextException]" + GetLineSeparator();
-        //         msg = msg + nextEx.GetType().Name + GetLineSeparator();
-	    //         msg = msg + nextEx.Message + GetLineSeparator();
-        //         Exception nextNextEx = nextEx.InnerException;
-        //         if (nextNextEx != null) {
-	    //             msg = msg + GetLineSeparator();
-	    //             msg = msg + "[NextNextException]" + GetLineSeparator();
-        //             msg = msg + nextNextEx.GetType().Name + GetLineSeparator();
-	    //             msg = msg + nextNextEx.Message + GetLineSeparator();
-        //         }
-        //     }
-	    //     msg = msg + "* * * * * * * * * */";
-	    //     throw new ${glEntityAlreadyExistsException}(msg, e);
-	    // }
-
-	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, Object resource, String completeSql) {
+	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, String completeSql) {
 	        String msg = "Look! Read the message below." + GetLineSeparator();
 	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
 	        msg = msg + "The SQL failed to execute!" + GetLineSeparator();
@@ -375,11 +333,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	            msg = msg + GetLineSeparator();
 	            msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
 	        }
-            if (resource != null) {
-	            msg = msg + GetLineSeparator();
-	            msg = msg + "[Resource]" + GetLineSeparator() + resource.GetType().FullName + GetLineSeparator();
-	            msg = msg + BuildResourceDisplay(resource) + GetLineSeparator();
-            }
             if (completeSql != null) {
 	            msg = msg + GetLineSeparator();
                 msg = msg + "[Display SQL]" + GetLineSeparator();
@@ -389,32 +342,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             throw new ${glSQLFailureException}(msg, e);
         }
 
-        protected String BuildResourceDisplay(Object resource) {
-            if (resource == null) { return ""; }
-
-            // if (resource is CommandContext) {
-            //     CommandContext ctx = (CommandContext)resource;
-            //     Object[] variables = ctx.getBindVariables();
-            //     return BuildResourceDisplay(variables);
-
-            if (resource is Object[]) {
-                return BuildResourceDisplay((Object[])resource);
-            } else {
-                return resource.ToString();
-            }
-        }
-        
-        protected String BuildResourceDisplay(Object[] resources) {
-            if (resources == null) { return ""; }
-            if (resources.Length == 0) { return "{}"; }
-            StringBuilder sb = new StringBuilder();
-            foreach (Object resource in resources) {
-                sb.Append(", ").Append(resource);
-            }
-            sb.Remove(0, ", ".Length).Insert(0, "{").Append("}");
-            return sb.ToString();
-        }
-        
         // protected String ExtractSQLState(DbException e) {
             // return "" +  e.ErrorCode; // [UnderReview]: Where is SQLState?
 
