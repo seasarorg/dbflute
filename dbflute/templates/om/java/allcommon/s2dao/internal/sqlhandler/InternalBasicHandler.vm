@@ -524,7 +524,7 @@ public class ${glInternalBasicHandler} {
         this.statementFactory = statementFactory;
     }
 
-    public void setLoggingMessageSqlArgs(String loggingMessageSqlArgs) {
+    public void setLoggingMessageSqlArgs(Object[] loggingMessageSqlArgs) {
         this.loggingMessageSqlArgs = loggingMessageSqlArgs;
     }
 }
