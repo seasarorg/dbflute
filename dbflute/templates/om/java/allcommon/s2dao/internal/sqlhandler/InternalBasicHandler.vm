@@ -231,7 +231,8 @@ public class ${glInternalBasicHandler} {
             }
 	        if (statement != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator();
+                msg = msg + statement.getClass().getName() + getLineSeparator();
 	        }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
@@ -297,7 +298,8 @@ public class ${glInternalBasicHandler} {
             }
 	        if (statement != null) {
 	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator() + statement + getLineSeparator();
+	            msg = msg + "[Statement]" + getLineSeparator();
+                msg = msg + statement.getClass().getName() + getLineSeparator();
 	        }
             if (completeSql != null) {
 	            msg = msg + getLineSeparator();
