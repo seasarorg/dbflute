@@ -116,8 +116,8 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         try {
             return ps.executeBatch();
         } catch (SQLException e) {
-            handleSQLException(e, ps, true, list);
-            return null;// Unreachable!
+            handleSQLException(e, ps, true);
+            return null; // Unreachable!
         }
     }
 	

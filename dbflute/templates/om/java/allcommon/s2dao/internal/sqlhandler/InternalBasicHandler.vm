@@ -8,7 +8,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.seasar.dao.CommandContext;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -121,12 +120,12 @@ public class ${glInternalBasicHandler} {
     //                                                                   Exception Handler
     //                                                                   =================
     protected void handleSQLException(SQLException e, Statement statement) {
-        handleSQLException(e, statement, false, null);
+        handleSQLException(e, statement, false);
     }
 
-    protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, Object resource) {
+    protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
         String completeSql = buildLoggingMessageSql();
-        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, resource, completeSql);
+        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, completeSql);
     }
 
     protected String buildLoggingMessageSql() {
