@@ -7,9 +7,13 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetWrapper};
 
 /**
  * @author ${database.ClassAuthor}
@@ -19,19 +23,16 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-	private ResultSetFactory resultSetFactory;
     private ResultSetHandler resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalBasicSelectHandler}(DataSource dataSource, String sql,
-            ResultSetHandler resultSetHandler,
-            StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
+            ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
         setSql(sql);
         setResultSetHandler(resultSetHandler);
-        setResultSetFactory(resultSetFactory);
     }
 
     // ===================================================================================
@@ -61,7 +62,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
             return execute(ps);
         } catch (SQLException e) {
             handleSQLException(e, ps);
-            return null;// Unreachable!
+            return null; // Unreachable!
         } finally {
             close(ps);
         }
@@ -80,21 +81,47 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         }
     }
 
-    protected ResultSet createResultSet(PreparedStatement ps) {
-        return resultSetFactory.createResultSet(ps);
+    protected ResultSet createResultSet(PreparedStatement ps) throws SQLException {
+        final ResultSet resultSet = ps.executeQuery();
+        if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
+            return resultSet;
+        }
+        final ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
+        if (!isUseFetchNarrowingResultSetWrapper(cb)) {
+            return resultSet;
+        }
+        final ${glFetchNarrowingResultSetWrapper} wrapper;
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
+        } else {
+            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, false, false);
+        }
+        return wrapper;
+    }
+
+    protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
+        if (cb.getSafetyMaxResultSize() > 0) {
+            return true;
+        }
+        if (!cb.isFetchNarrowingEffective()) {
+            return false; // It is not necessary to control.
+        }
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+                return true;
+            }
+        }
+        if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
+            return true;
+        }
+        return false;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ResultSetFactory getResultSetFactory() {
-        return resultSetFactory;
-    }
-
-    public void setResultSetFactory(ResultSetFactory resultSetFactory) {
-        this.resultSetFactory = resultSetFactory;
-    }
-
     public ResultSetHandler getResultSetHandler() {
         return resultSetHandler;
     }

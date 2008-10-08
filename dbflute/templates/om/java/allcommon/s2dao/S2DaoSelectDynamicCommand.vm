@@ -5,7 +5,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dao.CommandContext;
-import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
@@ -35,9 +34,6 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     /** The handler of resultSet. */
     protected ResultSetHandler resultSetHandler;
 
-    /** The factory of resultSet. */
-    protected ResultSetFactory resultSetFactory;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -46,14 +42,12 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
      * @param dataSource Data source.
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
-     * @param resultSetFactory The factory of resultSet.
      */
     public ${glSelectDynamicCommand}(DataSource dataSource,
             StatementFactory statementFactory,
-            ResultSetHandler resultSetHandler, ResultSetFactory resultSetFactory) {
+            ResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
-        this.resultSetFactory = resultSetFactory;
     }
 
     // ===================================================================================
@@ -63,7 +57,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     //                         SelectDynamicCommand Creation
     //                         -----------------------------
     protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
-        return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler, resultSetFactory);
+        return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler);
     }
 
     // ===================================================================================
@@ -349,11 +343,11 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     }
 
     protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
-        return newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
+        return newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory());
     }
 
-    protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
-        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory) {
+    protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
+        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory) {
             @Override
             protected void bindArgs(java.sql.PreparedStatement ps, Object[] args, Class[] argTypes) {
                 if (args == null) {

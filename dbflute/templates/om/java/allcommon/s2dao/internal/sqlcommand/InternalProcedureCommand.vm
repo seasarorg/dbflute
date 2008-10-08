@@ -3,7 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlComman
 import javax.sql.DataSource;
 
 import org.seasar.dao.SqlCommand;
-import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 
@@ -22,19 +21,16 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
     protected DataSource dataSource;
     protected ResultSetHandler resultSetHandler;
     protected StatementFactory statementFactory;
-    protected ResultSetFactory resultSetFactory;
     protected ${glInternalProcedureMetaData} procedureMetaData;
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalProcedureCommand}(DataSource dataSource, ResultSetHandler resultSetHandler,
-            StatementFactory statementFactory, ResultSetFactory resultSetFactory,
-            ${glInternalProcedureMetaData} procedureMetaData) {
+            StatementFactory statementFactory, ${glInternalProcedureMetaData} procedureMetaData) {
         this.dataSource = dataSource;
         this.resultSetHandler = resultSetHandler;
         this.statementFactory = statementFactory;
-        this.resultSetFactory = resultSetFactory;
         this.procedureMetaData = procedureMetaData;
     }
 
@@ -51,7 +47,7 @@ public class ${glInternalProcedureCommand} implements SqlCommand {
     }
     protected ${glInternalProcedureHandler} newArgumentDtoProcedureHandler() {
         return new ${glInternalProcedureHandler}(dataSource, createSql(procedureMetaData), resultSetHandler,
-                statementFactory, resultSetFactory, procedureMetaData);
+                statementFactory, procedureMetaData);
     }
     protected String createSql(final ${glInternalProcedureMetaData} procedureMetaData) {
         final StringBuilder sb = new StringBuilder();

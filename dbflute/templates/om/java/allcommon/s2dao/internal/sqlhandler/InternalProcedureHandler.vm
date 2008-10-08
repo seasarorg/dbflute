@@ -7,12 +7,12 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.seasar.framework.util.CaseInsensitiveMap;
 import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
@@ -37,8 +37,8 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
     //                                                                         ===========
     public ${glInternalProcedureHandler}(final DataSource dataSource, final String sql,
             final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
-            final ResultSetFactory resultSetFactory, final ${glInternalProcedureMetaData} procedureMetaData) {
-        super(dataSource, sql, resultSetHandler, statementFactory, resultSetFactory);
+            final ${glInternalProcedureMetaData} procedureMetaData) {
+        super(dataSource, sql, resultSetHandler, statementFactory);
         this.procedureMetaData = procedureMetaData;
     }
 	
@@ -130,10 +130,19 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
     protected Object handleResultSet(final CallableStatement cs) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = getResultSetFactory().getResultSet(cs);
+            rs = getResultSet(cs);
             return getResultSetHandler().handle(rs);
         } finally {
             close(rs);
+        }
+    }
+
+    protected ResultSet getResultSet(Statement statement)  {
+        try {
+            return statement.getResultSet();
+        } catch (SQLException e) {
+            handleSQLException(e, statement);
+            return null;// Unreachable!
         }
     }
 

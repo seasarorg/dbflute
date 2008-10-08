@@ -811,7 +811,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalProcedureCommand} createInternalProcedureCommand(Method method, ${glInternalProcedureMetaData} metaData) {
         final ResultSetHandler resultSetHandler = createResultSetHandler(method);
-        return new ${glInternalProcedureCommand}(dataSource, resultSetHandler, statementFactory, resultSetFactory, metaData);
+        return new ${glInternalProcedureCommand}(dataSource, resultSetHandler, statementFactory, metaData);
     }
 	
     // -----------------------------------------------------
@@ -914,7 +914,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @return The customize select dynamic command. (NotNull)
      */
     protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(ResultSetHandler handler) {
-        return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
+        return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler);
     }
 
     // ===================================================================================

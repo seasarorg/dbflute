@@ -7,9 +7,9 @@ import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.ResultSetFactory;
 
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+// import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+// import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+// import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
@@ -35,7 +35,7 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
      * @param statement Statement. (NotNull)
      * @return Result set for procedure executing of s2dao. (NotNull)
      */
-    public ResultSet getResultSet(Statement statement) {
+    public ResultSet getResultSet(Statement statement) { // Unused in DBFlute
         return doGetResultSet(statement);
     }
 
@@ -44,44 +44,45 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
      * @param ps Prepared statement. (NotNull)
      * @return Result set. (NotNull)
      */
-    public ResultSet createResultSet(PreparedStatement ps) {
-        final ResultSet resultSet = executeQuery(ps);
+    public ResultSet createResultSet(PreparedStatement ps) { // Unused in DBFlute
+        return executeQuery(ps);
 
-        if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
-            return resultSet;
-        }
-        final ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
-        if (!isUseFetchNarrowingResultSetWrapper(cb)) {
-            return resultSet;
-        }
-        final ${glFetchNarrowingResultSetWrapper} wrapper;
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
-        } else {
-            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, false, false);
-        }
-        return wrapper;
+        // *Move to InternalBasicSelectHandler 
+        // if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
+        //     return resultSet;
+        // }
+        // final ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
+        // if (!isUseFetchNarrowingResultSetWrapper(cb)) {
+        //     return resultSet;
+        // }
+        // final ${glFetchNarrowingResultSetWrapper} wrapper;
+        // if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+        //     final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        //     wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
+        // } else {
+        //     wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, false, false);
+        // }
+        // return wrapper;
     }
 
-    protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
-        if (cb.getSafetyMaxResultSize() > 0) {
-            return true;
-        }
-        if (!cb.isFetchNarrowingEffective()) {
-            return false;// It is not necessary to control.
-        }
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-            if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
-                return true;
-            }
-        }
-        if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
-            return true;
-        }
-        return false;
-    }
+    // protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
+    //     if (cb.getSafetyMaxResultSize() > 0) {
+    //         return true;
+    //     }
+    //     if (!cb.isFetchNarrowingEffective()) {
+    //         return false;// It is not necessary to control.
+    //     }
+    //     if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+    //         final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+    //         if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+    //             return true;
+    //         }
+    //     }
+    //     if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // ===================================================================================
     //                                                                      JDBC Delegator
