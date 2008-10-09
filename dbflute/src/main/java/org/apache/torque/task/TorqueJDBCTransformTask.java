@@ -196,12 +196,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ dbMetaData.toString(): " + dbMetaData.toString());
         _log.info("$ dbMetaData.getMaxRowSize(): " + dbMetaData.getMaxRowSize());
         _log.info("$ ");
-        _log.info("$ /------------------------------------");
+        logSchema();
         logObjectTypes();
+        _log.info("$ ");
+        _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
         _log.info("$ TableCount: " + tableList.size());
-        _log.info("$ ---------------------- /");
-        _log.info("$ ");
         _log.info("$ *************************************/");
 
         if (tableList.isEmpty()) {
@@ -333,6 +333,15 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
         setupAddtionalTableIfNeeds(); // since 0.8.0
         _doc.appendChild(_databaseNode);
+    }
+
+    protected void logSchema() {
+        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        String additionalExpression = "";
+        if (additionalSchemaList.isEmpty()) {
+            additionalExpression = " " + additionalSchemaList;
+        }
+        _log.info("$ Schema: " + _schema + additionalExpression);
     }
 
     protected void logObjectTypes() {
