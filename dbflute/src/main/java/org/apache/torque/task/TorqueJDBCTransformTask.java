@@ -337,58 +337,49 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _doc.appendChild(_databaseNode);
     }
 
+    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
+    }
+
+    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+        final DfColumnHandler columnHandler = new DfColumnHandler();
+        return columnHandler.getColumnTorqueType(columnMetaInfo);
+    }
+
+    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final String jdbcType = getColumnTorqueType(columnMetaInfo);
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
+                decimalDigits > 0 ? decimalDigits : null);
+        columnElement.setAttribute("javaType", javaNative);
+    }
+
+    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
+    }
+
+    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final int jdbcType = columnMetaInfo.getJdbcType();
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
+            if (decimalDigits > 0) {
+                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
+            } else {
+                columnElement.setAttribute("size", String.valueOf(columnSize));
+            }
+        }
+    }
+
+    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
+        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
+                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
+    }
+
     // ===================================================================================
     //                                                                   Meta Data Handler
     //                                                                   =================
-    /**
-     * Retrieves a list of the columns composing the primary key for a given table.
-     * @param dbMeta JDBC meta data.
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return A list of the primary key parts for <code>tableName</code>.
-     * @throws SQLException
-     */
-    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
-        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _schema, tableMetaInfo);
-    }
-
-    /**
-     * Get unique column name list.
-     * @param dbMeta
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return Unique column name list.
-     * @throws SQLException
-     */
-    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
-        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _schema, tableMetaInfo);
-    }
-
-    /**
-     * Get auto-increment column name.
-     * @param tableMetaInfo The meta information of table from which to retrieve PK information.
-     * @param primaryKeyColumnName Primary-key column-name.
-     * @param conn Connection.
-     * @return Auto-increment column name. (Nullable)
-     * @throws SQLException
-     */
-    protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
-            throws SQLException {
-        return _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
-    }
-
-    /**
-     * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data.
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return A list of foreign keys in <code>tableName</code>.
-     * @throws SQLException
-     */
-    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
-        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, _schema, tableMetaInfo);
-    }
-
     /**
      * Get all the table names in the current database that are not system tables.
      * @param dbMeta JDBC database meta data.
@@ -397,8 +388,23 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
         final List<DfTableMetaInfo> tableList = _tableNameHandler.getTableList(dbMeta, _schema);
+        resolveAdditionalSchema(dbMeta, tableList);
         helpTableComments(tableList);
         return tableList;
+    }
+
+    protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
+            throws SQLException {
+        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        for (String additionalSchema : additionalSchemaList) {
+            final List<DfTableMetaInfo> additionalTableList = _tableNameHandler.getTableList(dbMeta, additionalSchema);
+            for (DfTableMetaInfo metaInfo : additionalTableList) {
+                if (metaInfo.getTableSchema() == null) {
+                    metaInfo.setTableSchema(additionalSchema);
+                }
+            }
+            tableList.addAll(additionalTableList);
+        }
     }
 
     protected void helpTableComments(List<DfTableMetaInfo> tableList) {
@@ -430,7 +436,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, tableMetaInfo);
         helpColumnComments(tableMetaInfo, columnList);
         return columnList;
     }
@@ -448,6 +455,71 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 _log.debug("Failed to extract column comments: extractor=" + extractor, ignored);
             }
         }
+    }
+
+    /**
+     * Retrieves a list of the columns composing the primary key for a given table.
+     * @param dbMeta JDBC meta data.
+     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @return A list of the primary key parts for <code>tableName</code>.
+     * @throws SQLException
+     */
+    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema, tableMetaInfo);
+    }
+
+    /**
+     * Get unique column name list.
+     * @param dbMeta
+     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @return Unique column name list.
+     * @throws SQLException
+     */
+    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta,
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, schema, tableMetaInfo);
+    }
+
+    /**
+     * Get auto-increment column name.
+     * @param tableMetaInfo The meta information of table from which to retrieve PK information.
+     * @param primaryKeyColumnName Primary-key column-name.
+     * @param conn Connection.
+     * @return Auto-increment column name. (Nullable)
+     * @throws SQLException
+     */
+    protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
+            throws SQLException {
+        return _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
+    }
+
+    /**
+     * Retrieves a list of foreign key columns for a given table.
+     * @param dbMeta JDBC meta data.
+     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @return A list of foreign keys in <code>tableName</code>.
+     * @throws SQLException
+     */
+    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, schema, tableMetaInfo);
+    }
+
+    protected String getHandlerUseSchema(DfTableMetaInfo tableMetaInfo) {
+        return isAdditionalSchemaTable(tableMetaInfo) ? tableMetaInfo.getTableSchema() : _schema;
+    }
+
+    protected boolean isAdditionalSchemaTable(DfTableMetaInfo tableMetaInfo) {
+        final String schema = tableMetaInfo.getTableSchema();
+        if (schema == null || schema.trim().length() == 0) {
+            return false;
+        }
+        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        return additionalSchemaList.contains(schema);
     }
 
     protected DfDbCommentExtractor createDbCommentExtractor() {
@@ -499,49 +571,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
             _databaseNode.appendChild(tableElement);
         }
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
-    }
-
-    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final DfColumnHandler columnHandler = new DfColumnHandler();
-        return columnHandler.getColumnTorqueType(columnMetaInfo);
-    }
-
-    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final String jdbcType = getColumnTorqueType(columnMetaInfo);
-        final int columnSize = columnMetaInfo.getColumnSize();
-        final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
-                decimalDigits > 0 ? decimalDigits : null);
-        columnElement.setAttribute("javaType", javaNative);
-    }
-
-    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
-    }
-
-    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int jdbcType = columnMetaInfo.getJdbcType();
-        final int columnSize = columnMetaInfo.getColumnSize();
-        final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
-            if (decimalDigits > 0) {
-                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
-            } else {
-                columnElement.setAttribute("size", String.valueOf(columnSize));
-            }
-        }
-    }
-
-    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
-        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
-                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
     }
 
     // ===================================================================================

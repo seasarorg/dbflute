@@ -66,11 +66,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
                     @Override
-                    protected String[] getDatabaseTypeStringArray() {
+                    protected String[] getObjectTypeStringArray() {
                         if (_dropTargetDatabaseTypeList != null && !_dropTargetDatabaseTypeList.isEmpty()) {
                             return _dropTargetDatabaseTypeList.toArray(new String[] {});
                         } else {
-                            return super.getDatabaseTypeStringArray();
+                            return super.getObjectTypeStringArray();
                         }
                     }
                 };

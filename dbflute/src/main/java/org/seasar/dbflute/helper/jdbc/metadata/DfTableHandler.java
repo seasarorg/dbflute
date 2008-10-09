@@ -46,7 +46,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         // /---------------------------------------------------- [My Extension]
         // Get DatabaseTypes from ContextProperties.
         // These are the entity types we want from the database
-        final String[] types = getDatabaseTypeStringArray();
+        final String[] types = getObjectTypeStringArray();
         logDatabaseTypes(types);
         // -------------------/
 
@@ -88,10 +88,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Resolve same name table.
-     * <pre>
-     * 同じ名前のTableが存在するTableに関しては、
-     * それを示すFlagをtrueにする。
-     * </pre>
+     * If the same table names exist, it marks about it.
      * @param tableMetaInfoList The list of table meta info. (NotNull)
      */
     protected void resolveSameNameTable(final List<DfTableMetaInfo> tableMetaInfoList) {
@@ -115,14 +112,14 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             }
         }
     }
-    
+
     /**
-     * Get database-type-string-array.
-     * @return Database-type-string-array. (NotNull)
+     * Get object type string-array.
+     * @return Object type string-array. (NotNull)
      */
-    protected String[] getDatabaseTypeStringArray() {
-        final List<String> databaseTypeList = getProperties().getBasicProperties().getDatabaseTypeList();
-        return databaseTypeList.toArray(new String[databaseTypeList.size()]);
+    protected String[] getObjectTypeStringArray() {
+        final List<String> targetList = getProperties().getBasicProperties().getObjectTypeTargetList();
+        return targetList.toArray(new String[targetList.size()]);
     }
 
     /**

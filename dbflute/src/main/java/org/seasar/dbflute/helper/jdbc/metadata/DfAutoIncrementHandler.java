@@ -25,7 +25,6 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * The handler of auto increment. 
- * 
  * @author jflute
  */
 public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
