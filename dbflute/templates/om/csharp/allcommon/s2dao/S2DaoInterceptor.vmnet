@@ -304,6 +304,16 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String clientInvokeName = clientResult.getInvokeName();
                 String byPassInvokeName = byPassResult.getInvokeName();
                 String behaviorInvokeName = behaviorResult.getInvokeName();
+
+                // Save client invoke name for error message.
+                if (clientResult.getSimpleClassName() != null) {
+                    PutObjectToMapContext("df:ClientInvokeName", clientInvokeName);
+                }
+                // Save by-pass invoke name for error message.
+                if (byPassResult.getSimpleClassName() != null) {
+                    PutObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
+                }
+
                 if (clientInvokeName.Trim().Length == 0 && byPassInvokeName.Trim().Length == 0) {
                     return;
                 }

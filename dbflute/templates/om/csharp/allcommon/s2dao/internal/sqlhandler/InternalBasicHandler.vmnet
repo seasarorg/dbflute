@@ -304,7 +304,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 	                }
                 }
             }
-            Object invokeName = ${glInternalMapContextName}.GetObject("df:BehaviorInvokeName");
+            Object invokeName = ExtractBehaviorInvokeName();
             if (invokeName != null) {
 	            msg = msg + GetLineSeparator();
                 msg = msg + "[Behavior]" + GetLineSeparator();
@@ -394,6 +394,30 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             } catch (Exception) {
             }
             return null;
+        }
+
+        protected String ExtractBehaviorInvokeName() {
+            Object behaviorInvokeName = ${glInternalMapContextName}.GetObject("df:BehaviorInvokeName");
+            if (behaviorInvokeName == null) {
+                return null;
+            }
+            Object clientInvokeName = ${glInternalMapContextName}.GetObject("df:ClientInvokeName");
+            Object byPassInvokeName = ${glInternalMapContextName}.GetObject("df:ByPassInvokeName");
+            StringBuilder sb = new StringBuilder();
+            bool existsPath = false;
+            if (clientInvokeName != null) {
+                existsPath = true;
+                sb.Append(clientInvokeName);
+            }
+            if (byPassInvokeName != null) {
+                existsPath = true;
+                sb.Append(byPassInvokeName);
+            }
+            sb.Append(behaviorInvokeName);
+            if (existsPath) {
+                sb.Append("...");
+            }
+            return sb.ToString();
         }
 
         protected bool HasConditionBean() {

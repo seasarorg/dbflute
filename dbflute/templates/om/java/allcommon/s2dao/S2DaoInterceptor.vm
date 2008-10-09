@@ -350,7 +350,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
         // Save by-pass invoke name for error message.
         if (!byPassResult.isEmptyResult()) {
-            putObjectToMapContext("df:ByPassInvokeName", clientInvokeName);
+            putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
         }
         
         log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
