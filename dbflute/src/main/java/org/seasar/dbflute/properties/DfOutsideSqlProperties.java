@@ -121,6 +121,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                           OmitFileSystemPathPackage
+    //                                                           =========================
+    public boolean isOmitFileSystemPathPackageValid() { // C# only
+        return getOmitFileSystemPathPackage() != null && getOmitFileSystemPathPackage().trim().length() > 0
+                && !getOmitFileSystemPathPackage().trim().equals("null");
+    }
+
+    public String getOmitFileSystemPathPackage() { // C# only
+        return (String) getOutsideSqlDefinitionMap().get("omitFileSystemPathPackage");
+    }
+
+    // ===================================================================================
     //                                                                     OutputDirectory
     //                                                                     ===============
     public String getSql2EntityOutputDirectory() {

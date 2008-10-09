@@ -299,14 +299,15 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected String BuildFileSystemPath(String path) {
-            path = path.Substring(path.IndexOf(".") + ".".Length); // Remove project package.
-            String fileSeparator = "/";
-            String defaultPackage = ${glDBFluteConfig}.GetInstance().DefaultPackage;
-            if (defaultPackage != null && defaultPackage.Trim().Length > 0 && path.StartsWith(defaultPackage)) {
-                path = path.Substring(defaultPackage.Length + ".".Length);
+            String omitPathPackage = ${glDBFluteConfig}.GetInstance().OmitFileSystemPathPackage;
+            if (omitPathPackage != null && omitPathPackage.Trim().Length > 0 && path.StartsWith(omitPathPackage)) {
+                path = path.Substring(omitPathPackage.Length + ".".Length); // Remove omit package.
+            } else {
+                path = path.Substring(path.IndexOf(".") + ".".Length); // Remove project package.
             }
+            String fileSeparator = "/";
             String flatDirectory = ${glDBFluteConfig}.GetInstance().FlatDirectoryPackage;
-            if (flatDirectory != null && flatDirectory.Trim().Length > 0) {
+            if (flatDirectory != null && flatDirectory.Trim().Length > 0 && path.Contains(flatDirectory)) {
                 String front = path.Substring(0, path.IndexOf(flatDirectory));
                 String rear = path.Substring(path.IndexOf(flatDirectory) + flatDirectory.Length);
                 front = front.Replace(".", fileSeparator);

@@ -10,10 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
@@ -21,7 +17,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 
 /**
  * Basic properties.
- * 
+ * This class is very important at DBFlute.
  * @author jflute
  */
 public final class DfBasicProperties extends DfAbstractHelperProperties {
@@ -83,22 +79,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseSybase() {
         return getDatabaseName().equalsIgnoreCase("sybase");
     }
-    
-    public DfDbCommentExtractor createDbCommentExtractor(DataSource dataSource) {
-        if (isDatabaseOracle()) {
-            final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
-            extractor.setDataSource(dataSource);
-            return extractor;
-        }
-        return null;
-    }
 
     // ===================================================================================
     //                                                                    Output Directory
     //                                                                    ================
     public String getOutputDirectory() {
         final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return stringProp("torque.java.dir", defaultSourceDirectory);// 'java.dir' is legacy of Apache Torque.
+        return stringProp("torque.java.dir", defaultSourceDirectory); // 'java.dir' is legacy of Apache Torque.
     }
 
     // ===================================================================================

@@ -85,6 +85,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyM
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.factory.DfDbCommentExtractorFactory;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
@@ -401,15 +402,19 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void helpTableComments(List<DfTableMetaInfo> tableList) {
-        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor(getDataSource());
+        final DfDbCommentExtractor extractor = createDbCommentExtractor();
         if (extractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMetaInfo metaInfo : tableList) {
                 tableSet.add(metaInfo.getTableName());
             }
-            final Map<String, String> tableCommentMap = extractor.extractTableComment(tableSet);
-            for (DfTableMetaInfo metaInfo : tableList) {
-                metaInfo.acceptTableComment(tableCommentMap);
+            try {
+                final Map<String, String> tableCommentMap = extractor.extractTableComment(tableSet);
+                for (DfTableMetaInfo metaInfo : tableList) {
+                    metaInfo.acceptTableComment(tableCommentMap);
+                }
+            } catch (RuntimeException ignored) {
+                _log.debug("Failed to extract table comments: extractor=" + extractor, ignored);
             }
         }
     }
@@ -431,14 +436,27 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void helpColumnComments(DfTableMetaInfo tableInfo, List<DfColumnMetaInfo> columnList) {
-        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor(getDataSource());
+        final DfDbCommentExtractor extractor = createDbCommentExtractor();
         if (extractor != null) {
             final String tableName = tableInfo.getTableName();
-            final Map<String, String> columnCommentMap = extractor.extractColumnComment(tableName);
-            for (DfColumnMetaInfo metaInfo : columnList) {
-                metaInfo.acceptColumnComment(columnCommentMap);
+            try {
+                final Map<String, String> columnCommentMap = extractor.extractColumnComment(tableName);
+                for (DfColumnMetaInfo metaInfo : columnList) {
+                    metaInfo.acceptColumnComment(columnCommentMap);
+                }
+            } catch (RuntimeException ignored) {
+                _log.debug("Failed to extract column comments: extractor=" + extractor, ignored);
             }
         }
+    }
+
+    protected DfDbCommentExtractor createDbCommentExtractor() {
+        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory();
+        return factory.createDbCommentExtractor();
+    }
+
+    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory() {
+        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource());
     }
 
     // ===================================================================================
