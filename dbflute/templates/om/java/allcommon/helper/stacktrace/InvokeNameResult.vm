@@ -30,7 +30,7 @@ public class ${glInvokeNameResultName} {
     //                                                                              Determination
     //                                                                              =============
     public boolean isEmptyResult() {
-        return _simpleClassName != null;
+        return _simpleClassName == null;
     }
     
     // ==========================================================================================
