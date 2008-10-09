@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata.info;
 
+import java.util.Map;
+
 /**
  * @author jflute
  */
@@ -32,7 +34,17 @@ public class DfColumnMetaInfo {
     protected String columnComment;
     protected String defaultValue;
     protected String sql2entityTableName;
-
+    
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
+    public void acceptColumnComment(Map<String, String> columnCommentMap) {
+        final String comment = columnCommentMap.get(columnName);
+        if (comment != null && comment.trim().length() > 0) {
+            columnComment = comment;
+        }
+    }
+    
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

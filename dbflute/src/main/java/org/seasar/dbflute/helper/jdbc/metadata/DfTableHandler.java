@@ -115,7 +115,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             }
         }
     }
-
+    
     /**
      * Get database-type-string-array.
      * @return Database-type-string-array. (NotNull)

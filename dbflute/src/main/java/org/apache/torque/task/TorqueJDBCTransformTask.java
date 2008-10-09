@@ -60,6 +60,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
@@ -393,7 +395,23 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        return _tableNameHandler.getTableList(dbMeta, _schema);
+        final List<DfTableMetaInfo> tableList = _tableNameHandler.getTableList(dbMeta, _schema);
+        helpTableComments(tableList);
+        return tableList;
+    }
+
+    protected void helpTableComments(List<DfTableMetaInfo> tableList) {
+        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor();
+        if (extractor != null) {
+            final Set<String> tableSet = new HashSet<String>();
+            for (DfTableMetaInfo metaInfo : tableList) {
+                tableSet.add(metaInfo.getTableName());
+            }
+            final Map<String, String> tableCommentMap = extractor.extractTableComment(tableSet);
+            for (DfTableMetaInfo metaInfo : tableList) {
+                metaInfo.acceptTableComment(tableCommentMap);
+            }
+        }
     }
 
     /**
@@ -407,7 +425,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        return _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
+        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
+        helpColumnComments(tableMetaInfo, columnList);
+        return columnList;
+    }
+
+    protected void helpColumnComments(DfTableMetaInfo tableInfo, List<DfColumnMetaInfo> columnList) {
+        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor();
+        if (extractor != null) {
+            final String tableName = tableInfo.getTableName();
+            final Map<String, String> columnCommentMap = extractor.extractColumnComment(tableName);
+            for (DfColumnMetaInfo metaInfo : columnList) {
+                metaInfo.acceptColumnComment(columnCommentMap);
+            }
+        }
     }
 
     // ===================================================================================

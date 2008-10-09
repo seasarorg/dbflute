@@ -15,6 +15,10 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata.info;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author jflute
  * @since 0.7.0 (2008/04/18 Friday)
@@ -40,11 +44,11 @@ public class DfTableMetaInfo {
     public boolean isTableTypeView() {
         return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
     }
-    
+
     public boolean isTableTypeAlias() {
         return _tableType != null ? _tableType.equalsIgnoreCase("ALIAS") : false;
     }
-    
+
     public boolean isTableTypeSynonym() {
         return _tableType != null ? _tableType.equalsIgnoreCase("SYNONYM") : false;
     }
@@ -68,6 +72,16 @@ public class DfTableMetaInfo {
         }
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
+    public void acceptTableComment(Map<String, String> tableCommentMap) {
+        final String comment = tableCommentMap.get(_tableName);
+        if (comment != null && comment.trim().length() > 0) {
+            _tableComment = comment;
+        }
+    }
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
