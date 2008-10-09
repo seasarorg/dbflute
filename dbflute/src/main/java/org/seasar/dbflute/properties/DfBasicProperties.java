@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
@@ -82,9 +84,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseName().equalsIgnoreCase("sybase");
     }
     
-    public DfDbCommentExtractor createDbCommentExtractor() {
+    public DfDbCommentExtractor createDbCommentExtractor(DataSource dataSource) {
         if (isDatabaseOracle()) {
-            return new DfDbCommentExtractorOracle();
+            final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
+            extractor.setDataSource(dataSource);
+            return extractor;
         }
         return null;
     }

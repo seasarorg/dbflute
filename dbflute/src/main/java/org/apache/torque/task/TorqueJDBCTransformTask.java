@@ -401,7 +401,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void helpTableComments(List<DfTableMetaInfo> tableList) {
-        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor();
+        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor(getDataSource());
         if (extractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMetaInfo metaInfo : tableList) {
@@ -431,7 +431,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void helpColumnComments(DfTableMetaInfo tableInfo, List<DfColumnMetaInfo> columnList) {
-        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor();
+        final DfDbCommentExtractor extractor = getBasicProperties().createDbCommentExtractor(getDataSource());
         if (extractor != null) {
             final String tableName = tableInfo.getTableName();
             final Map<String, String> columnCommentMap = extractor.extractColumnComment(tableName);

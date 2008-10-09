@@ -15,9 +15,7 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata.info;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author jflute
