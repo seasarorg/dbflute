@@ -128,7 +128,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
-    protected DfTableHandler _tableNameHandler = new DfTableHandler();
+    protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
@@ -409,7 +409,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        final List<DfTableMetaInfo> tableList = _tableNameHandler.getTableList(dbMeta, _schema);
+        final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _schema);
         resolveAdditionalSchema(dbMeta, tableList);
         helpTableComments(tableList);
         return tableList;
@@ -419,9 +419,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             throws SQLException {
         final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
         for (String additionalSchema : additionalSchemaList) {
-            final List<DfTableMetaInfo> additionalTableList = _tableNameHandler.getTableList(dbMeta, additionalSchema);
+            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
-                if (metaInfo.getTableSchema() == null) {
+                final String tmp = metaInfo.getTableSchema();
+                if (tmp == null || tmp.trim().length() == 0) {
                     metaInfo.setTableSchema(additionalSchema);
                 }
             }
