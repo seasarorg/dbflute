@@ -216,7 +216,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
-            _log.info("...Processing table: " + tableMataInfo);
+            _log.info("$ " + tableMataInfo);
 
             final Element tableElement = _doc.createElement("table");
             tableElement.setAttribute("name", tableMataInfo.getTableName());
