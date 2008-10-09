@@ -196,13 +196,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ dbMetaData.toString(): " + dbMetaData.toString());
         _log.info("$ dbMetaData.getMaxRowSize(): " + dbMetaData.getMaxRowSize());
         _log.info("$ ");
-        logSchema();
+        logAdditionalSchemas();
         logObjectTypes();
         _log.info("$ ");
         _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
         _log.info("$ TableCount: " + tableList.size());
         _log.info("$ *************************************/");
+        _log.info("$ ");
 
         if (tableList.isEmpty()) {
             String msg = "Not found tables: url=" + _url + " schema=" + _schema;
@@ -335,13 +336,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _doc.appendChild(_databaseNode);
     }
 
-    protected void logSchema() {
+    protected void logAdditionalSchemas() {
         final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
         String additionalExpression = "";
         if (additionalSchemaList.isEmpty()) {
-            additionalExpression = " " + additionalSchemaList;
+            return;
         }
-        _log.info("$ Schema: " + _schema + additionalExpression);
+        _log.info("$ Additional Schemas: " + additionalExpression);
     }
 
     protected void logObjectTypes() {
@@ -356,7 +357,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
             ++i;
         }
-        _log.info("$ Object Types: " + typeString);
+        _log.info("$ Object Types: {" + typeString + "}");
     }
 
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
