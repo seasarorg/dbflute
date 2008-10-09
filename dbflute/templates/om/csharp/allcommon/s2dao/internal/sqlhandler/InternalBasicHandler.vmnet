@@ -380,18 +380,21 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // }
 
         protected int? ExtractErrorCode(Exception e) {
+            String expName = e.GetType().Name;
+            if (expName.Contains("Oracle") || expName.Contains("MySQL")) {
+                try {
+                    PropertyInfo pi = e.GetType().GetProperty("Number");
+                    if (pi != null) {
+                        Object result = pi.GetValue(e, null);
+                        if (result != null && result is int) {
+                            return (int)result;
+                        }
+                    }
+                } catch (Exception) {
+                }
+            }
             if (e is DbException) {
                 return ((DbException)e).ErrorCode;
-            }
-            try {
-                PropertyInfo pi = e.GetType().GetProperty("Number"); // for MySQL
-                if (pi != null) {
-                    Object result = pi.GetValue(e, null);
-                    if (result != null && result is int) {
-                        return (int)result;
-                    }
-                }
-            } catch (Exception) {
             }
             return null;
         }
