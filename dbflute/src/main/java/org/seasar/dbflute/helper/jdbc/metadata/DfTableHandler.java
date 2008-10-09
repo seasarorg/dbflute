@@ -43,17 +43,11 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
-        // /---------------------------------------------------- [My Extension]
-        // Get DatabaseTypes from ContextProperties.
-        // These are the entity types we want from the database
-        final String[] types = getObjectTypeStringArray();
-        logDatabaseTypes(types);
-        // -------------------/
-
+        final String[] objectTypes = getObjectTypeStringArray();
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            resultSet = dbMeta.getTables(null, schemaName, "%", types);
+            resultSet = dbMeta.getTables(null, schemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
                 final String tableType = resultSet.getString(4);
@@ -120,22 +114,6 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
     protected String[] getObjectTypeStringArray() {
         final List<String> targetList = getProperties().getBasicProperties().getObjectTypeTargetList();
         return targetList.toArray(new String[targetList.size()]);
-    }
-
-    /**
-     * Log database-types. {This is a mere helper method.}
-     * @param types Database-types. (NotNull)
-     */
-    protected void logDatabaseTypes(String[] types) {
-        String typeString = "";
-        for (int i = 0; i < types.length; i++) {
-            if (i == 0) {
-                typeString = types[i];
-            } else {
-                typeString = typeString + " - " + types[i];
-            }
-        }
-        _log.info("$ DatabaseTypes are '" + typeString + "'");
     }
 
     /**

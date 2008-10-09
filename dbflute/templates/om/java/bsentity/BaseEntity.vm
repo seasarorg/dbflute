@@ -336,7 +336,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.primaryKey)
         if (_${col.uncapitalisedJavaName} == null) { return false; }
 #end
-        return true;
+        return ${table.hasPrimaryKey()};
     }
 
     // ===================================================================================

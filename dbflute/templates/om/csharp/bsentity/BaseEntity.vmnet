@@ -248,7 +248,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($col in $table.primaryKey)
                 if (_${col.uncapitalisedJavaName} == null) { return false; }
 #end
-                return true;
+                return ${table.hasPrimaryKey()};
             }
         }
 
