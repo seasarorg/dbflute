@@ -470,19 +470,19 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 #end
-  #if (${col.isJavaNativeBooleanObject()})
+#if (${col.isJavaNativeBooleanObject()})
   
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
-  #end
-  #if (${col.isJavaNativeBinaryObject()})
-  #end
-  #if (!${col.isNotNull()})
+#end
+#if (${col.isJavaNativeBinaryObject()})
+#end
+#if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
         public void Set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
         public void Set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
-  #end
+#end
   
         protected void reg${tmpJavaName}(${glConditionKeyName} key, Object value) {
             registerQuery(key, value, getCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}");
