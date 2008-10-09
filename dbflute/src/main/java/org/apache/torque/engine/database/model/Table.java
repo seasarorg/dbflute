@@ -423,8 +423,8 @@ public class Table implements IDMethod {
     }
 
     // -----------------------------------------------------
-    //                                  Exclusive Table Name
-    //                                  --------------------
+    //                                   Especial Table Name
+    //                                   -------------------
     /**
      * Get annotation table name. (for S2Dao)
      * @return Annotation table name. (NotNull)
@@ -434,16 +434,28 @@ public class Table implements IDMethod {
     }
 
     /**
-     * Get table sql-name.
-     * @return Table sql-name. (NotNull)
+     * Get table SQL-name.
+     * @return Table SQL-name. (NotNull)
      */
     public String getTableSqlName() {
         if (isAvailableAddingSchemaToTableSqlName()) {
-            if (_schema != null && _schema.trim().length() != 0) {
+            if (_schema != null && _schema.trim().length() > 0) {
                 return _schema + "." + _name;
             }
         }
+        if (isOnAdditionalSchema()) { // For resolving additional schema.
+            return _schema + "." + _name;
+        }
         return _name;
+    }
+
+    protected boolean isOnAdditionalSchema() {
+        if (_schema != null && _schema.trim().length() > 0) {
+            final DfBasicProperties prop = getProperties().getBasicProperties();
+            final List<String> additionalSchemaList = prop.getAdditionalSchemaList();
+            return additionalSchemaList.contains(_schema);
+        }
+        return false;
     }
 
     // -----------------------------------------------------
