@@ -476,8 +476,6 @@ namespace ${glPackageBaseCQ} {
             reg${tmpJavaName}(CK_EQ, value);
         }
 #end
-#if (${col.isJavaNativeBinaryObject()})
-#end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
         public void Set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
