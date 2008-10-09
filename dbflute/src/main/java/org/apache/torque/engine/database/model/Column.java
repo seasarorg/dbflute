@@ -542,9 +542,9 @@ public class Column {
         return _needsTransactionInPostgres;
     }
 
-    // -------------------------------------------
-    //                                     NotNull
-    //                                     -------
+    // -----------------------------------------------------
+    //                                               NotNull
+    //                                               ==-----
     /**
      * Return the isNotNull property of the column
      */

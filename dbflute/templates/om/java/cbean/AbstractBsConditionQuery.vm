@@ -699,7 +699,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #end
-#if (!${col.isNotNull()})
+#if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
     /**
      * IsNull(is null). And OnceRegistered.
