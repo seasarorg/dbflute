@@ -201,7 +201,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ ");
         _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
-        _log.info("$ TableCount: " + tableList.size());
+        _log.info("$ Table Count: " + tableList.size());
         _log.info("$ *************************************/");
         _log.info("$ ");
 
@@ -338,11 +338,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected void logAdditionalSchemas() {
         final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
-        String additionalExpression = "";
         if (additionalSchemaList.isEmpty()) {
             return;
         }
-        _log.info("$ Additional Schemas: " + additionalExpression);
+        _log.info("$ Additional Schemas: " + additionalSchemaList);
     }
 
     protected void logObjectTypes() {
