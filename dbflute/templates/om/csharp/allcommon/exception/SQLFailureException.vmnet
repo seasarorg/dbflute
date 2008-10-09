@@ -1,5 +1,6 @@
 
 using System;
+using System.Data.Common;
 
 namespace ${glPackageBaseCommonException} {
 
@@ -9,11 +10,45 @@ namespace ${glPackageBaseCommonException} {
     /// </summary>
     public class ${glSQLFailureException} : SystemException {
 
-        protected Exception _sqlEx;
+        protected DbException _causeDbException;
 
         public ${glSQLFailureException}(String msg, Exception e)
-        : base(msg,e) { _sqlEx = e; }
+        : base(msg,e) {
+            SetupCauseDbException(e);
+        }
 
-        public Exception FailureException { get { return _sqlEx; } }
+        protected void SetupCauseDbException(Exception e) {
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            // It doesn't use recursive call by design because ADO.NET is unpredictable fellow.
+        }
+
+        public DbException CauseDbException { get { return _causeDbException; } }
     }
 }
