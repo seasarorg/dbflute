@@ -1,0 +1,16 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTrace};
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glInvokeNameExtractingResourceName} {
+
+    public boolean isTargetElement(String className, String methodName);
+    public String filterSimpleClassName(String simpleClassName);
+    public boolean isUseAdditionalInfo();
+    public int getStartIndex();
+    public int getLoopSize();
+}

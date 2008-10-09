@@ -25,6 +25,10 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractorName};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
+import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
@@ -236,11 +240,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                      ==============
     protected void logInvocation(MethodInvocation invocation) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final InvokeNameExtractingResult behaviorResult = extractBehaviorInvokeName(stackTrace);
+        final ${glInvokeNameResultName behaviorResult = extractBehaviorInvokeName(stackTrace);
 
         final String invokeClassName;
         final String invokeMethodName;
-        if (behaviorResult.getSimpleClassName() != null) {
+        if (!behaviorResult.isEmptyResult()) {
             invokeClassName = behaviorResult.getSimpleClassName();
             invokeMethodName = behaviorResult.getMethodName();
         } else {
@@ -330,9 +334,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
     protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, InvokeNameExtractingResult behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
-        final InvokeNameExtractingResult clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
+        final ${glInvokeNameResultName clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final InvokeNameExtractingResult byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+        final ${glInvokeNameResultName byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
 
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
@@ -340,6 +344,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
             return;
         }
+        
+        // Save client invoke name for error message.
+        if (!clientResult.isEmptyResult()) {
+            putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
+        }
+        // Save by-pass invoke name for error message.
+        if (!byPassInvokeName.isEmptyResult()) {
+            putObjectToMapContext("df:ByPassInvokeName", clientInvokeName);
+        }
+        
         log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
     }
 
@@ -359,9 +373,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return sb.toString();
     }
 
-    protected InvokeNameExtractingResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
+    protected ${glInvokeNameResultName extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
         final List<String> suffixList = Arrays.asList(new String[]{"Page", "Action"});
-        final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
+        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
@@ -378,12 +392,12 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return 25;
             }
         };
-        return extractInvokeName(callback, stackTrace);
+        return extractInvokeName(resource, stackTrace);
     }
 
-    protected InvokeNameExtractingResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
+    protected ${glInvokeNameResultName extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
         final List<String> suffixList = Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"});
-        final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
+        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
@@ -400,16 +414,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return loopSize >= 0 ? loopSize : 25;
             }
         };
-        return extractInvokeName(callback, stackTrace);
+        return extractInvokeName(resource, stackTrace);
     }
 
-    protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
+    protected ${glInvokeNameResultName extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable" , "PagingInvoker"});
         final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
         final List<String> ousideSql1List = Arrays.asList(new String[]{"OutsideSql"});
         final List<String> ousideSql2List = Arrays.asList(new String[]{"Executor"});
         final List<String> ousideSql3List = Arrays.asList(new String[]{"Executor$"});
-        final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
+        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
             public boolean isTargetElement(String className, String methodName) {
                 if (isClassNameEndsWith(className, suffixList)) {
                     return true;
@@ -436,7 +450,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return 25;
             }
         };
-        return extractInvokeName(callback, stackTrace);
+        return extractInvokeName(resource, stackTrace);
     }
 
     protected boolean isClassNameEndsWith(String className, List<String> suffixList) {
@@ -459,117 +473,14 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     /**
-     * @param callback the call-back for invoke-name-extracting. (NotNull)
+     * @param resource the call-back resource for invoke-name-extracting. (NotNull)
      * @param stackTrace Stack log. (NotNull)
-     * @return Invoke name. (NotNull: If not found, returns empty string.)
+     * @return The result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    protected InvokeNameExtractingResult extractInvokeName(InvokeNameExtractingCallback callback, StackTraceElement[] stackTrace) {
-        String targetSimpleClassName = null;
-        String targetMethodName = null;
-        int lineNumber = 0;
-        int foundIndex = -1;// The minus one means 'Not Found'.
-        int foundFirstIndex = -1;// The minus one means 'Not Found'.
-        boolean onTarget = false;
-        for (int i=callback.getStartIndex(); i < stackTrace.length; i++) {
-            final StackTraceElement element = stackTrace[i];
-            if (i > callback.getStartIndex() + callback.getLoopSize()) {
-                break;
-            }
-            final String className = element.getClassName();
-            if (className.startsWith("sun.") || className.startsWith("java.")) {
-                if (onTarget) {
-                    break;
-                }
-                continue;
-            }
-            final String methodName = element.getMethodName();
-            if (callback.isTargetElement(className, methodName)) {
-                if (methodName.equals("invoke")) {
-                    continue;
-                }
-                targetSimpleClassName = className.substring(className.lastIndexOf(".") + 1);
-                targetMethodName = methodName;
-                if (callback.isUseAdditionalInfo()) {
-                    lineNumber = element.getLineNumber();
-                }
-                foundIndex = i;
-                if (foundFirstIndex == -1) {
-                    foundFirstIndex = i;
-                }
-                onTarget = true;
-                continue;
-            }
-            if (onTarget) {
-                break;
-            }
-        }
-        final InvokeNameExtractingResult result = new InvokeNameExtractingResult();
-        if (targetSimpleClassName == null) {
-            result.setInvokeName("");// Not Found! It sets empty string as default.
-            return result;
-        }
-        final String filteredClassName = callback.filterSimpleClassName(targetSimpleClassName);
-        result.setSimpleClassName(callback.filterSimpleClassName(targetSimpleClassName));
-        result.setMethodName(targetMethodName);
-        if (lineNumber > 0) {
-            result.setInvokeName(filteredClassName + "." + targetMethodName + "():" + lineNumber + " --> ");
-        } else {
-            result.setInvokeName(filteredClassName + "." + targetMethodName + "() --> ");
-        }
-        result.setFoundIndex(foundIndex);
-        result.setFoundFirstIndex(foundFirstIndex);
-        return result;
-    }
-
-    protected static interface InvokeNameExtractingCallback {
-        public boolean isTargetElement(String className, String methodName);
-        public String filterSimpleClassName(String simpleClassName);
-        public boolean isUseAdditionalInfo();
-        public int getStartIndex();
-        public int getLoopSize();
-    }
-
-    protected static class InvokeNameExtractingResult {
-        protected String _simpleClassName;
-        protected String _methodName;
-        protected String _invokeName;
-        protected int _foundIndex;
-        protected int _foundFirstIndex;
-
-        public int getNextStartIndex() {
-            return _foundIndex + 1;
-        }
-
-        public String getSimpleClassName() {
-            return _simpleClassName;
-        }
-        public void setSimpleClassName(String simpleClassName) {
-            _simpleClassName = simpleClassName;
-        }
-        public String getMethodName() {
-            return _methodName;
-        }
-        public void setMethodName(String methodName) {
-            _methodName = methodName;
-        }
-        public String getInvokeName() {
-            return _invokeName;
-        }
-        public void setInvokeName(String invokeName) {
-            _invokeName = invokeName;
-        }
-        public int getFoundIndex() {
-            return _foundIndex;
-        }
-        public void setFoundIndex(int foundIndex) {
-            _foundIndex = foundIndex;
-        }
-        public int getFoundFirstIndex() {
-            return _foundFirstIndex;
-        }
-        public void setFoundFirstIndex(int foundFirstIndex) {
-            _foundFirstIndex = foundFirstIndex;
-        }
+    protected ${glInvokeNameResultName} extractInvokeName(${glInvokeNameExtractingResourceName} resource, StackTraceElement[] stackTrace) {
+        final ${glInvokeNameExtractorName} extractor = new ${glInvokeNameExtractorImplName}();
+        extractor.setStackTrace(stackTrace);
+        return extractor.extractInvokeName(resource);
     }
 
     /**

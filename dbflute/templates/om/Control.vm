@@ -265,6 +265,11 @@ targetdatabase = $targetDatabase
     #set ($glJapaneseCharacterName = "${glProjectPrefix}JapaneseCharacter")
     #set ($glJapaneseCharacterImplName = "${glProjectPrefix}JapaneseCharacterImpl")
 
+    #set ($glInvokeNameExtractingResourceName = "${glProjectPrefix}InvokeNameExtractingResource")
+    #set ($glInvokeNameExtractorName = "${glProjectPrefix}InvokeNameExtractor")
+    #set ($glInvokeNameExtractorImplName = "${glProjectPrefix}InvokeNameExtractorImpl")
+    #set ($glInvokeNameResulttName = "${glProjectPrefix}InvokeNameResultt")
+
     #set ($glLineTokenName = "${glProjectPrefix}LineToken")
     #set ($glLineTokenImplName = "${glProjectPrefix}LineTokenImpl")
     #set ($glLineTokenizingOptionName = "${glProjectPrefix}LineTokenizingOption")
@@ -433,6 +438,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
     #set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.helper.collection.order")
     #set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.helper.collection.order.impl")
+    #set ($glPackageBaseCommonHelperStackTrace = "${database.baseCommonPackage}.helper.stacktrace")
+    #set ($glPackageBaseCommonHelperStackTraceImpl = "${database.baseCommonPackage}.helper.stacktrace.impl")
     #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.helper.token")
     #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.helper.token.line")
     #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.helper.token.line.impl")
@@ -486,6 +493,8 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.Helper.Character.Impl")
       #set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.Helper.Collection.Order")
       #set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.Helper.Collection.Order.Impl")
+      #set ($glPackageBaseCommonHelperStackTrace = "${database.baseCommonPackage}.Helper.StTrace")
+      #set ($glPackageBaseCommonHelperStackTraceImpl = "${database.baseCommonPackage}.Helper.StTrace.Impl")
       #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.Helper.Token")
       #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.Helper.Token.Line")
       #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.Helper.Token.Line.Impl")
@@ -1368,6 +1377,28 @@ targetdatabase = $targetDatabase
       $database.info("    parseAccordingToOrderImpl();")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrderImpl})}${glAccordingToOrderImplName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/impl/AccordingToOrderImpl.${glTemplateFileExtension}",$path,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace}))
+      $database.makeDirectory($path)
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperStackTraceImpl}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('InvokeNameExtractingResource');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameExtractingResourceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameExtractingResource.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InvokeNameExtractor');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameExtractorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameExtractor.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InvokeNameResult');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameResultName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameResult.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InvokeNameExtractorImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTraceImpl})}${glInvokeNameExtractorImplName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/impl/InvokeNameExtractorImpl.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperToken}))
       $database.makeDirectory($path)

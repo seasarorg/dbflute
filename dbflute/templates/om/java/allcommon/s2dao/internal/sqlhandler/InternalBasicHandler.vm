@@ -204,7 +204,7 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
-            Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            Object invokeName = extractBehaviorInvokeName();
             if (invokeName != null) {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[Behavior]" + getLineSeparator();
@@ -271,7 +271,7 @@ public class ${glInternalBasicHandler} {
 	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
-            Object invokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            Object invokeName = extractBehaviorInvokeName();
             if (invokeName != null) {
 	            msg = msg + getLineSeparator();
                 msg = msg + "[Behavior]" + getLineSeparator();
@@ -348,6 +348,30 @@ public class ${glInternalBasicHandler} {
 
             // It doesn't use recursive call by design because JDBC is unpredictable fellow.
             return null;
+        }
+
+        protected String extractBehaviorInvokeName() {
+            final Object behaviorInvokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            if (behaviorInvokeName == null) {
+                return null;
+            }
+            final Object clientInvokeName = ${glInternalMapContextName}.getObject("df:ClientInvokeName");
+            final Object byPassInvokeName = ${glInternalMapContextName}.getObject("df:ByPassInvokeName");
+            final StringBuilder sb = new StringBuilder();
+            boolean existsPath = false;
+            if (clientInvokeName != null) {
+                existsPath = true;
+                sb.append(clientInvokeName);
+            }
+            if (byPassInvokeName != null) {
+                existsPath = true;
+                sb.append(byPassInvokeName);
+            }
+            sb.append(behaviorInvokeName);
+            if (existsPath) {
+                sb.append("...");
+            }
+            return sb.toString();
         }
 
         protected boolean hasConditionBean() {

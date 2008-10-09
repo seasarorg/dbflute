@@ -1,0 +1,13 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTrace};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glInvokeNameExtractorName} {
+
+    /**
+     * @param resource the call-back resource for invoke-name-extracting. (NotNull)
+     * @return The result of invoke name. (NotNull: If not found, returns empty string.)
+     */
+    public ${glInvokeNameResultName} extractInvokeName(${glInvokeNameExtractingResourceName} resource);
+}
