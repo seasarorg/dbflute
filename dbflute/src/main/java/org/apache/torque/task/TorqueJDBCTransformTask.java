@@ -196,8 +196,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ dbMetaData.toString(): " + dbMetaData.toString());
         _log.info("$ dbMetaData.getMaxRowSize(): " + dbMetaData.getMaxRowSize());
         _log.info("$ ");
-        logAdditionalSchemas();
         logObjectTypes();
+        logAdditionalSchemas();
         _log.info("$ ");
         _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);

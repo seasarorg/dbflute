@@ -347,13 +347,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
-    //                                Additional Schema List
-    //                                ----------------------
-    public List<String> getAdditionalSchemaList() {
-        return getVairousList("additionalSchemaList");
-    }
-
-    // -----------------------------------------------------
     //                               Object Type Target List
     //                               -----------------------
     public List<String> getObjectTypeTargetList() {
@@ -370,6 +363,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             resultList.add((String) object);
         }
         return resultList;
+    }
+    
+    // -----------------------------------------------------
+    //                                Additional Schema List
+    //                                ----------------------
+    public List<String> getAdditionalSchemaList() {
+        return getVairousList("additionalSchemaList");
     }
 
     // -----------------------------------------------------
