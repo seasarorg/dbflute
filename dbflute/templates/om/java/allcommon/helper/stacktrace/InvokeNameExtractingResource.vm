@@ -1,8 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTrace};
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author ${database.ClassAuthor}
  */

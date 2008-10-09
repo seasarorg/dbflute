@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTraceImpl};
 
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractorName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -32,8 +32,8 @@ public class ${glInvokeNameExtractorImplName} implements ${glInvokeNameExtractor
         int foundIndex = -1; // The minus one means 'Not Found'.
         int foundFirstIndex = -1; // The minus one means 'Not Found'.
         boolean onTarget = false;
-        for (int i=resource.getStartIndex(); i < stackTrace.length; i++) {
-            final StackTraceElement element = stackTrace[i];
+        for (int i=resource.getStartIndex(); i < _stackTrace.length; i++) {
+            final StackTraceElement element = _stackTrace[i];
             if (i > resource.getStartIndex() + resource.getLoopSize()) {
                 break;
             }

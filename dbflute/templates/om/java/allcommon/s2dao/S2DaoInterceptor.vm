@@ -26,7 +26,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractorName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
@@ -240,7 +239,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                      ==============
     protected void logInvocation(MethodInvocation invocation) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final ${glInvokeNameResultName behaviorResult = extractBehaviorInvokeName(stackTrace);
+        final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
 
         final String invokeClassName;
         final String invokeMethodName;
@@ -332,11 +331,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return invocationExpressionWithoutKakko;
     }
 
-    protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, InvokeNameExtractingResult behaviorResult) {
+    protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
-        final ${glInvokeNameResultName clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
+        final ${glInvokeNameResultName} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final ${glInvokeNameResultName byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+        final ${glInvokeNameResultName} byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
 
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
@@ -350,7 +349,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
         }
         // Save by-pass invoke name for error message.
-        if (!byPassInvokeName.isEmptyResult()) {
+        if (!byPassResult.isEmptyResult()) {
             putObjectToMapContext("df:ByPassInvokeName", clientInvokeName);
         }
         
@@ -373,7 +372,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return sb.toString();
     }
 
-    protected ${glInvokeNameResultName extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
+    protected ${glInvokeNameResultName} extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
         final List<String> suffixList = Arrays.asList(new String[]{"Page", "Action"});
         final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
             public boolean isTargetElement(String className, String methodName) {
@@ -395,7 +394,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected ${glInvokeNameResultName extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
+    protected ${glInvokeNameResultName} extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
         final List<String> suffixList = Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"});
         final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
             public boolean isTargetElement(String className, String methodName) {
@@ -417,7 +416,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected ${glInvokeNameResultName extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
+    protected ${glInvokeNameResultName} extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable" , "PagingInvoker"});
         final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
         final List<String> ousideSql1List = Arrays.asList(new String[]{"OutsideSql"});
@@ -478,7 +477,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @return The result of invoke name. (NotNull: If not found, returns empty string.)
      */
     protected ${glInvokeNameResultName} extractInvokeName(${glInvokeNameExtractingResourceName} resource, StackTraceElement[] stackTrace) {
-        final ${glInvokeNameExtractorName} extractor = new ${glInvokeNameExtractorImplName}();
+        final ${glInvokeNameExtractorImplName} extractor = new ${glInvokeNameExtractorImplName}();
         extractor.setStackTrace(stackTrace);
         return extractor.extractInvokeName(resource);
     }

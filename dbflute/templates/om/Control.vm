@@ -268,7 +268,7 @@ targetdatabase = $targetDatabase
     #set ($glInvokeNameExtractingResourceName = "${glProjectPrefix}InvokeNameExtractingResource")
     #set ($glInvokeNameExtractorName = "${glProjectPrefix}InvokeNameExtractor")
     #set ($glInvokeNameExtractorImplName = "${glProjectPrefix}InvokeNameExtractorImpl")
-    #set ($glInvokeNameResulttName = "${glProjectPrefix}InvokeNameResultt")
+    #set ($glInvokeNameResultName = "${glProjectPrefix}InvokeNameResult")
 
     #set ($glLineTokenName = "${glProjectPrefix}LineToken")
     #set ($glLineTokenImplName = "${glProjectPrefix}LineTokenImpl")
