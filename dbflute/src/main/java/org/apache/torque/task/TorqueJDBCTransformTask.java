@@ -454,7 +454,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 _log.debug("Failed to extract table comments: extractor=" + extractor, ignored);
             }
             try {
-                _columnCommentAllMap = extractor.extractColumnComment(tableSet);
+                if (_columnCommentAllMap == null) {
+                    _columnCommentAllMap = extractor.extractColumnComment(tableSet);
+                }
             } catch (RuntimeException ignored) {
                 _log.debug("Failed to extract column comments: extractor=" + extractor, ignored);
             }
