@@ -1095,9 +1095,6 @@ public class Table implements IDMethod {
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
-        if (size == 0) {
-            return "&nbsp;";
-        }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
@@ -1111,7 +1108,7 @@ public class Table implements IDMethod {
         return sb.toString();
     }
 
-    public String getForeignTableNameCommaStringWithHtmlHref() {// For SchemaHTML
+    public String getForeignTableNameCommaStringWithHtmlHref() { // For SchemaHTML
         final StringBuilder sb = new StringBuilder();
 
         final Set<String> tableSet = new HashSet<String>();
@@ -1574,6 +1571,9 @@ public class Table implements IDMethod {
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> referrerList = getReferrerList();
         final int size = referrerList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = referrerList.get(i);
             final String name = fk.getTable().getName();
