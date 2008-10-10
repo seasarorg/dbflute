@@ -43,6 +43,7 @@ public abstract class DfAbstractHelperProperties {
 
     public static final String DEFAULT_templateFileEncoding = "UTF-8";
     public static final String DEFAULT_sourceFileEncoding = "UTF-8";
+    public static final String DEFAULT_projectSchemaXMLEncoding = "UTF-8";
 
     // -----------------------------------------------------
     //                                   Empty Default Value

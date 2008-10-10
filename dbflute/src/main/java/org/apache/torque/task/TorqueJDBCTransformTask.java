@@ -55,7 +55,7 @@ package org.apache.torque.task;
  */
 
 import java.io.FileOutputStream;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -154,16 +154,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         try {
             generateXML();
 
+            // Get encoding from properties
+            final String encoding = getBasicProperties().getProejctSchemaXMLEncoding();
             _log.info("$ ");
             _log.info("$ ");
             _log.info("$ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.info("$ ...Serializing XML: " + _xmlSchema);
+            _log.info("$ ...Serializing XML: " + _xmlSchema + "(" + encoding + ")");
 
             final XMLSerializer xmlSerializer;
             {
-                final PrintWriter printWriter = new PrintWriter(new FileOutputStream(_xmlSchema));
-                final OutputFormat outputFormar = new OutputFormat(Method.XML, null, true);
-                xmlSerializer = new XMLSerializer(printWriter, outputFormar);
+                final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(_xmlSchema), encoding);
+                final OutputFormat outputFormar = new OutputFormat(Method.XML, encoding, true);
+                xmlSerializer = new XMLSerializer(writer, outputFormar);
             }
             xmlSerializer.serialize(_doc);
 

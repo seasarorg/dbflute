@@ -195,6 +195,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getSourceFileEncoding() {
         return stringProp("torque.sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
+    
+    public String getProejctSchemaXMLEncoding() {
+        return stringProp("torque.projectSchemaXMLEncoding", DEFAULT_projectSchemaXMLEncoding);
+    }
 
     // ===================================================================================
     //                                                                        Class Author

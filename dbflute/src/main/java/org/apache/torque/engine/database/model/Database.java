@@ -1368,6 +1368,14 @@ public class Database {
     public String getOmitResourcePathPackage() {
         return getProperties().getOutsideSqlProperties().getOmitResourcePathPackage();
     }
+    
+    public boolean isOmitFileSystemPathPackageValid() {
+        return getProperties().getOutsideSqlProperties().isOmitFileSystemPathPackageValid();
+    }
+    
+    public String getOmitFileSystemPathPackage() {
+        return getProperties().getOutsideSqlProperties().getOmitFileSystemPathPackage();
+    }
 
     public boolean isOmitDirectoryPackageValid() {
         return getProperties().getLittleAdjustmentProperties().isOmitDirectoryPackageValid();
