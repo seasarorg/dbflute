@@ -35,7 +35,7 @@ $!table.Description
     <td class="normalFont">${col.javaBeansRulePropertyName}</td>
     <td class="normalFont">${col.javaNative}</td>
     <td class="normalFont">#if ($col.hasClassification()==true)<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
-    <td class="normalFont">${col.comment}</td>
+    <td class="normalFont">#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
   </tr>
 #end
 </table>

@@ -401,6 +401,10 @@ public class Table implements IDMethod {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
+    public boolean hasComment() {
+        return _comment != null && _comment.trim().length() > 0;
+    }
+    
     /**
      * Get the comment of the Table
      */
@@ -1091,6 +1095,9 @@ public class Table implements IDMethod {
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
@@ -1110,6 +1117,9 @@ public class Table implements IDMethod {
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();

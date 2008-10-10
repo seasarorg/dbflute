@@ -27,7 +27,7 @@ ${database.initializeClassificationDeployment()}
       <td class="normalFont">$tbl.javaName</td>
       <td class="normalFont">$tbl.foreignTableNameCommaStringWithHtmlHref</td>
       <td class="normalFont">$tbl.referrerTableNameCommaStringWithHtmlHref</td>
-      <td class="normalFont">$tbl.comment</td>
+      <td class="normalFont">#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
     </tr>
 #end
   </table>

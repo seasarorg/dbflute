@@ -843,6 +843,10 @@ public class Column {
     // ===================================================================================
     //                                                                      Column Comment
     //                                                                      ==============
+    public boolean hasComment() {
+        return _comment != null && _comment.trim().length() > 0;
+    }
+    
     public String getComment() {
         return _comment != null ? _comment : "";
     }
