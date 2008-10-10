@@ -73,16 +73,22 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         }
     }
 
-    public Map<String, String> extractColumnComment(String tableName) {
-        Map<String, String> resultMap = new LinkedHashMap<String, String>();
+    public Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet) {
+        Map<String, Map<String, UserColComments>> resultMap = new LinkedHashMap<String, Map<String, UserColComments>>();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
-            final List<UserColComments> userColCommentsList = selectUserColComments(conn, tableName);
+            final List<UserColComments> userColCommentsList = selectUserColComments(conn, tableSet);
+            Map<String, UserColComments> elementMap = new LinkedHashMap<String, UserColComments>();
+            String previousTableName = null;
             for (UserColComments userColComments : userColCommentsList) {
+                final String tableName = userColComments.getTableName();
+                if (previousTableName == null || !previousTableName.equals(tableName)) {
+                    previousTableName = tableName;
+                    resultMap.put(tableName, elementMap);
+                }
                 final String columnName = userColComments.getColumnName();
-                final String comments = userColComments.getComments();
-                resultMap.put(columnName, comments);
+                elementMap.put(columnName, userColComments);
             }
             return resultMap;
         } catch (SQLException e) {
@@ -107,12 +113,12 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
             rs = statement.executeQuery(sql);
             final List<UserTabComments> resultList = new ArrayList<UserTabComments>();
             while (rs.next()) {
-                String tableName = rs.getString("TABLE_NAME");
+                final String tableName = rs.getString("TABLE_NAME");
                 if (!tableSet.contains(tableName)) {
                     continue;
                 }
-                String comments = rs.getString("COMMENTS");
-                UserTabComments userTabComments = new UserTabComments();
+                final String comments = rs.getString("COMMENTS");
+                final UserTabComments userTabComments = new UserTabComments();
                 userTabComments.setTableName(tableName);
                 userTabComments.setComments(comments);
                 resultList.add(userTabComments);
@@ -138,8 +144,8 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         }
     }
 
-    protected List<UserColComments> selectUserColComments(Connection conn, String tableName) {
-        final String sql = "select * from USER_COL_COMMENTS where TABLE_NAME = '" + tableName + "' order by TABLE_NAME asc, COLUMN_NAME asc";
+    protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
+        final String sql = "select * from USER_COL_COMMENTS order by TABLE_NAME asc, COLUMN_NAME asc";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -147,9 +153,13 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
             rs = statement.executeQuery(sql);
             final List<UserColComments> resultList = new ArrayList<UserColComments>();
             while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                String comments = rs.getString("COMMENTS");
-                UserColComments userColComments = new UserColComments();
+                final String tableName = rs.getString("TABLE_NAME");
+                if (!tableSet.contains(tableName)) {
+                    continue;
+                }
+                final String columnName = rs.getString("COLUMN_NAME");
+                final String comments = rs.getString("COMMENTS");
+                final UserColComments userColComments = new UserColComments();
                 userColComments.setTableName(tableName);
                 userColComments.setColumnName(columnName);
                 userColComments.setComments(comments);
@@ -186,36 +196,6 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
 
         public void setTableName(String tableName) {
             this.tableName = tableName;
-        }
-
-        public String getComments() {
-            return comments;
-        }
-
-        public void setComments(String comments) {
-            this.comments = comments;
-        }
-    }
-
-    protected static class UserColComments {
-        protected String tableName;
-        protected String columnName;
-        protected String comments;
-
-        public String getTableName() {
-            return tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this.tableName = tableName;
-        }
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
         }
 
         public String getComments() {
