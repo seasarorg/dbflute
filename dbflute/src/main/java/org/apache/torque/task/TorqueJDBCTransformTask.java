@@ -484,6 +484,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (_columnCommentAllMap != null) {
             final String tableName = tableInfo.getTableName();
             final Map<String, UserColComments> columnCommentMap = _columnCommentAllMap.get(tableName);
+            if (columnCommentMap == null) {
+                return;
+            }
             for (DfColumnMetaInfo metaInfo : columnList) {
                 metaInfo.acceptColumnComment(columnCommentMap);
             }

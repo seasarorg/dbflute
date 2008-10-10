@@ -79,12 +79,13 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         try {
             conn = _dataSource.getConnection();
             final List<UserColComments> userColCommentsList = selectUserColComments(conn, tableSet);
-            Map<String, UserColComments> elementMap = new LinkedHashMap<String, UserColComments>();
             String previousTableName = null;
+            Map<String, UserColComments> elementMap = null;
             for (UserColComments userColComments : userColCommentsList) {
                 final String tableName = userColComments.getTableName();
                 if (previousTableName == null || !previousTableName.equals(tableName)) {
                     previousTableName = tableName;
+                    elementMap = new LinkedHashMap<String, UserColComments>();
                     resultMap.put(tableName, elementMap);
                 }
                 final String columnName = userColComments.getColumnName();
