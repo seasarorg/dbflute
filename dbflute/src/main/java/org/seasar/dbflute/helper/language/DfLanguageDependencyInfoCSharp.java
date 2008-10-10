@@ -76,4 +76,8 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     public boolean isFlatOrOmitDirectorySupported() {
         return true;
     }
+
+    public String getDefaultSequenceType() {
+        return "int?";
+    }
 }

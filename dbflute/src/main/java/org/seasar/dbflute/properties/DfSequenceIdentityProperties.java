@@ -111,7 +111,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSequenceReturnType() {
-        return stringProp("torque.sequenceReturnType", "java.math.BigDecimal");
+        final String defaultSequenceType = getBasicProperties().getLanguageDependencyInfo().getDefaultSequenceType();
+        return stringProp("torque.sequenceReturnType", defaultSequenceType);
     }
 
     // ===================================================================================

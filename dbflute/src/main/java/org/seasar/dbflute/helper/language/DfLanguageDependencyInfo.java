@@ -80,4 +80,9 @@ public interface DfLanguageDependencyInfo {
      * @return Is the flat or omit directory supported?
      */
     public boolean isFlatOrOmitDirectorySupported();
+    
+    /**
+     * @return The default type of sequence. (NotNull)
+     */
+    public String getDefaultSequenceType();
 }

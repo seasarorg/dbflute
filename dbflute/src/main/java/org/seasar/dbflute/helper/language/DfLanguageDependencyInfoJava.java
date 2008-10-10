@@ -89,4 +89,8 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         }
         return DfStringUtil.replace(path, PATH_MAVEN_SRC_MAIN_JAVA, PATH_MAVEN_SRC_MAIN_RESOURCES);
     }
+
+    public String getDefaultSequenceType() {
+        return "java.math.BigDecimal";
+    }
 }

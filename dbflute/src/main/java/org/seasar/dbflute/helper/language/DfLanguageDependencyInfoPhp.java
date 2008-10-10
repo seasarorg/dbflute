@@ -72,4 +72,8 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
     public boolean isFlatOrOmitDirectorySupported() {
         return false;
     }
+    
+    public String getDefaultSequenceType() {
+        return "";
+    }
 }
