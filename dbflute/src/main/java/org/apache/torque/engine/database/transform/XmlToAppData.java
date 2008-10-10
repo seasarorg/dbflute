@@ -56,8 +56,8 @@ package org.apache.torque.engine.database.transform;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -71,6 +71,7 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
+import org.seasar.dbflute.DfBuildProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -156,23 +157,29 @@ public class XmlToAppData extends DefaultHandler {
 
             SAXParser parser = saxFactory.newSAXParser();
 
-            FileReader fr = null;
+            // Uses InputStreamReader for specifying an encoding for project schema XML.
+            final String encoding = getProejctSchemaXMLEncoding();
+            final InputStreamReader fr = new InputStreamReader(new FileInputStream(xmlFile), encoding);
+
+            // *FileReader that uses default encoding is unavailable here!      
+            // FileReader fr = null;
+            // try {
+            //     fr = new FileReader(xmlFile);
+            // } catch (FileNotFoundException fnfe) {
+            //     throw new FileNotFoundException(new File(xmlFile).getAbsolutePath());
+            // }
+
+            final BufferedReader br = new BufferedReader(fr);
             try {
-                fr = new FileReader(xmlFile);
-            } catch (FileNotFoundException fnfe) {
-                throw new FileNotFoundException(new File(xmlFile).getAbsolutePath());
-            }
-            BufferedReader br = new BufferedReader(fr);
-            try {
-                // Comment out!
-                //                log.info("Parsing file: '" + (new File(xmlFile)).getName() + "'");
-                InputSource is = new InputSource(br);
+                final InputSource is = new InputSource(br);
                 parser.parse(is, this);
             } finally {
                 br.close();
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String msg = getClass().getSimpleName() + ".parseFile() threw the exception:";
+            msg = msg + " xmlFile=" + xmlFile;
+            throw new RuntimeException(msg, e);
         }
         if (!isExternalSchema) {
             firstPass = false;
@@ -180,9 +187,12 @@ public class XmlToAppData extends DefaultHandler {
         return app;
     }
 
+    protected String getProejctSchemaXMLEncoding() {
+        return DfBuildProperties.getInstance().getBasicProperties().getProejctSchemaXMLEncoding();
+    }
+
     /**
      * EntityResolver implementation. Called by the XML parser
-     *
      * @param publicId The public identifier of the external entity
      * @param systemId The system identifier of the external entity
      * @return an InputSource for the database.dtd file
@@ -197,9 +207,8 @@ public class XmlToAppData extends DefaultHandler {
     }
 
     /**
-     * Handles opening elements of the xml file.
-     *
-     * @param uri
+     * Handles opening elements of the XML file.
+     * @param uri URI.
      * @param localName The local name (without prefix), or the empty string if
      *         Namespace processing is not being performed.
      * @param rawName The qualified name (with prefix), or the empty string if

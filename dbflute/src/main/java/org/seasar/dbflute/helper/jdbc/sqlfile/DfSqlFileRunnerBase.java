@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -93,7 +92,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         Connection connection = null;
         Statement statement = null;
         try {
-            reader = (_runInfo.isEncodingNull()) ? newFileReader() : newInputStreamReader();
+            reader = newInputStreamReader();
             final List<String> sqlList = extractSqlList(reader);
 
             connection = getConnection();
@@ -171,17 +170,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         return sql;
     }
 
-    protected FileReader newFileReader() {
-        try {
-            return new FileReader(_srcFile);
-        } catch (FileNotFoundException e) {
-            throw new BuildException("The file does not exist: " + _srcFile, e);
-        }
-    }
-
     protected InputStreamReader newInputStreamReader() {
         try {
-            return new InputStreamReader(new FileInputStream(_srcFile), _runInfo.getEncoding());
+            final String encoding = _runInfo.isEncodingNull() ? "UTF-8" : _runInfo.getEncoding();
+            return new InputStreamReader(new FileInputStream(_srcFile), encoding);
         } catch (FileNotFoundException e) {
             throw new BuildException("The file does not exist: " + _srcFile, e);
         } catch (UnsupportedEncodingException e) {
