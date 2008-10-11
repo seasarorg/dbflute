@@ -478,6 +478,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
     }
 
+    protected ${glBehaviorSelectorInterfaceName} findBSFLR() { // findBehaviorSelectorForLoadReferrer()
+        assertBehaviorSelectorNotNull("loadReferrer");
+        return getBehaviorSelector();
+    }
+
     private void assertBehaviorSelectorNotNull(String methodName) {
         if (_behaviorSelector == null) {
             String msg = "Look! Read the message below." + getLineSeparator();

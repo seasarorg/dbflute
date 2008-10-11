@@ -315,6 +315,11 @@ namespace ${glPackageBaseCommonBhv} {
             void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
         }
 
+        protected ${glBehaviorSelectorInterfaceName} FindBSFLR() { // FindBehaviorSelectorForLoadReferrer()
+            AssertBehaviorSelectorNotNull("loadReferrer");
+            return this.BehaviorSelector;
+        }
+
         private void AssertBehaviorSelectorNotNull(String methodName) {
             if (_behaviorSelector == null) {
                 String msg = "Look! Read the message below." + GetLineSeparator();

@@ -203,7 +203,7 @@ namespace ${glPackageExtendedBhv} {
         public virtual void Load${referrer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
             AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (ls.Count == 0) { return; }
-            ${referrerBhvClassName} referrerBhv = this.BehaviorSelector.Select<${referrerBhvClassName}>();
+            ${referrerBhvClassName} referrerBhv = FindBSFLR().Select<${referrerBhvClassName}>();
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
                     (ls, loadReferrerOption, new MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(referrerBhv));
         }
