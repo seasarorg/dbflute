@@ -39,10 +39,18 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             RelationRowCache relRowCache = null;
 
             int relSize = BeanMetaData.RelationPropertyTypeSize;
-            bool hasCB = HasConditionBean();
-            bool emptyRelation = IsSelectedForeignInfoEmpty();
-            bool hasOSC = HasOutsideSqlContext();
-            bool specifiedOutsideSql = IsSpecifiedOutsideSql();
+            bool skipRelationLoop;
+            {
+                bool hasCB = HasConditionBean();
+                bool emptyRelation = IsSelectedForeignInfoEmpty();
+                bool hasOSC = HasOutsideSqlContext();
+                bool specifiedOutsideSql = IsSpecifiedOutsideSql();
+
+                // If it has condition-bean that has no relation to get
+                // or it has outside-sql context that is specified-outside-sql,
+                // they are unnecessary to do relation loop!
+                skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
+            }
 
             while (dataReader.Read()) {
                 // Lazy initialization because if the result is zero, the resources are unused.
@@ -55,11 +63,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
                 // Create row instance of base table by row property cache.
                 Object row = CreateRow(dataReader, columns);
-
-                // If it has condition-bean that has no relation to get
-                // or it has outside-sql context that is specified-outside-sql,
-                // they are unnecessary to do relation loop!
-                if ((hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql)) {
+                if (skipRelationLoop) {
                     PostCreateRow(row, BeanMetaData);
                     list.Add(row);
                     continue;
@@ -177,7 +181,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             if (!HasOutsideSqlContext()) {
                 return false;
             }
-            ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlOnThread();
+            ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
             return context.IsSpecifiedOutsideSql;
         }
     }

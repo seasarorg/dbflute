@@ -50,12 +50,20 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         Map relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
         RelationRowCache relRowCache = null;
 
-        final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
-        final boolean hasCB = hasConditionBean();
-        final boolean emptyRelation = isSelectedForeignInfoEmpty();
-        final boolean hasOSC = hasOutsideSqlContext();
-        final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
         final List list = new ArrayList();
+        final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
+        final boolean skipRelationLoop;
+        {
+            final boolean hasCB = hasConditionBean();
+            final boolean emptyRelation = isSelectedForeignInfoEmpty();
+            final boolean hasOSC = hasOutsideSqlContext();
+            final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
+
+            // If it has condition-bean that has no relation to get
+            // or it has outside-sql context that is specified-outside-sql,
+            // they are unnecessary to do relation loop!
+            skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
+        }
 
         while (rs.next()) {
             // Lazy initialization because if the result is zero, the resources are unused.
@@ -195,7 +203,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         if (!hasOutsideSqlContext()) {
             return false;
         }
-        final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlOnThread();
+        final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
         return context.isSpecifiedOutsideSql();
     }
 }
