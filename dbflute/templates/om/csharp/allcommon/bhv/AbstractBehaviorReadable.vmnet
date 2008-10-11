@@ -339,6 +339,27 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         // ===============================================================================
+        //                                                         Pullout Internal Helper
+        //                                                         =======================
+        protected <LOCAL_ENTITY, FOREIGN_ENTITY> IList<FOREIGN_ENTITY> HelpPulloutInternally(List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback)
+                where LOCAL_ENTITY : ${glEntityInterfaceName} where FOREIGN_ENTITY : ${glEntityInterfaceName} {
+            AssertObjectNotNull("localEntityList", localEntityList);
+            IList<FOREIGN_ENTITY> foreignList = new List<FOREIGN_ENTITY>();
+            foreach (LOCAL_ENTITY entity in localEntityList) {
+                FOREIGN_ENTITY foreignEntity = callback.callbackGetForeignEntity(entity);
+                if (foreignEntity == null || foreignList.Contains(foreignEntity)) {
+                    continue;
+                }
+                foreignList.Add(foreignEntity);
+            }
+            return foreignList;
+        }
+
+        protected interface InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> where LOCAL_ENTITY : ${glEntityInterfaceName} where FOREIGN_ENTITY : ${glEntityInterfaceName} {
+            FOREIGN_ENTITY callbackGetForeignEntity(LOCAL_ENTITY entity);
+        }
+
+        // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
         protected abstract bool HasVersionNoValue(${glEntityInterfaceName} entity);

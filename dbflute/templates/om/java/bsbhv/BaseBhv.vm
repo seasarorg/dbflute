@@ -296,11 +296,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // ===================================================================================
-    //                                                                    Pull Out Foreign
-    //                                                                    ================
+    //                                                                     Pullout Foreign
+    //                                                                     ===============
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
-
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
@@ -315,7 +314,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #set ($referrerTable = $referrer.table)
   #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
   #if (${referrer.isOneToOne()})
-
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
