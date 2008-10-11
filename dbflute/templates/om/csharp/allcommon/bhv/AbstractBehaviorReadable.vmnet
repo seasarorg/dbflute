@@ -184,8 +184,8 @@ namespace ${glPackageBaseCommonBhv} {
          * @param value The value of primary key. (Nullable)
          * @return The value of primary key. (Nullable)
          */
-        protected PK ToLowerCasePrimaryKeyIfString<PK>(PK value) {
-            return (PK)ToLowerCaseIfString(value);
+        protected PK toLowerCasePrimaryKeyIfString<PK>(PK value) {
+            return (PK)toLowerCaseIfString(value);
         }
 
         /**
@@ -247,6 +247,13 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                  General Helper
         //                                                                  ==============
         #region General Helper
+        protected virtual Object toLowerCaseIfString(Object obj) {
+            if (obj != null && obj is String) {
+                return ((String)obj).ToLower();
+            }
+            return obj;
+        }
+
         protected virtual String GetLineSeparator() {
             return Environment.NewLine;
         }

@@ -27,17 +27,15 @@ import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
-
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
-
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplName};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The abstract class of behavior-readable.
@@ -645,8 +643,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected abstract boolean hasUpdateDateValue(${glEntityInterfaceName} entity);
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
     /**
      * To lower case if the type is String.
      * @param obj Object. (Nullable)
@@ -664,7 +662,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return The value of line separator. (NotNull)
      */
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     protected <ENTITY extends ${glEntityInterfaceName}> ENTITY helpDowncastInternally(${glEntityInterfaceName} entity, Class<ENTITY> clazz) {
