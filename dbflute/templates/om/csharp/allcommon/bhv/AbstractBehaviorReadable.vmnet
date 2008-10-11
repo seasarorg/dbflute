@@ -217,7 +217,7 @@ namespace ${glPackageBaseCommonBhv} {
             foreach (LOCAL_ENTITY localEntity in localEntityList) {
                 PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
                 pkList.Add(callback.callbackBase_getPrimaryKeyValue(localEntity));
-                if (!pkMyEntityMap.ContainsKey(primaryKeyValue)) {
+                if (!pkLocalEntityMap.ContainsKey(primaryKeyValue)) {
                     pkLocalEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
                 }
             }
