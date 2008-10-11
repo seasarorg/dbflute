@@ -121,6 +121,9 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                              Clause
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Complete Clause
+    //                                       ---------------
     public String getClause() {
         StringBuilder sb = new StringBuilder(512);
 		sb.append(getSelectClause());
@@ -160,7 +163,10 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         sb.append(getSqlSuffix());
         return sb.toString();
 	}
-	
+    
+    // -----------------------------------------------------
+    //                                       Fragment Clause
+    //                                       ---------------
     public String getClauseFromWhereWithUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(false);
     }
