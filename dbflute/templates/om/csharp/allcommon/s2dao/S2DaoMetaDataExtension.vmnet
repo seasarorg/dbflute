@@ -195,7 +195,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 msg = msg + " dbmeta.SequenceNextValSql=" + dbmeta.SequenceNextValSql + " method=" + methodInfo;
                 throw new SystemException(msg);
             }
-            SetupSelectMethodByManual(method, nextValSql);
+            SetupSelectMethodByManual(methodInfo, nextValSql);
             return true;
         }
 
@@ -578,7 +578,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!typeof(${glEntityInterfaceName}).IsAssignableFrom(beanType)) {
                 return null;
             }
-            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})beanType.NewInstance();
+            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})Activator.CreateInstance(beanType);
             return entity.DBMeta;
         }
 
