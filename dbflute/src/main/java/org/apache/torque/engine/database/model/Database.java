@@ -1277,8 +1277,12 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
     
-    public boolean isCompatibleSQLExceptionHandlingOldStyle() {// This is for compatibility!
+    public boolean isCompatibleSQLExceptionHandlingOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
+    }
+    
+    public boolean isCompatibleS2DaoSQLAnnotationValid() { // This is for compatibility!
+        return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
     }
 
     // -----------------------------------------------------

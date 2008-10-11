@@ -69,6 +69,7 @@ import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData}
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The extension of DaoMetaDataImpl for DBFlute.
@@ -228,10 +229,34 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected void assertSQLAnnotationUnsupported(final Method method, String sql) {
         if (sql != null) {
-            String msg = "Sorry! The SQL annotation of S2Dao is unsupported on DBFlute:";
-            msg = msg + " sql=" + sql + " method=" + method;
-            throw new UnsupportedOperationException(msg);
+            throwS2DaoSQLAnnotationUnsupportedException(method, sql);
         }
+    }
+
+    protected void throwS2DaoSQLAnnotationUnsupportedException(final Method method, String sql) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Sorry, the SQL annotation of S2Dao is unsupported on DBFlute!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please use outside-sql of behavior." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    memberBhv.outsideSql().selectList(...)" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "If you've got to use it, you can set the property:" + getLineSeparator();
+        msg = msg + "{torque.isCompatibleS2DaoSQLAnnotationValid = true}" + getLineSeparator();
+        msg = msg + "But pay attention to version up of DBFlute" + getLineSeparator();
+        msg = msg + " because the property will not always supported at the future." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Method]" + getLineSeparator() + method + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQL]" + getLineSeparator() + sql + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+#if ($database.isCompatibleS2DaoSQLAnnotationValid())
+        _log.debug(msg);
+#else
+        throw new UnsupportedOperationException(msg);
+#end
     }
 
     @Override
@@ -1163,6 +1188,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             throw new IllegalStateException(e);
         }
         return entity.getDBMeta();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     // ===================================================================================

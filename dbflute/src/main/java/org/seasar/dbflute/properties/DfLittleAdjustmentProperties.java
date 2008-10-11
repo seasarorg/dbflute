@@ -110,6 +110,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleSQLExceptionHandlingOldStyle() {
         return booleanProp("torque.isCompatibleSQLExceptionHandlingOldStyle", false);
     }
+    
+    public boolean isCompatibleS2DaoSQLAnnotationValid() {
+        return booleanProp("torque.isCompatibleS2DaoSQLAnnotationValid", false);
+    }
 
     // ===================================================================================
     //                                                                  Friendly Framework 

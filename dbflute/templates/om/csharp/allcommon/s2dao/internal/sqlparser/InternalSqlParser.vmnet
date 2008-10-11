@@ -138,7 +138,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[IF Comment Expression]" + GetLineSeparator() + _tokenizer.Token + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + _specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new ${glIfCommentConditionNotFoundException}(msg);
         }
 
@@ -174,7 +174,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "    after  (o) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3/*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + _specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new ${glEndCommentNotFoundException}(msg);
         }
 	
@@ -665,7 +665,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm your method call:"  + GetLineSeparator();
 			String beanName = resourceBean.GetType().Name;
-			String methodName = "set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+			String methodName = "Set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
             msg = msg + "    " + beanName + "." + methodName + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Target ParameterBean]" + GetLineSeparator() + resourceBean + GetLineSeparator();
@@ -684,14 +684,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "  For example:"  + GetLineSeparator();
             msg = msg + "    before (x):" + GetLineSeparator();
             String beanName = resourceBean.GetType().Name;
-            String methodName = "set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            String methodName = "Set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
             msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + GetLineSeparator();
             msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + GetLineSeparator();
-            msg = msg + "      likeSearchOption.splitBySpace(); // *No! Don't invoke this!"  + GetLineSeparator();
+            msg = msg + "      likeSearchOption.SplitBySpace(); // *No! Don't invoke this!"  + GetLineSeparator();
             msg = msg + "      pmb." + methodName + GetLineSeparator();
             msg = msg + "    after  (o):" + GetLineSeparator();
             msg = msg + "      " + beanName + " pmb = new " + beanName + "();"  + GetLineSeparator();
-            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"  + GetLineSeparator();
+            msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().LikeContain();"  + GetLineSeparator();
             msg = msg + "      pmb." + methodName + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Target LikeSearchOption]" + GetLineSeparator() + option + GetLineSeparator();
@@ -718,7 +718,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[NotFound Property]" + GetLineSeparator() + (targetType != null ? targetType.Name + "#" : "") + notFoundProperty + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             if (bind) {
                 throw new ${glBindVariableCommentNotFoundPropertyException}(msg);
             } else {
@@ -753,7 +753,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 			msg = msg + "[Parameter Property Type]" + GetLineSeparator() + targetType + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             if (bind) {
                 throw new ${glBindVariableParameterNullValueException}(msg);
             } else {
@@ -781,7 +781,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
 		
@@ -807,7 +807,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
 		
@@ -893,7 +893,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[Cause Message]" + GetLineSeparator() + cause.Message + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new ${glIfCommentWrongExpressionException}(msg, cause);
         }
 
@@ -911,7 +911,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[IF Comment Result Value]" + GetLineSeparator() + result + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
-            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new ${glIfCommentNotBooleanResultException}(msg);
         }
 
