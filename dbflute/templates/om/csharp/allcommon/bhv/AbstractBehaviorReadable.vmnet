@@ -341,7 +341,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                         Pullout Internal Helper
         //                                                         =======================
-        protected <LOCAL_ENTITY, FOREIGN_ENTITY> IList<FOREIGN_ENTITY> HelpPulloutInternally(List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback)
+        protected IList<FOREIGN_ENTITY> HelpPulloutInternally<LOCAL_ENTITY, FOREIGN_ENTITY>(List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback)
                 where LOCAL_ENTITY : ${glEntityInterfaceName} where FOREIGN_ENTITY : ${glEntityInterfaceName} {
             AssertObjectNotNull("localEntityList", localEntityList);
             IList<FOREIGN_ENTITY> foreignList = new List<FOREIGN_ENTITY>();

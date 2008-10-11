@@ -235,7 +235,7 @@ namespace ${glPackageExtendedBhv} {
             return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
-            public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; } });
+            public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
         }
 #end
 #foreach ($referrer in $table.referrers)
@@ -246,7 +246,7 @@ namespace ${glPackageExtendedBhv} {
             return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}> {
-            public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; } });
+            public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
         }
   #end
 #end
