@@ -346,7 +346,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     /**
-     * Help load referrer internally.
+     * Do help load referrer internally.
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * @param <LOCAL_ENTITY> The type of base entity.
      * @param <PK> The type of primary key.

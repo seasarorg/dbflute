@@ -8,120 +8,113 @@ using ${glPackageBaseCommonBhvSetup};
 
 namespace ${glPackageBaseCommonBhvLoad} {
 
-public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> where REFERRER_CONDITION_BEAN : ${glConditionBeanInterfaceName} where REFERRER_ENTITY : ${glEntityInterfaceName} {
+    public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> where REFERRER_CONDITION_BEAN : ${glConditionBeanInterfaceName} where REFERRER_ENTITY : ${glEntityInterfaceName} {
 
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> _conditionBeanSetupper;
+        // ===================================================================================
+        //                                                                           Attribute
+        //                                                                           =========
+        protected ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> _conditionBeanSetupper;
 
-    protected ${glEntityListSetupperName}<REFERRER_ENTITY> _entityListSetupper;
+        protected ${glEntityListSetupperName}<REFERRER_ENTITY> _entityListSetupper;
 
-    protected REFERRER_CONDITION_BEAN _referrerConditionBean;
+       protected REFERRER_CONDITION_BEAN _referrerConditionBean;
 
-    protected bool _toLastKeyCondition;
+        protected bool _toLastKeyCondition;
 
-    protected bool _stopOrderByKey;
+        protected bool _stopOrderByKey;
 
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public ${glLoadReferrerOptionName}() {
-    }
+        // ===================================================================================
+        //                                                                         Constructor
+        //                                                                         ===========
+        public ${glLoadReferrerOptionName}() {
+        }
 
-    public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
-        this._conditionBeanSetupper = conditionBeanSetupper;
-    }
+        public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
+            this._conditionBeanSetupper = conditionBeanSetupper;
+        }
 
-    public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
-        this._conditionBeanSetupper = conditionBeanSetupper;
-        this._entityListSetupper = entityListSetupper;
-    }
+        public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
+            this._conditionBeanSetupper = conditionBeanSetupper;
+            this._entityListSetupper = entityListSetupper;
+        }
 
-    public ${glLoadReferrerOptionName}(${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> option) {
-        this._conditionBeanSetupper = option._conditionBeanSetupper;
-        this._entityListSetupper = option._entityListSetupper;
-        this._referrerConditionBean = option._referrerConditionBean;
-        this._toLastKeyCondition = option._toLastKeyCondition;
-        this._stopOrderByKey = option._stopOrderByKey;
-    }
+        public ${glLoadReferrerOptionName}(${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> option) {
+            this._conditionBeanSetupper = option._conditionBeanSetupper;
+            this._entityListSetupper = option._entityListSetupper;
+            this._referrerConditionBean = option._referrerConditionBean;
+            this._toLastKeyCondition = option._toLastKeyCondition;
+            this._stopOrderByKey = option._stopOrderByKey;
+        }
 
-    // ===================================================================================
-    //                                                                         Easy-to-Use
-    //                                                                         ===========
-    /**
-     * Specify that the key condition is added as last condition. <br />
-     * This method is valid only after you use reffererConditionBean and add your original condition to it.
-     * @return this. (NotNull)
-     */
-    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondition() {
-        _toLastKeyCondition = true;
-        return this;
-    }
+        // ===================================================================================
+        //                                                                         Easy-to-Use
+        //                                                                         ===========
+        /**
+         * Specify that the key condition is added as last condition. <br />
+         * This method is valid only after you use reffererConditionBean and add your original condition to it.
+         * @return this. (NotNull)
+         */
+        public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> ToLastKeyCondition() {
+            _toLastKeyCondition = true;
+            return this;
+        }
 
-    /**
-     * Specify that it stops adding order-by of the key. <br />
-     * This method is valid only after you use reffererConditionBean and add your original order-by to it.
-     * @return this. (NotNull)
-     */
-    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> stopOrderByKey() {
-        _stopOrderByKey = true;
-        return this;
-    }
+        /**
+         * Specify that it stops adding order-by of the key. <br />
+         * This method is valid only after you use reffererConditionBean and add your original order-by to it.
+         * @return this. (NotNull)
+         */
+        public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> StopOrderByKey() {
+            _stopOrderByKey = true;
+            return this;
+        }
 
-    public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
-        if (!_toLastKeyCondition) {
-            // TODO: @jflute
-            // cb.SqlClause.exchangeFirstWhereClauseForLastOne();
+        public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
+            if (!_toLastKeyCondition) {
+                cb.SqlClause.exchangeFirstWhereClauseForLastOne();
+            }
+        }
+
+        public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) {// Internal
+            if (_conditionBeanSetupper != null) {
+                _conditionBeanSetupper.Invoke(cb);
+            }
+        }
+
+        public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) {// Internal
+            if (_entityListSetupper != null) {
+                _entityListSetupper.Invoke(entityList);
+            }
+        }
+
+        // ===================================================================================
+        //                                                                            Accessor
+        //                                                                            ========
+        public ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> ConditionBeanSetupper { get {
+            return _conditionBeanSetupper;
+        } set {
+            this._conditionBeanSetupper = value;
+        }}
+
+        public ${glEntityListSetupperName}<REFERRER_ENTITY> EntityListSetupper { get {
+            return _entityListSetupper;
+        } set {
+            this._entityListSetupper = entityListSetupper;
+        }}
+
+        public REFERRER_CONDITION_BEAN ReferrerConditionBean { get {
+            return _referrerConditionBean;
+        } set {
+            this._referrerConditionBean = referrerConditionBean;
+        }}
+
+        public bool isToLastKeyCondition() {
+            return _toLastKeyCondition;
+        }
+
+        public bool isStopOrderByKey() {
+            return _stopOrderByKey;
         }
     }
-
-    public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) {// Internal
-        if (_conditionBeanSetupper != null) {
-            _conditionBeanSetupper.Invoke(cb);
-        }
-    }
-
-    public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) {// Internal
-        if (_entityListSetupper != null) {
-            _entityListSetupper.Invoke(entityList);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> getConditionBeanSetupper() {
-        return _conditionBeanSetupper;
-    }
-
-    public void setConditionBeanSetupper(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
-        this._conditionBeanSetupper = conditionBeanSetupper;
-    }
-
-    public ${glEntityListSetupperName}<REFERRER_ENTITY> getEntityListSetupper() {
-        return _entityListSetupper;
-    }
-
-    public void setEntityListSetupper(${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
-        this._entityListSetupper = entityListSetupper;
-    }
-
-    public REFERRER_CONDITION_BEAN getReferrerConditionBean() {
-        return _referrerConditionBean;
-    }
-
-    public void setReferrerConditionBean(REFERRER_CONDITION_BEAN referrerConditionBean) {
-        this._referrerConditionBean = referrerConditionBean;
-    }
-
-    public bool isToLastKeyCondition() {
-        return _toLastKeyCondition;
-    }
-
-    public bool isStopOrderByKey() {
-        return _stopOrderByKey;
-    }
-}
 
 }

@@ -27,7 +27,16 @@ public class ${myClassName} {
             element.reverse();
         }
     }
-	
+
+    public void exchangeFirstOrderByElementForLastOne() {
+        if (_orderByList.size() > 1) {
+            ${glOrderByElementName} first = _orderByList.get(0);
+            ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+            _orderByList.set(0, last);
+            _orderByList.set(_orderByList.size() - 1, first);
+        }
+    }
+
 	public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
 	    if (_orderByList.isEmpty()) {
 		    return;

@@ -10,7 +10,6 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 using ${glPackageBaseCommonDBMeta};
-using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonBhv} {
@@ -171,14 +170,116 @@ namespace ${glPackageBaseCommonBhv} {
          * @param loadReferrerOption The option of loadReferrer. (NotNull)
          * @param callback The internal call-back of loadReferrer. (NotNull) 
          */
-        protected void helpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
+        protected virtual void helpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
                      where LOCAL_ENTITY : ${glEntityInterfaceName}
                      where REFERRER_CB : ${glConditionBeanInterfaceName}
                      where REFERRER_ENTITY : ${glEntityInterfaceName} {
-            // doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
+            DoHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
+        }
+
+        /**
+         * Help load referrer internally.
+         * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+         * @param <LOCAL_ENTITY> The type of base entity.
+         * @param <PK> The type of primary key.
+         * @param <REFERRER_CB> The type of referrer condition-bean.
+         * @param <REFERRER_ENTITY> The type of referrer entity.
+         * @param localEntityList The list of local entity. (NotNull)
+         * @param loadReferrerOption The option of loadReferrer. (NotNull)
+         * @param callback The internal call-back of loadReferrer. (NotNull) 
+         */
+        protected virtual void DoHelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
+                                               IList<LOCAL_ENTITY> localEntityList
+                                             , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
+                     where LOCAL_ENTITY : ${glEntityInterfaceName}
+                     where REFERRER_CB : ${glConditionBeanInterfaceName}
+                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
+
+            // - - - - - - - - - - -
+            // Assert pre-condition
+            // - - - - - - - - - - -
+            AssertBehaviorSelectorNotNull("loadReferrer");
+            AssertObjectNotNull("localEntityList", localEntityList);
+            AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
+            if (localEntityList.Count == 0) {
+                return;
+            }
+
+            // - - - - - - - - - - - - - -
+            // Prepare temporary container
+            // - - - - - - - - - - - - - -
+            IDictionary<PK, LOCAL_ENTITY> pkBaseEntityMap = new Dictionary<PK, LOCAL_ENTITY>();
+            IList<PK> pkList = new List<PK>();
+            foreach (LOCAL_ENTITY localEntity in localEntityList) {
+                PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
+                pkList.Add(callback.callbackBase_getPrimaryKeyValue(localEntity));
+                if (!pkMyEntityMap.ContainsKey(primaryKeyValue)) {
+                    pkBaseEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
+                }
+            }
+
+            // - - - - - - - - - - - - - - - -
+            // Prepare referrer condition bean
+            // - - - - - - - - - - - - - - - -
+            REFERRER_CB cb;
+            if (loadReferrerOption.ReferrerConditionBean != null) {
+                cb = loadReferrerOption.ReferrerConditionBean;
+            } else {
+                cb = callback.callbackReferrer_newMyConditionBean();
+            }
+
+            // - - - - - - - - - - - - - -
+            // Select the list of referrer
+            // - - - - - - - - - - - - - -
+            callback.callbackReferrer_queryForeignKeyInScope(cb, pkList);
+            loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
+            if (!loadReferrerOption.isStopOrderByKey()) {
+                callback.callbackReferrer_queryAddOrderByForeignKeyAsc(cb);
+                cb.SqlComponentOfOrderByClause.exchangeFirstOrderByElementForLastOne();
+            }
+            loadReferrerOption.delegateConditionBeanSettingUp(cb);
+            IList<REFERRER_ENTITY> referrerList = callback.callbackReferrer_selectList(cb);
+            loadReferrerOption.delegateEntitySettingUp(referrerList);
+
+            // - - - - - - - - - - - - - - - - - - - - - - - -
+            // Create the map of {primary key / referrer list}
+            // - - - - - - - - - - - - - - - - - - - - - - - -
+            IDictionary<PK, List<REFERRER_ENTITY>> pkReffererListMap = new Dictionary<PK, List<REFERRER_ENTITY>>();
+            foreach (REFERRER_ENTITY referrerEntity in referrerList) {
+                PK referrerListKey;
+                {
+                    PK foreignKeyValue = callback.callbackReferrer_getForeignKeyValue(referrerEntity);
+                    referrerListKey = ToLowerCasePrimaryKeyIfString(foreignKeyValue);
+                }
+                if (!pkReffererListMap.containsKey(referrerListKey)) {
+                    pkReffererListMap.Add(referrerListKey, new List<REFERRER_ENTITY>());
+                }
+                pkReferrerListMap[referrerListKey].Add(referrerEntity);
+
+                // for Reverse Reference.
+                LOCAL_ENTITY localEntity = pkBaseEntityMap[referrerListKey];
+                callback.callbackReferrer_setForeignEntity(referrerEntity, localEntity);
+            }
+
+            // - - - - - - - - - - - - - - - - - -
+            // Relate referrer list to base entity
+            // - - - - - - - - - - - - - - - - - -
+            foreach (LOCAL_ENTITY localEntity in localEntityList) {
+                PK referrerListKey;
+                {
+                    PK primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
+                    referrerListKey = ToLowerCasePrimaryKeyIfString(primaryKey);
+                }
+                if (pkReffererListMap.ContainsKey(referrerListKey)) {
+                    callback.callbackBase_setReferrerList(localEntity, pkReffererListMap[referrerListKey]);
+                } else {
+                    callback.callbackBase_setReferrerList(localEntity, new List<REFERRER_ENTITY>());
+                }
+            }
         }
 
         /**
@@ -187,8 +288,8 @@ namespace ${glPackageBaseCommonBhv} {
          * @param value The value of primary key. (Nullable)
          * @return The value of primary key. (Nullable)
          */
-        protected PK toLowerCasePrimaryKeyIfString<PK>(PK value) {
-            return (PK)toLowerCaseIfString(value);
+        protected PK ToLowerCasePrimaryKeyIfString<PK>(PK value) {
+            return (PK)ToLowerCaseIfString(value);
         }
 
         /**
@@ -214,7 +315,7 @@ namespace ${glPackageBaseCommonBhv} {
             void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
         }
 
-        private void assertBehaviorSelectorNotNull(String methodName) {
+        private void AssertBehaviorSelectorNotNull(String methodName) {
             if (_behaviorSelector == null) {
                 String msg = "Look! Read the message below." + GetLineSeparator();
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
@@ -250,7 +351,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                  General Helper
         //                                                                  ==============
         #region General Helper
-        protected virtual Object toLowerCaseIfString(Object obj) {
+        protected virtual Object ToLowerCaseIfString(Object obj) {
             if (obj != null && obj is String) {
                 return ((String)obj).ToLower();
             }
