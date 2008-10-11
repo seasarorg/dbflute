@@ -17,7 +17,7 @@ namespace ${glPackageBaseCommonBhvLoad} {
 
         protected ${glEntityListSetupperName}<REFERRER_ENTITY> _entityListSetupper;
 
-       protected REFERRER_CONDITION_BEAN _referrerConditionBean;
+        protected REFERRER_CONDITION_BEAN _referrerConditionBean;
 
         protected bool _toLastKeyCondition;
 
@@ -99,13 +99,13 @@ namespace ${glPackageBaseCommonBhvLoad} {
         public ${glEntityListSetupperName}<REFERRER_ENTITY> EntityListSetupper { get {
             return _entityListSetupper;
         } set {
-            this._entityListSetupper = entityListSetupper;
+            this._entityListSetupper = value;
         }}
 
         public REFERRER_CONDITION_BEAN ReferrerConditionBean { get {
             return _referrerConditionBean;
         } set {
-            this._referrerConditionBean = referrerConditionBean;
+            this._referrerConditionBean = value;
         }}
 
         public bool isToLastKeyCondition() {
@@ -116,5 +116,4 @@ namespace ${glPackageBaseCommonBhvLoad} {
             return _stopOrderByKey;
         }
     }
-
 }

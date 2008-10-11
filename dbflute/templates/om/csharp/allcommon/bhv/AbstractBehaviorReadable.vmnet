@@ -170,7 +170,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param loadReferrerOption The option of loadReferrer. (NotNull)
          * @param callback The internal call-back of loadReferrer. (NotNull) 
          */
-        protected virtual void helpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
+        protected virtual void HelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
@@ -212,13 +212,13 @@ namespace ${glPackageBaseCommonBhv} {
             // - - - - - - - - - - - - - -
             // Prepare temporary container
             // - - - - - - - - - - - - - -
-            IDictionary<PK, LOCAL_ENTITY> pkBaseEntityMap = new Dictionary<PK, LOCAL_ENTITY>();
+            IDictionary<PK, LOCAL_ENTITY> pkLocalEntityMap = new Dictionary<PK, LOCAL_ENTITY>();
             IList<PK> pkList = new List<PK>();
             foreach (LOCAL_ENTITY localEntity in localEntityList) {
                 PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
                 pkList.Add(callback.callbackBase_getPrimaryKeyValue(localEntity));
                 if (!pkMyEntityMap.ContainsKey(primaryKeyValue)) {
-                    pkBaseEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
+                    pkLocalEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
                 }
             }
 
@@ -248,20 +248,20 @@ namespace ${glPackageBaseCommonBhv} {
             // - - - - - - - - - - - - - - - - - - - - - - - -
             // Create the map of {primary key / referrer list}
             // - - - - - - - - - - - - - - - - - - - - - - - -
-            IDictionary<PK, List<REFERRER_ENTITY>> pkReffererListMap = new Dictionary<PK, List<REFERRER_ENTITY>>();
+            IDictionary<PK, List<REFERRER_ENTITY>> pkReferrerListMap = new Dictionary<PK, List<REFERRER_ENTITY>>();
             foreach (REFERRER_ENTITY referrerEntity in referrerList) {
                 PK referrerListKey;
                 {
                     PK foreignKeyValue = callback.callbackReferrer_getForeignKeyValue(referrerEntity);
                     referrerListKey = ToLowerCasePrimaryKeyIfString(foreignKeyValue);
                 }
-                if (!pkReffererListMap.containsKey(referrerListKey)) {
-                    pkReffererListMap.Add(referrerListKey, new List<REFERRER_ENTITY>());
+                if (!pkReferrerListMap.ContainsKey(referrerListKey)) {
+                    pkReferrerListMap.Add(referrerListKey, new List<REFERRER_ENTITY>());
                 }
                 pkReferrerListMap[referrerListKey].Add(referrerEntity);
 
                 // for Reverse Reference.
-                LOCAL_ENTITY localEntity = pkBaseEntityMap[referrerListKey];
+                LOCAL_ENTITY localEntity = pkLocalEntityMap[referrerListKey];
                 callback.callbackReferrer_setForeignEntity(referrerEntity, localEntity);
             }
 
@@ -274,8 +274,8 @@ namespace ${glPackageBaseCommonBhv} {
                     PK primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
                     referrerListKey = ToLowerCasePrimaryKeyIfString(primaryKey);
                 }
-                if (pkReffererListMap.ContainsKey(referrerListKey)) {
-                    callback.callbackBase_setReferrerList(localEntity, pkReffererListMap[referrerListKey]);
+                if (pkReferrerListMap.ContainsKey(referrerListKey)) {
+                    callback.callbackBase_setReferrerList(localEntity, pkReferrerListMap[referrerListKey]);
                 } else {
                     callback.callbackBase_setReferrerList(localEntity, new List<REFERRER_ENTITY>());
                 }

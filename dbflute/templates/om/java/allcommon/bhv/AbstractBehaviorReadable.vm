@@ -377,12 +377,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         // - - - - - - - - - - - - - -
         // Prepare temporary container
         // - - - - - - - - - - - - - -
-        final Map<PK, LOCAL_ENTITY> pkBaseEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
+        final Map<PK, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
         final List<PK> pkList = new ArrayList<PK>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
             pkList.add(callback.callbackBase_getPrimaryKeyValue(localEntity));
-            pkBaseEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
+            pkLocalEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
         }
 
         // - - - - - - - - - - - - - - - -
@@ -411,20 +411,20 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         // - - - - - - - - - - - - - - - - - - - - - - - -
         // Create the map of {primary key / referrer list}
         // - - - - - - - - - - - - - - - - - - - - - - - -
-        final Map<PK, List<REFERRER_ENTITY>> pkReffererListMap = new LinkedHashMap<PK, List<REFERRER_ENTITY>>();
+        final Map<PK, List<REFERRER_ENTITY>> pkReferrerListMap = new LinkedHashMap<PK, List<REFERRER_ENTITY>>();
         for (REFERRER_ENTITY referrerEntity : referrerList) {
             final PK referrerListKey;
             {
                 final PK foreignKeyValue = callback.callbackReferrer_getForeignKeyValue(referrerEntity);
                 referrerListKey = toLowerCasePrimaryKeyIfString(foreignKeyValue);
             }
-            if (!pkReffererListMap.containsKey(referrerListKey)) {
-                pkReffererListMap.put(referrerListKey, new ArrayList<REFERRER_ENTITY>());
+            if (!pkReferrerListMap.containsKey(referrerListKey)) {
+                pkReferrerListMap.put(referrerListKey, new ArrayList<REFERRER_ENTITY>());
             }
-            (pkReffererListMap.get(referrerListKey)).add(referrerEntity);
+            (pkReferrerListMap.get(referrerListKey)).add(referrerEntity);
 
             // for Reverse Reference.
-            final LOCAL_ENTITY localEntity = pkBaseEntityMap.get(referrerListKey);
+            final LOCAL_ENTITY localEntity = pkLocalEntityMap.get(referrerListKey);
             callback.callbackReferrer_setForeignEntity(referrerEntity, localEntity);
         }
 
@@ -437,10 +437,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
                 final PK primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
                 referrerListKey = toLowerCasePrimaryKeyIfString(primaryKey);
             }
-            if (pkReffererListMap.containsKey(referrerListKey)) {
-                callback.callbackBase_setReferrerList(localEntity, pkReffererListMap.get(referrerListKey));
+            if (pkReferrerListMap.containsKey(referrerListKey)) {
+                callback.callbackBase_setReferrerList(localEntity, pkReferrerListMap.get(referrerListKey));
             } else {
-                callback.callbackBase_setReferrerList(localEntity, new java.util.ArrayList<REFERRER_ENTITY>());
+                callback.callbackBase_setReferrerList(localEntity, new ArrayList<REFERRER_ENTITY>());
             }
         }
     }
