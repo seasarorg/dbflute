@@ -217,8 +217,23 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                                Setup Method by Auto
-    //                                                                ====================
+    //                                                                     Assert Override
+    //                                                                     ===============
+    @Override
+    protected void setupMethodByAnnotation(Class daoInterface, Method method) {
+        final String sql = daoAnnotationReader.getSQL(method, dbms.getSuffix());
+        assertSQLAnnotationUnsupported(method, sql);
+        super.setupMethodByAnnotation(daoInterface, method);
+    }
+
+    protected void assertSQLAnnotationUnsupported(final Method method, String sql) {
+        if (sql != null) {
+            String msg = "Sorry! The SQL annotation of S2Dao is unsupported on DBFlute:";
+            msg = msg + " sql=" + sql + " method=" + method;
+            throw new UnsupportedOperationException(msg);
+        }
+    }
+
     @Override
     protected void setupMethodByAuto(Method method) {
         final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
@@ -231,8 +246,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                                 ConditionBean Setup
-    //                                                                 ===================
+    //                                                              ConditionBean Override
+    //                                                              ======================
     @Override
     protected void setupSelectMethodByAuto(final Method method) {
         if (setupInternalSelectMethodSequenceNextVal(method)) { // For sequence

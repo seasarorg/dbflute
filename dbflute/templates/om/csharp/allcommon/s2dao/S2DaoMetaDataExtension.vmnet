@@ -124,8 +124,22 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         // ===============================================================================
-        //                                                      Outside Sql Check Override
-        //                                                      ==========================
+        //                                                                 Assert Override
+        //                                                                 ===============
+        protected override void SetupMethodByAttribute(MethodInfo methodInfo) {
+            String sql = _annotationReader.GetSql(methodInfo.Name, _dbms);
+            AssertSQLAnnotationUnsupported(methodInfo, sql);
+            base.SetupMethodByAttribute(methodInfo);
+        }
+
+        protected void AssertSQLAnnotationUnsupported(final MethodInfo methodInfo, String sql) {
+            if (sql != null) {
+                String msg = "Sorry! The SQL annotation of S2Dao is unsupported on DBFlute:";
+                msg = msg + " sql=" + sql + " method=" + methodInfo;
+                throw new NotSupportedException(msg);
+            }
+        }
+
         protected override void SetupMethodByAuto(MethodInfo mi) {
             ${glOutsideSqlAnnotation} outsideSql = Attribute.GetCustomAttribute(mi, typeof(${glOutsideSqlAnnotation})) as ${glOutsideSqlAnnotation};
             if (outsideSql != null) {
