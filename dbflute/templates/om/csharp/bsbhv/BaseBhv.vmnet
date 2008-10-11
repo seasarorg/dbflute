@@ -8,6 +8,7 @@ using Seasar.Quill.Attrs;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
+using ${glPackageBaseCommonBhvLoad};
 using ${glPackageBaseCommonBhvSetup};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
@@ -195,19 +196,19 @@ namespace ${glPackageExtendedBhv} {
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${referrerEntityClassName}>")
 #if (!${referrer.isOneToOne()})
-        public virtual void Load${referrer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
-            AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
-            if (ls.Count == 0) { return; }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
+            AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            if (${myEntityListVariableName}.Count == 0) { return; }
             Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
         }
-        public virtual void Load${referrer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-            AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
-            if (ls.Count == 0) { return; }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+            AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            if (${myEntityListVariableName}.Count == 0) { return; }
             ${referrerBhvClassName} referrerBhv = FindBSFLR().Select<${referrerBhvClassName}>();
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
-                    (ls, loadReferrerOption, new MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(referrerBhv));
+                    (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(referrerBhv));
         }
-        protected class MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
+        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
             protected ${referrerBhvClassName} referrerBhv;
             public MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) {
                 this.referrerBhv = referrerBhv;

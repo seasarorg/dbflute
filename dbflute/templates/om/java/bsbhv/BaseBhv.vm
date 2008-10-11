@@ -233,7 +233,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
-#foreach ($referrer in $table.refererList)
+#foreach ($referrer in $table.referrerList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
@@ -256,13 +256,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
      * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
-     * The conditionBean that the setupper provides have settings before you touch it. It is as follows:
+     * The condition-bean that the setupper provides have settings before you touch it. It is as follows:
      * <pre>
      * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
      * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
      * </pre>
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper Referrer condition setupper instance for registering referrer condition. (NotNull)
+     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
@@ -273,9 +273,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption the option of load-referrer. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
-    public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadReferrerOption<${referrerEntityClassName}, ${referrerCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
