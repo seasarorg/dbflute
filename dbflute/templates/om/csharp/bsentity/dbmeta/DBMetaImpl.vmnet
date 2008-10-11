@@ -41,8 +41,9 @@ namespace ${myDBMetaPackageName} {
         //                                                                      Table Info
         //                                                                      ==========
         #region Table Name
-        public override String TableDbName { get { return TABLE_DB_NAME; } }
-        public override String TablePropertyName { get { return TABLE_PROPERTY_NAME; } }
+        public override String TableDbName { get { return "$table.name"; } }
+        public override String TablePropertyName { get { return "$table.javaName"; } }
+        public override String TableSqlName { get { return "$table.tableSqlName"; } }
         #endregion
 
         // ===============================================================================
@@ -273,7 +274,10 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                    Various Info
         //                                                                    ============
-        public override bool HasSequence { get { return ${table.isUseSequence()}; } }
+#if ($table.isUseSequence())
+        public override bool HasSequence { get { return true; } }
+        public override String SequenceNextValSql { get { return "${table.SequenceNextSql}"; } }
+#end
 #if ($table.isUseVersionNo())
         public override bool HasVersionNo { get { return true; } }
         public override ${glColumnInfoName} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }

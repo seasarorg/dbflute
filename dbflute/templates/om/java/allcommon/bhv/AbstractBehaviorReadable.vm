@@ -60,7 +60,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                         =============
     /**
      * Get count all.
-     * 
      * @return Count all.
      */
     public int getCountAll() {
@@ -587,9 +586,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return All count.
      */
     protected int callGetCountAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return ((Integer)result).intValue();
+        return readCount(newConditionBean());
     }
 
     /**
@@ -597,9 +594,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return All list. (NotNull)
      */
     protected List<${glEntityInterfaceName}> callGetListAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return (List<${glEntityInterfaceName}>)result;
+        return readList(newConditionBean());
     }
 
     /**
@@ -623,12 +618,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected List<${glEntityInterfaceName}> callReadList(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
         final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
+        final Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (List<${glEntityInterfaceName}>)result;
     }
 
-    private java.lang.reflect.Method getMethod(Class clazz, String methodName, Class[] argTypes) {
+    private Method getMethod(Class clazz, String methodName, Class[] argTypes) {
         try {
             return clazz.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException ex) {
@@ -637,7 +632,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-    private Object invoke(java.lang.reflect.Method method, Object target, Object[] args) {
+    private Object invoke(Method method, Object target, Object[] args) {
         try {
             return method.invoke(target, args);
         } catch (java.lang.reflect.InvocationTargetException ex) {

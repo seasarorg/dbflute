@@ -140,6 +140,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                          ConditionBean Override
         //                                                          ======================
         protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
+            if (SetupSelectMethodSequenceNextVal(methodInfo)) {
+                return;
+            }
             String query = _annotationReader.GetQuery(methodInfo.Name);
             IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
             SelectDynamicCommand cmd = null;
@@ -193,6 +196,26 @@ namespace ${glPackageBaseCommonS2Dao} {
             cmd.ArgNames = argNames;
             cmd.ArgTypes = argTypes;
             _sqlCommands[methodInfo.Name] = cmd;
+        }
+
+        protected bool SetupSelectMethodSequenceNextVal(MethodInfo methodInfo) {
+            if (!"SelectNextVal".Equals(methodInfo.Name)) {
+                return false;
+            }
+            ${glDBMetaInterfaceName} dbmeta = FindDBMeta();
+            if (!dbmeta.HasSequence) {
+                String msg = "If the method 'SelectNextVal()' exists, DBMeta.HasSequence should return true:";
+                msg = msg + " dbmeta.HasSequence=" + dbmeta.HasSequence + " method=" + methodInfo;
+                throw new SystemException(msg);
+            }
+            final String nextValSql = dbmeta.SequenceNextValSql);
+            if (nextValSql == null) {
+                String msg = "If the method 'SelectNextVal()' exists, DBMeta.SequenceNextValSql should not return null:";
+                msg = msg + " dbmeta.SequenceNextValSql=" + dbmeta.SequenceNextValSql + " method=" + methodInfo;
+                throw new SystemException(msg);
+            }
+            SetupSelectMethodByManual(method, nextValSql);
+            return true;
         }
 
         // ===============================================================================
@@ -539,6 +562,21 @@ namespace ${glPackageBaseCommonS2Dao} {
 		        return null; // Unreachable!
 		    }
 		}
+
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
+        protected ${glDBMetaInterfaceName} FindDBMeta() {
+            Type beanType = this.BeanType;
+            if (beanType == null) {
+                return null;
+            }
+            if (!typeof(${glEntityInterfaceName}).IsAssignableFrom(beanType)) {
+                return null;
+            }
+            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})beanType.NewInstance();
+            return entity.DBMeta;
+        }
 
         // ===============================================================================
         //                                                                BeanMetaData Map

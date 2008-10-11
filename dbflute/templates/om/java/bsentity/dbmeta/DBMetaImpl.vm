@@ -24,6 +24,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                          ==========
     public String getTableDbName() { return "$table.name"; }
     public String getTablePropertyName() { return "$table.javaBeansRulePropertyName"; }
+    public String getTableSqlName() { return "$table.tableSqlName"; }
 
     // ===================================================================================
     //                                                                         Column Info
@@ -269,6 +270,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                        ============
 #if ($table.isUseSequence())
     public boolean hasSequence() { return true; }
+    public String getSequenceNextValSql() { return "${table.sequenceNextSql}"; }
 #end
 #if ($table.isUseVersionNo())
     public boolean hasVersionNo() { return true; }

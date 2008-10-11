@@ -527,6 +527,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                                        ============
     // These methods is expected to override if it needs.
     public boolean hasSequence() { return false; }
+    public String getSequenceNextValSql() { return null; }
     public boolean hasVersionNo() { return false; }
     public ${glColumnInfoName} getVersionNoColumnInfo() { return null; }
     public boolean hasUpdateDate() { return false; }

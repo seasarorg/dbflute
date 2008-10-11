@@ -25,17 +25,6 @@ namespace ${myExtendedDaoPackageName} {
     public partial interface ${myClassName} : ${InterfaceName} {
 		void InitializeDaoMetaData(String methodName);// Very Internal Method!
 
-        [Sql("select count(*) from ${table.Name}")]
-        int GetCountAll();
-        
-        [Sql("select ${table.columnNameCommaString} from ${table.Name}")]
-        IList<${myExtendedObjectClassName}> GetListAll();
-#if ($table.hasPrimaryKey())
-
-        [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
-        ${myExtendedObjectClassName} GetEntity(${table.PrimaryKeyArgsString});
-#end
-        
         int SelectCount(${myConditionBeanClassName} cb);
         IList<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb);
 
@@ -55,16 +44,9 @@ namespace ${myExtendedDaoPackageName} {
 #if (${table.hasOnlyOnePrimaryKey()})
         int DeleteByQuery(${myConditionBeanClassName} cb);// {DBFlute-0.7.9}
 #end
-
-// This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int InsertList(IList<${myExtendedObjectClassName}> entityList);
-//        int UpdateList(IList<${myExtendedObjectClassName}> entityList);
-//        int DeleteList(IList<${myExtendedObjectClassName}> entityList);
-
 #end
 #if ($table.isUseSequence())
 
-        [Sql("${table.SequenceNextSql}")]
         ${table.sequenceReturnType} SelectNextVal();
 #end
     }

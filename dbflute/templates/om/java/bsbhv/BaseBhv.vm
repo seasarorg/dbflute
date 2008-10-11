@@ -484,19 +484,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-#set ($batchUpdateReturnValueMethod = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnValueMethod = ".length")
-#else
-  #set ($batchUpdateReturnValueMethod = "")
-#end
-
     // ===================================================================================
     //                                                                        Batch Update
     //                                                                        ============
@@ -505,7 +492,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of inserted count.
      */
-    public ${batchUpdateReturnType} batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public int[] batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateInsertList(${myEntityListVariableName});
     }
@@ -521,7 +508,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
      */
-    public ${batchUpdateReturnType} batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
@@ -534,7 +521,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The array of updated count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
-    public ${batchUpdateReturnType} batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateListNonstrict(${myEntityListVariableName});
     }
@@ -551,7 +538,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
 #end
      */
-    public ${batchUpdateReturnType} batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }
@@ -564,7 +551,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The array of deleted count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
-    public ${batchUpdateReturnType} batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteListNonstrict(${myEntityListVariableName});
     }
@@ -673,10 +660,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    ${database.behaviorDelegateModifier} int delegateGetCountAll() { return getMyDao().getCountAll(); }
-    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() { return getMyDao().getListAll(); }
-#if ($table.hasPrimaryKey())
-    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) { return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()}); }
+#if ($database.isMakeDeprecated())
+    ${database.behaviorDelegateModifier} int delegateGetCountAll() { return delegateSelectCount(newMyConditionBean()); }
+    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() { return delegateSelectList(newMyConditionBean()); }
 #end
     ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
     ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
@@ -697,29 +683,23 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.hasOptimisticLock())
     ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
 #end
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
 
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+    ${database.behaviorDelegateModifier} int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
     }
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+    ${database.behaviorDelegateModifier} int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+    ${database.behaviorDelegateModifier} int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
     }
 #end
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+    ${database.behaviorDelegateModifier} int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+    ${database.behaviorDelegateModifier} int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
     }
 #end

@@ -1272,7 +1272,11 @@ public class Database {
     public boolean isAvailableDatabaseDependency() {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
-
+    
+    public boolean isAvailableNonPrimaryKeyWritable() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
+    }
+    
     public boolean isCompatibleSQLExceptionHandlingOldStyle() {// This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
     }

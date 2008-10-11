@@ -24,6 +24,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                      ==========
         public abstract String TableDbName { get; }
         public abstract String TablePropertyName { get; }
+        public abstract String TableSqlName { get; }
 
         // ===============================================================================
         //                                                                     Column Info
@@ -230,7 +231,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                   Sequence Info
         //                                                                   =============
-        public abstract bool HasSequence { get; }
+        public virtual bool HasSequence { get { return false; } }
+        public virtual bool SequenceNextValSql { get { return null; } }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info

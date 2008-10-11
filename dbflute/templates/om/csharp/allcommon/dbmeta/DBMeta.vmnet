@@ -16,6 +16,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                      ==========
         String TableDbName { get; }
         String TablePropertyName { get; }
+        String TableSqlName { get; }
 
         // ===============================================================================
         //                                                                   Name Handling
@@ -89,6 +90,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   Sequence Info
         //                                                                   =============
         bool HasSequence { get; }
+        String SequenceNextValSql { get; }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info

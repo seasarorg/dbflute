@@ -39,10 +39,12 @@ import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.MethodUtil;
 
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
 import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
@@ -233,6 +235,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                 ===================
     @Override
     protected void setupSelectMethodByAuto(final Method method) {
+        if (setupSelectMethodSequenceNextVal(method)) {
+            return;
+        }
         final ResultSetHandler handler = createResultSetHandler(method);
         final String[] argNames = daoAnnotationReader.getArgNames(method);
         final String query = daoAnnotationReader.getQuery(method);
@@ -244,6 +249,26 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             cmd = setupInternalNonQuerySelectMethodByAuto(method, handler, argNames, query);
         }
         putSqlCommand(method.getName(), cmd);
+    }
+
+    protected boolean setupSelectMethodSequenceNextVal(final Method method) {
+        if (!"selectNextVal".equals(method.getName())) {
+            return false;
+        }
+        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (!dbmeta.hasSequence()) {
+            String msg = "If the method 'selectNextVal()' exists, DBMeta.hasSequence() should return true:";
+            msg = msg + " dbmeta.hasSequence()=" + dbmeta.hasSequence() + " method=" + method;
+            throw new IllegalStateException(msg);
+        }
+        final String nextValSql = dbmeta.getSequenceNextValSql();
+        if (nextValSql == null) {
+            String msg = "If the method 'selectNextVal()' exists, DBMeta.getSequenceNextValSql() should not return null:";
+            msg = msg + " dbmeta.getSequenceNextValSql()=" + dbmeta.getSequenceNextValSql() + " method=" + method;
+            throw new IllegalStateException(msg);
+        }
+        setupSelectMethodByManual(method, nextValSql);
+        return true;
     }
 
     // For Pure S2Dao *Deprecated at the future...
@@ -298,6 +323,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     @Override
     protected void setupInsertMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
+#if ($database.isAvailableNonPrimaryKeyWritable())
+        if (setupNonPrimaryInsertMethodByAuto(method)) {
+            return;
+        }
+#end
         final String[] propertyNames = getPersistentPropertyNames(method);
         final SqlCommand command;
         if (isUpdateSignatureForBean(method)) {
@@ -324,6 +354,36 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         putSqlCommand(method.getName(), command);
     }
+#if ($database.isAvailableNonPrimaryKeyWritable())
+
+    /**
+     * @param method The target method. (NotNull)
+     * @return Whether the method is target. (For example if it has primary key, returns false.)
+     */
+    protected boolean setupNonPrimaryInsertMethodByAuto(final Method method) {
+        checkAutoUpdateMethod(method);
+        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.hasPrimaryKey()) {
+            return false;
+        }
+        final List<${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
+        final StringBuilder columnDefSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+            columnDefSb.append(", ").append(columnInfo.getColumnDbName());
+        }
+        columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final StringBuilder columnValuesSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+            columnValuesSb.append(", /*dto.").append(columnInfo.getPropertyName()).append("*/null");
+        }
+        columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
+        final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory);
+        registerSqlCommand(method.getName(), method, sql, new String[]{"dto"}, method.getParameterTypes(), cmd);
+        setupUpdateMethodByManual(method, sql); // It's S2Dao plain method.
+        return true;
+    }
+#end
 
     // -----------------------------------------------------
     //                                                Update
@@ -600,7 +660,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                     Normal OutsideSql
     //                                     -----------------
     @Override
-    protected void setupSelectMethodByManual(Method method, String sql) {// Contains SQL-Annotation
+    protected void setupSelectMethodByManual(Method method, String sql) {
         final Class<?>[] pmbTypes = method.getParameterTypes();
         final String[] argNames = this.daoAnnotationReader.getArgNames(method);
         final Class<?>[] argTypes;
@@ -625,23 +685,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
     }
 
-	// @jflute -- This override causes exception, it's pending...
-	//            This is for to use QLog about SQL-Annotation. But the priority is very low. 
-	// 
-    // @Override
-    // protected void setupUpdateMethodByManual(Method method, final String sql) {// Contains SQL-Annotation
-    //     final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory);
-    //     cmd.setSql(sql);
-    //     String[] argNames = daoAnnotationReader.getArgNames(method);
-    //     if (argNames.length == 0 && isUpdateSignatureForBean(method)) {
-    //         argNames = new String[] { StringUtil.decapitalize(ClassUtil.getShortClassName(beanClass)) };
-    //     }
-    // 
-    //     // It is unnecessary for DBFlute!
-    //     // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-    // 
-    //     registerSqlCommand(method.getName(), method, sql, argNames, method.getParameterTypes(), cmd);
-    // }
+    @Override
+    protected void setupUpdateMethodByManual(Method method, final String sql) {
+        // DBFlute Extesion does not exist. Because DBFlute methods don't use this!
+        // The insert/update/delete methods on DAO interface as outside SQL are target.
+        // And especially NonPrimaryInsertMethod uses this for using S2Dao's BindVariableNode.
+        super.setupUpdateMethodByManual(method, sql);
+    }
 
     // -----------------------------------------------------
     //                                  Specified OutsideSql
@@ -1060,6 +1110,28 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         public static Class<?> getElementTypeOfListFromReturnType(final Method method) {
             return getElementTypeOfList(method.getGenericReturnType());
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected ${glDBMetaInterfaceName} findDBMeta() {
+        final Class<?> beanType = getBeanClass();
+        if (beanType == null) {
+            return null;
+        }
+        if (!${glEntityInterfaceName}.class.isAssignableFrom(beanType)) {
+            return null;
+        }
+        final ${glEntityInterfaceName} entity;
+        try {
+            entity = (${glEntityInterfaceName})beanType.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        return entity.getDBMeta();
     }
 
     // ===================================================================================

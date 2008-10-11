@@ -53,10 +53,16 @@ public interface ${myClassName} {
     public String getTableDbName();
 
     /**
-     * Get table prop-name(JavaBeansRule).
+     * Get table property-name(JavaBeansRule).
      * @return Table property-name(JavaBeansRule). (NotNull)
      */
     public String getTablePropertyName();
+
+    /**
+     * Get table SQL-name.
+     * @return Table SQL-name. (NotNull)
+     */
+    public String getTableSqlName();
 
     // ===================================================================================
     //                                                                       Name Handling
@@ -288,6 +294,12 @@ public interface ${myClassName} {
      * @return Determination.
      */
     public boolean hasSequence();
+
+    /**
+     * Get the SQL string for getting next value of sequence.
+     * @return The SQL string for getting next value of sequence. (Nullable: If it does not have sequence, returns null.)
+     */
+    public String getSequenceNextValSql();
 
     // ===================================================================================
     //                                                                Optimistic Lock Info

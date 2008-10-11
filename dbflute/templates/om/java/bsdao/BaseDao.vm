@@ -13,26 +13,14 @@ import ${glPackageCB}.${myConditionBeanClassName};
 #end
 
 /**
- * The dao interface of ${table.name}.
+ * The DAO interface of ${table.name}.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public interface ${myClassName} extends ${InterfaceName} {
 
-    public Class BEAN = ${myExtendedObjectClassName}.class;// For S2Dao
-
-    public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
-    public int getCountAll();
-    
-    public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} getListAll();
-    
-#if ($table.isWritable())
-    public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
-    public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
-    public ${myExtendedObjectClassName} getEntity(${table.PrimaryKeyArgsString});
-#end
-
+    public Class<?> BEAN = ${myExtendedObjectClassName}.class; // For S2Dao
 #if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseBuri())
+
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
     List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);// For the Framework 'Buri'
@@ -42,47 +30,39 @@ public interface ${myClassName} extends ${InterfaceName} {
     public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
 #if ($table.isWritable())
 
-    public int insert(${myExtendedObjectClassName} entity);
-    public int updateModifiedOnly(${myExtendedObjectClassName} entity);
+    int insert(${myExtendedObjectClassName} entity);
+    int updateModifiedOnly(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-    public int updateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
+    int updateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
-    public int delete(${myExtendedObjectClassName} entity);
+    int delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-    public int deleteNonstrict(${myExtendedObjectClassName} entity);
+    int deleteNonstrict(${myExtendedObjectClassName} entity);
 #end
 
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-#set ($batchUpdateReturnType = "int[]")
-#else
-#set ($batchUpdateReturnType = "int")
-#end
-    public ${batchUpdateReturnType} insertList(List<${myExtendedObjectClassName}> entityList);
-    public ${batchUpdateReturnType} updateList(List<${myExtendedObjectClassName}> entityList);
+    int[] insertList(List<${myExtendedObjectClassName}> entityList);
+    int[] updateList(List<${myExtendedObjectClassName}> entityList);
 #if ($table.hasOptimisticLock())
-    public ${batchUpdateReturnType} updateListNonstrict(List<${myExtendedObjectClassName}> entityList);
+    int[] updateListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
-    public int updateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);// {DBFlute-0.7.5}
+    int updateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);
 #end
-    public ${batchUpdateReturnType} deleteList(List<${myExtendedObjectClassName}> entityList);
+    int[] deleteList(List<${myExtendedObjectClassName}> entityList);
 #if ($table.hasOptimisticLock())
-    public ${batchUpdateReturnType} deleteListNonstrict(List<${myExtendedObjectClassName}> entityList);
+    int[] deleteListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
-    public int deleteByQuery(${myConditionBeanClassName} cb);
+    int deleteByQuery(${myConditionBeanClassName} cb);
 #end
 #else
 
 #if ($table.isAvailableNonPrimaryKeyWritable())
-    public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesAsSqlComment})";
-    public int insert(${myExtendedObjectClassName} entity);
+    int insert(${myExtendedObjectClassName} entity);
 #end
 #end
 #if ($table.isUseSequence())
 
-    public String selectNextVal_SQL = "${table.sequenceNextSql}";
-    public ${table.sequenceReturnType} selectNextVal();
+    ${table.sequenceReturnType} selectNextVal();
 #end
 }
