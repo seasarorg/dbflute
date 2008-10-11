@@ -232,7 +232,7 @@ namespace ${glPackageExtendedBhv} {
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
         public IList<${foreignEntityClassName}> Pullout${foreignKeys.foreignPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-            return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
+            return HelpPulloutInternally<${myExtendedObjectClassName}, ${foreignEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
             public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
@@ -243,7 +243,7 @@ namespace ${glPackageExtendedBhv} {
   #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
   #if (${referrer.isOneToOne()})
         public IList<${referrerEntityClassName}> Pullout${referrer.referrerPropertyNameInitCapAsOne}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-            return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
+            return HelpPulloutInternally<${myExtendedObjectClassName}, ${referrerEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}> {
             public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
