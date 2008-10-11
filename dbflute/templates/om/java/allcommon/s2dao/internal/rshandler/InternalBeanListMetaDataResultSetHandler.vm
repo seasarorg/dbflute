@@ -44,7 +44,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
-        // Lazy Initialization
+        // Lazy initialization because if the result is zero, the resources are unused.
         Set columnNames = null; // Set<String(columnName)>
         Map propertyCache = null; // Map<String(columnName), PropertyType>
         Map relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
@@ -66,7 +66,6 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         }
 
         while (rs.next()) {
-            // Lazy initialization because if the result is zero, the resources are unused.
 			if (columnNames == null) {
 			    columnNames = createColumnNames(rs.getMetaData());
 			}
