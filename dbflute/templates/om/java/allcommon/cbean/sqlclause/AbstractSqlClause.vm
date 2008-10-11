@@ -1104,7 +1104,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     /**
      * ${database.ImplementComment}
-     * @return Determiantion.
+     * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {
         return _isFetchScopeEffective;
