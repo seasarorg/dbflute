@@ -208,7 +208,7 @@ namespace ${glPackageExtendedBhv} {
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
                     (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(referrerBhv));
         }
-        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
+        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
             protected ${referrerBhvClassName} referrerBhv;
             public MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.${table.getPrimaryKeyJavaNameAsOne()}; }
