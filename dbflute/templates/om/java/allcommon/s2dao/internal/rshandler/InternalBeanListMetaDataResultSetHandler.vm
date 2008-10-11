@@ -52,9 +52,9 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
 
         final List list = new ArrayList();
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
+        final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
         {
-            final boolean hasCB = hasConditionBean();
             final boolean emptyRelation = isSelectedForeignInfoEmpty();
             final boolean hasOSC = hasOutsideSqlContext();
             final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
@@ -80,7 +80,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
             // If it has condition-bean that has no relation to get
             // or it has outside-sql context that is specified-outside-sql,
             // they are unnecessary to do relation loop!
-            if ((hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql)) {
+            if (skipRelationLoop) {
                 postCreateRow(row);
                 list.add(row);
                 continue;

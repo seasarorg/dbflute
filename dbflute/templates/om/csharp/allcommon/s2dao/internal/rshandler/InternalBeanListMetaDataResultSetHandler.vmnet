@@ -39,9 +39,9 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             RelationRowCache relRowCache = null;
 
             int relSize = BeanMetaData.RelationPropertyTypeSize;
+            bool hasCB = HasConditionBean();
             bool skipRelationLoop;
             {
-                bool hasCB = HasConditionBean();
                 bool emptyRelation = IsSelectedForeignInfoEmpty();
                 bool hasOSC = HasOutsideSqlContext();
                 bool specifiedOutsideSql = IsSpecifiedOutsideSql();
