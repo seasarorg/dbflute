@@ -20,7 +20,7 @@ import org.seasar.dao.impl.RelationRowCache;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonOutsideSql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsideSql}.${glOutsideSqlContextName};
 
 /**
  * @author ${database.ClassAuthor}

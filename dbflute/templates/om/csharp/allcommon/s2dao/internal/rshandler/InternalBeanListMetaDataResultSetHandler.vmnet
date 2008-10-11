@@ -9,6 +9,7 @@ using Seasar.Dao;
 using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsideSql};
 
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
