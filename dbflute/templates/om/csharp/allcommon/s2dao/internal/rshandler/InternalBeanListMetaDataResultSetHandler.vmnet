@@ -31,14 +31,17 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected void Handle(IDataReader dataReader, System.Collections.IList list) {
+            // Lazy Initialization
             System.Collections.IList columnNames = null;
             IColumnMetaData[] columns = null;
             IDictionary<String, IDictionary<String, IPropertyType>> relationPropertyCache = null;
+            RelationRowCache relRowCache = null;
 
             int relSize = BeanMetaData.RelationPropertyTypeSize;
-            RelationRowCache relRowCache = new RelationRowCache(relSize);
             bool hasCB = HasConditionBean();
             bool emptyRelation = IsSelectedForeignInfoEmpty();
+            bool hasOSC = HasOutsideSqlContext();
+            bool specifiedOutsideSql = IsSpecifiedOutsideSql();
 
             while (dataReader.Read()) {
                 // Lazy initialization because if the result is zero, the resources are unused.
@@ -48,17 +51,24 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 if (columns == null) {
                     columns = CreateColumnMetaData(columnNames);
                 }
-                if (relationPropertyCache == null) {
-                    relationPropertyCache = CreateRelationPropertyCache(columnNames);
-                }
 
                 // Create row instance of base table by row property cache.
                 Object row = CreateRow(dataReader, columns);
 
-                if (hasCB && emptyRelation) {
+                // If it has condition-bean that has no relation to get
+                // or it has outside-sql context that is specified-outside-sql,
+                // they are unnecessary to do relation loop!
+                if ((hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql)) {
                     PostCreateRow(row, BeanMetaData);
                     list.Add(row);
                     continue;
+                }
+
+                if (relationPropertyCache == null) {
+                    relationPropertyCache = CreateRelationPropertyCache(columnNames);
+                }
+                if (relRowCache == null) {
+                    relRowCache = new RelationRowCache(relSize);
                 }
                 for (int i = 0; i < relSize; ++i) {
                     IRelationPropertyType rpt = BeanMetaData.GetRelationPropertyType(i);
@@ -156,6 +166,18 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         protected String BuildRelationNoSuffix(IRelationPropertyType rpt) {
             return "_" + rpt.RelationNo;
+        }
+
+        protected bool HasOutsideSqlContext() {
+            return ${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread();
+        }
+
+        protected bool IsSpecifiedOutsideSql() {
+            if (!HasOutsideSqlContext()) {
+                return false;
+            }
+            ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlOnThread();
+            return context.IsSpecifiedOutsideSql;
         }
     }
 }

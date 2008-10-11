@@ -20,6 +20,7 @@ import org.seasar.dao.impl.RelationRowCache;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonOutsideSql}.${glOutsideSqlContextName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -43,20 +44,18 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
-        // Set<String(columnName)>
-        Set columnNames = null;
+        // Lazy Initialization
+        Set columnNames = null; // Set<String(columnName)>
+        Map propertyCache = null; // Map<String(columnName), PropertyType>
+        Map relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
+        RelationRowCache relRowCache = null;
 
-        // Map<String(columnName), PropertyType>
-        Map propertyCache = null; // [DAO-118] (2007/08/26)
-
-        // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
-        Map relationPropertyCache = null; // [DAO-118] (2007/08/25)
-
-        final List list = new ArrayList();
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
-        final RelationRowCache relRowCache = new RelationRowCache(relSize);
         final boolean hasCB = hasConditionBean();
         final boolean emptyRelation = isSelectedForeignInfoEmpty();
+        final boolean hasOSC = hasOutsideSqlContext();
+        final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
+        final List list = new ArrayList();
 
         while (rs.next()) {
             // Lazy initialization because if the result is zero, the resources are unused.
@@ -66,17 +65,24 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
             if (propertyCache == null) {
                 propertyCache = createPropertyCache(columnNames);
             }
-            if (relationPropertyCache == null) {
-                relationPropertyCache = createRelationPropertyCache(columnNames);
-            }
 
             // Create row instance of base table by row property cache.
             final Object row = createRow(rs, propertyCache);
 
-            if (hasCB && emptyRelation) {
+            // If it has condition-bean that has no relation to get
+            // or it has outside-sql context that is specified-outside-sql,
+            // they are unnecessary to do relation loop!
+            if ((hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql)) {
                 postCreateRow(row);
                 list.add(row);
                 continue;
+            }
+
+            if (relationPropertyCache == null) {
+                relationPropertyCache = createRelationPropertyCache(columnNames);
+            }
+            if (relRowCache == null) {
+                relRowCache = new RelationRowCache(relSize);
             }
             for (int i = 0; i < relSize; ++i) {
                 final RelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
@@ -163,7 +169,6 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         }
         return false;
     }
-
     /**
      * Has it selected foreign information?
      * You should call hasConditionBean() before calling this!
@@ -180,5 +185,17 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     
     protected String buildRelationNoSuffix(RelationPropertyType rpt) {
         return "_" + rpt.getRelationNo();
+    }
+
+    protected boolean hasOutsideSqlContext() {
+        return ${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread();
+    }
+
+    protected boolean isSpecifiedOutsideSql() {
+        if (!hasOutsideSqlContext()) {
+            return false;
+        }
+        final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlOnThread();
+        return context.isSpecifiedOutsideSql();
     }
 }

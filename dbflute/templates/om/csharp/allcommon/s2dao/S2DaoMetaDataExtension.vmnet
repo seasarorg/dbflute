@@ -132,7 +132,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             base.SetupMethodByAttribute(methodInfo);
         }
 
-        protected void AssertSQLAnnotationUnsupported(final MethodInfo methodInfo, String sql) {
+        protected void AssertSQLAnnotationUnsupported(MethodInfo methodInfo, String sql) {
             if (sql != null) {
                 String msg = "Sorry! The SQL annotation of S2Dao is unsupported on DBFlute:";
                 msg = msg + " sql=" + sql + " method=" + methodInfo;
@@ -189,7 +189,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 msg = msg + " dbmeta.HasSequence=" + dbmeta.HasSequence + " method=" + methodInfo;
                 throw new SystemException(msg);
             }
-            final String nextValSql = dbmeta.SequenceNextValSql);
+            String nextValSql = dbmeta.SequenceNextValSql);
             if (nextValSql == null) {
                 String msg = "If the method 'SelectNextVal()' exists, DBMeta.SequenceNextValSql should not return null:";
                 msg = msg + " dbmeta.SequenceNextValSql=" + dbmeta.SequenceNextValSql + " method=" + methodInfo;
@@ -214,7 +214,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected void AssertAutoQueryByDtoUnsupported(MethodInfo methodInfo, Type[] argTypes) {
-            final Type firstArgType = argTypes[0];
+            Type firstArgType = argTypes[0];
             if (!${glConditionBeanContextName}.IsTheTypeConditionBean(firstArgType)) {
                 String msg = "Sorry! The auto query by DTO of S2Dao is unsupported on DBFlute:";
                 msg = msg + " dto=" + firstArgType + " method=" + methodInfo;
