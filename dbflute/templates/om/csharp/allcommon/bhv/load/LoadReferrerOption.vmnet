@@ -8,7 +8,7 @@ using ${glPackageBaseCommonBhvSetup};
 
 namespace ${glPackageBaseCommonBhvLoad} {
 
-public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY}> where REFERRER_CONDITION_BEAN extends ${glConditionBeanInterfaceName} where REFERRER_ENTITY extends ${glEntityInterfaceName} {
+public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> where REFERRER_CONDITION_BEAN : ${glConditionBeanInterfaceName} where REFERRER_ENTITY : ${glEntityInterfaceName} {
 
     // ===================================================================================
     //                                                                           Attribute
