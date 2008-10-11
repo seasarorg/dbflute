@@ -176,6 +176,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         }
         return false;
     }
+
     /**
      * Has it selected foreign information?
      * You should call hasConditionBean() before calling this!
@@ -189,7 +190,12 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         }
         return false;
     }
-    
+
+    /**
+     * Build the string of relation No suffix.
+     * @param rpt The property type of relation. (NotNull)
+     * @return The string of relation No suffix. (NotNull)
+     */
     protected String buildRelationNoSuffix(RelationPropertyType rpt) {
         return "_" + rpt.getRelationNo();
     }

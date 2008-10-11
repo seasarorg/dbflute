@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                   Basic Get All
         //                                                                   =============
         public int GetCountAll() {
-            return this.CallGetCountAll();
+            return this.ReadCount(NewConditionBean());
         }
 
         // ===============================================================================
@@ -162,10 +162,6 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
-        protected int CallGetCountAll() { return DoCallGetCountAll(); }
-        protected abstract int DoCallGetCountAll();
-        protected IList<${glEntityInterfaceName}> CallGetListAll() { return DoCallGetListAll(); }
-        protected abstract IList<${glEntityInterfaceName}> DoCallGetListAll();
         protected int CallReadCount(${glConditionBeanInterfaceName} cb) { return DoCallReadCount(cb); }
         protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
         protected IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) { return DoCallReadList(cb); }

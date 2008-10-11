@@ -232,7 +232,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   Sequence Info
         //                                                                   =============
         public virtual bool HasSequence { get { return false; } }
-        public virtual bool SequenceNextValSql { get { return null; } }
+        public virtual String SequenceNextValSql { get { return null; } }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info

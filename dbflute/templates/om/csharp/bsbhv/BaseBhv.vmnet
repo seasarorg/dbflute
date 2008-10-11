@@ -375,8 +375,6 @@ namespace ${glPackageExtendedBhv} {
         protected int DelegateSelectCount(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectCount(cb); }
         protected override int DoCallReadCount(${glConditionBeanInterfaceName} cb) { return this.DelegateSelectCount((${myConditionBeanClassName})cb); }
         protected IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectList(cb); }
-        protected override int DoCallGetCountAll() { return this.DelegateGetCountAll(); }
-        protected override IList<${glEntityInterfaceName}> DoCallGetListAll() { return (IList<${glEntityInterfaceName}>)this.DelegateGetListAll(); }
         protected override IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb) { return (IList<${glEntityInterfaceName}>)this.DelegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
         protected ${table.sequenceReturnType} DelegateSelectNextVal() { return this.Dao.SelectNextVal(); }
