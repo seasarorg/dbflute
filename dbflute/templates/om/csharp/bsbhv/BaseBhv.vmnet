@@ -183,7 +183,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                   Load Referrer
         //                                                                   =============
         #region Load Referrer
-#foreach ($referrer in $table.refererList)
+#foreach ($referrer in $table.referrerList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
 #set ($referrerDaoClassName = "${referrerEntityClassName}Dao")
