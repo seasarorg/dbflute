@@ -478,7 +478,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
     }
 
-    protected ${glBehaviorSelectorInterfaceName} findBSFLR() { // findBehaviorSelectorForLoadReferrer()
+    protected ${glBehaviorSelectorInterfaceName} xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
         assertBehaviorSelectorNotNull("loadReferrer");
         return getBehaviorSelector();
     }

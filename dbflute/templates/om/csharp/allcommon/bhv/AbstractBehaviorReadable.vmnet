@@ -315,7 +315,7 @@ namespace ${glPackageBaseCommonBhv} {
             void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
         }
 
-        protected ${glBehaviorSelectorInterfaceName} FindBSFLR() { // FindBehaviorSelectorForLoadReferrer()
+        protected ${glBehaviorSelectorInterfaceName} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
             AssertBehaviorSelectorNotNull("loadReferrer");
             return this.BehaviorSelector;
         }
