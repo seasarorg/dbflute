@@ -68,7 +68,7 @@ import ${glPackageCB}.*;
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
     // ===================================================================================
