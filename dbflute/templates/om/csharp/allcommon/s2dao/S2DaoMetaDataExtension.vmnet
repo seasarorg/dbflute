@@ -140,65 +140,32 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                          ConditionBean Override
         //                                                          ======================
         protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
-            if (SetupSelectMethodSequenceNextVal(methodInfo)) {
+            if (SetupInternalSelectMethodSequenceNextVal(methodInfo)) {
                 return;
             }
+
+            // Assert unsupported
             String query = _annotationReader.GetQuery(methodInfo.Name);
+            AssertQueryAnnotationUnsupported(methodInfo, query);
+
             IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
-            SelectDynamicCommand cmd = null;
             String[] argNames = MethodUtil.GetParameterNames(methodInfo);
             Type[] argTypes = MethodUtil.GetParameterTypes(methodInfo);
-            if (query != null && !StartsWithOrderBy(query)) {
-                cmd = CreateSelectDynamicCommand(handler, query);
+            SelectDynamicCommand cmd = CreateSelectDynamicCommand(handler);
+            if (argTypes.Length == 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
+                argNames = new String[] { "dto" };
+                AssertAutoQueryByDtoUnsupported(methodInfo, argTypes);
+                ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
+                cmd = dynamicCommand;
             } else {
-                cmd = CreateSelectDynamicCommand(handler);
-                String sql = null;
-                if (argTypes.Length == 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
-                    argNames = new String[] { "dto" };
-                    // /----------------------------------------------------- [MyExtension]
-                    if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
-                        ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
-                        cmd = dynamicCommand;
-                    } else {
-                        if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
-                            String msg = "If the first argument type is select-resource(and not condition-bean), ";
-                            msg = msg + "the method should not use auto-select-sql-by-dto.";
-                            msg = msg + " (Do you want to use outside-sql? Please check your sql-file-name and build-action!)";
-                            msg = msg + ": dao=" + methodInfo.DeclaringType + " method=" + methodInfo.Name + "()";
-                            msg = msg + " firstArgument=" + argTypes[0] + " argTypes.Length=" + argTypes.Length;
-                            throw new SystemException(msg);
-                        }
-                        sql = CreateAutoSelectSqlByDto(argTypes[0]);
-                    }
-                    // -----------/
-                } else {
-                    // /----------------------------------------------------- [MyExtension]
-                    if (argTypes.Length > 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
-                        if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
-                            String msg = "If the number of argument is more than 1 and the first argument type is select-resource, ";
-                            msg = msg + "the method should not use auto-select-sql.";
-                            msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
-                            msg = msg + ": dao=" + methodInfo.DeclaringType + " method=" + methodInfo.Name + "()";
-                            msg = msg + " firstArgument=" + argTypes[0] + " argTypes.Length=" + argTypes.Length;
-                            throw new SystemException(msg);
-                        }
-                    }
-                    // -----------/
-                    sql = CreateAutoSelectSql(argNames, argTypes);
-                }
-                if (query != null) {
-                    sql = sql + " " + query;
-                }
-				if (sql != null) {
-                    cmd.Sql = sql;
-				}
+                HandleAutoQueryByArgsAnnotationUnsupported(methodInfo, argNames);
             }
             cmd.ArgNames = argNames;
             cmd.ArgTypes = argTypes;
             _sqlCommands[methodInfo.Name] = cmd;
         }
 
-        protected bool SetupSelectMethodSequenceNextVal(MethodInfo methodInfo) {
+        protected bool SetupInternalSelectMethodSequenceNextVal(MethodInfo methodInfo) {
             if (!"SelectNextVal".Equals(methodInfo.Name)) {
                 return false;
             }
@@ -216,6 +183,29 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             SetupSelectMethodByManual(method, nextValSql);
             return true;
+        }
+
+        protected void AssertQueryAnnotationUnsupported(MethodInfo methodInfo, String query) {
+            if (query != null) {
+                String msg = "Sorry! The QUERY annotation of S2Dao is unsupported on DBFlute:";
+                msg = msg + " query=" + query + " method=" + methodInfo;
+                throw new NotSupportedException(msg);
+            }
+        }
+
+        protected void HandleAutoQueryByArgsAnnotationUnsupported(MethodInfo methodInfo, String[] argNames) {
+            String msg = "Sorry! The auto query by ARGS annotation of S2Dao is unsupported on DBFlute:";
+            msg = msg + " argNames=" + argNames + " method=" + methodInfo;
+            throw new NotSupportedException(msg);
+        }
+
+        protected void AssertAutoQueryByDtoUnsupported(MethodInfo methodInfo, Type[] argTypes) {
+            final Type firstArgType = argTypes[0];
+            if (!${glConditionBeanContextName}.IsTheTypeConditionBean(firstArgType)) {
+                String msg = "Sorry! The auto query by DTO of S2Dao is unsupported on DBFlute:";
+                msg = msg + " dto=" + firstArgType + " method=" + methodInfo;
+                throw new NotSupportedException(msg);
+            }
         }
 
         // ===============================================================================

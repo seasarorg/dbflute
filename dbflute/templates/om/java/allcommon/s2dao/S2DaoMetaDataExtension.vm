@@ -235,23 +235,27 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                 ===================
     @Override
     protected void setupSelectMethodByAuto(final Method method) {
-        if (setupSelectMethodSequenceNextVal(method)) {
+        if (setupInternalSelectMethodSequenceNextVal(method)) { // For sequence
             return;
         }
-        final ResultSetHandler handler = createResultSetHandler(method);
-        final String[] argNames = daoAnnotationReader.getArgNames(method);
-        final String query = daoAnnotationReader.getQuery(method);
-        final SqlCommand cmd;
-        if (query != null && !startsWithOrderBy(query)) {
-            // For Pure S2Dao *Deprecated at the future...
-            cmd = setupInternalQuerySelectMethodByAuto(method, handler, argNames, query);
-        } else {
-            cmd = setupInternalNonQuerySelectMethodByAuto(method, handler, argNames, query);
+        if (setupInternalSelectMethodEntityByIdsForBuri(method)) { // For Buri
+            return;
         }
+
+        // Assert unsupported
+        final String query = daoAnnotationReader.getQuery(method);
+        assertQueryAnnotationUnsupported(method, query);
+        final String[] argNames = daoAnnotationReader.getArgNames(method);
+        assertAutoQueryByArgsAnnotationUnsupported(method, argNames);
+
+        // Here it is the only method that the argument is DTO.
+        final ResultSetHandler handler = createResultSetHandler(method);
+        final SqlCommand cmd = setupInternalNonQuerySelectMethodByDto(method, handler);
+
         putSqlCommand(method.getName(), cmd);
     }
 
-    protected boolean setupSelectMethodSequenceNextVal(final Method method) {
+    protected boolean setupInternalSelectMethodSequenceNextVal(final Method method) { // For sequence
         if (!"selectNextVal".equals(method.getName())) {
             return false;
         }
@@ -271,47 +275,59 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return true;
     }
 
-    // For Pure S2Dao *Deprecated at the future...
-    protected SelectDynamicCommand setupInternalQuerySelectMethodByAuto(final Method method
-                                                                      , final ResultSetHandler handler
-                                                                      , final String[] argNames
-                                                                      , final String query) {
+    protected boolean setupInternalSelectMethodEntityByIdsForBuri(final Method method) { // For Buri
+        if (!"getEntityByIds".equals(method.getName())) {
+            return false;
+        }
+        final ResultSetHandler handler = createResultSetHandler(method);
+        final String[] argNames = daoAnnotationReader.getArgNames(method);
+        final String query = daoAnnotationReader.getQuery(method);
+        if (query == null) {
+            String msg = "The method 'getEntityByIds()' should have QUERY annotation:";
+            msg = msg + " method=" + method;
+            throw new IllegalStateException(msg);
+        }
         final Class[] types = method.getParameterTypes();
         final SelectDynamicCommand cmd = createSelectDynamicCommand(handler, query);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(types);
+        putSqlCommand(method.getName(), cmd);
+        return true;
+    }
+
+    protected void assertQueryAnnotationUnsupported(final Method method, String query) {
+        if (query != null) {
+            String msg = "Sorry! The QUERY annotation of S2Dao is unsupported on DBFlute:";
+            msg = msg + " query=" + query + " method=" + method;
+            throw new UnsupportedOperationException(msg);
+        }
+    }
+
+    protected void assertAutoQueryByArgsAnnotationUnsupported(final Method method, String[] argNames) {
+        if (!isAutoSelectSqlByDto(method, argNames)) {
+            String msg = "Sorry! The auto query by ARGS annotation of S2Dao is unsupported on DBFlute:";
+            msg = msg + " argNames=" + argNames + " method=" + method;
+            throw new UnsupportedOperationException(msg);
+        }
+    }
+
+    // For condition-bean!
+    protected SqlCommand setupInternalNonQuerySelectMethodByDto(Method method, ResultSetHandler handler) {
+        final Class[] argTypes = method.getParameterTypes();
+        assertAutoQueryByDtoUnsupported(method, argTypes);
+        final ${glSelectDynamicCommand} cmd = createCustomizeSelectDynamicCommand(handler);
+        cmd.setArgNames(new String[] { "dto" });
+        cmd.setArgTypes(argTypes);
         return cmd;
     }
 
-    protected SqlCommand setupInternalNonQuerySelectMethodByAuto(final Method method
-                                                               , final ResultSetHandler handler
-                                                               , final String[] argNames
-                                                               , final String query) {
-        if (isAutoSelectSqlByDto(method, argNames)) {
-            return setupInternalNonQuerySelectMethodByDto(method, handler, argNames, query);
-        } else {
-            // For Pure S2Dao *Deprecated at the future...
-            return setupNonQuerySelectMethodByArgs(method, handler, argNames, query);
+    protected void assertAutoQueryByDtoUnsupported(final Method method, Class[] argTypes) {
+        final Class firstArgType = argTypes[0];
+        if (!${glConditionBeanContextName}.isTheTypeConditionBean(firstArgType)) {
+            String msg = "Sorry! The auto query by DTO of S2Dao is unsupported on DBFlute:";
+            msg = msg + " dto=" + firstArgType + " method=" + method;
+            throw new UnsupportedOperationException(msg);
         }
-    }
-    
-    // For condition-bean!
-    protected SqlCommand setupInternalNonQuerySelectMethodByDto(Method method
-                                                              , ResultSetHandler handler
-                                                              , String[] argNames
-                                                              , String query) {
-        Class[] types = method.getParameterTypes();
-        Class clazz = types[0];
-        // /----------------------------------------------------- [MyExtension]
-        if (!${glConditionBeanContextName}.isTheTypeConditionBean(clazz)) {
-            return super.setupNonQuerySelectMethodByDto(method, handler, argNames, query);
-        }
-        argNames = new String[] { "dto" };
-        final ${glSelectDynamicCommand} cmd = createCustomizeSelectDynamicCommand(handler);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(types);
-        // -----------/
-        return cmd;
     }
 
     // ===================================================================================
@@ -324,7 +340,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected void setupInsertMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
 #if ($database.isAvailableNonPrimaryKeyWritable())
-        if (setupNonPrimaryInsertMethodByAuto(method)) {
+        if (setupInternalNonPrimaryInsertMethodByAuto(method)) {
             return;
         }
 #end
@@ -360,7 +376,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @param method The target method. (NotNull)
      * @return Whether the method is target. (For example if it has primary key, returns false.)
      */
-    protected boolean setupNonPrimaryInsertMethodByAuto(final Method method) {
+    protected boolean setupInternalNonPrimaryInsertMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
         final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
         if (dbmeta.hasPrimaryKey()) {
