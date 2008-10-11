@@ -378,7 +378,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         // Prepare temporary container
         // - - - - - - - - - - - - - -
         final Map<PK, LOCAL_ENTITY> pkBaseEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
-        final List<PK> pkList = new java.util.ArrayList<PK>();
+        final List<PK> pkList = new ArrayList<PK>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
             pkList.add(callback.callbackBase_getPrimaryKeyValue(localEntity));
@@ -419,7 +419,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
                 referrerListKey = toLowerCasePrimaryKeyIfString(foreignKeyValue);
             }
             if (!pkReffererListMap.containsKey(referrerListKey)) {
-                pkReffererListMap.put(referrerListKey, new java.util.ArrayList<REFERRER_ENTITY>());
+                pkReffererListMap.put(referrerListKey, new ArrayList<REFERRER_ENTITY>());
             }
             (pkReffererListMap.get(referrerListKey)).add(referrerEntity);
 

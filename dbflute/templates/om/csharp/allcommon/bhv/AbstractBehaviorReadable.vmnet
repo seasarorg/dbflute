@@ -4,10 +4,13 @@ using System;
 using System.Collections.Generic;
 
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonBhvLoad};
+using ${glPackageBaseCommonBhvSetup};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonBhv} {
@@ -169,12 +172,12 @@ namespace ${glPackageBaseCommonBhv} {
          * @param callback The internal call-back of loadReferrer. (NotNull) 
          */
         protected void helpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
-                                               List<LOCAL_ENTITY> localEntityList
+                                               IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
-                     where LOCAL_ENTITY extends ${glEntityInterfaceName}
-                     where REFERRER_CB extends ${glConditionBeanInterfaceName}
-                     where REFERRER_ENTITY extends ${glEntityInterfaceName} {
+                     where LOCAL_ENTITY : ${glEntityInterfaceName}
+                     where REFERRER_CB : ${glConditionBeanInterfaceName}
+                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
             // doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
         }
 
@@ -195,9 +198,9 @@ namespace ${glPackageBaseCommonBhv} {
          * @param <REFERRER_ENTITY> The type of referrer entity.
          */
         protected interface InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>
-                     where LOCAL_ENTITY extends ${glEntityInterfaceName}
-                     where REFERRER_CB extends ${glConditionBeanInterfaceName}
-                     where REFERRER_ENTITY extends ${glEntityInterfaceName} {
+                     where LOCAL_ENTITY : ${glEntityInterfaceName}
+                     where REFERRER_CB : ${glConditionBeanInterfaceName}
+                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
             // For Base
             PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
             void callbackBase_setReferrerList(LOCAL_ENTITY entity, IList<REFERRER_ENTITY> referrerList);
@@ -225,7 +228,7 @@ namespace ${glPackageBaseCommonBhv} {
                 msg = msg + "  _behaviorSelector  : " + _behaviorSelector + GetLineSeparator();
                 msg = msg + "  _daoSelector       : " + _daoSelector + GetLineSeparator();
                 msg = msg + "* * * * * * * * * */" + GetLineSeparator();
-                throw new IllegalStateException(msg);
+                throw new SystemException(msg);
             }
         }
 
