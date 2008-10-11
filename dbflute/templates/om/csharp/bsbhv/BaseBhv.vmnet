@@ -216,7 +216,7 @@ namespace ${glPackageExtendedBhv} {
             public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.NewMyConditionBean(); }
             public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, IList<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.Query().Set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
             public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
+            public IList<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity) { return entity.${referrer.getLocalColumnJavaNameAsOne()}; }
             public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.${referrer.foreignPropertyNameInitCap} = baseEntity; }
         }
