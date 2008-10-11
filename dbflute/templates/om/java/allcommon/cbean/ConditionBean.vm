@@ -113,7 +113,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                        Limit Select
     //                                                                        ============
     /**
-     * Limit select PK only.
+     * Limit select PK only. This is OLD style. You can do the same thing by specify().
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_PKOnly();
@@ -179,19 +179,21 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return The config of statement. (Nullable)
      */
 	public ${glStatementConfig} getStatementConfig();
-	
+#if ($database.isMakeDeprecated())
+
     // ===================================================================================
     //                                                                          Format SQL
     //                                                                          ==========
     /** @deprecated Sorry! ConditionBean must be formatted as default.*/
 	public void formatSql();
-	
+
     /**
 	 * @return Is the SQL formatted?
 	 * @deprecated Sorry! ConditionBean must be formatted as default.
 	 */
 	public boolean isFormatSql();
-	
+#end
+
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
