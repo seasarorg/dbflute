@@ -232,9 +232,9 @@ namespace ${glPackageExtendedBhv} {
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
         public IList<${foreignEntityClassName}> Pullout${foreignKeys.foreignPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-            return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
+            return HelpPulloutInternally(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
         }
-        protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
+        protected class MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
             public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; } });
         }
 #end
