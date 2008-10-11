@@ -8,6 +8,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonBhv} {
 
@@ -154,6 +155,81 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         // ===============================================================================
+        //                                                   Load Referrer Internal Helper
+        //                                                   =============================
+        /**
+         * Help load referrer internally.
+         * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+         * @param <LOCAL_ENTITY> The type of base entity.
+         * @param <PK> The type of primary key.
+         * @param <REFERRER_CB> The type of referrer condition-bean.
+         * @param <REFERRER_ENTITY> The type of referrer entity.
+         * @param localEntityList The list of local entity. (NotNull)
+         * @param loadReferrerOption The option of loadReferrer. (NotNull)
+         * @param callback The internal call-back of loadReferrer. (NotNull) 
+         */
+        protected void helpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
+                                               List<LOCAL_ENTITY> localEntityList
+                                             , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
+                     where LOCAL_ENTITY extends ${glEntityInterfaceName}
+                     where REFERRER_CB extends ${glConditionBeanInterfaceName}
+                     where REFERRER_ENTITY extends ${glEntityInterfaceName} {
+            // doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
+        }
+
+        /**
+         * To lower case for primary key if the value is string.
+         * @param <PK> The type of primary key.
+         * @param value The value of primary key. (Nullable)
+         * @return The value of primary key. (Nullable)
+         */
+        protected PK ToLowerCasePrimaryKeyIfString<PK>(PK value) {
+            return (PK)ToLowerCaseIfString(value);
+        }
+
+        /**
+         * @param <LOCAL_ENTITY> The type of base entity.
+         * @param <PK> The type of primary key.
+         * @param <REFERRER_CB> The type of referrer condition-bean.
+         * @param <REFERRER_ENTITY> The type of referrer entity.
+         */
+        protected interface InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>
+                     where LOCAL_ENTITY extends ${glEntityInterfaceName}
+                     where REFERRER_CB extends ${glConditionBeanInterfaceName}
+                     where REFERRER_ENTITY extends ${glEntityInterfaceName} {
+            // For Base
+            PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
+            void callbackBase_setReferrerList(LOCAL_ENTITY entity, IList<REFERRER_ENTITY> referrerList);
+
+            // For Referrer
+            REFERRER_CB callbackReferrer_newMyConditionBean();
+            void callbackReferrer_queryForeignKeyInScope(REFERRER_CB cb, IList<PK> pkList);
+            void callbackReferrer_queryAddOrderByForeignKeyAsc(REFERRER_CB cb);
+            IList<REFERRER_ENTITY> callbackReferrer_selectList(REFERRER_CB cb);
+            PK callbackReferrer_getForeignKeyValue(REFERRER_ENTITY entity);
+            void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
+        }
+
+        private void assertBehaviorSelectorNotNull(String methodName) {
+            if (_behaviorSelector == null) {
+                String msg = "Look! Read the message below." + GetLineSeparator();
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+                msg = msg + "Not found the selector of behavior as behavior's attributed!" + GetLineSeparator();
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Advice]" + GetLineSeparator();
+                msg = msg + "Please confirm the definition of the selector at your 'dbflute.dicon'." + GetLineSeparator();
+                msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + GetLineSeparator();
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Your Behavior's Attributes]" + GetLineSeparator();
+                msg = msg + "  _behaviorSelector  : " + _behaviorSelector + GetLineSeparator();
+                msg = msg + "  _daoSelector       : " + _daoSelector + GetLineSeparator();
+                msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+                throw new IllegalStateException(msg);
+            }
+        }
+
+        // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
         protected abstract bool HasVersionNoValue(${glEntityInterfaceName} entity);
@@ -168,12 +244,13 @@ namespace ${glPackageBaseCommonBhv} {
         protected abstract IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
 
         // ===============================================================================
-        //                                                                          Helper
-        //                                                                          ======
-        #region Helper
+        //                                                                  General Helper
+        //                                                                  ==============
+        #region General Helper
         protected virtual String GetLineSeparator() {
             return Environment.NewLine;
         }
+
         // -------------------------------------------------
         //                                     Assert Object
         //                                     -------------

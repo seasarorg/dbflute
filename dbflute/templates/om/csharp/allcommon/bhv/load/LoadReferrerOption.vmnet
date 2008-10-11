@@ -1,19 +1,14 @@
-${database.allClassCopyright}package ${glPackageBaseCommonBhvLoad};
 
-import java.util.List;
+using System;
+using System.Collections.Generic;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
-import ${glPackageBaseCommonBhvSetup}.${glEntityListSetupperName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonBhvSetup};
 
-/**
- * The class of load referrer option.
- * ${database.filterGenericsParamOutput('<REFERRER_CONDITION_BEAN>', 'The type of referrer condition-bean.')}
- * ${database.filterGenericsParamOutput('<REFERRER_ENTITY>', 'The type of referrer entity.')}
- * @author ${database.ClassAuthor}
- */
-public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glConditionBeanInterfaceName}, REFERRER_ENTITY extends ${glEntityInterfaceName}> {
+namespace ${glPackageBaseCommonBhvLoad} {
+
+public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY}> where REFERRER_CONDITION_BEAN extends ${glConditionBeanInterfaceName} where REFERRER_ENTITY extends ${glEntityInterfaceName} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -24,9 +19,9 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
 
     protected REFERRER_CONDITION_BEAN _referrerConditionBean;
 
-    protected boolean _toLastKeyCondition;
+    protected bool _toLastKeyCondition;
 
-    protected boolean _stopOrderByKey;
+    protected bool _stopOrderByKey;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -76,19 +71,20 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
 
     public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
         if (!_toLastKeyCondition) {
-            cb.getSqlClause().exchangeFirstWhereClauseForLastOne();
+            // TODO: @jflute
+            // cb.SqlClause.exchangeFirstWhereClauseForLastOne();
         }
     }
 
     public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) {// Internal
         if (_conditionBeanSetupper != null) {
-            _conditionBeanSetupper.setup(cb);
+            _conditionBeanSetupper.Invoke(cb);
         }
     }
 
-    public void delegateEntitySettingUp(List<REFERRER_ENTITY> entityList) {// Internal
+    public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) {// Internal
         if (_entityListSetupper != null) {
-            _entityListSetupper.setup(entityList);
+            _entityListSetupper.Invoke(entityList);
         }
     }
 
@@ -119,11 +115,13 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
         this._referrerConditionBean = referrerConditionBean;
     }
 
-    public boolean isToLastKeyCondition() {
+    public bool isToLastKeyCondition() {
         return _toLastKeyCondition;
     }
 
-    public boolean isStopOrderByKey() {
+    public bool isStopOrderByKey() {
         return _stopOrderByKey;
     }
+}
+
 }

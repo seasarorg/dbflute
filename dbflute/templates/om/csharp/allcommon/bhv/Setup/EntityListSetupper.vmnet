@@ -1,0 +1,10 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommon};
+
+namespace ${glPackageBaseCommonBhvSetup} {
+
+    public delegate void ${glEntityListSetupperName}<ENTITY>(IList<ENTITY> entityList) where ENTITY : ${glEntityInterfaceName};
+}

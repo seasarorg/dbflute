@@ -649,12 +649,23 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ValueLabelBox.${glTemplateFileExtension}",$path ,"", "")
     #end
     #if ($database.isTargetLanguageCSharp())
-        #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
-        $database.makeDirectory($path)
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
+      $database.makeDirectory($path)
 
-        $database.info("    parseConditionBeanSetupper()")
-        #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupperName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
+      $database.info("    parse('LoadReferrerOption')")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReferrerOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/load/LoadReferrerOption.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
+      $database.makeDirectory($path)
+
+      $database.info("    parseConditionBeanSetupper()")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupperName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.info("    parseEntityListSetupper()")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glEntityListSetupperName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/EntityListSetupper.${glTemplateFileExtension}",$path ,"", "")
     #end
     $database.info("}")
 

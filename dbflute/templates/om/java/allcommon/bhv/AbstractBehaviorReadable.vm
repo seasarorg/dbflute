@@ -460,19 +460,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * @param <LOCAL_ENTITY> The type of base entity.
      * @param <PK> The type of primary key.
-     * @param <REFERRER_CB> The type of referrer condition-bean.
-     * @param <REFERRER_ENTITY> The type of referrer entity.
-     */
-    protected static interface InternalLoadRefererCallback<LOCAL_ENTITY extends ${glEntityInterfaceName}
-                                                         , PK
-                                                         , REFERRER_CB extends ${glConditionBeanInterfaceName}
-                                                         , REFERRER_ENTITY extends ${glEntityInterfaceName}>
-                                                  extends InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> {
-    }
-
-    /**
-     * @param <LOCAL_ENTITY> The type of base entity.
-     * @param <PK> The type of primary key.
      * @param <REFERRER_CB> The type of referrer conditionBean.
      * @param <REFERRER_ENTITY> The type of referrer entity.
      */
