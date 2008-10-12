@@ -283,12 +283,12 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
-        sb.append(" listSize=").append(getSelectedList() != null ? Integer.valueOf(getSelectedList().size()) : null);
-        sb.append(" pageSize=").append(getPageSize());
-        sb.append(" page:{").append(isExistPrePage()).append("/").append(isExistNextPage()).append("}");
-        sb.append(" groupSize=").append(getPageGroupSize());
-        sb.append(" rangeSize=").append(getPageRangeSize()).append("}");
-        sb.append(":selectedList=").append(getSelectedList());
+        sb.append(" size:{list=").append(getSelectedList() != null ? Integer.valueOf(getSelectedList().size()) : null);
+        sb.append(",page=").append(getPageSize());
+        sb.append(",group=").append(getPageGroupSize());
+        sb.append(",range=").append(getPageRangeSize()).append("}");
+        sb.append(" exists:{").append(isExistPrePage()).append("/").append(isExistNextPage()).append("}");
+        sb.append("}").append(":selectedList=").append(getSelectedList());
         return sb.toString();
     }
 	

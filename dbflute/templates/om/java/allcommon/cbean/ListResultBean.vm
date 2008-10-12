@@ -174,10 +174,10 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 	@Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("{tableDbName=").append(_tableDbName);
-        sb.append(" allRecordCount=").append(_allRecordCount);
-        sb.append(" orderByClause=").append(_orderByClause).append("}");
-        sb.append(":selectedList=").append(_selectedList);
+        sb.append("{").append(_tableDbName);
+        sb.append(",").append(_allRecordCount);
+        sb.append(",").append(_selectedList);
+        sb.append("}");
         return sb.toString();
     }
 
