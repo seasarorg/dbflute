@@ -2,6 +2,8 @@
 
 using System;
 
+using Seasar.Framework.Util;
+
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonCBeanPagenaviGroup};
 using ${glPackageBaseCommonCBeanPagenaviRange};
@@ -178,11 +180,11 @@ namespace ${glPackageBaseCommonCBean} {
             sb.append("{").append(this.AllRecordCount);
             sb.append(" size:{list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
             sb.append(",page=").append(this.PageSize);
-            sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupBean.PageGroupSize : null);
-            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeBean.PageRangeSize : null);
+            sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupOption.PageGroupSize : null);
+            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeOption.PageRangeSize : null);
             sb.append(" page:{").append(IsExistPrePage()).append("/").append(IsExistNextPage()).append("}");
             sb.append("}");
-            sb.append(":selectedList=").append(this.SelectedList);
+            sb.append(":selectedList=").append(this.SelectedList != null ? ToStringUtil.ToString(this.SelectedList) : null);
             return sb.toString();
         }
     }

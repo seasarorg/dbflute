@@ -3,6 +3,8 @@
 using System;
 using System.Text;
 
+using Seasar.Framework.Util;
+
 using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
@@ -99,7 +101,7 @@ namespace ${glPackageBaseCommonCBean} {
             StringBuilder sb = new StringBuilder();
             sb.Append("{").Append(_tableDbName);
             sb.Append(",").Append(_allRecordCount);
-            sb.Append(",").Append(_selectedList);
+            sb.Append(",").Append(_selectedList != null ? ToStringUtil.ToString(_selectedList) : null);
             sb.Append("}");
             return sb.ToString();
         }
