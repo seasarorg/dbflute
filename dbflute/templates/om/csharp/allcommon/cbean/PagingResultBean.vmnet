@@ -177,7 +177,7 @@ namespace ${glPackageBaseCommonCBean} {
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(this.CurrentPageNumber).append("/").append(this.AllPageCount);
-            sb.append(" ").append(this.AllRecordCount);
+            sb.append(" of ").append(this.AllRecordCount);
             sb.append(" size:{list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
             sb.append(",page=").append(this.PageSize);
             sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupOption.PageGroupSize : null);
