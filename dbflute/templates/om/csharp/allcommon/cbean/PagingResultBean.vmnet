@@ -170,23 +170,18 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // =====================================================================================
-        //                                                                 Basic-Override Method
+        //                                                                 Basic Override Method
         //                                                                 =====================
-        /// <summary>
-        /// This method overrides the method that is declared at super.
-        /// </summary>
-        /// <returns>View-string of all-columns value.</returns>
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
-
             sb.append(this.CurrentPageNumber).append("/").append(this.AllPageCount);
-            sb.append(" ").append(this.AllRecordCount);
-            sb.append(" listSize=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
-            sb.append(" pageSize=").append(this.PageSize);
+            sb.append("{").append(this.AllRecordCount);
+            sb.append(" size:{list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
+            sb.append(",page=").append(this.PageSize);
+            sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupBean.PageGroupSize : null);
+            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeBean.PageRangeSize : null);
             sb.append(" page:{").append(IsExistPrePage()).append("/").append(IsExistNextPage()).append("}");
-            sb.append(" groupSize=").append(_pageGroupBean);
-            sb.append(" rangeSize=").append(_pageRangeBean);
-
+            sb.append(":selectedList=").append(this.SelectedList);
             return sb.toString();
         }
     }

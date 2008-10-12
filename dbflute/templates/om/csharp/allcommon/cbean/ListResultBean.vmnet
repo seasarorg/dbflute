@@ -89,26 +89,18 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                         Determination
         //                                                                         =============
         #region Determination
-        /// <summary>
-        /// Has this result selected?
-        /// </summary>
-        /// <returns>Determination.</returns>
         public bool IsSelectedResult { get { return _isSetterInvokedSelectedList; } }
         #endregion
 
         // =====================================================================================
         //                                                                 Basic-Override Method
         //                                                                 =====================
-        /// <summary>
-        /// This method overrides the method that is declared at super.
-        /// </summary>
-        /// <returns>View-string of all-columns value.</returns>
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
-            sb.Append("{tableDbName=").Append(_tableDbName);
-            sb.Append(" allRecordCount=").Append(_tableDbName);
-            sb.Append(" selectedList=").Append(_selectedList);
-            sb.Append(" orderByClause=").Append(_orderByClause).Append("}");
+            sb.Append("{").Append(_tableDbName);
+            sb.Append(",").Append(_allRecordCount);
+            sb.Append(",").Append(_selectedList);
+            sb.Append("}");
             return sb.ToString();
         }
 
