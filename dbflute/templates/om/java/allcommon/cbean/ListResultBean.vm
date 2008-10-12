@@ -176,6 +176,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(_tableDbName);
         sb.append(",").append(_allRecordCount);
+        sb.append(",").append(_orderByClause != null ? _orderByClause.getOrderByClause() : null);
         sb.append(",").append(_selectedList);
         sb.append("}");
         return sb.toString();

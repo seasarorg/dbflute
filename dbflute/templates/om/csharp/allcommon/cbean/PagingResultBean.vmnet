@@ -178,11 +178,15 @@ namespace ${glPackageBaseCommonCBean} {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(this.CurrentPageNumber).append("/").append(this.AllPageCount);
             sb.append(" of ").append(this.AllRecordCount);
-            sb.append(" size:{list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
-            sb.append(",page=").append(this.PageSize);
-            sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupOption.PageGroupSize : null);
-            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeOption.PageRangeSize : null).append("}");
-            sb.append(" exists:{").append(IsExistPrePage() ? "true" : "false").append("/").append(IsExistNextPage() ? "true" : "false").append("}");
+            sb.append(" ").append(IsExistPrePage() ? "true" : "false").append("/").append(IsExistNextPage() ? "true" : "false");
+            if (_pageGroupBean != null) {
+                sb.append(" group:{").append(_pageGroupOption.PageGroupSize).append(",").append(ToStringUtil.ToString(_pageGroupBean.CreatePageNumberList())).append("}");
+            }
+            if (_pageRangeBean != null) {
+                sb.append(" range:{").append(_pageRangeOption.PageRangeSize).append(",").append(ToStringUtil.ToString(_pageRangeBean.CreatePageNumberList())).append("}");
+            }
+            sb.append(" list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
+            sb.append(" page=").append(this.PageSize);
             sb.append("}");
             sb.append(":selectedList=").append(this.SelectedList != null ? ToStringUtil.ToString(this.SelectedList) : null);
             return sb.toString();
