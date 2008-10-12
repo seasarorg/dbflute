@@ -2,8 +2,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glListResultBeanName}")
 #set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
@@ -13,11 +17,11 @@ import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**
- * The list-result-bean for ${myClassName}.
+ * The result bean for list.
  * @param <ENTITY> The type of entity for the element of selected list.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializable {
+public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -35,7 +39,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
     protected int _allRecordCount;
 
     /** Selected list. */
-    protected List<ENTITY> _selectedList = new java.util.ArrayList<ENTITY>();
+    protected List<ENTITY> _selectedList = new ArrayList<ENTITY>();
 
     /** Order-by clause. */
     protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
@@ -170,12 +174,10 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
 	@Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-
-        sb.append(" tableDbName=").append(_tableDbName);
+        sb.append("{tableDbName=").append(_tableDbName);
         sb.append(" allRecordCount=").append(_allRecordCount);
-        sb.append(" selectedList.size()=").append(_selectedList.size());
-        sb.append(" orderByClause=").append(_orderByClause);
-
+        sb.append(" selectedList=").append(_selectedList);
+        sb.append(" orderByClause=").append(_orderByClause).append("}");
         return sb.toString();
     }
 
@@ -186,7 +188,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.add(o);
     }
 
-    public boolean addAll(java.util.Collection${database.filterGenericsString('? extends ENTITY')} c) {
+    public boolean addAll(Collection<? extends ENTITY> c) {
         return _selectedList.addAll(c);
     }
 
@@ -198,7 +200,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.contains(o);
     }
 
-    public boolean containsAll(java.util.Collection<?> c) {
+    public boolean containsAll(Collection<?> c) {
         return _selectedList.containsAll(c);
     }
 
@@ -206,7 +208,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.isEmpty();
     }
 
-    public java.util.Iterator<ENTITY> iterator() {
+    public Iterator<ENTITY> iterator() {
         return _selectedList.iterator();
     }
 
@@ -214,11 +216,11 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.remove(o);
     }
 
-    public boolean removeAll(java.util.Collection${database.filterGenericsString('?')} c) {
+    public boolean removeAll(Collection<?> c) {
         return _selectedList.removeAll(c);
     }
 
-    public boolean retainAll(java.util.Collection${database.filterGenericsString('?')} c) {
+    public boolean retainAll(Collection<?> c) {
         return _selectedList.retainAll(c);
     }
 
@@ -230,7 +232,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.toArray();
     }
 
-    public ${database.filterGenericsString('TYPE')} TYPE[] toArray(TYPE[] a) {
+    public <TYPE> TYPE[] toArray(TYPE[] a) {
         return _selectedList.toArray(a);
     }
 
@@ -238,7 +240,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         _selectedList.add(index, element);
     }
 
-    public boolean addAll(int index, java.util.Collection${database.filterGenericsString('? extends ENTITY')} c) {
+    public boolean addAll(int index, Collection<? extends ENTITY> c) {
         return _selectedList.addAll(index, c);
     }
 
@@ -254,11 +256,11 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.lastIndexOf(o);
     }
 
-    public java.util.ListIterator<ENTITY> listIterator() {
+    public ListIterator<ENTITY> listIterator() {
         return _selectedList.listIterator();
     }
 
-    public java.util.ListIterator<ENTITY> listIterator(int index) {
+    public ListIterator<ENTITY> listIterator(int index) {
         return _selectedList.listIterator(index);
     }
 
@@ -270,7 +272,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
         return _selectedList.set(index, element);
     }
 
-    public java.util.List<ENTITY> subList(int fromIndex, int toIndex) {
+    public List<ENTITY> subList(int fromIndex, int toIndex) {
         return _selectedList.subList(fromIndex, toIndex);
     }
 
