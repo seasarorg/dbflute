@@ -7,10 +7,6 @@ using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    /// <summary>
-    /// The list-result-bean of ${myClassName}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public class ${myClassName}<ENTITY> : System.Collections.Generic.IList<ENTITY>, System.Collections.IList {
 
@@ -109,12 +105,10 @@ namespace ${glPackageBaseCommonCBean} {
         /// <returns>View-string of all-columns value.</returns>
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
-
-            sb.Append(" tableDbName=").Append(_tableDbName);
+            sb.Append("{tableDbName=").Append(_tableDbName);
             sb.Append(" allRecordCount=").Append(_tableDbName);
-            sb.Append(" selectedList.Count=").Append(_selectedList.Count);
-            sb.Append(" orderByClause=").Append(_orderByClause);
-
+            sb.Append(" selectedList=").Append(_selectedList);
+            sb.Append(" orderByClause=").Append(_orderByClause).Append("}");
             return sb.ToString();
         }
 
