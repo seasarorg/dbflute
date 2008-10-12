@@ -179,11 +179,12 @@ namespace ${glPackageBaseCommonCBean} {
             sb.append("{").append(this.CurrentPageNumber).append("/").append(this.AllPageCount);
             sb.append(" of ").append(this.AllRecordCount);
             sb.append(" ").append(IsExistPrePage() ? "true" : "false").append("/").append(IsExistNextPage() ? "true" : "false");
-            if (_pageGroupBean != null) {
-                sb.append(" group:{").append(_pageGroupOption.PageGroupSize).append(",").append(ToStringUtil.ToString(_pageGroupBean.CreatePageNumberList())).append("}");
+            if (_pageGroupOption != null) {
+                sb.append(" group:{").append(_pageGroupOption.PageGroupSize).append(",").append(ToStringUtil.ToString(PageGroup().CreatePageNumberList())).append("}");
             }
-            if (_pageRangeBean != null) {
-                sb.append(" range:{").append(_pageRangeOption.PageRangeSize).append(",").append(ToStringUtil.ToString(_pageRangeBean.CreatePageNumberList())).append("}");
+            if (_pageRangeOption != null) {
+                sb.append(" range:{").append(_pageRangeOption.PageRangeSize).append(",").append(_pageRangeOption.IsFillLimit);
+                sb.append(",").append(ToStringUtil.ToString(PageRange().CreatePageNumberList())).append("}");
             }
             sb.append(" list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
             sb.append(" page=").append(this.PageSize);

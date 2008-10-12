@@ -284,11 +284,12 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
         sb.append(" ").append(isExistPrePage()).append("/").append(isExistNextPage());
-        if (_pageGroupBean != null) {
-            sb.append(" group:{").append(getPageGroupSize()).append(",").append(_pageGroupBean.createPageNumberList()).append("}");
+        if (_pageGroupOption != null) {
+            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList()).append("}");
         }
-        if (_pageRangeBean != null) {
-            sb.append(" range:{").append(getPageRangeSize()).append(",").append(_pageRangeBean.createPageNumberList()).append("}");
+        if (_pageRangeOption != null) {
+            sb.append(" range:{").append(getPageRangeSize()).append(",").append(_pageRangeOption.isFillLimit());
+            sb.append(",").append(pageRange().createPageNumberList()).append("}");
         }
         sb.append(" list=").append(getSelectedList() != null ? Integer.valueOf(getSelectedList().size()) : null);
         sb.append(" page=").append(getPageSize());
