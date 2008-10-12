@@ -52,25 +52,32 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
     // ===================================================================================
     //                                                                            Grouping
     //                                                                            ========
+    /**
+     * Group the list.
+     * @param <ROW> The type of row.
+     * @param groupingRowSetupper The setupper of grouping row. (NotNull)
+     * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
+     * @return The grouped list. (NotNull)
+     */
     public <ROW> List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
         final List<ROW> groupingList = new ArrayList<ROW>();
         ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
         if (rowEndDeterminer == null) {
             rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<ENTITY>() {
-                public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
-                    return columnIndex == (columnCount-1);
+                public boolean determine(int elementIndex, int breakCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
+                    return elementIndex == (breakCount-1);
                 }
-            };// as Default
+            }; // as Default
         }
         ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
-        int columnCount = groupingOption.getColumnCount();
-        int columnIndex = 0;
-        int rowIndex = 0;
+        int breakCount = groupingOption.getElementCount();
+        int rowElementIndex = 0;
+        int allElementIndex = 0;
         for (ENTITY entity : _selectedList) {
             // Set up row resource.
             rowResource.addGroupingRowList(entity);
 
-            if (_selectedList.size() == (rowIndex + 1)) {// Last Loop!
+            if (_selectedList.size() == (allElementIndex + 1)) { // Last Loop!
                 // Callback!
                 final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
 
@@ -79,13 +86,11 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
                 break;
             }
 
-            ENTITY nextElement = null;
-            if (_selectedList.size() > (rowIndex + 1)) {
-                nextElement = _selectedList.get(rowIndex);
-            }
+            // Not last loop so the nextElement must exist.
+            final ENTITY nextElement = _selectedList.get(allElementIndex + 1);
 
             // Do at row end.
-            if (rowEndDeterminer.determine(columnIndex, columnCount, rowResource, nextElement)) {
+            if (rowEndDeterminer.determine(rowElementIndex, breakCount, rowResource, nextElement)) {
                 // Callback!
                 final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
 
@@ -94,12 +99,12 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializabl
 
                 // Initialize!
                 rowResource = new ${glGroupingRowResourceName}<ENTITY>();
-                columnIndex = 0;
-                ++rowIndex;
+                rowElementIndex = 0;
+                ++allElementIndex;
                 continue;
             }
-            ++columnIndex;
-            ++rowIndex;
+            ++rowElementIndex;
+            ++allElementIndex;
         }
         return groupingList;
     }

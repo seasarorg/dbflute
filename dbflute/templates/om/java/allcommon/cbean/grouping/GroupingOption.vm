@@ -1,9 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
 
 /**
- * The class of option for grouping making.
- * 
- * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
+ * The class of option for grouping.
+ * @param  <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
 public class ${glGroupingOptionName}<ENTITY> {
@@ -11,26 +10,32 @@ public class ${glGroupingOptionName}<ENTITY> {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected int _columnCount;
+    protected int _elementCount;
 
     protected ${glGroupingRowEndDeterminerName}<ENTITY> _groupingRowEndDeterminer;
 
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
-    public ${glGroupingOptionName}(int columnCount) {
-        _columnCount = columnCount;
+    /**
+     * Constructor. You should set the determiner of grouping row end after you create the instance.
+     */
+    public ${glGroupingOptionName}() {
     }
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    /**
+     * Constructor.
+     * @param elementCount The count of row element in a group.
+     */
+    public ${glGroupingOptionName}(int elementCount) {
+        _elementCount = elementCount;
+    }
 
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public int getColumnCount() {
-        return this._columnCount;
+    public int getElementCount() {
+        return this._elementCount;
     }
 
     public ${glGroupingRowEndDeterminerName}<ENTITY> getGroupingRowEndDeterminer() {

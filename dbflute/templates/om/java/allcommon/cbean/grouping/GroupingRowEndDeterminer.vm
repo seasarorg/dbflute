@@ -1,12 +1,19 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
 
 /**
- * The interface of grouping switch point determiner.
- * 
- * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
+ * The interface of grouping end(switch point) determiner.
+ * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
 public interface ${glGroupingRowEndDeterminerName}<ENTITY> {
 
-    public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity);
+    /**
+     * Determine whether the grouping row is end.
+     * @param elementIndex The current index of element in grouping row. (NotMinus)
+     * @param breakCount The count to break grouping row registration loop. (NotMinus. If the value is zero, no break by count)
+     * @param rowResource The resource of grouping row. (NotNull and the property 'groupingRowList' is not empty)
+     * @param nextEntity The entity of next element. (NotNull and the rowResource does not contain yet)
+     * @return Whether the grouping row is end. (If the value is true, break grouping row and the nextEntity is registered to next row)
+     */
+    public boolean determine(int elementIndex, int breakCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity);
 }
