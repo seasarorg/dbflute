@@ -288,7 +288,8 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
         sb.append(",group=").append(getPageGroupSize());
         sb.append(",range=").append(getPageRangeSize()).append("}");
         sb.append(" exists:{").append(isExistPrePage()).append("/").append(isExistNextPage()).append("}");
-        sb.append("}").append(":selectedList=").append(getSelectedList());
+        sb.append("}");
+        sb.append(":selectedList=").append(getSelectedList());
         return sb.toString();
     }
 	

@@ -181,7 +181,7 @@ namespace ${glPackageBaseCommonCBean} {
             sb.append(" size:{list=").append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
             sb.append(",page=").append(this.PageSize);
             sb.append(",group=").append(_pageGroupBean != null ? ""+_pageGroupOption.PageGroupSize : null);
-            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeOption.PageRangeSize : null);
+            sb.append(",range=").append(_pageRangeBean != null ? ""+_pageRangeOption.PageRangeSize : null).append("}");
             sb.append(" exists:{").append(IsExistPrePage() ? "true" : "false").append("/").append(IsExistNextPage() ? "true" : "false").append("}");
             sb.append("}");
             sb.append(":selectedList=").append(this.SelectedList != null ? ToStringUtil.ToString(this.SelectedList) : null);
