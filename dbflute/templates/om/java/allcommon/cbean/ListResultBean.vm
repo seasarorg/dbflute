@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**

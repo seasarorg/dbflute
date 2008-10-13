@@ -7,6 +7,7 @@ using Seasar.Framework.Util;
 
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonCBeanGrouping};
+using ${glPackageBaseCommonCBeanMapping};
 
 namespace ${glPackageBaseCommonCBean} {
 
@@ -108,6 +109,7 @@ namespace ${glPackageBaseCommonCBean} {
             mappingList.OrderByClause = OrderByClause;
             return mappingList;
         }
+        #endregion
 
         // ===============================================================================
         //                                                                   Determination

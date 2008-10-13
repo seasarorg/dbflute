@@ -1,7 +1,7 @@
 
 using System;
 
-namesapce ${glPackageBaseCommonCBeanGrouping} {
+namespace ${glPackageBaseCommonCBeanGrouping} {
 
     public delegate ROW ${glGroupingRowSetupperName}<ROW, ENTITY>(${glGroupingRowResourceName}<ENTITY> groupingRowResource);
 }
