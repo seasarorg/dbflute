@@ -6,97 +6,119 @@ using System.Text;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonCBeanGrouping};
 
 namespace ${glPackageBaseCommonCBean} {
 
     [System.Serializable]
     public class ${myClassName}<ENTITY> : System.Collections.Generic.IList<ENTITY>, System.Collections.IList {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         #region Attribute
-
-        /// <summary>The value of table db-name.</summary>
         protected String _tableDbName;
-
-        /// <summary>The value of all record count.</summary>
         protected int _allRecordCount;
-
-        /// <summary>Selected list. Default value is empty.</summary>
         protected System.Collections.Generic.IList<ENTITY> _selectedList = new System.Collections.Generic.List<ENTITY>();
-
-        /// <summary>The value of current page number.</summary>
         protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
-
-        /// <summary>Has the setter of selected list invoked?</summary>
         protected bool _isSetterInvokedSelectedList;
-
         #endregion
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         #region Constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public ${myClassName}() {
         }
-
         #endregion
 
-        // =====================================================================================
-        //                                                                              Property
-        //                                                                              ========
-        #region Property
+        // ===============================================================================
+        //                                                                        Grouping
+        //                                                                        ========
+        #region Grouping
+        /**
+         * Group the list.
+         * @param <ROW> The type of row.
+         * @param groupingRowSetupper The setupper of grouping row. (NotNull)
+         * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
+         * @return The grouped list. (NotNull)
+         */
+        public System.Collections.Generic.IList<ROW> GroupingList<ROW>(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
+            System.Collections.Generic.IList<ROW> groupingList = new System.Collections.Generic.List<ROW>();
+            ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
+            if (rowEndDeterminer == null) {
+                rowEndDeterminer = delegate(${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
+                    return rowResource.IsSizeUpBreakCount;
+                }; // as Default
+            }
+            ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+            int breakCount = groupingOption.ElementCount;
+            int rowElementIndex = 0;
+            int allElementIndex = 0;
+            foreach (ENTITY entity in _selectedList) {
+                // Set up row resource.
+                rowResource.AddGroupingRowList(entity);
+                rowResource.ElementCurrentIndex = rowElementIndex;
+                rowResource.BreakCount = breakCount;
 
-        /// <summary>
-        /// The property of table db-name.
-        /// </summary>
-        public String TableDbName {
-            get { return _tableDbName; }
-            set { _tableDbName = value; }
-        }
+                if (_selectedList.Count == (allElementIndex + 1)) { // Last Loop!
+                    // Set up the object of grouping row!
+                    ROW groupingRowObject = groupingRowSetupper.Invoke(rowResource);
 
-        /// <summary>
-        /// The property of all record count.
-        /// </summary>
-        public int AllRecordCount {
-            get { return _allRecordCount; }
-            set { _allRecordCount = value; }
-        }
+                    // Register!
+                    groupingList.Add(groupingRowObject);
+                    break;
+                }
 
-        /// <summary>
-        /// The property of all record count.
-        /// </summary>
-        public System.Collections.Generic.IList<ENTITY> SelectedList {
-            get { return _selectedList; }
-            set { _isSetterInvokedSelectedList=true; _selectedList = value; }
-        }
+                // Not last loop so the nextElement must exist.
+                ENTITY nextElement = _selectedList[allElementIndex + 1];
 
-        /// <summary>
-        /// The property of order-by clause.
-        /// </summary>
-        public ${glOrderByClauseName} OrderByClause
-        {
-            get { return _orderByClause; }
-            set { _orderByClause = value; }
+                // Do at row end.
+                if (rowEndDeterminer.Invoke(rowResource, nextElement)) { // Determine the row end!
+                    // Set up the object of grouping row!
+                    ROW groupingRowObject = groupingRowSetupper.Invoke(rowResource);
+
+                    // Register!
+                    groupingList.Add(groupingRowObject);
+
+                    // Initialize!
+                    rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+                    rowElementIndex = 0;
+                    ++allElementIndex;
+                    continue;
+                }
+                ++rowElementIndex;
+                ++allElementIndex;
+            }
+            return groupingList;
         }
         #endregion
 
+        // ===============================================================================
+        //                                                                         Mapping
+        //                                                                         =======
+        #region Mapping
+        public ${myClassName}<DTO> MappingList<DTO>(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+            ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
+            foreach (ENTITY entity in _selectedList) {
+                mappingList.Add(entityDtoMapper.Invoke(entity));
+            }
+            mappingList.TableDbName = TableDbName;
+            mappingList.AllRecordCount = AllRecordCount;
+            mappingList.OrderByClause = OrderByClause;
+            return mappingList;
+        }
 
-        // =====================================================================================
-        //                                                                         Determination
-        //                                                                         =============
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
         #region Determination
-        public bool IsSelectedResult { get { return _isSetterInvokedSelectedList; } }
+        public bool IsSelectedResult { get { return _tableDbName != null; } } // Whether table DB name is not null
         #endregion
 
-        // =====================================================================================
-        //                                                                 Basic-Override Method
-        //                                                                 =====================
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
             sb.Append("{").Append(_tableDbName);
@@ -107,21 +129,20 @@ namespace ${glPackageBaseCommonCBean} {
             return sb.ToString();
         }
 
-        // =====================================================================================
-        //                                                                         List Elements
-        //                                                                         =============
+        // ===============================================================================
+        //                                                                   List Elements
+        //                                                                   =============
         public virtual void Add(ENTITY value) {
             _selectedList.Add(value);
         }
 
-        public virtual bool Contains(ENTITY value)
-        {
+        public virtual bool Contains(ENTITY value) {
             return _selectedList.Contains(value);
         }
 
-        public virtual void Clear()
-        {
-            _selectedList.Clear();        }
+        public virtual void Clear() {
+            _selectedList.Clear();
+        }
 
         public virtual int IndexOf(ENTITY value) {
             return _selectedList.IndexOf(value);
@@ -225,5 +246,30 @@ namespace ${glPackageBaseCommonCBean} {
         public object SyncRoot {
             get { throw new NotImplementedException("SyncRoot is unsupported: " + ToString()); }
         }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
+        public String TableDbName {
+            get { return _tableDbName; }
+            set { _tableDbName = value; }
+        }
+
+        public int AllRecordCount {
+            get { return _allRecordCount; }
+            set { _allRecordCount = value; }
+        }
+
+        public System.Collections.Generic.IList<ENTITY> SelectedList {
+            get { return _selectedList; }
+            set { if (value == null) { return; } _selectedList = value; }
+        }
+
+        public ${glOrderByClauseName} OrderByClause {
+            get { return _orderByClause; }
+            set { if (value == null) { return; } _orderByClause = value; }
+        }
+        #endregion
     }
 }

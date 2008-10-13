@@ -923,33 +923,31 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                       allcommon condition-bean grouping
     ##                       ---------------------------------
-    #if ($database.isTargetLanguageJava())
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping}))
-      $database.makeDirectory($path)
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping}))
+    $database.makeDirectory($path)
 
-      $database.info("    parse('GroupingOption');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingOptionName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingOption.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('GroupingOption');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingOptionName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parse('GroupingRowEndDeterminer');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowEndDeterminerName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowEndDeterminer.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('GroupingRowEndDeterminer');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowEndDeterminerName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowEndDeterminer.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parse('GroupingRowResource');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowResourceName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowResource.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('GroupingRowResource');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowResourceName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowResource.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parse('GroupingRowSetupper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowSetupperName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowSetupper.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('GroupingRowSetupper');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowSetupperName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowSetupper.${glTemplateFileExtension}",$path ,"", "")
 
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBeanMapping}))
-      $database.makeDirectory($path)
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBeanMapping}))
+    $database.makeDirectory($path)
 
-      $database.info("    parse('EntityDtoMapper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanMapping})}${glEntityDtoMapperName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/mapping/EntityDtoMapper.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parse('EntityDtoMapper');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanMapping})}${glEntityDtoMapperName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/mapping/EntityDtoMapper.${glTemplateFileExtension}",$path ,"", "")
 
     ## -----------------------------------------------------
     ##                  allcommon condition-bean outside-sql

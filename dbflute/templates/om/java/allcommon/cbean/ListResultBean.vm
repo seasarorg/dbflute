@@ -134,7 +134,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                       =============
     /**
      * Has this result selected?
-     * @return Determination.
+     * @return Determination. {Whether table DB name is not null}
      */
     public boolean isSelectedResult() {
         return _tableDbName != null;
@@ -316,7 +316,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Get the value of selectedList.
-     * @return Selected list. (Nullable: If it's null, it means 'Not Selected Yet'.)
+     * @return Selected list. (NotNull)
      */
     public List<ENTITY> getSelectedList() {
         return _selectedList;
@@ -327,12 +327,13 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
      * @param selectedList Selected list. (NotNull)
      */
     public void setSelectedList(List<ENTITY> selectedList) {
+        if (selectedList == null) { return; } // Not allow the null selected list
         _selectedList = selectedList;
     }
 
     /**
      * Get the value of orderByClause.
-     * @return The value of orderByClause. (Nullable: If it's null, it means 'Not Selected Yet'.)
+     * @return The value of orderByClause. (NotNull)
      */
     public ${glOrderByClauseName} getOrderByClause() {
         return _orderByClause;
@@ -343,6 +344,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
      * @param orderByClause The value of orderByClause. (NotNull)
      */
     public void setOrderByClause(${glOrderByClauseName} orderByClause) {
+        if (orderByClause == null) { return; } // Not allow the null order-by clause
         _orderByClause = orderByClause;
     }
 }
