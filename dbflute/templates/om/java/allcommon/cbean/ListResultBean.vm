@@ -324,10 +324,10 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of selectedList.
-     * @param selectedList Selected list. (NotNull)
+     * @param selectedList Selected list. (NotNull: If you set null, it ignores it)
      */
     public void setSelectedList(List<ENTITY> selectedList) {
-        if (selectedList == null) { return; } // Not allow the null selected list
+        if (selectedList == null) { return; } // Not allowed to set null value to the selected list
         _selectedList = selectedList;
     }
 
@@ -341,10 +341,10 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of orderByClause.
-     * @param orderByClause The value of orderByClause. (NotNull)
+     * @param orderByClause The value of orderByClause. (NotNull: If you set null, it ignores it)
      */
     public void setOrderByClause(${glOrderByClauseName} orderByClause) {
-        if (orderByClause == null) { return; } // Not allow the null order-by clause
+        if (orderByClause == null) { return; } // Not allowed to set null value to the selected list
         _orderByClause = orderByClause;
     }
 }
