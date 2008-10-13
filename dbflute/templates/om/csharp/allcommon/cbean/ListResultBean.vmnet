@@ -119,6 +119,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
+        #region Basic Override
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
             sb.Append("{").Append(_tableDbName);
@@ -128,10 +129,12 @@ namespace ${glPackageBaseCommonCBean} {
             sb.Append("}");
             return sb.ToString();
         }
+        #endregion
 
         // ===============================================================================
         //                                                                   List Elements
         //                                                                   =============
+        #region List Elements
         public virtual void Add(ENTITY value) {
             _selectedList.Add(value);
         }
@@ -193,10 +196,12 @@ namespace ${glPackageBaseCommonCBean} {
                 _selectedList[index] = value;
             }
         }
-		
+        #endregion
+
         // =====================================================================================
         //                                                             Non Generic List Elements
         //                                                             =========================
+        #region Non Generic List Elements
         public int Add(object value) {
             _selectedList.Add((ENTITY)value);
             return 1;
@@ -246,6 +251,7 @@ namespace ${glPackageBaseCommonCBean} {
         public object SyncRoot {
             get { throw new NotImplementedException("SyncRoot is unsupported: " + ToString()); }
         }
+        #endregion
 
         // ===============================================================================
         //                                                                        Accessor
