@@ -46,10 +46,10 @@ namespace ${glPackageBaseCommonCBean} {
          */
         public System.Collections.Generic.IList<ROW> GroupingList<ROW>(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
             System.Collections.Generic.IList<ROW> groupingList = new System.Collections.Generic.List<ROW>();
-            ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
+            ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.GroupingRowEndDeterminer;
             if (rowEndDeterminer == null) {
-                rowEndDeterminer = delegate(${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
-                    return rowResource.IsSizeUpBreakCount;
+                rowEndDeterminer = delegate(${glGroupingRowResourceName}<ENTITY> currentRowResource, ENTITY nextEntity) {
+                    return currentRowResource.IsSizeUpBreakCount;
                 }; // as Default
             }
             ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
