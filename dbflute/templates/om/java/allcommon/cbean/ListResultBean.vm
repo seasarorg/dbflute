@@ -32,16 +32,16 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value of table db-name. */
+    /** The value of table db-name. (Nullable: If it's null, it means 'Not Selected Yet'.) */
     protected String _tableDbName;
 
     /** The value of all record count. */
     protected int _allRecordCount;
 
-    /** Selected list. */
+    /** The list of selected entity. (NotNull) */
     protected List<ENTITY> _selectedList = new ArrayList<ENTITY>();
 
-    /** Order-by clause. */
+    /** The clause of order-by. (NotNull) */
     protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
     // ===================================================================================
@@ -324,7 +324,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of selectedList.
-     * @param selectedList Selected list. (NotNull: If you set null, it ignores it)
+     * @param selectedList Selected list. (NotNull: If you set null, it ignores it.)
      */
     public void setSelectedList(List<ENTITY> selectedList) {
         if (selectedList == null) { return; } // Not allowed to set null value to the selected list
@@ -341,7 +341,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of orderByClause.
-     * @param orderByClause The value of orderByClause. (NotNull: If you set null, it ignores it)
+     * @param orderByClause The value of orderByClause. (NotNull: If you set null, it ignores it.)
      */
     public void setOrderByClause(${glOrderByClauseName} orderByClause) {
         if (orderByClause == null) { return; } // Not allowed to set null value to the selected list
