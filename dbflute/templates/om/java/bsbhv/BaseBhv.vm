@@ -17,6 +17,7 @@ import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
@@ -175,22 +176,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                         List Select
     //                                                                         ===========
     /**
-     * Select the list as result-bean.
+     * Select the list as result bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The result-bean of selected list. (NotNull)
+     * @return The result bean of selected list. (NotNull)
      */
     public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
+        return new ${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     // ===================================================================================
     //                                                                         Page Select
     //                                                                         ===========
     /**
-     * Select the page as result-bean.
+     * Select the page as result bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The result-bean of selected page. (NotNull)
+     * @return The result bean of selected page. (NotNull)
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);

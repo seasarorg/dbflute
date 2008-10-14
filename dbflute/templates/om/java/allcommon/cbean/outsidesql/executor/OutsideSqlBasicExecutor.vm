@@ -73,7 +73,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
-     * @return The list of selected entity. (NotNull)
+     * @return The result bean of selected list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      */
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
