@@ -38,8 +38,8 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     private static final Log _log = LogFactory.getLog(DfForeignKeyHandler.class);
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                        Meta Getting
+    //                                                                        ============
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta JDBC meta data.
@@ -49,7 +49,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
-        schemaName = filterSchema(schemaName);
+        schemaName = filterSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         if (isForeignKeyExtractingUnsupported()) {

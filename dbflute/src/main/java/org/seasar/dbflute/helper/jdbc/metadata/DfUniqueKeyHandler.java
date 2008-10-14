@@ -51,7 +51,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
-        schemaName = filterSchema(schemaName);
+        schemaName = filterSchemaName(schemaName);
         
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
         if (isPrimaryKeyExtractingUnsupported()) {
@@ -107,7 +107,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     //
     public Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
-        schemaName = filterSchema(schemaName);
+        schemaName = filterSchemaName(schemaName);
         
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();

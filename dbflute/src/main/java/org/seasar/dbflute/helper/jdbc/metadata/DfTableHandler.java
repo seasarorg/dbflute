@@ -32,9 +32,15 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
  * @author jflute
  */
 public class DfTableHandler extends DfAbstractMetaDataHandler {
-
+    
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfTableHandler.class);
-
+    
+    // ===================================================================================
+    //                                                                        Meta Getting
+    //                                                                        ============
     /**
      * Get all the table names in the current database that are not system tables.
      * @param dbMeta JDBC database meta data.
@@ -42,7 +48,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
-        schemaName = filterSchema(schemaName);
+        schemaName = filterSchemaName(schemaName);
         final String[] objectTypes = getObjectTypeStringArray();
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;

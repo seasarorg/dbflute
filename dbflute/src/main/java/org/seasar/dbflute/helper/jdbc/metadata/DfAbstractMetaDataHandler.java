@@ -82,12 +82,12 @@ public class DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                        Database Dependency Resolver
     //                                                        ============================
-    protected String filterSchema(String schema) {
+    protected String filterSchemaName(String schemaName) {
         // The driver throws the exception if the value is empty string.
-        if (isMsAccess() && schema != null && schema.trim().length() == 0) {
+        if (isMsAccess() && schemaName != null && schemaName.trim().length() == 0) {
             return null;
         }
-        return schema;
+        return schemaName;
     }
 
     protected boolean isPrimaryKeyExtractingUnsupported() {

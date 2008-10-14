@@ -32,7 +32,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     public List<DfProcedureMetaInfo> getProcedures(DatabaseMetaData metaData, String schemaName) {
-        schemaName = filterSchema(schemaName);
+        schemaName = filterSchemaName(schemaName);
         
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Set up default schema name of PostgreSQL.
