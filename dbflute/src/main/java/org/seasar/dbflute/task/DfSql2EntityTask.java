@@ -158,7 +158,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         // - - - - - - - - - -/
         final Log innerLog = _log;
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
-            
+
             /**
              * Filter the string of SQL. Resolve JDBC dependency.
              * @param sql The string of SQL. (NotNull)
@@ -168,9 +168,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (!jdbcDeterminer.isBlockCommentValid()) {
                     sql = removeBlockComment(sql);
                 }
-                if (!jdbcDeterminer.isLineCommentValid()) {
-                    sql = removeLineComment(sql);
-                }
+                // The line comment is special mark on Sql2Entity
+                // so this timing to do is bad because the special mark is removed.
+                // if (!jdbcDeterminer.isLineCommentValid()) {
+                //     sql = removeLineComment(sql);
+                // }
                 return super.filterSql(sql);
             }
 
@@ -179,6 +181,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 try {
                     boolean alreadyIncrementGoodSqlCount = false;
                     if (isTargetEntityMakingSql(sql)) {
+                        if (!jdbcDeterminer.isLineCommentValid()) { // The timing to remove line comment is here!
+                            sql = removeLineComment(sql);
+                        }
                         rs = statement.executeQuery(sql);
 
                         _goodSqlCount++;
@@ -997,8 +1002,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected DfJdbcDeterminer createJdbcDeterminer() {
         return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
     }

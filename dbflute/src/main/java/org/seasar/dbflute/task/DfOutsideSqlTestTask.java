@@ -21,7 +21,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -69,17 +71,25 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
     @Override
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
+        final DfJdbcDeterminer jdbcDeterminer = createJdbcDeterminer();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected String filterSql(String sql) {
-                if (getProperties().getBasicProperties().isDatabaseDerby()) {
-                    sql = removeBeginEndComment(sql);
+                if (!jdbcDeterminer.isBlockCommentValid()) {
+                    sql = removeBlockComment(sql);
+                }
+                if (!jdbcDeterminer.isLineCommentValid()) {
+                    sql = removeLineComment(sql);
                 }
                 return super.filterSql(sql);
             }
 
-            protected String removeBeginEndComment(final String sql) {
+            protected String removeBlockComment(final String sql) {
                 return DfSqlStringUtil.removeBlockComment(sql);
+            }
+            
+            protected String removeLineComment(final String sql) {
+                return DfSqlStringUtil.removeLineComment(sql);
             }
 
             @Override
@@ -159,5 +169,12 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
     @Override
     protected boolean isRollbackOnly() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected DfJdbcDeterminer createJdbcDeterminer() {
+        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
     }
 }
