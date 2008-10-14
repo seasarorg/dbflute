@@ -1365,6 +1365,10 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getSqlPackage();
     }
 
+    public boolean isRemoveLineCommentFromExecutedSql() {
+        return getProperties().getOutsideSqlProperties().isRemoveLineCommentFromExecutedSql();
+    }
+    
     public boolean isDefaultPackageValid() {
         return getProperties().getOutsideSqlProperties().isDefaultPackageValid();
     }

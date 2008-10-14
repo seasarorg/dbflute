@@ -95,6 +95,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         String packageBase = packageProperties.getPackageBase();
         return DfStringUtil.replace(sqlPackage, "$$PACKAGE_BASE$$", packageBase);
     }
+    
+    // ===================================================================================
+    //                                                    RemoveLineCommentFromExecutedSql
+    //                                                    ================================
+    public boolean isRemoveLineCommentFromExecutedSql() { // Java only
+        return getBasicProperties().isDatabaseMsAccess(); // Only MS-Access does not support line comment. 
+
+        // In the meantime, this is not unsupported. At the future I don't know.
+        // final String value = (String) getOutsideSqlDefinitionMap().get("removeLineCommentFromExecutedSql");
+        // return value != null && value.trim().length() > 0 && value.trim().equalsIgnoreCase("true");
+    }
 
     // ===================================================================================
     //                                                                      DefaultPackage
