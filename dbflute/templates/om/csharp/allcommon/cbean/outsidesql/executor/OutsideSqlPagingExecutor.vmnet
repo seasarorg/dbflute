@@ -29,9 +29,16 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+        public ${glResultBeanBuilderName}<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
+            IList<ENTITY> resultList = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
+            return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
+        }
+#else
         public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
         }
+#end
 
         public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
             ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();

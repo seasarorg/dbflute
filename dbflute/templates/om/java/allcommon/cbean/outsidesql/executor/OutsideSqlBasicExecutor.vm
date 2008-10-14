@@ -2,6 +2,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
+#end
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
@@ -70,11 +74,18 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
      * @return The list of selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      */
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+    public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
+        List<ENTITY> resultList = _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
+        return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
+    }
+#else
     public <ENTITY> List<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
     }
+#end
 
     // ===================================================================================
     //                                                                             Execute
@@ -84,7 +95,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @return The count of execution.
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      */
     public int execute(String path, Object pmb) {
         return _outsideSqlDao.execute(path, pmb, createOutsideSqlOption());

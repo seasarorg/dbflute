@@ -3,6 +3,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
+#end
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
@@ -41,10 +45,18 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+    public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
+        setupScrollableCursorIfNeeds();
+        List<ENTITY> resultList = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+        return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
+    }
+#else
     public <ENTITY> List<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
         return _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
     }
+#end
 
     /**
      * Select page.
@@ -101,10 +113,11 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      */
     public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
-                                                      , final ${glPagingBeanInterfaceName} pmb
-                                                      , final Class<ENTITY> entityType) {
+                                                       , final ${glPagingBeanInterfaceName} pmb
+                                                       , final Class<ENTITY> entityType) {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
         final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {

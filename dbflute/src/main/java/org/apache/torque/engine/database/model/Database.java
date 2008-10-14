@@ -1284,6 +1284,10 @@ public class Database {
     public boolean isCompatibleS2DaoSQLAnnotationValid() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
     }
+    
+    public boolean isCompatibleOutsideSqlResultOldStyle() { // This is for compatibility!
+        return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
+    }
 
     // -----------------------------------------------------
     //                                                 Other

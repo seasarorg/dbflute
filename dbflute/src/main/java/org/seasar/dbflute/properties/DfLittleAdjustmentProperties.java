@@ -114,6 +114,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleS2DaoSQLAnnotationValid() {
         return booleanProp("torque.isCompatibleS2DaoSQLAnnotationValid", false);
     }
+    
+    public boolean isCompatibleOutsideSqlResultOldStyle() {
+        return booleanProp("torque.isCompatibleOutsideSqlResultOldStyle", false);
+    }
 
     // ===================================================================================
     //                                                                  Friendly Framework 
@@ -139,7 +143,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     @SuppressWarnings("unchecked")
     public Map<String, Map<String, Map<String, String>>> getMultipleFKPropertyMap() {
         if (_multipleFKPropertyMap == null) {
-            // TODO: @jflute - 真面目に展開すること。
             final Object obj = mapProp("torque." + KEY_multipleFKPropertyMap, DEFAULT_EMPTY_MAP);
             _multipleFKPropertyMap = (Map<String, Map<String, Map<String, String>>>) obj;
         }

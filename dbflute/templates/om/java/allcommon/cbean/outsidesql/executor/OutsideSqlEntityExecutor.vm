@@ -10,7 +10,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The cursor executor of outside-sql.
- * 
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
@@ -36,14 +35,13 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     //                                                                              ======
     /**
      * Select entity.
-     * 
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
@@ -58,13 +56,12 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
 
     /**
      * Select entity with deleted check.
-     * 
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 
+using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
 
@@ -28,10 +29,17 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+        public ${glResultBeanBuilderName}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
+            IList<ENTITY> resultList = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
+            return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
+            
+        }
+#else
         public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
         }
-
+#end
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======

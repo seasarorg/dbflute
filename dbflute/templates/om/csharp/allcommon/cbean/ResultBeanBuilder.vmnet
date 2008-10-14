@@ -21,6 +21,14 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                         Builder
         //                                                                         =======
+        public ${glListResultBeanName}<ENTITY> BuildListResultBean(IList<ENTITY> selectedList) {
+            ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            return rb;
+        }
+
         public ${glListResultBeanName}<ENTITY> BuildListResultBean(${glConditionBeanInterfaceName} ob, IList<ENTITY> selectedList) {
             ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
             rb.TableDbName = _tableDbName;
