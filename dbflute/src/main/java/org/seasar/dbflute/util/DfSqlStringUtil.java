@@ -1,8 +1,11 @@
 package org.seasar.dbflute.util;
 
+/**
+ * @author jflute
+ */
 public abstract class DfSqlStringUtil {
 
-    public static String removeBeginEndComment(final String sql) {
+    public static String removeBlockComment(final String sql) {
         if (sql == null || sql.trim().length() == 0) {
             String msg = "The sql is invalid: " + sql;
             throw new IllegalArgumentException(msg);
@@ -30,5 +33,29 @@ public abstract class DfSqlStringUtil {
             tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
         }
         return sb.toString();
+    }
+
+    public static String removeLineComment(final String sql) { // With removing CR!
+        if (sql == null || sql.trim().length() == 0) {
+            String msg = "The sql is invalid: " + sql;
+            throw new IllegalArgumentException(msg);
+        }
+        final StringBuilder sb = new StringBuilder();
+        final String[] lines = sql.split("\n");
+        for (String line : lines) {
+            if (line == null) {
+                continue;
+            }
+            line = removeCR(line); // Remove CR!
+            if (line.startsWith("--")) {
+                continue;
+            }
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+
+    protected static String removeCR(String str) {
+        return str.replaceAll("\r", "");
     }
 }

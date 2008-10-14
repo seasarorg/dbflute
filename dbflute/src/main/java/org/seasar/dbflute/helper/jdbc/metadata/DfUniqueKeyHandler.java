@@ -54,7 +54,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         schemaName = filterSchemaName(schemaName);
         
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
-        if (isPrimaryKeyExtractingUnsupported()) {
+        if (!isPrimaryKeyExtractingSupported()) {
             return primaryKeyColumnNameList;
         }
         ResultSet parts = null;

@@ -42,6 +42,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnMetaInfo;
@@ -55,6 +56,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
@@ -149,28 +151,25 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
+        final DfJdbcDeterminer jdbcDeterminer = createJdbcDeterminer();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
         // - - - - - - - - - -/
         final Log innerLog = _log;
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
+            
+            /**
+             * Filter the string of SQL. Resolve JDBC dependency.
+             * @param sql The string of SQL. (NotNull)
+             * @return The filtered string of SQL. (NotNull)
+             */
             protected String filterSql(String sql) {
-
-                // TODO: @jflute - At the future....
-                //                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
-                //                while (true) {
-                //                    final int result = tokenizer.next();
-                //                    if (result == SqlTokenizer.EOF) {
-                //                        break;
-                //                    }
-                //                    if (tokenizer.getTokenType() == SqlTokenizer.COMMENT) {
-                //                        System.out.println("***: " + tokenizer.getToken());
-                //                    }
-                //                }
-
-                if (getProperties().getBasicProperties().isDatabaseDerby()) {
-                    sql = removeBeginEndComment(sql);
+                if (!jdbcDeterminer.isBlockCommentValid()) {
+                    sql = removeBlockComment(sql);
+                }
+                if (!jdbcDeterminer.isLineCommentValid()) {
+                    sql = removeLineComment(sql);
                 }
                 return super.filterSql(sql);
             }
@@ -583,8 +582,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return DfStringUtil.getListBetweenBeginEndMark(targetStr, beginMark, endMark);
     }
 
-    protected String removeBeginEndComment(final String sql) {
-        return DfSqlStringUtil.removeBeginEndComment(sql);
+    protected String removeBlockComment(final String sql) {
+        return DfSqlStringUtil.removeBlockComment(sql);
+    }
+
+    protected String removeLineComment(final String sql) {
+        return DfSqlStringUtil.removeLineComment(sql); // With removing CR
     }
 
     // ===================================================================================
@@ -991,6 +994,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected <KEY, VALUE> DfFlexibleNameMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
         return new DfFlexibleNameMap<KEY, VALUE>(map);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected DfJdbcDeterminer createJdbcDeterminer() {
+        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
     }
 
     // ===================================================================================

@@ -79,7 +79,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
             }
 
             protected String removeBeginEndComment(final String sql) {
-                return DfSqlStringUtil.removeBeginEndComment(sql);
+                return DfSqlStringUtil.removeBlockComment(sql);
             }
 
             @Override

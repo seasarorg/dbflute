@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
+import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
@@ -84,20 +86,29 @@ public class DfAbstractMetaDataHandler {
     //                                                        ============================
     protected String filterSchemaName(String schemaName) {
         // The driver throws the exception if the value is empty string.
-        if (isMsAccess() && schemaName != null && schemaName.trim().length() == 0) {
+        if (schemaName != null && schemaName.trim().length() == 0 && !isSchemaNameEmptyAllowed()) {
             return null;
         }
         return schemaName;
     }
-
-    protected boolean isPrimaryKeyExtractingUnsupported() {
-        return isMsAccess(); // The driver does not support this method.
+    
+    protected boolean isSchemaNameEmptyAllowed() {
+        return createJdbcDeterminer().isSchemaNameEmptyAllowed();
     }
     
-    protected boolean isForeignKeyExtractingUnsupported() {
-        return isMsAccess();
-    }
 
+    protected boolean isPrimaryKeyExtractingSupported() {
+        return createJdbcDeterminer().isPrimaryKeyExtractingSupported();
+    }
+    
+    protected boolean isForeignKeyExtractingSupported() {
+        return createJdbcDeterminer().isForeignKeyExtractingSupported();
+    }
+    
+    protected DfJdbcDeterminer createJdbcDeterminer() {
+        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
+    }
+    
     // ===================================================================================
     //                                                                Except Determination
     //                                                                ====================

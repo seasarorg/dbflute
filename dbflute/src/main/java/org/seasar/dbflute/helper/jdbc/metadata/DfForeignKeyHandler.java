@@ -52,7 +52,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         schemaName = filterSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
-        if (isForeignKeyExtractingUnsupported()) {
+        if (!isForeignKeyExtractingSupported()) {
             return fkMap;
         }
         ResultSet foreignKeys = null;
