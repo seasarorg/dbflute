@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
@@ -44,6 +45,10 @@ public class DfAbstractMetaDataHandler {
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
+    
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
 
     protected List<String> getTableExceptList() {
         if (_tableExceptList == null) {
@@ -66,9 +71,36 @@ public class DfAbstractMetaDataHandler {
         return _simpleColumnExceptList;
     }
 
-    //========================================================================================
-    //                                                                           Determination
-    //                                                                           =============
+    protected boolean isMsAccess() {
+        return getBasicProperties().isDatabaseMsAccess();
+    }
+
+    protected boolean isPostgreSQL() {
+        return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    // ===================================================================================
+    //                                                        Database Dependency Resolver
+    //                                                        ============================
+    protected String filterSchema(String schema) {
+        // The driver throws the exception if the value is empty string.
+        if (isMsAccess() && schema != null && schema.trim().length() == 0) {
+            return null;
+        }
+        return schema;
+    }
+
+    protected boolean isPrimaryKeyExtractingUnsupported() {
+        return isMsAccess(); // The driver does not support this method.
+    }
+    
+    protected boolean isForeignKeyExtractingUnsupported() {
+        return isMsAccess();
+    }
+
+    // ===================================================================================
+    //                                                                Except Determination
+    //                                                                ====================
     /**
      * Is the table name out of sight?
      * @param tableName Table name. (NotNull)

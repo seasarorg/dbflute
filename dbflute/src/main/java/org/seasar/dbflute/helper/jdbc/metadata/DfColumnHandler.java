@@ -53,6 +53,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, String tableName,
             boolean caseInsensitive) {
+        schemaName = filterSchema(schemaName);
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         ResultSet columnResultSetLowerSpare = null;

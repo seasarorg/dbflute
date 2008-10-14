@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -43,6 +42,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
+        schemaName = filterSchema(schemaName);
         final String[] objectTypes = getObjectTypeStringArray();
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
@@ -121,6 +121,6 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * @return Determination.
      */
     protected boolean isOracle() {
-        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
+        return getBasicProperties().isDatabaseOracle();
     }
 }

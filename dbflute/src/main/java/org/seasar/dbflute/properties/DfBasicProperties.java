@@ -76,6 +76,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
     }
+    
+    public boolean isDatabaseMsAccess() {
+        return getDatabaseName().equalsIgnoreCase("msaccess");
+    }
 
     public boolean isDatabaseSybase() {
         return getDatabaseName().equalsIgnoreCase("sybase");

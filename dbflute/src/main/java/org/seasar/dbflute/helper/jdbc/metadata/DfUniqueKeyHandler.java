@@ -36,7 +36,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
+    private static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
 
     // ===================================================================================
     //                                                                                Main
@@ -51,7 +51,12 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
+        schemaName = filterSchema(schemaName);
+        
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
+        if (isPrimaryKeyExtractingUnsupported()) {
+            return primaryKeyColumnNameList;
+        }
         ResultSet parts = null;
         try {
             final String tableName = tableMetaInfo.getTableName();
@@ -102,6 +107,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     //
     public Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
+        schemaName = filterSchema(schemaName);
+        
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }

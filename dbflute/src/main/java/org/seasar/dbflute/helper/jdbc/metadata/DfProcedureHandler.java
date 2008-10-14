@@ -22,8 +22,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.DfBuildProperties;
-
 /**
  * @author jflute
  * @since 0.7.5 (2008/06/28 Saturday)
@@ -34,6 +32,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     public List<DfProcedureMetaInfo> getProcedures(DatabaseMetaData metaData, String schemaName) {
+        schemaName = filterSchema(schemaName);
+        
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Set up default schema name of PostgreSQL.
         // Because PostgreSQL returns system procedures.
@@ -153,10 +153,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnComment(columnComment);
             procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
         }
-    }
-
-    protected boolean isPostgreSQL() {
-        return DfBuildProperties.getInstance().getBasicProperties().isDatabasePostgreSQL();
     }
 
     // ===================================================================================
