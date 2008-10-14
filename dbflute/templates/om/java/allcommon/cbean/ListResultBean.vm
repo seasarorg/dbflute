@@ -57,7 +57,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                            Grouping
     //                                                                            ========
     /**
-     * Group the list.
+     * Group the list. This method needs the property 'selectedList' only.
      * @param <ROW> The type of row.
      * @param groupingRowSetupper The setupper of grouping row. (NotNull)
      * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)

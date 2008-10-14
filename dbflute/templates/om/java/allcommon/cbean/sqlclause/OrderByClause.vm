@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glOrderByClauseName}")
+import java.io.Serializable;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.StringTokenizer;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} implements java.io.Serializable {
+public class ${myClassName} implements Serializable {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -18,7 +19,7 @@ public class ${myClassName} implements java.io.Serializable {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected List<${glOrderByElementName}> _orderByList = new ArrayList${database.filterGenericsString(${glOrderByElementName})}();
+    protected List<${glOrderByElementName}> _orderByList = new ArrayList<${glOrderByElementName}>();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -30,8 +31,8 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     // =====================================================================================
-    //                                                                              Behavior
-    //                                                                              ========
+    //                                                                          Manipulation
+    //                                                                          ============
     /**
      * Add order-by element.
      * @param orderByElement Order-by element. (NotNull)
@@ -83,6 +84,9 @@ public class ${myClassName} implements java.io.Serializable {
         public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
 	}
 
+    // =====================================================================================
+    //                                                                   Order-By Expression
+    //                                                                   ===================
     public List<${glOrderByElementName}> getOrderByList() {
         return _orderByList;
     }
@@ -232,7 +236,7 @@ public class ${myClassName} implements java.io.Serializable {
      * Get iterator of order-by list.
      * @return Determination.
      */
-    public java.util.Iterator<${glOrderByElementName}> iterator() {
+    public Iterator<${glOrderByElementName}> iterator() {
         return _orderByList.iterator();
     }
 
@@ -244,11 +248,11 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    //                                                                        Basic Override
+    //                                                                        ==============
     /**
      * This method overrides the method that is declared at super.
-     * @return View-string of all-columns value.
+     * @return The view string of all-columns value. (NotNUll)
      */
     public String toString() {
         return _orderByList.toString();
