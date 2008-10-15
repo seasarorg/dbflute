@@ -181,10 +181,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 try {
                     boolean alreadyIncrementGoodSqlCount = false;
                     if (isTargetEntityMakingSql(sql)) {
+                        final String executedActuallySql;
                         if (!jdbcDeterminer.isLineCommentValid()) { // The timing to remove line comment is here!
-                            sql = removeLineComment(sql);
+                            executedActuallySql = removeLineComment(sql);
+                        } else {
+                            executedActuallySql = sql;
                         }
-                        rs = statement.executeQuery(sql);
+                        rs = statement.executeQuery(executedActuallySql);
 
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
