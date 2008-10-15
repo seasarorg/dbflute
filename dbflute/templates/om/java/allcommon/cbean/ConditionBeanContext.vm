@@ -13,7 +13,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
- * Condition-Bean context.
+ * The context of condition-bean.
  * @author ${database.ClassAuthor}
  */
 public class ${glConditionBeanContextName} {
@@ -75,7 +75,8 @@ public class ${glConditionBeanContextName} {
             if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
 		{
-            Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
+            Class<?> clazz = ${glPackageBaseCommon}.${glAccessContextName}.class;
+            clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
@@ -84,9 +85,7 @@ public class ${glConditionBeanContextName} {
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
             clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
             clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
-#if ($database.isVersionAfter1047())
             clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
-#end
             if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
         }
         if (debugEnabled) { 
