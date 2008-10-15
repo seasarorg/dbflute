@@ -1,0 +1,8 @@
+map:{
+	; dataLoadingType = ut
+	; loggingInsertSql = true
+	# /- - - - - - - - - - - - - - - - - - - - - - - - - -
+	# You can specify the skip sheet by regular expression
+	# - - - - - - - - - -/
+	# ; skipSheet = P.+
+}

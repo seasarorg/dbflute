@@ -1,0 +1,8 @@
+# /---------------------------------------------------------------------------
+# [OutsideSql Definition]
+#
+map:{
+    ; generateProcedureParameterBean = true
+}
+# ----------------/
+

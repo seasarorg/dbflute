@@ -1,0 +1,25 @@
+# /---------------------------------------------------------------------------
+# [Sequence]
+#   sequenceDefinitionMap: (Default 'map:{}')
+#     The method 'XxxDao#selectNextVal()' is generated for its table primary key.
+#
+#       ex) public String selectNextVal_SQL = "select gen_id(BOOK_BOOK_ID_INC, 1) from RDB$DATABASE";
+#           public java.math.BigDecimal selectNextVal();
+#           // This example is for the database of Firebird
+#
+#   sequenceReturnType: (Default 'java.math.BigDecimal')
+#     The return type of The method 'XxxDao#selectNextVal()' as DEFAULT!
+#     If the primary key type of the table is BigDecimal
+#     , The return type is the same as it inspite of this property.
+#
+#   isAvailableBehaviorInsertSequenceInjection: (Default 'true')
+#     [true]
+#       Inject sequence (auto) to primary key on behavior insert.
+#
+map:{
+    ; PURCHASE     = SEQ_PURCHASE
+    ; MEMBER       = SEQ_MEMBER
+    ; MEMBER_LOGIN = SEQ_MEMBER_LOGIN
+    ; PRODUCT      = SEQ_PRODUCT
+}
+# ----------------/

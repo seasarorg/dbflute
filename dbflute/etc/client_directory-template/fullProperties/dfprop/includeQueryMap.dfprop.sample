@@ -1,0 +1,17 @@
+# /---------------------------------------------------------------------------
+# [Include Query] (NotRequired - Default 'map:{}')
+#
+map:{
+    ; String = map:{
+        ; GreaterThan = map:{}
+        ; LessThan = map:{}
+        ; GreaterEqual = map:{}
+        ; LessEqual = map:{}
+    }
+    ; Number = map:{
+    }
+    ; Date = map:{
+        ; NotEqual = map:{}
+    }
+}
+# ----------------/
