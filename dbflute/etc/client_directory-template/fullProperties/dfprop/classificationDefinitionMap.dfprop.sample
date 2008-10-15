@@ -17,17 +17,17 @@
 #         }
 #
 map:{
-	; Flg = list:{
-		; map:{topComment=フラグを示す}
-		; map:{code=1;name=True ;alias=はい  ;comment=有効を示す}
-		; map:{code=0;name=False;alias=いいえ;comment=無効を示す}
-	}
-	; MemberStatus = list:{
-		; map:{topComment=会員の状態を示す}
-			; map:{code=PRV;name=Provisional;alias=仮会員  ;comment=仮会員を示す}
-			; map:{code=FML;name=Formalized ;alias=正式会員;comment=正式会員を示す}
-			; map:{code=WDL;name=Withdrawal ;alias=退会会員;comment=退会会員を示す}
-	}
+    ; Flg = list:{
+        ; map:{topComment=フラグを示す}
+        ; map:{code=1;name=True ;alias=はい  ;comment=有効を示す}
+        ; map:{code=0;name=False;alias=いいえ;comment=無効を示す}
+    }
+    ; MemberStatus = list:{
+        ; map:{topComment=会員の状態を示す}
+        ; map:{code=PRV;name=Provisional;alias=仮会員  ;comment=仮会員を示す}
+        ; map:{code=FML;name=Formalized ;alias=正式会員;comment=正式会員を示す}
+        ; map:{code=WDL;name=Withdrawal ;alias=退会会員;comment=退会会員を示す}
+    }
 }
 # ----------------/
 

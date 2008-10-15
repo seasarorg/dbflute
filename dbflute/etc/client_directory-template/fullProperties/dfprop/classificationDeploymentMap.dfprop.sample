@@ -9,9 +9,9 @@
 #         }
 #
 map:{
-		; $$ALL$$       = map:{suffix:_FLG=Flg}
-		; MEMBER        = map:{MEMBER_STATUS_CODE=MemberStatus}
-		; MEMBER_STATUS = map:{MEMBER_STATUS_CODE=MemberStatus}
-	}
+    ; $$ALL$$       = map:{suffix:_FLG=Flg}
+    ; MEMBER        = map:{MEMBER_STATUS_CODE=MemberStatus}
+    ; MEMBER_STATUS = map:{MEMBER_STATUS_CODE=MemberStatus}
+}
 # ----------------/
 

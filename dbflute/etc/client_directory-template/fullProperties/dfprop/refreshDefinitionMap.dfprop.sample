@@ -1,4 +1,4 @@
 map:{
-	; projectName = dbflute-basic-example
-	; requestUrl = http://localhost:8386/
+    ; projectName = dbflute-basic-example
+    ; requestUrl = http://localhost:8386/
 }
