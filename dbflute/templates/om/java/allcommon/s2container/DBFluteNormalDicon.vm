@@ -22,27 +22,15 @@
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
-#if ($database.isVersionAfter1047())
     <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
-#else
-    <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
-#end
-#if ($database.isVersionAfter1047())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
     <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
-#if ($database.isAvailableDaoMethodMetaDataInitializing())
-    <component class="org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl"/>
-#else
     <component class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}"/>
-#end
     <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
     <component class="org.seasar.dao.impl.DefaultTableNaming"/>
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
-#end
-#if ($database.isVersionAfter1046())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
-#end
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
 
     <!-- The selector of behavior. -->
