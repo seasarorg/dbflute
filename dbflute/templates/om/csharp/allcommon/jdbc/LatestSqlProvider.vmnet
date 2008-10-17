@@ -3,9 +3,11 @@ using System;
 
 using Seasar.Quill.Attrs;
 
+using ${glPackageBaseCommonS2Dao};
+
 namespace ${glPackageBaseCommonJdbc} {
 
-    [Implementation]
+    [Implementation(typeof(${glDaoLatestSqlProvider}))]
     public interface ${glLatestSqlProviderName} {
         String GetDisplaySql();
 	    void ClearSqlCache();
