@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 
 using Seasar.Quill.Attrs;
 
@@ -10,6 +11,7 @@ namespace ${glPackageBaseCommonJdbc} {
     [Implementation(typeof(${glDaoLatestSqlProvider}))]
     public interface ${glLatestSqlProviderName} {
         String GetDisplaySql();
+        IList<String> ExtractDisplaySqlList();
 	    void ClearSqlCache();
     }
 }

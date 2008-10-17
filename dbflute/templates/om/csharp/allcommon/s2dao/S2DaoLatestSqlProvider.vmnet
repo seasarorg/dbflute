@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonS2DaoInternalSqlLog};
@@ -8,16 +9,17 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glDaoLatestSqlProvider} : ${glLatestSqlProviderName} {
 
+        protected IList<String> _emptyList = new List<String>();
         public String GetDisplaySql() {
             return GetLastCompleteSql();
         }
 
         protected String GetLastCompleteSql() {
             try {
-                if (!${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+                if (sqlLogRegistry == null) {
                     return null;
                 }
-                ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
                 ${glInternalSqlLog} sqlLog = sqlLogRegistry.Last;
                 if (sqlLog == null) {
                     return null;
@@ -27,8 +29,33 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return null;
             }
         }
-	
-    	public void ClearSqlCache() {
+
+        public IList<String> ExtractDisplaySqlList() {
+            ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+            if (sqlLogRegistry == null) {
+                return _emptyList;
+            }
+            ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
+	        IList<String> sqlList = new List<String>();
+	        foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
+	            sqlList.Add(sqlLog.CompleteSql());
+	        }
+	        return sqlList;
 	    }
+
+    	public void ClearSqlCache() {
+            ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+            if (sqlLogRegistry == null) {
+                return;
+            }
+            sqlLogRegistry.Clear();
+        }
+
+    	protected ${glInternalSqlLogRegistry} Find${glInternalSqlLogRegistry}() {
+            if (!${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                return null;
+            }
+            return ${glInternalSqlLogRegistryLocator}.Instance;
+        }
     }
 }

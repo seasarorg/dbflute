@@ -67,7 +67,7 @@ public class ${glInternalSqlLogRegistry} {
             SqlLogList.Clear();
         }
 
-        protected LinkedList<${glInternalSqlLog}> SqlLogList { get {
+        public LinkedList<${glInternalSqlLog}> SqlLogList { get {
             return _sqlLogList;
         }}
     }
