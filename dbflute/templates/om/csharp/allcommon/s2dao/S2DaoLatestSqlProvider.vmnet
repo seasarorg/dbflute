@@ -35,7 +35,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (sqlLogRegistry == null) {
                 return _emptyList;
             }
-            ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
 	        IList<String> sqlList = new List<String>();
 	        foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
 	            sqlList.Add(sqlLog.CompleteSql());

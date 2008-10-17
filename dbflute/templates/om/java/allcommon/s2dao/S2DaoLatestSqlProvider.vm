@@ -10,22 +10,15 @@ import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
  */
 public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
 
-    /**
-     * The implementation.
-     * @return Display SQL. (Nullable: If it was not found, returns null.)
-     */
     public String getDisplaySql() {
-        return getLastCompleteSql();
+        return ${glInternalSqlLogRegistry}.peekCompleteSql();
     }
 
-    protected String getLastCompleteSql() {
-        try {
-            return ${glInternalSqlLogRegistry}.peekCompleteSql();
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    public List<String> extractDisplaySqlList() {
+        return ${glInternalSqlLogRegistry}.extractCompleteSqlList();
     }
-	
+
 	public void clearSqlCache() {
+        return ${glInternalSqlLogRegistry}.clearSqlLogRegistry();
 	}
 }

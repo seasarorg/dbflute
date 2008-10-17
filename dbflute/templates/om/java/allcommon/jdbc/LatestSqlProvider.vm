@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
 
+import java.util.List;
+
 /**
  * The provider of latest SQL.
  * @author ${database.ClassAuthor}
@@ -11,7 +13,13 @@ public interface ${glLatestSqlProviderName} {
      * @return Display SQL. (Nullable: If it was not found, returns null.)
      */
     public String getDisplaySql();
-	
+
+    /**
+     * Extract the list of display SQL.
+     * @return The list of display SQL. (NotNull: If it was not found, returns empty.)
+     */
+    public List<String> extractDisplaySqlList();
+
 	/**
 	 * Clear the cache of SQL.
 	 */
