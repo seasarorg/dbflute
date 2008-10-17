@@ -17,6 +17,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.util.DfStringUtil;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
@@ -140,7 +141,15 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
+        final DfReplaceSchemaProperties prop = getMyProperties();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected String filterSql(String sql) {
+                sql = super.filterSql(sql);
+                sql = prop.resolveFilterVariablesIfNeeds(sql);
+                return sql;
+            }
+
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
@@ -210,6 +219,13 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replaceString(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
     }
 
     // ===================================================================================

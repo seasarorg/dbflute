@@ -109,12 +109,20 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
+        final DfReplaceSchemaProperties prop = getMyProperties();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+            @Override
+            protected String filterSql(String sql) {
+                sql = super.filterSql(sql);
+                sql = prop.resolveFilterVariablesIfNeeds(sql);
+                return sql;
+            }
+
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
             }
-            
+
             @Override
             protected String getTerminater4Tool() {
                 return resolveTerminater4Tool();

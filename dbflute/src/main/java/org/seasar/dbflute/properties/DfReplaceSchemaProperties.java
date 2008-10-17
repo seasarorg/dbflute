@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -61,7 +63,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return propString;
     }
-    
+
     protected String getEnvironmentType() {// Old Style!
         final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
         if (propString == null) {
@@ -69,7 +71,49 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return propString;
     }
-    
+
+    // ===================================================================================
+    //                                                                Filter Variables Map
+    //                                                                ====================
+    protected Map<String, String> _filterVariablesMap;
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, String> getFilterVariablesMap() {
+        if (_filterVariablesMap != null) {
+            return _filterVariablesMap;
+        }
+        _filterVariablesMap = (Map<String, String>) getReplaceSchemaDefinitionMap().get("filterVariablesMap");
+        if (_filterVariablesMap == null) {
+            _filterVariablesMap = new HashMap<String, String>();
+        }
+        return _filterVariablesMap;
+    }
+
+    protected String getFilterVariablesBeginMark() {
+        return "/*$";
+    }
+
+    protected String getFilterVariablesEndMark() {
+        return "*/";
+    }
+
+    public String resolveFilterVariablesIfNeeds(String sql) {
+        final String beginMark = getFilterVariablesBeginMark();
+        final String endMark = getFilterVariablesEndMark();
+        final Map<String, String> filterVariablesMap = getFilterVariablesMap();
+        if (!filterVariablesMap.isEmpty() && sql.contains(beginMark) && sql.contains(endMark)) {
+            final Set<String> keySet = filterVariablesMap.keySet();
+            for (String key : keySet) {
+                final String variableMark = beginMark + key + endMark;
+                if (sql.contains(variableMark)) {
+                    final String value = filterVariablesMap.get(key);
+                    sql = replaceString(sql, variableMark, value);
+                }
+            }
+        }
+        return sql;
+    }
+
     // ===================================================================================
     //                                                                      Callback Class
     //                                                                      ==============
@@ -185,5 +229,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         } else {
             return false;
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replaceString(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
     }
 }
