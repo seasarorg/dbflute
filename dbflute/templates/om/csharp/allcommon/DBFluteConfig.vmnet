@@ -22,7 +22,7 @@ public class ${myClassName} {
 	protected bool _conditionBeanFormatSql = true;
 	protected bool _queryLogLevelInfo;
 	protected bool _executeStatusLogLevelInfo;
-#if ($database.isAvailableSqlLogRegistry())
+#if ($database.isSqlLogRegistryValid())
 	protected bool _useSqlLogRegistry = true;
 #else
 	protected bool _useSqlLogRegistry;

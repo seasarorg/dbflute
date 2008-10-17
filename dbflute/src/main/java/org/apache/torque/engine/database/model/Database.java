@@ -1273,10 +1273,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
-    public boolean isAvailableSqlLogRegistry() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableSqlLogRegistry();
-    }
-    
     public boolean isAvailableNonPrimaryKeyWritable() {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
@@ -1293,6 +1289,17 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
     }
 
+    // -----------------------------------------------------
+    //                                      Sql Log Registry
+    //                                      ----------------
+    public boolean isSqlLogRegistryValid() {
+        return getProperties().getSqlLogRegistryProperties().isValid();
+    }
+    
+    public int getSqlLogRegistryLimitSize() {
+        return getProperties().getSqlLogRegistryProperties().getLimitSize();
+    }
+    
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----

@@ -5,15 +5,12 @@ using System.Threading;
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
 
-/**
- * @author ${database.ClassAuthor}
- */
-public class ${glInternalSqlLogRegistry} {
+    public class ${glInternalSqlLogRegistry} {
 
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        private static readonly int DEFAULT_LIMIT_SIZE = 3;
+        private static readonly int DEFAULT_LIMIT_SIZE = ${database.sqlLogRegistryLimitSize};
 
         // ===============================================================================
         //                                                                       Attribute

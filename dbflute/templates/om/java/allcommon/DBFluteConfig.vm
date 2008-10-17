@@ -24,7 +24,7 @@ public class ${myClassName} {
 	protected boolean _conditionBeanFormatSql = true;// This is for compatibility!
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
-#if ($database.isAvailableSqlLogRegistry())
+#if ($database.isSqlLogRegistryValid())
 	protected boolean _useSqlLogRegistry = true;
 #else
 	protected boolean _useSqlLogRegistry;

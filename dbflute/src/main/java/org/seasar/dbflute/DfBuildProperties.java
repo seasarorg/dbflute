@@ -40,6 +40,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 
@@ -209,6 +210,13 @@ public final class DfBuildProperties {
     //                                         -------------
     public DfIncludeQueryProperties getIncludeQueryProperties() {
         return getHandler().getIncludeQueryProperties(getProperties());
+    }
+    
+    // -----------------------------------------------------
+    //                                      Sql Log Registry
+    //                                      ----------------
+    public DfSqlLogRegistryProperties getSqlLogRegistryProperties() {
+        return getHandler().getSqlLogRegistryProperties(getProperties());
     }
 
     // -----------------------------------------------------

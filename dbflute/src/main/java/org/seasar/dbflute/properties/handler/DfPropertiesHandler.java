@@ -24,6 +24,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -223,6 +224,18 @@ public final class DfPropertiesHandler {
             _includeQueryProperties = new DfIncludeQueryProperties(prop);
         }
         return _includeQueryProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                      Sql Log Registry
+    //                                      ----------------
+    protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
+    
+    public DfSqlLogRegistryProperties getSqlLogRegistryProperties(Properties prop) {
+        if (_sqlLogRegistryProperties == null) {
+            _sqlLogRegistryProperties = new DfSqlLogRegistryProperties(prop);
+        }
+        return _sqlLogRegistryProperties;
     }
 
     // -----------------------------------------------------
