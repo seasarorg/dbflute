@@ -1,0 +1,79 @@
+
+using System;
+using System.Threading;
+
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalSqlLogRegistry} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static readonly int DEFAULT_LIMIT_SIZE = 3;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private int limitSize;
+    private LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalSqlLogRegistry}() {
+        this(DEFAULT_LIMIT_SIZE);
+    }
+
+    public ${glInternalSqlLogRegistry}(int limitSize) {
+        this.limitSize = limitSize;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public int getLimitSize() {
+        return limitSize;
+    }
+
+    public int getSize() {
+        return getSqlLogList().size();
+    }
+
+    public bool isEmpty() {
+        return getSize() == 0;
+    }
+
+    public ${glInternalSqlLogRegistry} get(int index) {
+        return (${glInternalSqlLogRegistry}) getSqlLogList().get(index);
+    }
+
+    public ${glInternalSqlLogRegistry} getLast() {
+        return isEmpty() ? null : (${glInternalSqlLogRegistry}) getSqlLogList().getLast();
+    }
+
+    public void add(${glInternalSqlLogRegistry} sqlLog) {
+        if (limitSize <= 0) {
+            return;
+        }
+        List<${glInternalSqlLogRegistry}> list = getSqlLogList();
+        list.add(sqlLog);
+        if (list.size() > limitSize) {
+            list.removeFirst();
+        }
+    }
+
+    public void clear() {
+        getSqlLogList().clear();
+    }
+
+    protected List<${glInternalSqlLogRegistry}> getSqlLogList() {
+        return (List<${glInternalSqlLogRegistry}>) _slot.get();
+    }
+}
+
+}

@@ -376,6 +376,7 @@ targetdatabase = $targetDatabase
     #set ($glInternalUpdateBatchAutoHandler = "${glProjectPrefix}InternalUpdateBatchAutoHandler")
     #set ($glInternalSqlLog = "${glProjectPrefix}InternalSqlLog")
     #set ($glInternalSqlLogRegistry = "${glProjectPrefix}InternalSqlLogRegistry")
+    #set ($glInternalSqlLogRegistryLocator = "${glProjectPrefix}InternalSqlLogRegistryLocator")
     #set ($glInternalCommandContextCreator = "${glProjectPrefix}InternalCommandContextCreator")
     #set ($glInternalSqlParser = "${glProjectPrefix}InternalSqlParser")
     #set ($glInternalSqlTokenizer = "${glProjectPrefix}InternalSqlTokenizer")
@@ -509,6 +510,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.S2Dao.Internal.RsHandler")
       #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.S2Dao.Internal.SqlCommand")
       #set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.S2Dao.Internal.SqlHandler")
+      #set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.S2Dao.Internal.SqlLog")
       #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
       #set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
       #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
@@ -2057,6 +2059,21 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalUpdateAutoHandler');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalUpdateAutoHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalUpdateAutoHandler.${glTemplateFileExtension}",$path,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlLog}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('InternalSqlLog');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlLog})}${glInternalSqlLog}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqllog/InternalSqlLog.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalSqlLogRegistry');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlLog})}${glInternalSqlLogRegistry}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqllog/InternalSqlLogRegistry.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalSqlLogRegistryLocator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlLog})}${glInternalSqlLogRegistryLocator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqllog/InternalSqlLogRegistryLocator.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser}))
       $database.makeDirectory($path)
