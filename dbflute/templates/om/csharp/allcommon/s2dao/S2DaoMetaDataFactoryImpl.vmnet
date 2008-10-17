@@ -54,6 +54,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             _readerFactory = readerFactory;
             _dataReaderFactory = dataReaderFactory;
 
+            HandleSqlLogRegistry();
+        }
+
+        protected void HandleSqlLogRegistry() {
             StringBuilder sb = new StringBuilder();
             sb.Append("{SqlLog Information}").Append(GetLineSeparator());
             sb.Append("  [SqlLogRegistry]").Append(GetLineSeparator());

@@ -154,6 +154,28 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
 
         initializeDatabaseProductNameOfContext(xaDataSource);
 
+        handleSqlLogRegistry();
+        
+        ${glDBFluteConfig}.getInstance().lock();
+        _log.info("* * * * */");
+    }
+
+    protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+        final StringBuilder sb = new StringBuilder();
+        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
+            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            final String url = xaDataSourceImpl.getURL();
+            final String user = xaDataSourceImpl.getUser();
+            sb.append("  [XADataSource]:").append(getLineSeparator());
+            sb.append("    driver = " + driverClassName).append(getLineSeparator());
+            sb.append("    url    = " + url).append(getLineSeparator());
+            sb.append("    user   = " + user);
+        }
+        _log.info("{Injection Information}" + getLineSeparator() + sb);
+    }
+
+    protected void handleSqlLogRegistry() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{SqlLog Information}").append(getLineSeparator());
         sb.append("  [SqlLogRegistry]").append(getLineSeparator());
@@ -175,24 +197,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             }
         }
         _log.info(sb);
-        
-        ${glDBFluteConfig}.getInstance().lock();
-        _log.info("* * * * */");
-    }
-
-    protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
-        final StringBuilder sb = new StringBuilder();
-        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
-            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            final String url = xaDataSourceImpl.getURL();
-            final String user = xaDataSourceImpl.getUser();
-            sb.append("  [XADataSource]:").append(getLineSeparator());
-            sb.append("    driver = " + driverClassName).append(getLineSeparator());
-            sb.append("    url    = " + url).append(getLineSeparator());
-            sb.append("    user   = " + user);
-        }
-        _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
 
     // -----------------------------------------------------
