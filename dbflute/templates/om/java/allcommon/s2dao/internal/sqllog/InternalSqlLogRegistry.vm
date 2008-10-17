@@ -24,7 +24,6 @@ public class ${glInternalSqlLogRegistry} {
 	protected static final String NAME_SqlLogRegistryImpl = "org.seasar.extension.jdbc.impl.SqlLogRegistryImpl";
 	protected static final String NAME_SqlLog = "org.seasar.extension.jdbc.SqlLog";
 	protected static final String NAME_SqlLogImpl = "org.seasar.extension.jdbc.impl.SqlLogImpl";
-	protected static boolean STATUS_SqlLogExists = false;
 	static {
 	    forNameContainerSqlLogRegistryLocator();
 	}
@@ -32,10 +31,6 @@ public class ${glInternalSqlLogRegistry} {
 	// ===================================================================================
     //                                                                        Public Entry
     //                                                                        ============
-	public static boolean existsSqlLogRegistry() {
-	    return STATUS_SqlLogExists;
-	}
-	
 	public static boolean setupSqlLogRegistry() {
 	    final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
 		if (sqlLogRegistryLocatorType == null) {
@@ -222,9 +217,7 @@ public class ${glInternalSqlLogRegistry} {
 	    Class<?> clazz = null;
 	    try {
 	        clazz = Class.forName(NAME_SqlLogRegistryLocator);
-			STATUS_SqlLogExists = true;
 		} catch (Exception ignored) {
-		    STATUS_SqlLogExists = false;
 		    return null;
 		}
 		return clazz;

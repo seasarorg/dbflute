@@ -100,7 +100,8 @@ public class ${glInternalBasicHandler} {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final ${glSqlLogHandlerName} sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
-        final boolean existsSqlLogRegistry = ${glInternalSqlLogRegistry}.existsSqlLogRegistry();
+        final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+        final boolean existsSqlLogRegistry = sqlLogRegistry != null;
         if (${glQLog}.isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
             if (isContainsLineSeparatorInSql()) {
@@ -112,10 +113,7 @@ public class ${glInternalBasicHandler} {
                 sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
-                final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-                if (sqlLogRegistry != null) {
-                    ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
-                }
+                ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
             }
         }
     }
