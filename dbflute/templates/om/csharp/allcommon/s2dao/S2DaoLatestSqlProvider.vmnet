@@ -1,33 +1,34 @@
 
-using Syste;
+using System;
 
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonS2DaoInternalSqlLog};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
-public class ${glDaoLatestSqlProvider} : ${glLatestSqlProviderName} {
+    public class ${glDaoLatestSqlProvider} : ${glLatestSqlProviderName} {
 
-    public String GetDisplaySql() {
-        return GetLastCompleteSql();
-    }
-
-    protected String GetLastCompleteSql() {
-        try {
-            if (!${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
-                return null;
-            }
-            ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
-            ${glInternalSqlLog} sqlLog = sqlLogRegistry.Last;
-            if (sqlLog == null) {
-                return null;
-            }
-            return sqlLog.CompleteSql;
-        } catch (Exception ignored) {
-            return null;
+        public String GetDisplaySql() {
+            return GetLastCompleteSql();
         }
-    }
+
+        protected String GetLastCompleteSql() {
+            try {
+                if (!${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                    return null;
+                }
+                ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
+                ${glInternalSqlLog} sqlLog = sqlLogRegistry.Last;
+                if (sqlLog == null) {
+                    return null;
+                }
+                return sqlLog.CompleteSql;
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
 	
-	public void ClearSqlCache() {
-	}
+    	public void ClearSqlCache() {
+	    }
+    }
 }
