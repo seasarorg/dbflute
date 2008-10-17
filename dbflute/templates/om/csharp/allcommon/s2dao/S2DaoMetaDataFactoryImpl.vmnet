@@ -73,7 +73,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     sb.append("    SqlLogRegistry is not available!");
                 }
             }
-            _log.Info(sb);
+            _log.Info(sb.toString());
         }
 
         // ===============================================================================
