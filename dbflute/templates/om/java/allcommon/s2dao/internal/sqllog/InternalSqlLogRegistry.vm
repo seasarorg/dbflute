@@ -1,8 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlLog};
 
-import java.util.List;
-import java.util.ArrayList;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
@@ -70,19 +67,16 @@ public class ${glInternalSqlLogRegistry} {
 		if (sqlLogRegistryLocatorType == null) {
 		    return;
 		}
-		final Class<?> sqlLogRegistryType = forNameContainerSqlLogRegistry();
-		if (sqlLogRegistryType == null) {
-		    return;
-		}
-	    final Object sqlLogRegistryImpl = createContainerSqlLogRegistryImpl();
-	    if (sqlLogRegistryImpl == null) {
+	    final Object sqlLogRegistry = findContainerSqlLogRegistry();
+	    if (sqlLogRegistry == null) {
 	        return;
 	    }
+	    Class<? extends Object> sqlLogRegistryType = sqlLogRegistry.getClass();
 	    try {
 	        final Method method = sqlLogRegistryType.getMethod("clear", new Class[]{});
-		    method.invoke(sqlLogRegistryImpl, new Object[]{});
+		    method.invoke(sqlLogRegistry, new Object[]{});
 		} catch (Exception e) {
-		    String msg = "${glInternalSqlLogRegistry}.clearSqlLogRegistry() threw the exception:";
+		    String msg = "InternalSqlLogRegistry.clearSqlLogRegistry() threw the exception:";
 			msg = msg + " sqlLogRegistryLocatorType=" + sqlLogRegistryLocatorType;
 		    throw new IllegalStateException(msg, e);
 		}
@@ -132,31 +126,6 @@ public class ${glInternalSqlLogRegistry} {
 	    final Object sqlLogImpl = createContainerSqlLogImpl(rawSql, completeSql, bindArgs, bindArgTypes);
 		reflectSqlLogToContainerSqlLogRegistry(sqlLogImpl, sqlLogRegistry);
     }
-	
-	public static List<String> extractCompleteSqlList() {
-		final Class<?> sqlLogRegistryType = forNameContainerSqlLogRegistry();
-		if (sqlLogRegistryType == null) {
-		    return new ArrayList<String>();
-		}
-	    final Object sqlLogRegistry = findContainerSqlLogRegistry();
-		if (sqlLogRegistry == null) {
-		    return new ArrayList<String>();
-		}
-	    try {
-	        final Method method = sqlLogRegistryType.getMethod("getSqlLogList", new Class[]{});
-		    method.setAccessible(true);
-		    final List<Object> sqlLogList = (List<Object>)method.invoke(sqlLogRegistry, new Object[]{});
-		    final List<String> displaySqlList = new ArrayList<String>();
-		    for (Object sqlLog : sqlLogList) {
-		        displaySqlList.add(extractCompleteSqlFromContainerSqlLog(sqlLog));
-		    }
-		    return displaySqlList;
-		} catch (Exception e) {
-		    String msg = "${glInternalSqlLogRegistry}.extractCompleteSqlList() threw the exception:";
-			msg = msg + " sqlLogRegistryType=" + sqlLogRegistryType;
-		    throw new IllegalStateException(msg, e);
-		}
-	}
 
 	public static String peekCompleteSql() {
 	    final Object sqlLogRegistry = findContainerSqlLogRegistry();

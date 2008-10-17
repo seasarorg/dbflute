@@ -1,0 +1,39 @@
+
+using System;
+using System.Threading;
+
+using ${glPackageBaseCommonJdbc};
+
+namespace ${glPackageBaseCommon} {
+
+    public class ${glCallbackContextName} {
+
+        private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
+
+        public static ${glCallbackContextName} GetCallbackContextOnThread() {
+            return (${glCallbackContextName})Thread.GetData(_slot);
+        }
+
+        public static void SetCallbackContextOnThread(${glCallbackContextName} context) {
+            if (context == null) {
+                String msg = "The argument[context] must not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            Thread.SetData(_slot, context);
+        }
+
+        public static void ClearCallbackContextOnThread() {
+            Thread.SetData(_slot, null);
+        }
+
+        public static bool IsExistCallbackContextOnThread() {
+            return (Thread.GetData(_slot) != null);
+        }
+
+		protected ${glSqlLogHandlerName} _sqlLogHandler;
+		public ${glSqlLogHandlerName} SqlLogHandler {
+		    get { return _sqlLogHandler; }
+			set { _sqlLogHandler = value; }
+		}
+    }
+}

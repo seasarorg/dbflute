@@ -1,7 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
- * The interface of statement history witness.
+ * The handler of cursor.
  * @author ${database.ClassAuthor}
  */
 public interface ${glCursorHandlerName} {
@@ -11,5 +14,5 @@ public interface ${glCursorHandlerName} {
      * @return Result
      * @throws java.sql.SQLException
      */
-    Object handle(java.sql.ResultSet resultSet) throws java.sql.SQLException;
+    Object handle(ResultSet resultSet) throws SQLException;
 }

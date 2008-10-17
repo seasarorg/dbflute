@@ -1,7 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.util.List;
-
 import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
@@ -14,10 +12,6 @@ public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
 
     public String getDisplaySql() {
         return ${glInternalSqlLogRegistry}.peekCompleteSql();
-    }
-
-    public List<String> extractDisplaySqlList() {
-        return ${glInternalSqlLogRegistry}.extractCompleteSqlList();
     }
 
 	public void clearSqlCache() {

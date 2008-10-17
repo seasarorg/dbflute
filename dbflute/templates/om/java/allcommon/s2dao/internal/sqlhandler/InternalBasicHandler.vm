@@ -13,9 +13,10 @@ import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.exception.SQLRuntimeException;
 
-import ${glPackageBaseCommon}.${glQLog};
+import ${glPackageBaseCommon}.${glCallbackContextName};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommon}.${glQLog};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
@@ -23,6 +24,7 @@ import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 import ${glPackageBaseCommonException}.${glSQLFailureException};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
+import ${glPackageBaseCommonJdbc}.${glSqlLogHandlerName};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -96,14 +98,20 @@ public class ${glInternalBasicHandler} {
     }
 
     protected void logSql(Object[] args, Class<?>[] argTypes) {
-        if (${glQLog}.isLogEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+        final ${glSqlLogHandlerName} sqlLogHandler = getSqlLogHander();
+        final boolean existsSqlLogHandler = sqlLogHandler != null;
+        final boolean existsSqlLogRegistry = ${glInternalSqlLogRegistry}.existsSqlLogRegistry();
+        if (${glQLog}.isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
             if (isContainsLineSeparatorInSql()) {
                 ${glQLog}.log(getLineSeparator() + completeSql);
             } else {
                 ${glQLog}.log(completeSql);
             }
-            if (${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+            if (existsSqlLogHandler) { // DBFlute provides
+                sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
+            }
+            if (existsSqlLogRegistry) { // S2Container provides
                 final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
                 if (sqlLogRegistry != null) {
                     ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
@@ -111,7 +119,14 @@ public class ${glInternalBasicHandler} {
             }
         }
     }
-    
+
+    protected ${glSqlLogHandlerName} getSqlLogHander() {
+        if (!${glCallbackContextName}.isExistCallbackContextOnThread()) {
+            return null;
+        }
+        return ${glCallbackContextName}.getCallbackContextOnThread().getSqlLogHandler();
+    }
+
     protected boolean isContainsLineSeparatorInSql() {
         return sql != null ? sql.contains(getLineSeparator()) : false;
     }

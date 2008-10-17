@@ -66,8 +66,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Annotation]
     #set ($glOutsideSqlAnnotation = "OutsideSql")
 
-    ## [Allcommon-Base-AccessContext]
+    ## [Allcommon-Base-Context]
     #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
+    #set ($glCallbackContextName = "${glProjectPrefix}CallbackContext")
 
     ## [Allcommon-Base-Dao]
     #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
@@ -305,6 +306,7 @@ targetdatabase = $targetDatabase
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
     #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
     #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
+    #set ($glSqlLogHandlerName = "${glProjectPrefix}SqlLogHandler")
     #set ($glStatementConfig = "${glProjectPrefix}StatementConfig")
 
     ## [Allcommon-JDBC-History]
@@ -672,12 +674,16 @@ targetdatabase = $targetDatabase
     $database.info("}")
 
     ## ===================================================================================
-    ##                                                                      access-context
-    ##                                                                      ==============
-    $database.info("public void parseAccessContext() {")
-    $database.info("    parseAccessContext()")
+    ##                                                                             context
+    ##                                                                             =======
+    $database.info("public void parseContext() {")
+    $database.info("    parse('AccessContext')")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glAccessContextName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('CallbackContext')")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCallbackContextName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/CallbackContext.${glTemplateFileExtension}",$path ,"", "")
     $database.info("}")
 
     ## -----------------------------------------------------
@@ -1700,6 +1706,10 @@ targetdatabase = $targetDatabase
     $database.info("    parse('LatestSqlProvider');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProviderName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/LatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
+
+    $database.info("    parse('SqlLogHandler');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glSqlLogHandlerName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/SqlLogHandler.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('StatementConfig');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glStatementConfig}.${glClassFileExtension}" )

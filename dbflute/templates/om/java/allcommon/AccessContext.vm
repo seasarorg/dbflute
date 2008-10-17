@@ -4,11 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Access-Context.
- * <p>
- * This access-context on the thread should be initialized at the beginning of access.
- * The access is various. Web-Access, Batch-Access, JUnit-Access and so on...
- * </p>
+ * The context of DB access.
  * @author ${database.ClassAuthor}
  */
 public class ${glAccessContextName} {
@@ -17,14 +13,14 @@ public class ${glAccessContextName} {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<${glAccessContextName}> threadLocal = new ThreadLocal<${glAccessContextName}>();
+    private static final ThreadLocal<${glAccessContextName}> _threadLocal = new ThreadLocal<${glAccessContextName}>();
 
     /**
      * Get access-context on thread.
      * @return Access-context. (Nullable)
      */
     public static ${glAccessContextName} getAccessContextOnThread() {
-        return (${glAccessContextName}) threadLocal.get();
+        return (${glAccessContextName}) _threadLocal.get();
     }
 
     /**
@@ -36,7 +32,7 @@ public class ${glAccessContextName} {
             String msg = "The argument[accessContext] must not be null.";
             throw new IllegalArgumentException(msg);
         }
-        threadLocal.set(accessContext);
+        _threadLocal.set(accessContext);
     }
 
     /**
@@ -44,14 +40,14 @@ public class ${glAccessContextName} {
      * @return Determination.
      */
     public static boolean isExistAccessContextOnThread() {
-        return (threadLocal.get() != null);
+        return (_threadLocal.get() != null);
     }
 
     /**
      * Clear access-context on thread.
      */
     public static void clearAccessContextOnThread() {
-        threadLocal.set(null);
+        _threadLocal.set(null);
     }
 
     // ===================================================================================

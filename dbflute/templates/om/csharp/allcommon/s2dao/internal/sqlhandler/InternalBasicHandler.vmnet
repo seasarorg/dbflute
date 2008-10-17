@@ -79,14 +79,20 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
-            if (${glQLog}.IsLogEnabled() || ${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+            ${glSqlLogHandlerName} sqlLogHandler = GetSqlLogHander();
+            bool existsSqlLogHandler = sqlLogHandler != null;
+            bool existsSqlLogRegistry = ${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry;
+            if (${glQLog}.IsLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
                 String completeSql = GetCompleteSql(args);
                 if (IsContainsLineSeparatorInSql()) {
                     ${glQLog}.Log(GetLineSeparator() + completeSql);
                 } else {
                     ${glQLog}.Log(completeSql);
                 }
-                if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                if (existsSqlLogHandler) { // DBFlute provides
+                    sqlLogHandler.Invoke(getSql(), completeSql, args, argTypes);
+                }
+                if (existsSqlLogRegistry) { // S2Container provides (But Actually DBFlute provides at CSharp)
                     ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
                     if (sqlLogRegistry != null) {
                         sqlLogRegistry.Add(CreateInternalSqlLog(completeSql, args, argTypes));
@@ -94,6 +100,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 }
             }
         }
+
+        protected ${glSqlLogHandlerName} GetSqlLogHander() {
+            if (!${glCallbackContextName}.IsExistCallbackContextOnThread()) {
+                return null;
+            }
+            return ${glCallbackContextName}.GetCallbackContextOnThread().SqlLogHandler;
+        }
+
         protected bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }

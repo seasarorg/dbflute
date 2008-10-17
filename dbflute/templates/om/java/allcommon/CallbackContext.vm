@@ -1,0 +1,67 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import ${glPackageBaseCommonJdbc}.${glSqlLogHandlerName};
+
+/**
+ * The context of callback.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glCallbackContextName} {
+
+    // ===================================================================================
+    //                                                                        Thread Local
+    //                                                                        ============
+    /** The thread-local for this. */
+    private static final ThreadLocal<${glCallbackContextName}> _threadLocal = new ThreadLocal<${glCallbackContextName}>();
+
+    /**
+     * Get callback-context on thread.
+     * @return Access-context. (Nullable)
+     */
+    public static ${glCallbackContextName} getCallbackContextOnThread() {
+        return (${glCallbackContextName}) _threadLocal.get();
+    }
+
+    /**
+     * Set callback-context on thread.
+     * @param callbackContext Access-context. (NotNull)
+     */
+    public static void setCallbackContextOnThread(${glCallbackContextName} callbackContext) {
+        if (callbackContext == null) {
+            String msg = "The argument[callbackContext] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _threadLocal.set(callbackContext);
+    }
+
+    /**
+     * Is existing callback-context on thread?
+     * @return Determination.
+     */
+    public static boolean isExistCallbackContextOnThread() {
+        return (_threadLocal.get() != null);
+    }
+
+    /**
+     * Clear callback-context on thread.
+     */
+    public static void clearCallbackContextOnThread() {
+        _threadLocal.set(null);
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glSqlLogHandlerName} _sqlLogHandler;
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glSqlLogHandlerName} getSqlLogHandler() {
+        return _sqlLogHandler;
+    }
+
+    public void setSqlLogHandler(${glSqlLogHandlerName} sqlLogHandler) {
+        this._sqlLogHandler = sqlLogHandler;
+    }
+}
