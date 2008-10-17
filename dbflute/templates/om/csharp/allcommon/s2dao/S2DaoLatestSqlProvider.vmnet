@@ -23,7 +23,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return null;
                 }
                 return sqlLog.CompleteSql;
-            } catch (Exception ignored) {
+            } catch (Exception) {
                 return null;
             }
         }

@@ -49,7 +49,7 @@ public class ${glInternalSqlLogRegistry} {
         }}
 
         public ${glInternalSqlLog} Last { get {
-            return IsEmpty ? null : SqlLogList.Last;
+            return IsEmpty ? null : SqlLogList.Last.Value;
         }}
 
         public void Add(${glInternalSqlLog} sqlLog) {
@@ -57,7 +57,7 @@ public class ${glInternalSqlLogRegistry} {
                 return;
             }
             LinkedList<${glInternalSqlLog}> list = SqlLogList;
-            list.Add(sqlLog);
+            list.AddLast(sqlLog);
             if (list.Count > limitSize) {
                 list.RemoveFirst();
             }
