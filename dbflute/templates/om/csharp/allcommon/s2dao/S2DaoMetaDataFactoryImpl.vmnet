@@ -3,7 +3,6 @@ using System;
 using System.Data;
 using System.Collections;
 using System.Reflection;
-using System.Text;
 
 using Seasar.Framework.Util;
 using Seasar.Extension.ADO;
@@ -37,7 +36,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected readonly IDataReaderFactory _dataReaderFactory;
         protected readonly IAnnotationReaderFactory _readerFactory;
         protected IDatabaseMetaData _dbMetaData;
-        protected string _sqlFileEncoding = Encoding.Default.WebName;
+        protected string _sqlFileEncoding = System.Text.Encoding.Default.WebName;
         protected string[] _insertPrefixes;
         protected string[] _updatePrefixes;
         protected string[] _deletePrefixes;
@@ -59,19 +58,19 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected void HandleSqlLogRegistry() {
             StringBuilder sb = new StringBuilder();
-            sb.Append("{SqlLog Information}").Append(GetLineSeparator());
-            sb.Append("  [SqlLogRegistry]").Append(GetLineSeparator());
+            sb.append("{SqlLog Information}").append(GetLineSeparator());
+            sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
             if (${glDBFluteConfig}.GetInstance().IsUseSqlLogRegistry) {
                 ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
-                sb.Append("    ...Setting up SqlLogRegistry!").Append(GetLineSeparator());
-                sb.Append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
+                sb.append("    ...Setting up SqlLogRegistry!").append(GetLineSeparator());
+                sb.append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
             } else {
                 if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
                     ${glInternalSqlLogRegistryLocator}.Instance = null;
-                    sb.Append("    SqlLogRegistry is close! It's default for DBFlute.").Append(GetLineSeparator());
-                    sb.Append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
+                    sb.append("    SqlLogRegistry is close! It's default for DBFlute.").append(GetLineSeparator());
+                    sb.append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
                 } else {
-                    sb.Append("    SqlLogRegistry is not available!");
+                    sb.append("    SqlLogRegistry is not available!");
                 }
             }
             _log.Info(sb);

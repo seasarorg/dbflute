@@ -87,7 +87,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     ${glQLog}.Log(completeSql);
                 }
                 if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
-                    final ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
+                    ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
                     if (sqlLogRegistry != null) {
                         sqlLogRegistry.Add(CreateInternalSqlLog(completeSql, args, argTypes));
                     }

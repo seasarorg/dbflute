@@ -19,14 +19,14 @@ public class ${glInternalSqlLogRegistry} {
         //                                                                       Attribute
         //                                                                       =========
         [ThreadStatic]
-        private LinkedList<${glInternalSqlLog}> _sqlLogList = new LinkedList${glInternalSqlLog}>();
+        private LinkedList<${glInternalSqlLog}> _sqlLogList = new LinkedList<${glInternalSqlLog}>();
         private int limitSize;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalSqlLogRegistry}() {
-            this(DEFAULT_LIMIT_SIZE);
+            this.limitSize = DEFAULT_LIMIT_SIZE;
         }
 
         public ${glInternalSqlLogRegistry}(int limitSize) {
