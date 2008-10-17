@@ -40,5 +40,4 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
             bindArgTypes = value;
         }}
     }
-
 }

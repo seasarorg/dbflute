@@ -15,6 +15,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonUtil};
+using ${glPackageBaseCommonS2DaoInternalSqlLog};
 using ${glPackageBaseCommonS2DaoInternalUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
@@ -78,20 +79,33 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
-            if (${glQLog}.IsLogEnabled()) {
+            if (${glQLog}.IsLogEnabled() || ${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
                 String completeSql = GetCompleteSql(args);
                 if (IsContainsLineSeparatorInSql()) {
                     ${glQLog}.Log(GetLineSeparator() + completeSql);
                 } else {
                     ${glQLog}.Log(completeSql);
                 }
+                if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                    final ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
+                    if (sqlLogRegistry != null) {
+                        sqlLogRegistry.Add(CreateInternalSqlLog(completeSql, args, argTypes));
+				    }
+                }
             }
         }
-
         protected bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
 
+        protected ${glInternalSqlLog} CreateInternalSqlLog(String completeSql, Object[] args, Type[] argTypes) {
+            ${glInternalSqlLog} sqlLog = new ${glInternalSqlLog}();
+            sqlLog.RawSql = this.Sql;
+            sqlLog.CompleteSql = completeSql;
+            sqlLog.BindArgs = args;
+            sqlLog.BindArgTypes = argTypes;
+            return sqlLog;
+        }
 
         // ===============================================================================
         //                                                               Exception Handler

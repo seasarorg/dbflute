@@ -38,7 +38,7 @@ public class ${glInternalBasicHandler} {
     private StatementFactory statementFactory;
     private Object[] loggingMessageSqlArgs;
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalBasicHandler}(DataSource ds, StatementFactory statementFactory) {
@@ -48,11 +48,11 @@ public class ${glInternalBasicHandler} {
 
     public ${glInternalBasicHandler}(DataSource ds, String sql, StatementFactory statementFactory) {
         setDataSource(ds);
-		setSql(sql);
+        setSql(sql);
         setStatementFactory(statementFactory);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                           Basic Method for SubClass
     //                                                           =========================
     protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
@@ -98,23 +98,23 @@ public class ${glInternalBasicHandler} {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (${glQLog}.isLogEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
-			if (isContainsLineSeparatorInSql()) {
+            if (isContainsLineSeparatorInSql()) {
                 ${glQLog}.log(getLineSeparator() + completeSql);
-			} else {
+            } else {
                 ${glQLog}.log(completeSql);
-			}
-		    if (${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
-			    final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-				if (sqlLogRegistry != null) {
-				    ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
-				}
-			}
+            }
+            if (${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+                final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+                if (sqlLogRegistry != null) {
+                    ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
+                }
+            }
         }
     }
-	
-	protected boolean isContainsLineSeparatorInSql() {
-	    return sql != null ? sql.contains(getLineSeparator()) : false;
-	}
+    
+    protected boolean isContainsLineSeparatorInSql() {
+        return sql != null ? sql.contains(getLineSeparator()) : false;
+    }
 
     // ===================================================================================
     //                                                                   Exception Handler
@@ -141,85 +141,85 @@ public class ${glInternalBasicHandler} {
 
     public static class SQLExceptionHandler {
 
-	    public void handleSQLException(SQLException e, Statement statement) {
-	        handleSQLException(e, statement, false);
-	    }
-	    
-	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-	        handleSQLException(e, statement, uniqueConstraintValid, null);
-	    }
-	    
-	    public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, String completeSql) {
-	        if (isSqlExceptionOldStyleHandling()) {
-	            throw new SQLRuntimeException(e);
-	        }
-	        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-	            throwEntityAlreadyExistsException(e, statement, completeSql);
-	        }
-	        throwSQLFailureException(e, statement, completeSql);
-	    }
-	
-	    protected boolean isUniqueConstraintException(SQLException e) {
-	        ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
-	        if (determinator != null) {
-	            return determinator.isUniqueConstraintException(e);
-	        }
-	        return ${glConditionBeanContextName}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
-	    }
-	
-	    protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-	        return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
-	    }
-	
-	    protected boolean isSqlExceptionOldStyleHandling() {
-	        return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
-	    }
-	
-	    protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {
-	        String msg = "Look! Read the message below." + getLineSeparator();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-	        msg = msg + "The entity already exists on the database!" + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[Advice]" + getLineSeparator();
-	        msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
-	        msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
-	        msg = msg + e.getMessage() + getLineSeparator();
+        public void handleSQLException(SQLException e, Statement statement) {
+            handleSQLException(e, statement, false);
+        }
+        
+        public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
+            handleSQLException(e, statement, uniqueConstraintValid, null);
+        }
+        
+        public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, String completeSql) {
+            if (isSqlExceptionOldStyleHandling()) {
+                throw new SQLRuntimeException(e);
+            }
+            if (uniqueConstraintValid && isUniqueConstraintException(e)) {
+                throwEntityAlreadyExistsException(e, statement, completeSql);
+            }
+            throwSQLFailureException(e, statement, completeSql);
+        }
+    
+        protected boolean isUniqueConstraintException(SQLException e) {
+            ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
+            if (determinator != null) {
+                return determinator.isUniqueConstraintException(e);
+            }
+            return ${glConditionBeanContextName}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
+        }
+    
+        protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
+            return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
+        }
+    
+        protected boolean isSqlExceptionOldStyleHandling() {
+            return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
+        }
+    
+        protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The entity already exists on the database!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the primary key whether it already exists on the database." + getLineSeparator();
+            msg = msg + "And confirm the unique constraint for other columns." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
+            msg = msg + e.getMessage() + getLineSeparator();
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[NextException]" + getLineSeparator();
                 msg = msg + nextEx.getClass().getName() + getLineSeparator();
-	            msg = msg + nextEx.getMessage() + getLineSeparator();
+                msg = msg + nextEx.getMessage() + getLineSeparator();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
-	                msg = msg + getLineSeparator();
-	                msg = msg + "[NextNextException]" + getLineSeparator();
+                    msg = msg + getLineSeparator();
+                    msg = msg + "[NextNextException]" + getLineSeparator();
                     msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
-	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                    msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
             Object invokeName = extractBehaviorInvokeName();
             if (invokeName != null) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[Behavior]" + getLineSeparator();
                 msg = msg + invokeName + getLineSeparator();
             }
             if (hasConditionBean()) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[ConditionBean]" + getLineSeparator();
                 msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
             }
             if (hasOutsideSqlContext()) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[OutsideSql]" + getLineSeparator();
                 msg = msg + getOutsideSqlContext().getOutsideSqlPath() + getLineSeparator();
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[ParameterBean]" + getLineSeparator();
                 Object pmb = getOutsideSqlContext().getParameterBean();
                 if (pmb != null) {
@@ -229,64 +229,64 @@ public class ${glInternalBasicHandler} {
                     msg = msg + pmb + getLineSeparator();
                 }
             }
-	        if (statement != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator();
+            if (statement != null) {
+                msg = msg + getLineSeparator();
+                msg = msg + "[Statement]" + getLineSeparator();
                 msg = msg + statement.getClass().getName() + getLineSeparator();
-	        }
+            }
             if (completeSql != null) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[Display SQL]" + getLineSeparator();
                 msg = msg + completeSql + getLineSeparator();
             }
-	        msg = msg + "* * * * * * * * * */";
-	        throw new ${glEntityAlreadyExistsException}(msg, e);
-	    }
-	
-	    protected void throwSQLFailureException(SQLException e, Statement statement, String completeSql) {
-	        String msg = "Look! Read the message below." + getLineSeparator();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-	        msg = msg + "The SQL failed to execute!" + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[Advice]" + getLineSeparator();
-	        msg = msg + "Please confirm the SQLException message." + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-	        msg = msg + getLineSeparator();
-	        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
-	        msg = msg + e.getMessage() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new ${glEntityAlreadyExistsException}(msg, e);
+        }
+    
+        protected void throwSQLFailureException(SQLException e, Statement statement, String completeSql) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The SQL failed to execute!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the SQLException message." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLState]" + getLineSeparator() + extractSQLState(e) + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
+            msg = msg + e.getMessage() + getLineSeparator();
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[NextException]" + getLineSeparator();
+                msg = msg + getLineSeparator();
+                msg = msg + "[NextException]" + getLineSeparator();
                 msg = msg + nextEx.getClass().getName() + getLineSeparator();
-	            msg = msg + nextEx.getMessage() + getLineSeparator();
+                msg = msg + nextEx.getMessage() + getLineSeparator();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
-	                msg = msg + getLineSeparator();
-	                msg = msg + "[NextNextException]" + getLineSeparator();
+                    msg = msg + getLineSeparator();
+                    msg = msg + "[NextNextException]" + getLineSeparator();
                     msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
-	                msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                    msg = msg + nextNextEx.getMessage() + getLineSeparator();
                 }
             }
             Object invokeName = extractBehaviorInvokeName();
             if (invokeName != null) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[Behavior]" + getLineSeparator();
                 msg = msg + invokeName + getLineSeparator();
             }
             if (hasConditionBean()) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[ConditionBean]" + getLineSeparator();
                 msg = msg + getConditionBean().getClass().getName() + getLineSeparator();
             }
             if (hasOutsideSqlContext()) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[OutsideSql]" + getLineSeparator();
                 msg = msg + getOutsideSqlContext().getOutsideSqlPath() + getLineSeparator();
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[ParameterBean]" + getLineSeparator();
                 Object pmb = getOutsideSqlContext().getParameterBean();
                 if (pmb != null) {
@@ -296,13 +296,13 @@ public class ${glInternalBasicHandler} {
                     msg = msg + pmb + getLineSeparator();
                 }
             }
-	        if (statement != null) {
-	            msg = msg + getLineSeparator();
-	            msg = msg + "[Statement]" + getLineSeparator();
+            if (statement != null) {
+                msg = msg + getLineSeparator();
+                msg = msg + "[Statement]" + getLineSeparator();
                 msg = msg + statement.getClass().getName() + getLineSeparator();
-	        }
+            }
             if (completeSql != null) {
-	            msg = msg + getLineSeparator();
+                msg = msg + getLineSeparator();
                 msg = msg + "[Display SQL]" + getLineSeparator();
                 msg = msg + completeSql + getLineSeparator();
             }
@@ -511,7 +511,7 @@ public class ${glInternalBasicHandler} {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DataSource getDataSource() {

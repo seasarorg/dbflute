@@ -10,5 +10,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
         } set {
             instance = value;
         }}
+        pulic bool ExistsSqlLogRegistry { get {
+            return instance != null;
+        }}
     }
 }
