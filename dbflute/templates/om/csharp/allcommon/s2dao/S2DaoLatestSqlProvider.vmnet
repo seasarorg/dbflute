@@ -50,9 +50,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
     	protected ${glInternalSqlLogRegistry} Find${glInternalSqlLogRegistry}() {
-            if (!${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
-                return null;
-            }
             return ${glInternalSqlLogRegistryLocator}.Instance;
         }
     }

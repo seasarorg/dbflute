@@ -65,7 +65,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 sb.append("    ...Setting up SqlLogRegistry!").append(GetLineSeparator());
                 sb.append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
             } else {
-                if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                if (${glInternalSqlLogRegistryLocator}.Instance != null) {
                     ${glInternalSqlLogRegistryLocator}.Instance = null;
                     sb.append("    SqlLogRegistry is close! It's default for DBFlute.").append(GetLineSeparator());
                     sb.append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
