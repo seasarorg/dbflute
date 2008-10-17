@@ -11,10 +11,12 @@ using Seasar.Extension.ADO.Impl;
 using Seasar.Dao;
 using Seasar.Dao.Impl;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalRsHandler};
+using ${glPackageBaseCommonS2DaoInternalSqlLog};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -50,6 +52,24 @@ namespace ${glPackageBaseCommonS2Dao} {
             _commandFactory = commandFactory;
             _readerFactory = readerFactory;
             _dataReaderFactory = dataReaderFactory;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{SqlLog Information}").Append(getLineSeparator());
+            sb.Append("  [SqlLogRegistry]").Append(getLineSeparator());
+            if (${glDBFluteConfig}.GetInstance().IsUseSqlLogRegistry) {
+                ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
+                sb.Append("    ...Setting up SqlLogRegistry!").Append(getLineSeparator());
+                sb.Append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
+            } else {
+                if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
+                    ${glInternalSqlLogRegistryLocator}.Instance = null;
+                    sb.Append("    SqlLogRegistry is close! It's default for DBFlute.").Append(getLineSeparator());
+                    sb.Append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
+                } else {
+                    sb.Append("    SqlLogRegistry was not found!");
+                }
+            }
+            _log.Info(sb);
         }
 
         // ===============================================================================

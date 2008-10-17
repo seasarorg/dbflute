@@ -1272,6 +1272,10 @@ public class Database {
     public boolean isAvailableDatabaseDependency() {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
+
+    public boolean isAvailableSqlLogRegistry() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableSqlLogRegistry();
+    }
     
     public boolean isAvailableNonPrimaryKeyWritable() {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();

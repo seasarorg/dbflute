@@ -53,6 +53,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableDatabaseDependency() {
         return booleanProp("torque.isAvailableDatabaseDependency", false);
     }
+    
+    // ===================================================================================
+    //                                                                    Sql Log Registry
+    //                                                                    ================
+    public boolean isAvailableSqlLogRegistry() {
+        return booleanProp("torque.isAvailableSqlLogRegistry", false);
+    }
 
     // ===================================================================================
     //                                              ToLower in Generator Underscore Method
