@@ -270,11 +270,12 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                        Config Clear
     //                                                                        ============
-	public void clear() {
+	public void clear() { // the only properties that update OK while executing
 	    _defaultStatementConfig = null;
-	    _conditionBeanFormatSql = true;
+	    _conditionBeanFormatSql = true; // as default
 	    _queryLogLevelInfo = false;
 	    _executeStatusLogLevelInfo = false;
+	    _useSqlLogRegistry = false;
 	    _logDateFormat = null;
 	    _logTimestampFormat = null;
 		_internalDebug = false;
