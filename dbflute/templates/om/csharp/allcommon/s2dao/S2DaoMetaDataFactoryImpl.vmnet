@@ -66,7 +66,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     sb.Append("    SqlLogRegistry is close! It's default for DBFlute.").Append(getLineSeparator());
                     sb.Append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
                 } else {
-                    sb.Append("    SqlLogRegistry was not found!");
+                    sb.Append("    SqlLogRegistry is not available!");
                 }
             }
             _log.Info(sb);

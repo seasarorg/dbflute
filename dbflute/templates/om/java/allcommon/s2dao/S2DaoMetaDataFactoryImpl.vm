@@ -163,7 +163,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
             sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
         } else {
-            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
+            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
         }
         _log.info(sb);
         
