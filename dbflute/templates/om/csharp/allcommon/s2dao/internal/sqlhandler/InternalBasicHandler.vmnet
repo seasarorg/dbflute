@@ -14,6 +14,7 @@ using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
+using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonUtil};
 using ${glPackageBaseCommonS2DaoInternalSqlLog};
 using ${glPackageBaseCommonS2DaoInternalUtil};
@@ -90,7 +91,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     ${glQLog}.Log(completeSql);
                 }
                 if (existsSqlLogHandler) { // DBFlute provides
-                    sqlLogHandler.Invoke(getSql(), completeSql, args, argTypes);
+                    sqlLogHandler.Invoke(this.Sql, completeSql, args, argTypes);
                 }
                 if (existsSqlLogRegistry) { // S2Container provides (But Actually DBFlute provides at CSharp)
                     ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
