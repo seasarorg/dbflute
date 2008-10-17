@@ -17,6 +17,7 @@ using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalRsHandler};
 using ${glPackageBaseCommonS2DaoInternalSqlLog};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -54,16 +55,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             _dataReaderFactory = dataReaderFactory;
 
             StringBuilder sb = new StringBuilder();
-            sb.Append("{SqlLog Information}").Append(getLineSeparator());
-            sb.Append("  [SqlLogRegistry]").Append(getLineSeparator());
+            sb.Append("{SqlLog Information}").Append(GetLineSeparator());
+            sb.Append("  [SqlLogRegistry]").Append(GetLineSeparator());
             if (${glDBFluteConfig}.GetInstance().IsUseSqlLogRegistry) {
                 ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
-                sb.Append("    ...Setting up SqlLogRegistry!").Append(getLineSeparator());
+                sb.Append("    ...Setting up SqlLogRegistry!").Append(GetLineSeparator());
                 sb.Append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
             } else {
                 if (${glInternalSqlLogRegistryLocator}.ExistsSqlLogRegistry) {
                     ${glInternalSqlLogRegistryLocator}.Instance = null;
-                    sb.Append("    SqlLogRegistry is close! It's default for DBFlute.").Append(getLineSeparator());
+                    sb.Append("    SqlLogRegistry is close! It's default for DBFlute.").Append(GetLineSeparator());
                     sb.Append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
                 } else {
                     sb.Append("    SqlLogRegistry is not available!");
@@ -126,6 +127,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected virtual InternalDataReaderHandlerFactory CreateInternalDataReaderHandlerFactory() {
             return new InternalDataReaderHandlerFactory();
+        }
+
+        protected String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
 
         // ===============================================================================

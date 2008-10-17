@@ -157,13 +157,22 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         final StringBuilder sb = new StringBuilder();
         sb.append("{SqlLog Information}").append(getLineSeparator());
         sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-        final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-        if (sqlLogRegistry != null) {
-            ${glInternalSqlLogRegistry}.closeRegistration();
-            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
-            sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
+            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
+                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
+                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
+            } else {
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
+            }
         } else {
-            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
+            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+            if (sqlLogRegistry != null) {
+                ${glInternalSqlLogRegistry}.closeRegistration();
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+            } else {
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
+            }
         }
         _log.info(sb);
         

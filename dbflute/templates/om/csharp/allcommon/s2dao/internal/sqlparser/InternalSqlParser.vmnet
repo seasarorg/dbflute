@@ -915,8 +915,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             throw new ${glIfCommentNotBooleanResultException}(msg);
         }
 
-        protected virtual String GetLineSeparator() {
-            return Environment.NewLine;
+        protected String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 }
