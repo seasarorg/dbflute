@@ -4,16 +4,14 @@ import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
- * The provider of latest SQL as S2Dao. <br />
- * This instance should be singleton. <br />
- * 
+ * The provider of latest SQL as S2Dao.
+ * This instance should be singleton.
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
 
     /**
      * The implementation.
-     * 
      * @return Display SQL. (Nullable: If it was not found, returns null.)
      */
     public String getDisplaySql() {

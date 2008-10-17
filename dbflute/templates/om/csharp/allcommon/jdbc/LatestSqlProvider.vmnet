@@ -1,0 +1,10 @@
+
+using System;
+
+namespace ${glPackageBaseCommonJdbc} {
+
+    public interface ${glLatestSqlProviderName} {
+        String GetDisplaySql();
+	    void ClearSqlCache();
+    }
+}

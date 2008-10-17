@@ -90,14 +90,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     final ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
                     if (sqlLogRegistry != null) {
                         sqlLogRegistry.Add(CreateInternalSqlLog(completeSql, args, argTypes));
-				    }
+                    }
                 }
             }
         }
         protected bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
-
+        
         protected ${glInternalSqlLog} CreateInternalSqlLog(String completeSql, Object[] args, Type[] argTypes) {
             ${glInternalSqlLog} sqlLog = new ${glInternalSqlLog}();
             sqlLog.RawSql = this.Sql;
@@ -243,97 +243,97 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
     public class DbExceptionHandler {
 
-	    public void HandleDbException(Exception e, IDbCommand cmd) {
-	        HandleDbException(e, cmd, false);
-	    }
+        public void HandleDbException(Exception e, IDbCommand cmd) {
+            HandleDbException(e, cmd, false);
+        }
 
-	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid) {
+        public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
-	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
-	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
-	        // }
-	        HandleDbException(e, cmd, false, null);
-	    }
+            // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
+            //     ThrowEntityAlreadyExistsException(e, cmd, resource);
+            // }
+            HandleDbException(e, cmd, false, null);
+        }
 
-	    public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, String completeSql) {
+        public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, String completeSql) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
-	        // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
-	        //     ThrowEntityAlreadyExistsException(e, cmd, resource);
-	        // }
-	        ThrowSQLFailureException(e, cmd, completeSql);
-	    }
+            // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
+            //     ThrowEntityAlreadyExistsException(e, cmd, resource);
+            // }
+            ThrowSQLFailureException(e, cmd, completeSql);
+        }
 
-	    protected bool IsUniqueConstraintException(DbException e) {
+        protected bool IsUniqueConstraintException(DbException e) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
-	        // return ${glConditionBeanContextName}.IsUniqueConstraintException(ExtractSQLState(e), e.ErrorCode);
-	        return false;
-	    }
+            // return ${glConditionBeanContextName}.IsUniqueConstraintException(ExtractSQLState(e), e.ErrorCode);
+            return false;
+        }
 
-	    protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, String completeSql) {
-	        String msg = "Look! Read the message below." + GetLineSeparator();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-	        msg = msg + "The SQL failed to execute!" + GetLineSeparator();
-	        msg = msg + GetLineSeparator();
-	        msg = msg + "[Advice]" + GetLineSeparator();
-	        msg = msg + "Please confirm the Exception message." + GetLineSeparator();
-	        msg = msg + GetLineSeparator();
-	        // msg = msg + "[SQLState]" + GetLineSeparator() + ExtractSQLState(e) + GetLineSeparator();
-	        // msg = msg + GetLineSeparator();
-	        // msg = msg + "[ErrorCode]" + GetLineSeparator() + e.ErrorCode + GetLineSeparator();
-	        // msg = msg + GetLineSeparator();
-	        msg = msg + "[Exception]" + GetLineSeparator() + e.GetType().FullName + GetLineSeparator();
-	        msg = msg + e.Message + GetLineSeparator();
-	        int? errorCode = ExtractErrorCode(e);
-	        if (errorCode != null) {
-	            msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
-	        }
-	        if (e is DbException) {
-	            msg = msg + "  HelpLink  = " + ((DbException)e).HelpLink + GetLineSeparator();
-	        }
+        protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, String completeSql) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The SQL failed to execute!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the Exception message." + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            // msg = msg + "[SQLState]" + GetLineSeparator() + ExtractSQLState(e) + GetLineSeparator();
+            // msg = msg + GetLineSeparator();
+            // msg = msg + "[ErrorCode]" + GetLineSeparator() + e.ErrorCode + GetLineSeparator();
+            // msg = msg + GetLineSeparator();
+            msg = msg + "[Exception]" + GetLineSeparator() + e.GetType().FullName + GetLineSeparator();
+            msg = msg + e.Message + GetLineSeparator();
+            int? errorCode = ExtractErrorCode(e);
+            if (errorCode != null) {
+                msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+            }
+            if (e is DbException) {
+                msg = msg + "  HelpLink  = " + ((DbException)e).HelpLink + GetLineSeparator();
+            }
             Exception nextEx = e.InnerException;
             if (nextEx != null) {
-	            msg = msg + GetLineSeparator();
-	            msg = msg + "[NextException]" + GetLineSeparator();
+                msg = msg + GetLineSeparator();
+                msg = msg + "[NextException]" + GetLineSeparator();
                 msg = msg + nextEx.GetType().FullName + GetLineSeparator();
-	            msg = msg + nextEx.Message + GetLineSeparator();
-	            errorCode = ExtractErrorCode(nextEx);
-	            if (errorCode != null) {
-	                msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
-	            }
-	            if (nextEx is DbException) {
-	                msg = msg + "  HelpLink  = " + ((DbException)nextEx).HelpLink + GetLineSeparator();
-	            }
+                msg = msg + nextEx.Message + GetLineSeparator();
+                errorCode = ExtractErrorCode(nextEx);
+                if (errorCode != null) {
+                    msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+                }
+                if (nextEx is DbException) {
+                    msg = msg + "  HelpLink  = " + ((DbException)nextEx).HelpLink + GetLineSeparator();
+                }
                 Exception nextNextEx = nextEx.InnerException;
                 if (nextNextEx != null) {
-	                msg = msg + GetLineSeparator();
-	                msg = msg + "[NextNextException]" + GetLineSeparator();
+                    msg = msg + GetLineSeparator();
+                    msg = msg + "[NextNextException]" + GetLineSeparator();
                     msg = msg + nextNextEx.GetType().FullName + GetLineSeparator();
-	                msg = msg + nextNextEx.Message + GetLineSeparator();
-	                errorCode = ExtractErrorCode(nextNextEx);
-	                if (errorCode != null) {
-	                    msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
-	                }
-	                if (nextNextEx is DbException) {
-	                    msg = msg + "  HelpLink  = " + ((DbException)nextNextEx).HelpLink + GetLineSeparator();
-	                }
+                    msg = msg + nextNextEx.Message + GetLineSeparator();
+                    errorCode = ExtractErrorCode(nextNextEx);
+                    if (errorCode != null) {
+                        msg = msg + "  ErrorCode = " + errorCode + GetLineSeparator();
+                    }
+                    if (nextNextEx is DbException) {
+                        msg = msg + "  HelpLink  = " + ((DbException)nextNextEx).HelpLink + GetLineSeparator();
+                    }
                 }
             }
             Object invokeName = ExtractBehaviorInvokeName();
             if (invokeName != null) {
-	            msg = msg + GetLineSeparator();
+                msg = msg + GetLineSeparator();
                 msg = msg + "[Behavior]" + GetLineSeparator();
                 msg = msg + invokeName + GetLineSeparator();
             }
             if (HasConditionBean()) {
-	            msg = msg + GetLineSeparator();
+                msg = msg + GetLineSeparator();
                 msg = msg + "[ConditionBean]" + GetLineSeparator();
                 msg = msg + GetConditionBean().GetType().FullName + GetLineSeparator();
             }
             if (HasOutsideSqlContext()) {
-	            msg = msg + GetLineSeparator();
+                msg = msg + GetLineSeparator();
                 msg = msg + "[OutsideSqlPath]" + GetLineSeparator();
                 msg = msg + GetOutsideSqlContext().OutsideSqlPath + GetLineSeparator();
-	            msg = msg + GetLineSeparator();
+                msg = msg + GetLineSeparator();
                 msg = msg + "[ParameterBean]" + GetLineSeparator();
                 Object pmb = GetOutsideSqlContext().ParameterBean;
                 if (pmb != null) {
@@ -343,12 +343,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     msg = msg + pmb + GetLineSeparator();
                 }
             }
-	        if (cmd != null) {
-	            msg = msg + GetLineSeparator();
-	            msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
-	        }
+            if (cmd != null) {
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
+            }
             if (completeSql != null) {
-	            msg = msg + GetLineSeparator();
+                msg = msg + GetLineSeparator();
                 msg = msg + "[Display SQL]" + GetLineSeparator();
                 msg = msg + completeSql + GetLineSeparator();
             }
