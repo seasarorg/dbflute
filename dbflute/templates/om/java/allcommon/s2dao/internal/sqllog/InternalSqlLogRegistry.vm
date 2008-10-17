@@ -68,15 +68,15 @@ public class ${glInternalSqlLogRegistry} {
 	public static void clearSqlLogRegistry() {
 	    final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
 		if (sqlLogRegistryLocatorType == null) {
-		    return false;
+		    return;
 		}
 		final Class<?> sqlLogRegistryType = forNameContainerSqlLogRegistry();
 		if (sqlLogRegistryType == null) {
-		    return false;
+		    return;
 		}
 	    final Object sqlLogRegistryImpl = createContainerSqlLogRegistryImpl();
 	    if (sqlLogRegistryImpl == null) {
-	        return false;
+	        return;
 	    }
 	    try {
 	        final Method method = sqlLogRegistryType.getMethod("clear", new Class[]{});
@@ -156,7 +156,6 @@ public class ${glInternalSqlLogRegistry} {
 			msg = msg + " sqlLogRegistryType=" + sqlLogRegistryType;
 		    throw new IllegalStateException(msg, e);
 		}
-	    sqlLogRegistryType.get"getSqlLogList"
 	}
 
 	public static String peekCompleteSql() {

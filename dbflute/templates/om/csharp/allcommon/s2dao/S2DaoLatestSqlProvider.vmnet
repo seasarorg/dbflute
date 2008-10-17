@@ -9,7 +9,6 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glDaoLatestSqlProvider} : ${glLatestSqlProviderName} {
 
-        protected IList<String> _emptyList = new List<String>();
         public String GetDisplaySql() {
             return GetLastCompleteSql();
         }
@@ -33,11 +32,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         public IList<String> ExtractDisplaySqlList() {
             ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
             if (sqlLogRegistry == null) {
-                return _emptyList;
+                return new List<String>();
             }
 	        IList<String> sqlList = new List<String>();
 	        foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
-	            sqlList.Add(sqlLog.CompleteSql());
+	            sqlList.Add(sqlLog.CompleteSql);
 	        }
 	        return sqlList;
 	    }

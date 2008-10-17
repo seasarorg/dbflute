@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.util.List;
+
 import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
@@ -19,6 +21,6 @@ public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
     }
 
 	public void clearSqlCache() {
-        return ${glInternalSqlLogRegistry}.clearSqlLogRegistry();
+        ${glInternalSqlLogRegistry}.clearSqlLogRegistry();
 	}
 }
