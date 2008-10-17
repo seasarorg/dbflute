@@ -460,7 +460,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
-            return ${glInternalRowCreator}.FindDBMeta(rowType, tableName);
+            return InternalRowCreator.FindDBMeta(rowType, tableName);
         }
 
         protected override void SetupRelationAllValue(RelationRowCreationResource res) {
@@ -508,9 +508,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 		
 		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
-		    return ${glInternalRowCreator}.FindDBMeta(row);
+		    return InternalRowCreator.FindDBMeta(row);
         }
-		
+
         protected override void SetupPropertyCache(RelationRowCreationResource res) {
             // - - - - - - - - - - - 
             // Recursive Call Point!

@@ -1,8 +1,11 @@
 
 using System;
 
+using Seasar.Quill.Attrs;
+
 namespace ${glPackageBaseCommonJdbc} {
 
+    [Implementation]
     public interface ${glLatestSqlProviderName} {
         String GetDisplaySql();
 	    void ClearSqlCache();
