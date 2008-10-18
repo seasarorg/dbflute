@@ -28,11 +28,11 @@
     <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
     <td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${table.name}${col.name}">${col.name}</td>
     <td>${col.dbType}</td>
-    <td><center>#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end </center></td>
-    <td>#if ($col.hasDefaultValue() && !$col.isIdentityOrSequence()) ${col.defaultValue}#else &nbsp;#end</td>
-    <td class="subcell"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
-    <td class="subcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-    <td class="subcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
+    <td class="numcell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+    <td class="subcell">#if ($col.hasDefaultValue() && !$col.isIdentityOrSequence()) ${col.defaultValue}#else &nbsp;#end</td>
+    <td class="linkcell"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
+    <td class="linkcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+    <td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
     <td>#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
     <td class="subcell">${col.javaBeansRulePropertyName}</td>
     <td class="subcell">${col.javaNativeRemovedPackage}</td>
