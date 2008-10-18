@@ -89,7 +89,7 @@
         </tr>
       </thead>
     <tbody>
-#foreach ($tbl in $database.tables)
+#foreach ($tbl in $database.tableDisplaySortedList)
       <tr>
         <td><a href="#${tbl.name}">${tbl.name}</a></td>
         <td>${tbl.type}</td>
@@ -102,7 +102,7 @@
     </tbody>
   </table>
 
-#foreach ($tbl in $database.tables)
+#foreach ($tbl in $database.tableDisplaySortedList)
 $generator.parse("doc/html/table.vm", null, "table", $tbl)
 #end
 

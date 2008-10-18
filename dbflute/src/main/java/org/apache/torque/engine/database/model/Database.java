@@ -56,11 +56,13 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -109,7 +111,7 @@ public class Database {
 
     protected String _name;
 
-    protected String _pkg;// TODO: @jflute -- Unused?
+    protected String _pkg; // Unused on DBFlute
 
     protected String _defaultIdMethod;
 
@@ -135,7 +137,7 @@ public class Database {
      */
     public void loadFromXML(Attributes attrib) {
         setName(attrib.getValue("name"));
-        _pkg = attrib.getValue("package");// TODO: @jflute -- Unused?
+        _pkg = attrib.getValue("package"); // Unused on DBFlute
         _defaultJavaType = attrib.getValue("defaultJavaType");
         _defaultIdMethod = attrib.getValue("defaultIdMethod");
         _defaultJavaNamingMethod = attrib.getValue("defaultJavaNamingMethod");
@@ -165,6 +167,28 @@ public class Database {
             ls.add(table);
         }
         return ls;
+    }
+
+    public List<Table> getTableDisplaySortedList() {
+        final TreeSet<Table> tableSet = new TreeSet<Table>(new Comparator<Table>() {
+            public int compare(Table table1, Table table2) {
+                final String type1 = table1.getType();
+                final String type2 = table2.getType();
+                if (!type1.equals(type2)) {
+                    if (table1.isTypeTable()) {
+                        return -1;
+                    }
+                    if (table2.isTypeTable()) {
+                        return 1;
+                    }
+                    return type1.compareTo(type2);
+                }
+                final String name1 = table1.getName();
+                final String name2 = table2.getName();
+                return name1.compareTo(name2);
+            }
+        });
+        return new ArrayList<Table>(tableSet);
     }
 
     public Table getTable(String name) {
@@ -216,7 +240,7 @@ public class Database {
         return false;
     }
 
-    public void doFinalInitialization() throws EngineException {
+    public void doFinalInitialization() throws EngineException { // Unused on DBFlute
         Table[] tables = getTables();
         for (int i = 0; i < tables.length; i++) {
             Table currTable = tables[i];

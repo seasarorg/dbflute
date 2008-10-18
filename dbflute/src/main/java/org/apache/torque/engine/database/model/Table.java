@@ -376,6 +376,10 @@ public class Table implements IDMethod {
     public void setType(String type) {
         this._type = type;
     }
+    
+    public boolean isTypeTable() {
+        return _type != null && _type.equalsIgnoreCase("table");
+    }
 
     // -----------------------------------------------------
     //                                          Table Schema
