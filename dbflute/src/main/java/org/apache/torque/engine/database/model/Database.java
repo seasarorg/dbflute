@@ -54,6 +54,8 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -1740,6 +1742,14 @@ public class Database {
         _log.debug(msg);
     }
 
+    // -----------------------------------------------------
+    //                                             Timestamp
+    //                                             ---------
+    public String getTimestampExpression() {
+        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(timestamp);
+    }
+    
     // -----------------------------------------------------
     //                                                String
     //                                                ------

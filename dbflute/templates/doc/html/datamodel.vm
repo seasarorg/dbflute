@@ -27,7 +27,10 @@
         border-left: 10px solid #af0000;
         text-indent: 10px;
     }
-    
+    .updatedate {
+        text-align: right;
+    }
+
     /* table */
     table {
         border-collapse:collapse;
@@ -76,18 +79,19 @@
 
 <body>
   <h1>${database.projectName} schema on ${database.databaseName}</h1>
-  <h2>Tables</h2>
+  <p class="updatedate">${database.timestampExpression}</p>
+  <h2>Table List</h2>
   <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>ForeignTable</th>
-          <th>ReferrerTable</th>
-          <th>Comment</th>
-          <th>EntityName</th>
-        </tr>
-      </thead>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>ForeignTable</th>
+        <th>ReferrerTable</th>
+        <th>Comment</th>
+        <th>EntityName</th>
+      </tr>
+    </thead>
     <tbody>
 #foreach ($tbl in $database.tableDisplaySortedList)
       <tr>
