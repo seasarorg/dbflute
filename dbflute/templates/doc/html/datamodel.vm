@@ -84,8 +84,8 @@
           <th>Type</th>
           <th>ForeignTable</th>
           <th>ReferrerTable</th>
-          <th>EntityName</th>
           <th>Comment</th>
+          <th>EntityName</th>
         </tr>
       </thead>
     <tbody>
@@ -95,8 +95,8 @@
         <td>${tbl.type}</td>
         <td class="subcell">${tbl.foreignTableNameCommaStringWithHtmlHref}</td>
         <td class="subcell">${tbl.referrerTableNameCommaStringWithHtmlHref}</td>
-        <td class="subcell">${tbl.javaName}</td>
         <td>#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
+        <td class="subcell">${tbl.javaName}</td>
       </tr>
 #end
     </tbody>
