@@ -127,7 +127,7 @@ $generator.parse("doc/html/table.vm", null, "table", $tbl)
   #set ($existTop = false)
 #end
       <tr>
-        <td>$classificationName</td>
+        <td><a name="${classificationName}"/>${classificationName}</td>
         <td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
         <td>
           <table class="child">
@@ -138,7 +138,7 @@ $generator.parse("doc/html/table.vm", null, "table", $tbl)
             </tr>
 #foreach ($classificationMap in $classificationMapList)
             <tr>
-              <td><a name="$classificationName"/>$classificationMap.get('code')</td>
+              <td>$classificationMap.get('code')</td>
               <td>${classificationMap.get('name')}</td>
               <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
             </tr>
