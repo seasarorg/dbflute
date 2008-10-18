@@ -101,7 +101,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual void Log(String msg) {
-            return ${glQLog}.Log(msg);
+            ${glQLog}.Log(msg);
         }
 
         protected virtual String GetCompleteSql(Object[] args) {
