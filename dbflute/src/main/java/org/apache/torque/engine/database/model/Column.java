@@ -1459,7 +1459,8 @@ public class Column {
         if (isIdentity()) {
             return true;
         }
-        if (getTable().hasOnlyOnePrimaryKey() && getTable().isUseSequence()) {
+        final Table table = getTable();
+        if (isPrimaryKey() && table.hasOnlyOnePrimaryKey() && table.isUseSequence()) {
             return true;
         }
         return false;
