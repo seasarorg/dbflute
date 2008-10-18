@@ -71,7 +71,7 @@ namespace ${glPackageBaseCommonCBean} {
     		if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
     		    ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
     			String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
-    			msg = msg + "[Executed SQL for Display]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+    			msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
     		} else {
                 msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4Log + GetLineSeparator();
             }
@@ -95,7 +95,7 @@ namespace ${glPackageBaseCommonCBean} {
     		if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
     		    ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
     			String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
-    			msg = msg + "[Executed SQL for Display]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+    			msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
     		} else {
                 msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4Log + GetLineSeparator();
             }

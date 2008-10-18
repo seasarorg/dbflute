@@ -252,7 +252,7 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
+			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
@@ -271,7 +271,7 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
+			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
