@@ -1451,7 +1451,7 @@ public class Column {
             throw e;
         }
     }
-    
+
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
@@ -1479,6 +1479,27 @@ public class Column {
     }
 
     // ===================================================================================
+    //                                                                       Common Column
+    //                                                                       =============
+    protected Boolean _commonColumn;
+
+    protected boolean isCommonColumn() {
+        if (_commonColumn == null) {
+            _commonColumn = false;
+            final List<Column> commonColumnList = getTable().getCommonColumnList();
+            if (getTable().hasAllCommonColumn()) {
+                for (Column column : commonColumnList) {
+                    if (column.getName().equals(getName())) {
+                        _commonColumn = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return _commonColumn;
+    }
+
+    // ===================================================================================
     //                                                                          Version No
     //                                                                          ==========
     public boolean isVersionNo() {
@@ -1487,8 +1508,8 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                          Version No
-    //                                                                          ==========
+    //                                                                         Update Date
+    //                                                                         ===========
     public boolean isUpdateDate() {
         final String updateDatePropertyName = getTable().getUpdateDatePropertyName();
         return getTable().isUseUpdateDate() && getJavaName().equalsIgnoreCase(updateDatePropertyName);
@@ -1537,5 +1558,27 @@ public class Column {
         public DfLanguageDependencyInfo getLanguageDependencyInfo() {
             return getBasicProperties().getLanguageDependencyInfo();
         }
+    }
+
+    // ===================================================================================
+    //                                                                           CSS Class
+    //                                                                           =========
+    public boolean hasSchemaHtmlColumnNameCssClass() {
+        return isCommonColumn() || isVersionNo() || isUpdateDate();
+    }
+
+    public String getSchemaHtmlColumnNameCssClass() {
+        final String delimiter = " ";
+        final StringBuilder sb = new StringBuilder();
+        if (isCommonColumn()) {
+            sb.append("comcolcell");
+        }
+        if (isVersionNo() || isUpdateDate()) {
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append("optcell");
+        }
+        return sb.toString();
     }
 }

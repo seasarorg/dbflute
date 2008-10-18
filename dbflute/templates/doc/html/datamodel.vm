@@ -50,6 +50,12 @@
 	.subcell {
         font-size: 0.8em;
     }
+	.comcolcell {
+        color: #666;
+    }
+	.optcell {
+        font-style: italic;
+    }
 
     /* inner table */
     table.child {
