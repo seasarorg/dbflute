@@ -117,7 +117,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         try {
             final String tableName = tableMetaInfo.getTableName();
             final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
-            parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, true, true);
+            final boolean uniqueKeyOnly = true;
+            parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final boolean isNonUnique;
                 {

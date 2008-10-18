@@ -77,6 +77,8 @@ public class Index {
     /** Log instance. */
     private static Log log = LogFactory.getLog(Index.class);
 
+    public static final Integer FIRST_POSITION = Integer.valueOf(1);
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -109,7 +111,7 @@ public class Index {
      * @exception EngineException Error generating name.
      * @see #Index()
      */
-    protected Index(Table table, List<Column> indexColumns) throws EngineException {
+    protected Index(Table table, List<Column> indexColumns) throws EngineException { // Unused on DBFlute
         this();
         setTable(table);
         if (indexColumns.isEmpty()) {
@@ -133,7 +135,7 @@ public class Index {
      * Creates a name for the index using the NameFactory.
      * @throws EngineException if the name could not be created
      */
-    private void createName() throws EngineException {
+    private void createName() throws EngineException { // Unused on DBFlute
         final Table table = getTable();
         final List<Object> inputs = new ArrayList<Object>(4);
         inputs.add(table.getDatabase());
@@ -192,7 +194,7 @@ public class Index {
         if (getIndexColumnMap().isEmpty()) {
             return false;
         }
-        final String first = getIndexColumnMap().get(Integer.valueOf(1));
+        final String first = getIndexColumnMap().get(FIRST_POSITION);
         if (first == null) {
             return false;
         }

@@ -195,7 +195,7 @@ public class Table implements IDMethod {
         _javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // These are unused at DBFlute!
+        // These are unused on DBFlute!
         // - - - - - - - - - -/
         _idMethod = attrib.getValue("idMethod");
         if ("null".equals(_idMethod)) {
@@ -209,14 +209,14 @@ public class Table implements IDMethod {
         }
         _skipSql = "true".equals(attrib.getValue("skipSql"));
 
-        // Unused at DBFlute
+        // Unused on DBFlute
         // _pkg = attrib.getValue("package");
 
-        // Unused at DBFlute
+        // Unused on DBFlute
         // _baseClass = attrib.getValue("baseClass");
         // _basePeer = attrib.getValue("basePeer");
 
-        // These are unused at DBFlute
+        // These are unused on DBFlute
         _abstractValue = "true".equals(attrib.getValue("abstract"));
         _alias = attrib.getValue("alias");
         _isHeavyIndexing = "true".equals(attrib.getValue("heavyIndexing"))
