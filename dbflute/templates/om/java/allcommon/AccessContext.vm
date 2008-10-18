@@ -17,7 +17,7 @@ public class ${glAccessContextName} {
 
     /**
      * Get access-context on thread.
-     * @return Access-context. (Nullable)
+     * @return The context of DB access.. (Nullable)
      */
     public static ${glAccessContextName} getAccessContextOnThread() {
         return (${glAccessContextName}) _threadLocal.get();
@@ -25,7 +25,7 @@ public class ${glAccessContextName} {
 
     /**
      * Set access-context on thread.
-     * @param accessContext Access-context. (NotNull)
+     * @param accessContext The context of DB access.. (NotNull)
      */
     public static void setAccessContextOnThread(${glAccessContextName} accessContext) {
         if (accessContext == null) {

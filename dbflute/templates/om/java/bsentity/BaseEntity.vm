@@ -94,7 +94,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                Column
     //                                                ------
 #foreach ($col in $table.columns)
-    /** The attribute of the column '${col.name}'. {${col.columnDefinitionLineDisp}} */
+    /** ${col.name}: {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
@@ -473,8 +473,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     /**
-     * Get the value of the column '${col.name}'. <br />
-     * {${col.columnDefinitionLineDisp}}
+     * ${col.name}: {${col.columnDefinitionLineDisp}}
      * @return The value of the column '${col.name}'. (Nullable)
      */
     public ${col.JavaNative} get${col.javaName}() {
@@ -482,8 +481,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the value of the column '${col.name}'. <br />
-     * {${col.columnDefinitionLineDisp}}
+     * ${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {

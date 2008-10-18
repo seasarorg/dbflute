@@ -16,7 +16,7 @@ public class ${glCallbackContextName} {
 
     /**
      * Get callback-context on thread.
-     * @return Access-context. (Nullable)
+     * @return The context of callback. (Nullable)
      */
     public static ${glCallbackContextName} getCallbackContextOnThread() {
         return (${glCallbackContextName}) _threadLocal.get();
@@ -24,7 +24,7 @@ public class ${glCallbackContextName} {
 
     /**
      * Set callback-context on thread.
-     * @param callbackContext Access-context. (NotNull)
+     * @param callbackContext The context of callback. (NotNull)
      */
     public static void setCallbackContextOnThread(${glCallbackContextName} callbackContext) {
         if (callbackContext == null) {

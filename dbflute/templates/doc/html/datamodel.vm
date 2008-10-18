@@ -1,35 +1,96 @@
-#set ( $database = $dataModel.database )
-${database.initializeClassificationDeployment()}
-
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
-  <title>$dataModel.name</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <style>
-  .normalFont {
-    $docHtmlNormalFont
-  }
+  <title>${database.projectName} schema</title>
+  <style type="text/css">
+      * {
+          margin: 0;
+        padding: 0;
+      }
+    body {
+          font-family: sans-serif;
+        font-size: 90%;
+        margin: 10px 5px 5px 15px;
+    }
+    
+    /* header */
+    h1 {
+        font-size: 1.5em;
+        border-bottom: 2px solid #af0000;
+        border-top: 2px solid #af0000;
+    }
+    h2 {
+        margin: 30px 0 5px 0;
+        font-size: 1.8em;
+        border-bottom: 2px solid #af0000;
+        border-left: 10px solid #af0000;
+        text-indent: 10px;
+    }
+    
+    /* table */
+    table {
+        border-collapse:collapse;
+    }
+    table, th {
+        border: 1px solid #555;
+    }
+    th {
+        background-color: #cc9;
+        font-size: 0.8em;
+    }
+    td {
+        border-bottom: 1px dotted #aaa;
+        border-left: 1px solid #555;
+        padding:2px;
+    }
+    .flgcell {
+        text-align: center;
+    }
+    
+    /* inner table */
+    table.child {
+        margin: 3px;
+    }
+    table.child th {
+        font-size: 0.7em;
+        background-color: #fff;
+    }
+    table.child, table.child td, table.child th {
+        border-top: none;
+        border-left: none;
+        border-bottom: 1px solid #aaa;
+        border-right: 1px solid #aaa;
+    }
   </style>
 </head>
 
-<body class="normalFont">
-  <table border="1" cellspacing="0" cellpadding="0">
-    <tr bgcolor="#CCCCCC">
-      <th class="normalFont">Table Name</th>
-      <th class="normalFont">Entity Name</th>
-      <th class="normalFont">Foreign Table</th>
-      <th class="normalFont">Referrer Table</th>
-      <th class="normalFont">Comment</th>
-    </tr>
+<body>
+  <h1>${database.projectName} schema on ${database.databaseName}</h1>
+  <h2>Tables</h2>
+  <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>ForeignTable</th>
+          <th>ReferrerTable</th>
+          <th>EntityName</th>
+          <th>Comment</th>
+        </tr>
+      </thead>
+    <tbody>
 #foreach ($tbl in $database.tables)
-    <tr>
-      <td class="normalFont"><a href="#$tbl.Name">$tbl.Name</a></td>
-      <td class="normalFont">$tbl.javaName</td>
-      <td class="normalFont">$tbl.foreignTableNameCommaStringWithHtmlHref</td>
-      <td class="normalFont">$tbl.referrerTableNameCommaStringWithHtmlHref</td>
-      <td class="normalFont">#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
-    </tr>
+      <tr>
+        <td><a href="#${tbl.name}">${tbl.name}</a></td>
+        <td>${tbl.type}</td>
+        <td>${tbl.foreignTableNameCommaStringWithHtmlHref}</td>
+        <td>${tbl.referrerTableNameCommaStringWithHtmlHref}</td>
+        <td>${tbl.javaName}</td>
+        <td>#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
+      </tr>
 #end
+    </tbody>
   </table>
 
 #foreach ($tbl in $database.tables)
@@ -37,49 +98,48 @@ $generator.parse("doc/html/table.vm", null, "table", $tbl)
 #end
 
 #if ($database.hasClassificationDefinitionMap())
-  <p/>
-  <p/>
   <h2>Classification Definition</h2>
-  <p/>
-  <table border="1" cellspacing="0" cellpadding="0">
-    <tr bgcolor="#CCCCCC">
-      <th class="normalFont">Classification</th>
-      <th class="normalFont">Top Comment</th>
-      <th class="normalFont">Definition</th>
-    </tr>
+  <table>
+      <thead>
+      <tr>
+        <th>Classification</th>
+        <th>Top Comment</th>
+        <th>Definition</th>
+      </tr>
+      </thead>
+    <tbody>
 #foreach ($classificationName in $database.classificationNameList)
-  #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+  #set ($existTop = true)
+#else
   #set ($existTop = false)
-  #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-    #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
-    #set ($existTop = true)
-  #else
-    #set ($existTop = false)
-  #end
-
-    <tr>
-      <td class="normalFont">$classificationName</td>
-      <td class="normalFont">#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
-      <td class="normalFont">
-	    <table border="1">
-          <tr bgcolor="#EEEEEE">
-            <th class="normalFont">Code</th>
-            <th class="normalFont">Name</th>
-            <th class="normalFont">Comment</th>
-          </tr>
+#end
+      <tr>
+        <td>$classificationName</td>
+        <td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
+        <td>
+          <table class="child">
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Comment</th>
+            </tr>
 #foreach ($classificationMap in $classificationMapList)
-          <tr>
-            <td><a name="$classificationName"/>$classificationMap.get('code')</td>
-            <td>${classificationMap.get('name')}</td>
-            <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
-          </tr>
+            <tr>
+              <td><a name="$classificationName"/>$classificationMap.get('code')</td>
+              <td>${classificationMap.get('name')}</td>
+              <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
+            </tr>
 #end
-        </table>
-	  </td>
-    </tr>
+          </table>
+        </td>
+      </tr>
 #end
+    <tbody>
   </table>
 #end
-
 </body>
 </html>

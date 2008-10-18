@@ -119,26 +119,26 @@ public class Column {
 
     private String _columnSize;
 
-    // ........................
-    //               Constraint
-    //               ^^^^^^^^^^
+    // -----------------------------------------------------
+    //                                            Constraint
+    //                                            ----------
     private boolean _isNotNull = false;
 
-    // ........................
-    //                    Other
-    //                    ^^^^^
+    // -----------------------------------------------------
+    //                                             Java Name
+    //                                             ---------
     private String _javaName = null;
 
     private String _javaNamingMethod;
-
-    // ------------------------------------
-    //                             Relation
-    //                             --------
+    
+    // -----------------------------------------------------
+    //                                              Relation
+    //                                              --------
     private List<ForeignKey> _referrers;
 
-    // ------------------------------------
-    //                                Other
-    //                                -----
+    // -----------------------------------------------------
+    //                                                 Other
+    //                                                 -----
     private int _position;
 
     // only one type is supported currently, which assumes the
@@ -158,6 +158,9 @@ public class Column {
     //    /** class name to do input validation on this column */
     //    private String _inputValidator = null;
 
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
     private String _sql2EntityTableName;
 
     // ==============================================================================
@@ -172,7 +175,6 @@ public class Column {
 
     /**
      * Creates a new column and set the name
-     *
      * @param name column name
      */
     public Column(String name) {
@@ -254,8 +256,11 @@ public class Column {
     }
 
     // ==============================================================================
-    //                                                                       Accessor
-    //                                                                       ========
+    //                                                              Basic Information
+    //                                                              =================
+    // -----------------------------------------------------
+    //                                           Column Name
+    //                                           -----------
     public String getName() {
         return _name;
     }
@@ -264,6 +269,10 @@ public class Column {
         _name = newName;
     }
 
+    // -----------------------------------------------------
+    //                                           Description
+    //                                           -----------
+    // No use at DBFlute
     public String getDescription() {
         return _description;
     }
@@ -273,8 +282,8 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                              JavaName
-    //                                              --------
+    //                                             Java Name
+    //                                             ---------
     protected boolean _needsJavaNameConvert = true;
 
     public void setupNeedsJavaNameConvertFalse() {
@@ -327,6 +336,9 @@ public class Column {
         this._javaName = javaName;
     }
 
+    // -----------------------------------------------------
+    //                                             Java Type
+    //                                             ---------
     /**
      * Get type to use in Java sources
      */
@@ -350,6 +362,10 @@ public class Column {
         this._position = v;
     }
 
+
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
     /**
      * Set the parent Table of the column
      */
@@ -433,22 +449,22 @@ public class Column {
         }
         if (isAutoIncrement()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("INC");
+            sb.append("ID");
         }
         if (isUnique()) {
             plugDelimiterIfNeeds(sb);
             sb.append("UQ");
+        }
+        if (isNotNull()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("NotNull");
         }
         plugDelimiterIfNeeds(sb);
         sb.append(getDbType() != null ? getDbType() : "UnknownType");
         if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
             sb.append("(" + getColumnSize() + ")");
         }
-        if (isNotNull()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("NotNull");
-        }
-        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0) {
+        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0 && !isAutoIncrement()) {
             plugDelimiterIfNeeds(sb);
             sb.append("Default=[").append(getDefaultValue() + "]");
         }
@@ -544,7 +560,7 @@ public class Column {
 
     // -----------------------------------------------------
     //                                               NotNull
-    //                                               ==-----
+    //                                               -------
     /**
      * Return the isNotNull property of the column
      */
@@ -710,9 +726,9 @@ public class Column {
         }
     }
 
-    // -------------------------------------------
-    //                                    Referrer
-    //                                    --------
+    // -----------------------------------------------------
+    //                                              Referrer
+    //                                              --------
     /**
      * Adds the foreign key from another table that refers to this column.
      */
@@ -840,9 +856,9 @@ public class Column {
                         .equals("CHAR"));
     }
 
-    // ===================================================================================
-    //                                                                      Column Comment
-    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                        Column Comment
+    //                                        --------------
     public boolean hasComment() {
         return _comment != null && _comment.trim().length() > 0;
     }
@@ -854,10 +870,10 @@ public class Column {
     public void setComment(String comment) {
         this._comment = comment;
     }
-    
-    // ===================================================================================
-    //                                                                       Default Value
-    //                                                                       =============
+
+    // -----------------------------------------------------
+    //                                         Default Value
+    //                                         -------------
     /**
      * Return a string that will give this column a default value.
      */
@@ -898,9 +914,9 @@ public class Column {
         _sql2EntityTableName = sql2EntityTableName;
     }
 
-    // =========================================================================================
-    //                                                                            Checked Getter
-    //                                                                            ==============
+    // ===================================================================================
+    //                                                                      Checked Getter
+    //                                                                      ==============
     protected Database getDatabaseChecked() {
         final Table tbl = getTable();
         if (tbl == null) {
@@ -913,12 +929,11 @@ public class Column {
         return db;
     }
 
-    // =========================================================================================
-    //                                                                                toString()
-    //                                                                                ==========
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * String representation of the column. This is an xml representation.
-     *
      * @return string representation in xml
      */
     public String toString() {
@@ -959,6 +974,9 @@ public class Column {
         return result.toString();
     }
 
+    // ===================================================================================
+    //                                                                              Unused
+    //                                                                              ======
     /**
      * Set the column type from a string property
      * (normally a string from an sql input file)
@@ -1009,8 +1027,15 @@ public class Column {
         return TypeMap.findJavaNativeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
     }
 
-    // for CSharp
-    public String getJavaNativeRemovedCSharpNullable() {
+    public String getJavaNativeRemovedPackage() { // for SchemaHTML
+        final String javaNative = getJavaNative();
+        if (!javaNative.contains(".")) {
+            return javaNative;
+        }
+        return javaNative.substring(javaNative.lastIndexOf(".") + ".".length());
+    }
+
+    public String getJavaNativeRemovedCSharpNullable() { // for CSharp
         final String javaNative = getJavaNative();
         if (javaNative.endsWith("?")) {
             return javaNative.substring(0, javaNative.length() - "?".length());

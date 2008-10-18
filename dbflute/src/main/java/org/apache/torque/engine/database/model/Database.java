@@ -149,10 +149,6 @@ public class Database {
     // ===================================================================================
     //                                                                               Table
     //                                                                               =====
-    /**
-     * Return an array of all tables
-     * @return array of all tables
-     */
     public Table[] getTables() {
         int size = _tableList.size();
         Table[] tbls = new Table[size];
@@ -162,10 +158,6 @@ public class Database {
         return tbls;
     }
 
-    /**
-     * Return an array of all tables
-     * @return array of all tables
-     */
     public List<Table> getTableList() {
         final List<Table> ls = new ArrayList<Table>();
         final Table[] tables = getTables();
@@ -175,20 +167,10 @@ public class Database {
         return ls;
     }
 
-    /**
-     * Return the table with the specified name.
-     * @param name table name
-     * @return A Table object.  If it does not exist it returns null
-     */
     public Table getTable(String name) {
         return (Table) _flexibleTableMap.get(name);
     }
 
-    /**
-     * An utility method to add a new table from an xml attribute.
-     * @param attrib the xml attributes
-     * @return the created Table
-     */
     public Table addTable(Attributes attrib) {
         Table tbl = new Table();
         tbl.setDatabase(this);
@@ -197,10 +179,6 @@ public class Database {
         return tbl;
     }
 
-    /**
-     * Add a table to the list and sets the Database property to this Database
-     * @param tbl the table to add
-     */
     public void addTable(Table tbl) {
         tbl.setDatabase(this);
         _tableList.add(tbl);
@@ -615,19 +593,23 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                               JavaDir
+    //                                               Project
     //                                               -------
-    public String getJavaDir() {
-        return getBasicProperties().getOutputDirectory();
+    public String getProjectName() {
+        return getBasicProperties().getProjectName();
     }
 
     // -----------------------------------------------------
     //                                              Database
     //                                              --------
+    public String getDatabaseName() {
+        return getBasicProperties().getDatabaseName();
+    }
+
     public boolean isDatabaseOracle() {
         return getBasicProperties().isDatabaseOracle();
     }
-    
+
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
@@ -635,7 +617,7 @@ public class Database {
     public boolean isDatabaseMySQL() {
         return getBasicProperties().isDatabaseMySQL();
     }
-    
+
     // -----------------------------------------------------
     //                                              Language
     //                                              --------
@@ -703,6 +685,13 @@ public class Database {
     //                                              --------
     public String getTemplateFileEncoding() {
         return getBasicProperties().getTemplateFileEncoding();
+    }
+
+    // -----------------------------------------------------
+    //                                               JavaDir
+    //                                               -------
+    public String getJavaDir() {
+        return getBasicProperties().getOutputDirectory();
     }
 
     // -----------------------------------------------------
@@ -1276,15 +1265,15 @@ public class Database {
     public boolean isAvailableNonPrimaryKeyWritable() {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
-    
+
     public boolean isCompatibleSQLExceptionHandlingOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
     }
-    
+
     public boolean isCompatibleS2DaoSQLAnnotationValid() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
     }
-    
+
     public boolean isCompatibleOutsideSqlResultOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
     }
@@ -1295,11 +1284,11 @@ public class Database {
     public boolean isSqlLogRegistryValid() {
         return getProperties().getSqlLogRegistryProperties().isValid();
     }
-    
+
     public int getSqlLogRegistryLimitSize() {
         return getProperties().getSqlLogRegistryProperties().getLimitSize();
     }
-    
+
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----
@@ -1379,7 +1368,7 @@ public class Database {
     public boolean isRemoveLineCommentFromExecutedSql() {
         return getProperties().getOutsideSqlProperties().isRemoveLineCommentFromExecutedSql();
     }
-    
+
     public boolean isDefaultPackageValid() {
         return getProperties().getOutsideSqlProperties().isDefaultPackageValid();
     }
@@ -1395,11 +1384,11 @@ public class Database {
     public String getOmitResourcePathPackage() {
         return getProperties().getOutsideSqlProperties().getOmitResourcePathPackage();
     }
-    
+
     public boolean isOmitFileSystemPathPackageValid() {
         return getProperties().getOutsideSqlProperties().isOmitFileSystemPathPackageValid();
     }
-    
+
     public String getOmitFileSystemPathPackage() {
         return getProperties().getOutsideSqlProperties().getOmitFileSystemPathPackage();
     }
@@ -1411,11 +1400,11 @@ public class Database {
     public String getOmitDirectoryPackage() {
         return getProperties().getLittleAdjustmentProperties().getOmitDirectoryPackage();
     }
-    
+
     public boolean isFlatDirectoryPackageValid() {
         return getProperties().getLittleAdjustmentProperties().isFlatDirectoryPackageValid();
     }
-    
+
     public String getFlatDirectoryPackage() {
         return getProperties().getLittleAdjustmentProperties().getFlatDirectoryPackage();
     }
@@ -1542,12 +1531,12 @@ public class Database {
     }
 
     //====================================================================================
-    //                                                                     databaseInfoMap
-    //                                                                     ===============
-    protected Map<String, String> _databaseInfoMap;
+    //                                                                 Database Definition
+    //                                                                 ===================
+    protected Map<String, String> _databaseDefinitionMap;
 
     public Map<String, String> getDatabaseInfoMap() {
-        if (_databaseInfoMap == null) {
+        if (_databaseDefinitionMap == null) {
             final Map<String, Map<String, String>> databaseDefinitionMap = getDatabaseDefinitionMap();
             Map<String, String> databaseInfoMap = databaseDefinitionMap.get(getDatabaseType());
             if (databaseInfoMap == null) {
@@ -1557,9 +1546,9 @@ public class Database {
                     throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
                 }
             }
-            _databaseInfoMap = databaseInfoMap;
+            _databaseDefinitionMap = databaseInfoMap;
         }
-        return _databaseInfoMap;
+        return _databaseDefinitionMap;
     }
 
     protected Map<String, Map<String, String>> getDatabaseDefinitionMap() {

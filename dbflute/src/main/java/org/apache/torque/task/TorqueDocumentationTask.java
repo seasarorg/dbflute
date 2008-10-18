@@ -63,24 +63,45 @@ import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String _outputFormat;
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    @Override
+    protected void doExecute() {
+        super.doExecute();
+        refreshResources();
+    }
+
+    // ===================================================================================
+    //                                                                         Data Source
+    //                                                                         ===========
+    protected boolean isUseDataSource() {
+        return false; // No use data source.
+    }
+
+    // ===================================================================================
+    //                                                                       Task Override
+    //                                                                       =============
+    public Context initControlContext() throws Exception {
+        super.initControlContext();
+        _context.put("outputFormat", _outputFormat);
+        _context.put("escape", new Escape());
+        return _context;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getOutputFormat() {
         return _outputFormat;
     }
 
     public void setOutputFormat(String v) {
         _outputFormat = v;
-    }
-
-    protected boolean isUseDataSource() {
-        return false;
-    }
-
-    public Context initControlContext() throws Exception {
-        super.initControlContext();
-        _context.put("outputFormat", _outputFormat);
-        _context.put("escape", new Escape());
-        return _context;
     }
 }

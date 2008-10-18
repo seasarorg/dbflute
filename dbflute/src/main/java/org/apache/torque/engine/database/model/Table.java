@@ -423,7 +423,7 @@ public class Table implements IDMethod {
     //                                Basic Info Disp String
     //                                ----------------------
     public String getBasicInfoDispString() {
-        return _name + "(" + _type + ")";
+        return _name + " that the type is " + _type;
     }
 
     // -----------------------------------------------------

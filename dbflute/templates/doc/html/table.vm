@@ -1,54 +1,39 @@
-
-<a name="$table.name"/>
-<h2>$table.name</h2>
-$!table.Description
-<p/>
-<table border="1" cellspacing="0">
-  <tr>
-    <th class="normalFont" bgcolor="#CCCCCC">PK</th>
-    <th class="normalFont" bgcolor="#CCCCCC">INC</th>
-    <th class="normalFont" bgcolor="#CCCCCC">UQ</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Name</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Type</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Size</th>
-    <th class="normalFont" bgcolor="#CCCCCC">NotNull</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Default</th>
-    <th class="normalFont" bgcolor="#CCCCCC">ForeignTable</th>
-    <th class="normalFont" bgcolor="#CCCCCC">ReferrerTable</th>
-    <th class="normalFont" bgcolor="#CCCCCC">PropertyName</th>
-    <th class="normalFont" bgcolor="#CCCCCC">${table.database.targetLanguageInitCap}Type</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Comment</th>
-  </tr>
+<h2><a name="$table.name" />${table.name}</h2>
+<table>
+  <thead>
+    <tr>
+      <th>PK</th>
+      <th>ID</th>
+      <th>UQ</th>
+      <th>Not<br />Null</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Def</th>
+      <th>ForeignTable</th>
+      <th>ReferrerTable</th>
+      <th>PropertyName</th>
+      <th>${table.database.targetLanguageInitCap}Type</th>
+      <th>Classification</th>
+      <th>Comment</th>
+    </tr>
+  </thead>
 #foreach ($col in $table.columns)
   <tr>
-    <td class="normalFont"><center> #if ($col.isPrimaryKey())o#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isAutoIncrement())o#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isUnique())o#else &nbsp;#end </center></td>
-    <td class="normalFont" id="${table.name}${col.name}">${col.name}</td>
-    <td class="normalFont">${col.dbType}</td>
-    <td class="normalFont"><center>#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isNotNull())o#else &nbsp;#end </center></td>
-    <td class="normalFont">#if ($col.hasDefaultValue() && !$col.isAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
-    <td class="normalFont"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
-    <td class="normalFont">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-    <td class="normalFont">${col.javaBeansRulePropertyName}</td>
-    <td class="normalFont">${col.javaNative}</td>
-    <td class="normalFont">#if ($col.hasClassification()==true)<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
-    <td class="normalFont">#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isAutoIncrement())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isUnique())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isNotNull())o#else &nbsp;#end</td>
+    <td id="${table.name}${col.name}">${col.name}</td>
+    <td>${col.dbType}</td>
+    <td><center>#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end </center></td>
+    <td>#if ($col.hasDefaultValue() && !$col.isAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
+    <td><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
+    <td>${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+    <td>${col.javaBeansRulePropertyName}</td>
+    <td>${col.javaNativeRemovedPackage}</td>
+    <td>#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
+    <td>#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
   </tr>
 #end
 </table>
-<script>
-#foreach ($foreignKey in $table.foreignKeys)
-if(document.getElementById) {
-#foreach ($columnName in $foreignKey.localColumns)
-    var col = document.getElementById("${table.name}${columnName}");
-    if (col != null) {
-        col.style.backgroundColor = "${docHtmlFkColor}";
-        col.title="Foreignkey from ${foreignKey.foreignTableName}.${foreignKey.foreignColumnNames}";
-    }
-#end
-}
-#end
-</script>

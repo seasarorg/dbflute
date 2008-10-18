@@ -76,6 +76,7 @@ public class ${glConditionBeanContextName} {
         }
 		{
             Class<?> clazz = ${glPackageBaseCommon}.${glAccessContextName}.class;
+            clazz = ${glPackageBaseCommon}.${glCallbackContextName}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
