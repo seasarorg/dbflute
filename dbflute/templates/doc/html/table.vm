@@ -22,7 +22,7 @@
 #foreach ($col in $table.columns)
   <tr>
     <td class="flgcell">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
-    <td class="flgcell">#if ($col.isAutoIncrement())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isUnique())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.hasIndex())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>

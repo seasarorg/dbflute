@@ -1451,6 +1451,19 @@ public class Column {
             throw e;
         }
     }
+    
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    public boolean isIdentityOrSequence() { // for Schema HTML
+        if (isIdentity()) {
+            return true;
+        }
+        if (getTable().hasOnlyOnePrimaryKey() && getTable().isUseSequence()) {
+            return true;
+        }
+        return false;
+    }
 
     // ===================================================================================
     //                                                                            Identity
