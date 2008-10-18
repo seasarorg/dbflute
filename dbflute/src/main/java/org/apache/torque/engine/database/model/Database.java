@@ -188,6 +188,7 @@ public class Database {
                 return name1.compareTo(name2);
             }
         });
+        tableSet.addAll(getTableList());
         return new ArrayList<Table>(tableSet);
     }
 
