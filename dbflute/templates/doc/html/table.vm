@@ -5,6 +5,7 @@
       <th>PK</th>
       <th>ID</th>
       <th>UQ</th>
+      <th>IX</th>
       <th>Not<br />Null</th>
       <th>Name</th>
       <th>Type</th>
@@ -23,16 +24,17 @@
     <td class="flgcell">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isAutoIncrement())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isUnique())o#else &nbsp;#end</td>
-    <td class="flgcell">#if ($col.isNotNull())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.hasIndex())o#else &nbsp;#end</td>
+    <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
     <td id="${table.name}${col.name}">${col.name}</td>
     <td>${col.dbType}</td>
     <td><center>#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end </center></td>
     <td>#if ($col.hasDefaultValue() && !$col.isAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
-    <td><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
-    <td>${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-    <td>${col.javaBeansRulePropertyName}</td>
-    <td>${col.javaNativeRemovedPackage}</td>
-    <td>#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
+    <td class="subcell"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
+    <td class="subcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+    <td class="subcell">${col.javaBeansRulePropertyName}</td>
+    <td class="subcell">${col.javaNativeRemovedPackage}</td>
+    <td class="subcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
     <td>#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
   </tr>
 #end

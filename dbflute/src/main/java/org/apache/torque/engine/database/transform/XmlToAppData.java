@@ -209,10 +209,8 @@ public class XmlToAppData extends DefaultHandler {
     /**
      * Handles opening elements of the XML file.
      * @param uri URI.
-     * @param localName The local name (without prefix), or the empty string if
-     *         Namespace processing is not being performed.
-     * @param rawName The qualified name (with prefix), or the empty string if
-     *         qualified names are not available.
+     * @param localName The local name (without prefix), or the empty string if namespace processing is not being performed.
+     * @param rawName The qualified name (with prefix), or the empty string if qualified names are not available.
      * @param attributes The specified or defaulted attributes
      */
     public void startElement(String uri, String localName, String rawName, Attributes attributes) {

@@ -79,6 +79,7 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
@@ -132,6 +133,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
+    protected DfIndexHandler _indexHandler = new DfIndexHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
 
@@ -308,34 +310,71 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Unique keys for this table.
-            Map<String, Map<Integer, String>> uniqueMap = null;
-            try {
-                uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
-            } catch (SQLException e) {
-                _log.warn("Failed to get unique column information! But continue...", e);
-            } finally {
-                if (uniqueMap == null) {
-                    uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+            Map<String, Map<Integer, String>> uniqueMapForGettingIndex = null;
+            {
+                Map<String, Map<Integer, String>> uniqueMap = null;
+                try {
+                    uniqueMap = getUniqueKeyMap(dbMetaData, tableMataInfo);
+                } catch (SQLException e) {
+                    _log.warn("Failed to get unique column information! But continue...", e);
+                } finally {
+                    if (uniqueMap == null) {
+                        uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+                    }
+                }
+                uniqueMapForGettingIndex = uniqueMap;
+                final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
+                for (final String uniqueIndexName : uniqueKeySet) {
+                    final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
+                    if (uniqueElementMap.isEmpty()) {
+                        String msg = "The uniqueKey has no elements: " + uniqueIndexName + " : " + uniqueMap;
+                        throw new IllegalStateException(msg);
+                    }
+                    final Element uniqueKeyElement = _doc.createElement("unique");
+                    uniqueKeyElement.setAttribute("name", uniqueIndexName);
+                    final Set<Integer> uniqueElementKeySet = uniqueElementMap.keySet();
+                    for (final Integer ordinalPosition : uniqueElementKeySet) {
+                        final String columnName = uniqueElementMap.get(ordinalPosition);
+                        final Element uniqueColumnElement = _doc.createElement("unique-column");
+                        uniqueColumnElement.setAttribute("name", columnName);
+                        uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
+                        uniqueKeyElement.appendChild(uniqueColumnElement);
+                    }
+                    tableElement.appendChild(uniqueKeyElement);
                 }
             }
-            final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
-            for (final String uniqueIndexName : uniqueKeySet) {
-                final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
-                if (uniqueElementMap.isEmpty()) {
-                    throw new IllegalStateException("The uniqueKey has no elements: " + uniqueIndexName + " : "
-                            + uniqueMap);
+
+            // Index for this table.
+            {
+                Map<String, Map<Integer, String>> indexMap = null;
+                try {
+                    indexMap = getIndexMap(dbMetaData, tableMataInfo, uniqueMapForGettingIndex);
+                } catch (SQLException e) {
+                    _log.warn("Failed to get unique column information! But continue...", e);
+                } finally {
+                    if (indexMap == null) {
+                        indexMap = new LinkedHashMap<String, Map<Integer, String>>();
+                    }
                 }
-                final Element uniqueKeyElement = _doc.createElement("unique");
-                uniqueKeyElement.setAttribute("name", uniqueIndexName);
-                final Set<Integer> uniqueElementKeySet = uniqueElementMap.keySet();
-                for (final Integer ordinalPosition : uniqueElementKeySet) {
-                    final String columnName = uniqueElementMap.get(ordinalPosition);
-                    final Element uniqueColumnElement = _doc.createElement("unique-column");
-                    uniqueColumnElement.setAttribute("name", columnName);
-                    uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
-                    uniqueKeyElement.appendChild(uniqueColumnElement);
+                final java.util.Set<String> indexKeySet = indexMap.keySet();
+                for (final String indexName : indexKeySet) {
+                    final Map<Integer, String> indexElementMap = indexMap.get(indexName);
+                    if (indexElementMap.isEmpty()) {
+                        String msg = "The index has no elements: " + indexName + " : " + indexMap;
+                        throw new IllegalStateException(msg);
+                    }
+                    final Element uniqueKeyElement = _doc.createElement("index");
+                    uniqueKeyElement.setAttribute("name", indexName);
+                    final Set<Integer> uniqueElementKeySet = indexElementMap.keySet();
+                    for (final Integer ordinalPosition : uniqueElementKeySet) {
+                        final String columnName = indexElementMap.get(ordinalPosition);
+                        final Element uniqueColumnElement = _doc.createElement("index-column");
+                        uniqueColumnElement.setAttribute("name", columnName);
+                        uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
+                        uniqueKeyElement.appendChild(uniqueColumnElement);
+                    }
+                    tableElement.appendChild(uniqueKeyElement);
                 }
-                tableElement.appendChild(uniqueKeyElement);
             }
 
             _databaseNode.appendChild(tableElement);
@@ -412,7 +451,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                   =================
     /**
      * Get all the table names in the current database that are not system tables.
-     * @param dbMeta JDBC database meta data.
+     * @param dbMeta The meta data of a database. (NotNull)
      * @return The list of all the tables in a database.
      * @throws SQLException
      */
@@ -467,7 +506,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Retrieves all the column names and types for a given table from
      * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
-     * @param dbMeta JDBC meta data.
+     * @param dbMeta The meta data of a database. (NotNull)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
@@ -495,7 +534,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * @param dbMeta JDBC meta data.
+     * @param dbMeta The meta data of a database. (NotNull)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
@@ -508,15 +547,29 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Get unique column name list.
-     * @param dbMeta
+     * @param dbMeta The meta data of a database. (NotNull)
      * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return Unique column name list.
+     * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta,
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
         final String schema = getHandlerUseSchema(tableMetaInfo);
-        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, schema, tableMetaInfo);
+        return _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema, tableMetaInfo);
+    }
+
+    /**
+     * Get index column name list.
+     * @param dbMeta The meta data of a database. (NotNull)
+     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param uniqueKeyMap The map of unique key. (NotNull)
+     * @return The list of index columns. (NotNull)
+     * @throws SQLException
+     */
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        return _indexHandler.getIndexMap(dbMeta, schema, tableMetaInfo, uniqueKeyMap);
     }
 
     /**
@@ -534,7 +587,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data.
+     * @param dbMeta The meta data of a database. (NotNull)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException

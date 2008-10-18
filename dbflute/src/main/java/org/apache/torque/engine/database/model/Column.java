@@ -103,7 +103,7 @@ public class Column {
     private boolean _isAutoIncrement = false;
 
     private String _defaultValue;
-    
+
     private String _comment;
 
     // -----------------------------------------------------
@@ -130,7 +130,7 @@ public class Column {
     private String _javaName = null;
 
     private String _javaNamingMethod;
-    
+
     // -----------------------------------------------------
     //                                              Relation
     //                                              --------
@@ -235,7 +235,7 @@ public class Column {
 
         // Column comment.
         _comment = attrib.getValue("comment");
-        
+
         // Default column value.
         _defaultValue = attrib.getValue("default");
 
@@ -361,7 +361,6 @@ public class Column {
     public void setPosition(int v) {
         this._position = v;
     }
-
 
     // -----------------------------------------------------
     //                                                 Table
@@ -539,7 +538,7 @@ public class Column {
     public boolean isUnique() {
         final List<Unique> uniqueList = getTable().getUniqueList();
         for (Unique unique : uniqueList) {
-            final Map<Integer, String> uniqueColumnMap = unique.getUniqueColumnMap();
+            final Map<Integer, String> uniqueColumnMap = unique.getIndexColumnMap();
             final Set<Integer> ordinalPositionSet = uniqueColumnMap.keySet();
             for (Integer ordinalPosition : ordinalPositionSet) {
                 final String columnName = uniqueColumnMap.get(ordinalPosition);
@@ -552,10 +551,23 @@ public class Column {
     }
 
     /**
-     * Return true if the column requires a transaction in Postgres
+     * Return true if the column requires a transaction in Postgres SQL
      */
     public boolean requiresTransactionInPostgres() {
         return _needsTransactionInPostgres;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Index
+    //                                                 -----
+    public boolean hasIndex() {
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (index.hasSameFirstColumn(this)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -804,6 +816,7 @@ public class Column {
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
+        final String delimiter = ",<br />";
         final Set<String> tableSet = new HashSet<String>();
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrers) {
@@ -813,9 +826,9 @@ public class Column {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            sb.append(delimiter).append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
-        sb.delete(0, ", ".length());
+        sb.delete(0, delimiter.length());
         return sb.toString();
     }
 
@@ -862,7 +875,7 @@ public class Column {
     public boolean hasComment() {
         return _comment != null && _comment.trim().length() > 0;
     }
-    
+
     public String getComment() {
         return _comment != null ? _comment : "";
     }

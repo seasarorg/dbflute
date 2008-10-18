@@ -135,7 +135,7 @@ public class Table implements IDMethod {
 
     private String _alias;
 
-    private String _enterface;
+    private String _interface;
 
     private String _pkg;
 
@@ -176,34 +176,28 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
-    //                                                                         Initializer
+    //                                                                         XML Loading
     //                                                                         ===========
     /**
      * Load the table object from an xml tag.
-     *
-     * @param attrib xml attributes
-     * @param defaultIdMethod defined at db level
+     * @param attrib xml attributes. (NotNull)
+     * @param defaultIdMethod defined at db level.
      */
     public void loadFromXML(Attributes attrib, String defaultIdMethod) {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
         _schema = attrib.getValue("schema");
         _comment = attrib.getValue("comment");
-
         _javaName = attrib.getValue("javaName");
-        _idMethod = attrib.getValue("idMethod");
 
-        //
-        // retrieves the method for converting from specified name to a java name.
-        // 
-        // *Attension
-        //   Always use Default-JavaNamingMethod!!!
-        // 
-        //   // This line is commented out.
-        //   _javaNamingMethod = attrib.getValue("javaNamingMethod");
-        // 
+        // It retrieves the method for converting from specified name to a java name.
+        // *Attention: Always use Default-JavaNamingMethod!!!
         _javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
 
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // These are unused at DBFlute!
+        // - - - - - - - - - -/
+        _idMethod = attrib.getValue("idMethod");
         if ("null".equals(_idMethod)) {
             _idMethod = defaultIdMethod;
         }
@@ -214,15 +208,21 @@ public class Table implements IDMethod {
             _idMethod = NATIVE;
         }
         _skipSql = "true".equals(attrib.getValue("skipSql"));
-        // pkg = attrib.getValue("package");
+
+        // Unused at DBFlute
+        // _pkg = attrib.getValue("package");
+
+        // Unused at DBFlute
+        // _baseClass = attrib.getValue("baseClass");
+        // _basePeer = attrib.getValue("basePeer");
+
+        // These are unused at DBFlute
         _abstractValue = "true".equals(attrib.getValue("abstract"));
-        //        _baseClass = attrib.getValue("baseClass");
-        //        _basePeer = attrib.getValue("basePeer");
         _alias = attrib.getValue("alias");
         _isHeavyIndexing = "true".equals(attrib.getValue("heavyIndexing"))
                 || (!"false".equals(attrib.getValue("heavyIndexing")) && getDatabase().isHeavyIndexing());
         _description = attrib.getValue("description");
-        _enterface = attrib.getValue("interface");
+        _interface = attrib.getValue("interface");
     }
 
     // ===================================================================================
@@ -404,7 +404,7 @@ public class Table implements IDMethod {
     public boolean hasComment() {
         return _comment != null && _comment.trim().length() > 0;
     }
-    
+
     /**
      * Get the comment of the Table
      */
@@ -761,7 +761,7 @@ public class Table implements IDMethod {
      * @return value of interface.
      */
     public String getInterface() {
-        return _enterface;
+        return _interface;
     }
 
     /**
@@ -769,7 +769,7 @@ public class Table implements IDMethod {
      * @param v  Value to assign to interface.
      */
     public void setInterface(String v) {
-        this._enterface = v;
+        this._interface = v;
     }
 
     /**
@@ -799,7 +799,6 @@ public class Table implements IDMethod {
 
     /**
      * Get the value of package.
-     *
      * @return value of package.
      */
     public String getPackage() {
@@ -812,7 +811,6 @@ public class Table implements IDMethod {
 
     /**
      * Set the value of package.
-     *
      * @param v  Value to assign to package.
      */
     public void setPackage(String v) {
@@ -1631,25 +1629,10 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
-    //                                                                               Index
-    //                                                                               =====
-    /**
-     * Returns an Array containing all the indices in the table
-     *
-     * @return An array containing all the indices
-     */
-    public Index[] getIndices() {// TODO: @jflute - Unnecessary?
-        int size = _indices.size();
-        Index[] tbls = new Index[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Index) _indices.get(i);
-        }
-        return tbls;
-    }
-
+    //                                                                          Unique Key
+    //                                                                          ==========
     /**
      * Returns an Array containing all the UKs in the table
-     *
      * @return An array containing all the UKs
      */
     public Unique[] getUnices() {
@@ -1663,6 +1646,26 @@ public class Table implements IDMethod {
 
     public List<Unique> getUniqueList() {
         return _unices;
+    }
+
+    // ===================================================================================
+    //                                                                               Index
+    //                                                                               =====
+    /**
+     * Returns an Array containing all the indices in the table
+     * @return An array containing all the indices
+     */
+    public Index[] getIndices() {
+        int size = _indices.size();
+        Index[] tbls = new Index[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Index) _indices.get(i);
+        }
+        return tbls;
+    }
+
+    public List<Index> getIndexList() {
+        return _indices;
     }
 
     // ===================================================================================

@@ -82,9 +82,9 @@ public class Unique extends Index {
         StringBuffer result = new StringBuffer();
         result.append(" <unique name=\"").append(getName()).append("\">\n");
 
-        final Set<Integer> ordinalPositionKeySet = getUniqueColumnMap().keySet();
+        final Set<Integer> ordinalPositionKeySet = getIndexColumnMap().keySet();
         for (final Integer ordinalPosition : ordinalPositionKeySet) {
-            final String columnName = getUniqueColumnMap().get(ordinalPositionKeySet);
+            final String columnName = getIndexColumnMap().get(ordinalPositionKeySet);
             result.append("  <unique-column name=\"").append(columnName).append("\"");
             result.append(" position=\"").append(ordinalPosition).append("\"/>\n");
         }

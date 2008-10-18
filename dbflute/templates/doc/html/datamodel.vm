@@ -47,7 +47,10 @@
     .flgcell {
         text-align: center;
     }
-    
+	.subcell {
+        font-size: 0.8em;
+    }
+
     /* inner table */
     table.child {
         margin: 3px;
@@ -84,9 +87,9 @@
       <tr>
         <td><a href="#${tbl.name}">${tbl.name}</a></td>
         <td>${tbl.type}</td>
-        <td>${tbl.foreignTableNameCommaStringWithHtmlHref}</td>
-        <td>${tbl.referrerTableNameCommaStringWithHtmlHref}</td>
-        <td>${tbl.javaName}</td>
+        <td class="subcell">${tbl.foreignTableNameCommaStringWithHtmlHref}</td>
+        <td class="subcell">${tbl.referrerTableNameCommaStringWithHtmlHref}</td>
+        <td class="subcell">${tbl.javaName}</td>
         <td>#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
       </tr>
 #end

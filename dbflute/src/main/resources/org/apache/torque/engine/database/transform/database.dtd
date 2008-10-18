@@ -133,7 +133,7 @@ Java class or method name.
 <!ELEMENT index-column EMPTY>
 <!ATTLIST index-column
   name CDATA #REQUIRED
-  size CDATA #IMPLIED
+  position CDATA #REQUIRED
 >
 
 <!ELEMENT unique (unique-column+)>

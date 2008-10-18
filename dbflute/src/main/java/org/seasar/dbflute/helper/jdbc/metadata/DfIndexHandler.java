@@ -18,9 +18,7 @@ package org.seasar.dbflute.helper.jdbc.metadata;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,58 +27,18 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * @author jflute
+ * @since 0.8.2 (2008/10/18 Saturday)
  */
-public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
+public class DfIndexHandler extends DfAbstractMetaDataHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
+    private static final Log _log = LogFactory.getLog(DfIndexHandler.class);
 
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    /**
-     * Retrieves a list of the columns composing the primary key for a given table.
-     * @param dbMeta JDBC meta data.
-     * @param schemaName Schema name. (NotNull & AllowedEmpty)
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return A list of the primary key parts for <code>tableName</code>.
-     * @throws SQLException
-     */
-    public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
-        schemaName = filterSchemaName(schemaName);
-
-        final List<String> primaryKeyColumnNameList = new ArrayList<String>();
-        if (!isPrimaryKeyExtractingSupported()) {
-            return primaryKeyColumnNameList;
-        }
-        ResultSet parts = null;
-        try {
-            final String tableName = tableMetaInfo.getTableName();
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
-            parts = getPrimaryKeyResultSetFromDBMeta(dbMeta, realSchemaName, tableName);
-            while (parts.next()) {
-                primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
-            }
-        } finally {
-            if (parts != null) {
-                parts.close();
-            }
-        }
-        return primaryKeyColumnNameList;
-    }
-
-    protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, String schemaName, String tableName)
-            throws SQLException {
-        return dbMeta.getPrimaryKeys(null, schemaName, tableName);
-    }
-
-    protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
-        return resultSet.getString(4);
-    }
-
     // {WEBから抜粋}
     // 
     //テーブルのインデックスと統計情報の記述を取得します。 NON_UNIQUE、TYPE、INDEX_NAME、ORDINAL_POSITION の順に並べます。
@@ -104,29 +62,34 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     //  12. PAGES int => TYPE が tableIndexStatistic の場合は、テーブルのページ数。そのほかの場合は、現在のインデックスのページ数。
     //  13. FILTER_CONDITION String => フィルタがある場合は、そのフィルタの状態 (null の場合もあります)。 
     //
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
-            DfTableMetaInfo tableMetaInfo) throws SQLException { // Non Primary Key Only
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName,
+            DfTableMetaInfo tableMetaInfo, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         schemaName = filterSchemaName(schemaName);
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
 
-        final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, schemaName, tableMetaInfo);
-        final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+        final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
             final String tableName = tableMetaInfo.getTableName();
             final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
             parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, true, true);
             while (parts.next()) {
+                final String indexName = parts.getString(6);
                 final boolean isNonUnique;
                 {
                     final String nonUnique = parts.getString(4);
                     isNonUnique = (nonUnique != null && nonUnique.equalsIgnoreCase("true"));
                 }
-                if (isNonUnique) {
+                if (!isNonUnique) {
                     continue;
                 }
+                if (uniqueKeyMap != null && uniqueKeyMap.containsKey(indexName)) {
+                    continue;
+                }
+
+                // Non Unique Only
 
                 final String indexType;
                 {
@@ -137,16 +100,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
-
-                if (primaryColumnNameList.contains(columnName)) {
-                    continue;
-                }
-
                 if (isColumnExcept(columnName)) {
                     continue;
                 }
-
-                final String indexName = parts.getString(6);
                 final Integer ordinalPosition;
                 {
                     final String ordinalPositionString = parts.getString(8);
@@ -166,13 +122,13 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     }
                 }
 
-                if (uniqueMap.containsKey(indexName)) {
-                    final Map<Integer, String> uniqueElementMap = uniqueMap.get(indexName);
+                if (indexMap.containsKey(indexName)) {
+                    final Map<Integer, String> uniqueElementMap = indexMap.get(indexName);
                     uniqueElementMap.put(ordinalPosition, columnName);
                 } else {
                     final Map<Integer, String> uniqueElementMap = new LinkedHashMap<Integer, String>();
                     uniqueElementMap.put(ordinalPosition, columnName);
-                    uniqueMap.put(indexName, uniqueElementMap);
+                    indexMap.put(indexName, uniqueElementMap);
                 }
             }
         } finally {
@@ -180,6 +136,6 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 parts.close();
             }
         }
-        return uniqueMap;
+        return indexMap;
     }
 }

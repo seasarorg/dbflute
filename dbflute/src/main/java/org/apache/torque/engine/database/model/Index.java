@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,20 +71,27 @@ import org.xml.sax.Attributes;
  */
 public class Index {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static Log log = LogFactory.getLog(Index.class);
 
-    /** name of the index */
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The name of the index. */
     private String _indexName;
-    /** table */
-    private Table _parentTable;
 
-    /** Unique column map. {ordinalPosition : columnName} */
-    private final Map<Integer, String> _uniqueColumnMap = new LinkedHashMap<Integer, String>();
+    /** The table. */
+    private Table _table;
 
-    /** columns */
-    private List<String> _indexColumns = new ArrayList<String>(3);
+    /** The map of index columns. {ordinalPosition : columnName} */
+    private final Map<Integer, String> _indexColumnMap = new LinkedHashMap<Integer, String>();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Creates a new instance with default characteristics (no name or
      * parent table, small column list size allocation, non-unique).
@@ -101,31 +109,33 @@ public class Index {
      * @exception EngineException Error generating name.
      * @see #Index()
      */
-    protected Index(Table table, List indexColumns) throws EngineException {
+    protected Index(Table table, List<Column> indexColumns) throws EngineException {
         this();
         setTable(table);
-        if (indexColumns.size() > 0) {
-            this._indexColumns = new ArrayList<String>(3);
-            for (Object object : indexColumns) {
-                _indexColumns.add((String) object);
-            }
-            createName();
-
-            if (log.isDebugEnabled()) {
-                log.debug("Created Index named " + getName() + " with " + indexColumns.size() + " columns");
-            }
-        } else {
-            throw new EngineException("Cannot create a new Index using an " + "empty list Column object");
+        if (indexColumns.isEmpty()) {
+            throw new EngineException("Cannot create a new Index using an empty list Column object: " + table);
+        }
+        int index = 1;
+        for (Column column : indexColumns) {
+            _indexColumnMap.put(Integer.valueOf(index), column.getName());
+            ++index;
+        }
+        createName();
+        if (log.isDebugEnabled()) {
+            log.debug("Created Index named " + getName() + " with " + indexColumns.size() + " columns");
         }
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     /**
      * Creates a name for the index using the NameFactory.
      * @throws EngineException if the name could not be created
      */
     private void createName() throws EngineException {
-        Table table = getTable();
-        List<Object> inputs = new ArrayList<Object>(4);
+        final Table table = getTable();
+        final List<Object> inputs = new ArrayList<Object>(4);
         inputs.add(table.getDatabase());
         inputs.add(table.getName());
         if (isUnique()) {
@@ -138,6 +148,94 @@ public class Index {
         _indexName = NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
     }
 
+    // ===================================================================================
+    //                                                                         XML Loading
+    //                                                                         ===========
+    /**
+     * Imports index from an XML specification
+     * @param attrib the xml attributes
+     */
+    public void loadFromXML(Attributes attrib) {
+        _indexName = attrib.getValue("name");
+    }
+
+    /**
+     * Adds a new column to an index.
+     * @param attrib xml attributes for the column
+     */
+    public void addColumn(Attributes attrib) {
+        final String columnName = attrib.getValue("name");
+        final Integer ordinalPosition;
+        {
+            final String ordinalPositionString = attrib.getValue("position");
+            ordinalPosition = Integer.parseInt(ordinalPositionString);
+        }
+        _indexColumnMap.put(ordinalPosition, columnName);
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasSameColumnSet(List<Column> columnList) {
+        for (final Column column : columnList) {
+            if (!getIndexColumnMap().containsValue(column.getName())) {
+                return false;
+            }
+        }
+        if (getIndexColumnMap().size() != columnList.size()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean hasSameFirstColumn(Column column) {
+        if (getIndexColumnMap().isEmpty()) {
+            return false;
+        }
+        final String first = getIndexColumnMap().get(Integer.valueOf(1));
+        if (first == null) {
+            return false;
+        }
+        return first.equals(column.getName());
+    }
+
+    public boolean hasSameColumn(Column column) {
+        return getIndexColumnMap().containsValue(column.getName());
+    }
+
+    /**
+     * Returns the uniqueness of this index.
+     * @return the uniqueness of this index
+     */
+    public boolean isUnique() {
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * String representation of the index. This is an xml representation.
+     * @return a xml representation
+     */
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+        result.append(" <index name=\"").append(getName()).append("\"");
+
+        result.append(">\n");
+
+        final Set<Integer> keySet = _indexColumnMap.keySet();
+        for (Integer position : keySet) {
+            final String columnName = _indexColumnMap.get(position);
+            result.append("  <index-column name=\"").append(columnName).append("\" position=\"" + position + "\"/>\n");
+        }
+        result.append(" </index>\n");
+        return result.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Gets the name of this index.
      * @return the name of this index
@@ -167,7 +265,7 @@ public class Index {
      * @param parent the table
      */
     public void setTable(Table parent) {
-        _parentTable = parent;
+        _table = parent;
     }
 
     /**
@@ -175,72 +273,10 @@ public class Index {
      * @return the table
      */
     public Table getTable() {
-        return _parentTable;
+        return _table;
     }
 
-    public Map<Integer, String> getUniqueColumnMap() {
-        return _uniqueColumnMap;
-    }
-
-    /**
-     * Returns the uniqueness of this index.
-     * @return the uniqueness of this index
-     */
-    public boolean isUnique() {
-        return false;
-    }
-
-    /**
-     * Imports index from an XML specification
-     * @param attrib the xml attributes
-     */
-    public void loadFromXML(Attributes attrib) {
-        _indexName = attrib.getValue("name");
-    }
-
-    /**
-     * Adds a new column to an index.
-     * @param attrib xml attributes for the column
-     */
-    public void addColumn(Attributes attrib) {
-        final String columnName = attrib.getValue("name");
-        final Integer ordinalPosition;
-        {
-            final String ordinalPositionString = attrib.getValue("position");
-            ordinalPosition = Integer.parseInt(ordinalPositionString);
-        }
-        _uniqueColumnMap.put(ordinalPosition, columnName);
-
-        // Deprecated!!!
-        _indexColumns.add(attrib.getValue("name"));
-    }
-
-    public boolean hasSameColumnSet(List<Column> columnList) {
-        for (final Column column : columnList) {
-            if (!getUniqueColumnMap().containsValue(column.getName())) {
-                return false;
-            }
-        }
-        if (getUniqueColumnMap().size() != columnList.size()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * String representation of the index. This is an xml representation.
-     * @return a xml representation
-     */
-    public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append(" <index name=\"").append(getName()).append("\"");
-
-        result.append(">\n");
-
-        for (int i = 0; i < _indexColumns.size(); i++) {
-            result.append("  <index-column name=\"").append(_indexColumns.get(i)).append("\"/>\n");
-        }
-        result.append(" </index>\n");
-        return result.toString();
+    public Map<Integer, String> getIndexColumnMap() {
+        return _indexColumnMap;
     }
 }

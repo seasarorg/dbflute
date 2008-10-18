@@ -39,6 +39,10 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    public boolean isTableTypeTable() {
+        return _tableType != null ? _tableType.equalsIgnoreCase("TABLE") : false;
+    }
+
     public boolean isTableTypeView() {
         return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
     }
