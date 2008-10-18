@@ -43,6 +43,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         // ===============================================================================
         //                                                                    Common Logic
         //                                                                    ============
+        // -------------------------------------------------
+        //                                     Args Handling
+        //                                     -------------
         protected virtual void BindArgs(IDbCommand command, Object[] args, Type[] argTypes) {
             if (_loggingMessageSqlArgs == null) { _loggingMessageSqlArgs = args; } // Save arguments for logging.
             if (args == null) return;
@@ -71,25 +74,18 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return argTypes;
         }
 
-        protected virtual string GetCompleteSql(Object[] args) {
-            return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
-        }
-
-        protected virtual String GetBindVariableText(Object bindVariable) {
-            return ${glInternalBindVariableUtil}.GetBindVariableText(bindVariable);
-        }
-
+        // -------------------------------------------------
+        //                                       SQL Logging
+        //                                       -----------
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
             ${glSqlLogHandlerName} sqlLogHandler = GetSqlLogHander();
             bool existsSqlLogHandler = sqlLogHandler != null;
             ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
             bool existsSqlLogRegistry = sqlLogRegistry != null;
-            if (${glQLog}.IsLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
+            if (IsLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
                 String completeSql = GetCompleteSql(args);
-                if (IsContainsLineSeparatorInSql()) {
-                    ${glQLog}.Log(GetLineSeparator() + completeSql);
-                } else {
-                    ${glQLog}.Log(completeSql);
+                if (IsLogEnabled()) {
+                    Log((IsContainsLineSeparatorInSql() ? GetLineSeparator() : "") + completeSql);
                 }
                 if (existsSqlLogHandler) { // DBFlute provides
                     sqlLogHandler.Invoke(this.Sql, completeSql, args, argTypes);
@@ -100,24 +96,43 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
-        protected ${glSqlLogHandlerName} GetSqlLogHander() {
+        protected virtual bool IsLogEnabled() {
+            return ${glQLog}.IsLogEnabled();
+        }
+
+        protected virtual void Log(String msg) {
+            return ${glQLog}.Log(msg);
+        }
+
+        protected virtual String GetCompleteSql(Object[] args) {
+            return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
+        }
+
+        protected virtual ${glSqlLogHandlerName} GetSqlLogHander() {
             if (!${glCallbackContextName}.IsExistCallbackContextOnThread()) {
                 return null;
             }
             return ${glCallbackContextName}.GetCallbackContextOnThread().SqlLogHandler;
         }
 
-        protected bool IsContainsLineSeparatorInSql() {
+        protected virtual bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
         
-        protected ${glInternalSqlLog} CreateInternalSqlLog(String completeSql, Object[] args, Type[] argTypes) {
+        protected virtual ${glInternalSqlLog} CreateInternalSqlLog(String completeSql, Object[] args, Type[] argTypes) {
             ${glInternalSqlLog} sqlLog = new ${glInternalSqlLog}();
             sqlLog.RawSql = this.Sql;
             sqlLog.CompleteSql = completeSql;
             sqlLog.BindArgs = args;
             sqlLog.BindArgTypes = argTypes;
             return sqlLog;
+        }
+
+        // -------------------------------------------------
+        //                                           Various
+        //                                           -------
+        protected virtual String GetBindVariableText(Object bindVariable) {
+            return ${glInternalBindVariableUtil}.GetBindVariableText(bindVariable);
         }
 
         // ===============================================================================

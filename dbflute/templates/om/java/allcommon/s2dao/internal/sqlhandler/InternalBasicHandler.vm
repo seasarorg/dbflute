@@ -55,8 +55,11 @@ public class ${glInternalBasicHandler} {
     }
 
     // ===================================================================================
-    //                                                           Basic Method for SubClass
-    //                                                           =========================
+    //                                                                        Common Logic
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                         Args Handling
+    //                                         -------------
     protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
         if (args == null) {
             return;
@@ -85,29 +88,18 @@ public class ${glInternalBasicHandler} {
         return argTypes;
     }
 
-    protected String getCompleteSql(Object[] args) {
-        return ${glInternalBindVariableUtil}.getCompleteSql(sql, args);
-    }
-
-    protected String getBindVariableText(Object bindVariable) {
-        return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
-    }
-
-    protected ValueType getValueType(Class<?> clazz) {
-        return ValueTypes.getValueType(clazz);
-    }
-
+    // -----------------------------------------------------
+    //                                           SQL Logging
+    //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final ${glSqlLogHandlerName} sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
         final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
-        if (${glQLog}.isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
+        if (isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
-            if (isContainsLineSeparatorInSql()) {
-                ${glQLog}.log(getLineSeparator() + completeSql);
-            } else {
-                ${glQLog}.log(completeSql);
+            if (isLogEnabled()) {
+                log((isContainsLineSeparatorInSql() ? getLineSeparator() : "") + completeSql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
                 sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
@@ -118,6 +110,18 @@ public class ${glInternalBasicHandler} {
         }
     }
 
+    protected boolean isLogEnabled() {
+        return ${glQLog}.isLogEnabled();
+    }
+
+    protected void log(String msg) {
+        ${glQLog}.log(msg);
+    }
+
+    protected String getCompleteSql(Object[] args) {
+        return ${glInternalBindVariableUtil}.getCompleteSql(sql, args);
+    }
+	
     protected ${glSqlLogHandlerName} getSqlLogHander() {
         if (!${glCallbackContextName}.isExistCallbackContextOnThread()) {
             return null;
@@ -127,6 +131,17 @@ public class ${glInternalBasicHandler} {
 
     protected boolean isContainsLineSeparatorInSql() {
         return sql != null ? sql.contains(getLineSeparator()) : false;
+    }
+
+    // -----------------------------------------------------
+    //                                               Various
+    //                                               -------
+    protected String getBindVariableText(Object bindVariable) {
+        return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
+    }
+
+    protected ValueType getValueType(Class<?> clazz) {
+        return ValueTypes.getValueType(clazz);
     }
 
     // ===================================================================================
