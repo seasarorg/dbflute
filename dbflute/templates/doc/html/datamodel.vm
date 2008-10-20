@@ -47,6 +47,9 @@
         border-left: 1px solid #555;
         padding:2px;
     }
+    .aliascell {
+        white-space: nowrap;
+    }
     .flgcell {
         text-align: center;
     }
@@ -108,7 +111,7 @@
 #foreach ($table in $database.tableDisplaySortedList)
       <tr>
 #if ($database.isAliasDelimiterInDbCommentValid())
-        <td>${table.alias}</td>
+        <td class="aliascell">${table.alias}</td>
 #end
         <td><a href="#${tbl.name}">${table.name}</a></td>
         <td>${table.type}</td>

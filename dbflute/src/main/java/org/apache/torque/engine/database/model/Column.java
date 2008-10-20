@@ -1621,4 +1621,27 @@ public class Column {
         }
         return sb.toString();
     }
+
+    public boolean hasSchemaHtmlColumnAliasCssClass() {
+        return isCommonColumn() || isVersionNo() || isUpdateDate();
+    }
+
+    public String getSchemaHtmlColumnAliasCssClass() {
+        final String delimiter = " ";
+        final StringBuilder sb = new StringBuilder();
+        sb.append("aliascell");
+        if (isCommonColumn()) {
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append("comcolcell");
+        }
+        if (isVersionNo() || isUpdateDate()) {
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append("optcell");
+        }
+        return sb.toString();
+    }
 }

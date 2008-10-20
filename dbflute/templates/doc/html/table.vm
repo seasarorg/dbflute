@@ -30,7 +30,7 @@
     <td class="flgcell">#if ($col.hasIndex())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
 #if ($database.isAliasDelimiterInDbCommentValid())
-    <td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end>${col.alias}</td>
+    <td#if ($col.hasSchemaHtmlColumnAliasCssClass()) class="${col.schemaHtmlColumnAliasCssClass}"#end>${col.alias}</td>
 #end
     <td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${table.name}${col.name}">${col.name}</td>
     <td>${col.dbType}</td>
