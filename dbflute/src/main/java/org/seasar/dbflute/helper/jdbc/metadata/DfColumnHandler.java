@@ -138,7 +138,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.BLOB);
             return torqueType;
         }
-        
+
         if (Types.OTHER != jdbcType) {
 
             // For compatible to Oracle's JDBC driver.
@@ -183,9 +183,9 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     protected boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
         return isOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
     }
-    
+
     protected boolean isPostgreSQLBytesOid(final int jdbcType, final String dbTypeName) {
-        return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName); // TODO: Is it OK?
+        return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
 
     protected String getDateTorqueType() {

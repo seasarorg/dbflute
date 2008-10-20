@@ -1120,7 +1120,7 @@ public class Column {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
 
-    public boolean isJavaNativeOracleStringClob() {
+    public boolean isJavaNativeStringClob() {
         if (!getTable().getDatabase().isDatabaseOracle()) {
             return false;
         }
@@ -1128,6 +1128,19 @@ public class Column {
             return false;
         }
         if (getDbType() == null || !getDbType().equalsIgnoreCase("CLOB")) {
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean isJavaNativeBytesOid() {
+        if (!getTable().getDatabase().isDatabasePostgreSQL()) {
+            return false;
+        }
+        if (!getJavaNative().equalsIgnoreCase("byte[]")) {
+            return false;
+        }
+        if (getDbType() == null || !getDbType().equalsIgnoreCase("oid")) {
             return false;
         }
         return true;

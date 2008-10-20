@@ -637,6 +637,10 @@ public class Database {
         return getBasicProperties().isDatabaseOracle();
     }
 
+    public boolean isDatabasePostgreSQL() {
+        return getBasicProperties().isDatabasePostgreSQL();
+    }
+
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
@@ -1749,7 +1753,7 @@ public class Database {
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(timestamp);
     }
-    
+
     // -----------------------------------------------------
     //                                                String
     //                                                ------
