@@ -1622,10 +1622,6 @@ public class Column {
         return sb.toString();
     }
 
-    public boolean hasSchemaHtmlColumnAliasCssClass() {
-        return isCommonColumn() || isVersionNo() || isUpdateDate();
-    }
-
     public String getSchemaHtmlColumnAliasCssClass() {
         final String delimiter = " ";
         final StringBuilder sb = new StringBuilder();
