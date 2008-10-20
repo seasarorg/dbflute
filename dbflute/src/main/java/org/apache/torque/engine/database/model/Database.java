@@ -107,15 +107,33 @@ public class Database {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _databaseType;
-    protected List<Table> _tableList = new ArrayList<Table>(100);
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected String _name;
+
+    // -----------------------------------------------------
+    //                                               AppData
+    //                                               -------
     protected AppData _appData;
-    protected String _defaultJavaNamingMethod;
+
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
+    protected List<Table> _tableList = new ArrayList<Table>(100);
     protected DfFlexibleNameMap<String, Table> _flexibleTableMap = new DfFlexibleNameMap<String, Table>();
 
+    // -----------------------------------------------------
+    //                                        for Sql2Entity
+    //                                        --------------
     /** The meta data of parameter bean. */
     protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+
+    // -----------------------------------------------------
+    //                                                 Other
+    //                                                 -----
+    protected String _databaseType;
+    protected String _defaultJavaNamingMethod;
 
     // [Unused on DBFlute]
     // protected String _pkg;
@@ -1434,18 +1452,18 @@ public class Database {
     public String getSql2EntityExtendedParameterBeanPackage() {
         return getProperties().getOutsideSqlProperties().getExtendedParameterBeanPackage();
     }
-    
+
     // ===================================================================================
     //                                                               Properties - Document
     //                                                               =====================
     public boolean isAliasDelimiterInDbCommentValid() {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
     }
-    
+
     public boolean isEntityJavaDocDbCommentValid() {
         return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
     }
-    
+
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========

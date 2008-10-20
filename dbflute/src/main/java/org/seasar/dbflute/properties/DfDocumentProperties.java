@@ -56,7 +56,21 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (!comment.contains(delimiter)) {
             return null;
         }
-        return comment.substring(0, comment.indexOf(delimiter));
+        return comment.substring(0, comment.indexOf(delimiter)).trim();
+    }
+
+    public String extractCommentFromDbComment(String comment) {
+        if (comment == null || comment.trim().length() == 0) {
+            return comment;
+        }
+        if (!isAliasDelimiterInDbCommentValid()) {
+            return comment;
+        }
+        final String delimiter = getAliasDelimiterInDbComment();
+        if (!comment.contains(delimiter)) {
+            return comment;
+        }
+        return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
     }
 
     // ===================================================================================

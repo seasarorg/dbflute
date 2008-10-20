@@ -274,8 +274,13 @@ public class Column {
     // -----------------------------------------------------
     //                                            Alias Name
     //                                            ----------
+    public boolean hasAlias() {
+        final String alias = getAlias();
+        return alias != null && alias.trim().length() > 0;
+    }
+
     public String getAlias() {
-        final DfDocumentProperties prop = getDatabaseChecked().getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _comment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
@@ -285,15 +290,15 @@ public class Column {
         }
         return "";
     }
-    
-    public String getAliasExpression() {
+
+    public String getAliasExpression() { // for expression '(alias)name'
         final String alias = getAlias();
         if (alias == null || alias.trim().length() == 0) {
             return "";
         }
         return "(" + alias + ")";
     }
-    
+
     // -----------------------------------------------------
     //                                           Description
     //                                           -----------
@@ -898,11 +903,16 @@ public class Column {
     //                                        Column Comment
     //                                        --------------
     public boolean hasComment() {
-        return _comment != null && _comment.trim().length() > 0;
+        final String comment = getComment();
+        return comment != null && comment.trim().length() > 0;
     }
 
     public String getComment() {
-        return _comment != null ? _comment : "";
+        String comment = _comment;
+        if (hasAlias()) {
+            comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
+        }
+        return comment != null ? comment : "";
     }
 
     public void setComment(String comment) {
@@ -1425,12 +1435,16 @@ public class Column {
         return getIncludeQueryProperties().isAvailableDateLessEqualOldAsInline(getTableName(), getName());
     }
 
-    // **********************************************************************************************
-    //                                                                                     Properties
-    //                                                                                     **********
-    // ===============================================================================
-    //                                                     Properties - Classification
-    //                                                     ===========================
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         return getTable().getDatabase().getClassificationDeploymentMap();
     }

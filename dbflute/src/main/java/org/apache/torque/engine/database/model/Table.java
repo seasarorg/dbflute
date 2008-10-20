@@ -290,6 +290,11 @@ public class Table {
     // -----------------------------------------------------
     //                                            Alias Name
     //                                            ----------
+    public boolean hasAlias() {
+        final String alias = getAlias();
+        return alias != null && alias.trim().length() > 0;
+    }
+
     public String getAlias() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _comment;
@@ -301,15 +306,15 @@ public class Table {
         }
         return "";
     }
-    
-    public String getAliasExpression() {
+
+    public String getAliasExpression() { // for expression '(alias)name'
         final String alias = getAlias();
         if (alias == null || alias.trim().length() == 0) {
             return "";
         }
         return "(" + alias + ")";
     }
-    
+
     // -----------------------------------------------------
     //                                            Table Type
     //                                            ----------
@@ -356,14 +361,19 @@ public class Table {
     //                                         Table Comment
     //                                         -------------
     public boolean hasComment() {
-        return _comment != null && _comment.trim().length() > 0;
+        final String comment = getComment();
+        return comment != null && comment.trim().length() > 0;
     }
 
     /**
      * Get the comment of the Table
      */
     public String getComment() {
-        return _comment != null ? _comment : "";
+        String comment = _comment;
+        if (hasAlias()) {
+            comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
+        }
+        return comment != null ? comment : "";
     }
 
     /**
@@ -1783,13 +1793,16 @@ public class Table {
         return result.toString();
     }
 
-    // **********************************************************************************************
-    //                                                                                     Properties
-    //                                                                                     **********
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
+    // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
     public boolean hasClassification() {
         final Column[] columns = getColumns();
         for (Column column : columns) {
