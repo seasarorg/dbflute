@@ -94,7 +94,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                Column
     //                                                ------
 #foreach ($col in $table.columns)
-    /** ${col.name}: {${col.columnDefinitionLineDisp}} */
+    /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
