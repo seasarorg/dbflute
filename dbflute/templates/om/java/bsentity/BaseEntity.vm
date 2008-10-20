@@ -231,7 +231,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
     public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
 
-    /** The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. */
+    /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
@@ -269,7 +269,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
     public static final String ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneReferrer";
     
-    /** the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
+    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
     /**
@@ -308,8 +308,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     //   Referrer Property = [${referrer.referrerJavaBeansRulePropertyName}]
     // * * * * * * * * */
-
-    /** The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. */
+    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
