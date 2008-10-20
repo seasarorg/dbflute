@@ -387,7 +387,7 @@ public class Table {
     //                                Basic Info Disp String
     //                                ----------------------
     public String getBasicInfoDispString() {
-        return _name + " that the type is " + _type;
+        return getAliasExpression() + getName() + " that the type is " + getType();
     }
 
     // -----------------------------------------------------
@@ -1498,7 +1498,7 @@ public class Table {
      * Table will be skipped, if return true.
      * @return value of forReferenceOnly.
      */
-    public boolean isForReferenceOnly() {
+    public boolean isForReferenceOnly() { // Unused on DBFlute but template uses...
         return _isForReferenceOnly;
     }
 
