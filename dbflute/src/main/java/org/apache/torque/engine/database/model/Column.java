@@ -908,10 +908,7 @@ public class Column {
     }
 
     public String getComment() {
-        String comment = _comment;
-        if (hasAlias()) {
-            comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
-        }
+        final String comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
         return comment != null ? comment : "";
     }
 

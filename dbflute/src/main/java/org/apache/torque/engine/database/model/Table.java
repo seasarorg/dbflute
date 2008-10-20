@@ -369,10 +369,7 @@ public class Table {
      * Get the comment of the Table
      */
     public String getComment() {
-        String comment = _comment;
-        if (hasAlias()) {
-            comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
-        }
+        final String comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
         return comment != null ? comment : "";
     }
 
