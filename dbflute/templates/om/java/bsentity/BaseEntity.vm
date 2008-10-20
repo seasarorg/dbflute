@@ -64,7 +64,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /** TABLE-Annotation for S2Dao. The value is ${table.annotationTableName}. */
     public static final String TABLE = "${table.annotationTableName}";
-
 #if ($table.isUseUpdateDate())
     
     /** TIMESTAMP-Annotation */
