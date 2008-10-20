@@ -218,5 +218,11 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
+
+  <target name="reflect-win-limit-postgresql" description="==> reflect to test application">
+    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 		
 </project>
