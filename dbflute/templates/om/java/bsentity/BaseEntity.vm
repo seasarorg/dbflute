@@ -222,6 +222,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                    ================
 #set ($foreignKeyIndex = 0)
 #foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -234,7 +235,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * Get the entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. {without lazy-load}
+     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. {without lazy-load}
      * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
@@ -242,7 +243,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'.
+     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
      * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
@@ -258,6 +259,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
@@ -271,7 +273,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     protected ${referrerEntityClassName} ${referrerVariableName};
 
     /**
-     * Get the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
@@ -279,7 +281,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
@@ -299,6 +301,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                   Referrer Property
     //                                                                   =================
 #foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #if (!${referrer.isOneToOne()})
@@ -310,7 +313,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
-     * Get the entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. {without lazy-load} <br />
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. {without lazy-load} <br />
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
@@ -319,7 +322,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
