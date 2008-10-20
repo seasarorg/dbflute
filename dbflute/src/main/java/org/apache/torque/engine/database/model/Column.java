@@ -67,6 +67,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -1121,29 +1122,19 @@ public class Column {
     }
 
     public boolean isJavaNativeStringClob() {
-        if (!getTable().getDatabase().isDatabaseOracle()) {
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
             return false;
         }
-        if (!getJavaNative().equalsIgnoreCase("String")) {
-            return false;
-        }
-        if (getDbType() == null || !getDbType().equalsIgnoreCase("CLOB")) {
-            return false;
-        }
-        return true;
+        return new DfColumnHandler().isOracleStringClob(dbTypeName);
     }
-    
+
     public boolean isJavaNativeBytesOid() {
-        if (!getTable().getDatabase().isDatabasePostgreSQL()) {
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
             return false;
         }
-        if (!getJavaNative().equalsIgnoreCase("byte[]")) {
-            return false;
-        }
-        if (getDbType() == null || !getDbType().equalsIgnoreCase("oid")) {
-            return false;
-        }
-        return true;
+        return new DfColumnHandler().isPostgreSQLBytesOid(dbTypeName);
     }
 
     // ===================================================================================

@@ -134,7 +134,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     public String getColumnTorqueType(int jdbcType, String dbTypeName) {
-        if (isPostgreSQLBytesOid(jdbcType, dbTypeName)) {
+        if (isPostgreSQLBytesOid(dbTypeName)) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.BLOB);
             return torqueType;
         }
@@ -180,11 +180,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         }
     }
 
-    protected boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
+    public boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
         return isOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
     }
+    
+    public boolean isOracleStringClob(final String dbTypeName) {
+        return isOracle() && "clob".equalsIgnoreCase(dbTypeName);
+    }
 
-    protected boolean isPostgreSQLBytesOid(final int jdbcType, final String dbTypeName) {
+    public boolean isPostgreSQLBytesOid(final String dbTypeName) {
         return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
 
