@@ -384,6 +384,9 @@ targetdatabase = $targetDatabase
     #set ($glInternalSqlTokenizer = "${glProjectPrefix}InternalSqlTokenizer")
     #set ($glInternalBindVariableUtil = "${glProjectPrefix}InternalBindVariableUtil")
 
+    ## [Allcommon-S2Dao-Internal-ValueType]
+    #set ($glInternalBytesOidType = "${glProjectPrefix}InternalBytesOidType")
+
     ## [Allcommon-S2Dao-Internal-Various]
     #set ($glInternalProcedureMetaData = "${glProjectPrefix}InternalProcedureMetaData")
     #set ($glInternalProcedureMetaDataFactory = "${glProjectPrefix}InternalProcedureMetaDataFactory")
@@ -455,6 +458,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
     #set ($glPackageBaseCommonS2DaoInternal = "${database.baseCommonPackage}.s2dao.internal")
+    #set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.s2dao.internal.valuetype")
     #set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.s2dao.internal.various")
     #set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.s2dao.internal.rshandler")
     #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.s2dao.internal.sqlcommand")
@@ -508,6 +512,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+      #set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.S2Dao.Internal.VlType")
       #set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.S2Dao.Internal.Various")
       #set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.S2Dao.Internal.RsHandler")
       #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.S2Dao.Internal.SqlCommand")
@@ -1935,6 +1940,13 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
       
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalValueType}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('InternalBytesOidType');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalValueType})}${glInternalBytesOidType}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/valuetype/InternalBytesOidType.${glTemplateFileExtension}",$path,"", "")
+
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious}))
       $database.makeDirectory($path)
 

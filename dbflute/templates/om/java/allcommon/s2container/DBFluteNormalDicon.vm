@@ -32,6 +32,7 @@
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
+	<component name="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
 
     <!-- The selector of behavior. -->
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">

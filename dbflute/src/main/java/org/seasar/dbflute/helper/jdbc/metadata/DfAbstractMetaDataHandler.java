@@ -47,7 +47,7 @@ public class DfAbstractMetaDataHandler {
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
-    
+
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
     }
@@ -73,12 +73,16 @@ public class DfAbstractMetaDataHandler {
         return _simpleColumnExceptList;
     }
 
-    protected boolean isMsAccess() {
-        return getBasicProperties().isDatabaseMsAccess();
+    protected boolean isOracle() {
+        return getBasicProperties().isDatabaseOracle();
     }
 
     protected boolean isPostgreSQL() {
         return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    protected boolean isMsAccess() {
+        return getBasicProperties().isDatabaseMsAccess();
     }
 
     // ===================================================================================
@@ -91,24 +95,23 @@ public class DfAbstractMetaDataHandler {
         }
         return schemaName;
     }
-    
+
     protected boolean isSchemaNameEmptyAllowed() {
         return createJdbcDeterminer().isSchemaNameEmptyAllowed();
     }
-    
 
     protected boolean isPrimaryKeyExtractingSupported() {
         return createJdbcDeterminer().isPrimaryKeyExtractingSupported();
     }
-    
+
     protected boolean isForeignKeyExtractingSupported() {
         return createJdbcDeterminer().isForeignKeyExtractingSupported();
     }
-    
+
     protected DfJdbcDeterminer createJdbcDeterminer() {
         return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
     }
-    
+
     // ===================================================================================
     //                                                                Except Determination
     //                                                                ====================

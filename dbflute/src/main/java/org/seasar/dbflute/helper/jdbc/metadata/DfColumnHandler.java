@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -135,6 +134,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     public String getColumnTorqueType(int jdbcType, String dbTypeName) {
+        if (isPostgreSQLBytesOid(jdbcType, dbTypeName)) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.BLOB);
+            return torqueType;
+        }
+        
         if (Types.OTHER != jdbcType) {
 
             // For compatible to Oracle's JDBC driver.
@@ -176,15 +180,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         }
     }
 
-    protected boolean isOracleCompatibleDate(final int sqlTypeCode, final String dbTypeName) {
-        return isOracle() && java.sql.Types.TIMESTAMP == sqlTypeCode && "date".equalsIgnoreCase(dbTypeName);
+    protected boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
+        return isOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
+    }
+    
+    protected boolean isPostgreSQLBytesOid(final int jdbcType, final String dbTypeName) {
+        return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName); // TODO: Is it OK?
     }
 
     protected String getDateTorqueType() {
         return TypeMap.getTorqueType(java.sql.Types.DATE);
-    }
-
-    protected boolean isOracle() {
-        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
     }
 }
