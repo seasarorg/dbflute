@@ -55,7 +55,6 @@ package org.apache.torque.engine.database.transform;
  */
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Stack;
@@ -78,14 +77,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * A Class that is used to parse an input xml schema file and creates an AppData java structure.
+ * A Class that is used to parse an input XML schema file and creates an AppData java structure.
  * @author Modified by jflute
  */
 public class XmlToAppData extends DefaultHandler {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    //                                                                Attribute
+    //                                                                =========
     private AppData app;
     private Database currDB;
     private Table currTable;
@@ -95,10 +94,8 @@ public class XmlToAppData extends DefaultHandler {
     private Unique currUnique;
 
     private boolean firstPass;
-    private boolean isExternalSchema;
     private String currentPackage;
     private String currentXmlFile;
-    private String defaultPackage;
 
     private static SAXParserFactory saxFactory;
 
@@ -114,23 +111,23 @@ public class XmlToAppData extends DefaultHandler {
     }
 
     // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
+    //                                                              Constructor
+    //                                                              ===========
     /**
      * Creates a new instance for the specified database type.
      * @param databaseType The type of database for the application.
-     * @param defaultPackage the default java package used for the om
-     * file, including trailing slash.
+     * @param defaultPackage the default java package used for the template file, including trailing slash.
      */
     public XmlToAppData(String databaseType, String defaultPackage) {
         app = new AppData(databaseType);
-        this.defaultPackage = defaultPackage;
         firstPass = true;
+        // [Unused on DBFlute]
+        // this.defaultPackage = defaultPackage;
     }
 
     // ===================================================================================
-    //                                                                               Parse
-    //                                                                               =====
+    //                                                                    Parse
+    //                                                                    =====
     /**
      * Parses a XML input file and returns a newly created and
      * populated AppData structure.
@@ -143,7 +140,7 @@ public class XmlToAppData extends DefaultHandler {
             if (!firstPass) {
                 throw new Error("No more double pass");
             }
-            // check to see if we alread have parsed the file
+            // check to see if we already have parsed the file
             if ((alreadyReadFiles != null) && alreadyReadFiles.contains(xmlFile)) {
                 return app;
             } else if (alreadyReadFiles == null) {
@@ -181,9 +178,7 @@ public class XmlToAppData extends DefaultHandler {
             msg = msg + " xmlFile=" + xmlFile;
             throw new RuntimeException(msg, e);
         }
-        if (!isExternalSchema) {
-            firstPass = false;
-        }
+        firstPass = false;
         return app;
     }
 
@@ -216,38 +211,25 @@ public class XmlToAppData extends DefaultHandler {
     public void startElement(String uri, String localName, String rawName, Attributes attributes) {
         try {
             if (rawName.equals("database")) {
-                if (isExternalSchema) {
-                    currentPackage = attributes.getValue("package");
-                    if (currentPackage == null) {
-                        currentPackage = defaultPackage;
-                    }
-                } else {
-                    currDB = app.addDatabase(attributes);
-                    if (currDB.getPackage() == null) {
-                        currDB.setPackage(defaultPackage);
-                    }
-                }
-            } else if (rawName.equals("external-schema")) {
-                String xmlFile = attributes.getValue("filename");
-                if (xmlFile.charAt(0) != '/') {
-                    File f = new File(currentXmlFile);
-                    xmlFile = new File(f.getParent(), xmlFile).getPath();
-                }
-
-                // put current state onto the stack
-                ParseStackElement.pushState(this);
-
-                isExternalSchema = true;
-
-                parseFile(xmlFile);
-                // get the last state from the stack
-                ParseStackElement.popState(this);
+                currDB = app.addDatabase(attributes);
+                // [Unused on DBFlute]
+                // } else if (rawName.equals("external-schema")) {
+                //     String xmlFile = attributes.getValue("filename");
+                //     if (xmlFile.charAt(0) != '/') {
+                //         File f = new File(currentXmlFile);
+                //         xmlFile = new File(f.getParent(), xmlFile).getPath();
+                //     }
+                //
+                //     // put current state onto the stack
+                //     ParseStackElement.pushState(this);
+                //
+                //     isExternalSchema = true;
+                //
+                //     parseFile(xmlFile);
+                //     // get the last state from the stack
+                //     ParseStackElement.popState(this);
             } else if (rawName.equals("table")) {
                 currTable = currDB.addTable(attributes);
-                if (isExternalSchema) {
-                    currTable.setForReferenceOnly(true);
-                    currTable.setPackage(currentPackage);
-                }
             } else if (rawName.equals("column")) {
                 currColumn = currTable.addColumn(attributes);
             } else if (rawName.equals("inheritance")) {
@@ -282,9 +264,9 @@ public class XmlToAppData extends DefaultHandler {
      */
     public void endElement(String uri, String localName, String rawName) {
         // Comment out!
-        //        if (log.isDebugEnabled()) {
-        //            log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
-        //        }
+        // if (log.isDebugEnabled()) {
+        //     log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
+        // }
     }
 
     /**
@@ -292,7 +274,6 @@ public class XmlToAppData extends DefaultHandler {
      * need to use a stack to remember some values.
      */
     private static class ParseStackElement {
-        private boolean isExternalSchema;
         private String currentPackage;
         private String currentXmlFile;
         private boolean firstPass;
@@ -302,7 +283,6 @@ public class XmlToAppData extends DefaultHandler {
          */
         public ParseStackElement(XmlToAppData parser) {
             // remember current state of parent object
-            isExternalSchema = parser.isExternalSchema;
             currentPackage = parser.currentPackage;
             currentXmlFile = parser.currentXmlFile;
             firstPass = parser.firstPass;
@@ -320,7 +300,6 @@ public class XmlToAppData extends DefaultHandler {
                 ParseStackElement elem = (ParseStackElement) parser.parsingStack.pop();
 
                 // activate stored state
-                parser.isExternalSchema = elem.isExternalSchema;
                 parser.currentPackage = elem.currentPackage;
                 parser.currentXmlFile = elem.currentXmlFile;
                 parser.firstPass = elem.firstPass;

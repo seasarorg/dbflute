@@ -75,7 +75,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                          ==========
     public boolean isSqlPackageValid() {
         final String sqlPackage = getSqlPackage();
-        return sqlPackage != null && sqlPackage.trim().length() > 0 && !sqlPackage.trim().equals("null");
+        return sqlPackage != null && sqlPackage.trim().length() > 0 && !sqlPackage.trim().equalsIgnoreCase("null");
     }
 
     public String getSqlPackage() {
@@ -112,7 +112,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                      ==============
     public boolean isDefaultPackageValid() { // C# only
         return getDefaultPackage() != null && getDefaultPackage().trim().length() > 0
-                && !getDefaultPackage().trim().equals("null");
+                && !getDefaultPackage().trim().equalsIgnoreCase("null");
     }
 
     public String getDefaultPackage() { // C# only
@@ -124,7 +124,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                             =======================
     public boolean isOmitResourcePathPackageValid() { // C# only
         return getOmitResourcePathPackage() != null && getOmitResourcePathPackage().trim().length() > 0
-                && !getOmitResourcePathPackage().trim().equals("null");
+                && !getOmitResourcePathPackage().trim().equalsIgnoreCase("null");
     }
 
     public String getOmitResourcePathPackage() { // C# only
@@ -136,7 +136,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                           =========================
     public boolean isOmitFileSystemPathPackageValid() { // C# only
         return getOmitFileSystemPathPackage() != null && getOmitFileSystemPathPackage().trim().length() > 0
-                && !getOmitFileSystemPathPackage().trim().equals("null");
+                && !getOmitFileSystemPathPackage().trim().equalsIgnoreCase("null");
     }
 
     public String getOmitFileSystemPathPackage() { // C# only

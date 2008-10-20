@@ -70,6 +70,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.util.DfCompareUtil;
@@ -270,6 +271,29 @@ public class Column {
         _name = newName;
     }
 
+    // -----------------------------------------------------
+    //                                            Alias Name
+    //                                            ----------
+    public String getAlias() {
+        final DfDocumentProperties prop = getDatabaseChecked().getProperties().getDocumentProperties();
+        final String comment = _comment;
+        if (comment != null) {
+            final String alias = prop.extractAliasFromDbComment(comment);
+            if (alias != null) {
+                return alias;
+            }
+        }
+        return "";
+    }
+    
+    public String getAliasExpression() {
+        final String alias = getAlias();
+        if (alias == null || alias.trim().length() == 0) {
+            return "";
+        }
+        return "(" + alias + ")";
+    }
+    
     // -----------------------------------------------------
     //                                           Description
     //                                           -----------

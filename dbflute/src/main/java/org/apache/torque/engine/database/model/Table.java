@@ -71,6 +71,7 @@ import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
@@ -82,7 +83,7 @@ import org.xml.sax.Attributes;
 /**
  * @author Modified by jflute
  */
-public class Table implements IDMethod {
+public class Table {
 
     // ===================================================================================
     //                                                                          Definition
@@ -92,64 +93,38 @@ public class Table implements IDMethod {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    //private AttributeListImpl attributes;
     private List<Column> _columnList;
-
     private List<ForeignKey> _foreignKeys;
-
     private List<Index> _indices;
-
     private List<Unique> _unices;
-
     private List<IdMethodParameter> _idMethodParameters;
-
     private String _name;
-
     private String _type;
-
     private String _schema;
-
     private String _comment;
-
     private String _description;
-
     private String _javaName;
-
-    private String _idMethod;
-
     protected String _javaNamingMethod;
-
     private Database _tableParent;
-
     private List<ForeignKey> _referrers;
-
     private List<String> _foreignTableNames;
-
     private boolean _containsForeignPK;
-
     private Column _inheritanceColumn;
-
-    private boolean _skipSql;
-
-    private boolean _abstractValue;
-
-    private String _alias;
-
-    private String _interface;
-
-    private String _pkg;
-
     protected DfFlexibleNameMap<String, Column> _columnMap = new DfFlexibleNameMap<String, Column>();
-
     private boolean _isNeedsTransactionInPostgres;
-
-    private boolean _isHeavyIndexing;
-
     private boolean _isForReferenceOnly;
-
     private boolean _existSameNameTable;
-
     private boolean _sql2entityTypeSafeCursor;
+
+    // [Unused on DBFlute]
+    // private String _idMethod;
+    // private AttributeListImpl attributes;
+    // private boolean _skipSql;
+    // private boolean _abstractValue;
+    // private boolean _isHeavyIndexing;
+    // private String _alias;
+    // private String _interface;
+    // private String _pkg;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -163,7 +138,6 @@ public class Table implements IDMethod {
 
     /**
      * Constructs a table object with a name
-     *
      * @param name table name
      */
     public Table(String name) {
@@ -179,11 +153,10 @@ public class Table implements IDMethod {
     //                                                                         XML Loading
     //                                                                         ===========
     /**
-     * Load the table object from an xml tag.
-     * @param attrib xml attributes. (NotNull)
-     * @param defaultIdMethod defined at db level.
+     * Load the table object from an XML tag.
+     * @param attrib XML attributes. (NotNull)
      */
-    public void loadFromXML(Attributes attrib, String defaultIdMethod) {
+    public void loadFromXML(Attributes attrib) {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
         _schema = attrib.getValue("schema");
@@ -194,35 +167,27 @@ public class Table implements IDMethod {
         // *Attention: Always use Default-JavaNamingMethod!!!
         _javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
 
-        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // These are unused on DBFlute!
-        // - - - - - - - - - -/
-        _idMethod = attrib.getValue("idMethod");
-        if ("null".equals(_idMethod)) {
-            _idMethod = defaultIdMethod;
-        }
-        if ("autoincrement".equals(_idMethod) || "sequence".equals(_idMethod)) {
-            _log.warn("The value '" + _idMethod + "' for Torque's "
-                    + "table.idMethod attribute has been deprecated in favor " + "of '" + NATIVE
-                    + "'.  Please adjust your " + "Torque XML schema accordingly.");
-            _idMethod = NATIVE;
-        }
-        _skipSql = "true".equals(attrib.getValue("skipSql"));
-
-        // Unused on DBFlute
+        // [Unused on DBFlute]
+        // _idMethod = attrib.getValue("idMethod");
+        // if ("null".equals(_idMethod)) {
+        //     _idMethod = defaultIdMethod;
+        // }
+        // if ("autoincrement".equals(_idMethod) || "sequence".equals(_idMethod)) {
+        //     _log.warn("The value '" + _idMethod + "' for Torque's "
+        //             + "table.idMethod attribute has been deprecated in favor " + "of '" + NATIVE
+        //             + "'.  Please adjust your " + "Torque XML schema accordingly.");
+        //     _idMethod = NATIVE;
+        // }
+        // _skipSql = "true".equals(attrib.getValue("skipSql"));
         // _pkg = attrib.getValue("package");
-
-        // Unused on DBFlute
+        // _alias = attrib.getValue("alias");
+        // _interface = attrib.getValue("interface");
+        // _abstractValue = "true".equals(attrib.getValue("abstract"));
         // _baseClass = attrib.getValue("baseClass");
         // _basePeer = attrib.getValue("basePeer");
 
         // These are unused on DBFlute
-        _abstractValue = "true".equals(attrib.getValue("abstract"));
-        _alias = attrib.getValue("alias");
-        _isHeavyIndexing = "true".equals(attrib.getValue("heavyIndexing"))
-                || (!"false".equals(attrib.getValue("heavyIndexing")) && getDatabase().isHeavyIndexing());
         _description = attrib.getValue("description");
-        _interface = attrib.getValue("interface");
     }
 
     // ===================================================================================
@@ -232,57 +197,20 @@ public class Table implements IDMethod {
      * <p>A hook for the SAX XML parser to call when this table has
      * been fully loaded from the XML, and all nested elements have
      * been processed.</p>
-     *
      * <p>Performs heavy indexing and naming of elements which weren't
      * provided with a name.</p>
      */
-    public void doFinalInitialization() {// TODO: @jflute - Unnecessary?
+    public void doFinalInitialization() {
         // Heavy indexing must wait until after all columns composing
         // a table's primary key have been parsed.
-        if (_isHeavyIndexing) {
-            doHeavyIndexing();
-        }
+        // [Unused on DBFlute]
+        // if (_isHeavyIndexing) {
+        //     doHeavyIndexing();
+        // }
 
         // Name any indices which are missing a name using the
         // appropriate algorithm.
         doNaming();
-    }
-
-    /**
-     * <p>Adds extra indices for multi-part primary key columns.</p>
-     *
-     * <p>For databases like MySQL, values in a where clause must
-     * match key part order from the left to right.  So, in the key
-     * definition <code>PRIMARY KEY (FOO_ID, BAR_ID)</code>,
-     * <code>FOO_ID</code> <i>must</i> be the first element used in
-     * the <code>where</code> clause of the SQL query used against
-     * this table for the primary key index to be used.  This feature
-     * could cause problems under MySQL with heavily indexed tables,
-     * as MySQL currently only supports 16 indices per table (i.e. it
-     * might cause too many indices to be created).</p>
-     *
-     * <p>See <a href="http://www.mysql.com/doc/E/X/EXPLAIN.html">the
-     * manual</a> for a better description of why heavy indexing is
-     * useful for quickly searchable database tables.</p>
-     */
-    private void doHeavyIndexing() {
-        if (_log.isDebugEnabled()) {
-            _log.debug("doHeavyIndex() called on table " + getName());
-        }
-
-        List<Column> pk = getPrimaryKey();
-        int size = pk.size();
-
-        try {
-            // We start at an offset of 1 because the entire column
-            // list is generally implicitly indexed by the fact that
-            // it's a primary key.
-            for (int i = 1; i < size; i++) {
-                addIndex(new Index(this, pk.subList(i, size)));
-            }
-        } catch (EngineException e) {
-            _log.error(e, e);
-        }
     }
 
     /**
@@ -325,7 +253,6 @@ public class Table implements IDMethod {
 
     /**
      * Macro to a constraint name.
-     *
      * @param nameType constraint type
      * @param nbr unique number for this constraint type
      * @return unique name for constraint
@@ -361,6 +288,29 @@ public class Table implements IDMethod {
     }
 
     // -----------------------------------------------------
+    //                                            Alias Name
+    //                                            ----------
+    public String getAlias() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = _comment;
+        if (comment != null) {
+            final String alias = prop.extractAliasFromDbComment(comment);
+            if (alias != null) {
+                return alias;
+            }
+        }
+        return "";
+    }
+    
+    public String getAliasExpression() {
+        final String alias = getAlias();
+        if (alias == null || alias.trim().length() == 0) {
+            return "";
+        }
+        return "(" + alias + ")";
+    }
+    
+    // -----------------------------------------------------
     //                                            Table Type
     //                                            ----------
     /**
@@ -376,7 +326,7 @@ public class Table implements IDMethod {
     public void setType(String type) {
         this._type = type;
     }
-    
+
     public boolean isTypeTable() {
         return _type != null && _type.equalsIgnoreCase("table");
     }
@@ -688,145 +638,6 @@ public class Table implements IDMethod {
 
     public String getBehaviorComponentName() {
         return getDatabase().filterProjectSuffixForComponentName(getUncapitalisedJavaName()) + "Bhv";
-    }
-
-    // -----------------------------------------------------
-    //                                              IDMethod
-    //                                              --------
-    /**
-     * Get the method for generating pk's
-     */
-    public String getIdMethod() {
-        if (_idMethod == null) {
-            return IDMethod.NO_ID_METHOD;
-        } else {
-            return _idMethod;
-        }
-    }
-
-    /**
-     * Set the method for generating pk's
-     */
-    public void setIdMethod(String idMethod) {
-        this._idMethod = idMethod;
-    }
-
-    // -----------------------------------------------------
-    //                                               SkipSql
-    //                                               -------
-    /**
-     * Skip generating sql for this table (in the event it should
-     * not be created from scratch).
-     * @return value of skipSql.
-     */
-    public boolean isSkipSql() {
-        return (_skipSql || isAlias() || isForReferenceOnly());
-    }
-
-    /**
-     * Set whether this table should have its creation sql generated.
-     * @param v  Value to assign to skipSql.
-     */
-    public void setSkipSql(boolean v) {
-        this._skipSql = v;
-    }
-
-    // -----------------------------------------------------
-    //                                                 Alias
-    //                                                 -----
-    /**
-     * JavaName of om object this entry references.
-     * @return value of external.
-     */
-    public String getAlias() {
-        return _alias;
-    }
-
-    /**
-     * Is this table specified in the schema or is there just
-     * a foreign key reference to it.
-     * @return value of external.
-     */
-    public boolean isAlias() {
-        return (_alias != null);
-    }
-
-    /**
-     * Set whether this table specified in the schema or is there just
-     * a foreign key reference to it.
-     * @param v  Value to assign to alias.
-     */
-    public void setAlias(String v) {
-        this._alias = v;
-    }
-
-    /**
-     * Interface which objects for this table will implement
-     * @return value of interface.
-     */
-    public String getInterface() {
-        return _interface;
-    }
-
-    /**
-     * Interface which objects for this table will implement
-     * @param v  Value to assign to interface.
-     */
-    public void setInterface(String v) {
-        this._interface = v;
-    }
-
-    /**
-     * When a table is abstract, it marks the business object class that is
-     * generated as being abstract. If you have a table called "FOO", then the
-     * Foo BO will be <code>public abstract class Foo</code>
-     * This helps support class hierarchies
-     *
-     * @return value of abstractValue.
-     */
-    public boolean isAbstract() {
-        return _abstractValue;
-    }
-
-    /**
-     * When a table is abstract, it marks the business object
-     * class that is generated as being abstract. If you have a
-     * table called "FOO", then the Foo BO will be
-     * <code>public abstract class Foo</code>
-     * This helps support class hierarchies
-     *
-     * @param v  Value to assign to abstractValue.
-     */
-    public void setAbstract(boolean v) {
-        this._abstractValue = v;
-    }
-
-    /**
-     * Get the value of package.
-     * @return value of package.
-     */
-    public String getPackage() {
-        if (_pkg != null) {
-            return _pkg;
-        } else {
-            return this.getDatabase().getPackage();
-        }
-    }
-
-    /**
-     * Set the value of package.
-     * @param v  Value to assign to package.
-     */
-    public void setPackage(String v) {
-        this._pkg = v;
-    }
-
-    /**
-     * Returns a Collection of parameters relevant for the chosen
-     * id generation method.
-     */
-    public List<IdMethodParameter> getIdMethodParameters() {
-        return _idMethodParameters;
     }
 
     // -----------------------------------------------------
@@ -1609,27 +1420,6 @@ public class Table implements IDMethod {
 
     public boolean getContainsForeignPK() {
         return _containsForeignPK;
-    }
-
-    // ===================================================================================
-    //                                                                            Sequence
-    //                                                                            ========
-    /**
-     * A name to use for creating a sequence if one is not specified.
-     *
-     * @return name of the sequence
-     */
-    public String getSequenceName() {// TODO: @jflute - Unnecessary?
-        String result = null;
-        if (getIdMethod().equals(NATIVE)) {
-            List<IdMethodParameter> idMethodParams = getIdMethodParameters();
-            if (idMethodParams == null) {
-                result = getName() + "_SEQ";
-            } else {
-                result = ((IdMethodParameter) idMethodParams.get(0)).getValue();
-            }
-        }
-        return result;
     }
 
     // ===================================================================================
@@ -2594,15 +2384,6 @@ public class Table implements IDMethod {
         result.append("<table name=\"").append(getName()).append('\"');
         if (_javaName != null) {
             result.append(" javaName=\"").append(_javaName).append('\"');
-        }
-        if (_idMethod != null) {
-            result.append(" idMethod=\"").append(_idMethod).append('\"');
-        }
-        if (_skipSql) {
-            result.append(" skipSql=\"").append(new Boolean(_skipSql)).append('\"');
-        }
-        if (_abstractValue) {
-            result.append(" abstract=\"").append(new Boolean(_abstractValue)).append('\"');
         }
         result.append(">\n");
         if (_columnList != null) {

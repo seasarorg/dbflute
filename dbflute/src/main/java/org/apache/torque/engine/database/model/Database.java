@@ -108,45 +108,34 @@ public class Database {
     //                                                                           Attribute
     //                                                                           =========
     protected String _databaseType;
-
     protected List<Table> _tableList = new ArrayList<Table>(100);
-
     protected String _name;
-
-    protected String _pkg; // Unused on DBFlute
-
-    protected String _defaultIdMethod;
-
-    protected String _defaultJavaType;
-
+    protected AppData _appData;
     protected String _defaultJavaNamingMethod;
-
-    protected AppData _dbParent;
-
     protected DfFlexibleNameMap<String, Table> _flexibleTableMap = new DfFlexibleNameMap<String, Table>();
-
-    protected boolean _isHeavyIndexing;
 
     /** The meta data of parameter bean. */
     protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+
+    // [Unused on DBFlute]
+    // protected String _pkg;
+    // protected String _defaultIdMethod;
+    // protected String _defaultJavaType;
+    // protected boolean _isHeavyIndexing;
 
     // ===================================================================================
     //                                                                             Loading
     //                                                                             =======
     /**
-     * Load the database object from an xml tag.
-     * @param attrib the xml attributes
+     * Load the database object from an XML tag.
+     * @param attrib the XML attributes
      */
     public void loadFromXML(Attributes attrib) {
         setName(attrib.getValue("name"));
-        _pkg = attrib.getValue("package"); // Unused on DBFlute
-        _defaultJavaType = attrib.getValue("defaultJavaType");
-        _defaultIdMethod = attrib.getValue("defaultIdMethod");
-        _defaultJavaNamingMethod = attrib.getValue("defaultJavaNamingMethod");
+        _defaultJavaNamingMethod = attrib.getValue("defaultJavaNamingMethod"); // Basically Null
         if (_defaultJavaNamingMethod == null) {
-            _defaultJavaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE;
+            _defaultJavaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE; // Basically Here!
         }
-        _isHeavyIndexing = "true".equals(attrib.getValue("heavyIndexing"));
 
     }
 
@@ -201,7 +190,7 @@ public class Database {
     public Table addTable(Attributes attrib) {
         Table tbl = new Table();
         tbl.setDatabase(this);
-        tbl.loadFromXML(attrib, this.getDefaultIdMethod());
+        tbl.loadFromXML(attrib);
         addTable(tbl);
         return tbl;
     }
@@ -210,7 +199,6 @@ public class Database {
         tbl.setDatabase(this);
         _tableList.add(tbl);
         _flexibleTableMap.put(tbl.getName(), tbl);
-        tbl.setPackage(getPackage());
     }
 
     /**
@@ -225,24 +213,6 @@ public class Database {
         return (p == null ? null : p.getProperty(name));
     }
 
-    /**
-     * Determines if this database will be using the
-     * <code>IDMethod.ID_BROKER</code> to create ids for torque OM
-     * objects.
-     * @return true if there is at least one table in this database that
-     * uses the <code>IDMethod.ID_BROKER</code> method of generating
-     * ids. returns false otherwise.
-     */
-    public boolean requiresIdTable() {
-        Table table[] = getTables();
-        for (int i = 0; i < table.length; i++) {
-            if (table[i].getIdMethod().equals(IDMethod.ID_BROKER)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void doFinalInitialization() throws EngineException { // Unused on DBFlute
         Table[] tables = getTables();
         for (int i = 0; i < tables.length; i++) {
@@ -252,21 +222,22 @@ public class Database {
             // if idMethod="autoincrement", make sure a column is
             // specified as autoIncrement="true"
             // FIXME: Handle idMethod="native" via DB adapter.
-            if (currTable.getIdMethod().equals("autoincrement")) {
-                Column[] columns = currTable.getColumns();
-                boolean foundOne = false;
-                for (int j = 0; j < columns.length && !foundOne; j++) {
-                    foundOne = columns[j].isAutoIncrement();
-                }
-
-                if (!foundOne) {
-                    String errorMessage = "Table '" + currTable.getName()
-                            + "' is marked as autoincrement, but it does not "
-                            + "have a column which declared as the one to "
-                            + "auto increment (i.e. autoIncrement=\"true\")\n";
-                    throw new EngineException("Error in XML schema: " + errorMessage);
-                }
-            }
+            // [Unused on DBFlute]
+            // if (currTable.getIdMethod().equals("autoincrement")) {
+            //     Column[] columns = currTable.getColumns();
+            //     boolean foundOne = false;
+            //     for (int j = 0; j < columns.length && !foundOne; j++) {
+            //         foundOne = columns[j].isAutoIncrement();
+            //     }
+            // 
+            //     if (!foundOne) {
+            //         String errorMessage = "Table '" + currTable.getName()
+            //                 + "' is marked as autoincrement, but it does not "
+            //                 + "have a column which declared as the one to "
+            //                 + "auto increment (i.e. autoIncrement=\"true\")\n";
+            //         throw new EngineException("Error in XML schema: " + errorMessage);
+            //     }
+            // }
 
             currTable.doFinalInitialization();
 
@@ -1463,7 +1434,18 @@ public class Database {
     public String getSql2EntityExtendedParameterBeanPackage() {
         return getProperties().getOutsideSqlProperties().getExtendedParameterBeanPackage();
     }
-
+    
+    // ===================================================================================
+    //                                                               Properties - Document
+    //                                                               =====================
+    public boolean isAliasDelimiterInDbCommentValid() {
+        return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
+    }
+    
+    public boolean isEntityJavaDocDbCommentValid() {
+        return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
+    }
+    
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
@@ -1824,20 +1806,16 @@ public class Database {
     /**
      * Creates a string representation of this Database.
      * The representation is given in xml format.
-     * @return string representation in xml
+     * @return String representation in XML. (NotNull)
      */
     public String toString() {
-        StringBuffer result = new StringBuffer();
-
-        result.append("<database name=\"").append(getName()).append('"').append(" package=\"").append(getPackage())
-                .append('"').append(" defaultIdMethod=\"").append(getDefaultIdMethod()).append('"').append(">\n");
-
+        StringBuffer sb = new StringBuffer();
+        sb.append("<database name=\"").append(getName()).append('"').append(">\n");
         for (Iterator<Table> i = _tableList.iterator(); i.hasNext();) {
-            result.append(i.next());
+            sb.append(i.next());
         }
-
-        result.append("</database>");
-        return result.toString();
+        sb.append("</database>");
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -1851,30 +1829,9 @@ public class Database {
         this._name = (name == null ? "default" : name);
     }
 
-    public String getPackage() {
-        return _pkg;
-    }
-
-    public void setPackage(String v) {
-        this._pkg = v;
-    }
-
-    public String getDefaultIdMethod() {
-        return _defaultIdMethod;
-    }
-
-    public void setDefaultIdMethod(String v) {
-        this._defaultIdMethod = v;
-    }
-
-    public String getDefaultJavaType() {
-        return _defaultJavaType;
-    }
-
     /**
      * Get the value of defaultJavaNamingMethod which specifies the
      * method for converting schema names for table and column to Java names.
-     *
      * @return The default naming conversion used by this database.
      */
     public String getDefaultJavaNamingMethod() {
@@ -1889,28 +1846,12 @@ public class Database {
         this._defaultJavaNamingMethod = v;
     }
 
-    /**
-     * Get the value of heavyIndexing.
-     * @return value of heavyIndexing.
-     */
-    public boolean isHeavyIndexing() {
-        return _isHeavyIndexing;
-    }
-
-    /**
-     * Set the value of heavyIndexing.
-     * @param v  Value to assign to heavyIndexing.
-     */
-    public void setHeavyIndexing(boolean v) {
-        this._isHeavyIndexing = v;
-    }
-
-    public void setAppData(AppData parent) {
-        _dbParent = parent;
+    public void setAppData(AppData appData) {
+        _appData = appData;
     }
 
     public AppData getAppData() {
-        return _dbParent;
+        return _appData;
     }
 
     public String getDatabaseType() {

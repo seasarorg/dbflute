@@ -56,6 +56,9 @@
 	.linkcell {
         font-size: 0.8em;
     }
+	.commentcell {
+        font-size: 0.7em;
+    }
 	.subcell {
         font-size: 0.8em;
     }
@@ -90,6 +93,9 @@
   <table>
     <thead>
       <tr>
+#if ($database.isAliasDelimiterInDbCommentValid())
+        <th>Alias</th>
+#end
         <th>Name</th>
         <th>Type</th>
         <th>ForeignTable</th>
@@ -99,21 +105,24 @@
       </tr>
     </thead>
     <tbody>
-#foreach ($tbl in $database.tableDisplaySortedList)
+#foreach ($table in $database.tableDisplaySortedList)
       <tr>
-        <td><a href="#${tbl.name}">${tbl.name}</a></td>
-        <td>${tbl.type}</td>
-        <td class="subcell">${tbl.foreignTableNameCommaStringWithHtmlHref}</td>
-        <td class="subcell">${tbl.referrerTableNameCommaStringWithHtmlHref}</td>
-        <td>#if ($tbl.hasComment()) ${tbl.comment}#else &nbsp;#end</td>
-        <td class="subcell">${tbl.javaName}</td>
+#if ($database.isAliasDelimiterInDbCommentValid())
+        <td>${table.alias}</td>
+#end
+        <td><a href="#${tbl.name}">${table.name}</a></td>
+        <td>${table.type}</td>
+        <td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
+        <td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+        <td class="commentcell">#if ($table.hasComment()) ${table.comment}#else &nbsp;#end</td>
+        <td class="subcell">${table.javaName}</td>
       </tr>
 #end
     </tbody>
   </table>
 
-#foreach ($tbl in $database.tableDisplaySortedList)
-$generator.parse("doc/html/table.vm", null, "table", $tbl)
+#foreach ($table in $database.tableDisplaySortedList)
+$generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
 #if ($database.hasClassificationDefinitionMap())

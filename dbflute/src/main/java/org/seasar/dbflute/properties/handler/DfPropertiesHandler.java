@@ -8,6 +8,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -248,6 +249,18 @@ public final class DfPropertiesHandler {
             _outsideSqlProperties = new DfOutsideSqlProperties(prop);
         }
         return _outsideSqlProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                              Document
+    //                                              --------
+    protected DfDocumentProperties _documentProperties;
+    
+    public DfDocumentProperties getDocumentProperties(Properties prop) {
+        if (_documentProperties == null) {
+            _documentProperties = new DfDocumentProperties(prop);
+        }
+        return _documentProperties;
     }
 
     // -----------------------------------------------------
