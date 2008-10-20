@@ -39,6 +39,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         System.Collections.IList getListAsNg();
     }
 
+    [System.Serializable]
     public class ArrayList<ELEMENT> : List<ELEMENT>, NgList {
         IList<ELEMENT> _res = new System.Collections.Generic.List<ELEMENT>();
         public ArrayList() {
@@ -104,6 +105,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);
         }
+        [System.Serializable]
         protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
             protected IEnumerator<ELEMENT> _target;
             public MyEmumerator(ArrayList<ELEMENT> target) {
@@ -136,6 +138,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         bool containsAsNg(Object element);
     }
 
+    [System.Serializable]
     public class HashSet<ELEMENT> : Set<ELEMENT>, NgSet {
         protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
         public bool add(ELEMENT element) {
@@ -185,6 +188,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);
         }
+        [System.Serializable]
         protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
             protected IEnumerator<ELEMENT> _target;
             protected int _index;
@@ -210,6 +214,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 		}
     }
 
+    [System.Serializable]
     public class LinkedHashSet<ELEMENT> : Set<ELEMENT>, NgSet {
         protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
         protected List<ELEMENT> _seq = new ArrayList<ELEMENT>();
@@ -265,6 +270,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);
         }
+        [System.Serializable]
         protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
             protected LinkedHashSet<ELEMENT> _target;
             protected int _index = -1;
@@ -311,6 +317,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         bool containsKeyAsNg(Object key);
     }
 
+    [System.Serializable]
     public class HashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
 		protected IDictionary<KEY, VALUE> _res = new Dictionary<KEY, VALUE>();
         public VALUE get(KEY key) {
@@ -378,6 +385,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 		}
     }
 
+    [System.Serializable]
     public class LinkedHashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
         protected Map<KEY, VALUE> _res = new HashMap<KEY, VALUE>();
         protected LinkedHashSet<KEY> _seq = new LinkedHashSet<KEY>();
