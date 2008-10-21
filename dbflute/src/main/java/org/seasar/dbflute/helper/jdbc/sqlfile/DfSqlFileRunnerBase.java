@@ -222,7 +222,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     line = line.trim();
                 }
                 if (!existsCommentOn && isSqlTrimAndRemoveLineSeparator() && isHandlingCommentOnLineSeparator()) {
-                    if (line.trim().toLowerCase().startsWith("comment on ")) {
+                    final String lowerLine = line.trim().toLowerCase();
+                    if (lowerLine.startsWith("comment on ") && lowerLine.contains("is") && lowerLine.contains("'")) {
                         existsCommentOn = true;
                     }
                 }
