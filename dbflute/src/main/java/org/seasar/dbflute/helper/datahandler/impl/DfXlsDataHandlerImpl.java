@@ -18,13 +18,13 @@ package org.seasar.dbflute.helper.datahandler.impl;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,6 @@ import org.seasar.extension.dataset.impl.SqlServerSqlWriter;
 import org.seasar.extension.dataset.states.CreatedState;
 import org.seasar.extension.dataset.states.SqlContext;
 import org.seasar.extension.dataset.types.ColumnTypes;
-import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
 /**
  * @author jflute
@@ -73,6 +72,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected boolean _loggingInsertSql;
     protected String _schemaName;
     protected Pattern _skipSheetPattern;
+
+    /** The cache map of meta info. The key is table name. */
+    protected Map<String, DfFlexibleNameMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleNameMap<String, DfColumnMetaInfo>>();
+
+    /** The handler of columns for getting column meta information. */
     protected DfColumnHandler _columnHandler = new DfColumnHandler();// as helper.
 
     // ===================================================================================
@@ -238,6 +242,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //                                                                       Assist Helper
     //                                                                       =============
     protected DfFlexibleNameMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+        if (_metaInfoCacheMap.containsKey(tableName)) {
+            return _metaInfoCacheMap.get(tableName);
+        }
         final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
@@ -246,6 +253,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
             }
+            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
             return columnMetaInfoMap;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -421,11 +429,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
-            final Map<?, ?> columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
 
+            final DfFlexibleNameMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DataColumn dataColumn = table.getColumn(j);
-                if (!columnMap.containsKey(dataColumn.getColumnName())) {
+                if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
                     dataColumn.setWritable(false);
                 }
             }
@@ -438,12 +446,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             final DataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
-            final Map<?, ?> columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
 
+            final DfFlexibleNameMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
-                if (columnMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
+                if (metaInfoMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
                     final ColumnType columnType;
                     final Object value;
                     if (defaultValue.equalsIgnoreCase("sysdate")) {
@@ -483,33 +491,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final Map<String, List<String>> targetMap = reader.readMapAsListStringValue(path, "UTF-8");
         return new DfFlexibleNameMap<String, List<String>>(targetMap);
     }
-
-    protected Map<?, ?> getDatabaseMetaColumnMap(String tableName, DataSource dataSource) {
-        final Connection connection;
-        final DatabaseMetaData dbMetaData;
-        try {
-            connection = dataSource.getConnection();
-            dbMetaData = connection.getMetaData();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        final Map<?, ?> columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
-        return columnMap;
-    }
-
-    // Old style method to createColumnContainer()
-    //    protected List<String> createValueList(final DataTable dataTable, final DataRow dataRow) {
-    //        final List<String> valueList = new ArrayList<String>();
-    //        for (int k = 0; k < dataTable.getColumnSize(); k++) {
-    //            final DataColumn dataColumn = dataTable.getColumn(k);
-    //            if (!dataColumn.isWritable()) {
-    //                continue;
-    //            }
-    //            final Object value = dataRow.getValue(k);
-    //            valueList.add(value != null ? value.toString() : null);
-    //        }
-    //        return valueList;
-    //    }
 
     protected String getSql4Log(String tableName, List<String> columnNameList,
             final List<? extends Object> bindParameters) {
