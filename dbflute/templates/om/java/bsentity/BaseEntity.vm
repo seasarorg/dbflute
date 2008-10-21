@@ -303,10 +303,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                   Referrer Property
     //                                                                   =================
 #foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-#if (!${referrer.isOneToOne()})
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     //   Referrer Property = [${referrer.referrerJavaBeansRulePropertyName}]
     // * * * * * * * * */

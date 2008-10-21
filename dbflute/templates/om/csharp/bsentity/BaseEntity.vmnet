@@ -23,7 +23,7 @@ using ${myDBMetaPackageName};
 namespace ${myExtendedEntityPackageName} {
 
     /// <summary>
-    /// The entity of ${table.name}. (partial class for auto-generation)
+    /// The entity of ${table.basicInfoDispString}. (partial class for auto-generation)
     /// <![CDATA[
     /// [primary-key]
     ///     ${table.primaryKeyNameCommaString}
@@ -69,12 +69,13 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                       =========
         #region Attribute
 #foreach ($col in $table.columns)
-
-        /// <summary>The value of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
+        /// <summary>${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}</summary>
         protected ${col.JavaNative} _${col.uncapitalisedJavaName};
+
 #end
         protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
 #if ($table.hasAllCommonColumn())
+
         protected bool _canCommonColumnAutoSetup = true;
 #end
         #endregion
@@ -186,12 +187,15 @@ namespace ${myExtendedEntityPackageName} {
         #region Foreign Property
 #set ($foreignKeyIndex = 0)
 #foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKey.foreignTable.JavaName}")
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         //   Foreign Property = [${foreignKey.foreignPropertyNameInitCap}]
         // * * * * * * * * */
         protected ${foreignEntityClassName} ${foreignVariableName};
+
+        /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignPropertyNameInitCap}'.</summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKey.RelationKeysCommaString")]
         public ${foreignEntityClassName} ${foreignKey.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
@@ -201,13 +205,16 @@ namespace ${myExtendedEntityPackageName} {
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #foreach ($referrer in $table.referrerList)
+#if (${referrer.isOneToOne()})
+#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameAsOne}")
-#if (${referrer.isOneToOne()})
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         //   Foreign Property = [${referrer.refererJavaBeansRulePropertyNameInitCapAsOne}]
         // * * * * * * * * */
         protected ${referrerEntityClassName} ${referrerVariableName};
+
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$referrer.relationKeysCommaStringForOneToOneReferrer")]
         public ${referrerEntityClassName} ${referrer.referrerPropertyNameInitCapAsOne} {
             get { return ${referrerVariableName}; }
@@ -225,19 +232,22 @@ namespace ${myExtendedEntityPackageName} {
         #region Referrer Property
 #foreach ($referrer in $table.referrerList)
 #if (!${referrer.isOneToOne()})
+#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.ReferrerPropertyNameInitCap}")
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         //   Referrer Property = [${referrer.referrerPropertyNameInitCap}]
         // * * * * * * * * */
         protected IList<${referrerEntityClassName}> $referrerVariableName;
+
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCap}'.</summary>
         public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
             get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }
         }
-#end
-#end
 
+#end
+#end
         #endregion
 
         // ===============================================================================
@@ -342,7 +352,7 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                        ========
         #region Accessor
 #foreach ($col in $table.columns)
-        /// <summary>The property of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
+        /// <summary>${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}</summary>
 #if ($col.isIdentity())
         [Seasar.Dao.Attrs.ID("identity")]
 #end
