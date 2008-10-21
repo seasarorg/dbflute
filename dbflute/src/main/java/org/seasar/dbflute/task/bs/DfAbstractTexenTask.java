@@ -121,6 +121,14 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 _log.error("Failed to execute DBFlute Task!", e);
             }
             throw e;
+        } catch (Error e) {
+            try {
+                logError(e);
+            } catch (RuntimeException ignored) {
+                _log.warn("Ignored exception occured!", ignored);
+                _log.error("Failed to execute DBFlute Task!", e);
+            }
+            throw e;
         } finally {
             long after = System.currentTimeMillis();
             _log.info("");
@@ -159,6 +167,26 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         msg = msg + "[Runtime Exception]" + getLineSeparator();
         msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
         msg = msg + "exception message = " + e.getMessage() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        _log.error(msg, e);
+    }
+
+    protected void logError(Error e) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Failed to execute DBFlute Task!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Basic Properties]" + getLineSeparator();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Database Properties]" + getLineSeparator();
+        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Error]" + getLineSeparator();
+        msg = msg + "error class   = " + e.getClass() + getLineSeparator();
+        msg = msg + "error message = " + e.getMessage() + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
