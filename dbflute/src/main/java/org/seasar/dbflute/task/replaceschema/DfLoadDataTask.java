@@ -138,8 +138,6 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
-        } else if (basicProperties.isDatabaseSybase()) {
-            xlsDataHandler.writeSeveralDataForSybase(directoryPath, getDataSource());
         } else {
             xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
         }

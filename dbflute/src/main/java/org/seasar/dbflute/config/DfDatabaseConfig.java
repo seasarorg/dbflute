@@ -27,9 +27,9 @@ import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
  */
 public class DfDatabaseConfig {
 
-    //====================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    // ===============================================================================
+    //                                                                       Attribute
+    //                                                                       =========
     protected String _databaseBaseInfo;
     {
         _databaseBaseInfo = "map:{"
@@ -45,9 +45,9 @@ public class DfDatabaseConfig {
                 + "; default    = map:{daoGenDbName = Default    ; wildCard = % ; sequenceNextSql = Unsupported}" + "}";
     }
 
-    //====================================================================================
-    //                                                                           Analyzing
-    //                                                                           =========
+    // ===============================================================================
+    //                                                                       Analyzing
+    //                                                                       =========
     /**
      * Analyze database base-info.
      * @return Database base-info. (NotNull)
@@ -71,9 +71,9 @@ public class DfDatabaseConfig {
         return realMap;
     }
 
-    //========================================================================================
-    //                                                                                Accessor
-    //                                                                                ========
+    // ===============================================================================
+    //                                                                        Accessor
+    //                                                                        ========
     public String getDatabaseBaseInfo() {
         return _databaseBaseInfo;
     }

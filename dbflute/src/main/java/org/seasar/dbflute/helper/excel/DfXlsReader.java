@@ -16,6 +16,8 @@
 package org.seasar.dbflute.helper.excel;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -41,9 +43,7 @@ import org.seasar.extension.dataset.DataSetConstants;
 import org.seasar.extension.dataset.DataTable;
 import org.seasar.extension.dataset.impl.DataSetImpl;
 import org.seasar.extension.dataset.types.ColumnTypes;
-import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.Base64Util;
-import org.seasar.framework.util.FileInputStreamUtil;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.TimestampConversionUtil;
 
@@ -78,7 +78,15 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     //                                                                         ===========
     public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap,
             DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
-        this(FileInputStreamUtil.create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+        this(create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+    }
+
+    protected static InputStream create(File file) {
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap,
@@ -92,8 +100,8 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     protected void setupWorkbook(InputStream in) {
         try {
             _workbook = new HSSFWorkbook(in);
-        } catch (IOException ex) {
-            throw new IORuntimeException(ex);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
         _dataFormat = _workbook.createDataFormat();
         _dataSet = new DataSetImpl();
@@ -355,7 +363,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         HSSFCellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
         String format = _dataFormat.getFormat(dfNum);
-        if (StringUtil.isEmpty(format)) {
+        if (format == null || format.length() == 0) {
             return false;
         }
         if (format.indexOf('/') > 0 || format.indexOf('y') > 0 || format.indexOf('m') > 0 || format.indexOf('d') > 0) {

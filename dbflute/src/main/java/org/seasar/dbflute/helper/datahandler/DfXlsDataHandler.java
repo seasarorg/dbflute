@@ -33,7 +33,5 @@ public interface DfXlsDataHandler {
 
     public void writeSeveralDataForSqlServer(String dataDirectoryName, DataSource dataSource);
 
-    public void writeSeveralDataForSybase(String dataDirectoryName, DataSource dataSource);
-
     public List<File> getXlsList(String dataDirectoryName);
 }

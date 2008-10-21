@@ -1,9 +1,13 @@
 package org.seasar.dbflute.velocity;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -18,7 +22,6 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import org.seasar.framework.util.FileUtil;
 
 /**
  * @author modified by taktos
@@ -200,7 +203,7 @@ public class DfOriginalGenerator extends DfGenerator {
             VelocityContext vc = new VelocityContext(controlContext);
             template.merge(vc, sw);
             String newContent = sw.toString();
-            String oldContent = new String(FileUtil.getBytes(oldFile), specifiedOutputEncoding);
+            String oldContent = new String(getBytes(oldFile), specifiedOutputEncoding);
             if (newContent.equals(oldContent)) {
                 skipFileNameList.add(oldFile.getName());
                 return "";
@@ -334,6 +337,48 @@ public class DfOriginalGenerator extends DfGenerator {
         }
         // clear the file writers cache
         writers.clear();
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected byte[] getBytes(File file) throws IOException {
+        return getBytes(create(file));
+    }
+
+    protected final byte[] getBytes(InputStream is) throws IOException {
+        byte[] bytes = null;
+        byte[] buf = new byte[8192];
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int n = 0;
+            while ((n = is.read(buf, 0, buf.length)) != -1) {
+                baos.write(buf, 0, n);
+            }
+            bytes = baos.toByteArray();
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (is != null) {
+                close(is);
+            }
+        }
+        return bytes;
+    }
+
+    public static void close(InputStream is) throws IOException {
+        if (is == null) {
+            return;
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    protected FileInputStream create(File file) throws IOException {
+        return new FileInputStream(file);
     }
 
     // ===================================================================================
