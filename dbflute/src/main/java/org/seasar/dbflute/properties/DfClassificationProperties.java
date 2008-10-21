@@ -608,7 +608,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
         final String property = stringProp("torque." + KEY_classificationDefinitionMap, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
+        return filterDoubleQuotation(removeLineSeparator(property));
     }
 
     public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
@@ -672,7 +672,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
         final String property = stringProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
+        return filterDoubleQuotation(removeLineSeparator(property));
     }
 
     public boolean hasClassification(String tableName, String columnName) {

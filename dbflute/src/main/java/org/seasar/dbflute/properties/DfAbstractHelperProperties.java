@@ -334,7 +334,7 @@ public abstract class DfAbstractHelperProperties {
         }
         return reader.readString("./dfprop/" + filteredKey + ".dfprop", encoding);
     }
-    
+
     protected Map<String, Object> getOutsidePropMap(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
         final String encoding = "UTF-8";
@@ -387,8 +387,18 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertyUtil.convertAll(str, "\"", "'");
     }
 
-    public String removeNewLine(String str) {
-        return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
+    public String removeLineSeparator(String str) {
+        str = removeCR(str);
+        str = removeLF(str);
+        return str;
+    }
+
+    protected String removeLF(String str) {
+        return str.replaceAll("\n", "");
+    }
+
+    protected String removeCR(String str) {
+        return str.replaceAll("\r", "");
     }
 
     protected boolean processBooleanString(String value) {

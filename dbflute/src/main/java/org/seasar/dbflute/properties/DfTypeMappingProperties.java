@@ -127,6 +127,6 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                                                               =====
     public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
         final String property = stringProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP_STRING);
-        return removeNewLine(property);
+        return removeLineSeparator(property);
     }
 }

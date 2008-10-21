@@ -118,8 +118,4 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         return comment;
     }
-
-    protected String removeCR(String str) {
-        return str.replaceAll("\r", "");
-    }
 }
