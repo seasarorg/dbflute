@@ -39,7 +39,7 @@
     <td class="linkcell"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
     <td class="linkcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
     <td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
-    <td class="commentcell">#if ($col.hasComment()) ${col.comment}#else &nbsp;#end</td>
+    <td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
     <td class="subcell">${col.javaBeansRulePropertyName}</td>
     <td class="subcell">${col.javaNativeRemovedPackage}</td>
   </tr>

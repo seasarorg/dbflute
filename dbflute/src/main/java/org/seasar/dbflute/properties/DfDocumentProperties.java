@@ -10,6 +10,12 @@ import java.util.Properties;
 public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String NORMAL_LINE_SEPARATOR = "\n";
+    protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDocumentProperties(Properties prop) {
@@ -60,7 +66,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final String delimiter = getAliasDelimiterInDbComment();
         return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
     }
-    
+
     protected boolean hasAlias(String comment) {
         if (comment == null || comment.trim().length() == 0) {
             return false;
@@ -81,5 +87,39 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     public boolean isEntityJavaDocDbCommentValid() {
         String value = (String) getDocumentDefinitionMap().get("entityJavaDocDbCommentValid");
         return value != null && value.trim().length() > 0 && value.equalsIgnoreCase("true");
+    }
+
+    public String resolveLineSeparatorForSchemaHtml(String comment) {
+        if (comment == null || comment.trim().length() == 0) {
+            return null;
+        }
+        comment = removeCR(comment);
+        final String htmlLineSeparator = "<br />";
+        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, htmlLineSeparator);
+        }
+        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
+        }
+        return comment;
+    }
+
+    public String resolveLineSeparatorForJavaDoc(String comment, String indent) {
+        if (comment == null || comment.trim().length() == 0) {
+            return null;
+        }
+        comment = removeCR(comment);
+        final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
+        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        return comment;
+    }
+
+    protected String removeCR(String str) {
+        return str.replaceAll("\r", "");
     }
 }

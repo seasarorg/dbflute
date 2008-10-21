@@ -46,6 +46,38 @@ public class ${glOutsideSqlPagingExecutorName} {
     //                                                                              Select
     //                                                                              ======
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
+    /**
+     * Select list with paging.
+     * <p>
+     * The SQL should have Paging without Count. <br />
+     * You do not need to use pagingBean's isPaging() method on your 'Parameter Comment'. <br />
+     * <pre>
+     * - - - - - - - - - - - - - - - - - - - - - - -
+     * ex) Your Correct SQL {MySQL and manualPaging}
+     * - - - - - - - - - - - - - - - - - - - - - - -
+     * # select member.MEMBER_ID
+     * #      , member.MEMBER_NAME
+     * #      , memberStatus.MEMBER_STATUS_NAME
+     * #   from MEMBER member
+     * #     left outer join MEMBER_STATUS memberStatus
+     * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
+     * #  /[*]BEGIN[*]/where
+     * #    /[*]IF pmb.memberId != null[*]/member.MEMBER_ID = /[*]pmb.memberId[*]/'123'/[*]END[*]/
+     * #    /[*]IF pmb.memberName != null[*]/and member.MEMBER_NAME like /[*]pmb.memberName[*]/'Billy' || '%'/[*]END[*]/
+     * #  /[*]END[*]/
+     * #  order by member.UPDATE_DATETIME desc
+     * #  limit /[*]$pmb.pageStartIndex[*]/80, /[*]$pmb.fetchSize[*]/20
+     * # 
+     * o [*] is easy escape to Java Doc Comment.
+     * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
+     * </pre>
+     * @param <ENTITY> The type of entity.
+     * @param path The path of SQL that executes count and paging. (NotNull)
+     * @param pmb The bean of paging parameter. (NotNull)
+     * @param entityType The type of result entity. (NotNull)
+     * @return The result bean of paged list. (NotNull)
+     * @exception com.example.dbflute.basic.dbflute.allcommon.exception.OutsideSqlNotFoundException When the outside-sql is not found.
+     */
     public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
         List<ENTITY> resultList = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
@@ -62,7 +94,7 @@ public class ${glOutsideSqlPagingExecutorName} {
      * Select page.
      * <p>
      * The SQL should have Count and Paging. <br />
-     * You can realize by pagingBean's isPaging() method on your 'SQL Comment'. For example, 'IF Comment'. <br />
+     * You can realize by pagingBean's isPaging() method on your 'Parameter Comment'. For example, 'IF Comment'. <br />
      * It returns false when it executes Count. And it returns true when it executes Paging. <br />
      * <pre>
      * - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,15 +141,14 @@ public class ${glOutsideSqlPagingExecutorName} {
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)
-     * @param pagingPath The path of paging SQL. (NotNull)
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
      */
     public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
-                                                       , final ${glPagingBeanInterfaceName} pmb
-                                                       , final Class<ENTITY> entityType) {
+                                                      , final ${glPagingBeanInterfaceName} pmb
+                                                      , final Class<ENTITY> entityType) {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
         final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {

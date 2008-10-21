@@ -335,7 +335,6 @@ namespace ${myExtendedEntityPackageName} {
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }
-
         #endregion
 
         // ===============================================================================
@@ -343,7 +342,6 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                        ========
         #region Accessor
 #foreach ($col in $table.columns)
-
         /// <summary>The property of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
 #if ($col.isIdentity())
         [Seasar.Dao.Attrs.ID("identity")]
@@ -356,6 +354,7 @@ namespace ${myExtendedEntityPackageName} {
                 _${col.uncapitalisedJavaName} = value;
             }
         }
+
 #end
         #endregion
     }

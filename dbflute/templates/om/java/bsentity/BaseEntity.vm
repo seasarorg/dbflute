@@ -23,7 +23,10 @@ import ${myExtendedEntityPackageName}.*;
 #end
 
 /**
- * The entity of ${table.basicInfoDispString}.
+ * The entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -479,7 +482,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
      * @return The value of the column '${col.name}'. (Nullable)
      */
     public ${col.JavaNative} get${col.javaName}() {
@@ -487,7 +493,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
      * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {

@@ -908,12 +908,30 @@ public class Column {
     }
 
     public String getComment() {
-        final String comment = getProperties().getDocumentProperties().extractCommentFromDbComment(_comment);
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.extractCommentFromDbComment(_comment);
         return comment != null ? comment : "";
     }
 
     public void setComment(String comment) {
         this._comment = comment;
+    }
+
+    public String getCommentForSchemaHtml() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveLineSeparatorForSchemaHtml(getComment());
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForJavaDocValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityJavaDocDbCommentValid();
+    }
+
+    public String getCommentForJavaDoc() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveLineSeparatorForJavaDoc(getComment(), "    ");
+        return comment != null ? comment : "";
     }
 
     // -----------------------------------------------------

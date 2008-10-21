@@ -211,6 +211,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             String sql = "";
             String line = "";
             boolean inGroup = false;
+            boolean existsCommentOn = false;
             boolean isAlreadyProcessUTF8Bom = false;
             while ((line = in.readLine()) != null) {
                 if (!isAlreadyProcessUTF8Bom) {
@@ -219,6 +220,11 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
                 if (!inGroup && isSqlTrimAndRemoveLineSeparator()) {
                     line = line.trim();
+                }
+                if (!existsCommentOn && isSqlTrimAndRemoveLineSeparator() && isHandlingCommentOnLineSeparator()) {
+                    if (line.trim().toLowerCase().startsWith("comment on ")) {
+                        existsCommentOn = true;
+                    }
                 }
 
                 // SQL defines "--" as a comment to EOL
@@ -262,7 +268,16 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         continue;
                     }
 
-                    final String lineConnect = isSqlTrimAndRemoveLineSeparator() ? " " : "";
+                    final String lineConnect;
+                    if (isSqlTrimAndRemoveLineSeparator()) {
+                        if (existsCommentOn) {
+                            lineConnect = getLineSeparator();
+                        } else {
+                            lineConnect = " ";
+                        }
+                    } else {
+                        lineConnect = "";
+                    }
                     if (line.indexOf("--") >= 0) {// If this line contains both SQL and comment, ...
                         // With Line Comment
                         line = replaceCommentQuestionMarkIfNeeds(line);
@@ -348,7 +363,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         return sql;
     }
-    
+
     protected String getTerminater4Tool() {// for override.
         return null;
     }
@@ -413,6 +428,13 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
      * @return Determination.
      */
     protected boolean isSqlTrimAndRemoveLineSeparator() {
+        return false;// as Default
+    }
+
+    /**
+     * @return Determination.
+     */
+    protected boolean isHandlingCommentOnLineSeparator() {
         return false;// as Default
     }
 

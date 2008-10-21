@@ -122,6 +122,11 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
             }
+            
+            @Override
+            protected boolean isHandlingCommentOnLineSeparator() {
+                return true;
+            }
 
             @Override
             protected String getTerminater4Tool() {

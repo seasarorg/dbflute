@@ -117,7 +117,7 @@
         <td>${table.type}</td>
         <td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
         <td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
-        <td class="commentcell">#if ($table.hasComment()) ${table.comment}#else &nbsp;#end</td>
+        <td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
         <td class="subcell">${table.javaName}</td>
       </tr>
 #end
