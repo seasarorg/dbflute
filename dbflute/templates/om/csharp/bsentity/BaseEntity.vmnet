@@ -25,6 +25,10 @@ namespace ${myExtendedEntityPackageName} {
     /// <summary>
     /// The entity of ${table.basicInfoDispString}. (partial class for auto-generation)
     /// <![CDATA[
+#if ($table.isCommentForJavaDocValid())
+    /// ${table.commentForJavaDoc}
+    /// 
+#end
     /// [primary-key]
     ///     ${table.primaryKeyNameCommaString}
     /// 
@@ -353,6 +357,11 @@ namespace ${myExtendedEntityPackageName} {
         #region Accessor
 #foreach ($col in $table.columns)
         /// <summary>${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}</summary>
+#if ($col.isCommentForJavaDocValid())
+        /// <remarks>
+        /// ${col.commentForJavaDoc}
+        /// </remarks>
+#end
 #if ($col.isIdentity())
         [Seasar.Dao.Attrs.ID("identity")]
 #end

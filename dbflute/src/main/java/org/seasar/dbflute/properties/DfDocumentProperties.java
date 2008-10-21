@@ -105,11 +105,29 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String resolveLineSeparatorForJavaDoc(String comment, String indent) {
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            return resolveLineSeparatorForCSharpDoc(comment, "    " + indent);
+        }
         if (comment == null || comment.trim().length() == 0) {
             return null;
         }
         comment = removeCR(comment);
         final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
+        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        return comment;
+    }
+    
+    protected String resolveLineSeparatorForCSharpDoc(String comment, String indent) {
+        if (comment == null || comment.trim().length() == 0) {
+            return null;
+        }
+        comment = removeCR(comment);
+        final String javaDocLineSeparator = NORMAL_LINE_SEPARATOR + indent + "/// ";
         if (comment.contains(NORMAL_LINE_SEPARATOR)) {
             comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
         }

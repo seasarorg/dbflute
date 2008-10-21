@@ -9,6 +9,6 @@
 #
 map:{
     ; aliasDelimiterInDbComment = :
-    ; entityJavaDocDbCommentValid = true
+    # ; entityJavaDocDbCommentValid = true
 }
 # ----------------/
