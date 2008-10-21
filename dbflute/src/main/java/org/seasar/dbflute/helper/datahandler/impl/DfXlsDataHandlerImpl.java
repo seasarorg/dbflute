@@ -22,6 +22,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -168,14 +169,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
                             }
                             String value = (String) obj;
-                            if (value == null) {
-                                final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-                                if (columnMetaInfo != null) {
-                                    final int jdbcType = columnMetaInfo.getJdbcType();
-                                    statement.setNull(bindCount, jdbcType);
-                                    bindCount++;
-                                    continue;
-                                }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Null Headache
+                            // - - - - - - - - - - - - - -
+                            if (processNull(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
                             }
 
                             // - - - - - - - - - - - - - - - - - - -
@@ -262,6 +262,36 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     protected boolean isNotNullNotString(Object obj) {
         return obj != null && !(obj instanceof String);
+    }
+
+    protected boolean processNull(String columnName, String value, PreparedStatement statement, int bindCount,
+            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value != null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo == null) {
+            return false;
+        }
+        final int jdbcType = columnMetaInfo.getJdbcType();
+        try {
+            statement.setNull(bindCount, jdbcType);
+        } catch (SQLException e) {
+            if (jdbcType != Types.OTHER) {
+                throw e;
+            }
+            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
+            final Integer mappedJdbcType = TypeMap.getJdbcType(torqueType);
+            try {
+                statement.setNull(bindCount, mappedJdbcType);
+            } catch (SQLException ignored) {
+                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcType + "):";
+                msg = msg + " " + ignored.getMessage();
+                _log.info(msg);
+                throw e;
+            }
+        }
+        return true;
     }
 
     protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,

@@ -57,6 +57,7 @@ package org.apache.torque.engine.database.model;
 import java.sql.Types;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -172,6 +173,7 @@ public class TypeMap {
     //                                                                            ========
     private static Hashtable<String, String> _torqueTypeToJavaNativeMap = null;
     private static Hashtable<Integer, String> _jdbcTypeToTorqueTypeMap = null;
+    private static Hashtable<String, Integer> _torqueTypeToJdbcTypeMap = null;
     private static Hashtable<String, String> _javaNativeToFlexNativeMap = null;
 
     // ===================================================================================
@@ -257,6 +259,15 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
 
+        _torqueTypeToJdbcTypeMap = new Hashtable<String, Integer>();
+        {
+            Set<Integer> keySet = _jdbcTypeToTorqueTypeMap.keySet();
+            for (Integer jdbcType : keySet) {
+                String torqueType = _jdbcTypeToTorqueTypeMap.get(jdbcType);
+                _torqueTypeToJdbcTypeMap.put(torqueType, jdbcType);
+            }
+        }
+
         _javaNativeToFlexNativeMap = new Hashtable<String, String>();
         _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
         _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));
@@ -287,7 +298,7 @@ public class TypeMap {
         }
         return javaNative;
     }
-    
+
     /**
      * @param javaNative The type as string for java native. (NotNull)
      * @param defaultFlexNative The default type as string for flex native. (NotNull)
@@ -319,6 +330,19 @@ public class TypeMap {
             throw new IllegalStateException(msg);
         }
         return _jdbcTypeToTorqueTypeMap.get(jdbcType);
+    }
+
+    public static Integer getJdbcType(String torqueType) {
+        // Make sure the we are initialized.
+        if (!_initialized) {
+            initialize();
+        }
+        if (!_torqueTypeToJdbcTypeMap.containsKey(torqueType)) {
+            String msg = "_torqueTypeToJdbcTypeMap doesn't contain the type as key: ";
+            msg = msg + "key=" + torqueType + " map=" + _torqueTypeToJdbcTypeMap;
+            throw new IllegalStateException(msg);
+        }
+        return _torqueTypeToJdbcTypeMap.get(torqueType);
     }
 
     // ===================================================================================
