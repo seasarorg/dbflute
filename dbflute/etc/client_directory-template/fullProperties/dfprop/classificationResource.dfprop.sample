@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="SHIFT_JIS"?>
 <!DOCTYPE XMI SYSTEM "UML_EA.dtd">
-<XMI xmi.version="1.1" xmlns:UML="omg.org/UML1.3" timestamp="2008-10-22 17:46:22">
+<XMI xmi.version="1.1" xmlns:UML="omg.org/UML1.3" timestamp="2008-10-22 19:07:18">
 	<XMI.header>
 		<XMI.documentation>
 			<XMI.exporter>Enterprise Architect</XMI.exporter>
@@ -31,14 +31,14 @@
 					<UML:Namespace.ownedElement>
 						<UML:Comment xmi.id="EAID_20A62264_A06F_48c3_8618_52A4ADF76559" visibility="public" namespace="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62">
 							<UML:ModelElement.taggedValue>
-								<UML:TaggedValue tag="documentation" value="【共通ノート】&#xA;&#xA;[フラグ]&#xA;$ Flg, フラグを示す&#xA;- 1, True, はい, 有効を示す&#xA;- 0, False, いいえ, 無効を示す"/>
+								<UML:TaggedValue tag="documentation" value="【共通ノート】&#xA;&#xA;[フラグ]: *_FLG&#xA;$ Flg, フラグを示す&#xA;- 1, True, はい, 有効を示す&#xA;- 0, False, いいえ, 無効を示す"/>
 								<UML:TaggedValue tag="isSpecification" value="false"/>
 								<UML:TaggedValue tag="ea_stype" value="Note"/>
 								<UML:TaggedValue tag="ea_ntype" value="0"/>
 								<UML:TaggedValue tag="version" value="1.0"/>
 								<UML:TaggedValue tag="package" value="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62"/>
 								<UML:TaggedValue tag="date_created" value="2008-10-22 17:41:09"/>
-								<UML:TaggedValue tag="date_modified" value="2008-10-22 17:44:40"/>
+								<UML:TaggedValue tag="date_modified" value="2008-10-22 19:06:19"/>
 								<UML:TaggedValue tag="gentype" value="&lt;なし&gt;"/>
 								<UML:TaggedValue tag="tagged" value="0"/>
 								<UML:TaggedValue tag="package_name" value="exampledb"/>
@@ -3250,14 +3250,14 @@
 						</UML:Class>
 						<UML:Comment xmi.id="EAID_A3477827_C979_4b4a_9960_4045CAAB72CD" visibility="public" namespace="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62">
 							<UML:ModelElement.taggedValue>
-								<UML:TaggedValue tag="documentation" value="[会員ステータス]&#xA;$ MemberStatus, 会員の状態を示す&#xA;- FML, Formalized, 正式会員, 正式な会員を示す&#xA;- PVS, Provisional, 仮会員, 仮の会員を示す&#xA;- WDL, Withdrawal, 退会会員, 退会した会員を示す"/>
+								<UML:TaggedValue tag="documentation" value="[会員ステータス]: MEMBER_STATUS_CODE&#xA;$ MemberStatus, 会員の状態を示す&#xA;- FML, Formalized, 正式会員, 正式な会員を示す&#xA;- PRV, Provisional, 仮会員, 仮の会員を示す&#xA;- WDL, Withdrawal, 退会会員, 退会した会員を示す"/>
 								<UML:TaggedValue tag="isSpecification" value="false"/>
 								<UML:TaggedValue tag="ea_stype" value="Note"/>
 								<UML:TaggedValue tag="ea_ntype" value="0"/>
 								<UML:TaggedValue tag="version" value="1.0"/>
 								<UML:TaggedValue tag="package" value="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62"/>
 								<UML:TaggedValue tag="date_created" value="2008-07-22 06:41:48"/>
-								<UML:TaggedValue tag="date_modified" value="2008-10-22 17:45:26"/>
+								<UML:TaggedValue tag="date_modified" value="2008-10-22 19:05:15"/>
 								<UML:TaggedValue tag="gentype" value="&lt;なし&gt;"/>
 								<UML:TaggedValue tag="tagged" value="0"/>
 								<UML:TaggedValue tag="package_name" value="exampledb"/>
@@ -3810,14 +3810,14 @@
 						</UML:Class>
 						<UML:Comment xmi.id="EAID_F43BD3F0_1F01_4568_8396_6641BACD29D1" visibility="public" namespace="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62">
 							<UML:ModelElement.taggedValue>
-								<UML:TaggedValue tag="documentation" value="[商品ステータス]&#xA;$ ProductStatus, 商品の状態を示す&#xA;- ONS, OnSale, 生産販売可能&#xA;- PST, ProductStop, 生産中止&#xA;- SST, SaleStop, 販売中止"/>
+								<UML:TaggedValue tag="documentation" value="[商品ステータス]: PRODUCT_STATUS_CODE&#xA;$ ProductStatus, 商品の状態を示す&#xA;- ONS, OnSale, 生産販売可能&#xA;- PST, ProductStop, 生産中止&#xA;- SST, SaleStop, 販売中止"/>
 								<UML:TaggedValue tag="isSpecification" value="false"/>
 								<UML:TaggedValue tag="ea_stype" value="Note"/>
 								<UML:TaggedValue tag="ea_ntype" value="0"/>
 								<UML:TaggedValue tag="version" value="1.0"/>
 								<UML:TaggedValue tag="package" value="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62"/>
 								<UML:TaggedValue tag="date_created" value="2008-07-22 06:43:10"/>
-								<UML:TaggedValue tag="date_modified" value="2008-10-22 17:45:37"/>
+								<UML:TaggedValue tag="date_modified" value="2008-10-22 19:05:49"/>
 								<UML:TaggedValue tag="gentype" value="&lt;なし&gt;"/>
 								<UML:TaggedValue tag="tagged" value="0"/>
 								<UML:TaggedValue tag="package_name" value="exampledb"/>
@@ -5605,7 +5605,7 @@
 				<UML:TaggedValue tag="version" value="1.0"/>
 				<UML:TaggedValue tag="author" value="jflute"/>
 				<UML:TaggedValue tag="created_date" value="2007-10-21 16:22:16"/>
-				<UML:TaggedValue tag="modified_date" value="2008-10-22 17:45:28"/>
+				<UML:TaggedValue tag="modified_date" value="2008-10-22 19:06:08"/>
 				<UML:TaggedValue tag="package" value="EAPK_6604672D_A320_46f0_B4A9_FD21BFB72B62"/>
 				<UML:TaggedValue tag="type" value="Logical"/>
 				<UML:TaggedValue tag="swimlanes" value="locked=false;orientation=0;width=0;inbar=false;names=false;color=0;bold=false;fcol=0;;cls=0;"/>
@@ -5616,8 +5616,8 @@
 			</UML:ModelElement.taggedValue>
 			<UML:Diagram.element>
 				<UML:DiagramElement geometry="Left=11;Top=68;Right=153;Bottom=172;" subject="EAID_20A62264_A06F_48c3_8618_52A4ADF76559" seqno="1" style="DUID=E3B579B6;"/>
-				<UML:DiagramElement geometry="Left=501;Top=544;Right=686;Bottom=637;" subject="EAID_F43BD3F0_1F01_4568_8396_6641BACD29D1" seqno="2" style="DUID=0DB3D64D;"/>
-				<UML:DiagramElement geometry="Left=174;Top=41;Right=404;Bottom=133;" subject="EAID_A3477827_C979_4b4a_9960_4045CAAB72CD" seqno="3" style="DUID=3EC76D6E;"/>
+				<UML:DiagramElement geometry="Left=501;Top=544;Right=722;Bottom=635;" subject="EAID_F43BD3F0_1F01_4568_8396_6641BACD29D1" seqno="2" style="DUID=0DB3D64D;"/>
+				<UML:DiagramElement geometry="Left=170;Top=39;Right=400;Bottom=131;" subject="EAID_A3477827_C979_4b4a_9960_4045CAAB72CD" seqno="3" style="DUID=3EC76D6E;"/>
 				<UML:DiagramElement geometry="Left=44;Top=189;Right=372;Bottom=293;" subject="EAID_B603E32C_BE34_4f8f_8EEC_9A532DBFDEE2" seqno="4" style="DUID=8C8D25C6;"/>
 				<UML:DiagramElement geometry="Left=407;Top=643;Right=709;Bottom=723;" subject="EAID_8795748D_6954_43f5_9A9A_A8E856745412" seqno="5" style="DUID=8C8D25C6;"/>
 				<UML:DiagramElement geometry="Left=765;Top=610;Right=1067;Bottom=696;" subject="EAID_C97C8074_002C_41a0_8457_EBB63F20CE23" seqno="6" style="DUID=8C8D25C6;"/>
