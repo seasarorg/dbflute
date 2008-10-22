@@ -716,6 +716,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (columnName == null || columnName.trim().length() == 0) {
                     columnName = "arg" + (index + 1);
                 }
+                columnName = filterColumnNameAboutVendorDependency(columnName);
                 final String propertyName;
                 {
                     propertyName = convertColumnNameToPropertyName(columnName);
@@ -790,22 +791,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return procedureName;
     }
+    
+    protected String filterColumnNameAboutVendorDependency(String columnName) {
+        // Because SQLServer returns '@returnValue'.
+        if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
+            columnName = columnName.substring("@".length());
+        }
+        return columnName;
+    }
 
     protected String convertColumnNameToPropertyName(String columnName) {
-        columnName = filterColumnName4PropertyNameAboutVendorDependency(columnName);
         if (columnName.contains("_")) {
             columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
         } else {
             boolean allUpperCase = isAllUpperCase(columnName);
             columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
-        }
-        return columnName;
-    }
-
-    protected String filterColumnName4PropertyNameAboutVendorDependency(String columnName) {
-        // Because SQLServer returns '@returnValue'.
-        if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
-            columnName = columnName.substring("@".length());
         }
         return columnName;
     }
