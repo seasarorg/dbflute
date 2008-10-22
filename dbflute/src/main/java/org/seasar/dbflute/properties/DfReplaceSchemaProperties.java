@@ -59,12 +59,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public String getDataLoadingType() {
         final String propString = (String) getReplaceSchemaDefinitionMap().get("dataLoadingType");
         if (propString == null) {
-            return getEnvironmentType();
+            return getOldStyleEnvironmentType();
         }
         return propString;
     }
 
-    protected String getEnvironmentType() {// Old Style!
+    protected String getOldStyleEnvironmentType() {// Old Style!
         final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
         if (propString == null) {
             return "ut";

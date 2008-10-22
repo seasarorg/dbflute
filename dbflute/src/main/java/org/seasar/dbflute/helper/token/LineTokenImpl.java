@@ -1,22 +1,15 @@
-${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLineImpl};
+package org.seasar.dbflute.helper.token;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
+import java.util.List;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author DBFlute(AutoGenerator)
  */
-public class ${glLineTokenImplName} implements ${glLineTokenName} {
+public class LineTokenImpl implements LineToken {
 
-    // ===================================================================================
-    //                                                                       Tokenize Line
-    //                                                                       =============
-    public List<String> tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption) {
+    public List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption) {
         final String delimiter = lineTokenizingOption.getDelimiter();
         final List<String> list = new ArrayList<String>();
         int i = 0;
@@ -41,7 +34,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return list;
     }
 
-    protected String filterHandlingEmptyAsNull(String target, ${glLineTokenizingOptionName} lineTokenizingOption) {
+    protected String filterHandlingEmptyAsNull(String target, LineTokenizingOption lineTokenizingOption) {
         if (target == null) {
             return null;
         }
@@ -51,10 +44,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return target;
     }
 
-    // ===================================================================================
-    //                                                                           Make Line
-    //                                                                           =========
-    public String make(java.util.List<String> valueList, ${glLineMakingOptionName} lineMakingOption) {
+    public String make(java.util.List<String> valueList, LineMakingOption lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
@@ -80,11 +70,12 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return sb.toString();
     }
 
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
     /**
      * Assert that the object is not null.
+     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -100,8 +91,12 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         }
     }
 
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
+     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */

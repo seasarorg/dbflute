@@ -16,6 +16,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
+import org.seasar.dbflute.properties.bean.DfClassificationElement;
+import org.seasar.dbflute.properties.bean.DfClassificationTop;
 
 /**
  * Classification properties.
@@ -69,7 +72,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     /**
      * Get the map of classification TOP definition.
-     * 
      * @return The map of classification TOP definition. (NotNull)
      */
     public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
@@ -82,7 +84,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     /**
      * Has the map of classification definition.
-     * 
      * @return Determination.
      */
     public boolean hasClassificationDefinitionMap() {
@@ -91,7 +92,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     /**
      * Get the map of classification definition.
-     * 
      * @return The map of classification definition. (NotNull)
      */
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
@@ -177,6 +177,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 }
             }
             _classificationDefinitionMap.put(classificationName, elementList);
+            reflectClassificationResource();
         }
         return _classificationDefinitionMap;
     }
@@ -552,6 +553,56 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         public void setGroup(boolean group) {
             this.group = group;
         }
+    }
+
+    // -----------------------------------------------------
+    //                               Classification Resource
+    //                               -----------------------
+    protected static final String NAME_CLASSIFICATION_RESOURCE = "classificationResource.dfprop";
+
+    protected void reflectClassificationResource() {
+        final List<DfClassificationTop> classificationTopList = extractClassificationResource();
+        for (DfClassificationTop classificationTop : classificationTopList) {
+            final String classificationName = classificationTop.getClassificationName();
+            if (_classificationDefinitionMap.containsKey(classificationName)) {
+                String msg = "Already registered at classificationDefinitionMap.dfprop:";
+                msg = msg + " classificationName=" + classificationName;
+                _log.info(msg);
+                continue;
+            }
+
+            // Reflect to classification top definition.
+            final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
+            topElementMap.put(ClassificationInfo.KEY_TOP_COMMENT, classificationTop.getTopComment());
+            _classificationTopDefinitionMap.put(classificationName, topElementMap);
+
+            // Reflect to classification definition.
+            final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+            final List<DfClassificationElement> classificationElementList = classificationTop
+                    .getClassificationElementList();
+            for (DfClassificationElement classificationElement : classificationElementList) {
+                final Map<String, String> elementMap = new LinkedHashMap<String, String>();
+                elementMap.put(ClassificationInfo.KEY_CODE, classificationElement.getCode());
+                elementMap.put(ClassificationInfo.KEY_NAME, classificationElement.getName());
+                final String alias = classificationElement.getAlias();
+                if (alias != null) {
+                    elementMap.put(ClassificationInfo.KEY_ALIAS, alias);
+                }
+                final String comment = classificationElement.getComment();
+                if (comment != null) {
+                    elementMap.put(ClassificationInfo.KEY_COMMENT, comment);
+                }
+                elementList.add(elementMap);
+            }
+            _classificationDefinitionMap.put(classificationName, elementList);
+        }
+    }
+
+    protected List<DfClassificationTop> extractClassificationResource() {
+        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final String environmentTypePath = isEnvironmentDefault() ? "/" : getEnvironmentType() + "/";
+        final String path = ".dfprop/" + environmentTypePath + NAME_CLASSIFICATION_RESOURCE;
+        return analyzer.analyze(path, null); // TODO: @jflute -- encoding is auto detect now. (and default UTF-8)
     }
 
     // -----------------------------------------------------

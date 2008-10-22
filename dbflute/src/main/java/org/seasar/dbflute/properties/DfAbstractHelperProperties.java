@@ -325,8 +325,8 @@ public abstract class DfAbstractHelperProperties {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
         final String encoding = "UTF-8";
         final DfStringFileReader reader = new DfStringFileReader();
-        if (!DfEnvironmentType.getInstance().isDefault()) {
-            final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+        if (!isEnvironmentDefault()) {
+            final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
             final String str = reader.readString(path, encoding);
             if (str.trim().length() > 0) {
@@ -340,8 +340,8 @@ public abstract class DfAbstractHelperProperties {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
         final String encoding = "UTF-8";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        if (!DfEnvironmentType.getInstance().isDefault()) {
-            final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+        if (!isEnvironmentDefault()) {
+            final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
             final Map<String, Object> map = reader.readMap(path, encoding);
             if (!map.isEmpty()) {
@@ -355,8 +355,8 @@ public abstract class DfAbstractHelperProperties {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
         final String encoding = "UTF-8";
         final DfListStringFileReader reader = new DfListStringFileReader();
-        if (!DfEnvironmentType.getInstance().isDefault()) {
-            final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+        if (!isEnvironmentDefault()) {
+            final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
             List<Object> list = reader.readList(path, encoding);
             if (!list.isEmpty()) {
@@ -381,14 +381,20 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
 
-
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============
     protected boolean isHitByTheHint(final String name, final String hint) {
         return DfNameHintUtil.isHitByTheHint(name, hint);
     }
-    
+
+    protected final boolean isEnvironmentDefault() {
+        return DfEnvironmentType.getInstance().isDefault();
+    }
+    protected final String getEnvironmentType() {
+        return DfEnvironmentType.getInstance().getEnvironmentType();
+    }
+
     // ===============================================================================
     //                                                                  General Helper
     //                                                                  ==============
