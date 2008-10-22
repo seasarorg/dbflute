@@ -386,7 +386,7 @@ public class Database {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameColumnNameMap(className).get(propertyName);
     }
-    
+
     protected String findPmbMetaDataPropertyOption(String className, String propertyName) {
         PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
         return finder.findPmbMetaDataPropertyOption(className, propertyName);
@@ -637,7 +637,7 @@ public class Database {
     public boolean isDatabaseMySQL() {
         return getBasicProperties().isDatabaseMySQL();
     }
-    
+
     public boolean isDatabaseSQLServer() {
         return getBasicProperties().isDatabaseSqlServer();
     }
@@ -1150,19 +1150,15 @@ public class Database {
         return getClassificationProperties().hasClassificationAlias(tableName, columnName);
     }
 
-    public Map<String, String> getAllColumnClassificationMap() {
+    public Map<String, String> getAllColumnClassificationMap() { // for EntityDefinedCommonColumn
         return getClassificationProperties().getAllColumnClassificationMap();
     }
 
-    public boolean isAllClassificationColumn(String columnName) {
-        if (columnName == null) {
-            String msg = "The argument[columnName] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
+    public boolean isAllClassificationColumn(String columnName) { // for EntityDefinedCommonColumn
         return getClassificationProperties().isAllClassificationColumn(columnName);
     }
 
-    public String getAllClassificationName(String columnName) {
+    public String getAllClassificationName(String columnName) { // for EntityDefinedCommonColumn
         return getClassificationProperties().getAllClassificationName(columnName);
     }
 

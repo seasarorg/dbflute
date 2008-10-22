@@ -13,6 +13,7 @@ import org.seasar.dbflute.helper.io.fileread.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
+import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
@@ -380,9 +381,17 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
 
+
     // ===============================================================================
-    //                                                                          Helper
-    //                                                                          ======
+    //                                                                   Assist Helper
+    //                                                                   =============
+    protected boolean isHitByTheHint(final String name, final String hint) {
+        return DfNameHintUtil.isHitByTheHint(name, hint);
+    }
+    
+    // ===============================================================================
+    //                                                                  General Helper
+    //                                                                  ==============
     public String filterDoubleQuotation(String str) {
         return DfPropertyUtil.convertAll(str, "\"", "'");
     }

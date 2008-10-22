@@ -6,25 +6,26 @@ namespace ${glPackageBaseCommon} {
 
     public interface ${glEntityDefinedCommonColumnInterfaceName} : ${glEntityInterfaceName} {
 #foreach ($columnName in ${database.CommonColumnNameList})
-  #set ($commonColumnMap = ${database.CommonColumnMap})
-  #set ($columnType = ${commonColumnMap.get(${columnName})})
-  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($commonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${commonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
 
         ${javaNative} ${javaName} { get; set; }
-  #if (${database.isAllClassificationColumn($columnName)})
-    #set ($classificationName = $database.getAllClassificationName($columnName))
-    #set ($classificationList = $database.getClassificationMapList($classificationName))
-    #foreach ($classificationMap in $classificationList)
+#if (${database.isAllClassificationColumn($filteredColumnName)})
+#set ($classificationName = $database.getAllClassificationName($filteredColumnName))
+#set ($classificationList = $database.getClassificationMapList($classificationName))
+#foreach ($classificationMap in $classificationList)
 
         void Classify${javaName}${classificationMap.get('name')}();
         bool Is${javaName}${classificationMap.get('name')}();
-    #end
-  #end
+#end
+#end
 #end
 
         void DisableCommonColumnAutoSetup();
-	    bool CanCommonColumnAutoSetup();
+        bool CanCommonColumnAutoSetup();
     }
 }

@@ -8,10 +8,16 @@ import java.util.List;
  */
 public class DfNameHintUtil {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public static final String PREFIX_MARK = "prefix:";
     public static final String SUFFIX_MARK = "suffix:";
     public static final String CONTAIN_MARK = "contain:";
 
+    // ===================================================================================
+    //                                                                              Target
+    //                                                                              ======
     public static boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         if (!targetList.isEmpty()) {
             return isHitByTargetList(name, targetList);
@@ -35,6 +41,15 @@ public class DfNameHintUtil {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
+    /**
+     * Does it hit the target name by the hint. {CaseInsensitive}
+     * @param name The target name. (NotNull)
+     * @param hint The hint of the name. (NotNull)
+     * @return Determination.
+     */
     public static boolean isHitByTheHint(String name, String hint) {
         final String prefixMark = PREFIX_MARK;
         final String suffixMark = SUFFIX_MARK;
