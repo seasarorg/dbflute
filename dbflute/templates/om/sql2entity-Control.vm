@@ -12,15 +12,10 @@ targetdatabase = $targetDatabase
   ##
   #foreach ($database in $dataModel.Databases)
 
-
     ## - - - - - - - - - - - -
     ## Initialize properties.
     ## - - - - - - - - - - - -
-    $database.initializeAdditionalPrimaryKey()
-    $database.initializeAdditionalForeignKey()
     $database.initializeClassificationDeployment()
-    $database.initializeIncludeQuery()
-    $database.checkProperties()
 
     ## *****************************************************************************************************************
     ##                                                                                                   Global Paramter
