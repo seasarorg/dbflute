@@ -386,6 +386,14 @@ public class Database {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameColumnNameMap(className).get(propertyName);
     }
+    
+    public String getPmbMetaDataPropertyParameterColumnName(String className, String propertyName) { // for C# + SQLServer
+        String columnName = getPmbMetaDataPropertyColumnName(className, propertyName);
+        if (isDatabaseSQLServer() && columnName.startsWith("@")) {
+            columnName = columnName.substring("@".length()); 
+        }
+        return columnName;
+    }
 
     protected String findPmbMetaDataPropertyOption(String className, String propertyName) {
         PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
@@ -636,6 +644,10 @@ public class Database {
 
     public boolean isDatabaseMySQL() {
         return getBasicProperties().isDatabaseMySQL();
+    }
+    
+    public boolean isDatabaseSQLServer() {
+        return getBasicProperties().isDatabaseSqlServer();
     }
 
     // -----------------------------------------------------

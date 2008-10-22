@@ -30,7 +30,7 @@ namespace ${glPackageExtendedParameterBean} {
         //                               -------------------
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-#set ($columnName = $database.getPmbMetaDataPropertyColumnName($pmbClassName, $propertyName))
+#set ($columnName = $database.getPmbMetaDataPropertyParameterColumnName($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
         public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, in";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
