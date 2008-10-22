@@ -486,16 +486,6 @@ public class Database {
     //                                                                         Initializer
     //                                                                         ===========
     // -----------------------------------------------------
-    //                                         Customize Dao
-    //                                         -------------
-    /**
-     * @deprecated Not Supported
-     */
-    public void initializeCustomizeDao() {
-        // Not support so do nothing!
-    }
-
-    // -----------------------------------------------------
     //                                  AdditionalPrimaryKey
     //                                  --------------------
     public void initializeAdditionalPrimaryKey() {
@@ -516,6 +506,7 @@ public class Database {
     //                              ------------------------
     public void initializeClassificationDeployment() {
         getClassificationProperties().initializeClassificationDeploymentMap(getTableList());
+        getClassificationProperties().initializeClassificationDefinition(); // Together!
     }
 
     // -----------------------------------------------------

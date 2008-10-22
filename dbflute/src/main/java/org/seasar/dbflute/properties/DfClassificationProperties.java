@@ -177,9 +177,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 }
             }
             _classificationDefinitionMap.put(classificationName, elementList);
-            reflectClassificationResource();
         }
+        reflectClassificationResource();
         return _classificationDefinitionMap;
+    }
+
+    // -----------------------------------------------------
+    //                                            Initialize
+    //                                            ----------
+    public void initializeClassificationDefinition() {
+        getClassificationDefinitionMap(); // Initialize
     }
 
     // -----------------------------------------------------
@@ -565,9 +572,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         for (DfClassificationTop classificationTop : classificationTopList) {
             final String classificationName = classificationTop.getClassificationName();
             if (_classificationDefinitionMap.containsKey(classificationName)) {
-                String msg = "Already registered at classificationDefinitionMap.dfprop:";
-                msg = msg + " classificationName=" + classificationName;
-                _log.info(msg);
                 continue;
             }
 
@@ -601,7 +605,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
         final String environmentTypePath = isEnvironmentDefault() ? "/" : getEnvironmentType() + "/";
-        final String path = ".dfprop/" + environmentTypePath + NAME_CLASSIFICATION_RESOURCE;
+        final String path = "./dfprop/" + environmentTypePath + NAME_CLASSIFICATION_RESOURCE;
         return analyzer.analyze(path, null); // TODO: @jflute -- encoding is auto detect now. (and default UTF-8)
     }
 

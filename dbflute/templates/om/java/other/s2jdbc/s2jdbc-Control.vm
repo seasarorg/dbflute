@@ -16,7 +16,7 @@ targetdatabase = $targetDatabase
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     ## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    $database.initializeCustomizeDao()
+    $database.initializeAdditionalPrimaryKey()
     $database.initializeAdditionalForeignKey()
     $database.initializeClassificationDeployment()
     $database.initializeIncludeQuery()

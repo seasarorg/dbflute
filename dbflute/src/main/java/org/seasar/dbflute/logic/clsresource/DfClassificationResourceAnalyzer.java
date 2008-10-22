@@ -9,9 +9,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.token.LineToken;
 import org.seasar.dbflute.helper.token.LineTokenImpl;
 import org.seasar.dbflute.helper.token.LineTokenizingOption;
+import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
 
@@ -21,6 +24,14 @@ import org.seasar.dbflute.properties.bean.DfClassificationTop;
  */
 public class DfClassificationResourceAnalyzer {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+
+    // ===================================================================================
+    //                                                                             Analyze
+    //                                                                             =======
     public List<DfClassificationTop> analyze(String path, String encoding) {
         final List<String> lineList;
         {
@@ -28,15 +39,25 @@ public class DfClassificationResourceAnalyzer {
             if (!file.exists()) {
                 return new ArrayList<DfClassificationTop>();
             }
-            if (encoding == null) {
-                encoding = extractEncoding(file);
+            try {
+                if (encoding == null) {
+                    encoding = extractEncoding(file);
+                }
+                if (encoding == null) {
+                    encoding = "UTF-8";
+                }
+                _log.info("...Analyzing classification resources: encoding=" + encoding);
+                lineList = createLineList(file, encoding);
+            } catch (RuntimeException ignored) {
+                _log.info("Failed to analyze classification resources: " + path, ignored);
+                return new ArrayList<DfClassificationTop>();
             }
-            if (encoding == null) {
-                encoding = "UTF-8";
-            }
-            lineList = createLineList(file, encoding);
         }
-        return analyze(lineList);
+        final List<DfClassificationTop> classificationTopList = analyze(lineList);
+        for (DfClassificationTop top : classificationTopList) {
+            _log.info("    " + top.getClassificationName() + ", " + top.getTopComment());
+        }
+        return classificationTopList;
     }
 
     protected List<DfClassificationTop> analyze(final List<String> lineList) {
@@ -125,8 +146,9 @@ public class DfClassificationResourceAnalyzer {
         final String encodingEnd = "\"";
         BufferedReader reader = null;
         try {
+            final String temporaryEncoding = "UTF-8";
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), temporaryEncoding));
             String encoding = null;
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {
@@ -142,7 +164,7 @@ public class DfClassificationResourceAnalyzer {
                 if (!line.contains(encodingEnd)) {
                     break;
                 }
-                encoding = line.substring(line.indexOf(encodingEnd)).trim();
+                encoding = line.substring(0, line.indexOf(encodingEnd)).trim();
                 break;
             }
             return encoding;
