@@ -1,11 +1,11 @@
 # /---------------------------------------------------------------------------
-# [Classification]
-#   classificationDefinitionMap: (NotRequired - Default 'map:{}')
+# [Classification Deployment]
+#   classificationDeploymentMap: (NotRequired - Default 'map:{}')
 #
 #     ex) map:{
-#             ; $$ALL$$                  = map:{suffix:_YN=YesNo}
-#             ; COLLECTION_STATUS        = map:{COLLECTION_STATUS_CODE=CollectionStatus}
-#             ; COLLECTION_STATUS_LOOKUP = map:{COLLECTION_STATUS_CODE=CollectionStatus}
+#             ; $$ALL$$       = map:{suffix:_FLG=Flg}
+#             ; MEMBER        = map:{MEMBER_STATUS_CODE=MemberStatus}
+#             ; MEMBER_STATUS = map:{MEMBER_STATUS_CODE=MemberStatus}
 #         }
 #
 map:{

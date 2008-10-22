@@ -13,9 +13,9 @@ targetdatabase = $targetDatabase
   #foreach ($database in $dataModel.Databases)
     $database.enableGenerateOutputDirectory()
 
-    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    ## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
-    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    ## - - - - - - - - - - - -
+    ## Initialize properties.
+    ## - - - - - - - - - - - -
     $database.initializeAdditionalPrimaryKey()
     $database.initializeAdditionalForeignKey()
     $database.initializeClassificationDeployment()

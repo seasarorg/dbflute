@@ -12,13 +12,22 @@ targetdatabase = $targetDatabase
   ##
   #foreach ($database in $dataModel.Databases)
 
-    ## ------------------------------------------------------------------
-    ##                                                    Global-Paramter
-    ##                                                    ---------------
+
+    ## - - - - - - - - - - - -
+    ## Initialize properties.
+    ## - - - - - - - - - - - -
+    $database.initializeAdditionalPrimaryKey()
+    $database.initializeAdditionalForeignKey()
+    $database.initializeClassificationDeployment()
+    $database.initializeIncludeQuery()
+    $database.checkProperties()
+
+    ## *****************************************************************************************************************
+    ##                                                                                                   Global Paramter
+    ##                                                                                                   ***************
     ## ===================================================================================
     ##                                                                            Language
     ##                                                                            ========
-    ## [Language]
     #set ($glTargetLanguage = ${database.TargetLanguage})
 
     ## ===================================================================================
