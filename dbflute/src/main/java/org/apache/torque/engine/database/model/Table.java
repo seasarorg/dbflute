@@ -114,6 +114,10 @@ public class Table {
     private boolean _isNeedsTransactionInPostgres;
     private boolean _isForReferenceOnly;
     private boolean _existSameNameTable;
+
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
     private boolean _sql2entityTypeSafeCursor;
 
     // [Unused on DBFlute]
@@ -2434,6 +2438,9 @@ public class Table {
         return result.toString();
     }
 
+    // ===================================================================================
+    //                                                         Sql2Entity Type Safe Cursor
+    //                                                         ===========================
     public boolean isSql2EntityTypeSafeCursor() {
         return _sql2entityTypeSafeCursor;
     }

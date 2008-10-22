@@ -127,7 +127,7 @@ public class DfColumnMetaInfo {
         this.columnComment = columnComment;
     }
 
-    public String getSql2EntityableName() {
+    public String getSql2EntityTableName() {
         return sql2entityTableName;
     }
 

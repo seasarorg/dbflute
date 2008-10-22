@@ -716,22 +716,21 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      */
     public void initializeClassificationDeploymentMap(List<Table> tableList) { // This should be called when the task start.
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
-                deploymentMap);
+        final DfFlexibleNameMap<String, Map<String, String>> flexibleDeploymentMap = newFlexibleNameMap(deploymentMap);
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap == null) {
             return;
         }
         for (Table table : tableList) {
-            Map<String, String> columnClassificationMap = (Map<String, String>) flexibledeploymentMap.get(table
-                    .getName());
+            Map<String, String> columnClassificationMap = flexibleDeploymentMap.get(table.getName());
             if (columnClassificationMap == null) {
                 columnClassificationMap = new LinkedHashMap<String, String>();
                 deploymentMap.put(table.getName(), columnClassificationMap);
             }
             final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
             for (String columnName : columnNameKeySet) {
-                columnClassificationMap.put(columnName, allColumnClassificationMap.get(columnName));
+                final String classificationName = allColumnClassificationMap.get(columnName);
+                columnClassificationMap.put(columnName, classificationName);
             }
         }
         _classificationDeploymentMap = deploymentMap;
@@ -747,14 +746,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                -----------------------
     public boolean hasClassification(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
-                deploymentMap);
+        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
         final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
         if (columnClassificationMap == null) {
             return false;
         }
-        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = new DfFlexibleNameMap<String, String>(
-                columnClassificationMap);
+        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
         final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
@@ -770,14 +767,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
-                deploymentMap);
+        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
         if (!flexibledeploymentMap.containsKey(tableName)) {
             return null;
         }
         final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
-        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = new DfFlexibleNameMap<String, String>(
-                columnClassificationMap);
+        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
         final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();

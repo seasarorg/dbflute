@@ -968,7 +968,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void setupSql2EntitySecondTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
             String columnName, final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
-        final String sql2EntityTableName = metaInfo.getSql2EntityableName();
+        final String sql2EntityTableName = metaInfo.getSql2EntityTableName();
         col.setSql2EntityTableName(sql2EntityTableName);
     }
 

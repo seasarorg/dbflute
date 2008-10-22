@@ -1468,27 +1468,44 @@ public class Column {
         return getTable().getDatabase().getClassificationDefinitionMap();
     }
 
-    protected String getClassificationTableName() {
-        if (_sql2EntityTableName != null) {
-            return _sql2EntityTableName;
-        }
-        return getTableName();
-    }
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // If sql2EntityTableName exists(when sql2entity only), use it at first.
+    // Then it would be not found, it uses formal table name of the column.
+    // - - - - - - - - - -/
 
     public boolean hasClassification() {
-        return getTable().getDatabase().hasClassification(getClassificationTableName(), getName());
+        final Database database = getTable().getDatabase();
+        if (_sql2EntityTableName != null && database.hasClassification(_sql2EntityTableName, getName())) {
+            return true;
+        }
+        return database.hasClassification(getTableName(), getName());
     }
 
     public boolean hasClassificationName() {
-        return getTable().getDatabase().hasClassificationName(getClassificationTableName(), getName());
+        final Database database = getTable().getDatabase();
+        if (_sql2EntityTableName != null && database.hasClassificationName(_sql2EntityTableName, getName())) {
+            return true;
+        }
+        return database.hasClassificationName(getTableName(), getName());
     }
 
     public boolean hasClassificationAlias() {
-        return getTable().getDatabase().hasClassificationAlias(getClassificationTableName(), getName());
+        final Database database = getTable().getDatabase();
+        if (_sql2EntityTableName != null && database.hasClassificationAlias(_sql2EntityTableName, getName())) {
+            return true;
+        }
+        return database.hasClassificationAlias(getTableName(), getName());
     }
 
     public String getClassificationName() {
-        return getTable().getDatabase().getClassificationName(getClassificationTableName(), getName());
+        final Database database = getTable().getDatabase();
+        if (_sql2EntityTableName != null) {
+            final String classificationName = database.getClassificationName(_sql2EntityTableName, getName());
+            if (classificationName != null) {
+                return classificationName;
+            }
+        }
+        return database.getClassificationName(getTableName(), getName());
     }
 
     public List<Map<String, String>> getClassificationMapList() {

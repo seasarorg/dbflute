@@ -167,6 +167,13 @@
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
+  <target name="reflect-mac-limit-mysql" description="==> reflect to test application">
+    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
   <target name="reflect-mac-limit-pbasic" description="==> reflect to test application">
     <copy todir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>

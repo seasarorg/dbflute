@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.fileread.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfStringFileReader;
@@ -391,6 +392,7 @@ public abstract class DfAbstractHelperProperties {
     protected final boolean isEnvironmentDefault() {
         return DfEnvironmentType.getInstance().isDefault();
     }
+
     protected final String getEnvironmentType() {
         return DfEnvironmentType.getInstance().getEnvironmentType();
     }
@@ -398,11 +400,15 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                  General Helper
     //                                                                  ==============
-    public String filterDoubleQuotation(String str) {
+    protected <KEY, VALUE> DfFlexibleNameMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
+        return new DfFlexibleNameMap<KEY, VALUE>(map);
+    }
+
+    protected String filterDoubleQuotation(String str) {
         return DfPropertyUtil.convertAll(str, "\"", "'");
     }
 
-    public String removeLineSeparator(String str) {
+    protected String removeLineSeparator(String str) {
         str = removeCR(str);
         str = removeLF(str);
         return str;
