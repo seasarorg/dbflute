@@ -26,17 +26,17 @@ public class DfClassificationResourceAnalyzerTest {
         lineList.add("AAAAAAAAAAAA");
         lineList.add("BBBB");
         lineList.add("[会員ステータス]");
-        lineList.add("$ MemberStatus, 会員のステータスを表す");
-        lineList.add("- FML, Formalized, 正式会員, 正式な会員を示す");
-        lineList.add("- PVS, Provisinal, 仮会員, 仮の会員を示す");
-        lineList.add("- WDL, Withdrawal, 退会会員, 退会した会員を示す");
+        lineList.add("$ MemberStatus, 会員の状態を表す");
+        lineList.add("- FML, Formalized, 正式会員, 正式な会員を表す");
+        lineList.add("- PVS, Provisinal, 仮会員, 仮の会員を表す");
+        lineList.add("- WDL, Withdrawal, 退会会員, 退会した会員を表す");
         lineList.add("CCCCCCCCCCCC");
         lineList.add("[会員ステータス2]");
-        lineList.add("$ MemberStatus2, 会員のステータスを表す");
-        lineList.add("- FML, Formalized, 正式会員, 正式な会員を示す");
-        lineList.add("- PVS, Provisinal, 仮会員, 仮の会員を示す");
+        lineList.add("$ MemberStatus2, 会員の状態を表す");
+        lineList.add("- FML, Formalized, 正式会員, 正式な会員を表す");
+        lineList.add("- PVS, Provisinal, 仮会員, 仮の会員を表す");
         lineList.add("DDDDDDDDDD");
-        lineList.add("- WDL, Withdrawal, 退会会員, 退会した会員を示す");
+        lineList.add("- WDL, Withdrawal, 退会会員, 退会した会員を表す");
         lineList.add("EEEEEEEEEEEEE");
         lineList.add("[Dummy]");
         lineList.add("FFFFFFFFFFFFFFFFFF");
@@ -54,7 +54,7 @@ public class DfClassificationResourceAnalyzerTest {
         {
             final DfClassificationTop top = classificationTopList.get(0);
             assertEquals("MemberStatus", top.getClassificationName());
-            assertEquals("会員のステータスを表す", top.getTopComment());
+            assertEquals("会員の状態を表す", top.getTopComment());
             assertEquals(3, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();
             {
@@ -62,27 +62,27 @@ public class DfClassificationResourceAnalyzerTest {
                 assertEquals("FML", element.getCode());
                 assertEquals("Formalized", element.getName());
                 assertEquals("正式会員", element.getAlias());
-                assertEquals("正式な会員を示す", element.getComment());
+                assertEquals("正式な会員を表す", element.getComment());
             }
             {
                 final DfClassificationElement element = classificationElementList.get(1);
                 assertEquals("PVS", element.getCode());
                 assertEquals("Provisinal", element.getName());
                 assertEquals("仮会員", element.getAlias());
-                assertEquals("仮の会員を示す", element.getComment());
+                assertEquals("仮の会員を表す", element.getComment());
             }
             {
                 final DfClassificationElement element = classificationElementList.get(2);
                 assertEquals("WDL", element.getCode());
                 assertEquals("Withdrawal", element.getName());
                 assertEquals("退会会員", element.getAlias());
-                assertEquals("退会した会員を示す", element.getComment());
+                assertEquals("退会した会員を表す", element.getComment());
             }
         }
         {
             final DfClassificationTop top = classificationTopList.get(1);
             assertEquals("MemberStatus2", top.getClassificationName());
-            assertEquals("会員のステータスを表す", top.getTopComment());
+            assertEquals("会員の状態を表す", top.getTopComment());
             assertEquals(2, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();
             {
@@ -90,14 +90,14 @@ public class DfClassificationResourceAnalyzerTest {
                 assertEquals("FML", element.getCode());
                 assertEquals("Formalized", element.getName());
                 assertEquals("正式会員", element.getAlias());
-                assertEquals("正式な会員を示す", element.getComment());
+                assertEquals("正式な会員を表す", element.getComment());
             }
             {
                 final DfClassificationElement element = classificationElementList.get(1);
                 assertEquals("PVS", element.getCode());
                 assertEquals("Provisinal", element.getName());
                 assertEquals("仮会員", element.getAlias());
-                assertEquals("仮の会員を示す", element.getComment());
+                assertEquals("仮の会員を表す", element.getComment());
             }
         }
     }
