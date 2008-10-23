@@ -6,6 +6,7 @@ import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
+import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -127,7 +128,22 @@ public final class DfPropertiesHandler {
         }
         return _behaviorFilterProperties;
     }
-
+    
+    // -----------------------------------------------------
+    //                                                  Buri
+    //                                                  ----
+    protected DfBuriProperties _buriProperties;
+    
+    public DfBuriProperties getBuriProperties(Properties prop) {
+        if (_buriProperties == null) {
+            _buriProperties = new DfBuriProperties(prop);
+        }
+        return _buriProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                       Optimistic Lock
+    //                                       ---------------
     protected DfOptimisticLockProperties _optimisticLockProperties;
 
     public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
@@ -137,6 +153,9 @@ public final class DfPropertiesHandler {
         return _optimisticLockProperties;
     }
 
+    // -----------------------------------------------------
+    //                                          Select Param
+    //                                          ------------
     protected DfSelectParamProperties _selectParamProperties;
 
     public DfSelectParamProperties getSelectParamProperties(Properties prop) {
@@ -146,6 +165,9 @@ public final class DfPropertiesHandler {
         return _selectParamProperties;
     }
 
+    // -----------------------------------------------------
+    //                                     Sequence Identity
+    //                                     -----------------
     protected DfSequenceIdentityProperties _sequenceIdentityProperties;
 
     public DfSequenceIdentityProperties getSequenceIdentityProperties(Properties prop) {

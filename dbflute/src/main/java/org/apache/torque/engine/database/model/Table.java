@@ -70,9 +70,9 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
+import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfCompareUtil;
@@ -1943,8 +1943,7 @@ public class Table {
     }
 
     public boolean isAvailableSequenceAssignedIdAnnotation() {
-        final DfLittleAdjustmentProperties littleAdjustmentProperties = getProperties().getLittleAdjustmentProperties();
-        if (littleAdjustmentProperties.isUseBuri()) {
+        if (isBuriTarget()) {
             return true;
         }
         final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
@@ -2313,7 +2312,7 @@ public class Table {
     }
 
     // ===============================================================================
-    //                                                 Adding Schema to Table Sql-Name
+    //                                                 Adding Schema to Table SQL-Name
     //                                                 ===============================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
@@ -2324,6 +2323,14 @@ public class Table {
     //                                                                            ========
     public boolean isFlexDtoBindable() {
         return getProperties().getFlexDtoProperties().isBindable(getName());
+    }
+
+    // ===================================================================================
+    //                                                                  Friendly Framework
+    //                                                                  ==================
+    public boolean isBuriTarget() {
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        return buriProperties.isUseBuri() && buriProperties.isBuriTargetTable(getName());
     }
 
     // ===================================================================================

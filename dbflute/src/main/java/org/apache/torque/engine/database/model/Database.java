@@ -1261,10 +1261,6 @@ public class Database {
         return "protected";
     }
 
-    public boolean isUseBuri() {
-        return getProperties().getLittleAdjustmentProperties().isUseBuri();
-    }
-
     public boolean isUseTeeda() {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
     }

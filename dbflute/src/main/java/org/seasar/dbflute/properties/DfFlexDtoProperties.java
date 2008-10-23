@@ -104,11 +104,11 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     }
 
     public String getBaseDtoPackage() {
-        return getDtoPropertyRequired("baseDtoPackage");
+        return getDtoPropertyAsRequired("baseDtoPackage");
     }
 
     public String getExtendedDtoPackage() {
-        return getDtoPropertyRequired("extendedDtoPackage");
+        return getDtoPropertyAsRequired("extendedDtoPackage");
     }
 
     public String getBaseDtoPrefix() {
@@ -130,7 +130,7 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
-    protected String getDtoPropertyRequired(String key) {
+    protected String getDtoPropertyAsRequired(String key) {
         final String value = getDtoProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";

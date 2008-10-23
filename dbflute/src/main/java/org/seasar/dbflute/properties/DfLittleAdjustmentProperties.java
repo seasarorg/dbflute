@@ -122,21 +122,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                  Friendly Framework 
     //                                                                  ==================
-    public boolean isUseBuri() {
-        final boolean isUseBuri = booleanProp("torque.isUseBuri", false);
-        if (isUseBuri) {
-            return true;
-        }
-        return booleanProp("torque.isUseS2Buri", false);
-    }
-
     public boolean isUseTeeda() {
         return booleanProp("torque.isUseTeeda", false);
     }
 
-    // ===============================================================================
-    //                                                             MultipleFK Property
-    //                                                             ===================
+    // ===================================================================================
+    //                                                                 MultipleFK Property
+    //                                                                 ===================
+    // Basically Deprecated
     public static final String KEY_multipleFKPropertyMap = "multipleFKPropertyMap";
     protected Map<String, Map<String, Map<String, String>>> _multipleFKPropertyMap;
 
