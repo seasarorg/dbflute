@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -95,7 +96,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         String packageBase = packageProperties.getPackageBase();
         return DfStringUtil.replace(sqlPackage, "$$PACKAGE_BASE$$", packageBase);
     }
-    
+
     // ===================================================================================
     //                                                    RemoveLineCommentFromExecutedSql
     //                                                    ================================
@@ -161,6 +162,23 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     public boolean isGenerateProcedureParameterBean() {
         String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
         return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
+    public boolean isTargetProcedureName(String procedureName) {
+        final List<String> targetProcedureNameList = getTargetProcedureNameList();
+        if (targetProcedureNameList == null || targetProcedureNameList.isEmpty()) {
+            return true;
+        }
+        for (String procedureNameHint : targetProcedureNameList) {
+            if (isHitByTheHint(procedureName, procedureNameHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getTargetProcedureNameList() {
+        return getOutsideSqlPropertyAsList("targetProcedureNameList");
     }
 
     // ===================================================================================
@@ -268,5 +286,13 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             pmbeanPackage = "PmBean";
         }
         return pmbeanPackage;
+    }
+
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
+    @SuppressWarnings("unchecked")
+    protected List<String> getOutsideSqlPropertyAsList(String key) {
+        return (List<String>) getOutsideSqlDefinitionMap().get(key);
     }
 }

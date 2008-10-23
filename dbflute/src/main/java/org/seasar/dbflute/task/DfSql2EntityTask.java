@@ -684,14 +684,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void doSetupProcedure() throws SQLException {
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
-        final boolean generateProcedureParameterBean = outsideSqlProperties.isGenerateProcedureParameterBean();
-        if (!generateProcedureParameterBean) {
+        if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return;
         }
         final List<DfProcedureMetaInfo> procedures = getProcedures();
         _log.info(" ");
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureName = metaInfo.getProcedureName();
+            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                continue;
+            }
+            
             _procedureMap.put(procedureName, metaInfo);
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
