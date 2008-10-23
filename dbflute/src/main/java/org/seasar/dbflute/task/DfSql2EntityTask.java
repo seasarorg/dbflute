@@ -688,8 +688,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (!generateProcedureParameterBean) {
             return;
         }
-        final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
-        final List<DfProcedureMetaInfo> procedures = new DfProcedureHandler().getProcedures(metaData, _schema);
+        final List<DfProcedureMetaInfo> procedures = getProcedures();
         _log.info(" ");
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureName = metaInfo.getProcedureName();
@@ -745,6 +744,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info(" ");
     }
 
+    protected List<DfProcedureMetaInfo> getProcedures() throws SQLException {
+        final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
+        return new DfProcedureHandler().getProcedures(metaData, _schema);
+        
+        // Anyway, it is not implemented to resolve the procedure in additional schema.
+        // Because I don't know that they really want to generate other schema procedures.
+        // And there are many ways how to stave off the problem.
+        // For example, creates the procedure in main schema that delegates other schema procedures.
+    }
+    
     protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         final String propertyType;
         if (isResultSetProperty(procedureColumnMetaInfo)) {
