@@ -20,7 +20,7 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationMap in $classificationList)
 
         void Classify${javaName}${classificationMap.get('name')}();
-        bool Is${javaName}${classificationMap.get('name')}();
+        bool Is${javaName}${classificationMap.get('name')} { get; }
 #end
 #end
 #end
