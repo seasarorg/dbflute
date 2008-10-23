@@ -3,7 +3,9 @@
 #
 map:{
     ; generateProcedureParameterBean = true
-    # ; targetProcedureList = list:{prefix:SP_}
+    # ; targetProcedureCatalogList = list:{ABC}
+    # ; targetProcedureSchemaList = list:{suffix:PLEDB}
+    # ; targetProcedureNameList = list:{prefix:SP_}
 }
 # ----------------/
 

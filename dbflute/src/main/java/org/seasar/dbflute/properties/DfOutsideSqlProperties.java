@@ -164,8 +164,56 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return value != null && value.trim().equalsIgnoreCase("true");
     }
 
-    public boolean isTargetProcedure(String procedureName) {
-        final List<String> targetProcedureList = getTargetProcedureList();
+    public boolean isTargetProcedureCatalog(String procedureCatalog) {
+        final List<String> targetProcedureList = getTargetProcedureCatalogList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
+            return true;
+        }
+        if (procedureCatalog == null || procedureCatalog.trim().length() == 0) {
+            if (targetProcedureList.contains("$$DEFAULT$$")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        for (String catalogHint : targetProcedureList) {
+            if (isHitByTheHint(procedureCatalog, catalogHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected List<String> getTargetProcedureCatalogList() {
+        return getOutsideSqlPropertyAsList("targetProcedureCatalogList");
+    }
+    
+    public boolean isTargetProcedureSchema(String procedureSchema) {
+        final List<String> targetProcedureList = getTargetProcedureSchemaList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
+            return true;
+        }
+        if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+            if (targetProcedureList.contains("$$DEFAULT$$")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        for (String schemaHint : targetProcedureList) {
+            if (isHitByTheHint(procedureSchema, schemaHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getTargetProcedureSchemaList() {
+        return getOutsideSqlPropertyAsList("targetProcedureSchemaList");
+    }
+    
+    public boolean isTargetProcedureName(String procedureName) {
+        final List<String> targetProcedureList = getTargetProcedureNameList();
         if (targetProcedureList == null || targetProcedureList.isEmpty()) {
             return true;
         }
@@ -177,8 +225,8 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected List<String> getTargetProcedureList() {
-        return getOutsideSqlPropertyAsList("targetProcedureList");
+    protected List<String> getTargetProcedureNameList() {
+        return getOutsideSqlPropertyAsList("targetProcedureNameList");
     }
 
     // ===================================================================================

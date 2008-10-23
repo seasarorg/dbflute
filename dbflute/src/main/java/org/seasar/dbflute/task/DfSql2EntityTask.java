@@ -690,11 +690,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<DfProcedureMetaInfo> procedures = getProcedures();
         _log.info(" ");
         for (DfProcedureMetaInfo metaInfo : procedures) {
-            final String procedureName = metaInfo.getProcedureName();
-            if (!outsideSqlProperties.isTargetProcedure(procedureName)) {
+            final String procedureCatalog = metaInfo.getProcedureCatalog();
+            if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
                 continue;
             }
-            
+            final String procedureSchema = metaInfo.getProcedureSchema();
+            if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
+                continue;
+            }
+            final String procedureName = metaInfo.getProcedureName();
+            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                continue;
+            }
+
             _procedureMap.put(procedureName, metaInfo);
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
@@ -705,7 +713,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     .getProcedureColumnMetaInfoList();
             int index = 0;
             final String pmbName = convertProcedureNameToPmbName(procedureName);
-            _log.info("[" + pmbName + "]: " + metaInfo.getProcedureType());
+            final String procedureSqlName = buildProcedureSqlName(metaInfo); 
+            
+            _log.info("[" + procedureSqlName + "]: " + metaInfo.getProcedureType());
             if (procedureColumnMetaInfoList.isEmpty()) {
                 _log.info("    *No Parameter");
             }
@@ -741,7 +751,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
             parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
-            parameterBeanMetaData.setProcedureName(procedureName);
+            parameterBeanMetaData.setProcedureName(procedureSqlName);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
         }
         _log.info(" ");
@@ -749,14 +759,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected List<DfProcedureMetaInfo> getProcedures() throws SQLException {
         final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
-        return new DfProcedureHandler().getProcedures(metaData, _schema);
-        
-        // Anyway, it is not implemented to resolve the procedure in additional schema.
-        // Because I don't know that they really want to generate other schema procedures.
-        // And there are many ways how to stave off the problem.
-        // For example, creates the procedure in main schema that delegates other schema procedures.
+        final DfProcedureHandler handler = new DfProcedureHandler();
+        final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
+        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        for (String additionalSchema : additionalSchemaList) {
+            final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData, additionalSchema);
+            for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
+                final String procedureSchema = metaInfo.getProcedureSchema();
+                if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+                    metaInfo.setProcedureSchema(additionalSchema);
+                }
+            }
+            procedures.addAll(additionalProcedureList);
+        }
+        return procedures;
     }
-    
+
     protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         final String propertyType;
         if (isResultSetProperty(procedureColumnMetaInfo)) {
@@ -803,7 +821,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return procedureName;
     }
-    
+
     protected String filterColumnNameAboutVendorDependency(String columnName) {
         // Because SQLServer returns '@returnValue'.
         if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
@@ -820,6 +838,23 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
         }
         return columnName;
+    }
+    
+    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        final String procedureCatalog = metaInfo.getProcedureCatalog();
+        final StringBuilder sb = new StringBuilder();
+        if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
+            sb.append(procedureCatalog).append(".");
+        }
+        final String procedureSchema = metaInfo.getProcedureSchema();
+        if (procedureSchema != null && procedureSchema.trim().length() > 0) {
+            final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+            if (additionalSchemaList.contains(procedureSchema)) {
+                sb.append(procedureSchema).append(".");
+            }
+        }
+        final String procedureName = metaInfo.getProcedureName();
+        return sb.append(procedureName).toString();
     }
 
     protected boolean isAllUpperCase(String name) {
