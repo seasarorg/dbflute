@@ -54,11 +54,8 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,13 +108,12 @@ public class Column {
     // -----------------------------------------------------
     //                                                  Type
     //                                                  ----
+    private String _javaType;
+    
     private String _torqueType;
 
     private String _dbType;
 
-    private String _javaType;
-
-    private Object _columnType;
 
     private String _columnSize;
 
@@ -376,6 +372,23 @@ public class Column {
         return _javaType;
     }
 
+    // -----------------------------------------------------
+    //                                           Torque Type
+    //                                           -----------
+    public void setTorqueType(String torqueType) {
+        this._torqueType = torqueType;
+        if (torqueType.equals("VARBINARY") || torqueType.equals("BLOB")) {
+            _needsTransactionInPostgres = true;
+        }
+    }
+
+    public Object getTorqueType() {
+        return _torqueType;
+    }
+    
+    // -----------------------------------------------------
+    //                                              Position
+    //                                              --------
     /**
      * Get the location of this column within the table (one-based).
      * @return value of position.
@@ -391,7 +404,7 @@ public class Column {
     public void setPosition(int v) {
         this._position = v;
     }
-
+    
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
@@ -489,7 +502,7 @@ public class Column {
             sb.append("NotNull");
         }
         plugDelimiterIfNeeds(sb);
-        sb.append(getDbType() != null ? getDbType() : "UnknownType");
+        sb.append(getDbTypeExpression());
         if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
             sb.append("(" + getColumnSize() + ")");
         }
@@ -618,6 +631,22 @@ public class Column {
     }
 
     // -----------------------------------------------------
+    //                                               DB Type
+    //                                               -------
+    // for documents basically
+    public void setDbType(String dbType) { 
+        this._dbType = dbType;
+    }
+
+    public String getDbType() {
+        return _dbType;
+    }
+    
+    public String getDbTypeExpression() {
+        return _dbType != null ? _dbType : "UnknownType";
+    }
+
+    // -----------------------------------------------------
     //                                           Column Size
     //                                           -----------
     public String getColumnSize() {
@@ -676,6 +705,73 @@ public class Column {
             return "null";
         }
         return String.valueOf(decimalDigits);
+    }
+
+    // -----------------------------------------------------
+    //                                        Column Comment
+    //                                        --------------
+    public boolean hasComment() {
+        final String comment = getComment();
+        return comment != null && comment.trim().length() > 0;
+    }
+
+    public String getComment() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.extractCommentFromDbComment(_comment);
+        return comment != null ? comment : "";
+    }
+
+    public void setComment(String comment) {
+        this._comment = comment;
+    }
+
+    public String getCommentForSchemaHtml() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveLineSeparatorForSchemaHtml(getComment());
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForJavaDocValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityJavaDocDbCommentValid();
+    }
+
+    public String getCommentForJavaDoc() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveLineSeparatorForJavaDoc(getComment(), "    ");
+        return comment != null ? comment : "";
+    }
+
+    // -----------------------------------------------------
+    //                                         Default Value
+    //                                         -------------
+    /**
+     * Return a string that will give this column a default value.
+     */
+    public String getDefaultSetting() {
+        StringBuffer dflt = new StringBuffer(0);
+        if (_defaultValue != null) {
+            dflt.append("default ");
+            if (TypeMap.isTextType(_torqueType)) {
+                // TODO: Properly SQL-escape the text.
+                dflt.append('\'').append(_defaultValue).append('\'');
+            } else {
+                dflt.append(_defaultValue);
+            }
+        }
+        return dflt.toString();
+    }
+
+    public void setDefaultValue(String def) {
+        _defaultValue = def;
+    }
+
+    public boolean hasDefaultValue() {
+        return _defaultValue != null && _defaultValue.trim().length() > 0;
+    }
+
+    public String getDefaultValue() {
+        return _defaultValue;
     }
 
     // -----------------------------------------------------
@@ -862,110 +958,6 @@ public class Column {
         return sb.toString();
     }
 
-    public void setTorqueType(String torqueType) {
-        this._torqueType = torqueType;
-        if (torqueType.equals("VARBINARY") || torqueType.equals("BLOB")) {
-            _needsTransactionInPostgres = true;
-        }
-    }
-
-    public Object getTorqueType() {
-        return _torqueType;
-    }
-
-    public void setDbType(String dbType) {
-        this._dbType = dbType;
-    }
-
-    public String getDbType() {
-        return _dbType;
-    }
-
-    /**
-     * Utility method to see if the column is a string
-     */
-    public boolean isString() {
-        return (_columnType instanceof String);
-    }
-
-    /**
-     * Utility method to return the value as an element to be usable
-     * in an SQL insert statement. This is used from the SQL loader task
-     */
-    public boolean needEscapedValue() {
-        return (_torqueType != null)
-                && (_torqueType.equals("VARCHAR") || _torqueType.equals("LONGVARCHAR") || _torqueType.equals("DATE")
-                        || _torqueType.equals("DATETIME") || _torqueType.equals("TIMESTAMP") || _torqueType
-                        .equals("CHAR"));
-    }
-
-    // -----------------------------------------------------
-    //                                        Column Comment
-    //                                        --------------
-    public boolean hasComment() {
-        final String comment = getComment();
-        return comment != null && comment.trim().length() > 0;
-    }
-
-    public String getComment() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_comment);
-        return comment != null ? comment : "";
-    }
-
-    public void setComment(String comment) {
-        this._comment = comment;
-    }
-
-    public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForSchemaHtml(getComment());
-        return comment != null ? comment : "";
-    }
-
-    public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return hasComment() && prop.isEntityJavaDocDbCommentValid();
-    }
-
-    public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForJavaDoc(getComment(), "    ");
-        return comment != null ? comment : "";
-    }
-
-    // -----------------------------------------------------
-    //                                         Default Value
-    //                                         -------------
-    /**
-     * Return a string that will give this column a default value.
-     */
-    public String getDefaultSetting() {
-        StringBuffer dflt = new StringBuffer(0);
-        if (_defaultValue != null) {
-            dflt.append("default ");
-            if (TypeMap.isTextType(_torqueType)) {
-                // TODO: Properly SQL-escape the text.
-                dflt.append('\'').append(_defaultValue).append('\'');
-            } else {
-                dflt.append(_defaultValue);
-            }
-        }
-        return dflt.toString();
-    }
-
-    public void setDefaultValue(String def) {
-        _defaultValue = def;
-    }
-
-    public boolean hasDefaultValue() {
-        return _defaultValue != null && _defaultValue.trim().length() > 0;
-    }
-
-    public String getDefaultValue() {
-        return _defaultValue;
-    }
-
     // ===================================================================================
     //                                                                    Sql2Entity Table
     //                                                                    ================
@@ -1035,45 +1027,6 @@ public class Column {
         result.append(" />\n");
 
         return result.toString();
-    }
-
-    // ===================================================================================
-    //                                                                              Unused
-    //                                                                              ======
-    /**
-     * Set the column type from a string property
-     * (normally a string from an sql input file)
-     */
-    public void setTypeFromString(String typeName, String size) {
-        String tn = typeName.toUpperCase();
-        setTorqueType(tn);
-
-        if (size != null) {
-            this._columnSize = size;
-        }
-
-        if (tn.indexOf("CHAR") != -1) {
-            _torqueType = "VARCHAR";
-            _columnType = "";
-        } else if (tn.indexOf("INT") != -1) {
-            _torqueType = "INTEGER";
-            _columnType = new Integer(0);
-        } else if (tn.indexOf("FLOAT") != -1) {
-            _torqueType = "FLOAT";
-            _columnType = new Float(0);
-        } else if (tn.indexOf("DATE") != -1) {
-            _torqueType = "DATE";
-            _columnType = new Date();
-        } else if (tn.indexOf("TIME") != -1) {
-            _torqueType = "TIMESTAMP";
-            _columnType = new Timestamp(System.currentTimeMillis());
-        } else if (tn.indexOf("BINARY") != -1) {
-            _torqueType = "LONGVARBINARY";
-            _columnType = new Hashtable<Object, Object>();
-        } else {
-            _torqueType = "VARCHAR";
-            _columnType = "";
-        }
     }
 
     // ===================================================================================
