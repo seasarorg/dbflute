@@ -51,8 +51,8 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         if (!isUseBuri()) {
             return false;
         }
-        final String baseDtoPackage = getBaseBaoPackage();
-        return baseDtoPackage != null && baseDtoPackage.trim().length() > 0;
+        final String baseBaoPackage = getBaseBaoPackage();
+        return baseBaoPackage != null && baseBaoPackage.trim().length() > 0;
     }
 
     public boolean isTargetTable(String tableName) {
@@ -97,11 +97,11 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     public String getBaseBaoPackage() { // required if generate BAO
-        return getBuriPropertyRequired("baseBaoPackage");
+        return getBuriPropertyIfNullEmpty("baseBaoPackage");
     }
 
     public String getExtendedBaoPackage() { // required if generate BAO
-        return getBuriPropertyRequired("extendedBaoPackage");
+        return getBuriPropertyIfNullEmpty("extendedBaoPackage");
     }
 
     // ===================================================================================

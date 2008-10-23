@@ -660,51 +660,51 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                Select
     //                                                ------
 #if ($database.isMakeDeprecated())
-    ${database.behaviorDelegateModifier} int delegateGetCountAll() { return delegateSelectCount(newMyConditionBean()); }
-    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() { return delegateSelectList(newMyConditionBean()); }
+    protected int delegateGetCountAll() { return delegateSelectCount(newMyConditionBean()); }
+    protected List<${myExtendedObjectClassName}> delegateGetListAll() { return delegateSelectList(newMyConditionBean()); }
 #end
-    ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
-    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
 #if ($table.isUseSequence())
-    ${database.behaviorDelegateModifier} ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
+    protected ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
 #end
 #if ($table.isWritable())
 
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
-    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
+    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
 #end
-    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
+    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
 #end
 
-    ${database.behaviorDelegateModifier} int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
     }
-    ${database.behaviorDelegateModifier} int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
     }
 #end
-    ${database.behaviorDelegateModifier} int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
     }
 #if ($table.hasOptimisticLock())
-    ${database.behaviorDelegateModifier} int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
         assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
     }
 #end
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
-    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
+    protected int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         return getMyDao().insert(entity);
     }
