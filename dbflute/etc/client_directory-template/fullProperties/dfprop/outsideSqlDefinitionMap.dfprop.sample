@@ -3,6 +3,7 @@
 #
 map:{
     ; generateProcedureParameterBean = true
+    # ; targetProcedureList = list:{prefix:SP_}
 }
 # ----------------/
 

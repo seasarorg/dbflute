@@ -164,12 +164,12 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return value != null && value.trim().equalsIgnoreCase("true");
     }
 
-    public boolean isTargetProcedureName(String procedureName) {
-        final List<String> targetProcedureNameList = getTargetProcedureNameList();
-        if (targetProcedureNameList == null || targetProcedureNameList.isEmpty()) {
+    public boolean isTargetProcedure(String procedureName) {
+        final List<String> targetProcedureList = getTargetProcedureList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
             return true;
         }
-        for (String procedureNameHint : targetProcedureNameList) {
+        for (String procedureNameHint : targetProcedureList) {
             if (isHitByTheHint(procedureName, procedureNameHint)) {
                 return true;
             }
@@ -177,8 +177,8 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected List<String> getTargetProcedureNameList() {
-        return getOutsideSqlPropertyAsList("targetProcedureNameList");
+    protected List<String> getTargetProcedureList() {
+        return getOutsideSqlPropertyAsList("targetProcedureList");
     }
 
     // ===================================================================================

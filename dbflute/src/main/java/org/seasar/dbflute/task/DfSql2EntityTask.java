@@ -691,7 +691,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info(" ");
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureName = metaInfo.getProcedureName();
-            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+            if (!outsideSqlProperties.isTargetProcedure(procedureName)) {
                 continue;
             }
             
