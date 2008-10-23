@@ -14,9 +14,9 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.token.LineToken;
 import org.seasar.dbflute.helper.token.LineTokenImpl;
 import org.seasar.dbflute.helper.token.LineTokenizingOption;
-import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * @author jflute
@@ -27,7 +27,7 @@ public class DfClassificationResourceAnalyzer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+    private static final Log _log = LogFactory.getLog(DfClassificationResourceAnalyzer.class);
 
     // ===================================================================================
     //                                                                             Analyze
@@ -62,6 +62,7 @@ public class DfClassificationResourceAnalyzer {
 
     protected List<DfClassificationTop> analyze(final List<String> lineList) {
         final List<DfClassificationTop> classificationList = new ArrayList<DfClassificationTop>();
+        String relatedColumnName = null;
         boolean inGroup = false;
         final int size = lineList.size();
         int index = -1;
@@ -71,6 +72,9 @@ public class DfClassificationResourceAnalyzer {
                 if (isTopLine(line)) {
                     final DfClassificationTop classificationTop = extractClassificationTop(line);
                     classificationList.add(classificationTop);
+                    if (relatedColumnName != null) {
+                        classificationTop.setRelatedColumnName(relatedColumnName);
+                    }
                     continue;
                 } else if (isElementLine(line)) {
                     final DfClassificationElement classificationElement = extractClassificationElement(line);
@@ -101,6 +105,7 @@ public class DfClassificationResourceAnalyzer {
             if (!isElementLine(nextNextLine)) {
                 continue;
             }
+            relatedColumnName = extractRelatedColumnNameFronTitleLine(line);
             inGroup = true;
         }
         return classificationList;
@@ -196,6 +201,33 @@ public class DfClassificationResourceAnalyzer {
 
     protected boolean isElementLine(String line) {
         return line.contains("- ") && line.contains(",") && line.indexOf("- ") + 1 < line.indexOf(",");
+    }
+
+    protected String extractRelatedColumnNameFronTitleLine(String line) {
+        if (!isTitleLine(line)) {
+            String msg = "The line should be title line: line=" + line;
+            throw new IllegalArgumentException(msg);
+        }
+        final String connectMark = "]:";
+        final String wildCard = "*";
+        final String prefixMark = DfNameHintUtil.PREFIX_MARK;
+        final String suffixMark = DfNameHintUtil.SUFFIX_MARK;
+        if (!line.contains(connectMark)) {
+            return null;
+        }
+        line = line.trim();
+        line = removeRearXmlEndIfNeeds(line);
+        String relatedColumnName = line.substring(line.indexOf(connectMark) + connectMark.length()).trim();
+        if (relatedColumnName == null) {
+            return relatedColumnName;
+        }
+        if (relatedColumnName.startsWith(wildCard)) { // *_FLG
+            relatedColumnName = suffixMark + relatedColumnName.substring(wildCard.length());
+        } else if (relatedColumnName.endsWith(wildCard)) { // LD_*
+            relatedColumnName = relatedColumnName.substring(0, relatedColumnName.lastIndexOf(wildCard));
+            relatedColumnName = prefixMark + relatedColumnName;
+        }
+        return relatedColumnName;
     }
 
     protected DfClassificationTop extractClassificationTop(String line) {

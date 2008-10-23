@@ -9,15 +9,25 @@ import java.util.List;
  */
 public class DfClassificationTop {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _classificationName;
     protected String _topComment;
+    protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _classificationName + ", " + _topComment + ", " + _elementList + "}";
+        return "{" + _classificationName + ", " + _topComment + ", " + _relatedColumnName + ", " + _elementList + "}";
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getClassificationName() {
         return _classificationName;
     }
@@ -32,6 +42,14 @@ public class DfClassificationTop {
 
     public void setTopComment(String topComment) {
         this._topComment = topComment;
+    }
+    
+    public String getRelatedColumnName() {
+        return _relatedColumnName;
+    }
+    
+    public void setRelatedColumnName(String relatedColumnName) {
+        this._relatedColumnName = relatedColumnName;
     }
 
     public List<DfClassificationElement> getClassificationElementList() {

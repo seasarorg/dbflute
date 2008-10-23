@@ -18,7 +18,7 @@ import org.junit.Test;
  */
 public class DfClassificationPropertiesTest {
 
-    protected static final String ALL_MARK = DfClassificationProperties.MARK_classificationDeploymentAllTable;
+    protected static final String ALL_MARK = DfClassificationProperties.MARK_allColumnClassification;
 
     @Test
     public void test_hasClassification_SameCase() throws Exception {
