@@ -845,16 +845,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
         final String procedureCatalog = metaInfo.getProcedureCatalog();
         final StringBuilder sb = new StringBuilder();
-        if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
-            if (getBasicProperties().isDatabaseOracle()) {
-                sb.append(procedureCatalog).append(".");
-            }
-        }
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
             final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
             if (additionalSchemaList.contains(procedureSchema)) {
                 sb.append(procedureSchema).append(".");
+            }
+        }
+        if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
+            if (getBasicProperties().isDatabaseOracle()) { // needs to confirm other DB.
+                sb.append(procedureCatalog).append(".");
             }
         }
         final String procedureName = metaInfo.getProcedureName();
