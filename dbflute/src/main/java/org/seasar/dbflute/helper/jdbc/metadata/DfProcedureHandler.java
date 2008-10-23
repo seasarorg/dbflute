@@ -71,6 +71,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs)
             throws SQLException {
         while (procedureRs.next()) {
+            final String procedureCatalog = procedureRs.getString("PROCEDURE_CAT");
+            final String procedureSchema = procedureRs.getString("PROCEDURE_SCHEM");
             final String procedureName = procedureRs.getString("PROCEDURE_NAME");
             final Integer procedureType = new Integer(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
@@ -86,6 +88,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
 
             final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
+            metaInfo.setProcedureCatalog(procedureCatalog);
+            metaInfo.setProcedureSchema(procedureSchema);
             metaInfo.setProcedureName(procedureName);
             if (procedureType == DatabaseMetaData.procedureResultUnknown) {
                 metaInfo.setProcedureType(DfProcedureType.procedureResultUnknown);
@@ -159,11 +163,34 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                 Procedure Meta Info
     //                                                                 ===================
     public static class DfProcedureMetaInfo {
+        protected String procedureCatalog;
+        protected String procedureSchema;
         protected String procedureName;
         protected String procedureComment;
         protected DfProcedureType procedureType;
         protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
 
+        @Override
+        public String toString() {
+            return "{" + procedureName + ", " + procedureType + ", " + procedureComment + ", "
+                    + procedureColumnMetaInfoList + "}";
+        }
+
+        public String getProcedureCatalog() {
+            return procedureCatalog;
+        }
+
+        public void setProcedureCatalog(String procedureCatalog) {
+            this.procedureCatalog = procedureCatalog;
+        }
+        
+        public String getProcedureSchema() {
+            return procedureSchema;
+        }
+
+        public void setProcedureSchema(String procedureSchema) {
+            this.procedureSchema = procedureSchema;
+        }
         public String getProcedureName() {
             return procedureName;
         }
@@ -196,11 +223,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfoList.add(procedureColumnMetaInfo);
         }
 
-        @Override
-        public String toString() {
-            return "{" + procedureName + ", " + procedureType + ", " + procedureComment + ", "
-                    + procedureColumnMetaInfoList + "}";
-        }
     }
 
     public static class DfProcedureColumnMetaInfo {
