@@ -65,6 +65,9 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
+    /**
+     * @return The directory for output. (NotNull)
+     */
     public String getOutputDirectory() {
         final String value = (String) getFlexDtoDefinitionMap().get("outputDirectory");
         if (value == null) {

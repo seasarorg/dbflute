@@ -2330,7 +2330,7 @@ public class Table {
     //                                                                  ==================
     public boolean isBuriTarget() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isUseBuri() && buriProperties.isBuriTargetTable(getName());
+        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName());
     }
 
     // ===================================================================================

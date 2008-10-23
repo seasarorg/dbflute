@@ -43,7 +43,19 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isUseS2Buri", false);
     }
 
-    public boolean isBuriTargetTable(String tableName) {
+    protected boolean hasBuriDefinitionMap() {
+        return !getBuriDefinitionMap().isEmpty();
+    }
+
+    public boolean isGenerateBao() {
+        if (!isUseBuri()) {
+            return false;
+        }
+        final String baseDtoPackage = getBaseBaoPackage();
+        return baseDtoPackage != null && baseDtoPackage.trim().length() > 0;
+    }
+
+    public boolean isTargetTable(String tableName) {
         if (!isUseBuri()) {
             return false;
         }
@@ -57,10 +69,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             }
         }
         return false;
-    }
-
-    protected boolean hasBuriDefinitionMap() {
-        return !getBuriDefinitionMap().isEmpty();
     }
 
     // ===================================================================================
@@ -77,7 +85,10 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
-    public String getOutputDirectory() {
+    /**
+     * @return The directory for output. (NotNull)
+     */
+    public String getOutputDirectory() { // not required
         final String value = (String) getBuriDefinitionMap().get("outputDirectory");
         if (value == null) {
             return getBasicProperties().getOutputDirectory();
@@ -85,28 +96,12 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         return getBasicProperties().getOutputDirectory() + "/" + value;
     }
 
-    public String getBaseDtoPackage() {
+    public String getBaseBaoPackage() { // required if generate BAO
         return getBuriPropertyRequired("baseBaoPackage");
     }
 
-    public String getExtendedDtoPackage() {
+    public String getExtendedBaoPackage() { // required if generate BAO
         return getBuriPropertyRequired("extendedBaoPackage");
-    }
-
-    public String getBaseDtoPrefix() {
-        return getBuriPropertyIfNullEmpty("baseBaoPrefix");
-    }
-
-    public String getBaseDtoSuffix() {
-        return getBuriPropertyIfNullEmpty("baseBaoSuffix");
-    }
-
-    public String getExtendedDtoPrefix() {
-        return getBuriPropertyIfNullEmpty("extendedBaoPrefix");
-    }
-
-    public String getExtendedDtoSuffix() {
-        return getBuriPropertyIfNullEmpty("extendedBaoSuffix");
     }
 
     // ===================================================================================

@@ -2404,6 +2404,47 @@ targetdatabase = $targetDatabase
 	  $database.enableGenerateOutputDirectory()
     #end
 
+    ## ===================================================================================
+    ##                                                                            Buri Bao
+    ##                                                                            ========
+    #if ($database.isBuriGenerateBao() && $database.isTargetLanguageJava())
+      $database.enableBuriBaoOutputDirectory()
+      $database.info("parseBuriBao() {")
+      #set ($myBaseBaoPackageName = "${database.buriBaseBaoPackage}")
+      #set ($myExtendedBaoPackageName = "${database.buriExtendedBaoPackage}")
+
+      #set ($path = $database.getPackageAsPath(${myBaseBaoPackageName}))
+      $database.makeDirectory($path)
+
+      #set ($path = $database.getPackageAsPath(${myExtendedBaoPackageName}))
+      $database.makeDirectory($path)
+
+      #foreach ($table in $database.buriTargetTableList)
+        #set ($myBaseBaoClassName = "${glProjectPrefix}Bs${table.javaName}Bao")
+        #set ($myExtendedBaoClassName = "${glProjectPrefix}${table.javaName}Bao")
+
+        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
+        #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
+
+        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+        #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
+
+        $database.info("    parse('${myExtendedBaoClassName}');")
+
+        #set ( $path = "${database.getPackageAsPath(${myBaseBaoPackageName})}${myBaseBaoClassName}.java" )
+        $generator.parse("om/${glResourceDirectory}/other/buri/BuriBaseBao.${glTemplateFileExtension}", $path, "table", $table)
+
+        #if (!$database.isStopGenerateExtendedEntity())
+          #set ( $path = "${database.getPackageAsPath(${myExtendedBaoPackageName})}${myExtendedBaoClassName}.java" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glResourceDirectory}/other/buri/BuriExtendedBao.${glTemplateFileExtension}", $path, "table", $table)
+          #end
+        #end
+      #end
+      $database.info("}")
+	  $database.enableGenerateOutputDirectory()
+    #end
+
   #end
 #end
 

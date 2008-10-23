@@ -577,6 +577,10 @@ public class Database {
     public void enableFlexDtoOutputDirectory() {
         getGeneratorInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
+    
+    public void enableBuriBaoOutputDirectory() {
+        getGeneratorInstance().setOutputPath(getProperties().getBuriProperties().getOutputDirectory());
+    }
 
     // ===================================================================================
     //                                                                           Generator
@@ -1257,10 +1261,6 @@ public class Database {
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
-    public String getBehaviorDelegateModifier() {
-        return "protected";
-    }
-
     public boolean isUseTeeda() {
         return getProperties().getLittleAdjustmentProperties().isUseTeeda();
     }
@@ -1283,6 +1283,32 @@ public class Database {
 
     public boolean isCompatibleOutsideSqlResultOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
+    }
+    
+    // -----------------------------------------------------
+    //                                                  Buri
+    //                                                  ----
+    public boolean isBuriGenerateBao() {
+        return getProperties().getBuriProperties().isGenerateBao();
+    }
+    
+    public String getBuriBaseBaoPackage() {
+        return getProperties().getBuriProperties().getBaseBaoPackage();
+    }
+    
+    public String getBuriExtendedBaoPackage() {
+        return getProperties().getBuriProperties().getExtendedBaoPackage();
+    }
+    
+    public List<Table> getBuriTargetTableList() {
+        final ArrayList<Table> buriTargetTableList = new ArrayList<Table>();
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            if (table.isBuriTarget()) {
+                buriTargetTableList.add(table);
+            }
+        }
+        return buriTargetTableList;
     }
 
     // -----------------------------------------------------
