@@ -59,7 +59,7 @@ namespace ${glPackageExtendedParameterBean} {
         // ===============================================================================
         //                                                                       Procedure
         //                                                                       =========
-        public String ProcedureName { get {
+        public virtual String ProcedureName { get {
             return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
         }}
 

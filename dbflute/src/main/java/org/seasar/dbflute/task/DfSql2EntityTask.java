@@ -689,6 +689,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         final List<DfProcedureMetaInfo> procedures = getProcedures();
         _log.info(" ");
+        _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
@@ -713,9 +714,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     .getProcedureColumnMetaInfoList();
             int index = 0;
             final String pmbName = convertProcedureNameToPmbName(procedureName);
-            final String procedureSqlName = buildProcedureSqlName(metaInfo); 
-            
-            _log.info("[" + procedureSqlName + "]: " + metaInfo.getProcedureType());
+            final String procedureSqlName = buildProcedureSqlName(metaInfo);
+
+            _log.info("[" + pmbName + "]: " + procedureSqlName + " // " + metaInfo.getProcedureType());
             if (procedureColumnMetaInfoList.isEmpty()) {
                 _log.info("    *No Parameter");
             }
@@ -754,6 +755,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setProcedureName(procedureSqlName);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
         }
+        _log.info("= = = = = = = = = =/");
         _log.info(" ");
     }
 
@@ -839,12 +841,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         return columnName;
     }
-    
+
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
         final String procedureCatalog = metaInfo.getProcedureCatalog();
         final StringBuilder sb = new StringBuilder();
         if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
-            sb.append(procedureCatalog).append(".");
+            if (getBasicProperties().isDatabaseOracle()) {
+                sb.append(procedureCatalog).append(".");
+            }
         }
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
