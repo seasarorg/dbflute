@@ -45,7 +45,7 @@ public class DfClassificationResourceAnalyzerTest {
         lineList.add("$ ABC, DEF");
         lineList.add("HHHHHHHHHHHHHHHHHHHHHH");
         lineList.add("[会員ステータス3]");
-        lineList.add("$ MemberStatus3, 会員の状態を示す");
+        lineList.add("$ MemberStatus3");
         lineList.add("- FML, Formalized");
         lineList.add("- PVS, Provisinal");
         lineList.add("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
@@ -111,7 +111,7 @@ public class DfClassificationResourceAnalyzerTest {
         {
             final DfClassificationTop top = classificationTopList.get(2);
             assertEquals("MemberStatus3", top.getClassificationName());
-            assertEquals("会員の状態を示す", top.getTopComment());
+            assertNull(top.getTopComment());
             assertNull(top.getRelatedColumnName());
             assertEquals(2, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();

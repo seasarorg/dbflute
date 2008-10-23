@@ -196,7 +196,7 @@ public class DfClassificationResourceAnalyzer {
     }
 
     protected boolean isTopLine(String line) {
-        return line.contains("$ ") && line.contains(",") && line.indexOf("$ ") + 1 < line.indexOf(",");
+        return line.contains("$ ");
     }
 
     protected boolean isElementLine(String line) {
@@ -239,11 +239,20 @@ public class DfClassificationResourceAnalyzer {
         line = removeRearXmlEndIfNeeds(line);
         line = line.substring(line.indexOf("$ ") + "$ ".length());
 
-        final String classificationName = line.substring(0, line.indexOf(",")).trim();
-        final String topComment = line.substring(line.indexOf(",") + ",".length()).trim();
+        final String classificationName;
+        final String topComment;
+        if (line.contains(",")) {
+            classificationName = line.substring(0, line.indexOf(",")).trim();
+            topComment = line.substring(line.indexOf(",") + ",".length()).trim();
+        } else {
+            classificationName = line.trim();
+            topComment = null;
+        }
         final DfClassificationTop classificationTop = new DfClassificationTop();
         classificationTop.setClassificationName(classificationName);
-        classificationTop.setTopComment(topComment);
+        if (topComment != null) {
+            classificationTop.setTopComment(topComment);
+        }
         return classificationTop;
     }
 
