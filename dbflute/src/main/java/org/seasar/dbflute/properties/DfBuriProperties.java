@@ -101,7 +101,13 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     public String getExtendedBaoPackage() { // required if generate BAO
-        return getBuriPropertyIfNullEmpty("extendedBaoPackage");
+        final String key = "extendedBaoPackage";
+        final String baseBaoPackage = getBaseBaoPackage();
+        if (baseBaoPackage != null && baseBaoPackage.trim().length() > 0) {
+            return getBuriPropertyRequired(key);
+        } else {
+            return getBuriPropertyIfNullEmpty(key);
+        }
     }
 
     // ===================================================================================
@@ -111,7 +117,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         final String value = getBuriProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
-            msg = msg + " flexDtoDefinitionMap=" + getBuriDefinitionMap();
+            msg = msg + " buriDefinitionMap=" + getBuriDefinitionMap();
             throw new IllegalStateException(msg);
         }
         return value;
