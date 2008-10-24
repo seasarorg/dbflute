@@ -69,12 +69,21 @@ public class ${glInternalBytesOidType} extends BytesType {
     protected static class InternalBytesOidImpl implements Blob {
 
         protected byte[] bytes;
+
         public InternalBytesOidImpl(byte[] bytes) {
             this.bytes = bytes;
         }
 
+        public void free() throws SQLException { // for JDK-6.0
+            throw new UnsupportedOperationException("free()");
+        }
+
         public InputStream getBinaryStream() throws SQLException {
             return new ByteArrayInputStream(bytes);
+        }
+
+        public InputStream getBinaryStream(long pos, long length) throws SQLException { // for JDK-6.0
+            throw new UnsupportedOperationException("getBinaryStream(pos, length)");
         }
 
         public byte[] getBytes(long pos, int length) throws SQLException {
