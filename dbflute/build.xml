@@ -108,12 +108,18 @@
             <include name="build-torque.xml"/>
         </zipfileset>
     </zip>
+  </target>
+
+  <target name="expand-dist">
     <delete dir="${dbflute.deploy.dir}"/>
     <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-main" description="==> reflect to test application">
+  <target name="reflect-mac-main" depends="expand-dist" description="==> reflect to test application">
+    <delete dir="${dbflute.deploy.dir}"/>
+    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -160,28 +166,34 @@
   	<chmod dir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-basic" description="==> reflect to test application">
+  <target name="reflect-mac-limit-basic" depends="expand-dist" description="==> reflect to test application">
+    <delete dir="${dbflute.deploy.dir}"/>
+    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-mysql" description="==> reflect to test application">
+  <target name="reflect-mac-limit-mysql" depends="expand-dist" description="==> reflect to test application">
+    <delete dir="${dbflute.deploy.dir}"/>
+    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
     <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-pbasic" description="==> reflect to test application">
+  <target name="reflect-mac-limit-pbasic" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-win-main" description="==> reflect to test application">
+  <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -202,31 +214,31 @@
     </copy>
   </target>
 
-  <target name="reflect-win-limit-basic" description="==> reflect to test application">
+  <target name="reflect-win-limit-basic" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-nbasic" description="==> reflect to test application">
+  <target name="reflect-win-limit-nbasic" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-noracle" description="==> reflect to test application">
+  <target name="reflect-win-limit-noracle" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-oracle" description="==> reflect to test application">
+  <target name="reflect-win-limit-oracle" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-postgresql" description="==> reflect to test application">
+  <target name="reflect-win-limit-postgresql" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
