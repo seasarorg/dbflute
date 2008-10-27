@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.PreparedStatement;
 import javax.sql.DataSource;
 
 import org.seasar.dao.CommandContext;
@@ -349,7 +350,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory) {
             @Override
-            protected void bindArgs(java.sql.PreparedStatement ps, Object[] args, Class[] argTypes) {
+            protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
                 if (args == null) {
                     return;
                 }

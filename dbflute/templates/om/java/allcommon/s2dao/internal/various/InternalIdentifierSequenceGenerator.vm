@@ -1,0 +1,101 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
+
+import java.util.HashMap;
+import javax.sql.DataSource;
+
+import org.seasar.framework.util.LongConversionUtil;
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.dao.Dbms;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalIdentifierSequenceGenerator} extends ${glInternalIdentifierAbstractGenerator} {
+
+    // - - - - - - - - - -
+    // [Unused on DBFlute]
+    // - - - - - - - - - -
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private String sequenceName;
+    private long allocationSize = 0;
+    private HashMap<DataSource, IdContext> idContextMap = new HashMap<DataSource, IdContext>();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalIdentifierSequenceGenerator}(PropertyType propertyType, Dbms dbms) {
+        super(propertyType, dbms);
+    }
+
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
+    public void setIdentifier(Object bean, DataSource ds) {
+        reflectIdentifier(bean, getNextValue(ds));
+    }
+
+    public boolean isSelfGenerate() {
+        return getDbms().isSelfGenerate();
+    }
+
+    // ===================================================================================
+    //                                                                          Next Value
+    //                                                                          ==========
+    protected Object getNextValue(DataSource ds) {
+        if (allocationSize > 0) {
+            long value = getIdContext(ds).getNextValue(ds);
+            return new Long(value);
+        }
+        return getNewInitialValue(ds);
+    }
+
+    protected Object getNewInitialValue(DataSource ds) {
+        return executeSql(ds, getDbms().getSequenceNextValString(sequenceName), null);
+    }
+
+    protected IdContext getIdContext(DataSource ds) {
+        synchronized (idContextMap) {
+            IdContext context = idContextMap.get(ds);
+            if (context == null) {
+                context = new IdContext();
+                idContextMap.put(ds, context);
+            }
+            return context;
+        }
+    }
+
+    public class IdContext {
+        protected long initialValue;
+        protected long allocated = Long.MAX_VALUE;
+        public synchronized long getNextValue(DataSource ds) {
+            if (allocated < allocationSize) {
+                return initialValue + allocated++;
+            }
+            initialValue = LongConversionUtil.toPrimitiveLong(getNewInitialValue(ds));
+            allocated = 1;
+            return initialValue;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getSequenceName() {
+        return sequenceName;
+    }
+
+    public void setSequenceName(String sequenceName) {
+        this.sequenceName = sequenceName;
+    }
+
+    public long getAllocationSize() {
+        return allocationSize;
+    }
+
+    public void setAllocationSize(long allocationSize) {
+        this.allocationSize = allocationSize;
+    }
+}

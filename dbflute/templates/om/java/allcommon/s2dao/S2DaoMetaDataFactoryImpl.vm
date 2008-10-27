@@ -5,6 +5,7 @@ import java.util.Map;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -160,7 +161,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         _log.info("* * * * */");
     }
 
-    protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+    protected void showInformation(DataSource dataSource, XADataSource xaDataSource) {
         final StringBuilder sb = new StringBuilder();
         if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
             final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
@@ -348,11 +349,37 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                                                  Result Set Factory
     //                                                                  ==================
     /**
-     * Create the customize result set factory that is for all SQL on DBFlute.
+     * Create the customize result set factory.
      * @return The customize statement factory. (NotNull)
      */
     protected ResultSetFactory createCustomizeResultSetFactory() {
-        return new ${glFetchNarrowingResultSetFactory}();
+        return new ResultSetFactory() { // [Unused on DBFlute] 
+            public ResultSet getResultSet(Statement statement) {
+                return doGetResultSet(statement);
+            }
+            public ResultSet createResultSet(PreparedStatement ps) {
+                return executeQuery(ps);
+            }
+            protected ResultSet doGetResultSet(Statement statement)  {
+                try {
+                    return statement.getResultSet();
+                } catch (SQLException e) {
+                    handleSQLException(e, statement);
+                    return null;// Unreachable!
+                }
+            }
+            protected ResultSet executeQuery(PreparedStatement ps) {
+                try {
+                    return ps.executeQuery();
+                } catch (SQLException e) {
+                    handleSQLException(e, ps);
+                    return null;// Unreachable!
+                }
+            }
+            protected void handleSQLException(SQLException e, Statement statement) {
+                new SQLExceptionHandler().handleSQLException(e, statement);
+            }
+        };
     }
 
     // ===================================================================================

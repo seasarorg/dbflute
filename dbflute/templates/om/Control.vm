@@ -388,6 +388,11 @@ targetdatabase = $targetDatabase
     #set ($glInternalBytesOidType = "${glProjectPrefix}InternalBytesOidType")
 
     ## [Allcommon-S2Dao-Internal-Various]
+    #set ($glInternalIdentifierGeneratorFactory = "${glProjectPrefix}InternalIdentifierGeneratorFactory")
+    #set ($glInternalIdentifierAbstractGenerator = "${glProjectPrefix}InternalIdentifierAbstractGenerator")
+    #set ($glInternalIdentifierAssignedGenerator = "${glProjectPrefix}InternalIdentifierAssignedGenerator")
+    #set ($glInternalIdentifierIdentityGenerator = "${glProjectPrefix}InternalIdentifierIdentityGenerator")
+    #set ($glInternalIdentifierSequenceGenerator = "${glProjectPrefix}InternalIdentifierSequenceGenerator")
     #set ($glInternalProcedureMetaData = "${glProjectPrefix}InternalProcedureMetaData")
     #set ($glInternalProcedureMetaDataFactory = "${glProjectPrefix}InternalProcedureMetaDataFactory")
     #set ($glInternalProcedureParameterType = "${glProjectPrefix}InternalProcedureParameterType")
@@ -1949,6 +1954,26 @@ targetdatabase = $targetDatabase
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious}))
       $database.makeDirectory($path)
+
+      $database.info("    parse('InternalIdentifierGeneratorFactory');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalIdentifierGeneratorFactory}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalIdentifierGeneratorFactory.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalIdentifierAbstractGenerator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalIdentifierAbstractGenerator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalIdentifierAbstractGenerator.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalIdentifierAssignedGenerator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalIdentifierAssignedGenerator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalIdentifierAssignedGenerator.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalIdentifierIdentityGenerator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalIdentifierIdentityGenerator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalIdentifierIdentityGenerator.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalIdentifierSequenceGenerator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalIdentifierSequenceGenerator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalIdentifierSequenceGenerator.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('InternalProcedureMetaData');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalProcedureMetaData}.${glClassFileExtension}" )
