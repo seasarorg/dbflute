@@ -58,19 +58,22 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected void HandleSqlLogRegistry() {
             StringBuilder sb = new StringBuilder();
-            sb.append("{SqlLog Information}").append(GetLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
             if (${glDBFluteConfig}.GetInstance().IsUseSqlLogRegistry) {
                 ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
+                sb.append("{SqlLog Information}").append(GetLineSeparator());
+                sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
                 sb.append("    ...Setting up SqlLogRegistry!").append(GetLineSeparator());
                 sb.append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
             } else {
                 if (${glInternalSqlLogRegistryLocator}.Instance != null) {
                     ${glInternalSqlLogRegistryLocator}.Instance = null;
+                    sb.append("{SqlLog Information}").append(GetLineSeparator());
+                    sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
                     sb.append("    SqlLogRegistry is close! It's default for DBFlute.").append(GetLineSeparator());
                     sb.append("    If you want to use this, set the property 'IsUseSqlLogRegistry' of the config of DBFlute.");
                 } else {
-                    sb.append("    SqlLogRegistry is not available!");
+                    // No logging here
+                    // sb.append("    SqlLogRegistry is not available!");
                 }
             }
             _log.Info(sb.toString());
