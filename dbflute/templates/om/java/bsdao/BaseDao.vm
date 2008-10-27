@@ -21,9 +21,13 @@ public interface ${myClassName} extends ${InterfaceName} {
     public Class<?> BEAN = ${myExtendedObjectClassName}.class; // For S2Dao
 #if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $table.isBuriTarget())
 
+    public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.primaryKeyWhereStringWithSqlComment}";
+    public static final String getEntity_ARGS = "${table.primaryKeyUncapitalisedJavaNameCommaString}";
+    public ${myExtendedObjectClassName} getEntity(${table.primaryKeyArgsString}); // For Buri
+
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
-    List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);// For the Framework 'Buri'
+    List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids); // For Buri
 #end
 
     public int selectCount(${myConditionBeanClassName} cb);

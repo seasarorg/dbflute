@@ -223,8 +223,38 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     @Override
     protected void setupMethodByAnnotation(Class daoInterface, Method method) {
         final String sql = daoAnnotationReader.getSQL(method, dbms.getSuffix());
-        assertSQLAnnotationUnsupported(method, sql);
+        if (isInternalSelectMethodEntityForBuri(method)) {
+            assertSQLAnnotationRequiredForBuri(method, sql);
+        } else {
+            assertSQLAnnotationUnsupported(method, sql);
+        }
         super.setupMethodByAnnotation(daoInterface, method);
+    }
+
+    protected boolean isInternalSelectMethodEntityForBuri(final Method method) { // For Buri
+        return "getEntity".equals(method.getName());
+    }
+
+    protected void assertSQLAnnotationRequiredForBuri(final Method method, String sql) {
+        if (sql == null) {
+            throwGetEntityMethodForBuriNotFoundSQLAnnotationException(method, sql);
+        }
+    }
+
+    protected void throwGetEntityMethodForBuriNotFoundSQLAnnotationException(final Method method, String sql) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The method of getEntity() for Buri should have the SQL annotation!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "The method of getEntity() is for Buri." + getLineSeparator();
+        msg = msg + "Don't use the method name at your extended DAO interface!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Method]" + getLineSeparator() + method + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SQL]" + getLineSeparator() + sql + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
     }
 
     protected void assertSQLAnnotationUnsupported(final Method method, String sql) {
