@@ -67,7 +67,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -110,7 +110,7 @@ public class Table {
     private List<String> _foreignTableNames;
     private boolean _containsForeignPK;
     private Column _inheritanceColumn;
-    protected DfFlexibleNameMap<String, Column> _columnMap = new DfFlexibleNameMap<String, Column>();
+    protected DfFlexibleMap<String, Column> _columnMap = new DfFlexibleMap<String, Column>();
     private boolean _isNeedsTransactionInPostgres;
     private boolean _isForReferenceOnly;
     private boolean _existSameNameTable;
@@ -1029,8 +1029,8 @@ public class Table {
     public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList) {
 
-        final DfFlexibleNameMap<String, Object> localColumnNameSet = createFlexibleNameMapByKeyList(localColumnNameList);
-        final DfFlexibleNameMap<String, Object> foreignColumnNameSet = createFlexibleNameMapByKeyList(foreignColumnNameList);
+        final DfFlexibleMap<String, Object> localColumnNameSet = createFlexibleNameMapByKeyList(localColumnNameList);
+        final DfFlexibleMap<String, Object> foreignColumnNameSet = createFlexibleNameMapByKeyList(foreignColumnNameList);
 
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
@@ -1088,13 +1088,13 @@ public class Table {
         return false;
     }
 
-    protected <ELEMENT_TYPE> DfFlexibleNameMap<ELEMENT_TYPE, Object> createFlexibleNameMapByKeyList(
+    protected <ELEMENT_TYPE> DfFlexibleMap<ELEMENT_TYPE, Object> createFlexibleNameMapByKeyList(
             List<ELEMENT_TYPE> keyList) {
         HashMap<ELEMENT_TYPE, Object> map = new HashMap<ELEMENT_TYPE, Object>();
         for (ELEMENT_TYPE name : keyList) {
             map.put(name, null);
         }
-        return new DfFlexibleNameMap<ELEMENT_TYPE, Object>(map);
+        return new DfFlexibleMap<ELEMENT_TYPE, Object>(map);
     }
 
     public boolean hasForeignKey() {

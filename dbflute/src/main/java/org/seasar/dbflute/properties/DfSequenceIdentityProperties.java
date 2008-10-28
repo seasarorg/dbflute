@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 
 /**
  * @author jflute
@@ -34,7 +34,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
-        final DfFlexibleNameMap<String, Object> flmap = new DfFlexibleNameMap<String, Object>(
+        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(
                 getSequenceDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }
@@ -129,7 +129,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
-        final DfFlexibleNameMap<String, Object> flmap = new DfFlexibleNameMap<String, Object>(
+        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(
                 getIdentityDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }

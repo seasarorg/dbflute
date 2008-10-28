@@ -2,14 +2,14 @@ package org.seasar.dbflute.helper.flexiblename;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 
 public class DfFlexibleNameMapTest {
 
     @Test
     public void test_Basic() {
         // ## Arrange ##
-        final DfFlexibleNameMap<String, String> map = new DfFlexibleNameMap<String, String>();
+        final DfFlexibleMap<String, String> map = new DfFlexibleMap<String, String>();
         
         // ## Act ##
         map.put("R_TIME", "aaa");

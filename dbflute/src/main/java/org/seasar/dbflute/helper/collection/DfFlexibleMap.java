@@ -27,7 +27,7 @@ import org.seasar.dbflute.util.DfStringUtil;
 /**
  * @author jflute
  */
-public class DfFlexibleNameMap<KEY, VALUE> {
+public class DfFlexibleMap<KEY, VALUE> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,14 +38,14 @@ public class DfFlexibleNameMap<KEY, VALUE> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFlexibleNameMap() {
+    public DfFlexibleMap() {
     }
 
-    public DfFlexibleNameMap(Map<KEY, ? extends VALUE> map) {
+    public DfFlexibleMap(Map<KEY, ? extends VALUE> map) {
         putAll(map);
     }
 
-    public DfFlexibleNameMap(List<KEY> keyList, List<VALUE> valueList) {
+    public DfFlexibleMap(List<KEY> keyList, List<VALUE> valueList) {
         putAll(keyList, valueList);
     }
 

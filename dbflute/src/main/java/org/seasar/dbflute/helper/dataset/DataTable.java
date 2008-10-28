@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
@@ -33,7 +33,7 @@ public class DataTable {
 
     private List<DataRow> removedRows = new ArrayList<DataRow>();
 
-    private DfFlexibleNameMap<String, DataColumn> columns = new DfFlexibleNameMap<String, DataColumn>();
+    private DfFlexibleMap<String, DataColumn> columns = new DfFlexibleMap<String, DataColumn>();
 
     private boolean hasMetaData = false;
 

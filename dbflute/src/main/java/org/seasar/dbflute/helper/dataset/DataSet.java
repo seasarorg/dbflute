@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -12,7 +12,7 @@ public class DataSet {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DfFlexibleNameMap<String, DataTable> tables = new DfFlexibleNameMap<String, DataTable>();
+    private DfFlexibleMap<String, DataTable> tables = new DfFlexibleMap<String, DataTable>();
 
     // ===================================================================================
     //                                                                         Constructor

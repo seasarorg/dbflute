@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 
 /**
  * @author jflute
@@ -341,7 +341,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                 throw new IllegalStateException(msg);
             }
             final Map<String, List<String>> map = _queryMap.get(javaTypeName).get(queryTypeName);
-            final DfFlexibleNameMap<String, List<String>> tableNameMap = new DfFlexibleNameMap<String, List<String>>(
+            final DfFlexibleMap<String, List<String>> tableNameMap = new DfFlexibleMap<String, List<String>>(
                     map);
             if (!tableNameMap.containsKey(tableName) && !tableNameMap.containsKey("$$ALL$$")) {
                 return false;
@@ -355,7 +355,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                 columnTmpMap.put(protoColumnName, new Object());
             }
 
-            final DfFlexibleNameMap<String, Object> columnNameMap = new DfFlexibleNameMap<String, Object>(columnTmpMap);
+            final DfFlexibleMap<String, Object> columnNameMap = new DfFlexibleMap<String, Object>(columnTmpMap);
             if (!columnNameMap.containsKey(columnName)) {
                 return false;
             }

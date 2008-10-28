@@ -3,7 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 
 /**
@@ -143,8 +143,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return _multipleFKPropertyMap;
     }
 
-    public DfFlexibleNameMap<String, Map<String, Map<String, String>>> getMultipleFKPropertyMapAsFlexible() {
-        return new DfFlexibleNameMap<String, Map<String, Map<String, String>>>(getMultipleFKPropertyMap());
+    public DfFlexibleMap<String, Map<String, Map<String, String>>> getMultipleFKPropertyMapAsFlexible() {
+        return new DfFlexibleMap<String, Map<String, Map<String, String>>>(getMultipleFKPropertyMap());
     }
 
     public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> columnNameList) {
@@ -153,7 +153,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             return "";
         }
         final String columnKey = createMultipleFKPropertyColumnKey(columnNameList);
-        final DfFlexibleNameMap<String, Map<String, String>> foreignKeyFxMap = getMultipleFKPropertyForeignKeyMapAsFlexible(foreignKeyMap);
+        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = getMultipleFKPropertyForeignKeyMapAsFlexible(foreignKeyMap);
         final Map<String, String> foreignPropertyElement = foreignKeyFxMap.get(columnKey);
         if (foreignPropertyElement == null) {
             return "";
@@ -171,9 +171,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return sb.toString();
     }
 
-    protected DfFlexibleNameMap<String, Map<String, String>> getMultipleFKPropertyForeignKeyMapAsFlexible(
+    protected DfFlexibleMap<String, Map<String, String>> getMultipleFKPropertyForeignKeyMapAsFlexible(
             final Map<String, Map<String, String>> foreignKeyMap) {
-        final DfFlexibleNameMap<String, Map<String, String>> foreignKeyFxMap = new DfFlexibleNameMap<String, Map<String, String>>(
+        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = new DfFlexibleMap<String, Map<String, String>>(
                 foreignKeyMap);
         return foreignKeyFxMap;
     }

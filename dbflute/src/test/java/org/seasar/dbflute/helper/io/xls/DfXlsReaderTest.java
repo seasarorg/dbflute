@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 
 /**
@@ -44,14 +44,14 @@ public class DfXlsReaderTest {
     }
 
     protected DfXlsReader createXlsReader(Pattern skipSheetPattern) {
-        return new DfXlsReaderEmpty(new DfFlexibleNameMap<String, String>(),
-                new DfFlexibleNameMap<String, List<String>>(), skipSheetPattern);
+        return new DfXlsReaderEmpty(new DfFlexibleMap<String, String>(),
+                new DfFlexibleMap<String, List<String>>(), skipSheetPattern);
     }
 
     protected static class DfXlsReaderEmpty extends DfXlsReader {
 
-        public DfXlsReaderEmpty(DfFlexibleNameMap<String, String> tableNameMap,
-                DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+        public DfXlsReaderEmpty(DfFlexibleMap<String, String> tableNameMap,
+                DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
             super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
         }
 

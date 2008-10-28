@@ -32,7 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.dataset.DataSetConstants;
 import org.seasar.dbflute.util.DfBase64Util;
@@ -73,17 +73,17 @@ public class DfXlsReader {
     // -----------------------------------------------------
     //                                           Read Option
     //                                           -----------
-    protected DfFlexibleNameMap<String, String> _tableNameMap;
+    protected DfFlexibleMap<String, String> _tableNameMap;
 
-    protected DfFlexibleNameMap<String, List<String>> _notTrimTableColumnMap;
+    protected DfFlexibleMap<String, List<String>> _notTrimTableColumnMap;
 
     protected Pattern _skipSheetPattern;// Not Required
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap,
-            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+    public DfXlsReader(File file, DfFlexibleMap<String, String> tableNameMap,
+            DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
         this(create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
     }
 
@@ -95,8 +95,8 @@ public class DfXlsReader {
         }
     }
 
-    public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap,
-            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+    public DfXlsReader(InputStream in, DfFlexibleMap<String, String> tableNameMap,
+            DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
         this._tableNameMap = tableNameMap;
         this._notTrimTableColumnMap = notTrimTableColumnMap;
         this._skipSheetPattern = skipSheetPattern;

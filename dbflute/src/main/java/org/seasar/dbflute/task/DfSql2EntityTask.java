@@ -40,7 +40,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
@@ -942,7 +942,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (commonColumnMap.isEmpty()) {
             return false;
         }
-        DfFlexibleNameMap<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
+        DfFlexibleMap<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
         Set<String> commonColumnSet = commonColumnMap.keySet();
         for (String commonColumnName : commonColumnSet) {
             if (!flexibleColumnJdbcTypeMap.containsKey(commonColumnName)) {
@@ -994,7 +994,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getCommonColumnTorqueType(String columnName) {
-        DfFlexibleNameMap<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
+        DfFlexibleMap<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
         return (String) flexibleNameMap.get(columnName);
     }
 
@@ -1051,8 +1051,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected <KEY, VALUE> DfFlexibleNameMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
-        return new DfFlexibleNameMap<KEY, VALUE>(map);
+    protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
+        return new DfFlexibleMap<KEY, VALUE>(map);
     }
 
     // ===================================================================================

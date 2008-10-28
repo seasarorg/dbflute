@@ -73,7 +73,7 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
@@ -121,7 +121,7 @@ public class Database {
     //                                                 Table
     //                                                 -----
     protected List<Table> _tableList = new ArrayList<Table>(100);
-    protected DfFlexibleNameMap<String, Table> _flexibleTableMap = new DfFlexibleNameMap<String, Table>();
+    protected DfFlexibleMap<String, Table> _flexibleTableMap = new DfFlexibleMap<String, Table>();
 
     // -----------------------------------------------------
     //                                        for Sql2Entity

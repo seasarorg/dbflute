@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
@@ -671,7 +671,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      */
     public void initializeClassificationDeploymentMap(List<Table> tableList) { // This should be called when the task start.
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibleDeploymentMap = newFlexibleNameMap(deploymentMap);
+        final DfFlexibleMap<String, Map<String, String>> flexibleDeploymentMap = newFlexibleNameMap(deploymentMap);
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap == null) {
             return;
@@ -701,12 +701,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                -----------------------
     public boolean hasClassification(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
+        final DfFlexibleMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
         final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
         if (columnClassificationMap == null) {
             return false;
         }
-        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
+        final DfFlexibleMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
         final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
@@ -722,12 +722,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
+        final DfFlexibleMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
         if (!flexibledeploymentMap.containsKey(tableName)) {
             return null;
         }
         final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
-        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
+        final DfFlexibleMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
         final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();

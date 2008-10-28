@@ -40,7 +40,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
@@ -75,7 +75,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected Pattern _skipSheetPattern;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, DfFlexibleNameMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleNameMap<String, DfColumnMetaInfo>>();
+    protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
 
     /** The handler of columns for getting column meta information. */
     protected DfColumnHandler _columnHandler = new DfColumnHandler();// as helper.
@@ -119,7 +119,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
 
                 // Set up columnMetaInfo.
-                final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
+                final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
                         tableName);
 
                 // Set up columnNameList.
@@ -241,11 +241,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected DfFlexibleNameMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+    protected DfFlexibleMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
         }
-        final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
+        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
             final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumns(metaData, _schemaName,
@@ -265,7 +265,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected boolean processNull(String columnName, String value, PreparedStatement statement, int bindCount,
-            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value != null) {
             return false;
         }
@@ -295,7 +295,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,
-            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -316,7 +316,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected boolean processNumber(String columnName, String value, PreparedStatement statement, int bindCount,
-            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -420,8 +420,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
-        final DfFlexibleNameMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
-        final DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
+        final DfFlexibleMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
+        final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
         final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap, _skipSheetPattern);
         if (tableNameMap != null && !tableNameMap.isEmpty()) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
@@ -460,7 +460,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             final DataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
 
-            final DfFlexibleNameMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final DfFlexibleMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
@@ -477,7 +477,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
 
-            final DfFlexibleNameMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final DfFlexibleMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
@@ -508,18 +508,18 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return reader.readMapAsStringValue(path, "UTF-8");
     }
 
-    private DfFlexibleNameMap<String, String> getTableNameMap(String dataDirectoryName) {
+    private DfFlexibleMap<String, String> getTableNameMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/table-name.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         final Map<String, String> targetMap = reader.readMapAsStringValue(path, "UTF-8");
-        return new DfFlexibleNameMap<String, String>(targetMap);
+        return new DfFlexibleMap<String, String>(targetMap);
     }
 
-    private DfFlexibleNameMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
+    private DfFlexibleMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/not-trim-column.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         final Map<String, List<String>> targetMap = reader.readMapAsListStringValue(path, "UTF-8");
-        return new DfFlexibleNameMap<String, List<String>>(targetMap);
+        return new DfFlexibleMap<String, List<String>>(targetMap);
     }
 
     protected String getSql4Log(String tableName, List<String> columnNameList,

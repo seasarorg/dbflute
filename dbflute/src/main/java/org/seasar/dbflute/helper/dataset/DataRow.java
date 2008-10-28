@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.dataset;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.states.RowState;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
@@ -21,7 +21,7 @@ public class DataRow {
     //                                                                           =========
     private DataTable _table;
 
-    private DfFlexibleNameMap<String, Object> _values = new DfFlexibleNameMap<String, Object>();
+    private DfFlexibleMap<String, Object> _values = new DfFlexibleMap<String, Object>();
 
     private RowState _state = RowStates.UNCHANGED;
 

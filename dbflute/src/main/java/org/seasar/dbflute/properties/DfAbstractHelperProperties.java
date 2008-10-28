@@ -9,7 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
-import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.io.text.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.text.DfStringFileReader;
@@ -400,8 +400,8 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                  General Helper
     //                                                                  ==============
-    protected <KEY, VALUE> DfFlexibleNameMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
-        return new DfFlexibleNameMap<KEY, VALUE>(map);
+    protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
+        return new DfFlexibleMap<KEY, VALUE>(map);
     }
 
     protected String filterDoubleQuotation(String str) {
