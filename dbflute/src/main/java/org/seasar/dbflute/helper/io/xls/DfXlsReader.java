@@ -205,7 +205,7 @@ public class DfXlsReader {
                 value = getValue(cell, table);
                 final DataColumn column = table.getColumn(i);
                 try {
-                    dataRow.setValue(column.getColumnName(), value);
+                    dataRow.setValue(i, value);
                 } catch (NumberFormatException e) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
                         throw e;
@@ -214,7 +214,7 @@ public class DfXlsReader {
                     msg = msg + " name=" + column.getColumnName() + " value=" + value;
                     _log.info(msg);
                     column.setColumnType(ColumnTypes.STRING);
-                    dataRow.setValue(column.getColumnName(), value);
+                    dataRow.setValue(i, value);
                 }
             }
         } catch (RuntimeException e) {

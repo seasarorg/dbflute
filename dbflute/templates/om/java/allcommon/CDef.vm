@@ -36,8 +36,6 @@ public class ${myClassName} {
 #if ($count != 0)
         ,
 #end
-        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
-        static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
 #if ($classificationMap.containsKey('comment'))
         /** ${classificationMap.get('comment')} */
 #end
@@ -49,6 +47,8 @@ public class ${myClassName} {
 #set ($count = $count + 1)
 #end
         ;
+        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
         private String _code; private String _alias;
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }

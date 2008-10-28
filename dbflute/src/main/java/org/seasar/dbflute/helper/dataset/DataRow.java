@@ -1,9 +1,8 @@
 package org.seasar.dbflute.helper.dataset;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.states.RowState;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
@@ -21,7 +20,7 @@ public class DataRow {
     //                                                                           =========
     private DataTable _table;
 
-    private DfFlexibleMap<String, Object> _values = new DfFlexibleMap<String, Object>();
+    private List<Object> _values = new ArrayList<Object>();
 
     private RowState _state = RowStates.UNCHANGED;
 
@@ -35,7 +34,7 @@ public class DataRow {
 
     private void initValues() {
         for (int i = 0; i < _table.getColumnSize(); ++i) {
-            _values.put(_table.getColumnName(i), null);
+            _values.add(null);
         }
     }
 
@@ -43,17 +42,23 @@ public class DataRow {
     //                                                                      Value Handling
     //                                                                      ==============
     public Object getValue(int index) {
-        return _values.getValue(index);
+        return _values.get(index);
     }
 
     public Object getValue(String columnName) {
-        DataColumn column = _table.getColumn(columnName);
-        return _values.getValue(column.getColumnIndex());
+        final DataColumn column = _table.getColumn(columnName);
+        return _values.get(column.getColumnIndex());
+    }
+    
+    public void addValue(String columnName, Object value) {
+        final DataColumn column = _table.getColumn(columnName);
+        _values.add(column.convert(value));
+        modify();
     }
 
-    public void setValue(String columnName, Object value) {
-        DataColumn column = _table.getColumn(columnName);
-        _values.put(columnName, column.convert(value));
+    public void setValue(int index, Object value) {
+        final DataColumn column = _table.getColumn(index);
+        _values.set(index, column.convert(value));
         modify();
     }
 
@@ -104,7 +109,7 @@ public class DataRow {
         DataRow other = (DataRow) o;
         for (int i = 0; i < _table.getColumnSize(); ++i) {
             String columnName = _table.getColumnName(i);
-            Object value = _values.getValue(i);
+            Object value = _values.get(i);
             Object otherValue = other.getValue(columnName);
             ColumnType ct = ColumnTypes.getColumnType(value);
             if (ct.equals(value, otherValue)) {
@@ -113,59 +118,5 @@ public class DataRow {
             return false;
         }
         return true;
-    }
-
-    public void copyFrom(Object source) {
-        if (source instanceof Map) {
-            copyFromMap((Map<?, ?>) source);
-        } else if (source instanceof DataRow) {
-            copyFromRow((DataRow) source);
-        } else {
-            throw new UnsupportedOperationException();
-            // copyFromBean(source);
-        }
-
-    }
-
-    private void copyFromMap(Map<?, ?> source) {
-        for (Iterator<?> i = source.keySet().iterator(); i.hasNext();) {
-            String columnName = (String) i.next();
-            if (_table.hasColumn(columnName)) {
-                Object value = source.get(columnName);
-                setValue(columnName, convertValue(value));
-            }
-        }
-    }
-
-    private void copyFromRow(DataRow source) {
-        for (int i = 0; i < source.getTable().getColumnSize(); ++i) {
-            String columnName = source.getTable().getColumnName(i);
-            if (_table.hasColumn(columnName)) {
-                Object value = source.getValue(i);
-                setValue(columnName, convertValue(value));
-            }
-        }
-    }
-
-    // [Unused on DBFlute]
-    //    private void copyFromBean(Object source) {
-    //        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(source.getClass());
-    //        for (int i = 0; i < _table.getColumnSize(); ++i) {
-    //            String columnName = _table.getColumnName(i);
-    //            String propertyName = DfStringUtil.replace(columnName, "_", "");
-    //            if (beanDesc.hasPropertyDesc(propertyName)) {
-    //                PropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
-    //                Object value = pd.getValue(source);
-    //                setValue(columnName, convertValue(value));
-    //            }
-    //        }
-    //    }
-
-    private Object convertValue(Object value) {
-        if (value == null) {
-            return null;
-        }
-        ColumnType columnType = ColumnTypes.getColumnType(value.getClass());
-        return columnType.convert(value, null);
     }
 }

@@ -172,38 +172,6 @@ public class DataTable {
         hasMetaData = true;
     }
 
-    // [Unused on DBFlute]
-    //    public void setupColumns(Class<?> beanClass) {
-    //        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(beanClass);
-    //        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
-    //            PropertyDesc pd = beanDesc.getPropertyDesc(i);
-    //            addColumn(pd.getPropertyName(), ColumnTypes.getColumnType(pd.getPropertyType()));
-    //        }
-    //    }
-
-    public void copyFrom(Object source) {
-        if (source instanceof List) {
-            copyFromList((List<?>) source);
-        } else {
-            copyFromBeanOrMap(source);
-        }
-
-    }
-
-    private void copyFromList(List<?> source) {
-        for (int i = 0; i < source.size(); ++i) {
-            DataRow row = addRow();
-            row.copyFrom(source.get(i));
-            row.setState(RowStates.UNCHANGED);
-        }
-    }
-
-    private void copyFromBeanOrMap(Object source) {
-        DataRow row = addRow();
-        row.copyFrom(source);
-        row.setState(RowStates.UNCHANGED);
-    }
-
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

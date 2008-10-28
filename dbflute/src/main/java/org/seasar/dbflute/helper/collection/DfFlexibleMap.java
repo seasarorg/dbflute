@@ -57,12 +57,12 @@ public class DfFlexibleMap<KEY, VALUE> {
     }
 
     public VALUE getValue(int i) {
-        final KEY key = _keyList.get(i);
+        final KEY key = getKey(i);
         return get(key);
     }
 
     public VALUE remove(int i) {
-        final KEY key = _keyList.get(i);
+        final KEY key = getKey(i);
         return remove(key);
     }
     

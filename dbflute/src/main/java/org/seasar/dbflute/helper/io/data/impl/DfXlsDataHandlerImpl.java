@@ -152,21 +152,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
-
                         int bindCount = 1;
                         final Set<String> columnNameSet = columnValueMap.keySet();
                         for (String columnName : columnNameSet) {
                             final Object obj = columnValueMap.get(columnName);
-                            if (isNotNullNotString(obj)) {
-                                if (obj instanceof Timestamp) {
-                                    statement.setTimestamp(bindCount, (Timestamp) obj);
-                                    bindCount++;
-                                    continue;
-                                } else {
-                                    statement.setObject(bindCount, obj);
-                                    bindCount++;
-                                    continue;
-                                }
+                            if (processNotNullNotString(columnName, obj, statement, bindCount)) {
+                                bindCount++;
+                                continue;
                             }
                             String value = (String) obj;
 
@@ -258,6 +250,21 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected boolean processNotNullNotString(String columnName, Object obj, PreparedStatement statement, int bindCount)
+            throws SQLException {
+        if (!isNotNullNotString(obj)) {
+            return false;
+        }
+        if (obj instanceof Timestamp) {
+            statement.setTimestamp(bindCount, (Timestamp) obj);
+        } else if (obj instanceof BigDecimal) {
+            statement.setBigDecimal(bindCount, (BigDecimal) obj);
+        } else {
+            statement.setObject(bindCount, obj);
+        }
+        return true;
     }
 
     protected boolean isNotNullNotString(Object obj) {
@@ -493,9 +500,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
 
+                    int rowSize = table.getRowSize();
                     for (int j = 0; j < table.getRowSize(); j++) {
                         final DataRow row = table.getRow(j);
-                        row.setValue(defaultTargetColumnName, value);
+                        row.addValue(defaultTargetColumnName, value);
+                        ++rowSize;
                     }
                 }
             }
@@ -533,12 +542,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     protected ColumnContainer createColumnContainer(final DataTable dataTable, final DataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
-        for (int k = 0; k < dataTable.getColumnSize(); k++) {
-            final DataColumn dataColumn = dataTable.getColumn(k);
+        for (int i = 0; i < dataTable.getColumnSize(); i++) {
+            final DataColumn dataColumn = dataTable.getColumn(i);
             if (!dataColumn.isWritable()) {
                 continue;
             }
-            final Object value = dataRow.getValue(k);
+            final Object value = dataRow.getValue(i);
             final String columnName = dataColumn.getColumnName();
             container.addColumnValue(columnName, value);
             container.addColumnObject(columnName, dataColumn);
