@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.io.datar.impl;
+package org.seasar.dbflute.helper.io.data.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
