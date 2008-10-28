@@ -3,25 +3,12 @@ package org.seasar.dbflute.util.basic;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
-import org.seasar.framework.util.StringUtil;
-
 /**
  * {Refers to S2Container and Extends it}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public abstract class DfBigDecimalUtil {
-
-    protected static final String TIGER_NORMALIZER_CLASS_NAME = "org.seasar.framework.util.TigerBigDecimalConversion";
-
-    protected static BigDecimalNormalizer normalizer = new DefaultNormalizer();
-    static {
-        try {
-            final Class<?> clazz = Class.forName(TIGER_NORMALIZER_CLASS_NAME);
-            normalizer = (BigDecimalNormalizer) clazz.newInstance();
-        } catch (Exception ignore) {
-        }
-    }
 
     public static BigDecimal toBigDecimal(Object o) {
         return toBigDecimal(o, null);
@@ -39,17 +26,21 @@ public abstract class DfBigDecimalUtil {
             return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
         } else if (o instanceof String) {
             String s = (String) o;
-            if (StringUtil.isEmpty(s)) {
+            if (DfStringUtil.isEmpty(s)) {
                 return null;
             }
-            return normalizer.normalize(new BigDecimal(s));
+            return normalize(new BigDecimal(s));
         } else {
-            return normalizer.normalize(new BigDecimal(o.toString()));
+            return normalize(new BigDecimal(o.toString()));
         }
     }
 
+    public static BigDecimal normalize(final BigDecimal dec) {
+        return new BigDecimal(dec.toPlainString());
+    }
+
     public static String toString(BigDecimal dec) {
-        return normalizer.toString(dec);
+        return dec.toPlainString();
     }
 
     public interface BigDecimalNormalizer {

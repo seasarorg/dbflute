@@ -1,6 +1,8 @@
 package org.seasar.dbflute.helper.dataset.writers;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
@@ -10,9 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
-import org.seasar.extension.jdbc.impl.BasicSelectHandler;
-import org.seasar.extension.jdbc.impl.ObjectResultSetHandler;
-import org.seasar.framework.util.StatementUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -61,22 +60,60 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
         if (_log.isDebugEnabled()) {
             _log.debug(sql);
         }
-        final Connection connection = DfDataSourceUtil.getConnection(getDataSource());
+        final Connection conn = DfDataSourceUtil.getConnection(getDataSource());
         try {
-            final Statement statement = DfConnectionUtil.createStatement(connection);
+            final Statement stmt = DfConnectionUtil.createStatement(conn);
             try {
-                StatementUtil.execute(statement, sql);
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                throw new IllegalStateException(e);
             } finally {
-                StatementUtil.close(statement);
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
             }
         } finally {
-            DfConnectionUtil.close(connection);
+            DfConnectionUtil.close(conn);
         }
     }
 
     private boolean hasIdentityColumn(final DataTable dataTable) {
         final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
-        final BasicSelectHandler handler = new BasicSelectHandler(getDataSource(), sql, new ObjectResultSetHandler());
-        return handler.execute(null) != null;
+        final Connection conn = DfDataSourceUtil.getConnection(getDataSource());
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                final Object value = rs.getObject(1);
+                return value != null;
+            }
+            return true;
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
     }
 }

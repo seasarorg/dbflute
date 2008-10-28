@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.seasar.framework.util.Base64Util;
+import org.seasar.dbflute.util.crypto.DfBase64Util;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -166,7 +166,7 @@ public abstract class DfStringUtil {
         } else if (value instanceof Number) {
             return toString((Number) value, pattern);
         } else if (value instanceof byte[]) {
-            return Base64Util.encode((byte[]) value);
+            return DfBase64Util.encode((byte[]) value);
         } else {
             return value.toString();
         }
