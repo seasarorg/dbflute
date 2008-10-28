@@ -13,21 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.fileread;
+package org.seasar.dbflute.helper.io.text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * @author jflute
+ * @since 0.5.4 (2007/07/18)
  */
-public class DfMapStringFileReader {
+public class DfStringFileReader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -39,12 +35,8 @@ public class DfMapStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    /**
-     * @param path The file path. (NotNull)
-     * @param encoding The file encoding. (NotNull)
-     * @return The read map. (NotNull)
-     */
-    public Map<String, Object> readMap(String path, String encoding) {
+    public String readString(String path, String encoding) {
+        final String lineSeparator = System.getProperty("line.separator");
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -60,21 +52,15 @@ public class DfMapStringFileReader {
                 while (true) {
                     ++count;
 
-                    String lineString = br.readLine();
+                    final String lineString = br.readLine();
                     if (lineString == null) {
                         break;
-                    }
-                    if (count == 0 && !_saveInitialUnicodeBom) {
-                        lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
-                    }
-                    if (lineString.trim().length() == 0) {
-                        continue;
                     }
                     // If the line is comment...
                     if (_lineCommentMark != null && lineString.trim().startsWith(_lineCommentMark)) {
                         continue;
                     }
-                    sb.append(lineString);
+                    sb.append(lineString + lineSeparator);
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -82,11 +68,11 @@ public class DfMapStringFileReader {
                 throw new RuntimeException(e);
             }
         }
-        if (sb.toString().trim().length() == 0) {
-            return new LinkedHashMap<String, Object>();
+        if (!_saveInitialUnicodeBom) {
+            return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
+        } else {
+            return sb.toString();
         }
-        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        return mapListString.generateMap(sb.toString());
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
@@ -94,38 +80,6 @@ public class DfMapStringFileReader {
             value = value.substring(1);
         }
         return value;
-    }
-
-    public Map<String, String> readMapAsStringValue(String path, String encoding) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (String) map.get(key));
-        }
-        return resultMap;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<String, java.util.List<String>> readMapAsListStringValue(String path, String encoding) {
-        final Map<String, java.util.List<String>> resultMap = new LinkedHashMap<String, java.util.List<String>>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.List<String>) map.get(key));
-        }
-        return resultMap;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<String, java.util.Map<String, String>> readMapAsMapValue(String path, String encoding) {
-        final Map<String, java.util.Map<String, String>> resultMap = new LinkedHashMap<String, java.util.Map<String, String>>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.Map<String, String>) map.get(key));
-        }
-        return resultMap;
     }
 
     // ===================================================================================

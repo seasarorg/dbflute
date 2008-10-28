@@ -13,17 +13,21 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.fileread;
+package org.seasar.dbflute.helper.io.text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * @author jflute
- * @since 0.5.4 (2007/07/18)
+ * @since 0.6.8 (2008/03/31 Monday)
  */
-public class DfStringFileReader {
+public class DfListStringFileReader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,8 +39,7 @@ public class DfStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public String readString(String path, String encoding) {
-        final String lineSeparator = System.getProperty("line.separator");
+    public List<Object> readList(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -52,15 +55,21 @@ public class DfStringFileReader {
                 while (true) {
                     ++count;
 
-                    final String lineString = br.readLine();
+                    String lineString = br.readLine();
                     if (lineString == null) {
                         break;
+                    }
+                    if (count == 0 && !_saveInitialUnicodeBom) {
+                        lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
+                    }
+                    if (lineString.trim().length() == 0) {
+                        continue;
                     }
                     // If the line is comment...
                     if (_lineCommentMark != null && lineString.trim().startsWith(_lineCommentMark)) {
                         continue;
                     }
-                    sb.append(lineString + lineSeparator);
+                    sb.append(lineString);
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -68,11 +77,11 @@ public class DfStringFileReader {
                 throw new RuntimeException(e);
             }
         }
-        if (!_saveInitialUnicodeBom) {
-            return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
-        } else {
-            return sb.toString();
+        if (sb.toString().trim().length() == 0) {
+            return new ArrayList<Object>();
         }
+        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
+        return mapListString.generateList(sb.toString());
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {

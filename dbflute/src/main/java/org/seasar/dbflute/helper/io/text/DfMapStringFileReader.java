@@ -13,21 +13,21 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.fileread;
+package org.seasar.dbflute.helper.io.text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * @author jflute
- * @since 0.6.8 (2008/03/31 Monday)
  */
-public class DfListStringFileReader {
+public class DfMapStringFileReader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -39,7 +39,12 @@ public class DfListStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public List<Object> readList(String path, String encoding) {
+    /**
+     * @param path The file path. (NotNull)
+     * @param encoding The file encoding. (NotNull)
+     * @return The read map. (NotNull)
+     */
+    public Map<String, Object> readMap(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -78,10 +83,10 @@ public class DfListStringFileReader {
             }
         }
         if (sb.toString().trim().length() == 0) {
-            return new ArrayList<Object>();
+            return new LinkedHashMap<String, Object>();
         }
         final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        return mapListString.generateList(sb.toString());
+        return mapListString.generateMap(sb.toString());
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
@@ -89,6 +94,38 @@ public class DfListStringFileReader {
             value = value.substring(1);
         }
         return value;
+    }
+
+    public Map<String, String> readMapAsStringValue(String path, String encoding) {
+        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
+        final Map<String, Object> map = readMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (String) map.get(key));
+        }
+        return resultMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, java.util.List<String>> readMapAsListStringValue(String path, String encoding) {
+        final Map<String, java.util.List<String>> resultMap = new LinkedHashMap<String, java.util.List<String>>();
+        final Map<String, Object> map = readMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (java.util.List<String>) map.get(key));
+        }
+        return resultMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, java.util.Map<String, String>> readMapAsMapValue(String path, String encoding) {
+        final Map<String, java.util.Map<String, String>> resultMap = new LinkedHashMap<String, java.util.Map<String, String>>();
+        final Map<String, Object> map = readMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (java.util.Map<String, String>) map.get(key));
+        }
+        return resultMap;
     }
 
     // ===================================================================================
