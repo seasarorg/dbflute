@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.mapstring.DfMapListString;
-import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
+import org.seasar.dbflute.helper.collection.DfMapListString;
+import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
 
 public class DfPropertyUtil {
 

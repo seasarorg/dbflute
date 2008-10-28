@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfMapListStringImpl;
+import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
 
 /**
  * @author jflute
