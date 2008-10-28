@@ -362,13 +362,13 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean isCellBase64Formatted(HSSFCell cell) {
+    protected boolean isCellBase64Formatted(HSSFCell cell) {
         HSSFCellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
         return DataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
     }
 
-    public boolean isCellDateFormatted(HSSFCell cell) {
+    protected boolean isCellDateFormatted(HSSFCell cell) {
         HSSFCellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
         String format = _dataFormat.getFormat(dfNum);

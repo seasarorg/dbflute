@@ -2,7 +2,7 @@ package org.seasar.dbflute.helper.dataset.types;
 
 import java.sql.Timestamp;
 
-import org.seasar.framework.util.TimestampConversionUtil;
+import org.seasar.dbflute.util.basic.DfTimestampUtil;
 
 /**
  * Data Table. {Refer to S2Container}
@@ -15,7 +15,7 @@ public class TimestampType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return TimestampConversionUtil.toTimestamp(value, formatPattern);
+        return DfTimestampUtil.toTimestamp(value, formatPattern);
     }
 
     public Class<?> getType() {
