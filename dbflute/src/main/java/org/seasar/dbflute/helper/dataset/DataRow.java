@@ -3,11 +3,11 @@ package org.seasar.dbflute.helper.dataset;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.dataset.states.RowState;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
-import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
  * {Refers to S2Container and Extends it}

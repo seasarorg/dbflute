@@ -9,7 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
-import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.text.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.text.DfStringFileReader;

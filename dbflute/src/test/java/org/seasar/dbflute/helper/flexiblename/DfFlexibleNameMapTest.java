@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.flexiblename;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 
 public class DfFlexibleNameMapTest {
 

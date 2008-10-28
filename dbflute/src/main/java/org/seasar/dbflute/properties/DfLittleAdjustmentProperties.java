@@ -3,7 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 
 /**

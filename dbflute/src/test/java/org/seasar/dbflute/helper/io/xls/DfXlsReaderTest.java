@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
-import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 
 /**

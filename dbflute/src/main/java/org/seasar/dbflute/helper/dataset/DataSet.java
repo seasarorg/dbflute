@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset;
 
-import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.collection.DfFlexibleNameMap;
 
 /**
  * {Refers to S2Container and Extends it}
