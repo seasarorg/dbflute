@@ -31,7 +31,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
@@ -50,6 +49,7 @@ import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
@@ -436,7 +436,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     if (key.startsWith("torque.")) {
                         String newKey = key.substring("torque.".length());
                         for (int j = newKey.indexOf("."); j != -1; j = newKey.indexOf(".")) {
-                            newKey = newKey.substring(0, j) + StringUtils.capitalise(newKey.substring(j + 1));
+                            newKey = newKey.substring(0, j) + DfStringUtil.initCap(newKey.substring(j + 1));
                         }
                         contextProperties.setProperty(newKey, (String) env.get(key));
                     }

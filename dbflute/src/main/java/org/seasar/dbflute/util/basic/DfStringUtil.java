@@ -123,6 +123,19 @@ public abstract class DfStringUtil {
     // ===================================================================================
     //                                                                             Initial
     //                                                                             =======
+    public static String initCap(String str) {
+        if (str == null) {
+            return null;
+        }
+        if (str.length() == 0) {
+            return str;
+        }
+        if (str.length() == 1) {
+            return str.toUpperCase();
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+    
     public static String initCapAfterTrimming(String str) {
         if (str == null) {
             return null;
@@ -136,7 +149,7 @@ public abstract class DfStringUtil {
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
-
+    
     // ===================================================================================
     //                                                                         List String
     //                                                                         ===========

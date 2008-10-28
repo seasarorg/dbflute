@@ -105,7 +105,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
                 _dataModelDbMap.put(appData.getName(), database.getName());
                 _databaseNames.put(database.getName(), database.getName());
             }
-
         } catch (EngineException e) {
             throw new BuildException(e);
         }
