@@ -93,7 +93,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (isDataXlsTemplateRecordLimitValid()) {
             processDataXlsTemplate();
         }
-
+        
         refreshResources();
     }
 
@@ -105,10 +105,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         super.doExecute();
+        _log.info("");
     }
 
     protected void processDataXlsTemplate() {
-        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Data Xls Template *");
