@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.datahandler.impl.internal;
+package org.seasar.dbflute.helper.io.transfer.impl.internal;
 
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
