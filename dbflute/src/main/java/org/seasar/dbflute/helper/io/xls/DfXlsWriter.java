@@ -36,7 +36,9 @@ import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.seasar.dbflute.util.crypto.DfBase64Util;
 
 /**
+ * {Refers to S2Container and Extends it}
  * @author jflute 
+ * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfXlsWriter implements DataSetConstants {
 
