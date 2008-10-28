@@ -24,6 +24,6 @@ public abstract class AbstractRowState implements RowState {
     // protected void execute(UpdateHandler handler, Object[] args, Class<?>[] argTypes) {
     //     handler.execute(args, argTypes);
     // }
-    // 
-    // protected abstract SqlContext getSqlContext(DataRow row);
+    
+    protected abstract SqlContext getSqlContext(DataRow row);
 }

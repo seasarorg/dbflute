@@ -57,12 +57,6 @@ public class DataRow {
         modify();
     }
 
-    //    public void setValue(int index, Object value) {
-    //        DataColumn column = table_.getColumn(index);
-    //        _values.set(index, column.convert(value));
-    //        modify();
-    //    }
-
     private void modify() {
         if (_state.equals(RowStates.UNCHANGED)) {
             _state = RowStates.MODIFIED;

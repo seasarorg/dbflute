@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.seasar.extension.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DataSet;
 
 /**
  * @author jflute

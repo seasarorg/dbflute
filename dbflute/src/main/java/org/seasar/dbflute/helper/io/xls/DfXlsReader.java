@@ -33,18 +33,17 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.dataset.DataColumn;
+import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataSetConstants;
+import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.types.ColumnType;
+import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.basic.DfTimestampUtil;
-import org.seasar.extension.dataset.ColumnType;
-import org.seasar.extension.dataset.DataColumn;
-import org.seasar.extension.dataset.DataRow;
-import org.seasar.extension.dataset.DataSet;
-import org.seasar.extension.dataset.DataTable;
-import org.seasar.extension.dataset.impl.DataSetImpl;
-import org.seasar.extension.dataset.types.ColumnTypes;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -64,7 +63,7 @@ public class DfXlsReader {
     // -----------------------------------------------------
     //                                          Xls Resource
     //                                          ------------
-    protected org.seasar.extension.dataset.DataSet _dataSet;
+    protected DataSet _dataSet;
 
     protected HSSFWorkbook _workbook;
 
@@ -102,7 +101,7 @@ public class DfXlsReader {
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
     }
-    
+
     // -----------------------------------------------------
     //                                       Set up Workbook
     //                                       ---------------
@@ -113,7 +112,7 @@ public class DfXlsReader {
             throw new IllegalStateException(e);
         }
         _dataFormat = _workbook.createDataFormat();
-        _dataSet = new DataSetImpl();
+        _dataSet = new DataSet();
         for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
             final String sheetName = _workbook.getSheetName(i);
             if (isCommentOutSheet(sheetName)) {// since 0.7.9
@@ -195,6 +194,7 @@ public class DfXlsReader {
 
     protected void setupRow(DataTable table, HSSFRow row) {
         DataRow dataRow = table.addRow();
+
         // /----------------------------------------------------------------- Modification
         // Add try-catch
         HSSFCell cell = null;
@@ -203,18 +203,18 @@ public class DfXlsReader {
             for (int i = 0; i < table.getColumnSize(); ++i) {
                 cell = row.getCell((short) i);
                 value = getValue(cell, table);
+                final DataColumn column = table.getColumn(i);
                 try {
-                    dataRow.setValue(i, value);
+                    dataRow.setValue(column.getColumnName(), value);
                 } catch (NumberFormatException e) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
                         throw e;
                     }
-                    DataColumn column = table.getColumn(i);
                     String msg = "...Changing the column type to STRING type:";
                     msg = msg + " name=" + column.getColumnName() + " value=" + value;
                     _log.info(msg);
                     column.setColumnType(ColumnTypes.STRING);
-                    dataRow.setValue(i, value);
+                    dataRow.setValue(column.getColumnName(), value);
                 }
             }
         } catch (RuntimeException e) {

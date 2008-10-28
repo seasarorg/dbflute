@@ -41,20 +41,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.dataset.DataColumn;
+import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.helper.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.states.CreatedState;
+import org.seasar.dbflute.helper.dataset.states.SqlContext;
+import org.seasar.dbflute.helper.dataset.types.ColumnType;
+import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.helper.dataset.writers.SqlServerSqlWriter;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.extension.dataset.ColumnType;
-import org.seasar.extension.dataset.DataColumn;
-import org.seasar.extension.dataset.DataRow;
-import org.seasar.extension.dataset.DataSet;
-import org.seasar.extension.dataset.DataTable;
-import org.seasar.extension.dataset.impl.SqlServerSqlWriter;
-import org.seasar.extension.dataset.states.CreatedState;
-import org.seasar.extension.dataset.states.SqlContext;
-import org.seasar.extension.dataset.types.ColumnTypes;
 
 /**
  * @author jflute
@@ -414,7 +414,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             filterValidColumn(dataSet, dataSource);
             setupDefaultValue(dataDirectoryName, dataSet, dataSource);
 
-            final SqlServerSqlWriter sqlServerSqlWriter = new SqlServerSqlWriter(dataSource);
+            final SqlServerSqlWriter sqlServerSqlWriter = new SqlServerSqlWriter(dataSource, _schemaName);
             sqlServerSqlWriter.write(dataSet);
         }
     }
