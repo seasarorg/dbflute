@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,54 +13,30 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.transfer;
+package org.seasar.dbflute.helper.io.data;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jflute
  */
-public class DfSeparatedDataSeveralHandlingInfo {
-    
+public class DfSeparatedDataResultInfo {
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String basePath;
-    protected String typeName;
-    protected String delimter;
-    protected boolean errorContinue;
+    protected Map<String, Set<String>> notFoundColumnMap;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getBasePath() {
-        return basePath;
+    public Map<String, Set<String>> getNotFoundColumnMap() {
+        return notFoundColumnMap;
     }
 
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
-
-    public String getDelimter() {
-        return delimter;
-    }
-
-    public void setDelimter(String delimter) {
-        this.delimter = delimter;
-    }
-
-    public boolean isErrorContinue() {
-        return errorContinue;
-    }
-
-    public void setErrorContinue(boolean errorContinue) {
-        this.errorContinue = errorContinue;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
+        this.notFoundColumnMap = notFoundColumnMap;
     }
 
 }

@@ -1,8 +1,8 @@
-package org.seasar.dbflute.helper.datahandler.impl;
+package org.seasar.dbflute.helper.io.datar.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.helper.io.transfer.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 
 /**
  * @author jflute

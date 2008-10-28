@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.transfer.impl;
+package org.seasar.dbflute.helper.io.data.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -41,8 +41,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
-import org.seasar.dbflute.helper.io.transfer.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.datahandler.impl;
+package org.seasar.dbflute.helper.io.datar.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,7 +13,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.seasar.dbflute.helper.io.transfer.impl.DfXlsDataHandlerImpl;
+import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerImpl;
 
 public class DfXlsDataHandlerImplTest {
 

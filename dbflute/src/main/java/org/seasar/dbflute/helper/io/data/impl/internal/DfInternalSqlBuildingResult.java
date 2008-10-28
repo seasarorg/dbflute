@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.io.transfer.impl.internal;
+package org.seasar.dbflute.helper.io.data.impl.internal;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

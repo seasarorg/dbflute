@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.transfer.impl;
+package org.seasar.dbflute.helper.io.data.impl;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,9 +29,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.io.transfer.DfSeparatedDataWriter;
-import org.seasar.dbflute.helper.io.transfer.impl.internal.DfInternalSqlBuilder;
-import org.seasar.dbflute.helper.io.transfer.impl.internal.DfInternalSqlBuildingResult;
+import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
+import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
+import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
 import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 

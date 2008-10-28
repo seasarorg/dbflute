@@ -34,7 +34,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.DataSetConstants;
-import org.seasar.dbflute.helper.io.transfer.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.basic.DfTimestampUtil;
