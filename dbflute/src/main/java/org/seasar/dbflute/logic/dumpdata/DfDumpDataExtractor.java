@@ -12,11 +12,21 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.properties.DfAbstractHelperProperties;
+
 /**
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDumpDataExtractor {
+
+    // ===============================================================================
+    //                                                                      Definition
+    //                                                                      ==========
+    /** Log-instance */
+    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -43,20 +53,24 @@ public class DfDumpDataExtractor {
                 final Statement statement = conn.createStatement();
                 final String selectClause = buildSelectClause(columnNameList);
                 final String fromClause = buildFromClause(tableName);
-                final ResultSet rs = statement.executeQuery(selectClause + " " + fromClause);
                 final List<Map<String, String>> recordList = new ArrayList<Map<String, String>>();
-                int count = 0;
-                while (rs.next()) {
-                    if (limit >= 0 && limit <= count) {
-                        break;
+                try {
+                    final ResultSet rs = statement.executeQuery(selectClause + " " + fromClause);
+                    int count = 0;
+                    while (rs.next()) {
+                        if (limit >= 0 && limit <= count) {
+                            break;
+                        }
+                        final LinkedHashMap<String, String> recordMap = new LinkedHashMap<String, String>();
+                        for (String columnName : columnNameList) {
+                            final String columnValue = rs.getString(columnName);
+                            recordMap.put(columnName, columnValue);
+                        }
+                        recordList.add(recordMap);
+                        ++count;
                     }
-                    final LinkedHashMap<String, String> recordMap = new LinkedHashMap<String, String>();
-                    for (String columnName : columnNameList) {
-                        final String columnValue = rs.getString(columnName);
-                        recordMap.put(columnName, columnValue);
-                    }
-                    recordList.add(recordMap);
-                    ++count;
+                } catch (SQLException ignored) {
+                    _log.info("Failed to extract data of " + tableName + ": " + ignored.getMessage());
                 }
                 dumpDataMap.put(tableName, recordList);
             }

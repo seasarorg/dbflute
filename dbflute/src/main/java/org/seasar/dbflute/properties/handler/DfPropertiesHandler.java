@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
+import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -116,31 +117,31 @@ public final class DfPropertiesHandler {
         }
         return _commonColumnProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                       Behavior Filter
     //                                       ---------------
     protected DfBehaviorFilterProperties _behaviorFilterProperties;
-    
+
     public DfBehaviorFilterProperties getBehaviorFilterProperties(Properties prop) {
         if (_behaviorFilterProperties == null) {
             _behaviorFilterProperties = new DfBehaviorFilterProperties(prop);
         }
         return _behaviorFilterProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                                  Buri
     //                                                  ----
     protected DfBuriProperties _buriProperties;
-    
+
     public DfBuriProperties getBuriProperties(Properties prop) {
         if (_buriProperties == null) {
             _buriProperties = new DfBuriProperties(prop);
         }
         return _buriProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                       Optimistic Lock
     //                                       ---------------
@@ -176,12 +177,24 @@ public final class DfPropertiesHandler {
         }
         return _sequenceIdentityProperties;
     }
-    
+
+    // -----------------------------------------------------
+    //                                Additional Primary Key
+    //                                ----------------------
+    protected DfAdditionalTableProperties _additionalTableProperties;
+
+    public DfAdditionalTableProperties getAdditionalTableProperties(Properties prop) {
+        if (_additionalTableProperties == null) {
+            _additionalTableProperties = new DfAdditionalTableProperties(prop);
+        }
+        return _additionalTableProperties;
+    }
+
     // -----------------------------------------------------
     //                                Additional Primary Key
     //                                ----------------------
     protected DfAdditionalPrimaryKeyProperties _additionalPrimaryKeyProperties;
-    
+
     public DfAdditionalPrimaryKeyProperties getAdditionalPrimaryKeyProperties(Properties prop) {
         if (_additionalPrimaryKeyProperties == null) {
             _additionalPrimaryKeyProperties = new DfAdditionalPrimaryKeyProperties(prop);
@@ -248,12 +261,12 @@ public final class DfPropertiesHandler {
         }
         return _includeQueryProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                      Sql Log Registry
     //                                      ----------------
     protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
-    
+
     public DfSqlLogRegistryProperties getSqlLogRegistryProperties(Properties prop) {
         if (_sqlLogRegistryProperties == null) {
             _sqlLogRegistryProperties = new DfSqlLogRegistryProperties(prop);
@@ -272,12 +285,12 @@ public final class DfPropertiesHandler {
         }
         return _outsideSqlProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                              Document
     //                                              --------
     protected DfDocumentProperties _documentProperties;
-    
+
     public DfDocumentProperties getDocumentProperties(Properties prop) {
         if (_documentProperties == null) {
             _documentProperties = new DfDocumentProperties(prop);

@@ -68,6 +68,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler;
+import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
@@ -115,12 +116,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * *");
         final DfDumpDataXlsHandler xlsHandler = new DfDumpDataXlsHandler(getDataSource());
         final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
+        final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
+        final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final List<AppData> dataModels = getDataModels();
         for (AppData appData : dataModels) { // basically one loop only
             try {
                 final Database database = appData.getDatabase();
                 final List<Table> tableList = database.getTableList();
                 for (Table table : tableList) {
+                    if (additionalTableMap.containsKey(table.getName())) {
+                        continue;
+                    }
                     final Column[] columns = table.getColumns();
                     final List<String> columnNameList = new ArrayList<String>();
                     for (Column column : columns) {

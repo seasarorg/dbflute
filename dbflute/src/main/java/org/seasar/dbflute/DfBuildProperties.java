@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
+import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -145,7 +146,7 @@ public final class DfBuildProperties {
     public DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getHandler().getSequenceIdentityProperties(getProperties());
     }
-    
+
     // -----------------------------------------------------
     //                                                  Buri
     //                                                  ----
@@ -192,7 +193,14 @@ public final class DfBuildProperties {
     public DfSelectParamProperties getSelectParamProperties() {
         return getHandler().getSelectParamProperties(getProperties());
     }
-    
+
+    // -----------------------------------------------------
+    //                                      Additional Table
+    //                                     ----------------
+    public DfAdditionalTableProperties getAdditionalTableProperties() {
+        return getHandler().getAdditionalTableProperties(getProperties());
+    }
+
     // -----------------------------------------------------
     //                                Additional Primary Key
     //                                ----------------------
@@ -220,7 +228,7 @@ public final class DfBuildProperties {
     public DfIncludeQueryProperties getIncludeQueryProperties() {
         return getHandler().getIncludeQueryProperties(getProperties());
     }
-    
+
     // -----------------------------------------------------
     //                                      Sql Log Registry
     //                                      ----------------
@@ -285,7 +293,7 @@ public final class DfBuildProperties {
     public DfOutsideSqlProperties getOutsideSqlProperties() {
         return getHandler().getOutsideSqlProperties(getProperties());
     }
-    
+
     // -----------------------------------------------------
     //                                    documentProperties
     //                                    ------------------

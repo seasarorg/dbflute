@@ -22,8 +22,6 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
- * Build properties for Torque.
- * 
  * @author jflute
  */
 public abstract class DfAbstractHelperProperties {
