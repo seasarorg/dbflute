@@ -1,6 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 #set ($myClassName = "${glCDef}")
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The definition class that has classification.
  * @author ${database.ClassAuthor}
@@ -33,6 +36,8 @@ public class ${myClassName} {
 #if ($count != 0)
         ,
 #end
+        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
 #if ($classificationMap.containsKey('comment'))
         /** ${classificationMap.get('comment')} */
 #end
@@ -48,9 +53,7 @@ public class ${myClassName} {
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }
         public static ${classificationName} codeOf(String code) {
-            if (code == null) { return null; }
-            for (${classificationName} value : values()) { if (code.equalsIgnoreCase(value.code())) { return value; } }
-            return null;
+            if (code == null) { return null; } return _codeValueMap.get(code.toLowerCase());
         }
     }
 
