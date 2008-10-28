@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.excel;
+package org.seasar.dbflute.helper.io.xls;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 
 /**
  * @author jflute
