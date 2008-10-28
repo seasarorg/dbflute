@@ -55,7 +55,8 @@ public class DfDumpDataExtractor {
                 final String fromClause = buildFromClause(tableName);
                 final List<Map<String, String>> recordList = new ArrayList<Map<String, String>>();
                 try {
-                    final ResultSet rs = statement.executeQuery(selectClause + " " + fromClause);
+                    final String sql = selectClause + " " + fromClause;
+                    final ResultSet rs = statement.executeQuery(sql);
                     int count = 0;
                     while (rs.next()) {
                         if (limit >= 0 && limit <= count) {
@@ -69,6 +70,7 @@ public class DfDumpDataExtractor {
                         recordList.add(recordMap);
                         ++count;
                     }
+                    _log.info("  " + tableName + ": recordCount=" + recordList.size());
                 } catch (SQLException ignored) {
                     _log.info("Failed to extract data of " + tableName + ": " + ignored.getMessage());
                 }
