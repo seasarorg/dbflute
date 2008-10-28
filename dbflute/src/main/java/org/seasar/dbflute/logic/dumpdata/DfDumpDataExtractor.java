@@ -24,6 +24,13 @@ public class DfDumpDataExtractor {
     protected DataSource _dataSource;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfDumpDataExtractor(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
     public Map<String, List<Map<String, String>>> extractData(Map<String, List<String>> tableColumnMap, int limit) {
@@ -40,7 +47,7 @@ public class DfDumpDataExtractor {
                 final List<Map<String, String>> recordList = new ArrayList<Map<String, String>>();
                 int count = 0;
                 while (rs.next()) {
-                    if (limit <= count) {
+                    if (limit >= 0 && limit <= count) {
                         break;
                     }
                     final LinkedHashMap<String, String> recordMap = new LinkedHashMap<String, String>();
@@ -72,16 +79,5 @@ public class DfDumpDataExtractor {
 
     protected String buildFromClause(String tableName) {
         return "from " + tableName;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
     }
 }

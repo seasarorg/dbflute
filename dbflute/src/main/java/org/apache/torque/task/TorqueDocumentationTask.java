@@ -54,11 +54,25 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.torque.engine.EngineException;
+import org.apache.torque.engine.database.model.AppData;
+import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
+ * The task for documentation. {SchemaHTML and DataXlsTemplate}
  * @author Modified by jflute
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
@@ -73,15 +87,80 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        super.doExecute();
+        processSchemaHtml();
+
+        if (isDataXlsTemplateRecordLimitValid()) {
+            processDataXlsTemplate();
+        }
+
         refreshResources();
+    }
+
+    protected void processSchemaHtml() {
+        _log.info("");
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("*    Schema HTML    *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
+        super.doExecute();
+    }
+
+    protected void processDataXlsTemplate() {
+        _log.info("");
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Data Xls Template *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
+        final DfDumpDataXlsHandler xlsHandler = new DfDumpDataXlsHandler(getDataSource());
+        final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
+        final List<AppData> dataModels = getDataModels();
+        for (AppData appData : dataModels) { // basically one loop only
+            try {
+                final Database database = appData.getDatabase();
+                final List<Table> tableList = database.getTableList();
+                for (Table table : tableList) {
+                    final Column[] columns = table.getColumns();
+                    final List<String> columnNameList = new ArrayList<String>();
+                    for (Column column : columns) {
+                        columnNameList.add(column.getName());
+                    }
+                    tableColumnMap.put(table.getName(), columnNameList);
+                }
+            } catch (EngineException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        _log.info("...Creating data xls template: tableCount=" + tableColumnMap.size());
+        xlsHandler.dumpToXls(tableColumnMap, getDataXlsTemplateRecordLimit(), getDataXlsTemplateFile());
+        _log.info("");
     }
 
     // ===================================================================================
     //                                                                         Data Source
     //                                                                         ===========
     protected boolean isUseDataSource() {
-        return false; // No use data source.
+        return isDataXlsTemplateRecordLimitValid();
+    }
+
+    // ===================================================================================
+    //                                                                  Related Properties
+    //                                                                  ==================
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected boolean isDataXlsTemplateRecordLimitValid() {
+        return getDocumentProperties().isDataXlsTemplateRecordLimitValid();
+    }
+
+    protected Integer getDataXlsTemplateRecordLimit() {
+        return getDocumentProperties().getDataXlsTemplateRecordLimit();
+    }
+
+    protected File getDataXlsTemplateFile() {
+        return getDocumentProperties().getDataXlsTemplateFile();
     }
 
     // ===================================================================================

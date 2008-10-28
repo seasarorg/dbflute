@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
@@ -17,33 +19,57 @@ import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
  */
 public class DfDumpDataXlsHandler {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DataSource _dataSource;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfDumpDataXlsHandler(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    // ===================================================================================
+    //                                                                         Dump to Xls
+    //                                                                         ===========
+    /**
+     * @param tableColumnMap The map of table and column. (NotNull)
+     * @param limit The limit of extracted record.
+     * @param xlsFile The file of xls. (NotNull)
+     */
+    public void dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
+        final DfDumpDataExtractor extractor = new DfDumpDataExtractor(_dataSource);
+        final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableColumnMap, limit);
+        transferToXls(tableColumnMap, dumpDataMap, xlsFile);
+    }
+
     /**
      * @param dumpDataMap The map of dump data. (NotNull)
      * @param xlsFile The file of xls. (NotNull)
      */
-    public void dumpToExcel(Map<String, List<Map<String, String>>> dumpDataMap, File xlsFile) {
+    protected void transferToXls(Map<String, List<String>> tableColumnMap,
+            Map<String, List<Map<String, String>>> dumpDataMap, File xlsFile) {
         final Set<String> tableNameSet = dumpDataMap.keySet();
         final DfXlsWriter writer = new DfXlsWriter(xlsFile);
         final DataSet dataSet = new DataSet();
         for (String tableName : tableNameSet) {
-            final List<Map<String, String>> recordList = dumpDataMap.get(tableName);
+            final List<String> columnNameList = tableColumnMap.get(tableName);
             final DataTable dataTable = new DataTable(tableName);
-            int recordIndex = 0;
+            int columnIndex = 0;
+            for (String columnName : columnNameList) {
+                dataTable.addColumn(columnName, ColumnTypes.STRING);
+                ++columnIndex;
+            }
+            final List<Map<String, String>> recordList = dumpDataMap.get(tableName);
             for (Map<String, String> recordMap : recordList) {
                 final Set<String> columnNameSet = recordMap.keySet();
-                if (recordIndex == 0) { // at the first loop
-                    int columnIndex = 0;
-                    for (String columnName : columnNameSet) {
-                        dataTable.addColumn(columnName, ColumnTypes.STRING);
-                        ++columnIndex;
-                    }
-                }
                 final DataRow dataRow = dataTable.addRow();
                 for (String columnName : columnNameSet) {
                     final String value = recordMap.get(columnName);
                     dataRow.addValue(columnName, value);
                 }
-                ++recordIndex;
             }
             dataSet.addTable(dataTable);
         }

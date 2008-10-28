@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
@@ -121,7 +122,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         return comment;
     }
-    
+
     protected String resolveLineSeparatorForCSharpDoc(String comment, String indent) {
         if (comment == null || comment.trim().length() == 0) {
             return null;
@@ -135,5 +136,32 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
         return comment;
+    }
+
+    // ===================================================================================
+    //                                                                   Data Xls Tempalte
+    //                                                                   =================
+    public boolean isDataXlsTemplateRecordLimitValid() {
+        final Integer limit = getDataXlsTemplateRecordLimit();
+        return limit != null;
+    }
+
+    public Integer getDataXlsTemplateRecordLimit() {
+        String limit = (String) getDocumentDefinitionMap().get("dataXlsTemplateRecordLimit");
+        if (limit == null || limit.trim().length() == 0 || limit.trim().equalsIgnoreCase("null")) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(limit);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'dataXlsTemplateRecordLimit' of " + KEY_documentDefinitionMap;
+            msg = msg + " should be number but: value=" + limit;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    public File getDataXlsTemplateFile() {
+        final File xlsFile = new File("./output/doc/data-xls-template.xls");
+        return xlsFile;
     }
 }
