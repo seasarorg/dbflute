@@ -42,32 +42,39 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     //                                                                                ====
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * @param dbMeta JDBC meta data.
+     * @param metaData JDBC meta data.
      * @param schemaName Schema name. (NotNull & AllowedEmpty)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
-     * @throws SQLException
      */
-    public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
+    public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName,
+            DfTableMetaInfo tableMetaInfo) {
+        final String tableName = tableMetaInfo.getTableName();
+        return getPrimaryColumnNameList(metaData, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
+    }
+
+    public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName, String tableName) {
         schemaName = filterSchemaName(schemaName);
 
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
-        if (!isPrimaryKeyExtractingSupported()) {
-            return primaryKeyColumnNameList;
-        }
-        ResultSet parts = null;
         try {
-            final String tableName = tableMetaInfo.getTableName();
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
-            parts = getPrimaryKeyResultSetFromDBMeta(dbMeta, realSchemaName, tableName);
-            while (parts.next()) {
-                primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
+            if (!isPrimaryKeyExtractingSupported()) {
+                return primaryKeyColumnNameList;
             }
-        } finally {
-            if (parts != null) {
-                parts.close();
+            ResultSet parts = null;
+            try {
+                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName);
+                while (parts.next()) {
+                    primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
+                }
+            } finally {
+                if (parts != null) {
+                    parts.close();
+                }
             }
+        } catch (SQLException e) {
+            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
+            throw new IllegalStateException(msg);
         }
         return primaryKeyColumnNameList;
     }

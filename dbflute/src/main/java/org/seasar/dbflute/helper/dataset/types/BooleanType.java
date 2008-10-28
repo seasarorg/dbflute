@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset.types;
 
-import org.seasar.framework.util.BooleanConversionUtil;
+import org.seasar.dbflute.util.basic.DfBooleanUtil;
 
 /**
  * Data Table. {Refer to S2Container}
@@ -13,7 +13,7 @@ public class BooleanType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return BooleanConversionUtil.toBoolean(value);
+        return DfBooleanUtil.toBoolean(value);
     }
 
     public Class<?> getType() {

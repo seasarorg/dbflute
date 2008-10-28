@@ -1,7 +1,6 @@
 package org.seasar.dbflute.helper.dataset;
 
-import org.seasar.framework.util.ArrayMap;
-import org.seasar.framework.util.CaseInsensitiveMap;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -10,11 +9,20 @@ import org.seasar.framework.util.CaseInsensitiveMap;
  */
 public class DataSet {
 
-    private ArrayMap tables = new CaseInsensitiveMap();
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private DfFlexibleNameMap<String, DataTable> tables = new DfFlexibleNameMap<String, DataTable>();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DataSet() {
     }
 
+    // ===================================================================================
+    //                                                                      Table Handling
+    //                                                                      ==============
     public int getTableSize() {
         return tables.size();
     }
@@ -24,7 +32,7 @@ public class DataSet {
     }
 
     public DataTable getTable(int index) {
-        return (DataTable) tables.get(index);
+        return (DataTable) tables.getValue(index);
     }
 
     public boolean hasTable(String tableName) {
@@ -66,6 +74,9 @@ public class DataSet {
         return table;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     public String toString() {
         StringBuffer buf = new StringBuffer(100);
         for (int i = 0; i < getTableSize(); ++i) {

@@ -9,6 +9,9 @@ import org.seasar.dbflute.helper.dataset.types.ColumnType;
  */
 public class DataColumn {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String columnName;
 
     private ColumnType columnType;
@@ -21,12 +24,18 @@ public class DataColumn {
 
     private String formatPattern;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DataColumn(String columnName, ColumnType columnType, int columnIndex) {
         setColumnName(columnName);
         setColumnType(columnType);
         setColumnIndex(columnIndex);
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getColumnName() {
         return columnName;
     }

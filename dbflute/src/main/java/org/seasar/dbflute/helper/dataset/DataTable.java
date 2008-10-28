@@ -2,6 +2,8 @@ package org.seasar.dbflute.helper.dataset;
 
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,14 +11,11 @@ import java.util.Set;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.extension.jdbc.util.ColumnDesc;
-import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
-import org.seasar.framework.util.ArrayMap;
-import org.seasar.framework.util.CaseInsensitiveMap;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -25,28 +24,29 @@ import org.seasar.framework.util.CaseInsensitiveMap;
  */
 public class DataTable {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String tableName;
 
     private List<DataRow> rows = new ArrayList<DataRow>();
 
     private List<DataRow> removedRows = new ArrayList<DataRow>();
 
-    private ArrayMap columns = new CaseInsensitiveMap();
+    private DfFlexibleNameMap<String, DataColumn> columns = new DfFlexibleNameMap<String, DataColumn>();
 
     private boolean hasMetaData = false;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DataTable(String tableName) {
         setTableName(tableName);
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public int getRowSize() {
         return rows.size();
     }
@@ -88,7 +88,7 @@ public class DataTable {
     }
 
     public DataColumn getColumn(int index) {
-        return (DataColumn) columns.get(index);
+        return columns.getValue(index);
     }
 
     public DataColumn getColumn(String columnName) {
@@ -102,16 +102,16 @@ public class DataTable {
     }
 
     private DataColumn getColumn0(String columnName) {
-        DataColumn column = (DataColumn) columns.get(columnName);
+        DataColumn column = columns.get(columnName);
         if (column == null) {
             String name = DfStringUtil.replace(columnName, "_", "");
-            column = (DataColumn) columns.get(name);
+            column = columns.get(name);
             if (column == null) {
                 for (int i = 0; i < columns.size(); ++i) {
                     String key = (String) columns.getKey(i);
                     String key2 = DfStringUtil.replace(key, "_", "");
                     if (key2.equalsIgnoreCase(name)) {
-                        column = (DataColumn) columns.get(i);
+                        column = columns.getValue(i);
                         break;
                     }
                 }
@@ -150,20 +150,21 @@ public class DataTable {
         return hasMetaData;
     }
 
-    public void setupMetaData(DatabaseMetaData dbMetaData) {
-        Set primaryKeySet = DatabaseMetaDataUtil.getPrimaryKeySet(dbMetaData, tableName);
-        Map columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
+    public void setupMetaData(DatabaseMetaData metaData, String schemaName) {
+        final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, schemaName);
+        final Set<String> primaryKeySet = getPrimaryKeySet(metaData, schemaName);
         for (int i = 0; i < getColumnSize(); ++i) {
-            DataColumn column = getColumn(i);
+            final DataColumn column = getColumn(i);
             if (primaryKeySet.contains(column.getColumnName())) {
                 column.setPrimaryKey(true);
             } else {
                 column.setPrimaryKey(false);
             }
-            if (columnMap.containsKey(column.getColumnName())) {
+            final DfColumnMetaInfo metaInfo = metaMap.get(column.getColumnName());
+            if (metaInfo != null) {
                 column.setWritable(true);
-                ColumnDesc cd = (ColumnDesc) columnMap.get(column.getColumnName());
-                column.setColumnType(ColumnTypes.getColumnType(cd.getSqlType()));
+                final int jdbcType = metaInfo.getJdbcType();
+                column.setColumnType(ColumnTypes.getColumnType(jdbcType));
             } else {
                 column.setWritable(false);
             }
@@ -171,24 +172,25 @@ public class DataTable {
         hasMetaData = true;
     }
 
-    public void setupColumns(Class beanClass) {
-        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(beanClass);
-        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
-            PropertyDesc pd = beanDesc.getPropertyDesc(i);
-            addColumn(pd.getPropertyName(), ColumnTypes.getColumnType(pd.getPropertyType()));
-        }
-    }
+    // [Unused on DBFlute]
+    //    public void setupColumns(Class<?> beanClass) {
+    //        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(beanClass);
+    //        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
+    //            PropertyDesc pd = beanDesc.getPropertyDesc(i);
+    //            addColumn(pd.getPropertyName(), ColumnTypes.getColumnType(pd.getPropertyType()));
+    //        }
+    //    }
 
     public void copyFrom(Object source) {
         if (source instanceof List) {
-            copyFromList((List) source);
+            copyFromList((List<?>) source);
         } else {
             copyFromBeanOrMap(source);
         }
 
     }
 
-    private void copyFromList(List source) {
+    private void copyFromList(List<?> source) {
         for (int i = 0; i < source.size(); ++i) {
             DataRow row = addRow();
             row.copyFrom(source.get(i));
@@ -202,6 +204,26 @@ public class DataTable {
         row.setState(RowStates.UNCHANGED);
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName) {
+        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumns(metaData, schemaName, tableName);
+        final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
+        for (DfColumnMetaInfo metaInfo : metaList) {
+            metaMap.put(metaInfo.getColumnName(), metaInfo);
+        }
+        return metaMap;
+    }
+
+    protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, String schemaName) {
+        final List<String> list = new DfUniqueKeyHandler().getPrimaryColumnNameList(metaData, schemaName, tableName);
+        return new HashSet<String>(list);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     public String toString() {
         StringBuffer buf = new StringBuffer(100);
         buf.append(tableName);
@@ -244,5 +266,16 @@ public class DataTable {
             }
         }
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

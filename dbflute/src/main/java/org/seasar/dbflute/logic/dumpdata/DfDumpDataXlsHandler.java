@@ -19,6 +19,7 @@ public class DfDumpDataXlsHandler {
         for (String tableName : tableNameSet) {
             final List<Map<String, String>> recordList = dumpDataMap.get(tableName);
             for (Map<String, String> recordMap : recordList) {
+                recordMap.toString();
                 // TODO: @jflute: to excel
             }
         }

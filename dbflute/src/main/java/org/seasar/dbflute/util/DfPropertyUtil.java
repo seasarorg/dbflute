@@ -102,6 +102,7 @@ public class DfPropertyUtil {
     //========================================================================================
     //																				TagStrUtil
     //																				==========
+    @SuppressWarnings("unchecked")
     public static String convertTag(String targetStr, Map convertMap) {
         Set keySet = convertMap.keySet();
         Collection valCol = convertMap.values();
@@ -162,6 +163,7 @@ public class DfPropertyUtil {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public static String convertAll(String targetStr, Map convertMap) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
