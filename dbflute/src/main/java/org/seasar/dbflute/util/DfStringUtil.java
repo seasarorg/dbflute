@@ -1,10 +1,32 @@
 package org.seasar.dbflute.util;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import org.seasar.framework.util.Base64Util;
+
+/**
+ * {Refers to S2Container and Extends it}
+ * @author jflute
+ * @since 0.8.3 (2008/10/28 Tuesday)
+ */
 public abstract class DfStringUtil {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String[] EMPTY_STRINGS = new String[0];
+
+    public static final int WAVE_DASH = 0x301c;
+
+    public static final int FULLWIDTH_TILDE = 0xff5e;
+
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public static String replace(String text, String fromText, String toText) {
         if (text == null || fromText == null || toText == null) {
             return null;
@@ -29,6 +51,40 @@ public abstract class DfStringUtil {
         return buf.toString();
     }
 
+    public static final boolean isEmpty(String text) {
+        return text == null || text.length() == 0;
+    }
+
+    public static String[] split(final String str, final String delim) {
+        if (isEmpty(str)) {
+            return EMPTY_STRINGS;
+        }
+        List<String> list = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(str, delim);
+        while (st.hasMoreElements()) {
+            list.add((String)st.nextElement());
+        }
+        return list.toArray(new String[list.size()]);
+    }
+
+    public static final String rtrim(String text) {
+        return rtrim(text, null);
+    }
+
+    public static final String rtrim(String text, String trimText) {
+        if (text == null)
+            return null;
+        if (trimText == null)
+            trimText = " ";
+        int pos;
+        for (pos = text.length() - 1; pos >= 0 && trimText.indexOf(text.charAt(pos)) >= 0; pos--)
+            ;
+        return text.substring(0, pos + 1);
+    }
+
+    // ===================================================================================
+    //                                                                      Begin End Mark
+    //                                                                      ==============
     public static String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
         final String ret;
         {
@@ -64,6 +120,9 @@ public abstract class DfStringUtil {
         return resultList;
     }
 
+    // ===================================================================================
+    //                                                                             Initial
+    //                                                                             =======
     public static String initCapAfterTrimming(String str) {
         if (str == null) {
             return null;
@@ -76,5 +135,71 @@ public abstract class DfStringUtil {
             return str.toUpperCase();
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    // ===================================================================================
+    //                                                                           To String
+    //                                                                           =========
+    public static String toString(Object value) {
+        return toString(value, null);
+    }
+
+    public static String toString(Object value, String pattern) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof String) {
+            return (String) value;
+        } else if (value instanceof java.util.Date) {
+            return toString((java.util.Date) value, pattern);
+        } else if (value instanceof Number) {
+            return toString((Number) value, pattern);
+        } else if (value instanceof byte[]) {
+            return Base64Util.encode((byte[]) value);
+        } else {
+            return value.toString();
+        }
+    }
+
+    public static String toString(Number value, String pattern) {
+        if (value != null) {
+            if (pattern != null) {
+                return new DecimalFormat(pattern).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+
+    public static String toString(java.util.Date value, String pattern) {
+        if (value != null) {
+            if (pattern != null) {
+                return new SimpleDateFormat(pattern).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+    
+    // ===================================================================================
+    //                                                                    Pinpoint Replace
+    //                                                                    ================
+    public static String fromWaveDashToFullwidthTilde(String source) {
+        if (source == null) {
+            return null;
+        }
+        StringBuffer result = new StringBuffer(source.length());
+        char ch;
+        for (int i = 0; i < source.length(); i++) {
+            ch = source.charAt(i);
+            switch (ch) {
+            case WAVE_DASH:
+                ch = FULLWIDTH_TILDE;
+                break;
+            default:
+                break;
+            }
+            result.append(ch);
+        }
+        return result.toString();
     }
 }

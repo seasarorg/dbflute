@@ -26,9 +26,15 @@ import java.util.Map;
  */
 public class DfMapListStringImpl implements DfMapListString {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Line separator. */
     public static final String NEW_LINE = System.getProperty("line.separator");
-
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Map mark. */
     protected String _mapMark;
 
@@ -52,7 +58,10 @@ public class DfMapListStringImpl implements DfMapListString {
 
     /** Remainder string. */
     protected String _remainderString;
-
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfMapListStringImpl() {
         _mapMark = DEFAULT_MAP_MARK;
         _listMark = DEFAULT_LIST_MARK;
@@ -81,43 +90,11 @@ public class DfMapListStringImpl implements DfMapListString {
         _equal = equal;
     }
 
-    // ==========================================================================================
-    //                                                                                     Setter
-    //                                                                                     ======
-    /**
-     * Set delimiter.
-     * @param delimiter Delimiter.
-     */
-    public synchronized void setDelimiter(String delimiter) {
-        _delimiter = delimiter;
-    }
-
-    /**
-     * Set start brace.
-     * @param startBrace Start brace.
-     */
-    public synchronized void setStartBrace(String startBrace) {
-        _startBrace = startBrace;
-    }
-
-    /**
-     * Set end brace.
-     * @param endBrace End brace.
-     */
-    public synchronized void setEndBrace(String endBrace) {
-        _endBrace = endBrace;
-    }
-
-    // ****************************************************************************************************
-    //                                                                                          Main Method
-    //                                                                                          ***********
-
-    // ==========================================================================================
-    //                                                                                   Generate
-    //                                                                                   ========
+    // ===================================================================================
+    //                                                                            Generate
+    //                                                                            ========
     /**
      * Generate map from map-string. {Implement}
-     * 
      * @param mapString Map-string (NotNull)
      * @return Generated map. (NotNull)
      */
@@ -144,7 +121,6 @@ public class DfMapListStringImpl implements DfMapListString {
 
     /**
      * Generate map from list-string. {Implement}
-     * 
      * @param listString List-string (NotNull)
      * @return Generated list. (NotNull)
      */
@@ -299,13 +275,9 @@ public class DfMapListStringImpl implements DfMapListString {
         removePrefixEndBrace();
     }
 
-    // ****************************************************************************************************
-    //                                                                                      StateFul Method
-    //                                                                                      ***************
-
-    // ==========================================================================================
-    //                                                                                     Remove
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                              Remove
+    //                                                                              ======
     protected void removePrefixMapMarkAndStartBrace() {
         removePrefix(_mapMark + _startBrace);
     }
@@ -374,13 +346,9 @@ public class DfMapListStringImpl implements DfMapListString {
         _remainderString = _remainderString.substring(index + 1);
     }
 
-    // ****************************************************************************************************
-    //                                                                                     StateLess Method
-    //                                                                                     ****************
-
-    // ==========================================================================================
-    //                                                                                     Assert
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                              Assert
+    //                                                                              ======
     protected void assertMapString(String mapString) {
         if (mapString == null) {
             String msg = "Argument[mapString] must not be null: ";
@@ -433,7 +401,7 @@ public class DfMapListStringImpl implements DfMapListString {
         }
     }
 
-    protected void assertEqualIndex(String remainderMapString, int equalIndex, String mapString4Log, Map currentMap4Log) {
+    protected void assertEqualIndex(String remainderMapString, int equalIndex, String mapString4Log, Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
             msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
@@ -474,7 +442,7 @@ public class DfMapListStringImpl implements DfMapListString {
     }
 
     protected void assertEndBracekIndex(String remainderMapString, int endBraceIndex, String mapString4Log,
-            Map currentMap4Log) {
+            Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
             msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
@@ -515,7 +483,7 @@ public class DfMapListStringImpl implements DfMapListString {
     }
 
     protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log,
-            List currentList4Log) {
+            List<Object> currentList4Log) {
         if (remainderListString == null) {
             String msg = "Argument[remainderListString] must not be null:";
             msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
@@ -555,9 +523,9 @@ public class DfMapListStringImpl implements DfMapListString {
         }
     }
 
-    // ==========================================================================================
-    //                                                                                     Filter
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
     /**
      * Filter map or list value.
      * <p>
@@ -578,9 +546,9 @@ public class DfMapListStringImpl implements DfMapListString {
         return (("".equals(value) || "null".equals(value)) ? null : value);
     }
 
-    // ==========================================================================================
-    //                                                                                  Judgement
-    //                                                                                  =========
+    // ===================================================================================
+    //                                                                           Judgement
+    //                                                                           =========
     protected boolean isStartsWithMapPrefix(String targetString) {
         if (targetString == null) {
             String msg = "Argument[targetString] must not be null: " + targetString;
@@ -646,9 +614,9 @@ public class DfMapListStringImpl implements DfMapListString {
         }
     }
 
-    // ==========================================================================================
-    //                                                                                      Other
-    //                                                                                      =====
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
     protected Map<String, Object> setupNestMap(Map<String, Object> currentMap, String mapKey) {
         final Map<String, Object> nestMap = newStringObjectMap();
         currentMap.put(mapKey, nestMap);
@@ -700,4 +668,32 @@ public class DfMapListStringImpl implements DfMapListString {
         }
         return result;
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Set delimiter.
+     * @param delimiter Delimiter.
+     */
+    public synchronized void setDelimiter(String delimiter) {
+        _delimiter = delimiter;
+    }
+
+    /**
+     * Set start brace.
+     * @param startBrace Start brace.
+     */
+    public synchronized void setStartBrace(String startBrace) {
+        _startBrace = startBrace;
+    }
+
+    /**
+     * Set end brace.
+     * @param endBrace End brace.
+     */
+    public synchronized void setEndBrace(String endBrace) {
+        _endBrace = endBrace;
+    }
+
 }

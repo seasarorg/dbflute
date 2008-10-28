@@ -33,24 +33,24 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.helper.dataset.DataSetConstants;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.util.DfBase64Util;
+import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfTimestampUtil;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataColumn;
-import org.seasar.extension.dataset.DataReader;
 import org.seasar.extension.dataset.DataRow;
 import org.seasar.extension.dataset.DataSet;
-import org.seasar.extension.dataset.DataSetConstants;
 import org.seasar.extension.dataset.DataTable;
 import org.seasar.extension.dataset.impl.DataSetImpl;
 import org.seasar.extension.dataset.types.ColumnTypes;
-import org.seasar.framework.util.Base64Util;
-import org.seasar.framework.util.StringUtil;
-import org.seasar.framework.util.TimestampConversionUtil;
 
 /**
- * @author jflute 
+ * {Refers to S2Container and Extends it}
+ * @author jflute
  */
-public class DfXlsReader implements DataReader, DataSetConstants {
+public class DfXlsReader {
 
     // ===================================================================================
     //                                                                          Definition
@@ -61,12 +61,18 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                          Xls Resource
+    //                                          ------------
     protected org.seasar.extension.dataset.DataSet _dataSet;
 
     protected HSSFWorkbook _workbook;
 
     protected HSSFDataFormat _dataFormat;
 
+    // -----------------------------------------------------
+    //                                           Read Option
+    //                                           -----------
     protected DfFlexibleNameMap<String, String> _tableNameMap;
 
     protected DfFlexibleNameMap<String, List<String>> _notTrimTableColumnMap;
@@ -96,7 +102,10 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
     }
-
+    
+    // -----------------------------------------------------
+    //                                       Set up Workbook
+    //                                       ---------------
     protected void setupWorkbook(InputStream in) {
         try {
             _workbook = new HSSFWorkbook(in);
@@ -277,7 +286,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         switch (cell.getCellType()) {
         case HSSFCell.CELL_TYPE_NUMERIC:
             if (isCellDateFormatted(cell)) {
-                return TimestampConversionUtil.toTimestamp(cell.getDateCellValue());
+                return DfTimestampUtil.toTimestamp(cell.getDateCellValue());
             }
             final double numericCellValue = cell.getNumericCellValue();
             if (isInt(numericCellValue)) {
@@ -293,7 +302,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
                         s = "\"" + s + "\"";
                     }
                 } else {
-                    s = StringUtil.rtrim(s);
+                    s = DfStringUtil.rtrim(s);
                 }
                 // --------------------/
             }
@@ -301,7 +310,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
                 s = null;
             }
             if (isCellBase64Formatted(cell)) {
-                return Base64Util.decode(s);
+                return DfBase64Util.decode(s);
             }
             return s;
         case HSSFCell.CELL_TYPE_BOOLEAN:
@@ -356,7 +365,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
     public boolean isCellBase64Formatted(HSSFCell cell) {
         HSSFCellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
-        return BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
+        return DataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
     }
 
     public boolean isCellDateFormatted(HSSFCell cell) {
