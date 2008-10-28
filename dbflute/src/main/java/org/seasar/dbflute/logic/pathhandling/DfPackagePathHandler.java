@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

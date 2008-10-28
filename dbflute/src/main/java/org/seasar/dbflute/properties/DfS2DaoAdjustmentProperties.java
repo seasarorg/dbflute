@@ -2,7 +2,7 @@ package org.seasar.dbflute.properties;
 
 import java.util.Properties;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

@@ -17,7 +17,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 

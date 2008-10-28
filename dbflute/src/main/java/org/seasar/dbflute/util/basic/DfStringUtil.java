@@ -1,4 +1,4 @@
-package org.seasar.dbflute.util;
+package org.seasar.dbflute.util.basic;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -62,7 +62,7 @@ public abstract class DfStringUtil {
         List<String> list = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(str, delim);
         while (st.hasMoreElements()) {
-            list.add((String)st.nextElement());
+            list.add((String) st.nextElement());
         }
         return list.toArray(new String[list.size()]);
     }
@@ -138,6 +138,18 @@ public abstract class DfStringUtil {
     }
 
     // ===================================================================================
+    //                                                                         List String
+    //                                                                         ===========
+    public static boolean containsIgnoreCase(String target, List<String> strList) {
+        for (String str : strList) {
+            if (target.equalsIgnoreCase(str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                           To String
     //                                                                           =========
     public static String toString(Object value) {
@@ -179,7 +191,7 @@ public abstract class DfStringUtil {
         }
         return null;
     }
-    
+
     // ===================================================================================
     //                                                                    Pinpoint Replace
     //                                                                    ================

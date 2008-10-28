@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * {Refers to S2Container and Extends it}

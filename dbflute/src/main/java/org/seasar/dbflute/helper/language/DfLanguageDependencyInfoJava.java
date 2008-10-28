@@ -25,7 +25,7 @@ import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconJava;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

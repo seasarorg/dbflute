@@ -16,10 +16,10 @@ import org.seasar.dbflute.helper.io.text.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * Build properties for Torque.

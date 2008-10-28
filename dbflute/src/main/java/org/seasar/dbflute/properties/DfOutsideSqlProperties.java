@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

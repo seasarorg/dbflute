@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 

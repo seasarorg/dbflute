@@ -64,7 +64,7 @@ import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

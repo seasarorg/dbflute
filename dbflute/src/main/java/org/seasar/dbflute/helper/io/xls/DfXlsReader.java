@@ -41,9 +41,9 @@ import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
-import org.seasar.dbflute.util.DfBase64Util;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.seasar.dbflute.util.basic.DfTimestampUtil;
+import org.seasar.dbflute.util.crypto.DfBase64Util;
 
 /**
  * {Refers to S2Container and Extends it}

@@ -70,8 +70,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
-import org.seasar.dbflute.util.DfCompareUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -802,7 +801,7 @@ public class Column {
                 continue;
             }
             List<String> columnsNameList = fks[i].getLocalColumns();
-            if (!DfCompareUtil.containsIgnoreCase(myColumnName, columnsNameList)) {
+            if (!DfStringUtil.containsIgnoreCase(myColumnName, columnsNameList)) {
                 return true;
             }
         }

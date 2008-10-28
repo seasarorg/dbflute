@@ -32,8 +32,8 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataSetConstants;
 import org.seasar.dbflute.helper.dataset.DataTable;
-import org.seasar.dbflute.util.DfBase64Util;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.crypto.DfBase64Util;
 
 /**
  * @author jflute 

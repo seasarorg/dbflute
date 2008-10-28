@@ -1,4 +1,4 @@
-package org.seasar.dbflute.util;
+package org.seasar.dbflute.util.crypto;
 
 /**
  * {Refers to S2Container and Extends it}

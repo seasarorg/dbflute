@@ -43,7 +43,7 @@ import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

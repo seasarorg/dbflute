@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset.types;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * Data Table. {Refer to S2Container}

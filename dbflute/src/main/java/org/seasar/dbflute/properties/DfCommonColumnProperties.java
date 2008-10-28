@@ -23,7 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

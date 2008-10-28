@@ -75,9 +75,8 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
-import org.seasar.dbflute.util.DfCompareUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -894,7 +893,7 @@ public class Table {
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
             List<String> localColumns = key.getLocalColumns();
-            if (DfCompareUtil.containsIgnoreCase(columnName, localColumns)) {
+            if (DfStringUtil.containsIgnoreCase(columnName, localColumns)) {
                 if (firstFK == null) {
                     firstFK = key;
                 }

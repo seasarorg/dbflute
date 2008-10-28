@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute

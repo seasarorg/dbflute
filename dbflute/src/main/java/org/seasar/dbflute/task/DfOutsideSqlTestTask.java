@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute
