@@ -31,10 +31,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
-import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
-import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
+import org.seasar.dbflute.helper.io.transfer.DfSeparatedDataHandler;
+import org.seasar.dbflute.helper.io.transfer.DfSeparatedDataResultInfo;
+import org.seasar.dbflute.helper.io.transfer.DfSeparatedDataSeveralHandlingInfo;
 
 /**
  * @author jflute

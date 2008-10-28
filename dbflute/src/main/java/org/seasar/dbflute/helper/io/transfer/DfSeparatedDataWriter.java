@@ -13,25 +13,23 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.datahandler;
+package org.seasar.dbflute.helper.io.transfer;
 
-import java.io.File;
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.seasar.extension.dataset.DataSet;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jflute
  */
-public interface DfXlsDataHandler {
+public interface DfSeparatedDataWriter {
 
-    public List<DataSet> readSeveralData(String dataDirectoryName);
-
-    public void writeSeveralData(String dataDirectoryName, DataSource dataSource);
-
-    public void writeSeveralDataForSqlServer(String dataDirectoryName, DataSource dataSource);
-
-    public List<File> getXlsList(String dataDirectoryName);
+    /**
+     * Write data from separated-file.
+     * @param notFoundColumnMap Not found column map. (NotNUl)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws FileNotFoundException, IOException;
 }

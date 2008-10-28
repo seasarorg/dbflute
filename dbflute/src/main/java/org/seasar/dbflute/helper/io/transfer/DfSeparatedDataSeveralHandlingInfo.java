@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,54 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.datahandler;
-
-import java.util.Map;
-import java.util.Set;
+package org.seasar.dbflute.helper.io.transfer;
 
 /**
  * @author jflute
  */
-public class DfSeparatedDataResultInfo {
-
+public class DfSeparatedDataSeveralHandlingInfo {
+    
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, Set<String>> notFoundColumnMap;
+    protected String basePath;
+    protected String typeName;
+    protected String delimter;
+    protected boolean errorContinue;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, Set<String>> getNotFoundColumnMap() {
-        return notFoundColumnMap;
+    public String getBasePath() {
+        return basePath;
     }
 
-    public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
-        this.notFoundColumnMap = notFoundColumnMap;
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+    }
+
+    public String getDelimter() {
+        return delimter;
+    }
+
+    public void setDelimter(String delimter) {
+        this.delimter = delimter;
+    }
+
+    public boolean isErrorContinue() {
+        return errorContinue;
+    }
+
+    public void setErrorContinue(boolean errorContinue) {
+        this.errorContinue = errorContinue;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
 }

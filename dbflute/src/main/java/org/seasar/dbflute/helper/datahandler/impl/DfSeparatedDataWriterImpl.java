@@ -29,9 +29,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.datahandler.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfInternalSqlBuildingResult;
+import org.seasar.dbflute.helper.io.transfer.DfSeparatedDataWriter;
 import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
