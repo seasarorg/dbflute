@@ -49,8 +49,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName,
             DfTableMetaInfo tableMetaInfo) {
+        schemaName = filterSchemaName(schemaName);
+        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
-        return getPrimaryColumnNameList(metaData, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
+        return getPrimaryColumnNameList(metaData, schemaName, tableName);
     }
 
     public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName, String tableName) {
@@ -114,6 +116,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException { // Non Primary Key Only
         schemaName = filterSchemaName(schemaName);
+        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
+        final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
@@ -122,10 +126,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
-            final String tableName = tableMetaInfo.getTableName();
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
             final boolean uniqueKeyOnly = true;
-            parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, uniqueKeyOnly, true);
+            parts = dbMeta.getIndexInfo(null, schemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final boolean isNonUnique;
                 {

@@ -65,6 +65,8 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         schemaName = filterSchemaName(schemaName);
+        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
+        final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
@@ -72,10 +74,8 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
-            final String tableName = tableMetaInfo.getTableName();
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
             final boolean uniqueKeyOnly = false;
-            parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, uniqueKeyOnly, true);
+            parts = dbMeta.getIndexInfo(null, schemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;

@@ -58,7 +58,7 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                        Name Builder
     //                                                                        ============
-    public String selectRealSchemaName(String schemaName) {
+    public String selectMetaExtractingSchemaName(String schemaName) {
         if (isExistSameNameTable()) {
             return _tableSchema;
         } else {

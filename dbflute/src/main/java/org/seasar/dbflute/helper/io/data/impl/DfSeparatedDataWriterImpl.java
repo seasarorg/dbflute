@@ -32,8 +32,9 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTokenUtil;
-import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
 /**
  * @author jflute
@@ -49,9 +50,11 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _loggingInsertSql;
-
     protected DataSource _dataSource;
+
+    protected String _schemaName;
+
+    protected boolean _loggingInsertSql;
 
     protected String _filename;
 
@@ -88,7 +91,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final Map<?, ?> columnMap = getColumnMap(tableName, _dataSource);
+        final Map<String, DfColumnMetaInfo> columnMap = getColumnMap(tableName, _dataSource);
         if (columnMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
@@ -473,17 +476,18 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         return firstLineInformation;
     }
 
-    protected Map<?, ?> getColumnMap(String tableName, DataSource dataSource) {
+    protected Map<String, DfColumnMetaInfo> getColumnMap(String tableName, DataSource dataSource) {
         final Connection connection;
-        final DatabaseMetaData dbMetaData;
+        final DatabaseMetaData metaData;
         try {
             connection = dataSource.getConnection();
-            dbMetaData = connection.getMetaData();
+            metaData = connection.getMetaData();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        final Map<?, ?> columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
-        return columnMap;
+        final Map<String, DfColumnMetaInfo> columnMetaMap = new DfColumnHandler().getColumnMetaMap(metaData,
+                _schemaName, tableName);
+        return columnMetaMap;
     }
 
     protected void addValueToList(List<String> ls, String value) {
@@ -517,6 +521,14 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getSchemaName() {
+        return _schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this._schemaName = schemaName;
+    }
+
     public boolean isLoggingInsertSql() {
         return _loggingInsertSql;
     }

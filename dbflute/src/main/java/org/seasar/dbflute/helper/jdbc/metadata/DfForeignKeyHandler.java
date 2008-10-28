@@ -50,6 +50,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
         schemaName = filterSchemaName(schemaName);
+        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         if (!isForeignKeyExtractingSupported()) {
@@ -57,8 +58,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         }
         ResultSet foreignKeys = null;
         try {
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
-            foreignKeys = dbMeta.getImportedKeys(null, realSchemaName, tableName);
+            foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
             while (foreignKeys.next()) {
                 String refTableName = foreignKeys.getString(3);
 

@@ -128,7 +128,6 @@ public class DfXlsReader {
     }
 
     protected DataTable createTable(String sheetName, HSSFSheet sheet) {
-        // /----------------------------------------------------------------- Modification
         String tableName = sheetName;
         if (_tableNameMap != null && !_tableNameMap.isEmpty() && sheetName.startsWith("$")) {
             String realTableName = _tableNameMap.get(sheetName);
@@ -142,8 +141,6 @@ public class DfXlsReader {
             tableName = realTableName;
         }
         final DataTable table = _dataSet.addTable(tableName);
-        // --------------------/
-
         final int rowCount = sheet.getLastRowNum();
         final HSSFRow nameRow = sheet.getRow(0);
         if (nameRow == null) {
@@ -194,9 +191,6 @@ public class DfXlsReader {
 
     protected void setupRow(DataTable table, HSSFRow row) {
         DataRow dataRow = table.addRow();
-
-        // /----------------------------------------------------------------- Modification
-        // Add try-catch
         HSSFCell cell = null;
         Object value = null;
         try {
@@ -220,11 +214,8 @@ public class DfXlsReader {
         } catch (RuntimeException e) {
             throwCellValueHandlingException(cell, value, e);
         }
-        // --------------------/
     }
 
-    // /----------------------------------------------------------------- Modification
-    // Add
     protected void throwCellValueHandlingException(HSSFCell cell, Object value, RuntimeException e) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -267,8 +258,6 @@ public class DfXlsReader {
         return System.getProperty("line.separator");
     }
 
-    // --------------------/
-
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
@@ -296,7 +285,6 @@ public class DfXlsReader {
         case HSSFCell.CELL_TYPE_STRING:
             String s = cell.getStringCellValue();
             if (s != null) {
-                // /----------------------------------------------------------------- Modification
                 if (isNotTrimTarget(cell, table)) {
                     if (s.length() != s.trim().length()) {
                         s = "\"" + s + "\"";
@@ -304,7 +292,6 @@ public class DfXlsReader {
                 } else {
                     s = DfStringUtil.rtrim(s);
                 }
-                // --------------------/
             }
             if ("".equals(s)) {
                 s = null;

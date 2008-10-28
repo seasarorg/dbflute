@@ -241,7 +241,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
             final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumns(metaData, _schemaName,
-                    tableName, true);
+                    tableName);
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
             }

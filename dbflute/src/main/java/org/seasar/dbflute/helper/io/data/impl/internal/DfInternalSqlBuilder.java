@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+
 /**
  * @author jflute
  */
@@ -16,7 +18,7 @@ public class DfInternalSqlBuilder {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableName;
-    protected Map<?, ?> _columnMap;
+    protected Map<String, DfColumnMetaInfo> _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
@@ -163,11 +165,11 @@ public class DfInternalSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<?, ?> getColumnMap() {
+    public Map<String, DfColumnMetaInfo> getColumnMap() {
         return _columnMap;
     }
 
-    public void setColumnMap(Map<?, ?> columnMap) {
+    public void setColumnMap(Map<String, DfColumnMetaInfo> columnMap) {
         this._columnMap = columnMap;
     }
 
