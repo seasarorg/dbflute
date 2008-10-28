@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.token;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class LineTokenizingOption {
+public class DfLineTokenizingOption {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -17,22 +17,22 @@ public class LineTokenizingOption {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public LineTokenizingOption delimitateByComma() {
+    public DfLineTokenizingOption delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public LineTokenizingOption delimitateByTab() {
+    public DfLineTokenizingOption delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
-    public LineTokenizingOption trimDoubleQuotation() {
+    public DfLineTokenizingOption trimDoubleQuotation() {
         _trimDoubleQuotation = true;
         return this;
     }
 
-    public LineTokenizingOption handleEmtpyAsNull() {
+    public DfLineTokenizingOption handleEmtpyAsNull() {
         _handleEmtpyAsNull = true;
         return this;
     }

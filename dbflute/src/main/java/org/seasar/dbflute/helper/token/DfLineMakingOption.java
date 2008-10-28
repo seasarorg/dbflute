@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.token;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class LineMakingOption {
+public class DfLineMakingOption {
 
     protected String _delimiter;
 
@@ -11,12 +11,12 @@ public class LineMakingOption {
 
     protected boolean _trimSpace;
 
-    public LineMakingOption delimitateByComma() {
+    public DfLineMakingOption delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public LineMakingOption delimitateByTab() {
+    public DfLineMakingOption delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
@@ -29,7 +29,7 @@ public class LineMakingOption {
         _delimiter = delimiter;
     }
 
-    public LineMakingOption quoteByDoubleQuotation() {
+    public DfLineMakingOption quoteByDoubleQuotation() {
         _quoteByDoubleQuotation = true;
         return this;
     }
@@ -38,7 +38,7 @@ public class LineMakingOption {
         return _quoteByDoubleQuotation;
     }
 
-    public LineMakingOption trimSpace() {
+    public DfLineMakingOption trimSpace() {
         _trimSpace = true;
         return this;
     }

@@ -7,9 +7,9 @@ import java.util.List;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class LineTokenImpl implements LineToken {
+public class DfLineTokenImpl implements DfLineToken {
 
-    public List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption) {
+    public List<String> tokenize(String lineString, DfLineTokenizingOption lineTokenizingOption) {
         final String delimiter = lineTokenizingOption.getDelimiter();
         final List<String> list = new ArrayList<String>();
         int i = 0;
@@ -34,7 +34,7 @@ public class LineTokenImpl implements LineToken {
         return list;
     }
 
-    protected String filterHandlingEmptyAsNull(String target, LineTokenizingOption lineTokenizingOption) {
+    protected String filterHandlingEmptyAsNull(String target, DfLineTokenizingOption lineTokenizingOption) {
         if (target == null) {
             return null;
         }
@@ -44,7 +44,7 @@ public class LineTokenImpl implements LineToken {
         return target;
     }
 
-    public String make(java.util.List<String> valueList, LineMakingOption lineMakingOption) {
+    public String make(java.util.List<String> valueList, DfLineMakingOption lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
