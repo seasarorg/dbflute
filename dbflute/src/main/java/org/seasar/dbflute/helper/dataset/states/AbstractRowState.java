@@ -21,9 +21,9 @@ public abstract class AbstractRowState implements RowState {
         //        execute(handler, ctx.getArgs(), ctx.getArgTypes());
     }
 
-    //    protected void execute(UpdateHandler handler, Object[] args, Class<?>[] argTypes) {
-    //        handler.execute(args, argTypes);
-    //    }
-
-    protected abstract SqlContext getSqlContext(DataRow row);
+    // protected void execute(UpdateHandler handler, Object[] args, Class<?>[] argTypes) {
+    //     handler.execute(args, argTypes);
+    // }
+    // 
+    // protected abstract SqlContext getSqlContext(DataRow row);
 }

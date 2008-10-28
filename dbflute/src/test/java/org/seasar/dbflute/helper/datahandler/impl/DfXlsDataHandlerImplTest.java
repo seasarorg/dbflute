@@ -13,6 +13,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.seasar.dbflute.helper.io.transfer.impl.DfXlsDataHandlerImpl;
 
 public class DfXlsDataHandlerImplTest {
 
