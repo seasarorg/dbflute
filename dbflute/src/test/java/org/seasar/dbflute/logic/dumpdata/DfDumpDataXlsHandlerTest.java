@@ -28,7 +28,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
     @Test
     public void test_transferToXls() {
         // ## Arrange ##
-        final DfDumpDataXlsHandler target = createTarget(null);
+        final DfDumpDataXlsHandler target = createDumpDataXlsHandler(null);
         final File dir = new File(PATH_TMP_DBFLUTE_TEST);
         if (!dir.exists()) {
             dir.mkdir();
@@ -85,7 +85,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
         }
     }
 
-    protected DfDumpDataXlsHandler createTarget(DataSource dataSource) {
+    protected DfDumpDataXlsHandler createDumpDataXlsHandler(DataSource dataSource) {
         return new DfDumpDataXlsHandler(dataSource);
     }
 }
