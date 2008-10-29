@@ -273,7 +273,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 ppt.IsOutType = true;
                 ppt.ParameterDirectionType = ParameterDirection.InputOutput;
             } else if (type.Equals("return")) {
-                ppt.IsOutType = true;
+                // *Set false to IsOutType
+                // The return is not out-parameter at ADO.NET!
+                // though JDBC treats it as out-parameter.
+                // ppt.IsOutType = true;
                 ppt.IsReturnType = true;
                 ppt.ParameterDirectionType = ParameterDirection.ReturnValue;
             } else {

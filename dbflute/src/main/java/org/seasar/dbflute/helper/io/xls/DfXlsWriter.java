@@ -106,6 +106,8 @@ public class DfXlsWriter implements DataSetConstants {
                     final Object value = dataRow.getValue(k);
                     if (value != null) {
                         final HSSFCell cell = row.createCell((short) k);
+                        System.out.println("****: " + HSSFCell.ENCODING_UTF_16);
+                        cell.setEncoding(HSSFCell.ENCODING_UTF_16);
                         setValue(cell, value);
                     }
                 }
