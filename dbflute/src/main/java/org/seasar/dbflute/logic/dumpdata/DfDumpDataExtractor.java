@@ -70,7 +70,7 @@ public class DfDumpDataExtractor {
                         recordList.add(recordMap);
                         ++count;
                     }
-                    _log.info("  " + tableName + ": recordCount=" + recordList.size());
+                    _log.info("[" + tableName + "]: records=" + recordList.size());
                 } catch (SQLException ignored) {
                     _log.info("Failed to extract data of " + tableName + ": " + ignored.getMessage());
                 }

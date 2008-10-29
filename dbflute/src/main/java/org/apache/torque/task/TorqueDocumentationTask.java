@@ -138,7 +138,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                 throw new IllegalStateException(e);
             }
         }
-        _log.info("...Creating data xls template: tableCount=" + tableColumnMap.size());
+        _log.info("...Creating data xls template: tables=" + tableColumnMap.size());
         xlsHandler.dumpToXls(tableColumnMap, getDataXlsTemplateRecordLimit(), getDataXlsTemplateFile());
         _log.info("");
     }
