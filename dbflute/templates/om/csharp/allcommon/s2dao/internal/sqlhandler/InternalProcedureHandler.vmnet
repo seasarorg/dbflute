@@ -13,6 +13,11 @@ using ${glPackageBaseCommonS2Dao};
 namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
     public class ${glInternalProcedureHandler} : ${glInternalBasicSelectHandler} {
+        // = = = = = = = = = = = = = = = = = = = = = = = =
+        // [Attension]
+        // The return is not out-parameter at ADO.NET!
+        // though JDBC treats it as out-parameter.
+        // = = = = = = = = = =/
 
         // ===============================================================================
         //                                                                       Attribute
@@ -43,7 +48,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     HandleDbException(e, dbCommand, false);
                 }
                 Object returnValue = null;
-                int additionalParamCount = 0;
                 if (_procedureMetaData.HasReturnParameterType) {
                     Type returnType = _procedureMetaData.ReturnParameterType;
                     String returnParamName = BindReturnValues(dbCommand, "RetValue", GetDbValueType(returnType));
@@ -55,7 +59,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     ExecuteNonQuery(dbCommand);
                     IDbDataParameter param = (IDbDataParameter)dbCommand.Parameters[returnParamName];
                     returnValue = param.Value;
-                    additionalParamCount = 1;
                 } else {
                     try {
                         BindParamters(dbCommand, dto);
@@ -65,7 +68,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     ExecuteNonQuery(dbCommand);
                 }
                 try {
-                    return HandleOutParameters(dbCommand, dto, returnValue, additionalParamCount);
+                    return HandleOutParameters(dbCommand, dto, returnValue);
                 } catch (Exception e) {
                     HandleDbException(e, dbCommand, false);
                     return null; // Unreachable!
@@ -100,9 +103,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             if (size == 0 || dto == null) {
                 return "call " + sql + "()"; // Because the procedure name is SQL at CSharp!
             }
-            // *Treats return type property as special
-            // The return is not out-parameter at ADO.NET!
-            // though JDBC treats it as out-parameter.
             StringBuilder tmpSb = new StringBuilder();
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
@@ -166,9 +166,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
-                // *Continue the loop when the type is return
-                // The return is not out-parameter at ADO.NET!
-                // though JDBC treats it as out-parameter.
                 if (ppt.IsReturnValue) {
                     continue;
                 }
@@ -269,15 +266,16 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 return DbType.Object;
         }
 
-        protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue, int additionalParamCount) {
+        protected Object HandleOutParameters(IDbCommand dbCommand, Object dto, Object returnValue) {
             if (dto == null) {
                 return null;
             }
+            int parameterIndexExceptReturn = 0;
             int size = _procedureMetaData.ParameterTypeSize;
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++, parameterIndexExceptReturn++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if (ppt.IsOutType) {
-                    Object value = ((IDataParameter) dbCommand.Parameters[i+additionalParamCount]).Value;
+                    Object value = ((IDataParameter) dbCommand.Parameters[parameterIndexExceptReturn]).Value;
                     if (value is IDataReader) {// Not support yet
                         IDataReader reader = (IDataReader) value;
                         throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
@@ -295,6 +293,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     }
                     // [Under Review]: @jflute -- If it's DBNull, what can I do for you?
                 } else if (ppt.IsReturnType) {
+                    --parameterIndexExceptReturn;
                     ppt.SetValue(dto, returnValue);
                 }
             }
