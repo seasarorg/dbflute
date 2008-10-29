@@ -160,6 +160,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public boolean isDataXlsTemplateContainsCommonColumn() {
+        final String value = (String) getDocumentDefinitionMap().get("dataXlsTemplateContainsCommonColumn");
+        return value != null && value.trim().length() > 0 && value.trim().equalsIgnoreCase("true");
+    }
+
     public File getDataXlsTemplateFile() {
         final File xlsFile = new File("./output/doc/data-xls-template.xls");
         return xlsFile;

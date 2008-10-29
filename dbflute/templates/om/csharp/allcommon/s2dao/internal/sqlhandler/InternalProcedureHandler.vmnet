@@ -166,7 +166,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
-                if (ppt.IsReturnValue) {
+                if (ppt.IsReturnType) {
                     continue;
                 }
                 String parameterName = ppt.ParameterName;

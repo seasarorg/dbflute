@@ -53,11 +53,17 @@ public class DfXlsWriter implements DataSetConstants {
 
     protected HSSFCellStyle base64Style;
 
+    protected CellEncoding cellEncoding;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfXlsWriter(File file) {
         this(create(file));
+    }
+
+    public DfXlsWriter(OutputStream out) {
+        setOutputStream(out);
     }
 
     protected static OutputStream create(File file) {
@@ -66,10 +72,6 @@ public class DfXlsWriter implements DataSetConstants {
         } catch (FileNotFoundException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public DfXlsWriter(OutputStream out) {
-        setOutputStream(out);
     }
 
     // ===================================================================================
@@ -96,8 +98,9 @@ public class DfXlsWriter implements DataSetConstants {
             final HSSFRow headerRow = sheet.createRow(0);
             for (int j = 0; j < table.getColumnSize(); ++j) {
                 final HSSFCell cell = headerRow.createCell((short) j);
-                // cell.setCellValue(new HSSFRichTextString(table.getColumnName(j)));
+                cell.setEncoding(HSSFCell.ENCODING_UTF_16);
                 cell.setCellValue(table.getColumnName(j));
+                // cell.setCellValue(new HSSFRichTextString(table.getColumnName(j)));
             }
             for (int j = 0; j < table.getRowSize(); ++j) {
                 final HSSFRow row = sheet.createRow(j + 1);
@@ -106,7 +109,6 @@ public class DfXlsWriter implements DataSetConstants {
                     final Object value = dataRow.getValue(k);
                     if (value != null) {
                         final HSSFCell cell = row.createCell((short) k);
-                        System.out.println("****: " + HSSFCell.ENCODING_UTF_16);
                         cell.setEncoding(HSSFCell.ENCODING_UTF_16);
                         setValue(cell, value);
                     }
@@ -142,5 +144,33 @@ public class DfXlsWriter implements DataSetConstants {
             // cell.setCellValue(new HSSFRichTextString(StringConversionUtil.toString(value, null)));
             cell.setCellValue(DfStringUtil.toString(value, null));
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Encoding
+    //                                                                            ========
+    public static enum CellEncoding {
+        ENCODING_COMPRESSED_UNICODE(HSSFCell.ENCODING_COMPRESSED_UNICODE), ENCODING_UTF_16(HSSFCell.ENCODING_UTF_16);
+
+        protected short _encoding;
+
+        CellEncoding(short encoding) {
+            _encoding = encoding;
+        }
+
+        public short getEncoding() {
+            return _encoding;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public CellEncoding getCellEncoding() {
+        return cellEncoding;
+    }
+
+    public void setCellEncoding(CellEncoding cellEncoding) {
+        this.cellEncoding = cellEncoding;
     }
 }

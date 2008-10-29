@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
@@ -67,8 +68,10 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
+import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
@@ -93,7 +96,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (isDataXlsTemplateRecordLimitValid()) {
             processDataXlsTemplate();
         }
-        
+
         refreshResources();
     }
 
@@ -119,6 +122,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final List<AppData> dataModels = getDataModels();
+        final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
+        final DfFlexibleMap<String, Object> commonColumnMap = getCommonColumnMap();
         for (AppData appData : dataModels) { // basically one loop only
             try {
                 final Database database = appData.getDatabase();
@@ -130,6 +135,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                     final Column[] columns = table.getColumns();
                     final List<String> columnNameList = new ArrayList<String>();
                     for (Column column : columns) {
+                        if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
+                            continue;
+                        }
                         columnNameList.add(column.getName());
                     }
                     tableColumnMap.put(table.getName(), columnNameList);
@@ -165,8 +173,23 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().getDataXlsTemplateRecordLimit();
     }
 
+    protected boolean isDataXlsTemplateContainsCommonColumn() {
+        return getDocumentProperties().isDataXlsTemplateContainsCommonColumn();
+    }
+
     protected File getDataXlsTemplateFile() {
         return getDocumentProperties().getDataXlsTemplateFile();
+    }
+
+    protected DfFlexibleMap<String, Object> getCommonColumnMap() {
+        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
+        final Map<String, Object> commonColumnMap = commonColumnProperties.getCommonColumnMap();
+        final DfFlexibleMap<String, Object> flexibleMap = new DfFlexibleMap<String, Object>();
+        final Set<String> keySet = commonColumnMap.keySet();
+        for (String key : keySet) {
+            flexibleMap.put(key, "dummy");
+        }
+        return flexibleMap;
     }
 
     // ===================================================================================

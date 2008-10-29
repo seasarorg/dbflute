@@ -11,5 +11,6 @@ map:{
     ; aliasDelimiterInDbComment = :
     # ; entityJavaDocDbCommentValid = true
     # ; dataXlsTemplateRecordLimit = 10
+    # ; dataXlsTemplateContainsCommonColumn = false
 }
 # ----------------/
