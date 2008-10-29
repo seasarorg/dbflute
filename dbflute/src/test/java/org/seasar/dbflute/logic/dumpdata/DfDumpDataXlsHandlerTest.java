@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.sql.Timestamp;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,14 +27,16 @@ import org.seasar.dbflute.unit.DfDBFluteTestCase;
 public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
 
     @Test
-    public void test_transferToXls() {
+    public void test_transferToXls() throws IOException {
         // ## Arrange ##
         final DfDumpDataXlsHandler target = createDumpDataXlsHandler(null);
-        final File dir = new File(PATH_TMP_DBFLUTE_TEST);
+        final String canonicalPath = getCanonicalPath();
+        
+        final File dir = new File(canonicalPath);
         if (!dir.exists()) {
             dir.mkdir();
         }
-        final File xlsFile = new File(PATH_TMP_DBFLUTE_TEST + "/DfDumpDataXlsHandlerTest.xls");
+        final File xlsFile = new File(canonicalPath + "/DfDumpDataXlsHandlerTest.xls");
         if (xlsFile.exists()) {
             xlsFile.delete();
         }

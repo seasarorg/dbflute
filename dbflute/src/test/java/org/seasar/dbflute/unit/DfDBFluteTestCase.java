@@ -1,22 +1,24 @@
 package org.seasar.dbflute.unit;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
+import org.seasar.dbflute.util.io.DfResourceUtil;
 
 /**
  * @author jflute
  */
 public abstract class DfDBFluteTestCase {
-    
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfDBFluteTestCase.class);
-    protected static final String PATH_TMP_DBFLUTE_TEST = "/tmp/dbflute/test";
 
     // ===================================================================================
     //                                                                              Helper
@@ -28,9 +30,20 @@ public abstract class DfDBFluteTestCase {
     protected Timestamp currentTimestamp() {
         return new Timestamp(System.currentTimeMillis());
     }
-    
-    protected static String getLineSeparator() {
+
+    protected String getLineSeparator() {
         return System.getProperty("line.separator");
+    }
+
+    protected String getCanonicalPath() {
+        final File buildDir = DfResourceUtil.getBuildDir(this.getClass());
+        final String canonicalPath;
+        try {
+            canonicalPath = buildDir.getCanonicalPath();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return canonicalPath;
     }
 
     // ===================================================================================

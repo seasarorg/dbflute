@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
-import org.seasar.dbflute.util.io.DfResourceUtil;
 
 /**
  * @author jflute
@@ -18,9 +17,7 @@ public class DfSqlFileGetterTest extends DfDBFluteTestCase {
     public void test_getSqlFileList() throws Exception {
         log("test_getSqlFileList()");
         final DfSqlFileGetter getter = new DfSqlFileGetter();
-
-        final File buildDir = DfResourceUtil.getBuildDir(DfSqlFileGetterTest.class);
-        final String canonicalPath = buildDir.getCanonicalPath();
+        final String canonicalPath = getCanonicalPath();
 
         final List<File> sqlFileList = getter.getSqlFileList(canonicalPath);
         if (sqlFileList.size() < 2) {
