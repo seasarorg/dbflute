@@ -133,10 +133,33 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return dbCommand;
         }
 
+        protected String BindReturnValues(IDbCommand command, string parameterName, DbType dbType) {
+            IDbDataParameter parameter = command.CreateParameter();
+            parameter.ParameterName = parameterName;
+            parameter.Direction = ParameterDirection.ReturnValue;
+            parameter.DbType = dbType;
+            parameter.Size = 4096;
+            if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                OleDbParameter oleDbParam = parameter as OleDbParameter;
+                oleDbParam.OleDbType = OleDbType.VarChar;
+            } else if ("SqlDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
+                SqlParameter sqlDbParam = parameter as SqlParameter;
+                sqlDbParam.SqlDbType = SqlDbType.VarChar;
+            }
+            command.Parameters.Add(parameter);
+            return parameter.ParameterName;
+        }
+
         protected void BindParamters(IDbCommand command, Object dto) {
             int size = _procedureMetaData.ParameterTypeSize;
             for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
+                // *Continue the loop when the type is return
+                // The return is not out-parameter at ADO.NET!
+                // though JDBC treats it as out-parameter.
+                if (ppt.IsReturnValue) {
+                    continue;
+                }
                 String parameterName = ppt.ParameterName;
                 InternalBindVariableType vt = GetBindVariableType(command);
                 switch (vt) {
@@ -201,23 +224,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             Question,
             QuestionWithParam,
             ColonWithParam
-        }
-
-        protected String BindReturnValues(IDbCommand command, string parameterName, DbType dbType) {
-            IDbDataParameter parameter = command.CreateParameter();
-            parameter.ParameterName = parameterName;
-            parameter.Direction = ParameterDirection.ReturnValue;
-            parameter.DbType = dbType;
-            parameter.Size = 4096;
-            if ("OleDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
-                OleDbParameter oleDbParam = parameter as OleDbParameter;
-                oleDbParam.OleDbType = OleDbType.VarChar;
-            } else if ("SqlDbCommand".Equals(command.GetType().Name) && dbType == DbType.String) {
-                SqlParameter sqlDbParam = parameter as SqlParameter;
-                sqlDbParam.SqlDbType = SqlDbType.VarChar;
-            }
-            command.Parameters.Add(parameter);
-            return parameter.ParameterName;
         }
 
         protected DbType GetDbValueType(Type type) {
