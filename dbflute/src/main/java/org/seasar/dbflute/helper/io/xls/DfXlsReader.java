@@ -198,17 +198,20 @@ public class DfXlsReader {
                 cell = row.getCell((short) i);
                 value = getValue(cell, table);
                 final DataColumn column = table.getColumn(i);
+                final String columnName = column.getColumnName();
                 try {
-                    dataRow.setValue(i, value);
+                    dataRow.addValue(columnName, value);
+                    // dataRow.setValue(i, value);
                 } catch (NumberFormatException e) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
                         throw e;
                     }
                     String msg = "...Changing the column type to STRING type:";
-                    msg = msg + " name=" + column.getColumnName() + " value=" + value;
+                    msg = msg + " name=" + columnName + " value=" + value;
                     _log.info(msg);
                     column.setColumnType(ColumnTypes.STRING);
-                    dataRow.setValue(i, value);
+                    dataRow.addValue(columnName, value);
+                    // dataRow.setValue(i, value);
                 }
             }
         } catch (RuntimeException e) {

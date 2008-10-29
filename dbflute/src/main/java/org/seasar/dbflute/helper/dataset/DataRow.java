@@ -29,14 +29,17 @@ public class DataRow {
     //                                                                         ===========
     public DataRow(DataTable table) {
         _table = table;
-        initValues();
+
+        // [Unused on DBFlute]
+        // initValues();
     }
 
-    private void initValues() {
-        for (int i = 0; i < _table.getColumnSize(); ++i) {
-            _values.add(null);
-        }
-    }
+    // [Unused on DBFlute]
+    // private void initValues() {
+    //     for (int i = 0; i < _table.getColumnSize(); ++i) {
+    //         _values.add(null);
+    //     }
+    // }
 
     // ===================================================================================
     //                                                                      Value Handling
@@ -49,18 +52,19 @@ public class DataRow {
         final DataColumn column = _table.getColumn(columnName);
         return _values.get(column.getColumnIndex());
     }
-    
+
     public void addValue(String columnName, Object value) {
         final DataColumn column = _table.getColumn(columnName);
         _values.add(column.convert(value));
         modify();
     }
 
-    public void setValue(int index, Object value) {
-        final DataColumn column = _table.getColumn(index);
-        _values.set(index, column.convert(value));
-        modify();
-    }
+    // [Unused on DBFlute]
+    // public void setValue(int index, Object value) {
+    //     final DataColumn column = _table.getColumn(index);
+    //     _values.set(index, column.convert(value));
+    //     modify();
+    // }
 
     private void modify() {
         if (_state.equals(RowStates.UNCHANGED)) {

@@ -21,7 +21,7 @@ public class DfDatabaseConfigTest extends DfDBFluteTestCase {
         for (String key : keySet) {
             Assert.assertNotNull(key);
 
-            _log.debug("[" + key + "]");
+            log("[" + key + "]");
 
             final Map<String, String> infoElement = (Map<String, String>) databaseBaseInfo.get(key);
             Assert.assertNotNull(infoElement);
@@ -31,7 +31,7 @@ public class DfDatabaseConfigTest extends DfDBFluteTestCase {
                 final String elementValue = infoElement.get(elementKey);
                 Assert.assertNotNull(elementValue);
 
-                _log.debug("    " + elementKey + "=" + elementValue);
+                log("    " + elementKey + "=" + elementValue);
             }
         }
     }
@@ -41,6 +41,6 @@ public class DfDatabaseConfigTest extends DfDBFluteTestCase {
         final DfDatabaseConfig component = new DfDatabaseConfig();
         final Map<String, Map<String, String>> databaseBaseInfo = component.analyzeDatabaseBaseInfo();
         Assert.assertNotNull(databaseBaseInfo);
-        _log.debug("databaseBaseInfoTest=" + databaseBaseInfo);
+        log("databaseBaseInfoTest=" + databaseBaseInfo);
     }
 }

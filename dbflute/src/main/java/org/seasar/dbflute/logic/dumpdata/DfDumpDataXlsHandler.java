@@ -35,6 +35,7 @@ public class DfDumpDataXlsHandler {
     //                                                                         Dump to Xls
     //                                                                         ===========
     /**
+     * Dump data to xls. {Using dataSource}
      * @param tableColumnMap The map of table and column. (NotNull)
      * @param limit The limit of extracted record.
      * @param xlsFile The file of xls. (NotNull)
@@ -46,6 +47,7 @@ public class DfDumpDataXlsHandler {
     }
 
     /**
+     * Transfer data to xls. {Stateless}
      * @param dumpDataMap The map of dump data. (NotNull)
      * @param xlsFile The file of xls. (NotNull)
      */

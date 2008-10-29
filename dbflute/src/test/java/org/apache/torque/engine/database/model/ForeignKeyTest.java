@@ -2,7 +2,7 @@ package org.apache.torque.engine.database.model;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.DfDBFluteTestCase;
 
 public class ForeignKeyTest extends DfDBFluteTestCase {
 

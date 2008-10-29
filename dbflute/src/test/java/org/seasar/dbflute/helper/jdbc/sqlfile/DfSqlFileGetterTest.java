@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.DfDBFluteTestCase;
 import org.seasar.dbflute.util.io.DfResourceUtil;
 
 /**

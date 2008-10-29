@@ -73,8 +73,8 @@ public class DfXlsWriter implements DataSetConstants {
     }
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                     Stream Setupper
+    //                                                                     ===============
     public void setOutputStream(OutputStream out) {
         this.out = out;
         workbook = new HSSFWorkbook();
@@ -84,25 +84,28 @@ public class DfXlsWriter implements DataSetConstants {
         base64Style = workbook.createCellStyle();
         base64Style.setDataFormat(df.getFormat(BASE64_FORMAT));
     }
-
+    
+    // ===================================================================================
+    //                                                                               Write
+    //                                                                               =====
     public void write(DataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
-            DataTable table = dataSet.getTable(i);
-            HSSFSheet sheet = workbook.createSheet();
+            final DataTable table = dataSet.getTable(i);
+            final HSSFSheet sheet = workbook.createSheet();
             workbook.setSheetName(i, table.getTableName());
-            HSSFRow headerRow = sheet.createRow(0);
+            final HSSFRow headerRow = sheet.createRow(0);
             for (int j = 0; j < table.getColumnSize(); ++j) {
-                HSSFCell cell = headerRow.createCell((short) j);
+                final HSSFCell cell = headerRow.createCell((short) j);
                 // cell.setCellValue(new HSSFRichTextString(table.getColumnName(j)));
                 cell.setCellValue(table.getColumnName(j));
             }
             for (int j = 0; j < table.getRowSize(); ++j) {
-                HSSFRow row = sheet.createRow(j + 1);
+                final HSSFRow row = sheet.createRow(j + 1);
                 for (int k = 0; k < table.getColumnSize(); ++k) {
-                    DataRow dataRow = table.getRow(j);
-                    Object value = dataRow.getValue(k);
+                    final DataRow dataRow = table.getRow(j);
+                    final Object value = dataRow.getValue(k);
                     if (value != null) {
-                        HSSFCell cell = row.createCell((short) k);
+                        final HSSFCell cell = row.createCell((short) k);
                         setValue(cell, value);
                     }
                 }
