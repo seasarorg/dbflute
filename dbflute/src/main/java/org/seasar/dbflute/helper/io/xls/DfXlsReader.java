@@ -57,6 +57,9 @@ public class DfXlsReader {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
+    protected static final DfFlexibleMap<String, String> EMPTY_TABLE_NAME_MAP = new DfFlexibleMap<String, String>();
+    protected static final DfFlexibleMap<String, List<String>> EMPTY_NOT_TRIM_TABLE_COLUMN_MAP = new DfFlexibleMap<String, List<String>>();
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -81,17 +84,13 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    public DfXlsReader(File file) {
+        this(file, EMPTY_TABLE_NAME_MAP, EMPTY_NOT_TRIM_TABLE_COLUMN_MAP, null);
+    }
+
     public DfXlsReader(File file, DfFlexibleMap<String, String> tableNameMap,
             DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
         this(create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
-    }
-
-    protected static InputStream create(File file) {
-        try {
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     public DfXlsReader(InputStream in, DfFlexibleMap<String, String> tableNameMap,
@@ -100,6 +99,14 @@ public class DfXlsReader {
         this._notTrimTableColumnMap = notTrimTableColumnMap;
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
+    }
+
+    protected static InputStream create(File file) {
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     // -----------------------------------------------------

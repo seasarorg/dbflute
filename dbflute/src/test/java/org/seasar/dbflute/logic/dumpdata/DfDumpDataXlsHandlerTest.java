@@ -1,6 +1,6 @@
 package org.seasar.dbflute.logic.dumpdata;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -12,6 +12,11 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.junit.Test;
+import org.seasar.dbflute.helper.dataset.DataColumn;
+import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.helper.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
 
 /**
@@ -58,6 +63,26 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
 
         // ## Assert ##
         assertTrue(xlsFile.exists());
+        final DfXlsReader xlsReader = new DfXlsReader(xlsFile);
+        final DataSet dataSet = xlsReader.read();
+        log("[DataSet]:" + getLineSeparator() + dataSet);
+        final int tableSize = dataSet.getTableSize();
+        assertTrue(tableSize > 0);
+        for (int i = 0; i < tableSize; i++) {
+            final DataTable dataTable = dataSet.getTable(i);
+            final int columnSize = dataTable.getColumnSize();
+            assertTrue(columnSize > 0);
+            final int rowSize = dataTable.getRowSize();
+            assertTrue(rowSize > 0);
+            for (int j = 0; j < rowSize; j++) {
+                final DataRow dataRow = dataTable.getRow(j);
+                for (int k = 0; k < rowSize; k++) {
+                    final DataColumn dataColumn = dataTable.getColumn(k);
+                    final Object value = dataRow.getValue(dataColumn.getColumnName());
+                    assertNotNull(value);
+                }
+            }
+        }
     }
 
     protected DfDumpDataXlsHandler createTarget(DataSource dataSource) {

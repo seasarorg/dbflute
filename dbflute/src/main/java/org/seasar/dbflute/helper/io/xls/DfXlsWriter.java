@@ -59,7 +59,7 @@ public class DfXlsWriter implements DataSetConstants {
     public DfXlsWriter(File file) {
         this(create(file));
     }
-    
+
     protected static OutputStream create(File file) {
         try {
             return new FileOutputStream(file);
@@ -67,7 +67,7 @@ public class DfXlsWriter implements DataSetConstants {
             throw new IllegalStateException(e);
         }
     }
-    
+
     public DfXlsWriter(OutputStream out) {
         setOutputStream(out);
     }
@@ -84,7 +84,7 @@ public class DfXlsWriter implements DataSetConstants {
         base64Style = workbook.createCellStyle();
         base64Style.setDataFormat(df.getFormat(BASE64_FORMAT));
     }
-    
+
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
@@ -121,6 +121,9 @@ public class DfXlsWriter implements DataSetConstants {
     }
 
     protected void setValue(HSSFCell cell, Object value) {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // HSSFRichTextString is not supported at current version of POI.
+        // - - - - - - - - - -/
         if (value instanceof Number) {
             // cell.setCellValue(new HSSFRichTextString(value.toString()));
             cell.setCellValue(value.toString());

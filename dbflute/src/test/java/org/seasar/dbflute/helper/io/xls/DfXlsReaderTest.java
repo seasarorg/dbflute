@@ -1,6 +1,7 @@
 package org.seasar.dbflute.helper.io.xls;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -12,7 +13,10 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.dataset.DataColumn;
+import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetterTest;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
 import org.seasar.dbflute.util.io.DfResourceUtil;
@@ -38,8 +42,24 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
         final DataSet dataSet = reader.read();
 
         // ## Assert ##
-        // TODO: @jflute: Assert
-        log(dataSet);
+        log("[DataSet]:" + getLineSeparator() + dataSet);
+        final int tableSize = dataSet.getTableSize();
+        assertTrue(tableSize > 0);
+        for (int i = 0; i < tableSize; i++) {
+            final DataTable dataTable = dataSet.getTable(i);
+            final int columnSize = dataTable.getColumnSize();
+            assertTrue(columnSize > 0);
+            final int rowSize = dataTable.getRowSize();
+            assertTrue(rowSize > 0);
+            for (int j = 0; j < rowSize; j++) {
+                final DataRow dataRow = dataTable.getRow(j);
+                for (int k = 0; k < rowSize; k++) {
+                    final DataColumn dataColumn = dataTable.getColumn(k);
+                    final Object value = dataRow.getValue(dataColumn.getColumnName());
+                    assertNotNull(value);
+                }
+            }
+        }
     }
 
     @Test
@@ -68,9 +88,7 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
     }
 
     protected DfXlsReader createXlsReader(File xlsFile, Pattern skipSheetPattern) {
-        final DfFlexibleMap<String, String> tableNameMap = new DfFlexibleMap<String, String>();
-        final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = new DfFlexibleMap<String, List<String>>();
-        return new DfXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+        return new DfXlsReader(xlsFile);
     }
 
     protected DfXlsReader createEmptyXlsReader(Pattern skipSheetPattern) {
