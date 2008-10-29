@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
                 final Map<String, String> columnValueMap = new LinkedHashMap<String, String>();
                 columnValueMap.put("AAA", "AAA_VALUE");
                 columnValueMap.put("BBB", "BBB_VALUE");
-                columnValueMap.put("CCC", "CCC_VALUE");
+                columnValueMap.put("CCC", currentTimestamp().toString());
                 columnValueMapList.add(columnValueMap);
             }
             dumpDataMap.put("TEST_TABLE", columnValueMapList);
