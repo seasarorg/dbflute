@@ -74,6 +74,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
         log("[DataSet]:" + getLineSeparator() + dataSet);
         final int tableSize = dataSet.getTableSize();
         assertTrue(tableSize > 0);
+        boolean existsJapaneseColumn = false;
         for (int i = 0; i < tableSize; i++) {
             final DataTable dataTable = dataSet.getTable(i);
             final int columnSize = dataTable.getColumnSize();
@@ -82,15 +83,21 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
             assertTrue(rowSize > 0);
             for (int j = 0; j < rowSize; j++) {
                 final DataRow dataRow = dataTable.getRow(j);
-                for (int k = 0; k < rowSize; k++) {
+                for (int k = 0; k < columnSize; k++) {
                     final DataColumn dataColumn = dataTable.getColumn(k);
                     final String columnName = dataColumn.getColumnName();
                     final Object value = dataRow.getValue(columnName);
                     assertNotNull(value);
                     log(columnName + " = " + value);
+                    if ("DDD".equals(columnName)) {
+                        if (value != null && "あいうえお".equals(value)) {
+                            existsJapaneseColumn = true;
+                        }
+                    }
                 }
             }
         }
+        assertTrue(existsJapaneseColumn);
     }
 
     protected DfDumpDataXlsHandler createDumpDataXlsHandler(DataSource dataSource) {
