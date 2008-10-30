@@ -12,8 +12,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="lib/forCompile/poi-2.5.1-final-20040804.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-collections-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-lang-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/forExecute/poi-3.0-final-20070503.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

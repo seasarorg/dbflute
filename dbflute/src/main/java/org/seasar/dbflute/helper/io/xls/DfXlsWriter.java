@@ -25,6 +25,7 @@ import java.util.Date;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -52,8 +53,6 @@ public class DfXlsWriter implements DataSetConstants {
     protected HSSFCellStyle dateStyle;
 
     protected HSSFCellStyle base64Style;
-
-    protected CellEncoding cellEncoding;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -98,11 +97,7 @@ public class DfXlsWriter implements DataSetConstants {
             final HSSFRow headerRow = sheet.createRow(0);
             for (int j = 0; j < table.getColumnSize(); ++j) {
                 final HSSFCell cell = headerRow.createCell((short) j);
-                if (cellEncoding != null) {
-                    cell.setEncoding(cellEncoding.getEncoding());
-                }
-                cell.setCellValue(table.getColumnName(j));
-                // cell.setCellValue(new HSSFRichTextString(table.getColumnName(j)));
+                cell.setCellValue(createRichTextString(table.getColumnName(j)));
             }
             for (int j = 0; j < table.getRowSize(); ++j) {
                 final HSSFRow row = sheet.createRow(j + 1);
@@ -111,9 +106,6 @@ public class DfXlsWriter implements DataSetConstants {
                     final Object value = dataRow.getValue(k);
                     if (value != null) {
                         final HSSFCell cell = row.createCell((short) k);
-                        if (cellEncoding != null) {
-                            cell.setEncoding(cellEncoding.getEncoding());
-                        }
                         setValue(cell, value);
                     }
                 }
@@ -133,48 +125,21 @@ public class DfXlsWriter implements DataSetConstants {
         // HSSFRichTextString is not supported at current version of POI.
         // - - - - - - - - - -/
         if (value instanceof Number) {
-            // cell.setCellValue(new HSSFRichTextString(value.toString()));
-            cell.setCellValue(value.toString());
+            cell.setCellValue(createRichTextString(value.toString()));
         } else if (value instanceof Date) {
             cell.setCellValue((Date) value);
             cell.setCellStyle(dateStyle);
         } else if (value instanceof byte[]) {
-            // cell.setCellValue(new HSSFRichTextString(Base64Util.encode((byte[]) value)));
-            cell.setCellValue(DfBase64Util.encode((byte[]) value));
+            cell.setCellValue(createRichTextString(DfBase64Util.encode((byte[]) value)));
             cell.setCellStyle(base64Style);
         } else if (value instanceof Boolean) {
             cell.setCellValue(((Boolean) value).booleanValue());
         } else {
-            // cell.setCellValue(new HSSFRichTextString(StringConversionUtil.toString(value, null)));
-            cell.setCellValue(DfStringUtil.toString(value, null));
+            cell.setCellValue(createRichTextString(DfStringUtil.toString(value, null)));
         }
     }
 
-    // ===================================================================================
-    //                                                                            Encoding
-    //                                                                            ========
-    public static enum CellEncoding {
-        ENCODING_COMPRESSED_UNICODE(HSSFCell.ENCODING_COMPRESSED_UNICODE), ENCODING_UTF_16(HSSFCell.ENCODING_UTF_16);
-
-        protected short _encoding;
-
-        CellEncoding(short encoding) {
-            _encoding = encoding;
-        }
-
-        public short getEncoding() {
-            return _encoding;
-        }
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public CellEncoding getCellEncoding() {
-        return cellEncoding;
-    }
-
-    public void setCellEncoding(CellEncoding cellEncoding) {
-        this.cellEncoding = cellEncoding;
+    protected HSSFRichTextString createRichTextString(String str) {
+        return new HSSFRichTextString(str);
     }
 }

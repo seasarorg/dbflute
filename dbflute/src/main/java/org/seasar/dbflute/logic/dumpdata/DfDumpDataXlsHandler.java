@@ -12,7 +12,6 @@ import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
-import org.seasar.dbflute.helper.io.xls.DfXlsWriter.CellEncoding;
 
 /**
  * @author jflute
@@ -56,7 +55,8 @@ public class DfDumpDataXlsHandler {
             Map<String, List<Map<String, String>>> dumpDataMap, File xlsFile) {
         final Set<String> tableNameSet = dumpDataMap.keySet();
         final DfXlsWriter writer = new DfXlsWriter(xlsFile);
-        writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
+        // If the Apache POI version is 2.5, this is necessary to handle Japanese. 
+        // writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
         final DataSet dataSet = new DataSet();
         for (String tableName : tableNameSet) {
             final List<String> columnNameList = tableColumnMap.get(tableName);
