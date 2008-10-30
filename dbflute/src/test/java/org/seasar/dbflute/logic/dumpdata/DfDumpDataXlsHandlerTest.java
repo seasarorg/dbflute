@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.dumpdata;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +32,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
         // ## Arrange ##
         final DfDumpDataXlsHandler target = createDumpDataXlsHandler(null);
         final String canonicalPath = getCanonicalPath();
-        
+
         final File dir = new File(canonicalPath);
         if (!dir.exists()) {
             dir.mkdir();
@@ -46,6 +47,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
             columnNameList.add("AAA");
             columnNameList.add("BBB");
             columnNameList.add("CCC");
+            columnNameList.add("DDD");
             tableColumnMap.put("TEST_TABLE", columnNameList);
         }
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
@@ -56,6 +58,7 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
                 columnValueMap.put("AAA", "AAA_VALUE");
                 columnValueMap.put("BBB", "BBB_VALUE");
                 columnValueMap.put("CCC", currentTimestamp().toString());
+                columnValueMap.put("DDD", "あいうえお"); // for Japanese Test
                 columnValueMapList.add(columnValueMap);
             }
             dumpDataMap.put("TEST_TABLE", columnValueMapList);
@@ -81,8 +84,10 @@ public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
                 final DataRow dataRow = dataTable.getRow(j);
                 for (int k = 0; k < rowSize; k++) {
                     final DataColumn dataColumn = dataTable.getColumn(k);
-                    final Object value = dataRow.getValue(dataColumn.getColumnName());
+                    final String columnName = dataColumn.getColumnName();
+                    final Object value = dataRow.getValue(columnName);
                     assertNotNull(value);
+                    log(columnName + " = " + value);
                 }
             }
         }
