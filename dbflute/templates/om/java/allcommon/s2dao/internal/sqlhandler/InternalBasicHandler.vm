@@ -529,7 +529,8 @@ public class ${glInternalBasicHandler} {
             }
             sb.append(line).append("\n");
         }
-        return sb.toString();
+        final String filteredSql = sb.toString();
+        return filteredSql.substring(0, filteredSql.lastIndexOf("\n"));
     }
 
     // ===================================================================================
