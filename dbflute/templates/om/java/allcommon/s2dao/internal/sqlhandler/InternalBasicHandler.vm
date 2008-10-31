@@ -512,7 +512,7 @@ public class ${glInternalBasicHandler} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    // It needs this method if the target database doest not support line comment.
+    // It needs this method if the target database does not support line comment.
     protected String removeLineComment(final String sql) { // With removing CR!
         if (sql == null || sql.trim().length() == 0) {
             return sql;
