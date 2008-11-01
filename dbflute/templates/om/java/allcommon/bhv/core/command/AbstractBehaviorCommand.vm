@@ -1,0 +1,150 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.BeanMetaDataFactory;
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandComponentSetup};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorCommand}, ${glBehaviorCommandComponentSetup} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                     Basic Information
+    //                                     -----------------
+    protected Class<? extends ${glEntityInterfaceName}> _entityType;
+    protected String _tableDbName;
+    protected String _behaviorClassName;
+    protected boolean _initializeOnly;
+
+    // -----------------------------------------------------
+    //                                   Injection Component
+    //                                   -------------------
+    protected DataSource _dataSource;
+    protected StatementFactory _statementFactory;
+    protected BeanMetaDataFactory _beanMetaDataFactory;
+
+    // ===================================================================================
+    //                                                                             Factory
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                          BeanMetaData
+    //                                          ------------
+    protected BeanMetaData createBeanMetaData() {
+        return _beanMetaDataFactory.createBeanMetaData(_entityType);
+    }
+
+    // -----------------------------------------------------
+    //                                          SqlExecution
+    //                                          ------------
+    protected SqlExecution createConditionBeanExecution(Class<?> cbType, ResultSetHandler handler) {
+        final S2DaoSelectDynamicCommand cmd = createSelectDynamicCommand(handler);
+        cmd.setArgNames(new String[] { "dto" });
+        cmd.setArgTypes(new Class[] { cbType });
+        return cmd;
+    }
+
+    // -----------------------------------------------------
+    //                                   SelectDynamicCommnd
+    //                                   -------------------
+    protected ${glSelectDynamicCommand} createSelectDynamicCommand(ResultSetHandler handler) {
+        return new ${glSelectDynamicCommand}(_dataSource, _statementFactory, handler);
+    }
+
+    // -----------------------------------------------------
+    //                                      ResultSetHandler
+    //                                      ----------------
+    protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData bmd) { // DBFlute Target
+        final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
+        final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
+        return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
+    }
+    
+    protected ${glInternalRowCreator} createInternalRowCreator(BeanMetaData bmd) {
+        final Class<?> clazz = bmd != null ? bmd.getBeanClass() : null;
+        return ${glInternalRowCreator}.createInternalRowCreator(clazz);
+    }
+
+    protected ${glInternalRelationRowCreator} createInternalRelationRowCreator(BeanMetaData bmd) {
+        return new ${glInternalRelationRowCreator}(); // Not yet implemented about performance tuning!
+    }
+	
+    // ===================================================================================
+    //                                                              ConditionBean Handling
+    //                                                              ======================
+    public ${glConditionBeanInterfaceName} getConditionBean(Object[] args) {
+        if (args != null && args.length > 0 && args[0] instanceof ${glConditionBeanInterfaceName}) {
+            return (${glConditionBeanInterfaceName})args[0];
+        }
+        return null; 
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                     Basic Information
+    //                                     -----------------
+    public Class<? extends ${glEntityInterfaceName}> getEntityType() {
+        return _entityType;
+    }
+
+    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
+        _entityType = entityType;
+    }
+
+    public String getTableDbName() {
+        return _tableDbName;
+    }
+
+    public void setTableDbName(String tableDbName) {
+        _tableDbName = tableDbName;
+    }
+
+    public String getBehaviorClassName() {
+        return _behaviorClassName;
+    }
+
+    public void setBehaviorClassName(String behaviorClassName) {
+        _behaviorClassName = behaviorClassName;
+    }
+
+    public void setInitializeOnly(boolean initializeOnly) {
+        _initializeOnly = initializeOnly;
+    }
+
+    public boolean isInitializeOnly() {
+        return _initializeOnly;
+    }
+
+    // -----------------------------------------------------
+    //                                   Injection Component
+    //                                   -------------------
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    public void setStatementFactory(StatementFactory statementFactory) {
+        _statementFactory = statementFactory;
+    }
+
+    public void setBeanMetaDataFactory(BeanMetaDataFactory beanMetaDataFactory) {
+        _beanMetaDataFactory = beanMetaDataFactory;
+    }
+}

@@ -5,10 +5,12 @@ import javax.sql.DataSource;
 import org.seasar.dao.SqlCommand;
 import org.seasar.extension.jdbc.StatementFactory;
 
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glInternalAbstractSqlCommand} implements SqlCommand {
+public abstract class ${glInternalAbstractSqlCommand} implements SqlCommand, ${glSqlExecution} {
 
 	// ===================================================================================
     //                                                                           Attribute

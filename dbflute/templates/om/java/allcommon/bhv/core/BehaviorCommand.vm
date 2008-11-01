@@ -1,0 +1,38 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glBehaviorCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public Class<?> getEntityType();
+    public String getTableDbName();
+    public String getBehaviorClassName();
+    public String getBehaviorMethodName();
+    public Class<?> getBehaviorMethodReturnType();
+    public boolean isInitializeOnly();
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isConditionBean();
+    public boolean isOutsideSql();
+    public boolean isSelect();
+    public boolean isSelectCount();
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public String buildSqlExecutionKey(Object[] args);
+    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args);
+	
+    // ===================================================================================
+    //                                                              ConditionBean Handling
+    //                                                              ======================
+    public ${glConditionBeanInterfaceName} getConditionBean(Object[] args);
+}

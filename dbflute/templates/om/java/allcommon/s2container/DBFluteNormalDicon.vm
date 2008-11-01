@@ -17,6 +17,7 @@
         <property name="sqlFileEncoding">"${database.daoSqlFileEncoding}"</property>
 #end
     </component>
+    <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
     <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>

@@ -1,0 +1,96 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getBehaviorMethodName() {
+        return "selectList";
+    }
+
+    public Class<?> getBehaviorMethodReturnType() {
+        return ${glListResultBeanName}.class;
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isConditionBean() {
+        return true;
+    }
+
+    public boolean isOutsideSql() {
+        return false;
+    }
+
+    public boolean isSelect() {
+        return true;
+    }
+
+    public boolean isSelectCount() {
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public String buildSqlExecutionKey(Object[] args) {
+        assertStatus("buildSqlExecutionKey");
+        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
+    }
+
+    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
+        assertStatus("createSqlExecutionCreator");
+        final Class<?> cbType = _conditionBeanType;
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                BeanMetaData bmd = createBeanMetaData();
+                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
+                return createConditionBeanExecution(cbType, handler);
+            }
+        };
+    }
+
+    // ===================================================================================
+    //                                                                              Assert
+    //                                                                              ======
+    protected void assertStatus(String methodName) {
+        if (_conditionBeanType == null) {
+            String msg = "The property 'conditionBeanType' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
+        _conditionBeanType = conditionBeanType;
+    }
+}

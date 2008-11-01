@@ -1,0 +1,16 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.BeanMetaDataFactory;
+import org.seasar.extension.jdbc.StatementFactory;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glBehaviorCommandComponentSetup} {
+
+    public void setDataSource(DataSource dataSource);
+    public void setStatementFactory(StatementFactory statementFactory);
+    public void setBeanMetaDataFactory(BeanMetaDataFactory beanMetaDataFactory);
+}

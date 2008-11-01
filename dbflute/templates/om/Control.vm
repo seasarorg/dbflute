@@ -122,6 +122,17 @@ targetdatabase = $targetDatabase
     #set ($glTokenFileOutputOptionName = "${glProjectPrefix}TokenFileOutputOption")
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
+    ## [Allcommon-Behavior-Core]
+    #set ($glBehaviorCommand = "${glProjectPrefix}BehaviorCommand")
+    #set ($glBehaviorCommandComponentSetup = "${glProjectPrefix}BehaviorCommandComponentSetup")
+    #set ($glBehaviorCommandInvoker = "${glProjectPrefix}BehaviorCommandInvoker")
+    #set ($glSqlExecution = "${glProjectPrefix}SqlExecution")
+    #set ($glSqlExecutionCreator = "${glProjectPrefix}SqlExecutionCreator")
+
+    ## [Allcommon-Behavior-Core-Command]
+    #set ($glAbstractBehaviorCommand = "${glProjectPrefix}AbstractBehaviorCommand")
+    #set ($glSelectListCBCommand = "${glProjectPrefix}SelectListCBCommand")
+
     ## [Allcommon-Behavior-Load]
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
 
@@ -398,6 +409,7 @@ targetdatabase = $targetDatabase
     #set ($glInternalProcedureParameterType = "${glProjectPrefix}InternalProcedureParameterType")
     #set ($glInternalRowCreator = "${glProjectPrefix}InternalRowCreator")
     #set ($glInternalRelationRowCreator = "${glProjectPrefix}InternalRelationRowCreator")
+    #set ($glInternalStatementFactory = "${glProjectPrefix}InternalStatementFactory")
 
     ## [Allcommon-Util]
     #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
@@ -423,6 +435,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
     #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
+    #set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.bhv.core")
+    #set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.bhv.core.command")
     #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.bhv.load")
     #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
@@ -479,6 +493,8 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.Annotation")
       #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.Bhv")
       #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.Bhv.Batch")
+      #set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.Bhv.Core")
+      #set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.Bhv.Core.Command")
       #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.Bhv.Load")
       #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.Bhv.Setup")
       #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
@@ -635,6 +651,40 @@ targetdatabase = $targetDatabase
       $database.info("    parseTokenFileOutputResult()")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileOutputResultName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileOutputResult.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCore}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('BehaviorCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('BehaviorCommandComponentSetup');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommandComponentSetup}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommandComponentSetup.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('BehaviorCommandInvoker');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommandInvoker}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommandInvoker.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('SqlExecution');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecution}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/SqlExecution.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('SqlExecutionCreator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecutionCreator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/SqlExecutionCreator.${glTemplateFileExtension}",$path,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('AbstractBehaviorCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractBehaviorCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractBehaviorCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('SelectListCBCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectListCBCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectListCBCommand.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
       $database.makeDirectory($path)
@@ -1994,6 +2044,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('InternalRelationRowCreator');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalRelationRowCreator}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalRelationRowCreator.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('InternalStatementFactory');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalVarious})}${glInternalStatementFactory}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/various/InternalStatementFactory.${glTemplateFileExtension}",$path,"", "")
     #end
     #if ($database.isTargetLanguageCSharp())
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalRsHandler}))

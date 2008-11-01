@@ -1,145 +1,115 @@
-${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
 import java.util.Arrays;
 import java.util.List;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.HashMap;
+import javax.sql.DataSource;
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.seasar.framework.beans.MethodNotFoundRuntimeException;
-import org.seasar.dao.DaoMetaData;
-import org.seasar.dao.DaoMetaDataFactory;
-import org.seasar.dao.SqlCommand;
-import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
+import org.seasar.framework.util.NumberConversionUtil;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaDataFactory;
 
-import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glXLog};
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
-import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
- * The interceptor of S2Dao for DBFlute.
  * @author ${database.ClassAuthor}
  */
-public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.AbstractInterceptor {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
-
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
+public class ${glBehaviorCommandInvoker} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The factory of DAO meta data. */
-    protected DaoMetaDataFactory _daoMetaDataFactory;
-    
+    // -----------------------------------------------------
+    //                                      Injection Target
+    //                                      ----------------
+    protected DataSource _dataSource;
+    protected BeanMetaDataFactory _beanMetaDataFactory;
+
+    // -----------------------------------------------------
+    //                                        Fixed Property
+    //                                        --------------
+    protected final StatementFactory _statementFactory = createStatememtFactory();
+    protected final Map<String, ${glSqlExecution}> _executionMap = new HashMap<String, ${glSqlExecution}>();
+
     // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     * @param daoMetaDataFactory The factory of DAO meta data. (NotNull)
-     */
-    public ${glDaoInterceptor}(DaoMetaDataFactory daoMetaDataFactory) {
-        _daoMetaDataFactory = daoMetaDataFactory;
+    //                                                                      Command Set up
+    //                                                                      ==============
+    public void setupComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
+        behaviorCommand.setDataSource(_dataSource);
+        behaviorCommand.setStatementFactory(_statementFactory);
+        behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);
     }
 
     // ===================================================================================
-    //                                                                  Execute Status Log
-    //                                                                  ==================
-    protected void log(String msg) {
-        ${glXLog}.log(msg);
-    }
-    
-    protected boolean isLogEnabled() {
-        return ${glXLog}.isLogEnabled();
-    }
-    
-    // ===================================================================================
-    //                                                                              Invoke
-    //                                                                              ======
-    /**
-     * Invoke the method.
-     * @param invocation The method invocation. (NotNull)
-     * @return The result of the method. (Nullable)
-     * @throws Throwable
-     */
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        clearThreadLocal();
+    //                                                                      Command Invoke
+    //                                                                      ==============
+    public Object invoke(${glBehaviorCommand} behaviorCommand, Object[] args) {
+        clearContext();
         try {
-            return dispatchInvoking(invocation);
+            return doInvoke(behaviorCommand, args);
         } finally {
-            clearThreadLocal();
+            clearContext();
         }
     }
 
-    /**
-     * Dispatch invoking the method.
-     * @param invocation The method invocation. (NotNull)
-     * @return The result of the method. (Nullable)
-     * @throws Throwable
-     */
-    protected Object dispatchInvoking(MethodInvocation invocation) throws Throwable {
-        final Method method = invocation.getMethod();
-        if (!isAbstract(method)) {
-            return invocation.proceed();
-        }
-
+    protected Object doInvoke(${glBehaviorCommand} behaviorCommand, Object[] args) {
         // - - - - - - - - - - - - -
-        // Initialize DAO meta data
+        // Initialize SQL Execution
         // - - - - - - - - - - - - -
-        if (method.getName().equals("initializeDaoMetaData")) {
-            initializeSqlCommand(invocation);
-            return null;// The end! (Initilization Only)
+        if (behaviorCommand.isInitializeOnly()) {
+            initializeSqlExecution(behaviorCommand, args);
+            return null; // The end! (Initilize Only)
         }
 
         // - - - - - - - - - - - -
         // Preprocess outside-SQL
         // - - - - - - - - - - - -
-        preprocessOutsideSql(invocation);
+        preprocessOutsideSql(behaviorCommand, args);
 
         // - - - - - - - - - - - - -
         // Preprocess condition-bean
         // - - - - - - - - - - - - -
-        final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(invocation);
+        final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(behaviorCommand, args);
 
-        // - - - - - - - - - -
-        // Set up SQL-command
-        // - - - - - - - - - -
-        final SqlCommand cmd;
+        ${glSqlExecution} execution = null;
         try {
-            long beforeCmd = 0;
-            if (isLogEnabled()) {
-                beforeCmd = System.currentTimeMillis();
-            }
-            cmd = findSqlCommand(invocation);
-            if (isLogEnabled()) {
-                final long afterCmd = System.currentTimeMillis();
-                if (beforeCmd != afterCmd) {
-                    logSqlCommand(invocation, cmd, beforeCmd, afterCmd);
+            final String key = behaviorCommand.buildSqlExecutionKey(args);
+            execution = getSqlExecution(key);
+            if (execution == null) {
+                long beforeCmd = 0;
+                if (isLogEnabled()) {
+                    beforeCmd = System.currentTimeMillis();
+                }
+                ${glSqlExecutionCreator} creator = createSqlExecutionCreator(behaviorCommand, args);
+                execution = getSqlExecution(key, creator);
+                if (isLogEnabled()) {
+                    final long afterCmd = System.currentTimeMillis();
+                    if (beforeCmd != afterCmd) {
+                        logSqlExecution(behaviorCommand, execution, beforeCmd, afterCmd);
+                    }
                 }
             }
         } finally {
             if (isLogEnabled()) {
-                logInvocation(invocation);
+                logInvocation(behaviorCommand, args);
             }
         }
 
@@ -148,96 +118,86 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             before = System.currentTimeMillis();
         }
 
-        // - - - - - - - - - -
-        // Execute SQL-command
-        // - - - - - - - - - -
         Object ret = null;
         try {
-            ret = cmd.execute(invocation.getArguments());
-        } catch (Exception e) {
-            if (e.getClass().equals(NotSingleRowUpdatedRuntimeException.class)) {
-                throw new ${glEntityAlreadyUpdatedException}((NotSingleRowUpdatedRuntimeException)e);
-            }
-            throw e;
+            ret = executeSql(execution, args);
         } finally {
-            postprocessConditionBean(invocation, cb);
+            postprocessConditionBean(behaviorCommand, cb);
         }
-        final Class<?> retType = method.getReturnType();
+        final Class<?> retType = behaviorCommand.getBehaviorMethodReturnType();
         assertRetType(retType, ret);
 
         if (isLogEnabled()) {
             final long after = System.currentTimeMillis();
-            logReturn(invocation, retType, ret, before, after);
+            logReturn(behaviorCommand, retType, ret, before, after);
         }
 
         // - - - - - - - - - -
         // Convert and Return!
         // - - - - - - - - - -
         if (retType.isPrimitive()) {
-            return org.seasar.framework.util.NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
+            return convertPrimitiveWrapper(retType, ret);
         } else if (Number.class.isAssignableFrom(retType)) {
-            return org.seasar.framework.util.NumberConversionUtil.convertNumber(retType, ret);
+            return convertNumber(retType, ret);
         } else {
             return ret;
         }
     }
 
     // ===================================================================================
-    //                                                                          SqlCommand
-    //                                                                          ==========
-    protected void initializeSqlCommand(MethodInvocation invocation) {
-        final Class<?> targetType = getTargetClass(invocation);
-        final DaoMetaData dmd = _daoMetaDataFactory.getDaoMetaData(targetType);
-        if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
-            return;// Do nothing!
-        } else {
-            final Object[] arguments = invocation.getArguments();
-            if (arguments != null && arguments.length > 0 && arguments[0] instanceof String) {
-                final String methodName = (String)arguments[0];
-                try {
-                    dmd.getSqlCommand(methodName);
-                } catch (MethodNotFoundRuntimeException ignored) {
-                    // Do nothing!
+    //                                                                       SQL Execution
+    //                                                                       =============
+    protected Object executeSql(${glSqlExecution} execution, Object[] args) {
+        return execution.execute(args);
+    }
+
+    protected void initializeSqlExecution(${glBehaviorCommand} behaviorCommand, Object[] args) {
+        final String key = behaviorCommand.buildSqlExecutionKey(args);
+        ${glSqlExecutionCreator} creator = createSqlExecutionCreator(behaviorCommand, args);
+        getSqlExecution(key, creator);
+    }
+
+    protected  ${glSqlExecution} getSqlExecution(String key) {
+        return _executionMap.get(key);
+    }
+
+    protected  ${glSqlExecution} getSqlExecution(String key, ${glSqlExecutionCreator} executionCreator) {
+        ${glSqlExecution} execution = getSqlExecution(key);
+        if (execution == null) {
+            synchronized (_executionMap) {
+                execution = getSqlExecution(key);
+                if (execution == null) {
                     if (isLogEnabled()) {
-                        log("Not Found the method: " + methodName + " msg=" + ignored.getMessage());
+                        log("...Initializing sqlExecution for the key '" + key + "'");
+                    }
+                    _executionMap.put(key, executionCreator.createSqlExecution());
+                } else {
+                    if (isLogEnabled()) {
+                        log("...Getting sqlExecution as cache because the previous thread have already initilized.");
                     }
                 }
-                return;
-            } else {
-                String msg = "The method should have one string argument as method name: " + invocation;
+            }
+            execution = getSqlExecution(key);
+            if (execution == null) {
+                String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
+                msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
                 throw new IllegalStateException(msg);
             }
         }
+        return execution;
     }
     
-    protected SqlCommand findSqlCommand(MethodInvocation invocation) {
-        final SqlCommand cmd;
-        final Class<?> targetType = getTargetClass(invocation);
-        final DaoMetaData dmd = _daoMetaDataFactory.getDaoMetaData(targetType);
-        if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
-            cmd = dmd.getSqlCommand(generateSpecifiedOutsideSqlUniqueKey(invocation));
-        } else {
-            cmd = dmd.getSqlCommand(invocation.getMethod().getName());
-        }
-        return cmd;
-    }
-
-    protected String generateSpecifiedOutsideSqlUniqueKey(MethodInvocation invocation) {
-        final Object[] args = invocation.getArguments();
-        final String path = (String)args[0];
-        final Object pmb = args[1];
-        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
-        Object resultTypeSpecification = null;
-        if (args.length > 3) {
-            resultTypeSpecification = args[3];
-        }
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, pmb, option, resultTypeSpecification);
+    // ===================================================================================
+    //                                                                      Log SqlCommand
+    //                                                                      ==============
+    protected void logSqlExecution(${glBehaviorCommand} behaviorCommand, ${glSqlExecution} execution, long beforeCmd, long afterCmd) {
+        log("SqlExecution Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     // ===================================================================================
     //                                                                      Log Invocation
     //                                                                      ==============
-    protected void logInvocation(MethodInvocation invocation) {
+    protected void logInvocation(${glBehaviorCommand} behaviorCommand, Object[] args) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
 
@@ -247,29 +207,27 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             invokeClassName = behaviorResult.getSimpleClassName();
             invokeMethodName = behaviorResult.getMethodName();
         } else {
-            final Method method = invocation.getMethod();
-            invokeClassName = extractInvocationExpression(method);
-            invokeMethodName = method.getName();
+            invokeClassName = behaviorCommand.getBehaviorClassName();
+            invokeMethodName = behaviorCommand.getBehaviorMethodName();
         }
-        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(invocation, invokeClassName, invokeMethodName);
+        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName, invokeMethodName);
 
         // Save behavior invoke name for error message.
         putObjectToMapContext("df:BehaviorInvokeName", expWithoutKakko + "()");
 
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
-        final String invocationExpression = expWithoutKakko + "()";
+        final String callerExpression = expWithoutKakko + "()";
 
         log("/=====================================================" + equalBorder + "==");
-        log("                                                      " + invocationExpression);
+        log("                                                      " + callerExpression);
         log("                                                      " + equalBorder + "=/");
 
-        logPath(invocation, stackTrace, behaviorResult);
+        // logPath(behaviorCommand, stackTrace, behaviorResult);
 
         // Specified OutsideSql
-        if (isSpecifiedOutsideSql(invocation)) {
+        if (isOutsideSql(behaviorCommand)) {
 		    final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
-            if (!outsideSqlContext.isProcedure()) {// [DBFlute-0.7.5]
-                Object[] args = invocation.getArguments();
+            if (!outsideSqlContext.isProcedure()) {
                 if (outsideSqlContext != null) {
 				    log("path: " + outsideSqlContext.getOutsideSqlPath());
                 } else {
@@ -280,11 +238,36 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    protected String buildInvocationExpressionWithoutKakko(MethodInvocation invocation, String invokeClassName, String invokeMethodName) {
+    protected void logPath(${glBehaviorCommand} behaviorCommand, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
+        final int bhvNextIndex = behaviorResult.getNextStartIndex();
+        final ${glInvokeNameResultName} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
+        final int clientFirstIndex = clientResult.getFoundFirstIndex();
+        final ${glInvokeNameResultName} byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+
+        final String clientInvokeName = clientResult.getInvokeName();
+        final String byPassInvokeName = byPassResult.getInvokeName();
+        final String behaviorInvokeName = behaviorResult.getInvokeName();
+        if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
+            return;
+        }
+        
+        // Save client invoke name for error message.
+        if (!clientResult.isEmptyResult()) {
+            putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
+        }
+        // Save by-pass invoke name for error message.
+        if (!byPassResult.isEmptyResult()) {
+            putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
+        }
+        
+        log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
+    }
+
+    protected String buildInvocationExpressionWithoutKakko(${glBehaviorCommand} behaviorCommand, String invokeClassName, String invokeMethodName) {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
             try {
                 final String originalName = invokeClassName;
-                if (isSpecifiedOutsideSql()) {
+                if (isOutsideSql(behaviorCommand)) {
                     final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                     final String tableDbName = outsideSqlContext.getTableDbName();
                     final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
@@ -309,10 +292,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 log("Ignored exception occurred: msg=" + ignored.getMessage());
             }
         }
-        String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
+        String callerExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
             boolean resultTypeInteger = false;
-            if (isSpecifiedOutsideSql()) {
+            if (isOutsideSql(behaviorCommand)) {
                 final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                 final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
                 if (resultTypeSpecification != null && resultTypeSpecification instanceof Class<?>) {
@@ -322,38 +305,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     }
                 }
             }
-            if (resultTypeInteger || "selectCount".equals(invocation.getMethod().getName())) {
-                invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():count";
+            if (resultTypeInteger || isSelectCount(behaviorCommand)) {
+                callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():count";
             } else {
-                invocationExpressionWithoutKakko = invocationExpressionWithoutKakko + "():paging";
+                callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():paging";
             }
         }
-        return invocationExpressionWithoutKakko;
-    }
-
-    protected void logPath(MethodInvocation invocation, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
-        final int bhvNextIndex = behaviorResult.getNextStartIndex();
-        final ${glInvokeNameResultName} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
-        final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final ${glInvokeNameResultName} byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
-
-        final String clientInvokeName = clientResult.getInvokeName();
-        final String byPassInvokeName = byPassResult.getInvokeName();
-        final String behaviorInvokeName = behaviorResult.getInvokeName();
-        if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
-            return;
-        }
-        
-        // Save client invoke name for error message.
-        if (!clientResult.isEmptyResult()) {
-            putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
-        }
-        // Save by-pass invoke name for error message.
-        if (!byPassResult.isEmptyResult()) {
-            putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
-        }
-        
-        log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
+        return callerExpressionWithoutKakko;
     }
 
     protected String buildFitBorder(String prefix, String element, String lengthTargetString, boolean space) {
@@ -483,15 +441,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     /**
-     * @param method The invoked method. (NotNull)
-     * @return The expression of invocation. (NotNull)
-     */
-    protected String extractInvocationExpression(Method method) {
-        final Class<?> declaringClass = method.getDeclaringClass();
-        return removeBasePrefixFromSimpleClassName(declaringClass.getSimpleName());
-    }
-    
-    /**
      * @param simpleClassName The simple class name. (NotNull)
      * @return The simple class name removed the base prefix. (NotNull)
      */
@@ -510,39 +459,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     // ===================================================================================
-    //                                                                      Log SqlCommand
-    //                                                                      ==============
-    protected void logSqlCommand(MethodInvocation invocation, SqlCommand cmd, long beforeCmd, long afterCmd) {
-        log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
-    }
-
-    protected void assertRetType(Class<?> retType, Object ret) {
-        if (java.util.List.class.isAssignableFrom(retType)) {
-            if (ret != null && !(ret instanceof java.util.List)) {
-                String msg = "The retType is difference from actual return: ";
-                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
-                throw new IllegalStateException(msg);
-            }
-        } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
-            if (ret != null && !(ret instanceof ${glEntityInterfaceName})) {
-                String msg = "The retType is difference from actual return: ";
-                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
-                throw new IllegalStateException(msg);
-            }
-        }
-    }
-
-    // ===================================================================================
     //                                                                          Log Return
     //                                                                          ==========
-    protected void logReturn(org.aopalliance.intercept.MethodInvocation invocation, Class<?> retType, Object ret, long before, long after) throws Throwable {
+    protected void logReturn(${glBehaviorCommand} behaviorCommand, Class<?> retType, Object ret, long before, long after) {
         try {
             final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";
-            if (java.util.List.class.isAssignableFrom(retType)) {
+            if (List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(daoResultPrefix + "Selected list: null]");
                 } else {
-                    final java.util.List<?> ls = (java.util.List<?>) ret;
+                    final List<?> ls = (java.util.List<?>) ret;
                     if (ls.isEmpty()) {
                         log(daoResultPrefix + "Selected list: 0]");
                     } else if (ls.size() == 1 && ls.get(0) instanceof Number) {
@@ -598,18 +524,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     }
                 }
             } else {
-                if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
+                if (isSelectCount(behaviorCommand)) {
                     log(daoResultPrefix + "Selected count: " + ret + "]");
                 } else {
                     log(daoResultPrefix + "Result: " + ret + "]");
                 }
             }
             log(" ");
-        } catch (Exception e) {
-            String msg = "Result object debug threw the exception: methodName=";
-            msg = msg + invocation.getMethod().getName() + " retType=" + retType;
+        } catch (RuntimeException e) {
+            String msg = "Result object debug threw the exception: behaviorCommand=";
+            msg = msg + behaviorCommand + " retType=" + retType;
             msg = msg + " ret=" + ret;
-            _log.warn(msg, e);
             throw e;
         }
     }
@@ -620,53 +545,22 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // -----------------------------------------------------
     //                                            OutsideSql
     //                                            ----------
-    protected void preprocessOutsideSql(MethodInvocation invocation) {
-        final Class<${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}> outsideSqlType = ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}.class;
-        final ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation} outsideSql = invocation.getMethod().getAnnotation(outsideSqlType);
-
-        // Traditional OutsideSql
-        if (outsideSql != null && (outsideSql.dynamicBinding() || outsideSql.offsetByCursor() || outsideSql.offsetByCursor() || outsideSql.limitByCursor())) {
-            final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-            outsideSqlContext.setDynamicBinding(outsideSql.dynamicBinding());
-            outsideSqlContext.setOffsetByCursorForcedly(outsideSql.offsetByCursor());
-            outsideSqlContext.setLimitByCursorForcedly(outsideSql.limitByCursor());
-            ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
-
-            // Set up fetchNarrowingBean.
-            final Object[] args = invocation.getArguments();
-            if (args == null || args.length == 0) {
-                return;
-            }
-            if (${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(args[0].getClass())) {
-                ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
-            }
-            return;
-        }
-
+    protected void preprocessOutsideSql(${glBehaviorCommand} behaviorCommand, Object[] args) {
         // Specified OutsideSql
-        if (isSpecifiedOutsideSql(invocation)) {
-            if (isOutsideSqlDaoMethodSelect(invocation)) {
-                setupOutsideSqlContextSelect(invocation);
+        if (isOutsideSql(behaviorCommand)) {
+            if (isSelect(behaviorCommand)) {
+                setupOutsideSqlContextSelect(behaviorCommand, args);
             } else {
-                setupOutsideSqlContextExecute(invocation);
+                setupOutsideSqlContextExecute(behaviorCommand, args);
             }
             return;
         }
-    }
-    
-    protected boolean isSpecifiedOutsideSql(MethodInvocation invocation) {
-        return ${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation));
     }
 
     // - - - - - - - - - - - -
     //                  Select
     //                   - - -
-    protected boolean isOutsideSqlDaoMethodSelect(MethodInvocation invocation) {
-        return invocation.getMethod().getName().startsWith("select");
-    }
-
-    protected void setupOutsideSqlContextSelect(MethodInvocation invocation) {
-        final Object[] args = invocation.getArguments();
+    protected void setupOutsideSqlContextSelect(${glBehaviorCommand} behaviorCommand, Object[] args) {
         if (args.length != 4) {
             String msg = "Internal Error! OutsideSqlDao.selectXxx() should have 4 arguements: args.length=" + args.length;
             throw new IllegalStateException(msg);
@@ -682,7 +576,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
-        outsideSqlContext.setMethodName(invocation.getMethod().getName());
+        outsideSqlContext.setMethodName(behaviorCommand.getBehaviorMethodName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
@@ -695,8 +589,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // - - - - - - - - - - - -
     //                 Execute
     //                 - - - -
-    protected void setupOutsideSqlContextExecute(MethodInvocation invocation) {
-        final Object[] args = invocation.getArguments();
+    protected void setupOutsideSqlContextExecute(${glBehaviorCommand} behaviorCommand, Object[] args) {
         if (args.length != 3) {
             String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.length=" + args.length;
             throw new IllegalStateException(msg);
@@ -710,7 +603,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setMethodName(invocation.getMethod().getName());
+        outsideSqlContext.setMethodName(behaviorCommand.getBehaviorMethodName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
@@ -748,67 +641,60 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                         ConditionBean
     //                                         -------------
     /**
-     * Pre-process conditionBean.
-     * <p>
-     * If this method is condition bean select target, make dynamic SQL.
-     * Else nothing.
-     * @param invocation Method invocation. (NotNull)
-     * @return ConditionBean. (Nullable)
+     * @param behaviorCommand The command of behavior. (NotNull)
+     * @param args The array of argument. (Nullable)
+     * @return The condition-bean. (Nullable)
      */
-    protected ${glConditionBeanInterfaceName} preprocessConditionBean(MethodInvocation invocation) {
-        final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
-        if (outsideSqlContext != null) {
+    protected ${glConditionBeanInterfaceName} preprocessConditionBean(${glBehaviorCommand} behaviorCommand, Object[] args) {
+        if (behaviorCommand.isOutsideSql()) {
             return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
         }
-        
-        final ${glConditionBeanInterfaceName} cb;
-        {
-            final Object[] args = invocation.getArguments();
-            if (args == null || args.length == 0) {
-                return null;
-            }
-            final Object arg0 = args[0];
-            if (arg0 == null) {
-                return null;
-            }
-            if (!${glConditionBeanContextName}.isTheTypeConditionBean(arg0.getClass())) {// The argument is not condition-bean...
-                if (${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(arg0.getClass()) && !isSelectCountIgnoreFetchScopeMethod(invocation)) {
-                    // Fetch-narrowing-bean and Not select count!
-                    ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
-                }
-                return null;
-            }
-            cb = (${glConditionBeanInterfaceName})arg0;
+        if (!isConditionBean(behaviorCommand)) {
+            return null;
         }
 
-        if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
+        final ${glConditionBeanInterfaceName} cb = behaviorCommand.getConditionBean(args);
+        if (cb == null) {
+            return null;
+        }
+
+        if (isSelectCount(behaviorCommand)) {
             cb.xsetupSelectCountIgnoreFetchScope();
         } else {
             ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         }
-
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
         return cb;
     }
 
     /**
-     * Post-process condition-bean.
-     * @param invocation Method invocation. (NotNull)
+     * @param behaviorCommand The command of behavior. (NotNull)
      * @param cb Condition-bean. (Nullable)
      */
-    protected void postprocessConditionBean(MethodInvocation invocation, ${glConditionBeanInterfaceName} cb) {
+    protected  void postprocessConditionBean(${glBehaviorCommand} behaviorCommand, ${glConditionBeanInterfaceName} cb) {
         if (cb == null) {
             return;
         }
-        if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
+        if (isSelectCount(behaviorCommand)) {
             cb.xafterCareSelectCountIgnoreFetchScope();
         }
     }
 
-    // -----------------------------------------------------
-    //                                    Clear Thread Local
-    //                                    ------------------
-    protected void clearThreadLocal() {
+    // ===================================================================================
+    //                                                                      Context Helper
+    //                                                                      ==============
+    protected ${glOutsideSqlContextName} getOutsideSqlContext() {
+        if (!${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            return null;
+        }
+        return ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+    }
+    
+    protected void putObjectToMapContext(String key, Object value) {
+        ${glInternalMapContextName}.setObject(key, value);
+    }
+
+    protected void clearContext() {
         if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
             ${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
         }
@@ -829,55 +715,86 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     // ===================================================================================
-    //                                                                      Context Helper
-    //                                                                      ==============
-    protected ${glOutsideSqlContextName} getOutsideSqlContext() {
-        if (!${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            return null;
-        }
-        return ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+    //                                                                  Execute Status Log
+    //                                                                  ==================
+    protected void log(String msg) {
+        ${glXLog}.log(msg);
     }
     
-    protected boolean isSpecifiedOutsideSql() {
-        final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
-        return outsideSqlContext != null && outsideSqlContext.isSpecifiedOutsideSql();
+    protected boolean isLogEnabled() {
+        return ${glXLog}.isLogEnabled();
     }
 
-    protected void putObjectToMapContext(String key, Object value) {
-        ${glInternalMapContextName}.setObject(key, value);
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    /**
-     * Is select count ignore-fetch-scope method?
-     * @param invocation Method invocation. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isSelectCountIgnoreFetchScopeMethod(MethodInvocation invocation) {
-        final String name = invocation.getMethod().getName();
-        return name.startsWith("readCount") || name.startsWith("selectCount");
+    protected StatementFactory createStatememtFactory() {
+        final ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+        final boolean internalDebug = ${glDBFluteConfig}.getInstance().isInternalDebug();
+        ${glInternalStatementFactory} factory = new ${glInternalStatementFactory}();
+        factory.setDefaultStatementConfig(defaultStatementConfig);
+        factory.setInternalDebug(internalDebug);
+        return factory;
     }
 
     // ===================================================================================
-    //                                                                      General Helper
+    //                                                                      Convert Helper
     //                                                                      ==============
-    /**
-     * Is the method abstract?
-     * @param method Method. (NotNull)
-     * @return Determination. (NotNull)
-     */
-    protected boolean isAbstract(Method method) {
-        final int mod = method.getModifiers();
-        return Modifier.isAbstract(mod);
+    protected Object convertPrimitiveWrapper(Class<?> retType, Object ret) {
+        return NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
     }
 
-    /**
-     * Get the value of line separator.
-     * @return The value of line separator. (NotNull)
-     */
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+    protected Object convertNumber(Class<?> retType, Object ret) {
+        return NumberConversionUtil.convertNumber(retType, ret);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertRetType(Class<?> retType, Object ret) {
+        if (List.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof List)) {
+                String msg = "The retType is difference from actual return: ";
+                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
+                throw new IllegalStateException(msg);
+            }
+        } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof ${glEntityInterfaceName})) {
+                String msg = "The retType is difference from actual return: ";
+                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glSqlExecutionCreator} createSqlExecutionCreator(${glBehaviorCommand} behaviorCommand, Object[] args) {
+        return behaviorCommand.createSqlExecutionCreator(args);
+    }
+
+    protected boolean isConditionBean(${glBehaviorCommand} behaviorCommand) {
+        return behaviorCommand.isConditionBean();
+    }
+
+    protected boolean isOutsideSql(${glBehaviorCommand} behaviorCommand) {
+        return behaviorCommand.isOutsideSql();
+    }
+
+    protected boolean isSelect(${glBehaviorCommand} behaviorCommand) {
+        return behaviorCommand.isSelect();
+    }
+
+    protected boolean isSelectCount(${glBehaviorCommand} behaviorCommand) {
+        return behaviorCommand.isSelectCount();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    public void setBeanMetaDataFactory(BeanMetaDataFactory beanMetaDataFactory) {
+        _beanMetaDataFactory = beanMetaDataFactory;
     }
 }
