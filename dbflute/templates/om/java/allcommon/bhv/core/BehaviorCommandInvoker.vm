@@ -52,7 +52,7 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Command Set up
     //                                                                      ==============
-    public void setupComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
+    public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
         behaviorCommand.setDataSource(_dataSource);
         behaviorCommand.setStatementFactory(_statementFactory);
         behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);

@@ -70,6 +70,12 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                      ResultSetHandler
     //                                      ----------------
+    protected ResultSetHandler createObjectResultSetHandler(BeanMetaData bmd) { // DBFlute Target
+        final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
+        final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
+        return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
+    }
+
     protected ResultSetHandler createBeanListMetaDataResultSetHandler(BeanMetaData bmd) { // DBFlute Target
         final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
         final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);

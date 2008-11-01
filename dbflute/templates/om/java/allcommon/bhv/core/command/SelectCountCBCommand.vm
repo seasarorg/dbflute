@@ -1,0 +1,59 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.extension.jdbc.ResultSetHandler;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getBehaviorMethodName() {
+        return "selectCount";
+    }
+
+    @Override
+    public Class<?> getBehaviorMethodReturnType() {
+        return int.class;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
+        assertStatus("createSqlExecutionCreator");
+        final Class<?> cbType = _conditionBeanType;
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                ResultSetHandler handler = new CountResultSetHandler();
+                return createConditionBeanExecution(cbType, handler);
+            }
+        };
+    }
+
+    protected class CountResultSetHandler implements ResultSetHandler {
+        public Object handle(ResultSet rs) throws SQLException {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return null;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isSelectCount() {
+        return true;
+    }
+}
