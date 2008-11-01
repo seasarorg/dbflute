@@ -11,13 +11,11 @@ import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
-
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
@@ -33,11 +31,11 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                                  Detail Information
     //                                                                  ==================
     public boolean isConditionBean() {
-        return true;
+        return false;
     }
 
     public boolean isOutsideSql() {
-        return false;
+        return true;
     }
 
     public boolean isSelect() {
@@ -53,7 +51,18 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                               =====================
     public String buildSqlExecutionKey(Object[] args) {
         assertStatus("buildSqlExecutionKey");
-        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
+        return generateSpecifiedOutsideSqlUniqueKey(args);
+    }
+
+    protected String generateSpecifiedOutsideSqlUniqueKey(Object[] args) {
+        final String path = (String)args[0];
+        final Object pmb = args[1];
+        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+        Object resultTypeSpecification = null;
+        if (args.length > 3) {
+            resultTypeSpecification = args[3];
+        }
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, pmb, option, resultTypeSpecification);
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
@@ -84,13 +93,6 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
-        _conditionBeanType = conditionBeanType;
+        return _behaviorClassName + "." + getBehaviorMethodName() + "()";
     }
 }
