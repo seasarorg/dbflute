@@ -53,8 +53,8 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                          SqlExecution
     //                                          ------------
-    protected SqlExecution createConditionBeanExecution(Class<?> cbType, ResultSetHandler handler) {
-        final S2DaoSelectDynamicCommand cmd = createSelectDynamicCommand(handler);
+    protected ${glSqlExecution} createConditionBeanExecution(Class<?> cbType, ResultSetHandler handler) {
+        final ${glSelectDynamicCommand} cmd = createSelectDynamicCommand(handler);
         cmd.setArgNames(new String[] { "dto" });
         cmd.setArgTypes(new Class[] { cbType });
         return cmd;
