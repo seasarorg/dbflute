@@ -126,7 +126,7 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     protected String getSqlFileEncoding() {
-        return "${database.daoSqlFileEncoding}";
+        return "${database.sqlFileEncoding}";
     }
 
     // ===================================================================================

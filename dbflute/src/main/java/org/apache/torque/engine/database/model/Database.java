@@ -1251,11 +1251,11 @@ public class Database {
     }
 
     public boolean hasDaoSqlFileEncoding() {
-        return getProperties().getS2DaoAdjustmentProperties().hasDaoSqlFileEncoding();
+        return getProperties().getOutsideSqlProperties().hasSqlFileEncoding();
     }
 
     public String getDaoSqlFileEncoding() {
-        return getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding();
+        return getProperties().getOutsideSqlProperties().getSqlFileEncoding();
     }
 
     // -----------------------------------------------------
@@ -1390,6 +1390,14 @@ public class Database {
     // ===================================================================================
     //                                                             Properties - OutsideSql
     //                                                             =======================
+    public boolean hasSqlFileEncoding() {
+        return getProperties().getOutsideSqlProperties().hasSqlFileEncoding();
+    }
+
+    public String getSqlFileEncoding() {
+        return getProperties().getOutsideSqlProperties().getSqlFileEncoding();
+    }
+
     public boolean isOutsideSqlPackageValid() {
         return getProperties().getOutsideSqlProperties().isSqlPackageValid();
     }

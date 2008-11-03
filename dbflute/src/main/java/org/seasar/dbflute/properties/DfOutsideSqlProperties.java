@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -30,6 +31,26 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             _outsideSqlDefinitionMap = mapProp("torque." + KEY_outsideSqlDefinitionMap, DEFAULT_EMPTY_MAP);
         }
         return _outsideSqlDefinitionMap;
+    }
+
+    // ===================================================================================
+    //                                                                     SqlFileEncoding
+    //                                                                     ===============
+    public boolean hasSqlFileEncoding() {
+        final String encoding = getSqlFileEncoding();
+        return encoding != null && encoding.trim().length() > 0 && !encoding.trim().equalsIgnoreCase("null");
+    }
+    
+    public String getSqlFileEncoding() {
+        final String value = (String) getOutsideSqlDefinitionMap().get("sqlFileEncoding");
+        if (value != null && value.trim().length() > 0 && !value.trim().equalsIgnoreCase("null")) {
+            return value;
+        }
+        DfS2DaoAdjustmentProperties prop = DfBuildProperties.getInstance().getS2DaoAdjustmentProperties();
+        if (prop.hasDaoSqlFileEncoding()) {
+            return prop.getDaoSqlFileEncoding();
+        }
+        return "UTF-8";
     }
 
     // ===================================================================================
@@ -183,11 +204,11 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
         return false;
     }
-    
+
     protected List<String> getTargetProcedureCatalogList() {
         return getOutsideSqlPropertyAsList("targetProcedureCatalogList");
     }
-    
+
     public boolean isTargetProcedureSchema(String procedureSchema) {
         final List<String> targetProcedureList = getTargetProcedureSchemaList();
         if (targetProcedureList == null || targetProcedureList.isEmpty()) {
@@ -211,7 +232,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     protected List<String> getTargetProcedureSchemaList() {
         return getOutsideSqlPropertyAsList("targetProcedureSchemaList");
     }
-    
+
     public boolean isTargetProcedureName(String procedureName) {
         final List<String> targetProcedureList = getTargetProcedureNameList();
         if (targetProcedureList == null || targetProcedureList.isEmpty()) {
