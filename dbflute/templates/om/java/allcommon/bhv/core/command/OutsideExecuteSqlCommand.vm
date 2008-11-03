@@ -6,44 +6,78 @@ import org.seasar.dao.BeanMetaData;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
+ * The behavior command for OutsideSql.execute().
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getBehaviorMethodName() {
-        return "selectList";
+        return "execute";
     }
 
     public Class<?> getBehaviorMethodReturnType() {
-        return ${glListResultBeanName}.class;
+        return int.class;
     }
 
     // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
     public boolean isConditionBean() {
-        return false;
+        return false; // When the command is for outsideSql, it always be false.
     }
 
     public boolean isOutsideSql() {
         return true;
     }
 
+    public boolean isProcedure() {
+        return false;
+    }
+
     public boolean isSelect() {
-        return true;
+        return false;
     }
 
     public boolean isSelectCount() {
-        return false;
+        return false; // When the command is for outsideSql, it always be false.
+    }
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution(Object[] args) {
+        assertOutsideSqlExecuteArgument(args);
+        final String path = getOutsideSqlPath(args);
+        final Object pmb = getOutsideSqlParameterBean(args);
+        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
+        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setOutsideSqlPath(path);
+        outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setMethodName(getBehaviorMethodName());
+        outsideSqlContext.setStatementConfig(option.getStatementConfig());
+        outsideSqlContext.setTableDbName(option.getTableDbName());
+		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
+        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+    }
+
+    public void afterExecuting(Object[] args) {
     }
 
     // ===================================================================================
@@ -55,24 +89,19 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
     }
 
     protected String generateSpecifiedOutsideSqlUniqueKey(Object[] args) {
-        final String path = (String)args[0];
-        final Object pmb = args[1];
-        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
-        Object resultTypeSpecification = null;
-        if (args.length > 3) {
-            resultTypeSpecification = args[3];
-        }
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, pmb, option, resultTypeSpecification);
+        final String path = getOutsideSqlPath(args);
+        final Object pmb = getOutsideSqlParameterBean(args);
+        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
+        final Object resultTypeSpecification = getResultTypeSpecification(args);
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(getBehaviorMethodName(), path, pmb, option, resultTypeSpecification);
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
         assertStatus("createSqlExecutionCreator");
-        final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                BeanMetaData bmd = createBeanMetaData();
-                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
-                return createSelectExecution(cbType, handler);
+                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                // return createOutsideSqlSelectExecution(outsideSqlContext);
             }
         };
     }
@@ -81,11 +110,6 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
     //                                                                              Assert
     //                                                                              ======
     protected void assertStatus(String methodName) {
-        if (_conditionBeanType == null) {
-            String msg = "The property 'conditionBeanType' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
     }
 
     // ===================================================================================

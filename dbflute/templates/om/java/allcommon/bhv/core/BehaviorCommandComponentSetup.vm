@@ -13,4 +13,5 @@ public interface ${glBehaviorCommandComponentSetup} {
     public void setDataSource(DataSource dataSource);
     public void setStatementFactory(StatementFactory statementFactory);
     public void setBeanMetaDataFactory(BeanMetaDataFactory beanMetaDataFactory);
+    public void setSqlFileEncoding(String sqlFileEncoding);
 }

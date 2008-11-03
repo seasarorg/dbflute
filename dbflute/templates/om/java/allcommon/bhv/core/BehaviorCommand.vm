@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -22,17 +23,28 @@ public interface ${glBehaviorCommand} {
     //                                                                  ==================
     public boolean isConditionBean();
     public boolean isOutsideSql();
+    public boolean isProcedure();
     public boolean isSelect();
     public boolean isSelectCount();
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution(Object[] args);
+    public void afterExecuting(Object[] args);
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     public String buildSqlExecutionKey(Object[] args);
     public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args);
-	
+
     // ===================================================================================
-    //                                                              ConditionBean Handling
-    //                                                              ======================
+    //                                                                   Argument Handling
+    //                                                                   =================
     public ${glConditionBeanInterfaceName} getConditionBean(Object[] args);
+    public String getOutsideSqlPath(Object[] args);
+    public Object getOutsideSqlParameterBean(Object[] args);
+    public ${glOutsideSqlOptionName} getOutsideSqlOption(Object[] args);
+    public Object getResultTypeSpecification(Object[] args);
 }

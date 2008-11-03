@@ -577,7 +577,7 @@ public class Database {
     public void enableFlexDtoOutputDirectory() {
         getGeneratorInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
-    
+
     public void enableBuriBaoOutputDirectory() {
         getGeneratorInstance().setOutputPath(getProperties().getBuriProperties().getOutputDirectory());
     }
@@ -1284,22 +1284,22 @@ public class Database {
     public boolean isCompatibleOutsideSqlResultOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
     }
-    
+
     // -----------------------------------------------------
     //                                                  Buri
     //                                                  ----
     public boolean isBuriGenerateBao() {
         return getProperties().getBuriProperties().isGenerateBao();
     }
-    
+
     public String getBuriBaseBaoPackage() {
         return getProperties().getBuriProperties().getBaseBaoPackage();
     }
-    
+
     public String getBuriExtendedBaoPackage() {
         return getProperties().getBuriProperties().getExtendedBaoPackage();
     }
-    
+
     public List<Table> getBuriTargetTableList() {
         final ArrayList<Table> buriTargetTableList = new ArrayList<Table>();
         final List<Table> tableList = getTableList();
@@ -1598,6 +1598,10 @@ public class Database {
     protected Map<String, Map<String, String>> getDatabaseDefinitionMap() {
         final DfDatabaseConfig config = new DfDatabaseConfig();
         return config.analyzeDatabaseBaseInfo();
+    }
+
+    public String getDatabaseProductName() {
+        return getDaoGenDbName();
     }
 
     public String getDaoGenDbName() {

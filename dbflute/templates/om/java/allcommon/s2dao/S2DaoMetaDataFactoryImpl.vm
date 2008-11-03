@@ -220,8 +220,8 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             }
         }
 
-        _log.info("...Initializing database product name as default: ${database.daoGenDbName}");
-        setDatabaseProductNameToContext("${database.daoGenDbName}");
+        _log.info("...Initializing database product name as default: ${database.databaseProductName}");
+        setDatabaseProductNameToContext("${database.databaseProductName}");
     }
 
     protected String getDatabaseProductNameFromContext() {

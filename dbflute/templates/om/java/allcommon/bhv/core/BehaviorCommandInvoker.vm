@@ -14,25 +14,30 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * @author ${database.ClassAuthor}
  */
 public class ${glBehaviorCommandInvoker} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glBehaviorCommandInvoker}.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -50,12 +55,78 @@ public class ${glBehaviorCommandInvoker} {
     protected final Map<String, ${glSqlExecution}> _executionMap = new HashMap<String, ${glSqlExecution}>();
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glBehaviorCommandInvoker}() {
+    }
+
+    // ===================================================================================
+    //                                                                          Initialize
+    //                                                                          ==========
+    public void initialize() {
+        ${glConditionBeanContextName}.initialize(); // Stop the LinkageError!
+        initializeDatabaseProductNameOfContext();
+        handleSqlLogRegistry();
+    }
+
+    // -----------------------------------------------------
+    //                                 Database Product Name
+    //                                 ---------------------
+    protected void initializeDatabaseProductNameOfContext() {
+        if (${glConditionBeanContextName}.getDatabaseProductName() != null) {
+            return;
+        }
+        final String productName = getDatabaseProductName();
+        _log.info("...Initializing database product name as default: " + productName);
+        ${glConditionBeanContextName}.setDatabaseProductName(productName);
+    }
+
+    protected String getDatabaseProductName() {
+        return "${database.databaseProductName}";
+    }
+
+    // -----------------------------------------------------
+    //                                      SQL Log Registry
+    //                                      ----------------
+    protected void handleSqlLogRegistry() {
+        final StringBuilder sb = new StringBuilder();
+        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
+            sb.append("{SqlLog Information}").append(getLineSeparator());
+            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
+                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
+                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
+            } else {
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
+            }
+        } else {
+            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+            if (sqlLogRegistry != null) {
+                ${glInternalSqlLogRegistry}.closeRegistration();
+            sb.append("{SqlLog Information}").append(getLineSeparator());
+            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+            } else {
+                // No logging here
+                // sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
+            }
+        }
+        _log.info(sb.toString());
+    }
+
+    // ===================================================================================
     //                                                                      Command Set up
     //                                                                      ==============
     public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
         behaviorCommand.setDataSource(_dataSource);
         behaviorCommand.setStatementFactory(_statementFactory);
         behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);
+        behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
+    }
+
+    protected String getSqlFileEncoding() {
+        return "${database.daoSqlFileEncoding}";
     }
 
     // ===================================================================================
@@ -78,16 +149,7 @@ public class ${glBehaviorCommandInvoker} {
             initializeSqlExecution(behaviorCommand, args);
             return null; // The end! (Initilize Only)
         }
-
-        // - - - - - - - - - - - -
-        // Preprocess outside-SQL
-        // - - - - - - - - - - - -
-        preprocessOutsideSql(behaviorCommand, args);
-
-        // - - - - - - - - - - - - -
-        // Preprocess condition-bean
-        // - - - - - - - - - - - - -
-        final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(behaviorCommand, args);
+        behaviorCommand.beforeGettingSqlExecution(args);
 
         ${glSqlExecution} execution = null;
         try {
@@ -122,7 +184,7 @@ public class ${glBehaviorCommandInvoker} {
         try {
             ret = executeSql(execution, args);
         } finally {
-            postprocessConditionBean(behaviorCommand, cb);
+            behaviorCommand.afterExecuting(args);
         }
         final Class<?> retType = behaviorCommand.getBehaviorMethodReturnType();
         assertRetType(retType, ret);
@@ -225,16 +287,9 @@ public class ${glBehaviorCommandInvoker} {
         // logPath(behaviorCommand, stackTrace, behaviorResult);
 
         // Specified OutsideSql
-        if (isOutsideSql(behaviorCommand)) {
-		    final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
-            if (!outsideSqlContext.isProcedure()) {
-                if (outsideSqlContext != null) {
-				    log("path: " + outsideSqlContext.getOutsideSqlPath());
-                } else {
-                    log("path: " + getOutsideSqlPath(args));
-			    }
-                log("option: " + getOutsideSqlOption(args));
-            }
+        if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
+            log("path: " + behaviorCommand.getOutsideSqlPath(args));
+            log("option: " + behaviorCommand.getOutsideSqlOption(args));
         }
     }
 
@@ -540,147 +595,6 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     // ===================================================================================
-    //                                                                    Pre Post Process
-    //                                                                    ================
-    // -----------------------------------------------------
-    //                                            OutsideSql
-    //                                            ----------
-    protected void preprocessOutsideSql(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        // Specified OutsideSql
-        if (isOutsideSql(behaviorCommand)) {
-            if (isSelect(behaviorCommand)) {
-                setupOutsideSqlContextSelect(behaviorCommand, args);
-            } else {
-                setupOutsideSqlContextExecute(behaviorCommand, args);
-            }
-            return;
-        }
-    }
-
-    // - - - - - - - - - - - -
-    //                  Select
-    //                   - - -
-    protected void setupOutsideSqlContextSelect(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        if (args.length != 4) {
-            String msg = "Internal Error! OutsideSqlDao.selectXxx() should have 4 arguements: args.length=" + args.length;
-            throw new IllegalStateException(msg);
-        }
-        final String path = getOutsideSqlPath(args);
-        final Object pmb = getOutsideSqlParameterBean(args);
-        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
-        final Object resultTypeSpecification = args[3];
-        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
-        outsideSqlContext.setMethodName(behaviorCommand.getBehaviorMethodName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
-
-        // Set up fetchNarrowingBean.
-        setupOutsideSqlFetchNarrowingBean(pmb, option);
-    }
-
-    // - - - - - - - - - - - -
-    //                 Execute
-    //                 - - - -
-    protected void setupOutsideSqlContextExecute(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        if (args.length != 3) {
-            String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.length=" + args.length;
-            throw new IllegalStateException(msg);
-        }
-        final String path = getOutsideSqlPath(args);
-        final Object pmb = getOutsideSqlParameterBean(args);
-        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
-        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setMethodName(behaviorCommand.getBehaviorMethodName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
-
-        // Set up fetchNarrowingBean.
-        setupOutsideSqlFetchNarrowingBean(pmb, option);
-    }
-
-    // - - - - - - - - - - - -
-    //                  Common
-    //                   - - -
-    protected String getOutsideSqlPath(Object[] args) {
-        return (String)args[0];
-    }
-    protected Object getOutsideSqlParameterBean(Object[] args) {
-        return args[1];
-    }
-    protected ${glOutsideSqlOptionName} getOutsideSqlOption(Object[] args) {
-        return (${glOutsideSqlOptionName})args[2];
-    }
-
-    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
-        if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
-            return;
-        }
-        final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
-        if (option.isManualPaging()) {
-            fetchNarrowingBean.ignoreFetchNarrowing();
-        }
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
-    }
-
-    // -----------------------------------------------------
-    //                                         ConditionBean
-    //                                         -------------
-    /**
-     * @param behaviorCommand The command of behavior. (NotNull)
-     * @param args The array of argument. (Nullable)
-     * @return The condition-bean. (Nullable)
-     */
-    protected ${glConditionBeanInterfaceName} preprocessConditionBean(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        if (behaviorCommand.isOutsideSql()) {
-            return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
-        }
-        if (!isConditionBean(behaviorCommand)) {
-            return null;
-        }
-
-        final ${glConditionBeanInterfaceName} cb = behaviorCommand.getConditionBean(args);
-        if (cb == null) {
-            return null;
-        }
-
-        if (isSelectCount(behaviorCommand)) {
-            cb.xsetupSelectCountIgnoreFetchScope();
-        } else {
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-        }
-        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
-        return cb;
-    }
-
-    /**
-     * @param behaviorCommand The command of behavior. (NotNull)
-     * @param cb Condition-bean. (Nullable)
-     */
-    protected  void postprocessConditionBean(${glBehaviorCommand} behaviorCommand, ${glConditionBeanInterfaceName} cb) {
-        if (cb == null) {
-            return;
-        }
-        if (isSelectCount(behaviorCommand)) {
-            cb.xafterCareSelectCountIgnoreFetchScope();
-        }
-    }
-
-    // ===================================================================================
     //                                                                      Context Helper
     //                                                                      ==============
     protected ${glOutsideSqlContextName} getOutsideSqlContext() {
@@ -785,6 +699,13 @@ public class ${glBehaviorCommandInvoker} {
 
     protected boolean isSelectCount(${glBehaviorCommand} behaviorCommand) {
         return behaviorCommand.isSelectCount();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     // ===================================================================================
