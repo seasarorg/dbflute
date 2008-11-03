@@ -35,8 +35,13 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
+    /** The type of entity. (Required) */
     protected Class<? extends ${glEntityInterfaceName}> _entityType;
+
+    /** The table DB-name. (Required) */
     protected String _tableDbName;
+
+    /** Is it initialize only? (Choise) */
     protected boolean _initializeOnly;
 
     // -----------------------------------------------------

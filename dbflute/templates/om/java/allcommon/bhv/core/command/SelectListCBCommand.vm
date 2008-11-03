@@ -19,7 +19,10 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The instance of condition-bean. (Required) */
     protected ${glConditionBeanInterfaceName} _conditionBean;
+
+    /** The type of condition-bean. (Derived from conditionBean) */
     protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
 
     // ===================================================================================

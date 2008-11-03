@@ -18,8 +18,13 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The path of outsideSql. (Required) */
     protected String _outsideSqlPath;
+
+    /** The parameter-bean. (Required to set, but Nullable) */
     protected Object _parameterBean;
+
+    /** The option of outsideSql. (Required) */
     protected ${glOutsideSqlOptionName} _outsideSqlOption;
 
     // ===================================================================================
