@@ -75,7 +75,6 @@ public class ${glBehaviorInitializer} {
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
             if (driverClassName != null) {
                 if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
-                    final String name = getDatabaseProductNameFromContext();
                     return true;
                 }
             }

@@ -1,11 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.dao.BeanMetaData;
-
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
@@ -16,14 +13,14 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
  * The behavior command for OutsideSql.selectList().
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _outsideSqlPath;
     protected Object _parameterBean;
-    protected Object _outsideSqlOption;
+    protected ${glOutsideSqlOptionName} _outsideSqlOption;
     protected Object _resultTypeSpecification;
 
     // ===================================================================================
@@ -97,7 +94,7 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
         ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
     }
 
-    public void afterExecuting(Object[] args) {
+    public void afterExecuting() {
     }
 
     // ===================================================================================
@@ -175,15 +172,15 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
         _outsideSqlPath = outsideSqlPath;
     }
 
-    public void setParameterBean(String parameterBean) {
+    public void setParameterBean(Object parameterBean) {
         _parameterBean = parameterBean;
     }
 
-    public void setOutsideSqlOption(String outsideSqlOption) {
+    public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
         _outsideSqlOption = outsideSqlOption;
     }
 
-    public void setResultTypeSpecification(String resultTypeSpecification) {
+    public void setResultTypeSpecification(Object resultTypeSpecification) {
         _resultTypeSpecification = resultTypeSpecification;
     }
 }

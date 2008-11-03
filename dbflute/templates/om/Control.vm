@@ -134,6 +134,8 @@ targetdatabase = $targetDatabase
     #set ($glAbstractBehaviorCommand = "${glProjectPrefix}AbstractBehaviorCommand")
     #set ($glSelectListCBCommand = "${glProjectPrefix}SelectListCBCommand")
     #set ($glSelectCountCBCommand = "${glProjectPrefix}SelectCountCBCommand")
+    #set ($glOutsideSqlSelectListCommand = "${glProjectPrefix}OutsideSqlSelectListCommand")
+    #set ($glOutsideSqlExecuteCommand = "${glProjectPrefix}OutsideSqlExecuteCommand")
 
     ## [Allcommon-Behavior-Load]
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
@@ -695,6 +697,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('SelectCountCBCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectCountCBCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectCountCBCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('OutsideSqlSelectListCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlSelectListCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlSelectListCommand.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
       $database.makeDirectory($path)

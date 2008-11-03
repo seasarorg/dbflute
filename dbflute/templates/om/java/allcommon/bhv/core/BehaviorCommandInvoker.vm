@@ -85,7 +85,7 @@ public class ${glBehaviorCommandInvoker} {
         // - - - - - - - - - - - - -
         if (behaviorCommand.isInitializeOnly()) {
             initializeSqlExecution(behaviorCommand);
-            return null; // The end! (Initilize Only)
+            return null; // The end! (Initialize Only)
         }
         behaviorCommand.beforeGettingSqlExecution();
 
