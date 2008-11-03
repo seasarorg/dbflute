@@ -1,11 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import java.util.List;
+
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
@@ -27,9 +28,6 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
     /** The option of outsideSql. (Required) */
     protected ${glOutsideSqlOptionName} _outsideSqlOption;
 
-    /** The result type specification. (Required) */
-    protected Object _resultTypeSpecification;
-
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
@@ -38,7 +36,7 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
     }
 
     public Class<?> getCommandReturnType() {
-        return ${glListResultBeanName}.class;
+        return List.class;
     }
 
     // ===================================================================================
@@ -72,7 +70,7 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        final Object resultTypeSpecification = _resultTypeSpecification;
+        final Object resultTypeSpecification = getResultTypeSpecification();
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
@@ -117,7 +115,7 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        final Object resultTypeSpecification = _resultTypeSpecification;
+        final Object resultTypeSpecification = getResultTypeSpecification();
         return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
     }
 
@@ -133,7 +131,7 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption, _resultTypeSpecification };
+        return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption, getResultTypeSpecification() };
     }
 
     // ===================================================================================
@@ -152,6 +150,13 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
     }
 
     // ===================================================================================
+    //                                                                     Extension Point
+    //                                                                     ===============
+    protected Object getResultTypeSpecification() {
+        return _entityType;
+    }
+
+    // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertStatus(String methodName) {
@@ -162,11 +167,6 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
         }
         if (_outsideSqlOption == null) {
             String msg = "The property 'outsideSqlOption' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
-        if (_resultTypeSpecification == null) {
-            String msg = "The property 'resultTypeSpecification' should not be null";
             msg = msg + " when you call " + methodName + "().";
             throw new IllegalStateException(msg);
         }
@@ -185,9 +185,5 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
 
     public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
         _outsideSqlOption = outsideSqlOption;
-    }
-
-    public void setResultTypeSpecification(Object resultTypeSpecification) {
-        _resultTypeSpecification = resultTypeSpecification;
     }
 }

@@ -3,9 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
@@ -112,7 +109,7 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} 
     }
 
     public Object[] getSqlExecutionArgument() {
-        return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption };
+        return new Object[] { _parameterBean };
     }
 
     // ===================================================================================

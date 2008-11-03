@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import java.util.List;
+
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.dao.BeanMetaData;
 
@@ -8,7 +10,6 @@ import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
@@ -33,7 +34,7 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     }
 
     public Class<?> getCommandReturnType() {
-        return ${glListResultBeanName}.class;
+        return List.class;
     }
 
     // ===================================================================================
@@ -96,7 +97,7 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
             public ${glSqlExecution} createSqlExecution() {
                 BeanMetaData bmd = createBeanMetaData();
                 ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
-                return createSelectExecution(cbType, handler);
+                return createSelectCBExecution(cbType, handler);
             }
         };
     }

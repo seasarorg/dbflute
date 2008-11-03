@@ -1,0 +1,73 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+
+/**
+ * The behavior command for OutsideSql.selectList().
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlSelectCursorCommand} extends ${glOutsideSqlSelectListCommand} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The handler of cursor. (Required) */
+    protected ${glCursorHandlerName} _cursorHandler;
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getCommandName() {
+        return "selectCursor";
+    }
+
+    @Override
+    public Class<?> getCommandReturnType() {
+        return Object.class;
+    }
+
+    // ===================================================================================
+    //                                                                     Extension Point
+    //                                                                     ===============
+    @Override
+    protected Object getResultTypeSpecification() {
+        return _cursorHandler;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    @Override
+    protected void assertStatus(String methodName) {
+        if (_outsideSqlPath == null) {
+            String msg = "The property 'outsideSqlPath' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_outsideSqlOption == null) {
+            String msg = "The property 'outsideSqlOption' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_cursorHandler == null) {
+            String msg = "The property 'cursorHandler' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setCursorHandler(${glCursorHandlerName} cursorHandler) {
+        _cursorHandler = cursorHandler;
+    }
+}

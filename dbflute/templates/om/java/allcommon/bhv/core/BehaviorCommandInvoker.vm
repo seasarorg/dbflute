@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.seasar.framework.util.NumberConversionUtil;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaDataFactory;
+import org.seasar.dao.ValueTypeFactory;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glXLog};
@@ -40,6 +41,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                      ----------------
     protected DataSource _dataSource;
     protected BeanMetaDataFactory _beanMetaDataFactory;
+    protected ValueTypeFactory _valueTypeFactory;
 
     // -----------------------------------------------------
     //                                        Fixed Property
@@ -60,6 +62,7 @@ public class ${glBehaviorCommandInvoker} {
         behaviorCommand.setDataSource(_dataSource);
         behaviorCommand.setStatementFactory(_statementFactory);
         behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);
+        behaviorCommand.setValueTypeFactory(_valueTypeFactory);
         behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
     }
 
@@ -636,5 +639,9 @@ public class ${glBehaviorCommandInvoker} {
 
     public void setBeanMetaDataFactory(BeanMetaDataFactory beanMetaDataFactory) {
         _beanMetaDataFactory = beanMetaDataFactory;
+    }
+
+    public void setValueTypeFactory(ValueTypeFactory valueTypeFactory) {
+        _valueTypeFactory = valueTypeFactory;
     }
 }

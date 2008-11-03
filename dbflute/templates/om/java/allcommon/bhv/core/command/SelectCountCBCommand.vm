@@ -36,7 +36,7 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
                 ResultSetHandler handler = new InternalCountResultSetHandler();
-                return createSelectExecution(cbType, handler);
+                return createSelectCBExecution(cbType, handler);
             }
         };
     }

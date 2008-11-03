@@ -6,6 +6,7 @@ import org.seasar.dao.SqlCommand;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalProcedureHandler};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
@@ -13,7 +14,7 @@ import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData}
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalProcedureCommand} implements SqlCommand {
+public class ${glInternalProcedureCommand} implements SqlCommand, ${glSqlExecution} {
 
 	// ===================================================================================
     //                                                                           Attribute

@@ -1,0 +1,75 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+
+/**
+ * The behavior command for OutsideSql.execute().
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getCommandName() {
+        return "call";
+    }
+
+    @Override
+    public Class<?> getCommandReturnType() {
+        return void.class;
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isProcedure() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    @Override
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                return createOutsideSqlCallCommand(outsideSqlContext);
+            }
+        };
+    }
+
+    @Override
+    public Object[] getSqlExecutionArgument() {
+        return new Object[] { _parameterBean };
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    @Override
+    protected void assertStatus(String methodName) {
+        if (_outsideSqlPath == null) {
+            String msg = "The property 'outsideSqlPath' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_parameterBean == null) {
+            String msg = "The property 'parameterBean' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_outsideSqlOption == null) {
+            String msg = "The property 'outsideSqlOption' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+    }
+}

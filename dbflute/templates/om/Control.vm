@@ -135,7 +135,9 @@ targetdatabase = $targetDatabase
     #set ($glSelectListCBCommand = "${glProjectPrefix}SelectListCBCommand")
     #set ($glSelectCountCBCommand = "${glProjectPrefix}SelectCountCBCommand")
     #set ($glOutsideSqlSelectListCommand = "${glProjectPrefix}OutsideSqlSelectListCommand")
+    #set ($glOutsideSqlSelectCursorCommand = "${glProjectPrefix}OutsideSqlSelectCursorCommand")
     #set ($glOutsideSqlExecuteCommand = "${glProjectPrefix}OutsideSqlExecuteCommand")
+    #set ($glOutsideSqlCallCommand = "${glProjectPrefix}OutsideSqlCallCommand")
 
     ## [Allcommon-Behavior-Load]
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
