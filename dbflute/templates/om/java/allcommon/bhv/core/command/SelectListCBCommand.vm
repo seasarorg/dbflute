@@ -100,7 +100,7 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _conditionBeanType };
+        return new Object[] { _conditionBean };
     }
 
     // ===================================================================================

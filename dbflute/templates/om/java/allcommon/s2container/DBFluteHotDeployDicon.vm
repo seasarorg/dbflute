@@ -13,17 +13,17 @@
 #end
 
     <!-- S2Dao component. -->
-    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
+    <component name="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}"/>
+    <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
 
     <component class="${database.extendedDaoMetaDataFactoryImplClassName}">
-#if ($database.hasDaoSqlFileEncoding())
-        <property name="sqlFileEncoding">"${database.daoSqlFileEncoding}"</property>
+#if ($database.hasSqlFileEncoding())
+        <property name="sqlFileEncoding">"${database.sqlFileEncoding}"</property>
 #end
     </component>
-
-    <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
     <component class="org.seasar.dao.impl.NullBeanEnhancer"/>

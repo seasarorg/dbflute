@@ -161,7 +161,7 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     //                                                                      ==============
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":" + buildSqlExecutionKey();
+        return getClass().getSimpleName() + ":{" + buildSqlExecutionKey() + "}";
     }
 
     // ===================================================================================

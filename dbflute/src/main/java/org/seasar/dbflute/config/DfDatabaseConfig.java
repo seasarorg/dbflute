@@ -33,16 +33,16 @@ public class DfDatabaseConfig {
     protected String _databaseBaseInfo;
     {
         _databaseBaseInfo = "map:{"
-                + "; derby      = map:{daoGenDbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; h2         = map:{daoGenDbName = H2         ; wildCard = % ; sequenceNextSql = select next value for $$sequenceName$$}"
-                + "; firebird   = map:{daoGenDbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
-                + "; oracle     = map:{daoGenDbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}"
-                + "; mysql      = map:{daoGenDbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; postgresql = map:{daoGenDbName = PostgreSql ; wildCard = % ; sequenceNextSql = select nextval ('$$sequenceName$$')}"
-                + "; mssql      = map:{daoGenDbName = SqlServer  ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; db2        = map:{daoGenDbName = Db2        ; wildCard = % ; sequenceNextSql = values nextval for $$sequenceName$$}"
-                + "; interbase  = map:{daoGenDbName = Interbase  ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
-                + "; default    = map:{daoGenDbName = Default    ; wildCard = % ; sequenceNextSql = Unsupported}" + "}";
+                + "; derby      = map:{dbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; h2         = map:{dbName = H2         ; wildCard = % ; sequenceNextSql = select next value for $$sequenceName$$}"
+                + "; firebird   = map:{dbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
+                + "; oracle     = map:{dbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}"
+                + "; mysql      = map:{dbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; postgresql = map:{dbName = PostgreSql ; wildCard = % ; sequenceNextSql = select nextval ('$$sequenceName$$')}"
+                + "; mssql      = map:{dbName = SqlServer  ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; db2        = map:{dbName = Db2        ; wildCard = % ; sequenceNextSql = values nextval for $$sequenceName$$}"
+                + "; interbase  = map:{dbName = Interbase  ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
+                + "; default    = map:{dbName = Default    ; wildCard = % ; sequenceNextSql = Unsupported}" + "}";
     }
 
     // ===============================================================================

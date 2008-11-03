@@ -67,7 +67,7 @@ public class ${glConditionBeanContextName} {
     //                                         ===========================================
 	@SuppressWarnings("unused")
     public static void initialize() {
-        boolean debugEnabled = _log.isDebugEnabled();
+        boolean debugEnabled = false; // If you watch the log, set this true.
         // Against the ClassLoader Headache!
         final StringBuilder sb = new StringBuilder();
         {
@@ -133,7 +133,6 @@ public class ${glConditionBeanContextName} {
     public static final String DB_NAME_POSTGRESQL = "postgresql";
     public static final String DB_NAME_FIREBIRD = "firebird";
     public static final String DB_NAME_MSSQL = "mssql";
-    public static final String DB_NAME_SYBASE = "sybase";
     public static final String DB_NAME_DB2 = "db2";
 
     protected static final Map<String, String> _driverHintDatabaseProductNameMap;
@@ -146,7 +145,6 @@ public class ${glConditionBeanContextName} {
         tmpMap.put("postgresql", DB_NAME_POSTGRESQL);
         tmpMap.put("firebird", DB_NAME_FIREBIRD);
         tmpMap.put("sqlserver", DB_NAME_MSSQL);
-        tmpMap.put("sybase", DB_NAME_SYBASE);
         tmpMap.put("db2", DB_NAME_DB2);
         _driverHintDatabaseProductNameMap = java.util.Collections.unmodifiableMap(tmpMap);
     }

@@ -23,7 +23,6 @@ import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceNa
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
-import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -32,12 +31,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * @author ${database.ClassAuthor}
  */
 public class ${glBehaviorCommandInvoker} {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glBehaviorCommandInvoker}.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -61,61 +54,6 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     // ===================================================================================
-    //                                                                          Initialize
-    //                                                                          ==========
-    public void initializeBehaviorApplication() {
-        ${glConditionBeanContextName}.initialize(); // Stop the LinkageError!
-        initializeDatabaseProductNameOfContext();
-        handleSqlLogRegistry();
-    }
-
-    // -----------------------------------------------------
-    //                                 Database Product Name
-    //                                 ---------------------
-    protected void initializeDatabaseProductNameOfContext() {
-        if (${glConditionBeanContextName}.getDatabaseProductName() != null) {
-            return;
-        }
-        final String productName = getDatabaseProductName();
-        _log.info("...Initializing database product name as default: " + productName);
-        ${glConditionBeanContextName}.setDatabaseProductName(productName);
-    }
-
-    protected String getDatabaseProductName() {
-        return "${database.databaseProductName}";
-    }
-
-    // -----------------------------------------------------
-    //                                      SQL Log Registry
-    //                                      ----------------
-    protected void handleSqlLogRegistry() {
-        final StringBuilder sb = new StringBuilder();
-        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
-            sb.append("{SqlLog Information}").append(getLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
-                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
-            } else {
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
-            }
-        } else {
-            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-            if (sqlLogRegistry != null) {
-                ${glInternalSqlLogRegistry}.closeRegistration();
-            sb.append("{SqlLog Information}").append(getLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
-                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
-            } else {
-                // No logging here
-                // sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
-            }
-        }
-        _log.info(sb.toString());
-    }
-
-    // ===================================================================================
     //                                                                      Command Set up
     //                                                                      ==============
     public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
@@ -126,7 +64,7 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     protected String getSqlFileEncoding() {
-        return "${database.sqlFileEncoding}";
+        return "${database.sqlFileEncoding}"; // This value is set when generating.
     }
 
     // ===================================================================================

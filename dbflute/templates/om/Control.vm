@@ -126,6 +126,7 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorCommand = "${glProjectPrefix}BehaviorCommand")
     #set ($glBehaviorCommandComponentSetup = "${glProjectPrefix}BehaviorCommandComponentSetup")
     #set ($glBehaviorCommandInvoker = "${glProjectPrefix}BehaviorCommandInvoker")
+    #set ($glBehaviorInitializer = "${glProjectPrefix}BehaviorInitializer")
     #set ($glSqlExecution = "${glProjectPrefix}SqlExecution")
     #set ($glSqlExecutionCreator = "${glProjectPrefix}SqlExecutionCreator")
 
@@ -667,6 +668,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('BehaviorCommandInvoker');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommandInvoker}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommandInvoker.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('BehaviorInitializer');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorInitializer}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorInitializer.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('SqlExecution');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecution}.${glClassFileExtension}" )

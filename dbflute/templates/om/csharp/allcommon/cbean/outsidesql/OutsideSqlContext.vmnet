@@ -167,6 +167,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             Assembly asm = GetType().Assembly;// In same assembly!
             if (IsExistResource(dbmsPath, asm)) {
                 return ReadText(dbmsPath, sqlFileEncoding, asm);
+            } else if ("_postgresql".equals(dbmsSuffix) && IsExistResource("_postgre", asm)) {
+                return ReadText("_postgre", sqlFileEncoding, asm); // Patch for name difference
+            } else if ("_sqlserver".equals(dbmsSuffix) && IsExistResource("_mssql", asm)) {
+                return ReadText("_mssql", sqlFileEncoding, asm); // Patch for name difference
             } else if (IsExistResource(standardPath, asm)) {
                 return ReadText(standardPath, sqlFileEncoding, asm);
             } else {

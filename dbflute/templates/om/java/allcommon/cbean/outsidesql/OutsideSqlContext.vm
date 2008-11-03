@@ -185,6 +185,10 @@ public class ${glOutsideSqlContextName} {
         String sql;
         if (isExistResource(dbmsPath)) {
             sql = readText(dbmsPath, sqlFileEncoding);
+        } else if ("_postgresql".equals(dbmsSuffix) && isExistResource("_postgre")) {
+            sql = readText("_postgre", sqlFileEncoding); // Patch for name difference
+        } else if ("_sqlserver".equals(dbmsSuffix) && isExistResource("_mssql")) {
+            sql = readText("_mssql", sqlFileEncoding); // Patch for name difference
         } else if (isExistResource(standardPath)) {
             sql = readText(standardPath, sqlFileEncoding);
         } else {

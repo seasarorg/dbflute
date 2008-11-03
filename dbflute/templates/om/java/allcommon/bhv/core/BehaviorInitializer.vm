@@ -1,0 +1,138 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import javax.sql.XADataSource;
+
+import org.seasar.extension.dbcp.impl.XADataSourceImpl;
+
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBehaviorInitializer} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glBehaviorInitializer}.class);
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glBehaviorInitializer}(XADataSource xaDataSource) {
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        showInformation(xaDataSource);
+        ${glConditionBeanContextName}.initialize(); // Stop the LinkageError!
+        initializeDatabaseProductNameOfContext(xaDataSource);
+        handleSqlLogRegistry();
+        ${glDBFluteConfig}.getInstance().lock();
+        _log.info("* * * * */");
+    }
+
+    // ===================================================================================
+    //                                                                         Information
+    //                                                                         ===========
+    protected void showInformation(XADataSource xaDataSource) {
+        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) {
+            final StringBuilder sb = new StringBuilder();
+            final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            final String url = xaDataSourceImpl.getURL();
+            final String user = xaDataSourceImpl.getUser();
+            sb.append("  [XADataSource]:").append(getLineSeparator());
+            sb.append("    driver = " + driverClassName).append(getLineSeparator());
+            sb.append("    url    = " + url).append(getLineSeparator());
+            sb.append("    user   = " + user);
+            _log.info("{Injection Information}" + getLineSeparator() + sb);
+        }
+    }
+
+    // ===================================================================================
+    //                                                               Database Product Name
+    //                                                               =====================
+    protected void initializeDatabaseProductNameOfContext(XADataSource xaDataSource) {
+        if (getDatabaseProductNameFromContext() != null) {
+            return;
+        }
+
+        // From JDBC Driver!
+        if (setupDatabaseProductNameByDriverClassNameIfPossible(xaDataSource)) {
+            return;
+        }
+ 
+        // From Default!
+        final String name = getDefaultDatabaseProductName();
+        setDatabaseProductNameToContext(name);
+    }
+
+    protected boolean setupDatabaseProductNameByDriverClassNameIfPossible(XADataSource xaDataSource) {
+        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) {
+            final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            if (driverClassName != null) {
+                if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
+                    final String name = getDatabaseProductNameFromContext();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected String getDefaultDatabaseProductName() {
+        return "${database.databaseProductName}"; // as default!
+    }
+
+    protected String getDatabaseProductNameFromContext() {
+        return ${glConditionBeanContextName}.getDatabaseProductName();
+    }
+
+    protected void setDatabaseProductNameToContext(String name) {
+        ${glConditionBeanContextName}.setDatabaseProductName(name);
+    }
+
+    protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
+        return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
+    }
+
+    // ===================================================================================
+    //                                                                    SQL Log Registry
+    //                                                                    ================
+    protected void handleSqlLogRegistry() {
+        final StringBuilder sb = new StringBuilder();
+        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
+            sb.append("{SqlLog Information}").append(getLineSeparator());
+            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
+                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
+                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
+            } else {
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
+            }
+        } else {
+            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+            if (sqlLogRegistry != null) {
+                ${glInternalSqlLogRegistry}.closeRegistration();
+            sb.append("{SqlLog Information}").append(getLineSeparator());
+            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+            } else {
+                // No logging here
+                // sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
+            }
+        }
+        _log.info(sb);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+}

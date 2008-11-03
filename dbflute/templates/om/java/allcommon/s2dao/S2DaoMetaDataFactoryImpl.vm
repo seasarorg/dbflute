@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
@@ -35,10 +34,8 @@ import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.pager.PagingSqlRewriter;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
-import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 
 /**
@@ -138,102 +135,9 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glDaoMetaDataFactoryImpl}(DataSource dataSource
-                                  , AnnotationReaderFactory annotationReaderFactory
-                                  , XADataSource xaDataSource) {
+    public ${glDaoMetaDataFactoryImpl}(DataSource dataSource, AnnotationReaderFactory annotationReaderFactory) {
         this.dataSource = dataSource;
         this.annotationReaderFactory = annotationReaderFactory;
-
-        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
-        showInformation(dataSource, xaDataSource);
-
-        // Stop the LinkageError!
-        ${glConditionBeanContextName}.initialize();
-
-        initializeDatabaseProductNameOfContext(xaDataSource);
-
-        handleSqlLogRegistry();
-        
-        ${glDBFluteConfig}.getInstance().lock();
-        _log.info("* * * * */");
-    }
-
-    protected void showInformation(DataSource dataSource, XADataSource xaDataSource) {
-        final StringBuilder sb = new StringBuilder();
-        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
-            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            final String url = xaDataSourceImpl.getURL();
-            final String user = xaDataSourceImpl.getUser();
-            sb.append("  [XADataSource]:").append(getLineSeparator());
-            sb.append("    driver = " + driverClassName).append(getLineSeparator());
-            sb.append("    url    = " + url).append(getLineSeparator());
-            sb.append("    user   = " + user);
-        }
-        _log.info("{Injection Information}" + getLineSeparator() + sb);
-    }
-
-    protected void handleSqlLogRegistry() {
-        final StringBuilder sb = new StringBuilder();
-        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
-            sb.append("{SqlLog Information}").append(getLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
-                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
-            } else {
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
-            }
-        } else {
-            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-            if (sqlLogRegistry != null) {
-                ${glInternalSqlLogRegistry}.closeRegistration();
-            sb.append("{SqlLog Information}").append(getLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
-                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
-            } else {
-                // No logging here
-                // sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
-            }
-        }
-        _log.info(sb);
-    }
-
-    // -----------------------------------------------------
-    //                                 Database Product Name
-    //                                 ---------------------
-    protected void initializeDatabaseProductNameOfContext(javax.sql.XADataSource xaDataSource) {
-        if (getDatabaseProductNameFromContext() != null) {
-            return;
-        }
-
-        // From JDBC Driver!
-        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
-            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            if (driverClassName != null) {
-                if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
-                    _log.info("...Initializing database product name from driverClassName: " + getDatabaseProductNameFromContext());
-                    return;
-                }
-            }
-        }
-
-        _log.info("...Initializing database product name as default: ${database.databaseProductName}");
-        setDatabaseProductNameToContext("${database.databaseProductName}");
-    }
-
-    protected String getDatabaseProductNameFromContext() {
-        return ${glConditionBeanContextName}.getDatabaseProductName();
-    }
-
-    protected void setDatabaseProductNameToContext(String name) {
-        ${glConditionBeanContextName}.setDatabaseProductName(name);
-    }
-
-    protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
-        return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
     }
 
     // ===================================================================================

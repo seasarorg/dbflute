@@ -29,7 +29,8 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
+    @Override
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {

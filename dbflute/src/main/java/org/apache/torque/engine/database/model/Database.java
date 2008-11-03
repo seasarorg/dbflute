@@ -1587,43 +1587,43 @@ public class Database {
     //                                                                 ===================
     protected Map<String, String> _databaseDefinitionMap;
 
-    public Map<String, String> getDatabaseInfoMap() {
+    public Map<String, String> getDatabaseDefinitionMap() {
         if (_databaseDefinitionMap == null) {
-            final Map<String, Map<String, String>> databaseDefinitionMap = getDatabaseDefinitionMap();
-            Map<String, String> databaseInfoMap = databaseDefinitionMap.get(getDatabaseType());
-            if (databaseInfoMap == null) {
-                databaseInfoMap = databaseDefinitionMap.get("default");
-                if (databaseInfoMap == null) {
+            final DfDatabaseConfig config = new DfDatabaseConfig();
+            final Map<String, Map<String, String>> databaseConfigMap = config.analyzeDatabaseBaseInfo();
+            Map<String, String> databaseDefinitionMap = databaseConfigMap.get(getDatabaseType());
+            if (databaseDefinitionMap == null) {
+                databaseDefinitionMap = databaseConfigMap.get("default");
+                if (databaseDefinitionMap == null) {
                     String msg = "The property[databaseDefinitionMap] doesn't have the database[";
                     throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
                 }
             }
-            _databaseDefinitionMap = databaseInfoMap;
+            _databaseDefinitionMap = databaseDefinitionMap;
         }
         return _databaseDefinitionMap;
     }
 
-    protected Map<String, Map<String, String>> getDatabaseDefinitionMap() {
-        final DfDatabaseConfig config = new DfDatabaseConfig();
-        return config.analyzeDatabaseBaseInfo();
+    public String getDatabaseProductName() { // for ConditionBeanContext
+        return getGenerateDbName().toLowerCase();
     }
 
-    public String getDatabaseProductName() {
-        return getDaoGenDbName();
+    public String getDaoGenDbName() { // for SqlClause
+        return getGenerateDbName();
     }
 
-    public String getDaoGenDbName() {
-        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
-        final String daoGenDbName = (String) databaseInfoMap.get("daoGenDbName");
-        if (daoGenDbName == null || daoGenDbName.trim().length() == 0) {
-            String msg = "The database doesn't have daoGenDbName in the property[databaseInfoMap]: ";
+    public String getGenerateDbName() {
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
+        final String dbName = (String) databaseInfoMap.get("dbName");
+        if (dbName == null || dbName.trim().length() == 0) {
+            String msg = "The database doesn't have dbName in the property[databaseInfoMap]: ";
             throw new IllegalStateException(msg + databaseInfoMap);
         }
-        return daoGenDbName;
+        return dbName;
     }
 
     public String getWildCard() {
-        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
         final String wildCard = (String) databaseInfoMap.get("wildCard");
         if (wildCard == null || wildCard.trim().length() == 0) {
             String msg = "The database doesn't have wildCard in the property[databaseInfoMap]: ";
@@ -1633,7 +1633,7 @@ public class Database {
     }
 
     public String getSequenceNextSql() {
-        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
         final String sequenceNextSql = (String) databaseInfoMap.get("sequenceNextSql");
         if (sequenceNextSql == null || sequenceNextSql.trim().length() == 0) {
             String msg = "The database doesn't have sequenceNextSql in the property[databaseInfoMap]: ";
