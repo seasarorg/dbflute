@@ -63,7 +63,7 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                          Initialize
     //                                                                          ==========
-    public void initialize() {
+    public void initializeBehaviorApplication() {
         ${glConditionBeanContextName}.initialize(); // Stop the LinkageError!
         initializeDatabaseProductNameOfContext();
         handleSqlLogRegistry();
