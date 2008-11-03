@@ -35,13 +35,13 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
         final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                ResultSetHandler handler = new CountResultSetHandler();
+                ResultSetHandler handler = new InternalCountResultSetHandler();
                 return createSelectExecution(cbType, handler);
             }
         };
     }
 
-    protected static class CountResultSetHandler implements ResultSetHandler {
+    protected static class InternalCountResultSetHandler implements ResultSetHandler {
         public Object handle(ResultSet rs) throws SQLException {
             if (rs.next()) {
                 return rs.getInt(1);
