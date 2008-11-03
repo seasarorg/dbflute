@@ -46,10 +46,13 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
         };
     }
 
-    @Override
-    public Object[] getSqlExecutionArgument() {
-        return new Object[] { _parameterBean };
-    }
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // InternalProcedureCommand switches argument so this override is unnecessary!
+    // - - - - - - - - - -/
+    // @Override
+    // public Object[] getSqlExecutionArgument() {
+    //     return new Object[] { _parameterBean };
+    // }
 
     // ===================================================================================
     //                                                                       Assert Helper
