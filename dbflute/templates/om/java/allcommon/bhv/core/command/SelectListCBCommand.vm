@@ -9,6 +9,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -18,16 +19,17 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected ${glConditionBeanInterfaceName} _conditionBean;
     protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    public String getBehaviorMethodName() {
+    public String getCommandName() {
         return "selectList";
     }
 
-    public Class<?> getBehaviorMethodReturnType() {
+    public Class<?> getCommandReturnType() {
         return ${glListResultBeanName}.class;
     }
 
@@ -57,11 +59,9 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
-    public void beforeGettingSqlExecution(Object[] args) {
-        final ${glConditionBeanInterfaceName} cb = getConditionBean(args);
-        if (cb == null) {
-            return;
-        }
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final ${glConditionBeanInterfaceName} cb = _conditionBean;
         if (isSelectCount()) {
             cb.xsetupSelectCountIgnoreFetchScope();
         } else {
@@ -70,11 +70,9 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
     }
 
-    public void afterExecuting(Object[] args) {
-        final ${glConditionBeanInterfaceName} cb = getConditionBean(args);
-        if (cb == null) {
-            return;
-        }
+    public void afterExecuting() {
+        assertStatus("afterExecuting");
+        final ${glConditionBeanInterfaceName} cb = _conditionBean;
         if (isSelectCount()) {
             cb.xafterCareSelectCountIgnoreFetchScope();
         }
@@ -83,12 +81,12 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    public String buildSqlExecutionKey(Object[] args) {
+    public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
+        return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
     }
 
-    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {
@@ -100,29 +98,47 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
         };
     }
 
+    public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
+        return new Object[] { _conditionBeanType };
+    }
+
     // ===================================================================================
-    //                                                                              Assert
-    //                                                                              ======
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBeanInterfaceName} getConditionBean() {
+        return _conditionBean;
+    }
+
+    public String getOutsideSqlPath() {
+        return null;
+    }
+
+    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     protected void assertStatus(String methodName) {
         if (_conditionBeanType == null) {
             String msg = "The property 'conditionBeanType' should not be null";
             msg = msg + " when you call " + methodName + "().";
             throw new IllegalStateException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        return _behaviorClassName + "." + getBehaviorMethodName() + "(" + _conditionBeanType.getSimpleName() + " cb)";
+        if (_conditionBean == null) {
+            String msg = "The property 'conditionBean' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
-        _conditionBeanType = conditionBeanType;
+    public void setConditionBean(${glConditionBeanInterfaceName} conditionBean) {
+        _conditionBean = conditionBean;
+        _conditionBeanType = conditionBean != null ? conditionBean.getClass() : null;
     }
 }

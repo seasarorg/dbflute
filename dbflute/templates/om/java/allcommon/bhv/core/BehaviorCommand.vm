@@ -13,9 +13,8 @@ public interface ${glBehaviorCommand} {
     //                                                                   =================
     public Class<?> getEntityType();
     public String getTableDbName();
-    public String getBehaviorClassName();
-    public String getBehaviorMethodName();
-    public Class<?> getBehaviorMethodReturnType();
+    public String getCommandName();
+    public Class<?> getCommandReturnType();
     public boolean isInitializeOnly();
 
     // ===================================================================================
@@ -30,21 +29,20 @@ public interface ${glBehaviorCommand} {
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
-    public void beforeGettingSqlExecution(Object[] args);
-    public void afterExecuting(Object[] args);
+    public void beforeGettingSqlExecution();
+    public void afterExecuting();
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    public String buildSqlExecutionKey(Object[] args);
-    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args);
+    public String buildSqlExecutionKey();
+    public ${glSqlExecutionCreator} createSqlExecutionCreator();
+    public Object[] getSqlExecutionArgument();
 
     // ===================================================================================
-    //                                                                   Argument Handling
-    //                                                                   =================
-    public ${glConditionBeanInterfaceName} getConditionBean(Object[] args);
-    public String getOutsideSqlPath(Object[] args);
-    public Object getOutsideSqlParameterBean(Object[] args);
-    public ${glOutsideSqlOptionName} getOutsideSqlOption(Object[] args);
-    public Object getResultTypeSpecification(Object[] args);
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBeanInterfaceName} getConditionBean();
+    public String getOutsideSqlPath();
+    public ${glOutsideSqlOptionName} getOutsideSqlOption();
 }

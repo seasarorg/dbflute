@@ -132,35 +132,35 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Command Invoke
     //                                                                      ==============
-    public Object invoke(${glBehaviorCommand} behaviorCommand, Object[] args) {
+    public Object invoke(${glBehaviorCommand} behaviorCommand) {
         clearContext();
         try {
-            return doInvoke(behaviorCommand, args);
+            return doInvoke(behaviorCommand);
         } finally {
             clearContext();
         }
     }
 
-    protected Object doInvoke(${glBehaviorCommand} behaviorCommand, Object[] args) {
+    protected Object doInvoke(${glBehaviorCommand} behaviorCommand) {
         // - - - - - - - - - - - - -
         // Initialize SQL Execution
         // - - - - - - - - - - - - -
         if (behaviorCommand.isInitializeOnly()) {
-            initializeSqlExecution(behaviorCommand, args);
+            initializeSqlExecution(behaviorCommand);
             return null; // The end! (Initilize Only)
         }
-        behaviorCommand.beforeGettingSqlExecution(args);
+        behaviorCommand.beforeGettingSqlExecution();
 
         ${glSqlExecution} execution = null;
         try {
-            final String key = behaviorCommand.buildSqlExecutionKey(args);
+            final String key = behaviorCommand.buildSqlExecutionKey();
             execution = getSqlExecution(key);
             if (execution == null) {
                 long beforeCmd = 0;
                 if (isLogEnabled()) {
                     beforeCmd = System.currentTimeMillis();
                 }
-                ${glSqlExecutionCreator} creator = createSqlExecutionCreator(behaviorCommand, args);
+                ${glSqlExecutionCreator} creator = behaviorCommand.createSqlExecutionCreator();
                 execution = getSqlExecution(key, creator);
                 if (isLogEnabled()) {
                     final long afterCmd = System.currentTimeMillis();
@@ -171,7 +171,7 @@ public class ${glBehaviorCommandInvoker} {
             }
         } finally {
             if (isLogEnabled()) {
-                logInvocation(behaviorCommand, args);
+                logInvocation(behaviorCommand);
             }
         }
 
@@ -182,11 +182,12 @@ public class ${glBehaviorCommandInvoker} {
 
         Object ret = null;
         try {
+            final Object[] args = behaviorCommand.getSqlExecutionArgument();
             ret = executeSql(execution, args);
         } finally {
-            behaviorCommand.afterExecuting(args);
+            behaviorCommand.afterExecuting();
         }
-        final Class<?> retType = behaviorCommand.getBehaviorMethodReturnType();
+        final Class<?> retType = behaviorCommand.getCommandReturnType();
         assertRetType(retType, ret);
 
         if (isLogEnabled()) {
@@ -209,13 +210,9 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
-    protected Object executeSql(${glSqlExecution} execution, Object[] args) {
-        return execution.execute(args);
-    }
-
-    protected void initializeSqlExecution(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        final String key = behaviorCommand.buildSqlExecutionKey(args);
-        ${glSqlExecutionCreator} creator = createSqlExecutionCreator(behaviorCommand, args);
+    protected void initializeSqlExecution(${glBehaviorCommand} behaviorCommand) {
+        final String key = behaviorCommand.buildSqlExecutionKey();
+        ${glSqlExecutionCreator} creator = behaviorCommand.createSqlExecutionCreator();
         getSqlExecution(key, creator);
     }
 
@@ -248,7 +245,11 @@ public class ${glBehaviorCommandInvoker} {
         }
         return execution;
     }
-    
+
+    protected Object executeSql(${glSqlExecution} execution, Object[] args) {
+        return execution.execute(args);
+    }
+
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
@@ -259,7 +260,7 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Log Invocation
     //                                                                      ==============
-    protected void logInvocation(${glBehaviorCommand} behaviorCommand, Object[] args) {
+    protected void logInvocation(${glBehaviorCommand} behaviorCommand) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
 
@@ -269,8 +270,8 @@ public class ${glBehaviorCommandInvoker} {
             invokeClassName = behaviorResult.getSimpleClassName();
             invokeMethodName = behaviorResult.getMethodName();
         } else {
-            invokeClassName = behaviorCommand.getBehaviorClassName();
-            invokeMethodName = behaviorCommand.getBehaviorMethodName();
+            invokeClassName = behaviorCommand.getTableDbName();
+            invokeMethodName = behaviorCommand.getCommandName();
         }
         final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName, invokeMethodName);
 
@@ -288,8 +289,11 @@ public class ${glBehaviorCommandInvoker} {
 
         // Specified OutsideSql
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
-            log("path: " + behaviorCommand.getOutsideSqlPath(args));
-            log("option: " + behaviorCommand.getOutsideSqlOption(args));
+            final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+            if (outsideSqlContext != null) {
+                log("path: " + behaviorCommand.getOutsideSqlPath());
+                log("option: " + behaviorCommand.getOutsideSqlOption());
+            }
         }
     }
 
@@ -322,7 +326,7 @@ public class ${glBehaviorCommandInvoker} {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
             try {
                 final String originalName = invokeClassName;
-                if (isOutsideSql(behaviorCommand)) {
+                if (behaviorCommand.isOutsideSql()) {
                     final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                     final String tableDbName = outsideSqlContext.getTableDbName();
                     final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
@@ -350,7 +354,7 @@ public class ${glBehaviorCommandInvoker} {
         String callerExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
             boolean resultTypeInteger = false;
-            if (isOutsideSql(behaviorCommand)) {
+            if (behaviorCommand.isOutsideSql()) {
                 final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                 final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
                 if (resultTypeSpecification != null && resultTypeSpecification instanceof Class<?>) {
@@ -360,7 +364,7 @@ public class ${glBehaviorCommandInvoker} {
                     }
                 }
             }
-            if (resultTypeInteger || isSelectCount(behaviorCommand)) {
+            if (resultTypeInteger || behaviorCommand.isSelectCount()) {
                 callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():count";
             } else {
                 callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():paging";
@@ -579,7 +583,7 @@ public class ${glBehaviorCommandInvoker} {
                     }
                 }
             } else {
-                if (isSelectCount(behaviorCommand)) {
+                if (behaviorCommand.isSelectCount()) {
                     log(daoResultPrefix + "Selected count: " + ret + "]");
                 } else {
                     log(daoResultPrefix + "Result: " + ret + "]");
@@ -676,29 +680,6 @@ public class ${glBehaviorCommandInvoker} {
                 throw new IllegalStateException(msg);
             }
         }
-    }
-
-    // ===================================================================================
-    //                                                                    Behavior Command
-    //                                                                    ================
-    protected ${glSqlExecutionCreator} createSqlExecutionCreator(${glBehaviorCommand} behaviorCommand, Object[] args) {
-        return behaviorCommand.createSqlExecutionCreator(args);
-    }
-
-    protected boolean isConditionBean(${glBehaviorCommand} behaviorCommand) {
-        return behaviorCommand.isConditionBean();
-    }
-
-    protected boolean isOutsideSql(${glBehaviorCommand} behaviorCommand) {
-        return behaviorCommand.isOutsideSql();
-    }
-
-    protected boolean isSelect(${glBehaviorCommand} behaviorCommand) {
-        return behaviorCommand.isSelect();
-    }
-
-    protected boolean isSelectCount(${glBehaviorCommand} behaviorCommand) {
-        return behaviorCommand.isSelectCount();
     }
 
     // ===================================================================================

@@ -17,10 +17,8 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandComponentSetup};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
@@ -39,7 +37,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     //                                     -----------------
     protected Class<? extends ${glEntityInterfaceName}> _entityType;
     protected String _tableDbName;
-    protected String _behaviorClassName;
     protected boolean _initializeOnly;
 
     // -----------------------------------------------------
@@ -158,57 +155,13 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     protected ${glInternalRelationRowCreator} createInternalRelationRowCreator(BeanMetaData bmd) {
         return new ${glInternalRelationRowCreator}(); // Not yet implemented about performance tuning!
     }
-	
+
     // ===================================================================================
-    //                                                                   Argument Handling
-    //                                                                   =================
-    public ${glConditionBeanInterfaceName} getConditionBean(Object[] args) {
-        if (args != null && args.length > 0 && args[0] instanceof ${glConditionBeanInterfaceName}) {
-            return (${glConditionBeanInterfaceName})args[0];
-        }
-        return null; 
-    }
-
-    public String getOutsideSqlPath(Object[] args) {
-        if (args != null && args.length > 0 && args[0] instanceof String) {
-            return (String)args[0];
-        }
-        return null; 
-    }
-
-    public Object getOutsideSqlParameterBean(Object[] args) {
-        if (args != null && args.length > 1) {
-            return args[1];
-        }
-        return null; 
-    }
-
-    public ${glOutsideSqlOptionName} getOutsideSqlOption(Object[] args) {
-        if (args != null && args.length > 2 && args[2] instanceof ${glOutsideSqlOptionName}) {
-            return (${glOutsideSqlOptionName})args[2];
-        }
-        return null; 
-    }
-
-    public Object getResultTypeSpecification(Object[] args) { // When the outsideSql is for select.
-        if (args != null && args.length > 3) {
-            return (${glOutsideSqlOptionName})args[2];
-        }
-        return null; 
-    }
-
-    protected void assertOutsideSqlSelectArgument(Object[] args) {
-        if (args.length != 4) {
-            String msg = "Internal Error! OutsideSql should have 4 arguements: args.length=" + args.length;
-            throw new IllegalStateException(msg);
-        }
-    }
-
-    protected void assertOutsideSqlExecuteArgument(Object[] args) {
-        if (args.length != 3) {
-            String msg = "Internal Error! OutsideSql should have 4 arguements: args.length=" + args.length;
-            throw new IllegalStateException(msg);
-        }
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ":" + buildSqlExecutionKey();
     }
 
     // ===================================================================================
@@ -231,14 +184,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
 
     public void setTableDbName(String tableDbName) {
         _tableDbName = tableDbName;
-    }
-
-    public String getBehaviorClassName() {
-        return _behaviorClassName;
-    }
-
-    public void setBehaviorClassName(String behaviorClassName) {
-        _behaviorClassName = behaviorClassName;
     }
 
     public void setInitializeOnly(boolean initializeOnly) {

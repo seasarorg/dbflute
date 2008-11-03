@@ -17,12 +17,12 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
     //                                                                   Basic Information
     //                                                                   =================
     @Override
-    public String getBehaviorMethodName() {
+    public String getCommandName() {
         return "selectCount";
     }
 
     @Override
-    public Class<?> getBehaviorMethodReturnType() {
+    public Class<?> getCommandReturnType() {
         return int.class;
     }
 
@@ -40,7 +40,7 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
         };
     }
 
-    protected class CountResultSetHandler implements ResultSetHandler {
+    protected static class CountResultSetHandler implements ResultSetHandler {
         public Object handle(ResultSet rs) throws SQLException {
             if (rs.next()) {
                 return rs.getInt(1);

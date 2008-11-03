@@ -21,15 +21,19 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String _outsideSqlPath;
+    protected Object _parameterBean;
+    protected Object _outsideSqlOption;
+    protected Object _resultTypeSpecification;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    public String getBehaviorMethodName() {
+    public String getCommandName() {
         return "selectList";
     }
 
-    public Class<?> getBehaviorMethodReturnType() {
+    public Class<?> getCommandReturnType() {
         return ${glListResultBeanName}.class;
     }
 
@@ -59,12 +63,12 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
-    public void beforeGettingSqlExecution(Object[] args) {
-        assertOutsideSqlSelectArgument(args);
-        final String path = getOutsideSqlPath(args);
-        final Object pmb = getOutsideSqlParameterBean(args);
-        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
-        final Object resultTypeSpecification = getResultTypeSpecification(args);
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final String path = _outsideSqlPath;
+        final Object pmb = _parameterBean;
+        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final Object resultTypeSpecification = _resultTypeSpecification;
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
@@ -72,7 +76,7 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
-        outsideSqlContext.setMethodName(getBehaviorMethodName());
+        outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
@@ -99,20 +103,21 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    public String buildSqlExecutionKey(Object[] args) {
+    public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return generateSpecifiedOutsideSqlUniqueKey(args);
+        return generateSpecifiedOutsideSqlUniqueKey();
     }
 
-    protected String generateSpecifiedOutsideSqlUniqueKey(Object[] args) {
-        final String path = getOutsideSqlPath(args);
-        final Object pmb = getOutsideSqlParameterBean(args);
-        final ${glOutsideSqlOptionName} option = getOutsideSqlOption(args);
-        final Object resultTypeSpecification = getResultTypeSpecification(args);
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(getBehaviorMethodName(), path, pmb, option, resultTypeSpecification);
+    protected String generateSpecifiedOutsideSqlUniqueKey() {
+        final String methodName = getCommandName();
+        final String path = _outsideSqlPath;
+        final Object pmb = _parameterBean;
+        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final Object resultTypeSpecification = _resultTypeSpecification;
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
     }
 
-    public ${glSqlExecutionCreator} createSqlExecutionCreator(Object[] args) {
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
@@ -122,17 +127,63 @@ public class ${glSelectListOutsideSqlCommand} extends ${glAbstractBehaviorComman
         };
     }
 
-    // ===================================================================================
-    //                                                                              Assert
-    //                                                                              ======
-    protected void assertStatus(String methodName) {
+    public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
+        return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption, _resultTypeSpecification };
     }
 
     // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        return _behaviorClassName + "." + getBehaviorMethodName() + "()";
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBeanInterfaceName} getConditionBean() {
+        return null;
+    }
+
+    public String getOutsideSqlPath() {
+        return _outsideSqlPath;
+    }
+
+    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+        return _outsideSqlOption;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertStatus(String methodName) {
+        if (_outsideSqlPath == null) {
+            String msg = "The property 'outsideSqlPath' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_outsideSqlOption == null) {
+            String msg = "The property 'outsideSqlOption' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_resultTypeSpecification == null) {
+            String msg = "The property 'resultTypeSpecification' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setOutsideSqlPath(String outsideSqlPath) {
+        _outsideSqlPath = outsideSqlPath;
+    }
+
+    public void setParameterBean(String parameterBean) {
+        _parameterBean = parameterBean;
+    }
+
+    public void setOutsideSqlOption(String outsideSqlOption) {
+        _outsideSqlOption = outsideSqlOption;
+    }
+
+    public void setResultTypeSpecification(String resultTypeSpecification) {
+        _resultTypeSpecification = resultTypeSpecification;
     }
 }
