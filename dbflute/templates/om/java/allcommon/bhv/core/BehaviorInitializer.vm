@@ -102,8 +102,8 @@ public class ${glBehaviorInitializer} {
     //                                                                    SQL Log Registry
     //                                                                    ================
     protected void handleSqlLogRegistry() {
-        final StringBuilder sb = new StringBuilder();
         if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
+            final StringBuilder sb = new StringBuilder();
             sb.append("{SqlLog Information}").append(getLineSeparator());
             sb.append("  [SqlLogRegistry]").append(getLineSeparator());
             if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
@@ -112,20 +112,13 @@ public class ${glBehaviorInitializer} {
             } else {
                 sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
             }
+           _log.info(sb);
         } else {
             final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
             if (sqlLogRegistry != null) {
                 ${glInternalSqlLogRegistry}.closeRegistration();
-            sb.append("{SqlLog Information}").append(getLineSeparator());
-            sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
-                sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
-            } else {
-                // No logging here
-                // sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not available!");
             }
         }
-        _log.info(sb);
     }
 
     // ===================================================================================
