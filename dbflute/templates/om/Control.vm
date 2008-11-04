@@ -133,6 +133,7 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Behavior-Core-Command]
     #set ($glAbstractBehaviorCommand = "${glProjectPrefix}AbstractBehaviorCommand")
     #set ($glAbstractEntityCommand = "${glProjectPrefix}AbstractEntityCommand")
+    #set ($glAbstractOutsideSqlCommand = "${glProjectPrefix}AbstractOutsideSqlCommand")
     #set ($glInsertEntityCommand = "${glProjectPrefix}InsertEntityCommand")
     #set ($glOutsideSqlCallCommand = "${glProjectPrefix}OutsideSqlCallCommand")
     #set ($glOutsideSqlExecuteCommand = "${glProjectPrefix}OutsideSqlExecuteCommand")
@@ -697,6 +698,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('AbstractEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractEntityCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractEntityCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('AbstractOutsideSqlCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('InsertEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glInsertEntityCommand}.${glClassFileExtension}" )

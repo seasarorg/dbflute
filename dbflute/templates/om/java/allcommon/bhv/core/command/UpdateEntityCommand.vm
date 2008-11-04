@@ -1,0 +1,47 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glUpdateEntityCommand} extends ${glAbstractEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "update";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                final BeanMetaData bmd = createBeanMetaData();
+                return createUpdateEntitySqlExecution(bmd);
+            }
+        };
+    }
+
+    protected ${glSqlExecution} createUpdateEntitySqlExecution(BeanMetaData bmd) {
+        final String[] propertyNames = getPersistentPropertyNames(bmd);
+        return createUpdateModifiedOnlyCommand(bmd, propertyNames);
+    }
+
+    protected ${glInternalUpdateModifiedOnlyCommand} createUpdateModifiedOnlyCommand(BeanMetaData bmd, String[] propertyNames) {
+        final ${glInternalUpdateModifiedOnlyCommand} cmd = new ${glInternalUpdateModifiedOnlyCommand}(_dataSource, _statementFactory);
+        cmd.setBeanMetaData(bmd);// Extension Point!
+        cmd.setPropertyNames(propertyNames);
+        cmd.setCheckSingleRowUpdate(true);
+        cmd.setVersionNoAutoIncrementOnMemory(true);
+        return cmd;
+    }
+}
