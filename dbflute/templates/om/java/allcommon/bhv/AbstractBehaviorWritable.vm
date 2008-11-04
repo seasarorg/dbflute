@@ -48,9 +48,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /** Map-string map-mark. */
     private static final String MAP_STRING_MAP_MARK = "map:";
 
-    /** Map-string list-mark. */
-    private static final String MAP_STRING_LIST_MARK = "list:";
-
     /** Map-string start-brace. */
     private static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
 
