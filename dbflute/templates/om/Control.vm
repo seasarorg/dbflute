@@ -141,6 +141,8 @@ targetdatabase = $targetDatabase
     #set ($glOutsideSqlSelectListCommand = "${glProjectPrefix}OutsideSqlSelectListCommand")
     #set ($glSelectCountCBCommand = "${glProjectPrefix}SelectCountCBCommand")
     #set ($glSelectListCBCommand = "${glProjectPrefix}SelectListCBCommand")
+    #set ($glUpdateEntityCommand = "${glProjectPrefix}UpdateEntityCommand")
+    #set ($glUpdateNonstrictEntityCommand = "${glProjectPrefix}UpdateNonstrictEntityCommand")
 
     ## [Allcommon-Behavior-Load]
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
@@ -730,6 +732,14 @@ targetdatabase = $targetDatabase
       $database.info("    parse('SelectListCBCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectListCBCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectListCBCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('UpdateEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateEntityCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('UpdateNonstrictEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateNonstrictEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
       $database.makeDirectory($path)

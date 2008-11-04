@@ -40,8 +40,12 @@ public class ${glUpdateEntityCommand} extends ${glAbstractEntityCommand} {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = new ${glInternalUpdateModifiedOnlyCommand}(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setCheckSingleRowUpdate(true);
-        cmd.setVersionNoAutoIncrementOnMemory(true);
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling());
+        cmd.setVersionNoAutoIncrementOnMemory(isOptimisticLockHandling());
         return cmd;
+    }
+    
+    protected boolean isOptimisticLockHandling() {
+        return true;
     }
 }
