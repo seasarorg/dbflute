@@ -19,6 +19,7 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractBehaviorCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
@@ -81,7 +82,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Read count. (NotNull)
      */
     public int readCount(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return callReadCount(cb);
     }
 
@@ -95,7 +96,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         final List<${glEntityInterfaceName}> ls = readList(cb);
         if (ls.isEmpty()) {
             return null;
@@ -113,7 +114,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         final List<${glEntityInterfaceName}> ls = readList(cb);
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
@@ -125,7 +126,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                           ===========================
     protected <ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}>
             ENTITY helpSelectEntityInternally(CB cb, InternalSelectEntityCallback<ENTITY, CB> callback) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         cb.checkSafetyResult(1);
         List<ENTITY> ls = null;
         try {
@@ -146,7 +147,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     protected <ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}>
             ENTITY helpSelectEntityWithDeletedCheckInternally(CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         cb.checkSafetyResult(1);
         List<ENTITY> ls = null;
         try {
@@ -172,7 +173,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
     public ${glListResultBeanName}<${glEntityInterfaceName}> readList(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${glEntityInterfaceName}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
     }
 
@@ -182,7 +183,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         final ${glPagingInvokerName}<${glEntityInterfaceName}> invoker = new ${glPagingInvokerName}<${glEntityInterfaceName}>(getTableDbName());
         final ${glPagingHandlerName}<${glEntityInterfaceName}> handler = new ${glPagingHandlerName}<${glEntityInterfaceName}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
@@ -548,7 +549,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          * @throws java.io.IOException
          */
         public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
-            assertConditionBeanNotNull(cb);
+            assertCBNotNull(cb);
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
 
@@ -601,7 +602,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Read count. (NotNull)
      */
     protected int callReadCount(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return doCallReadCount(cb);
     }
     protected abstract int doCallReadCount(${glConditionBeanInterfaceName} cb);
@@ -612,7 +613,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
     protected List<${glEntityInterfaceName}> callReadList(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return doCallReadList(cb);
     }
     protected abstract List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb);
@@ -743,7 +744,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean. (NotNull)
      */
     protected void assertConditionBeanNotNull(${glConditionBeanInterfaceName} cb) {
-        assertCBNotNull("cb", cb);
+        assertCBNotNull(cb);
     }
 
     /**
