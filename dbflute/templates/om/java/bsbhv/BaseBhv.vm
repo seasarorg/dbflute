@@ -97,7 +97,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /** @return The meta data of the database as my table type. (NotNull) */
     public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
-#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     // ===================================================================================
     //                                                                        Dao Accessor
@@ -107,7 +106,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${glDaoReadableInterfaceName} getDaoReadable() { return getMyDao(); }
 #if ($table.isWritable())
     public ${glDaoWritableInterfaceName} getDaoWritable() { return getMyDao(); }
-#end
 #end
 
     // ===================================================================================
