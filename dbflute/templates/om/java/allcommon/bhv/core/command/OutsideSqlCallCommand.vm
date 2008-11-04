@@ -4,6 +4,9 @@ import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalProcedureCommand};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
 
 /**
  * The behavior command for OutsideSql.execute().
@@ -46,6 +49,33 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
         };
     }
 
+    protected ${glSqlExecution} createOutsideSqlCallCommand(${glOutsideSqlContextName} outsideSqlContext) {
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        // The attribute of Specified-OutsideSqlContext.
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        final Object pmb = outsideSqlContext.getParameterBean();
+        final String procedureName = outsideSqlContext.getOutsideSqlPath();
+
+        // - - - - - - - - - - - - - - -
+        // The attribute of SqlCommand.
+        // - - - - - - - - - - - - - - -
+        final ${glInternalProcedureMetaDataFactory} factory = createProcedureMetaDataFactory();
+        factory.setValueTypeFactory(_valueTypeFactory);
+        final Class<?> pmbType = (pmb != null ? pmb.getClass() : null);
+        final ${glInternalProcedureMetaData} metaData = factory.createProcedureMetaData(procedureName, pmbType);
+        return createProcedureCommand(metaData);
+    }
+
+    protected ${glInternalProcedureMetaDataFactory} createProcedureMetaDataFactory() {
+        return new ${glInternalProcedureMetaDataFactory}();
+    }
+
+    protected ${glInternalProcedureCommand} createProcedureCommand(${glInternalProcedureMetaData} metaData) {
+        // Because a procedure command does not use result set handler.
+        final ResultSetHandler resultSetHandler = new InternalNullResultSetHandler(); 
+        return new ${glInternalProcedureCommand}(_dataSource, resultSetHandler, _statementFactory, metaData);
+    }
+
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // InternalProcedureCommand switches argument so this override is unnecessary!
     // - - - - - - - - - -/
@@ -59,6 +89,8 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
     //                                                                       =============
     @Override
     protected void assertStatus(String methodName) {
+        assertBasicProperty(methodName);
+        assertComponentProperty(methodName);
         if (_outsideSqlPath == null) {
             String msg = "The property 'outsideSqlPath' should not be null";
             msg = msg + " when you call " + methodName + "().";

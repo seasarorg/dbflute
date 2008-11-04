@@ -2,6 +2,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import java.util.List;
 
+import org.seasar.dao.BeanMetaData;
+import org.seasar.extension.jdbc.ResultSetHandler;
+
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
@@ -129,6 +132,32 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
         };
     }
 
+    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContextName} outsideSqlContext) {
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        // The attribute of Specified-OutsideSqlContext.
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        final String suffix = buildDbmsSuffix();
+        final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
+        final Object pmb = outsideSqlContext.getParameterBean();
+
+        // - - - - - - - - - - - - - - -
+        // The attribute of SqlCommand.
+        // - - - - - - - - - - - - - - -
+        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
+        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
+
+        // - - - - - - - - - - - - - - - -
+        // Create customized BeanMetaData.
+        // - - - - - - - - - - - - - - - -
+        final BeanMetaData bmd = createBeanMetaData();
+        final ResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
+
+        // - - - - - - - - - -
+        // Create Sql-Command.
+        // - - - - - - - - - -
+        return createSelectDynamicCommand(handler, argNames, argTypes, sql);
+    }
+
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
         return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption, getResultTypeSpecification() };
@@ -160,6 +189,8 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractBehaviorComman
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertStatus(String methodName) {
+        assertBasicProperty(methodName);
+        assertComponentProperty(methodName);
         if (_outsideSqlPath == null) {
             String msg = "The property 'outsideSqlPath' should not be null";
             msg = msg + " when you call " + methodName + "().";

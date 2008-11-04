@@ -108,6 +108,23 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} 
         };
     }
 
+    protected ${glSqlExecution} createOutsideSqlExecuteExecution(${glOutsideSqlContextName} outsideSqlContext) {
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        // The attribute of Specified-OutsideSqlContext.
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        final String suffix = buildDbmsSuffix();
+        final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
+        final Object pmb = outsideSqlContext.getParameterBean();
+
+        // - - - - - - - - - - - - - - -
+        // The attribute of SqlCommand.
+        // - - - - - - - - - - - - - - -
+        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
+        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
+
+        return createUpdateDynamicCommand(argNames, argTypes, sql);
+    }
+
     public Object[] getSqlExecutionArgument() {
         return new Object[] { _parameterBean };
     }

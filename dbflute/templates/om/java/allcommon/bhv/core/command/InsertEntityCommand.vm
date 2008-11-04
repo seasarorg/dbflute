@@ -1,0 +1,91 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import java.util.List;
+
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "insert";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        final Class<?> entityType = _entityType;
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                final BeanMetaData bmd = createBeanMetaData();
+                return createInsertEntitySqlExecution(bmd);
+            }
+        };
+    }
+
+    protected ${glSqlExecution} createInsertEntitySqlExecution(BeanMetaData bmd) {
+#if ($database.isAvailableNonPrimaryKeyWritable())
+        final ${glSqlExecution} nonPrimaryKeySqlExecution = createNonPrimaryInsertSqlExecution(bmd);
+        if (nonPrimaryKeySqlExecution != null) {
+            return nonPrimaryKeySqlExecution;
+        }
+#end
+        final String[] propertyNames = getPersistentPropertyNames(bmd);
+        final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
+        cmd.setBeanMetaData(bmd);
+        cmd.setDataSource(_dataSource);
+        cmd.setPropertyNames(propertyNames);
+        cmd.setStatementFactory(_statementFactory);
+        return cmd;
+    }
+#if ($database.isAvailableNonPrimaryKeyWritable())
+
+    /**
+     * @param method The target method. (NotNull)
+     * @return Whether the method is target. (For example if it has primary key, returns false.)
+     */
+    protected ${glSqlExecution} createNonPrimaryInsertSqlExecution(BeanMetaData bmd) {
+        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        if (dbmeta.hasPrimaryKey()) {
+            return null;
+        }
+        final List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
+        final StringBuilder columnDefSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+            columnDefSb.append(", ").append(columnInfo.getColumnDbName());
+        }
+        columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final StringBuilder columnValuesSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+            columnValuesSb.append(", /*dto.").append(columnInfo.getPropertyName()).append("*/null");
+        }
+        columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
+        return createUpdateDynamicCommand(new String[]{"dto"}, new Class<?>[]{ _entityType }, sql);
+    }
+#end
+
+    protected String[] getPersistentPropertyNames(BeanMetaData bmd) {
+        final List<String> nameList = new ArrayList<String>();
+        for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
+            final PropertyType pt = bmd.getPropertyType(i);
+            if (pt.isPersistent()) {
+                nameList.add(pt.getPropertyName());
+            }
+        }
+        return nameList.toArray(new String[names.size()]);
+    }
+}

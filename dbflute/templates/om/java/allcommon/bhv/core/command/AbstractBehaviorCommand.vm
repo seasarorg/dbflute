@@ -20,12 +20,10 @@ import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandComponentSetup};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
-import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalProcedureCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
-import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
-import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator};
 
@@ -66,83 +64,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     //                                          ------------
     protected BeanMetaData createBeanMetaData() {
         return _beanMetaDataFactory.createBeanMetaData(_entityType);
-    }
-
-    // -----------------------------------------------------
-    //                                          SqlExecution
-    //                                          ------------
-    protected ${glSqlExecution} createSelectCBExecution(Class<?> cbType, ResultSetHandler handler) { // for condition-bean
-        return createSelectDynamicCommand(handler, new String[] { "dto" }, new Class<?>[] { cbType }, null);
-    }
-
-    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final String suffix = buildDbmsSuffix();
-        final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
-        final Object pmb = outsideSqlContext.getParameterBean();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
-
-        // - - - - - - - - - - - - - - - -
-        // Create customized BeanMetaData.
-        // - - - - - - - - - - - - - - - -
-        final BeanMetaData bmd = createBeanMetaData();
-        final ResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
-
-        // - - - - - - - - - -
-        // Create Sql-Command.
-        // - - - - - - - - - -
-        return createSelectDynamicCommand(handler, argNames, argTypes, sql);
-    }
-
-    protected ${glSqlExecution} createOutsideSqlExecuteExecution(${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final String suffix = buildDbmsSuffix();
-        final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
-        final Object pmb = outsideSqlContext.getParameterBean();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
-
-        return createUpdateDynamicCommand(argNames, argTypes, sql);
-    }
-
-    protected ${glSqlExecution} createOutsideSqlCallCommand(${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final Object pmb = outsideSqlContext.getParameterBean();
-        final String procedureName = outsideSqlContext.getOutsideSqlPath();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final ${glInternalProcedureMetaDataFactory} factory = createProcedureMetaDataFactory();
-        factory.setValueTypeFactory(_valueTypeFactory);
-        final Class<?> pmbType = (pmb != null ? pmb.getClass() : null);
-        final ${glInternalProcedureMetaData} metaData = factory.createProcedureMetaData(procedureName, pmbType);
-        return createProcedureCommand(metaData);
-    }
-
-    protected ${glInternalProcedureMetaDataFactory} createProcedureMetaDataFactory() {
-        return new ${glInternalProcedureMetaDataFactory}();
-    }
-
-    protected ${glInternalProcedureCommand} createProcedureCommand(${glInternalProcedureMetaData} metaData) {
-        // Because a procedure command does not use result set handler.
-        final ResultSetHandler resultSetHandler = new InternalNullResultSetHandler(); 
-        return new ${glInternalProcedureCommand}(_dataSource, resultSetHandler, _statementFactory, metaData);
     }
 
     // -----------------------------------------------------
@@ -228,9 +149,78 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected ${glDBMetaInterfaceName} findDBMeta() {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        // Cannot use the handler of DBMeta instance
+        // because the customize-entity is contained to find here.
+        // - - - - - - - - - -/
+        // ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+
+        final Class<?> beanType = _entityType;
+        if (beanType == null) {
+            return null;
+        }
+        if (!${glEntityInterfaceName}.class.isAssignableFrom(beanType)) {
+            return null;
+        }
+        final ${glEntityInterfaceName} entity;
+        try {
+            entity = (${glEntityInterfaceName})beanType.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        return entity.getDBMeta();
+    }
+
     protected String buildDbmsSuffix() {
         final String productName = ${glConditionBeanContextName}.getDatabaseProductName();
         return (productName != null ? "_" + productName.toLowerCase() : "");
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertBasicProperty(String methodName) {
+        if (_entityType == null) {
+            String msg = "The property 'entityType' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_tableDbName == null) {
+            String msg = "The property 'tableDbName' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertComponentProperty(String methodName) {
+        if (_dataSource == null) {
+            String msg = "The property 'dataSource' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_statementFactory == null) {
+            String msg = "The property 'statementFactory' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_beanMetaDataFactory == null) {
+            String msg = "The property 'beanMetaDataFactory' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_valueTypeFactory == null) {
+            String msg = "The property 'valueTypeFactory' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
+        if (_sqlFileEncoding == null) {
+            String msg = "The property 'sqlFileEncoding' should not be null";
+            msg = msg + " when you call " + methodName + "().";
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
