@@ -1,15 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
 
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
-import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
-import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractBatchAutoHandler};
 
 /**

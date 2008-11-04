@@ -5,7 +5,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -45,9 +44,6 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
-import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
-import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanArrayMetaDataResultSetHandler};
@@ -63,8 +59,6 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCo
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
-import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateBatchAutoHandler};
-import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalDeleteBatchAutoHandler};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
@@ -503,7 +497,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(method, dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
         return cmd;
     }
@@ -516,7 +510,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = newInternalUpdateModifiedOnlyCommand(method, dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
         return cmd;
     }
@@ -528,8 +522,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
         final ${glInternalUpdateBatchAutoStaticCommand} cmd = new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory
                                                       , createBeanMetaData4UpdateDeleteByAuto(method), propertyNames
-                                                      , isUpdateVersionNoAutoIncrementOnMemory(method)) {
-        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+                                                      , isUpdateVersionNoAutoIncrementOnMemory(method));
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         return cmd;
     }
 
@@ -556,13 +550,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
         final ${glInternalDeleteAutoStaticCommand} cmd = new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         return cmd;
     }
 
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
         final ${glInternalDeleteBatchAutoStaticCommand} cmd = new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         return cmd;
     }
 
@@ -574,6 +568,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
     
     protected boolean isUpdateVersionNoAutoIncrementOnMemory(Method method) {
+        return !isNonstrictMethod(method);
+    }
+
+    protected boolean isOptimisticLockHandling(Method method) {
         return !isNonstrictMethod(method);
     }
 

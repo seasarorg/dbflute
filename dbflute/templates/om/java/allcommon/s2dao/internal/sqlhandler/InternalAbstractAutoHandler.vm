@@ -72,7 +72,7 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             close(ps);
         }
         if (optimisticLockHandling && ret != 1) {
-            throw createEntityAlreadyUpdatedException(args[0], rows);
+            throw createEntityAlreadyUpdatedException(bean, ret);
         }
         postUpdateBean(bean, ret);
         return ret;

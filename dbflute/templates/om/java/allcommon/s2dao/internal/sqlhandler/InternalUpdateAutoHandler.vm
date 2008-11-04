@@ -6,8 +6,6 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
-import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
-
 /**
  * @author ${database.ClassAuthor}
  */

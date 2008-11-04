@@ -13,6 +13,7 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
 import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
 import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
@@ -114,13 +115,17 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         addBatch(ps);
     }
 
-    protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result) throws SQLException {
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result) {
         if (${glConditionBeanContextName}.isOracle()) {
             final int updateCount;
             try {
                 updateCount = ps.getUpdateCount();
             } catch (SQLException e) {
                 handleSQLException(e, ps);
+                return; // Unreachable!
             }
             handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount);
         } else {
@@ -149,14 +154,11 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         }
     }
 
-    protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, Object result, Method method) {
+    protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, int[] result) {
         if (list.isEmpty()) {
             return;// for Safety!
         }
-        if (!(result instanceof int[])) {
-            return;// for Safety!
-        }
-        final int[] updatedCountArray = (int[])result;
+        final int[] updatedCountArray = result;
         final int entityCount = list.size();
         int index = 0;
         boolean alreadyUpdated = false;

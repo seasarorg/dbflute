@@ -10,7 +10,6 @@ import org.seasar.dao.IdentifierGenerator;
 #if ($database.isVersionAfter1045())
 import org.seasar.dao.InjectDaoClassSupport;
 #end
-import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 import org.seasar.dao.SqlCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
