@@ -1284,7 +1284,11 @@ public class Database {
     public boolean isCompatibleOutsideSqlResultOldStyle() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleOutsideSqlResultOldStyle();
     }
-
+    
+    public boolean isCompatibleBehaviorUseDaoInterface() { // This is for compatibility!
+        return getProperties().getLittleAdjustmentProperties().isCompatibleBehaviorUseDaoInterface();
+    }
+    
     // -----------------------------------------------------
     //                                                  Buri
     //                                                  ----

@@ -16,6 +16,10 @@ import java.lang.reflect.Constructor;
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -47,6 +51,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
+    protected ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+
     /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
     protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
@@ -610,6 +617,41 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected abstract List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb);
 
     // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glBehaviorCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {
+        assertBehaviorCommandInvoker();
+        final ${glSelectCountCBCommand} command = new ${glSelectCountCBCommand}();
+        command.setEntityType(getDBMeta().getEntityType());
+        command.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setConditionBean(cb);
+        return command;
+    }
+
+    protected ${glBehaviorCommand} createSelectListCBCommand(${glConditionBeanInterfaceName} cb) {
+        assertBehaviorCommandInvoker();
+        final ${glSelectListCBCommand} command = new ${glSelectListCBCommand}();
+        command.setEntityType(getDBMeta().getEntityType());
+        command.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setConditionBean(cb);
+        return command;
+    }
+
+    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
+        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    }
+
+    protected void assertBehaviorCommandInvoker() {
+        if (_behaviorCommandInvoker == null) {
+            String msg = "The invoker of behavior command at behavior should not be null:";
+            msg = msg + " behavior=" + toString();
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================
     protected abstract boolean hasVersionNoValue(${glEntityInterfaceName} entity);
@@ -756,6 +798,22 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the invoker of behavior command.
+     * @return The invoker of behavior command. (Nullable: But normally NotNull)
+     */
+    protected ${glBehaviorCommandInvoker} getBehaviorCommandInvoker() {
+        return _behaviorCommandInvoker;
+    }
+
+    /**
+     * Set the invoker of behavior command.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
+     */
+    public void setBehaviorCommandInvoker(${glBehaviorCommandInvoker} behaviorCommandInvoker) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
+    }
+
     /**
      * Get the selector of behavior.
      * @return The select of behavior. (Nullable: But normally NotNull)
