@@ -12,6 +12,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 #end
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
 
 /**
  * @author ${database.ClassAuthor}
@@ -47,6 +48,15 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
 #end
         final String[] propertyNames = getPersistentPropertyNames(bmd);
         return createInsertAutoDynamicCommand(bmd, propertyNames);
+    }
+
+    protected ${glInternalInsertAutoDynamicCommand} createInsertAutoDynamicCommand(BeanMetaData bmd, String[] propertyNames) {
+        final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
+        cmd.setBeanMetaData(bmd);
+        cmd.setDataSource(_dataSource);
+        cmd.setPropertyNames(propertyNames);
+        cmd.setStatementFactory(_statementFactory);
+        return cmd;
     }
 #if ($database.isAvailableNonPrimaryKeyWritable())
 

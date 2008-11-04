@@ -1,0 +1,23 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBatchUpdateNonstrictEntityCommand} extends ${glBatchUpdateEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getCommandName() {
+        return "batchUpdateNonstrict";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    @Override
+    protected boolean isOptimisticLockHandling() {
+        return false;
+    }
+}

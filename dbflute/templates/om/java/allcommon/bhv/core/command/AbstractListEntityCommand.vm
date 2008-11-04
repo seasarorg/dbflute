@@ -14,7 +14,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCommand} {
+public abstract class ${glAbstractListEntityCommand} extends ${glAbstractBehaviorCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -23,13 +23,13 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     protected Class<? extends ${glEntityInterfaceName}> _entityType;
 
     /** The instance of condition-bean. (Required) */
-    protected ${glEntityInterfaceName} _entity;
+    protected List<${glEntityInterfaceName}> _entityList;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public Class<?> getCommandReturnType() {
-        return int.class;
+        return int[].class;
     }
 
     // ===================================================================================
@@ -79,12 +79,12 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _tableDbName + ":" + getCommandName() + "(" + _entityType.getSimpleName() + ")";
+        return _tableDbName + ":" + getCommandName() + "(List<" + _entityType.getSimpleName() + ">)";
     }
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _entity };
+        return new Object[] { _entityList };
     }
 
     // ===================================================================================
@@ -150,8 +150,8 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
         if (_entityType == null) {
             throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
         }
-        if (_entity == null) {
-            throw new IllegalStateException(buildAssertMessage("_entity", methodName));
+        if (_entityList == null) {
+            throw new IllegalStateException(buildAssertMessage("_entityList", methodName));
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
         _entityType = entityType;
     }
 
-    public void setEntity(${glEntityInterfaceName} entity) {
-        _entity = entity;
+    public void setEntityList(List<${glEntityInterfaceName}> entityList) {
+        _entityList = entityList;
     }
 }

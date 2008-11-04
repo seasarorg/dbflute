@@ -19,7 +19,6 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
-import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator};
 
@@ -75,18 +74,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
         if (sql != null) {
             cmd.setSql(sql);
         }
-        return cmd;
-    }
-
-    // -----------------------------------------------------
-    //                               InsertAutoDynamicCommnd
-    //                               -----------------------
-    protected ${glInternalInsertAutoDynamicCommand} createInsertAutoDynamicCommand(BeanMetaData bmd, String[] propertyNames) {
-        final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
-        cmd.setBeanMetaData(bmd);
-        cmd.setDataSource(_dataSource);
-        cmd.setPropertyNames(propertyNames);
-        cmd.setStatementFactory(_statementFactory);
         return cmd;
     }
 

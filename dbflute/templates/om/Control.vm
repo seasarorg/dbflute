@@ -133,7 +133,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Behavior-Core-Command]
     #set ($glAbstractBehaviorCommand = "${glProjectPrefix}AbstractBehaviorCommand")
     #set ($glAbstractEntityCommand = "${glProjectPrefix}AbstractEntityCommand")
+    #set ($glAbstractListEntityCommand = "${glProjectPrefix}AbstractListEntityCommand")
     #set ($glAbstractOutsideSqlCommand = "${glProjectPrefix}AbstractOutsideSqlCommand")
+    #set ($glBatchInsertEntityCommand = "${glProjectPrefix}BatchInsertEntityCommand")
     #set ($glDeleteEntityCommand = "${glProjectPrefix}DeleteEntityCommand")
     #set ($glDeleteNonstrictEntityCommand = "${glProjectPrefix}DeleteNonstrictEntityCommand")
     #set ($glInsertEntityCommand = "${glProjectPrefix}InsertEntityCommand")
@@ -703,9 +705,17 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractEntityCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractEntityCommand.${glTemplateFileExtension}",$path,"", "")
 
+      $database.info("    parse('AbstractListEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractListEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractListEntityCommand.${glTemplateFileExtension}",$path,"", "")
+
       $database.info("    parse('AbstractOutsideSqlCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('BatchInsertEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchInsertEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchInsertEntityCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('DeleteEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glDeleteEntityCommand}.${glClassFileExtension}" )
