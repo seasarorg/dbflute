@@ -502,9 +502,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
-            msg = msg + "  _behaviorSelector  : " + _behaviorSelector + getLineSeparator();
-            msg = msg + "  _daoSelector       : " + _daoSelector + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + getLineSeparator();
+            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
     }
