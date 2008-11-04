@@ -1,12 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import java.util.List;
-
 import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+#if ($database.isAvailableNonPrimaryKeyWritable())
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+#end
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 
@@ -27,7 +26,6 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
     //                                                               =====================
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        final Class<?> entityType = _entityType;
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
                 final BeanMetaData bmd = createBeanMetaData();
@@ -44,12 +42,7 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
         }
 #end
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
-        cmd.setBeanMetaData(bmd);
-        cmd.setDataSource(_dataSource);
-        cmd.setPropertyNames(propertyNames);
-        cmd.setStatementFactory(_statementFactory);
-        return cmd;
+        return createInsertAutoDynamicCommand(bmd, propertyNames);
     }
 #if ($database.isAvailableNonPrimaryKeyWritable())
 
@@ -77,15 +70,4 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
         return createUpdateDynamicCommand(new String[]{"dto"}, new Class<?>[]{ _entityType }, sql);
     }
 #end
-
-    protected String[] getPersistentPropertyNames(BeanMetaData bmd) {
-        final List<String> nameList = new ArrayList<String>();
-        for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
-            final PropertyType pt = bmd.getPropertyType(i);
-            if (pt.isPersistent()) {
-                nameList.add(pt.getPropertyName());
-            }
-        }
-        return nameList.toArray(new String[names.size()]);
-    }
 }

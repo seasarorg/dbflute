@@ -1,13 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 
 /**
  * The behavior command for OutsideSql.selectList().

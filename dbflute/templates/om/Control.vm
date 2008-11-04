@@ -707,7 +707,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlSelectListCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('OutsideSqlCallCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${OutsideSqlCallCommand}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlCallCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlCallCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('OutsideSqlExecuteCommand');")

@@ -1,13 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import java.util.List;
+import java.util.ArrayList;
 
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.dao.BeanMetaData;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
@@ -87,6 +86,20 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
 
     public ${glOutsideSqlOptionName} getOutsideSqlOption() {
         return null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String[] getPersistentPropertyNames(BeanMetaData bmd) {
+        final List<String> nameList = new ArrayList<String>();
+        for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
+            final PropertyType pt = bmd.getPropertyType(i);
+            if (pt.isPersistent()) {
+                nameList.add(pt.getPropertyName());
+            }
+        }
+        return nameList.toArray(new String[nameList.size()]);
     }
 
     // ===================================================================================

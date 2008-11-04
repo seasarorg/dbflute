@@ -16,16 +16,13 @@ import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.framework.exception.SRuntimeException;
 
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalInsertAutoHandler};
 
 /**
  * @author ${database.ClassAuthor}
  */
-#if ($database.isVersionAfter1045())
-public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand, InjectDaoClassSupport {
-#else
-public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand {
-#end
+public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand, ${glSqlExecution} {
 
 	// ===================================================================================
     //                                                                         Constructor

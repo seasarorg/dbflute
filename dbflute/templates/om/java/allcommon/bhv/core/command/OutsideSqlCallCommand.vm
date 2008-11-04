@@ -1,9 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import org.seasar.extension.jdbc.ResultSetHandler;
+
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalProcedureCommand};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
