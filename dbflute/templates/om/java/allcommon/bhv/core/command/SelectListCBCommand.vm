@@ -5,6 +5,7 @@ import java.util.List;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.dao.BeanMetaData;
 
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};

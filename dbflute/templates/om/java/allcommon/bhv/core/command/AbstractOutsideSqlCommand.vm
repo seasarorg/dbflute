@@ -1,6 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -43,9 +49,7 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
             return new InternalObjectListResultSetHandler(valueType);
         }
-        final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
-        final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
-        return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
+        return createBeanListMetaDataResultSetHandler(bmd);
     }
 
     // ===================================================================================

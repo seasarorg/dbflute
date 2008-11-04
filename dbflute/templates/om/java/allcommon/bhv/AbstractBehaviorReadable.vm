@@ -653,6 +653,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return command;
     }
 
+    @SuppressWarnings("unchecked")
     protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
         return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }

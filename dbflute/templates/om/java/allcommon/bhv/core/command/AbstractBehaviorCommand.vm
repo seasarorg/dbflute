@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
@@ -171,7 +170,7 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     }
 
     protected String buildAssertMessage(String propertyName, String methodName) {
-        propertyName = propertyName.startsWith("_") : propertyName.substring("_".length) : propertyName;
+        propertyName = propertyName.startsWith("_") ? propertyName.substring("_".length()) : propertyName;
         String msg = "The property '" + propertyName + "' should not be null";
         msg = msg + " when you call " + methodName + "().";
         throw new IllegalStateException(msg);

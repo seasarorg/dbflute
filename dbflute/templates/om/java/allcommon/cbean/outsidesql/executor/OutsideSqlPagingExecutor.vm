@@ -163,7 +163,6 @@ public class ${glOutsideSqlPagingExecutorName} {
     public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
                                                       , final ${glPagingBeanInterfaceName} pmb
                                                       , final Class<ENTITY> entityType) {
-        final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = createCountExecutor();
         final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
             public ${glPagingBeanInterfaceName} getPagingBean() {
@@ -186,6 +185,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     }
 
     protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> createCountExecutor() {
+        final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption, _tableDbName);
     }
 
@@ -211,11 +211,11 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand} createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+    protected ${glBehaviorCommand} createSelectListCommand(String path, Object pmb, Class<?> entityType) {
         return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
     }
 
-    private ${glOutsideSqlSelectListCommand xsetupCommand(${glOutsideSqlSelectListCommand} command, String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+    private ${glOutsideSqlSelectListCommand} xsetupCommand(${glOutsideSqlSelectListCommand} command, String path, Object pmb, Class<?> entityType) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -225,6 +225,7 @@ public class ${glOutsideSqlPagingExecutorName} {
         return command;
     }
 
+    @SuppressWarnings("unchecked")
     protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
         return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }

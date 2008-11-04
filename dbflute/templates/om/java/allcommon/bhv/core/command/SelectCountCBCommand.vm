@@ -32,11 +32,10 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
     @Override
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
                 ResultSetHandler handler = new InternalCountResultSetHandler();
-                return createSelectCBExecution(cbType, handler);
+                return createSelectCBExecution(_conditionBeanType, handler);
             }
         };
     }
