@@ -17,27 +17,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 public interface ${glBehaviorReadableInterfaceName} {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Map-string map-mark. */
-    public static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** Map-string list-mark. */
-    public static final String MAP_STRING_LIST_MARK = "list:";
-
-    /** Map-string start-brace. */
-    public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-    /** Map-string end-brace. */
-    public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-    /** Map-string delimiter. */
-    public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-    /** Map-string equal. */
-    public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-
-    // ===================================================================================
     //                                                                          Table name
     //                                                                          ==========
     /**
@@ -149,4 +128,12 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return The value of sequence. (NotNull)
      */
     public ${database.sequenceReturnType} readNextVal();
+
+    // ===================================================================================
+    //                                                                             Warm Up
+    //                                                                             =======
+    /**
+     * Warm up the command of behavior.
+     */
+    public void warmUpCommand();
 }

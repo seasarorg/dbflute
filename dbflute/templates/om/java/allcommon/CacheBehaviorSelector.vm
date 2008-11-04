@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
@@ -45,8 +44,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
 		}
         for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
 		    final ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
-            final ${glDaoReadableInterfaceName} dao = bhv.getDaoReadable();
-			dao.initializeDaoMetaData("selectList");
+            bhv.warmUpCommand();
         }
 	    if (_log.isInfoEnabled()) {
 		    long after = System.currentTimeMillis();

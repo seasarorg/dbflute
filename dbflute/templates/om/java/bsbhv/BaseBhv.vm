@@ -697,27 +697,32 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
     }
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
     }
     @SuppressWarnings("unchecked")
     protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
     }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
     }
     @SuppressWarnings("unchecked")
     protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
     }
 #end
@@ -778,27 +783,32 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls)));
     }
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
     @SuppressWarnings("unchecked")
     protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
     @SuppressWarnings("unchecked")
     protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
 #end

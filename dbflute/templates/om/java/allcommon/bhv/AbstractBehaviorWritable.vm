@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractListEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
@@ -42,6 +41,27 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Map-string map-mark. */
+    private static final String MAP_STRING_MAP_MARK = "map:";
+
+    /** Map-string list-mark. */
+    private static final String MAP_STRING_LIST_MARK = "list:";
+
+    /** Map-string start-brace. */
+    private static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+    /** Map-string end-brace. */
+    private static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+    /** Map-string delimiter. */
+    private static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+    /** Map-string equal. */
+    private static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 #if ($database.isExistCommonColumnSetupElement())
 
     /** Log instance. */
@@ -924,27 +944,27 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
         return xsetupEntityCommand(new ${glInsertEntityCommand}(), entity);
     }
 
-    protected ${glBehaviorCommand} createUpdateEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glUpdateEntityCommand} createUpdateEntityCommand(${glEntityInterfaceName} entity) {
         assertBehaviorCommandInvoker("createUpdateEntityCommand");
         return xsetupEntityCommand(new ${glUpdateEntityCommand}(), entity);
     }
 
-    protected ${glBehaviorCommand} createUpdateNonstrictEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glUpdateNonstrictEntityCommand} createUpdateNonstrictEntityCommand(${glEntityInterfaceName} entity) {
         assertBehaviorCommandInvoker("createUpdateNonstrictEntityCommand");
         return xsetupEntityCommand(new ${glUpdateNonstrictEntityCommand}(), entity);
     }
 
-    protected ${glBehaviorCommand} createDeleteEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glDeleteEntityCommand} createDeleteEntityCommand(${glEntityInterfaceName} entity) {
         assertBehaviorCommandInvoker("createDeleteEntityCommand");
         return xsetupEntityCommand(new ${glDeleteEntityCommand}(), entity);
     }
 
-    protected ${glBehaviorCommand} createDeleteNonstrictEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glDeleteNonstrictEntityCommand} createDeleteNonstrictEntityCommand(${glEntityInterfaceName} entity) {
         assertBehaviorCommandInvoker("createDeleteNonstrictEntityCommand");
         return xsetupEntityCommand(new ${glDeleteNonstrictEntityCommand}(), entity);
     }
@@ -957,40 +977,46 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return command;
     }
 
-    protected ${glBehaviorCommand} createBatchInsertEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchInsertEntityCommand} createBatchInsertEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
         assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
         return xsetupListEntityCommand(new ${glBatchInsertEntityCommand}(), entityList);
     }
 
-    protected ${glBehaviorCommand} createBatchUpdateEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchUpdateEntityCommand} createBatchUpdateEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
         assertBehaviorCommandInvoker("createBatchUpdateEntityCommand");
         return xsetupListEntityCommand(new ${glBatchUpdateEntityCommand}(), entityList);
     }
 
-    protected ${glBehaviorCommand} createBatchUpdateNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchUpdateNonstrictEntityCommand} createBatchUpdateNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
         assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
         return xsetupListEntityCommand(new ${glBatchUpdateNonstrictEntityCommand}(), entityList);
     }
 
-    protected ${glBehaviorCommand} createBatchDeleteEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchDeleteEntityCommand} createBatchDeleteEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
         assertBehaviorCommandInvoker("createBatchDeleteEntityCommand");
         return xsetupListEntityCommand(new ${glBatchDeleteEntityCommand}(), entityList);
     }
 
-    protected ${glBehaviorCommand} createBatchDeleteNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchDeleteNonstrictEntityCommand} createBatchDeleteNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
         assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
         return xsetupListEntityCommand(new ${glBatchDeleteNonstrictEntityCommand}(), entityList);
     }
 
+    /**
+     * @param <COMMAND> The type of behavior command for list entity.
+     * @param command The command of behavior. (NotNull)
+     * @param entityList The list of entity. (NotNull, NotEmpty)
+     * @return The command of behavior. (NotNull)
+     */
     private <COMMAND extends ${glAbstractListEntityCommand}> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends ${glEntityInterfaceName}> entityList) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setEntityType(entityList.get(0).getClass());
+        command.setEntityType(entityList.get(0).getClass()); // *The list should not be empty!
         command.setEntityList(entityList);
         return command;
     }
 
-    protected ${glBehaviorCommand} createQueryDeleteCBCommand(${glConditionBeanInterfaceName} cb) {
+    protected ${glQueryDeleteCBCommand} createQueryDeleteCBCommand(${glConditionBeanInterfaceName} cb) {
         assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
         final ${glQueryDeleteCBCommand} cmd = new ${glQueryDeleteCBCommand}();
         cmd.setTableDbName(getTableDbName());
@@ -1000,7 +1026,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return cmd;
     }
 
-    protected ${glBehaviorCommand} createQueryUpdateEntityCBCommand(${glEntityInterfaceName} entity, ${glConditionBeanInterfaceName} cb) {
+    protected ${glQueryUpdateEntityCBCommand} createQueryUpdateEntityCBCommand(${glEntityInterfaceName} entity, ${glConditionBeanInterfaceName} cb) {
         assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
         final ${glQueryUpdateEntityCBCommand} cmd = new ${glQueryUpdateEntityCBCommand}();
         cmd.setTableDbName(getTableDbName());

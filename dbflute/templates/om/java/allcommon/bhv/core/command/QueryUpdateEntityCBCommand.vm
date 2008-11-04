@@ -71,7 +71,7 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _entity, _conditionBean };
+        return new Object[] { _conditionBean, _entity };
     }
 
     // ===================================================================================
