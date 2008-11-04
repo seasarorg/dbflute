@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 
@@ -16,7 +15,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandl
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
+public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractSqlCommand} {
 
 	// ===================================================================================
     //                                                                          Definition
@@ -31,7 +30,7 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     //                                                                           =========
     private BeanMetaData beanMetaData;
     private String[] propertyNames;
-    private boolean checkSingleRowUpdate = true;
+    private boolean optimisticLockHandling = true;
     private boolean versionNoAutoIncrementOnMemory = true;
 
 	// ===================================================================================
@@ -70,7 +69,7 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
     protected ${glInternalUpdateAutoHandler} createInternalUpdateAutoHandler(BeanMetaData bmd, PropertyType[] propertyTypes) {
         ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
-        handler.setCheckSingleRowUpdate(isCheckSingleRowUpdate()); // [DBFlute-0.8.0]
+        handler.setCheckSingleRowUpdate(optimisticLockHandling); // [DBFlute-0.8.0]
         return handler;
     }
 
@@ -158,11 +157,11 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
             sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5);
-        if (bmd.hasVersionNoPropertyType()) {
+        if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
-        if (bmd.hasTimestampPropertyType()) {
+        if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
@@ -197,11 +196,11 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
         this.propertyNames = propertyNames;
     }
 
-    public boolean isCheckSingleRowUpdate() {
-        return checkSingleRowUpdate;
+    public boolean isOptimisticLockHandling() {
+        return optimisticLockHandling;
     }
 
-    public void setCheckSingleRowUpdate(boolean resultCheck) {
-        this.checkSingleRowUpdate = resultCheck;
+    public void setOptimisticLockHandling(boolean optimisticLockHandling) {
+        this.optimisticLockHandling = optimisticLockHandling;
     }
 }

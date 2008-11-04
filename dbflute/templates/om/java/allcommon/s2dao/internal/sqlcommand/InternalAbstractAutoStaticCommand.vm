@@ -30,21 +30,19 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     //                                                                           Attribute
     //                                                                           =========
     private PropertyType[] propertyTypes;
-    private boolean checkSingleRowUpdate = true;
+    protected boolean optimisticLockHandling = true;
     protected boolean versionNoAutoIncrementOnMemory = DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY;
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames) {
+            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames) {
         this(dataSource, statementFactory, beanMetaData, propertyNames, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
     }
 
     public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
+            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData);
         this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
         setupPropertyTypes(propertyNames);
@@ -54,26 +52,19 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 	// ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public Object execute(Object[] args) {
+    public Object execute(Object[] args) { // NOT for Batch. Batch should override.
         ${glInternalAbstractAutoHandler} handler = createAutoHandler();
+        handler.setOptimisticLockHandling(optimisticLockHandling);
         handler.setSql(getSql());
         handler.setLoggingMessageSqlArgs(args);
         int rows = handler.execute(args);
-        if (isCheckSingleRowUpdate() && rows != 1) {
-            throw createNotSingleRowUpdatedRuntimeException(args[0], rows);
+        if (optimisticLockHandling && rows != 1) {
+            throw createEntityAlreadyUpdatedException(args[0], rows);
         }
         return new Integer(rows);
     }
 
-    public boolean isCheckSingleRowUpdate() {
-        return checkSingleRowUpdate;
-    }
-
-    public void setCheckSingleRowUpdate(boolean checkSingleRowUpdate) {
-        this.checkSingleRowUpdate = checkSingleRowUpdate;
-    }
-
-    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
+    protected ${glEntityAlreadyUpdatedException} createEntityAlreadyUpdatedException(Object bean, int rows) {
         return new ${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
@@ -177,7 +168,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
 
     protected void setupDeleteSql() {
         checkPrimaryKey();
-        StringBuilder sb = new StringBuilder(100);
+        final StringBuilder sb = new StringBuilder(100);
         sb.append("delete from ");
         sb.append(getBeanMetaData().getTableName());
         setupUpdateWhere(sb);
@@ -198,13 +189,24 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
             sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5);
-        if (bmd.hasVersionNoPropertyType()) {
+        if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
-        if (bmd.hasTimestampPropertyType()) {
+        if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
+    }
+
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isOptimisticLockHandling() {
+        return optimisticLockHandling;
+    }
+
+    public void setOptimisticLockHandling(boolean optimisticLockHandling) {
+        this.optimisticLockHandling = optimisticLockHandling;
     }
 }

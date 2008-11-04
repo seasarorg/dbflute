@@ -17,6 +17,8 @@ import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.IntegerConversionUtil;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException};
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -31,14 +33,14 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     protected Timestamp timestamp;
     protected Integer versionNo;
     protected PropertyType[] propertyTypes;
+    protected boolean optimisticLockHandling = true;
     protected boolean versionNoAutoIncrementOnMemory = true;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalAbstractAutoHandler}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData,
-            PropertyType[] propertyTypes) {
+            StatementFactory statementFactory, BeanMetaData beanMetaData, PropertyType[] propertyTypes) {
         super(dataSource, statementFactory);
         this.beanMetaData = beanMetaData;
         this.propertyTypes = propertyTypes;
@@ -69,6 +71,9 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         } finally {
             close(ps);
         }
+        if (optimisticLockHandling && ret != 1) {
+            throw createEntityAlreadyUpdatedException(args[0], rows);
+        }
         postUpdateBean(bean, ret);
         return ret;
     }
@@ -85,6 +90,10 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
                 handleSQLException(e, ps);
             }
         }
+    }
+
+    protected ${glEntityAlreadyUpdatedException} createEntityAlreadyUpdatedException(Object bean, int rows) {
+        return new ${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected void preUpdateBean(Object bean) {
@@ -166,13 +175,13 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
-        if (bmd.hasVersionNoPropertyType()) {
+        if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             PropertyType pt = bmd.getVersionNoPropertyType();
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
-        if (bmd.hasTimestampPropertyType()) {
+        if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             PropertyType pt = bmd.getTimestampPropertyType();
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
@@ -239,6 +248,14 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
 
     protected void setPropertyTypes(PropertyType[] propertyTypes) {
         this.propertyTypes = propertyTypes;
+    }
+
+    public boolean isOptimisticLockHandling() {
+        return optimisticLockHandling;
+    }
+
+    public void setOptimisticLockHandling(boolean optimisticLockHandling) {
+        this.optimisticLockHandling = optimisticLockHandling;
     }
 
     protected boolean isVersionNoAutoIncrementOnMemory() {

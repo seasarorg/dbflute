@@ -420,13 +420,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
             cmd.setBeanMetaData(getBeanMetaData());
             cmd.setDataSource(dataSource);
-            
-            // It is unnecessary for DBFlute!
-            // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-            
             cmd.setPropertyNames(propertyNames);
             cmd.setStatementFactory(statementFactory);
-            cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
             command = cmd;
         } else {
             boolean returningRows = false;
@@ -493,11 +488,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 cmd = createInternalUpdateAutoStaticCommand(method, propertyNames);
             }
         } else {
-            boolean returningRows = false;
-            if (int[].class.isAssignableFrom(method.getReturnType())) {
-                returningRows = true;
-            }
-            cmd = createInternalUpdateBatchAutoStaticCommand(method, propertyNames, returningRows);
+            cmd = createInternalUpdateBatchAutoStaticCommand(method, propertyNames);
         }
         putSqlCommand(method.getName(), cmd);
     }
@@ -512,11 +503,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(method, dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
-        
-        // It is unnecessary for DBFlute!
-        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        
+        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
         return cmd;
     }
@@ -529,11 +516,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = newInternalUpdateModifiedOnlyCommand(method, dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
-        
-        // It is unnecessary for DBFlute!
-        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        
+        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
         return cmd;
     }
@@ -542,27 +525,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new ${glInternalUpdateModifiedOnlyCommand}(ds, sf);
     }
 
-    protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory
-                                                      , createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows
+    protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
+        final ${glInternalUpdateBatchAutoStaticCommand} cmd = new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory
+                                                      , createBeanMetaData4UpdateDeleteByAuto(method), propertyNames
                                                       , isUpdateVersionNoAutoIncrementOnMemory(method)) {
-            @Override
-            protected ${glInternalUpdateBatchAutoHandler} newInternalBatchAutoHandler() {
-                return new ${glInternalUpdateBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes()) {
-                    @Override
-                    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
-                        final int[] result = super.executeBatch(ps, list);
-                        try {
-                            handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
-                        } catch (SQLException e) {
-                            handleSQLException(e, ps, false);
-                            return null;// Unreachable!
-                        }
-                        return result;
-                    }
-                };
-            }
-        };
+        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        return cmd;
     }
 
     // -----------------------------------------------------
@@ -581,51 +549,28 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (isUpdateSignatureForBean(method)) {
             cmd = createInternalDeleteAutoStaticCommand(method, propertyNames);
         } else {
-            boolean returningRows = false;
-            if (int[].class.isAssignableFrom(method.getReturnType())) {
-                returningRows = true;
-            }
-            cmd = createInternalDeleteBatchAutoStaticCommand(method, propertyNames, returningRows);
+            cmd = createInternalDeleteBatchAutoStaticCommand(method, propertyNames);
         }
         putSqlCommand(method.getName(), cmd);
     }
 
     protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
         final ${glInternalDeleteAutoStaticCommand} cmd = new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        cmd.setCheckSingleRowUpdate(!isNonstrictMethod(method));
+        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
         return cmd;
     }
 
-    protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
-            @Override
-            protected ${glInternalDeleteBatchAutoHandler} newInternalBatchAutoHandler() {
-                return new ${glInternalDeleteBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes()) {
-                    @Override
-                    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
-                        final int[] result = super.executeBatch(ps, list);
-                        try {
-                            handleBatchUpdateResultWithOptimisticLock(ps, list, result, method);
-                        } catch (SQLException e) {
-                            handleSQLException(e, ps, false);
-                            return null;// Unreachable!
-                        }
-                        return result;
-                    }
-                };
-            }
-        };
+    protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
+        final ${glInternalDeleteBatchAutoStaticCommand} cmd = new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        cmd.setOptimisticLockHandling(!isNonstrictMethod(method));
+        return cmd;
     }
 
     // -----------------------------------------------------
     //                                         Common Helper
     //                                         -------------
     protected BeanMetaData createBeanMetaData4UpdateDeleteByAuto(Method method) {
-        if (isNonstrictMethod(method)) {
-            return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
-        } else {
-            return getBeanMetaData();
-        }
+        return getBeanMetaData();
     }
     
     protected boolean isUpdateVersionNoAutoIncrementOnMemory(Method method) {
@@ -636,107 +581,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return method.getName().contains("Nonstrict");
     }
 
-    protected BeanMetaDataFactory createNonConcurrencyBmdFactory() {
-        final ${glS2BeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glS2BeanMetaDataFactoryImpl}() {
-            protected BeanMetaDataImpl createBeanMetaDataImpl() {
-                return new BeanMetaDataImpl() {
-                    public boolean hasVersionNoPropertyType() {
-                        return false;
-                    }
-
-                    public boolean hasTimestampPropertyType() {
-                        return false;
-                    }
-                };
-            }
-        };
-        nonConcurrencyBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
-        nonConcurrencyBmdFactory.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
-        nonConcurrencyBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        nonConcurrencyBmdFactory.setTableNaming(this.tableNaming);
-        nonConcurrencyBmdFactory.setDataSource(this.dataSource);
-        nonConcurrencyBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
-        nonConcurrencyBmdFactory.setBeanEnhancer(this.beanEnhancer);
-        return nonConcurrencyBmdFactory;
-    }
-
     protected boolean isFirstArgumentConditionBean(final Method method) {
         final Class<?>[] pmbTypes = method.getParameterTypes();
         return pmbTypes.length > 0 && ${glConditionBeanInterfaceName}.class.isAssignableFrom(pmbTypes[0]);
-    }
-
-    protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result, Method method) throws SQLException {
-        if (${glConditionBeanContextName}.isOracle()) {
-            final int updateCount = ps.getUpdateCount();
-            handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount, method);
-        } else {
-            handleBatchUpdateResultWithOptimisticLockByResult(list, result, method);
-        }
-    }
-
-    protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount, Method method) {
-        if (list.isEmpty()) {
-            return;// for Safety!
-        }
-        if (updateCount < 0) {
-            return;// for Safety!
-        }
-        final int entityCount = list.size();
-        if (updateCount < entityCount) {
-            if (isNonstrictMethod(method)) {
-                String msg = "The entity have already deleted:";
-                msg = msg + " updateCount=" + updateCount;
-                msg = msg + " entityCount=" + entityCount;
-                msg = msg + " allEntities=" + list;
-                throw new ${glEntityAlreadyDeletedException}(msg);
-            } else {
-                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(0), 0, updateCount);
-            }
-        }
-    }
-
-    protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, Object result, Method method) {
-        if (list.isEmpty()) {
-            return;// for Safety!
-        }
-        if (!(result instanceof int[])) {
-            return;// for Safety!
-        }
-        final int[] updatedCountArray = (int[])result;
-        final int entityCount = list.size();
-        int index = 0;
-        boolean alreadyUpdated = false;
-        for (int oneUpdateCount : updatedCountArray) {
-            if (entityCount <= index) {
-                break;// for Safety!
-            }
-            if (oneUpdateCount == 0) {
-                alreadyUpdated = true;
-                break;
-            } else if (oneUpdateCount > 1) {
-                String msg = "The entity updated two or more records in batch update:";
-                msg = msg + " entity=" + list.get(index);
-                msg = msg + " updatedCount=" + oneUpdateCount;
-                msg = msg + " allEntities=" + list;
-                throw new ${glEntityDuplicatedException}(msg);
-            }
-            ++index;
-        }
-        if (alreadyUpdated) {
-            int updateCount = 0;
-            for (int oneUpdateCount : updatedCountArray) {
-                updateCount = updateCount + oneUpdateCount;
-            }
-            if (isNonstrictMethod(method)) {
-                String msg = "The entity have already deleted:";
-                msg = msg + " entity=" + list.get(index);
-                msg = msg + " updateCount=" + updateCount;
-                msg = msg + " allEntities=" + list;
-                throw new ${glEntityAlreadyDeletedException}(msg);
-            } else {
-                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(index), 0, updateCount);
-            }
-        }
     }
 
     // ===================================================================================

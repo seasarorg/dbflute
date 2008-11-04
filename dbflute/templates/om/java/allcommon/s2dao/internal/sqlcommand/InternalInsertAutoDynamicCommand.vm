@@ -31,7 +31,6 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand, ${glSq
     protected StatementFactory statementFactory;
     protected BeanMetaData beanMetaData;
     protected String[] propertyNames;
-    protected boolean checkSingleRowUpdate = true;
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -51,9 +50,6 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand, ${glSq
         handler.setSql(sql);
         handler.setLoggingMessageSqlArgs(args);
         final int rows = handler.execute(args);
-        if (isCheckSingleRowUpdate() && rows != 1) {
-            throw new NotSingleRowUpdatedRuntimeException(args[0], rows);
-        }
         return new Integer(rows);
     }
 
@@ -149,13 +145,5 @@ public class ${glInternalInsertAutoDynamicCommand} implements SqlCommand, ${glSq
 
     public void setPropertyNames(String[] propertyNames) {
         this.propertyNames = propertyNames;
-    }
-
-    public boolean isCheckSingleRowUpdate() {
-        return checkSingleRowUpdate;
-    }
-
-    public void setCheckSingleRowUpdate(boolean checkSingleRowUpdate) {
-        this.checkSingleRowUpdate = checkSingleRowUpdate;
     }
 }

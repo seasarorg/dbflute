@@ -16,11 +16,6 @@ public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHand
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private boolean checkSingleRowUpdate = true;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
     public ${glInternalUpdateAutoHandler}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
             PropertyType[] propertyTypes) {
@@ -38,25 +33,7 @@ public class ${glInternalUpdateAutoHandler} extends ${glInternalAbstractAutoHand
 
 	@Override
     protected void postUpdateBean(Object bean, int ret) {
-        if (isCheckSingleRowUpdate() && ret < 1) {
-            throw createEntityAlreadyUpdatedException(bean, ret);
-        }
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
-    }
-
-    protected ${glEntityAlreadyUpdatedException} createEntityAlreadyUpdatedException(Object bean, int rows) {
-        return new ${glEntityAlreadyUpdatedException}(bean, rows);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isCheckSingleRowUpdate() {
-        return checkSingleRowUpdate;
-    }
-
-    public void setCheckSingleRowUpdate(boolean resultCheck) {
-        this.checkSingleRowUpdate = resultCheck;
     }
 }

@@ -1,10 +1,15 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaData;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
+import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
+import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractBatchAutoHandler};
 
 /**
@@ -13,45 +18,32 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractBatchAu
 public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glInternalAbstractAutoStaticCommand} {
 
 	// ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final boolean returningRows;
-
-	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean returningRows) {
-        this(dataSource, statementFactory, beanMetaData, propertyNames, returningRows, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
+            String[] propertyNames) {
+        this(dataSource, statementFactory, beanMetaData, propertyNames, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
     }
 
     public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean returningRows, boolean versionNoAutoIncrementOnMemory) {
+            String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData, propertyNames, versionNoAutoIncrementOnMemory);
-        this.returningRows = returningRows;
     }
 
 	// ===================================================================================
     //                                                                             Execute
     //                                                                             =======
+    @Override
     public Object execute(Object[] args) {
         final ${glInternalAbstractBatchAutoHandler} handler = createBatchAutoHandler();
-        
-		// It is unnecessary!
-		// injectDaoClass(handler);
-        
+        handler.setOptimisticLockHandling(optimisticLockHandling);
 		handler.setSql(getSql());
 		// The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(args);
-        if (this.returningRows) {
-            return handler.executeBatch(args);
-        } else {
-            final int updatedRows = handler.execute(args);
-            return new Integer(updatedRows);
-        }
+        return handler.executeBatch(args);
     }
-	
+
     protected abstract ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler();
 }

@@ -17,8 +17,8 @@ public class ${glInternalInsertBatchAutoHandler} extends ${glInternalAbstractBat
     public ${glInternalInsertBatchAutoHandler}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
             PropertyType[] propertyTypes) {
-
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
+        setOptimisticLockHandling(false);
     }
 
     // ===================================================================================

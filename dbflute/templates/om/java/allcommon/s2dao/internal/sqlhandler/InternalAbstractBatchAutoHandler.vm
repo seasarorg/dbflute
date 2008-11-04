@@ -13,6 +13,10 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
+import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
+import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
+import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -28,47 +32,13 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalAbstractBatchAutoHandler}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData,
-            PropertyType[] propertyTypes) {
+            StatementFactory statementFactory, BeanMetaData beanMetaData, PropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int[] execute(List<?> list, Class<?>[] argTypes) {
-        return execute(list);
-    }
-
-    public int[] execute(List<?> list) {
-        if (list == null) {
-            throw new IllegalArgumentException("list");
-        }
-		if (list.isEmpty()) {
-		    if (_log.isDebugEnabled()) {
-                _log.debug("Skip executeBatch() bacause of the empty list.");
-            }
-			return new int[0];
-		}
-        final Connection connection = getConnection();
-        try {
-            final PreparedStatement ps = prepareStatement(connection);
-            try {
-                for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
-                    final Object bean = (Object) iter.next();
-                    prepareBatchElement(ps, bean);
-                }
-                return executeBatch(ps, list);
-            } finally {
-                close(ps);
-            }
-        } finally {
-            close(connection);
-        }
-        // Reflection to bean is unsupported at batch update.
-        // postBatchUpdateBean(...);
-    }
-	
     public int execute(Object[] args) {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
@@ -102,11 +72,125 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         return execute(list);
     }
 
+    public int[] execute(List<?> list, Class<?>[] argTypes) {
+        return execute(list);
+    }
+
+    public int[] execute(List<?> list) {
+        if (list == null) {
+            throw new IllegalArgumentException("list");
+        }
+		if (list.isEmpty()) {
+		    if (_log.isDebugEnabled()) {
+                _log.debug("Skip executeBatch() bacause of the empty list.");
+            }
+			return new int[0];
+		}
+        final Connection connection = getConnection();
+        try {
+            final PreparedStatement ps = prepareStatement(connection);
+            try {
+                for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
+                    final Object bean = (Object) iter.next();
+                    prepareBatchElement(ps, bean);
+                }
+                final int[] result = executeBatch(ps, list);
+                handleBatchUpdateResultWithOptimisticLock(ps, list, result);
+                return result;
+            } finally {
+                close(ps);
+            }
+        } finally {
+            close(connection);
+        }
+        // Reflection to bean is unsupported at batch update.
+        // postBatchUpdateBean(...);
+    }
+
     protected void prepareBatchElement(PreparedStatement ps, Object bean) {
         setupBindVariables(bean);
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
         bindArgs(ps, getBindVariables(), getBindVariableValueTypes());
         addBatch(ps);
+    }
+
+    protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result) throws SQLException {
+        if (${glConditionBeanContextName}.isOracle()) {
+            final int updateCount;
+            try {
+                updateCount = ps.getUpdateCount();
+            } catch (SQLException e) {
+                handleSQLException(e, ps);
+            }
+            handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount);
+        } else {
+            handleBatchUpdateResultWithOptimisticLockByResult(list, result);
+        }
+    }
+
+    protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount) {
+        if (list.isEmpty()) {
+            return;// for Safety!
+        }
+        if (updateCount < 0) {
+            return;// for Safety!
+        }
+        final int entityCount = list.size();
+        if (updateCount < entityCount) {
+            if (isOptimisticLockHandling()) {
+                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(0), 0, updateCount);
+            } else {
+                String msg = "The entity have already deleted:";
+                msg = msg + " updateCount=" + updateCount;
+                msg = msg + " entityCount=" + entityCount;
+                msg = msg + " allEntities=" + list;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+        }
+    }
+
+    protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, Object result, Method method) {
+        if (list.isEmpty()) {
+            return;// for Safety!
+        }
+        if (!(result instanceof int[])) {
+            return;// for Safety!
+        }
+        final int[] updatedCountArray = (int[])result;
+        final int entityCount = list.size();
+        int index = 0;
+        boolean alreadyUpdated = false;
+        for (int oneUpdateCount : updatedCountArray) {
+            if (entityCount <= index) {
+                break;// for Safety!
+            }
+            if (oneUpdateCount == 0) {
+                alreadyUpdated = true;
+                break;
+            } else if (oneUpdateCount > 1) {
+                String msg = "The entity updated two or more records in batch update:";
+                msg = msg + " entity=" + list.get(index);
+                msg = msg + " updatedCount=" + oneUpdateCount;
+                msg = msg + " allEntities=" + list;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
+            ++index;
+        }
+        if (alreadyUpdated) {
+            int updateCount = 0;
+            for (int oneUpdateCount : updatedCountArray) {
+                updateCount = updateCount + oneUpdateCount;
+            }
+            if (isOptimisticLockHandling()) {
+                throw new ${glBatchEntityAlreadyUpdatedException}(list.get(index), 0, updateCount);
+            } else {
+                String msg = "The entity have already deleted:";
+                msg = msg + " entity=" + list.get(index);
+                msg = msg + " updateCount=" + updateCount;
+                msg = msg + " allEntities=" + list;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+        }
     }
 
     // ===================================================================================
