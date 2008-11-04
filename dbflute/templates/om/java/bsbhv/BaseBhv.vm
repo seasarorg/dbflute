@@ -125,7 +125,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return delegateSelectCount(cb);
     }
 
@@ -181,7 +181,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The result bean of selected list. (NotNull)
      */
     public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return new ${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
@@ -194,7 +194,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The result bean of selected page. (NotNull)
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         final ${glPagingInvokerName}<${myExtendedObjectClassName}> invoker = new ${glPagingInvokerName}<${myExtendedObjectClassName}>(getTableDbName());
         final ${glPagingHandlerName}<${myExtendedObjectClassName}> handler = new ${glPagingHandlerName}<${myExtendedObjectClassName}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
@@ -567,7 +567,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The updated count.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
-        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertConditionBeanNotNull(cb);
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
         setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
         filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
         return getMyDao().updateByQuery(cb, ${myEntityVariableName});
@@ -579,7 +579,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The deleted count.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
+        assertCBNotNull(cb);
         return getMyDao().deleteByQuery(cb);
     }
 #end
@@ -656,12 +656,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                     Delegate Method
     //                                                                     ===============
+#if ($database.isCompatibleBehaviorUseDaoInterface())
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return getMyDao().selectCount(cb); }
     protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
-    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return getMyDao().selectList(cb); }
     @SuppressWarnings("unchecked")
     protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
@@ -710,6 +711,64 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         return getMyDao().insert(entity);
     }
+#end
+#end
+#else
+    // -----------------------------------------------------
+    //                                                Select
+    //                                                ------
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return invoke(createSelectCountCBCommand(cb)); }
+    protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return invoke(createSelectListCBCommand(cb)); }
+    @SuppressWarnings("unchecked")
+    protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
+#if ($table.isUseSequence())
+    protected ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
+#end
+#if ($table.isWritable())
+
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
+    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
+    protected int doCallCreate(${glEntityInterfaceName} entity) { return delegateInsert(downcast(entity)); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
+    protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
+#if ($table.hasOptimisticLock())
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
+#end
+    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
+    protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
+#if ($table.hasOptimisticLock())
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
+#end
+
+    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
+    }
+    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
+    }
+#if ($table.hasOptimisticLock())
+    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
+    }
+#end
+    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
+    }
+#if ($table.hasOptimisticLock())
+    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
+        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
+    }
+#end
+#else
+#if ($table.isAvailableNonPrimaryKeyWritable())
+    protected int delegateInsert(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        return getMyDao().insert(entity);
+    }
+#end
 #end
 #end
 #if ($table.hasBehaviorFilterBeforeColumn())
