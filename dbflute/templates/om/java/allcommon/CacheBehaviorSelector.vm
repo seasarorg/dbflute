@@ -32,7 +32,6 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
     //                                                                          ==========
     /**
      * Initialize condition-bean meta data. <br />
-	 * If you call this, Hot Deploy of OutsideSql becomes Cool!
      */
     public void initializeConditionBeanMetaData() {
         final Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
