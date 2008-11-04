@@ -1,4 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+#if ($database.isAvailableNonPrimaryKeyWritable())
+
+import java.util.List;
+#end
 
 import org.seasar.dao.BeanMetaData;
 

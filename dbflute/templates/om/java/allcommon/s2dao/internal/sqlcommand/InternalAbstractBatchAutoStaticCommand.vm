@@ -29,6 +29,7 @@ public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glIn
     public Object execute(Object[] args) {
         final ${glInternalAbstractBatchAutoHandler} handler = createBatchAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
 		handler.setSql(getSql());
 		// The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(args);

@@ -46,12 +46,10 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
     public Object execute(Object[] args) { // NOT for Batch. Batch should override.
         ${glInternalAbstractAutoHandler} handler = createAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
         handler.setLoggingMessageSqlArgs(args);
         int rows = handler.execute(args);
-        if (optimisticLockHandling && rows != 1) {
-            throw createEntityAlreadyUpdatedException(args[0], rows);
-        }
         return new Integer(rows);
     }
 

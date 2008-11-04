@@ -46,6 +46,9 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         this.propertyTypes = propertyTypes;
     }
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     public int execute(Object[] args) {
         Connection connection = getConnection();
         try {
@@ -96,12 +99,18 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
         return new ${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
+    // ===================================================================================
+    //                                                                       Pre/Post Bean
+    //                                                                       =============
     protected void preUpdateBean(Object bean) {
     }
 
     protected void postUpdateBean(Object bean, int ret) {
     }
 
+    // ===================================================================================
+    //                                                                       Bind Setupper
+    //                                                                       =============
     protected abstract void setupBindVariables(Object bean);
 
     protected void setupInsertBindVariables(Object bean) {

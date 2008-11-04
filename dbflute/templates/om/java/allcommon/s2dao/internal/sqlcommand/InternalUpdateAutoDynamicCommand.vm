@@ -68,8 +68,8 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
 
     protected ${glInternalUpdateAutoHandler} createInternalUpdateAutoHandler(BeanMetaData bmd, PropertyType[] propertyTypes) {
         ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
-        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         handler.setOptimisticLockHandling(optimisticLockHandling); // [DBFlute-0.8.0]
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         return handler;
     }
 
@@ -194,10 +194,6 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
 
     public void setPropertyNames(String[] propertyNames) {
         this.propertyNames = propertyNames;
-    }
-
-    public boolean isOptimisticLockHandling() {
-        return optimisticLockHandling;
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {
