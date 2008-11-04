@@ -58,6 +58,10 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Command Set up
     //                                                                      ==============
+    /**
+     * Inject the properties of component to the command of behavior.
+     * @param behaviorCommand The command of behavior. (NotNull)
+     */
     public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
         behaviorCommand.setDataSource(_dataSource);
         behaviorCommand.setStatementFactory(_statementFactory);
@@ -73,6 +77,12 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Command Invoke
     //                                                                      ==============
+    /**
+     * Invoke the command of behavior.
+     * This method is an entry point!
+     * @param behaviorCommand The command of behavior. (NotNull)
+     * @return The result object. (Nullable)
+     */
     public Object invoke(${glBehaviorCommand} behaviorCommand) {
         clearContext();
         try {

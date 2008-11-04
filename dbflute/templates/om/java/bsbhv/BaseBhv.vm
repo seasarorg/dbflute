@@ -659,12 +659,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-#if ($database.isMakeDeprecated())
-    protected int delegateGetCountAll() { return delegateSelectCount(newMyConditionBean()); }
-    protected List<${myExtendedObjectClassName}> delegateGetListAll() { return delegateSelectList(newMyConditionBean()); }
-#end
     protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
+    protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount(cb) }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
+    @SuppressWarning("unchecked")
+    protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List<${glEntityInterfaceName}>)delegateSelectList(cb) }
 #if ($table.isUseSequence())
     protected ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
 #end
@@ -674,11 +673,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                Update
     //                                                ------
     protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
+    protected int doCallCreate(${glEntityInterfaceName} entity) { return delegateInsert(downcast(entity)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
+    protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
 #end
     protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
+    protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
 #end

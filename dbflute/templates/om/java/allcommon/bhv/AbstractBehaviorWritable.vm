@@ -538,8 +538,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callCreate(${glEntityInterfaceName} entity) {
         if (!processBeforeInsert(entity)) { return 1;/*as Normal End*/ }
-        return getDaoWritable().create(entity);
+        return doCallCreate(entity);
     }
+    protected abstract int doCallCreate(${glEntityInterfaceName} entity);
 
     /**
      * Process before insert.
@@ -566,8 +567,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callModify(${glEntityInterfaceName} entity) {
         if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
-        return getDaoWritable().modifyModifiedOnly(entity);
+        return doCallModify(entity);
     }
+    protected abstract int doCallModify(${glEntityInterfaceName} entity);
 
     /**
      * Process before update.
@@ -593,8 +595,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callRemove(${glEntityInterfaceName} entity) {
         if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
-        return getDaoWritable().remove(entity);
+        return doCallRemove(entity);
     }
+    protected abstract int doCallRemove(${glEntityInterfaceName} entity);
 
     /**
      * Process before delete.
