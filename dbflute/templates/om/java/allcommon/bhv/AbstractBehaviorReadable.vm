@@ -620,15 +620,22 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
+    protected ${glBehaviorCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
+        assertBehaviorCommandInvoker("createInsertEntityCommand");
+        final ${glInsertEntityCommand} command = xsetupCommand(new ${glInsertEntityCommand}());
+        command.setEntity(entity);
+        return command;
+    }
+
     protected ${glBehaviorCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {
-        assertBehaviorCommandInvoker();
+        assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final ${glSelectCountCBCommand} command = xsetupCommand(new ${glSelectCountCBCommand}());
         command.setConditionBean(cb);
         return command;
     }
 
     protected ${glBehaviorCommand} createSelectListCBCommand(${glConditionBeanInterfaceName} cb) {
-        assertBehaviorCommandInvoker();
+        assertBehaviorCommandInvoker("createSelectListCBCommand");
         final ${glSelectListCBCommand} command = xsetupCommand(new ${glSelectListCBCommand}());
         command.setConditionBean(cb);
         return command;
@@ -645,10 +652,20 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
-    protected void assertBehaviorCommandInvoker() {
-        if (_behaviorCommandInvoker == null) {
-            String msg = "The invoker of behavior command at behavior should not be null:";
-            msg = msg + " behavior=" + toString();
+    private void assertBehaviorCommandInvoker(String methodName) {
+        if (_behaviorSelector == null) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Not found the invoker of behavior command as behavior's attributed!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the definition of the invoker at your 'dbflute.dicon'." + getLineSeparator();
+            msg = msg + "It is precondition that '" + methodName + "()' needs the invoker instance." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
+            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + getLineSeparator();
+            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
     }
