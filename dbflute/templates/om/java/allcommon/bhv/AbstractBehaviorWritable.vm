@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glUpdateEntityCommand};

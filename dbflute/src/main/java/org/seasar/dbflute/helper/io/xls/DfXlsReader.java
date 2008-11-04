@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -166,11 +167,15 @@ public class DfXlsReader {
 
     protected void setupColumns(DataTable table, HSSFRow nameRow, HSSFRow valueRow) {
         for (int i = 0;; ++i) {
-            HSSFCell nameCell = nameRow.getCell((short) i);
+            final HSSFCell nameCell = nameRow.getCell((short) i);
             if (nameCell == null) {
                 break;
             }
-            String columnName = nameCell.getStringCellValue().trim();
+            final HSSFRichTextString richStringCellValue = nameCell.getRichStringCellValue();
+            if (richStringCellValue == null) {
+                break;
+            }
+            final String columnName = richStringCellValue.getString().trim();
             if (columnName.length() == 0) {
                 break;
             }
@@ -293,7 +298,7 @@ public class DfXlsReader {
             }
             return new BigDecimal(Double.toString(numericCellValue));
         case HSSFCell.CELL_TYPE_STRING:
-            String s = cell.getStringCellValue();
+            String s = cell.getRichStringCellValue().getString();
             if (s != null) {
                 if (isNotTrimTarget(cell, table)) {
                     if (s.length() != s.trim().length()) {
