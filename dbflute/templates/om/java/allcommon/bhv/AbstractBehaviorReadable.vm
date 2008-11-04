@@ -21,6 +21,7 @@ import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractBehaviorCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glSelectNextValCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -635,6 +636,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         command.setEntityType(getDBMeta().getEntityType());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
+        return command;
+    }
+
+    protected ${glBehaviorCommand} createSelectNextValCommand(Class<?> entityType) {
+        assertBehaviorCommandInvoker("createSelectNextValCommand");
+        final ${glSelectNextValCommand} command = xsetupSelectCommand(new ${glSelectNextValCommand}());
+        command.setEntityType(entityType);
         return command;
     }
 

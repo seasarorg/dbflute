@@ -23,7 +23,7 @@ public abstract class ${glAbstractListEntityCommand} extends ${glAbstractBehavio
     protected Class<? extends ${glEntityInterfaceName}> _entityType;
 
     /** The instance of condition-bean. (Required) */
-    protected List<${glEntityInterfaceName}> _entityList;
+    protected List<? extends ${glEntityInterfaceName}> _entityList;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -162,7 +162,7 @@ public abstract class ${glAbstractListEntityCommand} extends ${glAbstractBehavio
         _entityType = entityType;
     }
 
-    public void setEntityList(List<${glEntityInterfaceName}> entityList) {
+    public void setEntityList(List<? extends ${glEntityInterfaceName}> entityList) {
         _entityList = entityList;
     }
 }

@@ -12,6 +12,8 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.CommandContext;
 import org.seasar.dao.Node;
 import org.seasar.dao.SqlCommand;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
@@ -25,7 +27,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand  {
+public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand, ${glSqlExecution} {
 
     // ===================================================================================
     //                                                                           Attribute

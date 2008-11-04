@@ -1,29 +1,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import java.util.List;
-
-import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.dao.BeanMetaData;
-
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
-    protected Class<? extends ${glEntityInterfaceName}> _entityType;
-
     /** The type of condition-bean. (Derived from conditionBean) */
     protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
 
@@ -34,56 +26,26 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "selectList";
-    }
-
-    public Class<?> getCommandReturnType() {
-        return List.class;
+        return "queryUpdate";
     }
 
     // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
+    @Override
     public boolean isConditionBean() {
         return true;
-    }
-
-    public boolean isOutsideSql() {
-        return false;
-    }
-
-    public boolean isProcedure() {
-        return false;
-    }
-
-    public boolean isSelect() {
-        return true;
-    }
-
-    public boolean isSelectCount() {
-        return false;
     }
 
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
+    @Override
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xsetupSelectCountIgnoreFetchScope();
-        } else {
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-        }
+        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
-    }
-
-    public void afterExecuting() {
-        assertStatus("afterExecuting");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xafterCareSelectCountIgnoreFetchScope();
-        }
     }
 
     // ===================================================================================
@@ -91,31 +53,25 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
+        return _tableDbName + ":" + getCommandName() + "(" + _entityType.getSimpleName() + ", " + _conditionBeanType.getSimpleName() + ")";
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                BeanMetaData bmd = createBeanMetaData();
-                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
-                return createSelectCBExecution(_conditionBeanType, handler);
+                return createQueryUpdateEntityCBExecution(_conditionBeanType);
             }
         };
     }
 
-    protected BeanMetaData createBeanMetaData() {
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
-    }
-
-    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType, ResultSetHandler handler) {
-        return createSelectDynamicCommand(handler, new String[] { "dto" }, new Class<?>[] { cbType }, null);
+    protected ${glSqlExecution} createQueryUpdateEntityCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType) {
+        return new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _statementFactory);
     }
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _conditionBean };
+        return new Object[] { _entity, _conditionBean };
     }
 
     // ===================================================================================
@@ -136,9 +92,16 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    @Override
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
+        if (_entityType == null) {
+            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
+        }
+        if (_entity == null) {
+            throw new IllegalStateException(buildAssertMessage("_entity", methodName));
+        }
         if (_conditionBeanType == null) {
             throw new IllegalStateException(buildAssertMessage("_conditionBeanType", methodName));
         }
@@ -150,10 +113,6 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
-        _entityType = entityType;
-    }
-
     public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
         _conditionBeanType = conditionBeanType;
     }

@@ -8,11 +8,19 @@ import java.util.Iterator;
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractListEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glUpdateEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glUpdateNonstrictEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glDeleteEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glDeleteNonstrictEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glBatchInsertEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glBatchUpdateEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glBatchUpdateNonstrictEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glBatchDeleteEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glBatchDeleteNonstrictEntityCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glQueryDeleteCBCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glQueryUpdateEntityCBCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
@@ -316,19 +324,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-#set ($batchUpdateReturnValueMethod = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnValueMethod = ".length")
-#else
-  #set ($batchUpdateReturnValueMethod = "")
-#end
-
     // ===================================================================================
     //                                                                         Lump Update
     //                                                                         ===========
@@ -337,7 +332,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity list. (NotNull and NotEmpty)
      * @return The array of created count.
      */
-    public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] lumpCreate(List<${glEntityInterfaceName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callCreateList(entityList);
     }
@@ -348,7 +343,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Modified count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] lumpModify(List<${glEntityInterfaceName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callModifyList(entityList);
     }
@@ -359,7 +354,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Removed count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] lumpRemove(List<${glEntityInterfaceName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callRemoveList(entityList);
     }
@@ -806,45 +801,41 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected void assertEntityOfDelete(${glEntityInterfaceName} entity) {
     }
 
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-
     /**
      * ${database.ImplementComment}
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
-    public ${batchUpdateReturnType} callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] callCreateList(List<${glEntityInterfaceName}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeInsertInternally(entityList);
-        return getDaoWritable().createList(entityList);
+        return doCreateList(entityList);
     }
+    protected abstract int[] doCreateList(List<${glEntityInterfaceName}> entityList);
 
     /**
      * ${database.ImplementComment}
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Updated count.
      */
-    public ${batchUpdateReturnType} callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] callModifyList(List<${glEntityInterfaceName}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeUpdateInternally(entityList);
-        return getDaoWritable().modifyList(entityList);
+        return doModifyList(entityList);
     }
+    protected abstract int[] doModifyList(List<${glEntityInterfaceName}> entityList);
 
     /**
      * ${database.ImplementComment}
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
-    public ${batchUpdateReturnType} callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int[] callRemoveList(List<${glEntityInterfaceName}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeDeleteInternally(entityList);
-        return getDaoWritable().removeList(entityList);
+        return doRemoveList(entityList);
     }
+    protected abstract int[] doRemoveList(List<${glEntityInterfaceName}> entityList);
 
     protected void assertEntityHasVersionNoValue(${glEntityInterfaceName} entity) {
         if (!getDBMeta().hasVersionNo()) {
@@ -964,5 +955,60 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         command.setEntityType(entity.getClass());
         command.setEntity(entity);
         return command;
+    }
+
+    protected ${glBehaviorCommand} createBatchInsertEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+        assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
+        return xsetupListEntityCommand(new ${glBatchInsertEntityCommand}(), entityList);
+    }
+
+    protected ${glBehaviorCommand} createBatchUpdateEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+        assertBehaviorCommandInvoker("createBatchUpdateEntityCommand");
+        return xsetupListEntityCommand(new ${glBatchUpdateEntityCommand}(), entityList);
+    }
+
+    protected ${glBehaviorCommand} createBatchUpdateNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+        assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
+        return xsetupListEntityCommand(new ${glBatchUpdateNonstrictEntityCommand}(), entityList);
+    }
+
+    protected ${glBehaviorCommand} createBatchDeleteEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+        assertBehaviorCommandInvoker("createBatchDeleteEntityCommand");
+        return xsetupListEntityCommand(new ${glBatchDeleteEntityCommand}(), entityList);
+    }
+
+    protected ${glBehaviorCommand} createBatchDeleteNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+        assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
+        return xsetupListEntityCommand(new ${glBatchDeleteNonstrictEntityCommand}(), entityList);
+    }
+
+    private <COMMAND extends ${glAbstractListEntityCommand}> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends ${glEntityInterfaceName}> entityList) {
+        command.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setEntityType(entityList.get(0).getClass());
+        command.setEntityList(entityList);
+        return command;
+    }
+
+    protected ${glBehaviorCommand} createQueryDeleteCBCommand(${glConditionBeanInterfaceName} cb) {
+        assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
+        final ${glQueryDeleteCBCommand} cmd = new ${glQueryDeleteCBCommand}();
+        cmd.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setConditionBeanType(cb.getClass());
+        cmd.setConditionBean(cb);
+        return cmd;
+    }
+
+    protected ${glBehaviorCommand} createQueryUpdateEntityCBCommand(${glEntityInterfaceName} entity, ${glConditionBeanInterfaceName} cb) {
+        assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
+        final ${glQueryUpdateEntityCBCommand} cmd = new ${glQueryUpdateEntityCBCommand}();
+        cmd.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setConditionBeanType(cb.getClass());
+        cmd.setConditionBean(cb);
+        cmd.setEntityType(entity.getClass());
+        cmd.setEntity(entity);
+        return cmd;
     }
 }

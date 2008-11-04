@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
+#end
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
@@ -52,6 +54,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return DBMeta. (NotNull)
      */
     public ${glDBMetaInterfaceName} getDBMeta();
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     // ===================================================================================
     //                                                                        Dao Accessor
@@ -61,6 +64,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Dao-readable. (NotNull)
      */
     public ${glDaoReadableInterfaceName} getDaoReadable();
+#end
 
     // ===================================================================================
     //                                                                        New Instance

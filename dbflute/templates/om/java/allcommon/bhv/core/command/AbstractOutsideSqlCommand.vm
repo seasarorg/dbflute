@@ -47,7 +47,7 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
     protected ResultSetHandler createOutsideSqlBeanListResultSetHandler(BeanMetaData bmd) {
         final ValueType valueType = ValueTypes.getValueType(_entityType);
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
-            return new InternalObjectListResultSetHandler(valueType);
+            return createObjectListResultSetHandler(valueType);
         }
         return createBeanListMetaDataResultSetHandler(bmd);
     }

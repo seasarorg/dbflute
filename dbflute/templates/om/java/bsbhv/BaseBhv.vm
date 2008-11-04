@@ -97,6 +97,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /** @return The meta data of the database as my table type. (NotNull) */
     public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     // ===================================================================================
     //                                                                        Dao Accessor
@@ -107,7 +108,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isWritable())
     public ${glDaoWritableInterfaceName} getDaoWritable() { return getMyDao(); }
 #end
-
+#end
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
@@ -570,7 +571,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
         setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
         filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
+#if ($database.isCompatibleBehaviorUseDaoInterface())
         return getMyDao().updateByQuery(cb, ${myEntityVariableName});
+#else
+        return invoke(createQueryUpdateEntityCBCommand(${myEntityVariableName}, cb));
+#end
     }
 
     /**
@@ -580,7 +585,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
+#if ($database.isCompatibleBehaviorUseDaoInterface())
         return getMyDao().deleteByQuery(cb);
+#else
+        return invoke(createQueryDeleteCBCommand(cb));
+#end
     }
 #end
 
@@ -653,16 +662,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
+#if ($database.isCompatibleBehaviorUseDaoInterface())
     // ===================================================================================
     //                                                                     Delegate Method
     //                                                                     ===============
-#if ($database.isCompatibleBehaviorUseDaoInterface())
+    // [Dao (Old Style)]
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return getMyDao().selectCount(cb); }
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { return getMyDao().selectCount(cb); }
     protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
-    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return getMyDao().selectList(cb); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { return getMyDao().selectList(cb); }
     @SuppressWarnings("unchecked")
     protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
@@ -687,22 +697,28 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
+        return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
+        return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
+        return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
     }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
+        return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
+        return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
     }
 #end
 #else
@@ -714,52 +730,76 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #end
 #else
+    // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
+    // [Behavior Command]
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return invoke(createSelectCountCBCommand(cb)); }
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) {
+        return invoke(createSelectCountCBCommand(cb));
+    }
     protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
-    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertCBNotNull(cb); return invoke(createSelectListCBCommand(cb)); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
+        return invoke(createSelectListCBCommand(cb));
+    }
     @SuppressWarnings("unchecked")
     protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
-    protected ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
+    protected ${table.sequenceReturnType} delegateSelectNextVal() { return invoke(createSelectNextValCommand(${table.sequenceReturnType}.class)); }
 #end
 #if ($table.isWritable())
 
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
-    protected int doCallCreate(${glEntityInterfaceName} entity) { return delegateInsert(downcast(entity)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
+    protected int delegateInsert(${myExtendedObjectClassName} e) {
+        if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e));
+    }
+    protected int doCallCreate(${glEntityInterfaceName} entity) {return delegateInsert(downcast(entity)); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e) {
+        if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e));
+    }
     protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) {
+        if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e));
+    }
 #end
-    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
+    protected int delegateDelete(${myExtendedObjectClassName} e) {
+        if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e));
+    }
     protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) {
+        if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e));
+    }
 #end
 
     protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
+        return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls)));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
+        return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
+        return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
+        return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
+    @SuppressWarnings("unchecked")
+    protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        assertObjectNotNull("${myEntityListVariableName}", ls); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
+        return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
 #end
 #else

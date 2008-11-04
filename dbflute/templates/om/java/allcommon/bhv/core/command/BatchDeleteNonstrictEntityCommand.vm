@@ -1,0 +1,23 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBatchDeleteNonstrictEntityCommand} extends ${glBatchDeleteEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getCommandName() {
+        return "batchDeleteNonstrict";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    @Override
+    protected boolean isOptimisticLockHandling() {
+        return false;
+    }
+}

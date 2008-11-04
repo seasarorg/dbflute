@@ -1,29 +1,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import java.util.List;
-
-import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.dao.BeanMetaData;
-
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glQueryDeleteCBCommand} extends ${glAbstractBehaviorCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
-    protected Class<? extends ${glEntityInterfaceName}> _entityType;
-
     /** The type of condition-bean. (Derived from conditionBean) */
     protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
 
@@ -34,11 +26,11 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "selectList";
+        return "queryDelete";
     }
 
     public Class<?> getCommandReturnType() {
-        return List.class;
+        return int.class;
     }
 
     // ===================================================================================
@@ -57,7 +49,7 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     }
 
     public boolean isSelect() {
-        return true;
+        return false;
     }
 
     public boolean isSelectCount() {
@@ -70,20 +62,11 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xsetupSelectCountIgnoreFetchScope();
-        } else {
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-        }
+        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
     }
 
     public void afterExecuting() {
-        assertStatus("afterExecuting");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xafterCareSelectCountIgnoreFetchScope();
-        }
     }
 
     // ===================================================================================
@@ -98,19 +81,13 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                BeanMetaData bmd = createBeanMetaData();
-                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
-                return createSelectCBExecution(_conditionBeanType, handler);
+                return createQueryDeleteCBExecution(_conditionBeanType);
             }
         };
     }
 
-    protected BeanMetaData createBeanMetaData() {
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
-    }
-
-    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType, ResultSetHandler handler) {
-        return createSelectDynamicCommand(handler, new String[] { "dto" }, new Class<?>[] { cbType }, null);
+    protected ${glSqlExecution} createQueryDeleteCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType) {
+        return new ${glInternalDeleteQueryAutoDynamicCommand}(_dataSource, _statementFactory);
     }
 
     public Object[] getSqlExecutionArgument() {
@@ -150,10 +127,6 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
-        _entityType = entityType;
-    }
-
     public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
         _conditionBeanType = conditionBeanType;
     }
