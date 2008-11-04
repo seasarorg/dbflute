@@ -19,8 +19,8 @@ public class ${glInternalUpdateBatchAutoStaticCommand} extends ${glInternalAbstr
     //                                                                         ===========
     public ${glInternalUpdateBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, versionNoAutoIncrementOnMemory);
+            String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);
     }
 
 	// ===================================================================================

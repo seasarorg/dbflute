@@ -30,8 +30,8 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
     //                                                                           =========
     private BeanMetaData beanMetaData;
     private String[] propertyNames;
-    private boolean optimisticLockHandling = true;
-    private boolean versionNoAutoIncrementOnMemory = true;
+    private boolean optimisticLockHandling;
+    private boolean versionNoAutoIncrementOnMemory;
 
 	// ===================================================================================
     //                                                                         Constructor

@@ -33,8 +33,8 @@ public abstract class ${glInternalAbstractAutoHandler} extends ${glInternalBasic
     protected Timestamp timestamp;
     protected Integer versionNo;
     protected PropertyType[] propertyTypes;
-    protected boolean optimisticLockHandling = true;
-    protected boolean versionNoAutoIncrementOnMemory = true;
+    protected boolean optimisticLockHandling;
+    protected boolean versionNoAutoIncrementOnMemory;
 
     // ===================================================================================
     //                                                                         Constructor

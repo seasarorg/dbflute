@@ -21,28 +21,20 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHan
 public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInternalAbstractStaticCommand} {
 
 	// ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final boolean DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY = true;
-
-	// ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private PropertyType[] propertyTypes;
-    protected boolean optimisticLockHandling = true;
-    protected boolean versionNoAutoIncrementOnMemory = DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY;
+    protected boolean optimisticLockHandling;
+    protected boolean versionNoAutoIncrementOnMemory;
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames) {
-        this(dataSource, statementFactory, beanMetaData, propertyNames, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
-    }
-
-    public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
+    public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource
+            , StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames
+            , boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData);
+        this.optimisticLockHandling = optimisticLockHandling;
         this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
         setupPropertyTypes(propertyNames);
         setupSql();
@@ -196,16 +188,5 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInterna
             PropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
-    }
-
-	// ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isOptimisticLockHandling() {
-        return optimisticLockHandling;
-    }
-
-    public void setOptimisticLockHandling(boolean optimisticLockHandling) {
-        this.optimisticLockHandling = optimisticLockHandling;
     }
 }

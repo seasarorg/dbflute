@@ -18,14 +18,8 @@ public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glIn
     //                                                                         ===========
     public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames) {
-        this(dataSource, statementFactory, beanMetaData, propertyNames, DEFAULT_VERSION_NO_AUTO_INCREMENT_ON_MEMORY);
-    }
-
-    public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean versionNoAutoIncrementOnMemory) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, versionNoAutoIncrementOnMemory);
+            String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);
     }
 
 	// ===================================================================================

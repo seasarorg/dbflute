@@ -18,8 +18,8 @@ public class ${glInternalDeleteAutoStaticCommand} extends ${glInternalAbstractAu
     //                                                                         ===========
     public ${glInternalDeleteAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames);
+            String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, false);
     }
 
 	// ===================================================================================

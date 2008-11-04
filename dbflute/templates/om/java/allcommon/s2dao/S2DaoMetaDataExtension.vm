@@ -418,14 +418,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             cmd.setStatementFactory(statementFactory);
             command = cmd;
         } else {
-            boolean returningRows = false;
-            if (int[].class.isAssignableFrom(method.getReturnType())) {
-                returningRows = true;
-            }
-            final ${glInternalInsertBatchAutoStaticCommand} cmd = new ${glInternalInsertBatchAutoStaticCommand}(
-                    dataSource, statementFactory, getBeanMetaData(),
-                    propertyNames, returningRows);
-            command = cmd;
+            // The static command is set up at constructor so all properties is specified at constructor.
+            command = new ${glInternalInsertBatchAutoStaticCommand}(dataSource, statementFactory, getBeanMetaData(), propertyNames);
         }
         putSqlCommand(method.getName(), command);
     }
@@ -490,7 +484,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected UpdateAutoStaticCommand createInternalUpdateAutoStaticCommand(final Method method, final String[] propertyNames) {
         final UpdateAutoStaticCommand cmd = new UpdateAutoStaticCommand(dataSource, statementFactory, beanMetaData, propertyNames);
         cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
-        return cmd;
+        return cmd; // [Unused on DBFlute]
     }
     
     protected ${glInternalUpdateAutoDynamicCommand} createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
@@ -508,7 +502,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalUpdateModifiedOnlyCommand} createInternalUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = newInternalUpdateModifiedOnlyCommand(method, dataSource, statementFactory);
-        cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
+        cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
@@ -520,10 +514,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
+        // The static command is set up at constructor so all properties is specified at constructor.
         final ${glInternalUpdateBatchAutoStaticCommand} cmd = new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory
                                                       , createBeanMetaData4UpdateDeleteByAuto(method), propertyNames
+                                                      , isOptimisticLockHandling(method)
                                                       , isUpdateVersionNoAutoIncrementOnMemory(method));
-        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         return cmd;
     }
 
@@ -549,15 +544,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
-        final ${glInternalDeleteAutoStaticCommand} cmd = new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
-        return cmd;
+        // The static command is set up at constructor so all properties is specified at constructor.
+        return new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, isOptimisticLockHandling(method));
     }
 
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
-        final ${glInternalDeleteBatchAutoStaticCommand} cmd = new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
-        cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
-        return cmd;
+        // The static command is set up at constructor so all properties is specified at constructor.
+        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, isOptimisticLockHandling(method));
     }
 
     // -----------------------------------------------------

@@ -19,9 +19,8 @@ public class ${glInternalInsertBatchAutoStaticCommand} extends ${glInternalAbstr
     //                                                                         ===========
     public ${glInternalInsertBatchAutoStaticCommand}(DataSource dataSource,
             StatementFactory statementFactory, BeanMetaData beanMetaData,
-            String[] propertyNames, boolean returningRows) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, returningRows);
-        setOptimisticLockHandling(false);
+            String[] propertyNames) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, false, false);
     }
 
 	// ===================================================================================

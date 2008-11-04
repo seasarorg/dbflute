@@ -18,8 +18,8 @@ public class ${glInternalDeleteBatchAutoStaticCommand} extends ${glInternalAbstr
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalDeleteBatchAutoStaticCommand}(DataSource dataSource,
-            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames);
+            StatementFactory statementFactory, BeanMetaData beanMetaData, String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, false);
     }
 
 	// ===================================================================================
