@@ -9,7 +9,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStati
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glUpdateEntityCommand} extends ${glAbstractEntityCommand} {
+public class ${glDeleteEntityCommand} extends ${glAbstractEntityCommand} {
 
     // ===================================================================================
     //                                                                   Basic Information

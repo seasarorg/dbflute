@@ -732,17 +732,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
+    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
     protected int doCallCreate(${glEntityInterfaceName} entity) { return delegateInsert(downcast(entity)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
     protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
 #end
-    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
+    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
     protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
 #end
 
     protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
@@ -767,8 +767,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
     protected int delegateInsert(${myExtendedObjectClassName} entity) {
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-        return getMyDao().insert(entity);
+        assertEntityNotNull(entity); // If this table use identity, the entity does not have primary-key.
+        return invoke(createInsertEntityCommand(e));
     }
 #end
 #end

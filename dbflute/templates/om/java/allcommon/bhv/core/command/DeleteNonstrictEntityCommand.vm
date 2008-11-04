@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glUpdateNonstrictEntityCommand} extends ${glUpdateEntityCommand} {
+public class ${glDeleteNonstrictEntityCommand} extends ${glDeleteEntityCommand} {
 
     // ===================================================================================
     //                                                                   Basic Information

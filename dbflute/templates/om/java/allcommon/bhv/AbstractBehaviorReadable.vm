@@ -19,7 +19,6 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractBehaviorCommand};
-import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
@@ -621,17 +620,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
-        assertBehaviorCommandInvoker("createInsertEntityCommand");
-        final ${glInsertEntityCommand} command = xsetupCommand(new ${glInsertEntityCommand}());
-        command.setEntityType(getDBMeta().getEntityType());
-        command.setEntity(entity);
-        return command;
-    }
-
     protected ${glBehaviorCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
-        final ${glSelectCountCBCommand} command = xsetupCommand(new ${glSelectCountCBCommand}());
+        final ${glSelectCountCBCommand} command = xsetupSelectCommand(new ${glSelectCountCBCommand}());
         command.setEntityType(getDBMeta().getEntityType());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
@@ -640,14 +631,14 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     protected ${glBehaviorCommand} createSelectListCBCommand(${glConditionBeanInterfaceName} cb) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final ${glSelectListCBCommand} command = xsetupCommand(new ${glSelectListCBCommand}());
+        final ${glSelectListCBCommand} command = xsetupSelectCommand(new ${glSelectListCBCommand}());
         command.setEntityType(getDBMeta().getEntityType());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
         return command;
     }
 
-    private <COMMAND extends ${glAbstractBehaviorCommand}> COMMAND xsetupCommand(COMMAND command) {
+    private <COMMAND extends ${glAbstractBehaviorCommand}> COMMAND xsetupSelectCommand(COMMAND command) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         return command;
@@ -658,7 +649,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
-    private void assertBehaviorCommandInvoker(String methodName) {
+    protected void assertBehaviorCommandInvoker(String methodName) {
         if (_behaviorCommandInvoker == null) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
