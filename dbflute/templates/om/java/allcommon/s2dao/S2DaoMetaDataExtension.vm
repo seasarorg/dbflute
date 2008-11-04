@@ -489,7 +489,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     
     protected ${glInternalUpdateAutoDynamicCommand} createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
         final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(method, dataSource, statementFactory);
-        cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
+        cmd.setBeanMetaData(getBeanMetaData(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
@@ -502,7 +502,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalUpdateModifiedOnlyCommand} createInternalUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
         final ${glInternalUpdateModifiedOnlyCommand} cmd = newInternalUpdateModifiedOnlyCommand(method, dataSource, statementFactory);
-        cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));
+        cmd.setBeanMetaData(getBeanMetaData(method));
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling(method));
         cmd.setVersionNoAutoIncrementOnMemory(isUpdateVersionNoAutoIncrementOnMemory(method));
@@ -516,7 +516,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
         // The static command is set up at constructor so all properties is specified at constructor.
         final ${glInternalUpdateBatchAutoStaticCommand} cmd = new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory
-                                                      , createBeanMetaData4UpdateDeleteByAuto(method), propertyNames
+                                                      , getBeanMetaData(method), propertyNames
                                                       , isOptimisticLockHandling(method)
                                                       , isUpdateVersionNoAutoIncrementOnMemory(method));
         return cmd;
@@ -545,21 +545,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
         // The static command is set up at constructor so all properties is specified at constructor.
-        return new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, isOptimisticLockHandling(method));
+        return new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, getBeanMetaData(method), propertyNames, isOptimisticLockHandling(method));
     }
 
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames) {
         // The static command is set up at constructor so all properties is specified at constructor.
-        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, isOptimisticLockHandling(method));
+        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, getBeanMetaData(method), propertyNames, isOptimisticLockHandling(method));
     }
 
     // -----------------------------------------------------
     //                                         Common Helper
     //                                         -------------
-    protected BeanMetaData createBeanMetaData4UpdateDeleteByAuto(Method method) {
-        return getBeanMetaData();
-    }
-    
     protected boolean isUpdateVersionNoAutoIncrementOnMemory(Method method) {
         return !isNonstrictMethod(method);
     }

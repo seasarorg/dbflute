@@ -1,0 +1,23 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glUpdateNonstrictEntityCommand} extends ${glUpdateEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    @Override
+    public String getCommandName() {
+        return "deleteNonstrict";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    @Override
+    protected boolean isOptimisticLockHandling() {
+        return false;
+    }
+}

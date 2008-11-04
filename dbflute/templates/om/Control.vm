@@ -134,6 +134,8 @@ targetdatabase = $targetDatabase
     #set ($glAbstractBehaviorCommand = "${glProjectPrefix}AbstractBehaviorCommand")
     #set ($glAbstractEntityCommand = "${glProjectPrefix}AbstractEntityCommand")
     #set ($glAbstractOutsideSqlCommand = "${glProjectPrefix}AbstractOutsideSqlCommand")
+    #set ($glDeleteEntityCommand = "${glProjectPrefix}DeleteEntityCommand")
+    #set ($glDeleteNonstrictEntityCommand = "${glProjectPrefix}DeleteNonstrictEntityCommand")
     #set ($glInsertEntityCommand = "${glProjectPrefix}InsertEntityCommand")
     #set ($glOutsideSqlCallCommand = "${glProjectPrefix}OutsideSqlCallCommand")
     #set ($glOutsideSqlExecuteCommand = "${glProjectPrefix}OutsideSqlExecuteCommand")
@@ -704,6 +706,14 @@ targetdatabase = $targetDatabase
       $database.info("    parse('AbstractOutsideSqlCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('DeleteEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glDeleteEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/DeleteEntityCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('DeleteNonstrictEntityCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glDeleteNonstrictEntityCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/DeleteNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('InsertEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glInsertEntityCommand}.${glClassFileExtension}" )
