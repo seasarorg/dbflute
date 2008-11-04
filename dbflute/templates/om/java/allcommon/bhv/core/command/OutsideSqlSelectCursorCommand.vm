@@ -42,20 +42,9 @@ public class ${glOutsideSqlSelectCursorCommand} extends ${glOutsideSqlSelectList
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
-        if (_outsideSqlPath == null) {
-            String msg = "The property 'outsideSqlPath' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
-        if (_outsideSqlOption == null) {
-            String msg = "The property 'outsideSqlOption' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
+        assertOutsideSqlBasic(methodName);
         if (_cursorHandler == null) {
-            String msg = "The property 'cursorHandler' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_cursorHandler", methodName));
         }
     }
 

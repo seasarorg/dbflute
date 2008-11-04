@@ -20,11 +20,14 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The instance of condition-bean. (Required) */
-    protected ${glConditionBeanInterfaceName} _conditionBean;
+    /** The type of entity. (Required) */
+    protected Class<? extends ${glEntityInterfaceName}> _entityType;
 
     /** The type of condition-bean. (Derived from conditionBean) */
     protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
+
+    /** The instance of condition-bean. (Required) */
+    protected ${glConditionBeanInterfaceName} _conditionBean;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -92,17 +95,20 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        final Class<?> cbType = _conditionBeanType;
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
                 BeanMetaData bmd = createBeanMetaData();
                 ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
-                return createSelectCBExecution(cbType, handler);
+                return createSelectCBExecution(_conditionBeanType, handler);
             }
         };
     }
 
-    protected ${glSqlExecution} createSelectCBExecution(Class<?> cbType, ResultSetHandler handler) { // for condition-bean
+    protected BeanMetaData createBeanMetaData() {
+        return _beanMetaDataFactory.createBeanMetaData(_entityType);
+    }
+
+    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType, ResultSetHandler handler) {
         return createSelectDynamicCommand(handler, new String[] { "dto" }, new Class<?>[] { cbType }, null);
     }
 
@@ -147,8 +153,15 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
+        _entityType = entityType;
+    }
+
+    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
+        _conditionBeanType = conditionBeanType;
+    }
+
     public void setConditionBean(${glConditionBeanInterfaceName} conditionBean) {
         _conditionBean = conditionBean;
-        _conditionBeanType = conditionBean != null ? conditionBean.getClass() : null;
     }
 }

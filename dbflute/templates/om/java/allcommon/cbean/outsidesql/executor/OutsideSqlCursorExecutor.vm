@@ -1,8 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 
-import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectCursorCommand};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -15,16 +18,31 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The invoker of behavior command. (NotNull) */
+    protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
 
+    /** The DB name of table. (NotNull) */
+    protected final String _tableDbName;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+    public ${glOutsideSqlCursorExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
+        this._outsideSqlDao = null;
+        this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
+    }
+
+    public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = null;
         this._outsideSqlDao = outsideSqlDao;
         this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
     }
 
     // ===================================================================================
@@ -40,6 +58,27 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
      */
     public Object selectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
         return _outsideSqlDao.selectCursor(path, pmb, _outsideSqlOption, handler);
+    }
+
+    // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glBehaviorCommand} createSelectCursorCommand(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+        return xsetupCommand(new ${glOutsideSqlSelectCursorCommand}(), path, pmb, handler);
+    }
+
+    private ${glOutsideSqlSelectCursorCommand} xsetupCommand(${glOutsideSqlSelectCursorCommand} command, String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+        command.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setOutsideSqlPath(path);
+        command.setParameterBean(pmb);
+        command.setOutsideSqlOption(_outsideSqlOption);
+        command.setCursorHandler(handler);
+        return command;
+    }
+
+    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
+        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

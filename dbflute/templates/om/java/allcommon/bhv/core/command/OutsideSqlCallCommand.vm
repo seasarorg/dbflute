@@ -92,18 +92,9 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
-        if (_outsideSqlPath == null) {
-            String msg = "The property 'outsideSqlPath' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
+        assertOutsideSqlBasic(methodName);
         if (_parameterBean == null) {
             String msg = "The property 'parameterBean' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
-        if (_outsideSqlOption == null) {
-            String msg = "The property 'outsideSqlOption' should not be null";
             msg = msg + " when you call " + methodName + "().";
             throw new IllegalStateException(msg);
         }

@@ -10,19 +10,7 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
  * The behavior command for OutsideSql.execute().
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    /** The path of outsideSql. (Required) */
-    protected String _outsideSqlPath;
-
-    /** The parameter-bean. (Required to set, but Nullable) */
-    protected Object _parameterBean;
-
-    /** The option of outsideSql. (Required) */
-    protected ${glOutsideSqlOptionName} _outsideSqlOption;
+public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand} {
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -38,24 +26,12 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} 
     // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
-    public boolean isConditionBean() {
-        return false; // When the command is for outsideSql, it always be false.
-    }
-
-    public boolean isOutsideSql() {
-        return true;
-    }
-
     public boolean isProcedure() {
         return false;
     }
 
     public boolean isSelect() {
         return false;
-    }
-
-    public boolean isSelectCount() {
-        return false; // When the command is for outsideSql, it always be false.
     }
 
     // ===================================================================================
@@ -130,48 +106,11 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractBehaviorCommand} 
     }
 
     // ===================================================================================
-    //                                                                Argument Information
-    //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
-        return null;
-    }
-
-    public String getOutsideSqlPath() {
-        return _outsideSqlPath;
-    }
-
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
-        return _outsideSqlOption;
-    }
-
-    // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertStatus(String methodName) {
-        if (_outsideSqlPath == null) {
-            String msg = "The property 'outsideSqlPath' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
-        if (_outsideSqlOption == null) {
-            String msg = "The property 'outsideSqlOption' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setOutsideSqlPath(String outsideSqlPath) {
-        _outsideSqlPath = outsideSqlPath;
-    }
-
-    public void setParameterBean(Object parameterBean) {
-        _parameterBean = parameterBean;
-    }
-
-    public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
-        _outsideSqlOption = outsideSqlOption;
+        assertBasicProperty(methodName);
+        assertComponentProperty(methodName);
+        assertOutsideSqlBasic(methodName);
     }
 }

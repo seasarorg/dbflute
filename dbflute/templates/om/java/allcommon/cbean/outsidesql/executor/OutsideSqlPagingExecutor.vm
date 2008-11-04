@@ -3,6 +3,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
@@ -24,6 +27,9 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The invoker of behavior command. (NotNull) */
+    protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+
     /** The DAO of outsideSql. (NotNull) */
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
@@ -36,7 +42,15 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    public ${glOutsideSqlPagingExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
+        this._outsideSqlDao = null;
+        this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
+    }
+
     public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = null;
         this._outsideSqlDao = outsideSqlDao;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
@@ -150,7 +164,7 @@ public class ${glOutsideSqlPagingExecutorName} {
                                                       , final ${glPagingBeanInterfaceName} pmb
                                                       , final Class<ENTITY> entityType) {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
+        final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = createCountExecutor();
         final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
             public ${glPagingBeanInterfaceName} getPagingBean() {
                 return pmb;
@@ -171,6 +185,10 @@ public class ${glOutsideSqlPagingExecutorName} {
         return invoker.invokePaging(handler);
     }
 
+    protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> createCountExecutor() {
+        return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption, _tableDbName);
+    }
+
     protected void setupScrollableCursorIfNeeds() {
         if (!_outsideSqlOption.isAutoPaging()) {
             return;
@@ -189,7 +207,28 @@ public class ${glOutsideSqlPagingExecutorName} {
         }
         statementConfig.typeScrollInsensitive();
     }
-	
+
+    // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glBehaviorCommand} createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+        return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
+    }
+
+    private ${glOutsideSqlSelectListCommand xsetupCommand(${glOutsideSqlSelectListCommand} command, String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+        command.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setOutsideSqlPath(path);
+        command.setParameterBean(pmb);
+        command.setOutsideSqlOption(_outsideSqlOption);
+        command.setEntityType(entityType);
+        return command;
+    }
+
+    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
+        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    }
+
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
@@ -202,14 +241,4 @@ public class ${glOutsideSqlPagingExecutorName} {
         _outsideSqlOption.dynamicBinding();
         return this;
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * @return The executor of cursor. (NotNull)
-     * @deprecated This method is no cop. This was implemented by mistake. 
-     */
-    public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
-    }
-#end
 }

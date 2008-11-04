@@ -6,6 +6,12 @@ import java.util.List;
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 #end
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractOutsideSqlCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlExecuteCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlCallCommand};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
@@ -44,6 +50,9 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The invoker of behavior command. (NotNull) */
+    protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+
     /** The DAO of outside-sql. (NotNull) */
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
@@ -59,7 +68,14 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    public ${glOutsideSqlBasicExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, String tableDbName) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
+        this._outsideSqlDao = null;
+        this._tableDbName = tableDbName;
+    }
+
     public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
+        this._behaviorCommandInvoker = null;
         this._outsideSqlDao = outsideSqlDao;
         this._tableDbName = tableDbName;
     }
@@ -115,6 +131,37 @@ public class ${glOutsideSqlBasicExecutorName} {
     }
 
     // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glBehaviorCommand} createSelectListCommand(String path, Object pmb, Class<?> entityType) {
+        return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
+    }
+
+    protected ${glBehaviorCommand} createExecuteCommand(String path, Object pmb) {
+        return xsetupCommand(new ${glOutsideSqlExecuteCommand}(), path, pmb, null);
+    }
+
+    protected ${glBehaviorCommand} createCallCommand(String path, Object pmb) {
+        return xsetupCommand(new ${glOutsideSqlCallCommand}(), path, pmb, null);
+    }
+
+    private <COMMAND extends ${glAbstractOutsideSqlCommand}> COMMAND xsetupCommand(COMMAND command, String path, Object pmb, Class<?> entityType) {
+        command.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setOutsideSqlPath(path);
+        command.setParameterBean(pmb);
+        command.setOutsideSqlOption(createOutsideSqlOption());
+        if (entityType != null) {
+            command.setEntityType(entityType);
+        }
+        return command;
+    }
+
+    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
+        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    }
+
+    // ===================================================================================
     //                                                                              Option
     //                                                                              ======
     // -----------------------------------------------------
@@ -131,7 +178,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @return The cursor executor of outside-sql. (NotNull)
      */
     public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
+        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption(), _tableDbName);
     }
 
     /**
@@ -145,7 +192,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @return The cursor executor of outside-sql. (NotNull)
      */
     public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
-        return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
+        return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption(), _tableDbName);
     }
 
     // -----------------------------------------------------

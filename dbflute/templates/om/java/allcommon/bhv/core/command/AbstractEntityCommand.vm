@@ -9,6 +9,7 @@ import org.seasar.dao.BeanMetaData;
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -18,6 +19,9 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The type of entity. (Required) */
+    protected Class<? extends ${glEntityInterfaceName}> _entityType;
+
     /** The instance of condition-bean. (Required) */
     protected ${glEntityInterfaceName} _entity;
 
@@ -49,6 +53,16 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
 
     public boolean isSelectCount() {
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                             Factory
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                          BeanMetaData
+    //                                          ------------
+    protected BeanMetaData createBeanMetaData() {
+        return _beanMetaDataFactory.createBeanMetaData(_entityType);
     }
 
     // ===================================================================================
@@ -91,6 +105,31 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected ${glDBMetaInterfaceName} findDBMeta() {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        // Cannot use the handler of DBMeta instance
+        // because the customize-entity is contained to find here.
+        // - - - - - - - - - -/
+        // ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+
+        final Class<?> beanType = _entityType;
+        if (beanType == null) {
+            return null;
+        }
+        if (!${glEntityInterfaceName}.class.isAssignableFrom(beanType)) {
+            return null;
+        }
+        final ${glEntityInterfaceName} entity;
+        try {
+            entity = (${glEntityInterfaceName})beanType.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        return entity.getDBMeta();
+    }
+
     protected String[] getPersistentPropertyNames(BeanMetaData bmd) {
         final List<String> nameList = new ArrayList<String>();
         for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
@@ -113,6 +152,10 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
+        _entityType = entityType;
+    }
+
     public void setEntity(${glEntityInterfaceName} entity) {
         _entity = entity;
     }

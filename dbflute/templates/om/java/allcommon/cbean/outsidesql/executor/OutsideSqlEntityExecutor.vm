@@ -2,6 +2,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
@@ -18,16 +21,31 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The invoker of behavior command. (NotNull) */
+    protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
 
+    /** The DB name of table. (NotNull) */
+    protected final String _tableDbName;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlEntityExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+    public ${glOutsideSqlEntityExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
+        this._outsideSqlDao = null;
+        this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
+    }
+
+    public ${glOutsideSqlEntityExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        this._behaviorCommandInvoker = null;
         this._outsideSqlDao = outsideSqlDao;
         this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
     }
 
     // ===================================================================================
@@ -94,6 +112,27 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
 
     protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+    }
+
+    // ===================================================================================
+    //                                                                    Behavior Command
+    //                                                                    ================
+    protected ${glBehaviorCommand} createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+        return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
+    }
+
+    private ${glOutsideSqlSelectListCommand xsetupCommand(${glOutsideSqlSelectListCommand} command, String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+        command.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setOutsideSqlPath(path);
+        command.setParameterBean(pmb);
+        command.setOutsideSqlOption(_outsideSqlOption);
+        command.setEntityType(entityType);
+        return command;
+    }
+
+    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
+        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

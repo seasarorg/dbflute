@@ -14,11 +14,9 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandComponentSetup};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
@@ -37,9 +35,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    /** The type of entity. (Required) */
-    protected Class<? extends ${glEntityInterfaceName}> _entityType;
-
     /** The table DB-name. (Required) */
     protected String _tableDbName;
 
@@ -58,13 +53,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======
-    // -----------------------------------------------------
-    //                                          BeanMetaData
-    //                                          ------------
-    protected BeanMetaData createBeanMetaData() {
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
-    }
-
     // -----------------------------------------------------
     //                                   SelectDynamicCommnd
     //                                   -------------------
@@ -118,16 +106,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
         return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
     }
 
-    protected ResultSetHandler createOutsideSqlBeanListResultSetHandler(BeanMetaData bmd) {
-        final ValueType valueType = ValueTypes.getValueType(_entityType);
-        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
-            return new InternalObjectListResultSetHandler(valueType);
-        }
-        final ${glInternalRowCreator} rowCreator = createInternalRowCreator(bmd);
-        final ${glInternalRelationRowCreator} relationRowCreator = createInternalRelationRowCreator(bmd);
-        return new ${glInternalBeanListMetaDataResultSetHandler}(bmd, rowCreator, relationRowCreator);
-    }
-
     protected static class InternalObjectListResultSetHandler implements ResultSetHandler {
         private ValueType valueType;
         public InternalObjectListResultSetHandler(ValueType valueType) {
@@ -160,31 +138,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected ${glDBMetaInterfaceName} findDBMeta() {
-        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Cannot use the handler of DBMeta instance
-        // because the customize-entity is contained to find here.
-        // - - - - - - - - - -/
-        // ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
-
-        final Class<?> beanType = _entityType;
-        if (beanType == null) {
-            return null;
-        }
-        if (!${glEntityInterfaceName}.class.isAssignableFrom(beanType)) {
-            return null;
-        }
-        final ${glEntityInterfaceName} entity;
-        try {
-            entity = (${glEntityInterfaceName})beanType.newInstance();
-        } catch (InstantiationException e) {
-            throw new IllegalStateException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-        return entity.getDBMeta();
-    }
-
     protected String buildDbmsSuffix() {
         final String productName = ${glConditionBeanContextName}.getDatabaseProductName();
         return (productName != null ? "_" + productName.toLowerCase() : "");
@@ -194,44 +147,34 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertBasicProperty(String methodName) {
-        if (_entityType == null) {
-            String msg = "The property 'entityType' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
-        }
         if (_tableDbName == null) {
-            String msg = "The property 'tableDbName' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_tableDbName", methodName));
         }
     }
 
     protected void assertComponentProperty(String methodName) {
         if (_dataSource == null) {
-            String msg = "The property 'dataSource' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_dataSource", methodName));
         }
         if (_statementFactory == null) {
-            String msg = "The property 'statementFactory' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_statementFactory", methodName));
         }
         if (_beanMetaDataFactory == null) {
-            String msg = "The property 'beanMetaDataFactory' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_beanMetaDataFactory", methodName));
         }
         if (_valueTypeFactory == null) {
-            String msg = "The property 'valueTypeFactory' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_valueTypeFactory", methodName));
         }
         if (_sqlFileEncoding == null) {
-            String msg = "The property 'sqlFileEncoding' should not be null";
-            msg = msg + " when you call " + methodName + "().";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(buildAssertMessage("_sqlFileEncoding", methodName));
         }
+    }
+
+    protected String buildAssertMessage(String propertyName, String methodName) {
+        propertyName = propertyName.startsWith("_") : propertyName.substring("_".length) : propertyName;
+        String msg = "The property '" + propertyName + "' should not be null";
+        msg = msg + " when you call " + methodName + "().";
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
@@ -248,14 +191,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    public Class<? extends ${glEntityInterfaceName}> getEntityType() {
-        return _entityType;
-    }
-
-    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
-        _entityType = entityType;
-    }
-
     public String getTableDbName() {
         return _tableDbName;
     }
