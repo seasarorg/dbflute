@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Date;
 
 import javax.sql.DataSource;
 
@@ -15,7 +14,7 @@ import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
 
 /**
- * Row States. {Refer to S2Container}
+ * {Refers to S2Container and Extends it}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
@@ -72,15 +71,18 @@ public abstract class AbstractRowState implements RowState {
                 } else {
                     ps.setNull(parameterIndex, Types.NUMERIC);
                 }
-            } else if (Timestamp.class.isAssignableFrom(type)) {
-                if (value != null) {
-                    ps.setTimestamp(parameterIndex, (Timestamp) value);
-                } else {
-                    ps.setNull(parameterIndex, Types.TIMESTAMP);
-                }
             } else if (java.util.Date.class.isAssignableFrom(type)) {
                 if (value != null) {
-                    ps.setDate(parameterIndex, new java.sql.Date(((java.util.Date) value).getTime()));
+                    if (value instanceof String) {
+                        final Timestamp timestamp = Timestamp.valueOf((String) value);
+                        ps.setTimestamp(parameterIndex, timestamp);
+                    } else {
+                        if (value instanceof Timestamp) {
+                            ps.setTimestamp(parameterIndex, (Timestamp) value);
+                        } else {
+                            ps.setDate(parameterIndex, new java.sql.Date(((java.util.Date) value).getTime()));
+                        }
+                    }
                 } else {
                     ps.setNull(parameterIndex, Types.DATE);
                 }

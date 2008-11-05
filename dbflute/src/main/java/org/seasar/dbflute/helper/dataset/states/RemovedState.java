@@ -8,7 +8,7 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataTable;
 
 /**
- * {Refer to S2Container}
+ * {Refers to S2Container and Extends it}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */

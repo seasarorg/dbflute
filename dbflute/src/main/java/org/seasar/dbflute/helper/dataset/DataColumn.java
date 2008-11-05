@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.dataset;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 
 /**
- * Data Table. {Refer to S2Container}
+ * {Refers to S2Container and Extends it}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
