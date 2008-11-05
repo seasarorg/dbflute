@@ -10,6 +10,8 @@ import org.seasar.framework.util.NumberConversionUtil;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
+import org.seasar.framework.util.Disposable;
+import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glXLog};
@@ -31,7 +33,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glBehaviorCommandInvoker} {
+public class ${glBehaviorCommandInvoker} implements Disposable {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -49,6 +51,11 @@ public class ${glBehaviorCommandInvoker} {
     protected final StatementFactory _statementFactory = createStatememtFactory();
     protected final Map<String, ${glSqlExecution}> _executionMap = new ConcurrentHashMap<String, ${glSqlExecution}>();
 
+    // -----------------------------------------------------
+    //                                        Dispose Status
+    //                                        --------------
+    protected boolean disposable;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -59,7 +66,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                                                      Command Set up
     //                                                                      ==============
     /**
-     * Inject the properties of component to the command of behavior.
+     * Inject the properties of component to the command of behavior. {Public Interface}
      * @param behaviorCommand The command of behavior. (NotNull)
      */
     public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
@@ -78,7 +85,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                                                      Command Invoke
     //                                                                      ==============
     /**
-     * Invoke the command of behavior.
+     * Invoke the command of behavior. {Public Interface}
      * This method is an entry point!
      * @param behaviorCommand The command of behavior. (NotNull)
      * @return The result object. (Nullable)
@@ -171,6 +178,11 @@ public class ${glBehaviorCommandInvoker} {
         return _executionMap.get(key);
     }
 
+    /**
+     * @param key The key of SQL execution. (NotNull)
+     * @param executionCreator The creator of SQL execution. (NotNull)
+     * @return The SQL execution that may be created then. (NotNull)
+     */
     protected  ${glSqlExecution} getSqlExecution(String key, ${glSqlExecutionCreator} executionCreator) {
         ${glSqlExecution} execution = getSqlExecution(key);
         if (execution == null) {
@@ -192,6 +204,13 @@ public class ${glBehaviorCommandInvoker} {
                 String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
                 msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
                 throw new IllegalStateException(msg);
+            }
+            if (!disposable) {
+                synchronized (this) {
+                    if (!disposable) {
+                        toBeDisposable();
+                    }
+                }
             }
         }
         return execution;
@@ -601,6 +620,27 @@ public class ${glBehaviorCommandInvoker} {
         factory.setDefaultStatementConfig(defaultStatementConfig);
         factory.setInternalDebug(internalDebug);
         return factory;
+    }
+
+    // ===================================================================================
+    //                                                                             Dispose
+    //                                                                             =======
+    public void toBeDisposable() {
+        DisposableUtil.add(this);
+        disposable = true;
+    }
+
+    public void dispose() {
+        _executionMap.clear();
+        disposable = false;
+    }
+
+    public boolean isDisposable() {
+        return disposable;
+    }
+
+    public boolean isExecutionCacheEmpty() {
+        return _executionMap.isEmpty();
     }
 
     // ===================================================================================
