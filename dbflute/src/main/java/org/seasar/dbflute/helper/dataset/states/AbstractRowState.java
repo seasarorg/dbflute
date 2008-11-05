@@ -85,7 +85,11 @@ public abstract class AbstractRowState implements RowState {
                     ps.setNull(parameterIndex, Types.DATE);
                 }
             } else {
-                ps.setObject(parameterIndex, value);
+                if (value != null) {
+                    ps.setObject(parameterIndex, value);
+                } else {
+                    ps.setNull(parameterIndex, Types.VARCHAR);
+                }
             }
         }
     }
