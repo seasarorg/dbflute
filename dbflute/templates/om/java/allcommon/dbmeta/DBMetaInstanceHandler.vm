@@ -3,8 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 #set ($myClassName = "${glDBMetaInstanceHandlerName}")
 import java.util.Collections;
 import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
@@ -18,12 +18,12 @@ public class ${myClassName} {
     //                                                                          Definition
     //                                                                          ==========
     /** Table DB-name instance map. */
-    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new LinkedHashMap<String, ${glDBMetaInterfaceName}>();
+    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new ConcurrentHashMap<String, ${glDBMetaInterfaceName}>();
 
     /** The map of table DB-name and class name. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
     static {
-        Map<String, String> tmpMap = new LinkedHashMap<String, String>();
+        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.Name}", "${table.DBMetaFullClassName}");
@@ -35,7 +35,7 @@ public class ${myClassName} {
     /** The key-to-lower map of DB-name and property-name for table. */
     protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
     static {
-        Map<String, String> tmpMap = new LinkedHashMap<String, String>();
+        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.name}".toLowerCase(), "${table.javaBeansRulePropertyName}");
@@ -47,7 +47,7 @@ public class ${myClassName} {
     /** The key-to-lower map of property-name and DB-name for table. */
     protected static final Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
     static {
-        Map<String, String> tmpMap = new LinkedHashMap<String, String>();
+        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.javaBeansRulePropertyName}".toLowerCase(), "${table.name}");

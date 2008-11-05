@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
@@ -25,7 +25,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
     //                                                                           Attribute
     //                                                                           =========
     /** The cache of behavior. (It's the generic hell!) */
-    protected Map<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}> _behaviorCache = new LinkedHashMap<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}>();
+    protected Map<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}> _behaviorCache = new ConcurrentHashMap<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}>();
 
     // ===================================================================================
     //                                                                          Initialize
