@@ -1,8 +1,12 @@
 package org.seasar.dbflute.helper.dataset.states;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Date;
 
 import javax.sql.DataSource;
 
@@ -53,7 +57,36 @@ public abstract class AbstractRowState implements RowState {
             return;
         }
         for (int i = 0; i < args.length; ++i) {
-            ps.setObject(i + 1, args[i]);
+            final Object value = args[i];
+            final Class<?> type = argTypes[i];
+            final int parameterIndex = (i + 1);
+            if (String.class.isAssignableFrom(type)) {
+                if (value != null) {
+                    ps.setString(parameterIndex, (String) value);
+                } else {
+                    ps.setNull(parameterIndex, Types.VARCHAR);
+                }
+            } else if (Number.class.isAssignableFrom(type)) {
+                if (value != null) {
+                    ps.setBigDecimal(parameterIndex, new BigDecimal(value.toString()));
+                } else {
+                    ps.setNull(parameterIndex, Types.NUMERIC);
+                }
+            } else if (Timestamp.class.isAssignableFrom(type)) {
+                if (value != null) {
+                    ps.setTimestamp(parameterIndex, (Timestamp) value);
+                } else {
+                    ps.setNull(parameterIndex, Types.TIMESTAMP);
+                }
+            } else if (java.util.Date.class.isAssignableFrom(type)) {
+                if (value != null) {
+                    ps.setDate(parameterIndex, new java.sql.Date(((java.util.Date) value).getTime()));
+                } else {
+                    ps.setNull(parameterIndex, Types.DATE);
+                }
+            } else {
+                ps.setObject(parameterIndex, value);
+            }
         }
     }
 
