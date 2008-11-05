@@ -76,7 +76,12 @@ public abstract class AbstractRowState implements RowState {
             final int parameterIndex = (i + 1);
             if (String.class.isAssignableFrom(type)) {
                 if (value != null) {
-                    ps.setString(parameterIndex, (String) value);
+                    if (isTimestampValue((String) value)) {
+                        final Timestamp timestamp = getTimestampValue((String) value);
+                        ps.setTimestamp(parameterIndex, timestamp);
+                    } else {
+                        ps.setString(parameterIndex, (String) value);
+                    }
                 } else {
                     ps.setNull(parameterIndex, Types.VARCHAR);
                 }
@@ -109,6 +114,19 @@ public abstract class AbstractRowState implements RowState {
                 }
             }
         }
+    }
+
+    protected boolean isTimestampValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        value = filterTimestampValue(value);
+        try {
+            Timestamp.valueOf(value);
+            return true;
+        } catch (RuntimeException e) {
+        }
+        return false;
     }
 
     protected Timestamp getTimestampValue(String value) {
