@@ -367,7 +367,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         try {
             return Timestamp.valueOf(filteredTimestampValue);
         } catch (RuntimeException e) {
-            throw e;
+            String msg = "The value cannot be convert to timestamp:";
+            msg = msg + " value=" + value + " filtered=" + filteredTimestampValue;
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -533,8 +535,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     protected String getSql4Log(String tableName, List<String> columnNameList,
             final List<? extends Object> bindParameters) {
-        String columnNameString = columnNameList.toString();
-        columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
         return tableName + ":{" + bindParameterString + "}";

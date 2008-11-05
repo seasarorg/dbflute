@@ -6,9 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
@@ -20,19 +24,24 @@ import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
  */
 public abstract class AbstractRowState implements RowState {
 
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(AbstractRowState.class);
+
     AbstractRowState() {
     }
 
     public void update(DataSource dataSource, DataRow row) {
         final SqlContext ctx = getSqlContext(row);
-        execute(dataSource, ctx.getSql(), ctx.getArgs(), ctx.getArgTypes());
+        execute(dataSource, ctx.getSql(), ctx.getArgs(), ctx.getArgTypes(), row);
     }
 
-    protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes) {
+    protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes, DataRow row) {
+        final String tableName = row.getTable().getTableName();
         final Connection conn = DfDataSourceUtil.getConnection(dataSource);
         try {
             final PreparedStatement ps = DfConnectionUtil.prepareStatement(conn, sql);
             try {
+                _log.info(getSql4Log(tableName, Arrays.asList(args)));
                 bindArgs(ps, args, argTypes);
                 ps.executeUpdate();
             } catch (SQLException e) {
@@ -49,6 +58,12 @@ public abstract class AbstractRowState implements RowState {
         } finally {
             DfConnectionUtil.close(conn);
         }
+    }
+
+    protected String getSql4Log(String tableName, final List<? extends Object> bindParameters) {
+        String bindParameterString = bindParameters.toString();
+        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
+        return tableName + ":{" + bindParameterString + "}";
     }
 
     protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) throws SQLException {
@@ -101,7 +116,9 @@ public abstract class AbstractRowState implements RowState {
         try {
             return Timestamp.valueOf(filteredTimestampValue);
         } catch (RuntimeException e) {
-            throw e;
+            String msg = "The value cannot be convert to timestamp:";
+            msg = msg + " value=" + value + " filtered=" + filteredTimestampValue;
+            throw new IllegalStateException(msg, e);
         }
     }
 
