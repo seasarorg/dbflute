@@ -391,7 +391,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                               Entity Property Setup
     //                                                               =====================
     // It's very INTERNAL!
-    protected Map<String, Eps<${myExtendedObjectClassName}>> _epsMap = newHashMap();
+    protected Map<String, Eps<${myExtendedObjectClassName}>> _epsMap = newConcurrentHashMap();
     {
 #foreach ($column in $table.columns)
         setupEps(_epsMap, new Eps${column.javaName}(), column${column.javaBeansRulePropertyNameInitCap}());

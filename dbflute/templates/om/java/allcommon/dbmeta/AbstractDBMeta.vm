@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -32,6 +33,11 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final Object DUMMY_VALUE = new Object();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1017,9 +1023,9 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     protected Map<String, String> setupKeyToLowerMap(boolean dbNameKey) {
         final Map<String, String> map;
 		if (dbNameKey) {
-		    map = newLinkedHashMap(getTableDbName().toLowerCase(), getTablePropertyName());
+		    map = newConcurrentHashMap(getTableDbName().toLowerCase(), getTablePropertyName());
 		} else {
-		    map = newLinkedHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
+		    map = newConcurrentHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
 		}
         Method[] methods = this.getClass().getMethods();
         String columnInfoMethodPrefix = "column";
@@ -1072,6 +1078,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 	protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
         return new HashMap<KEY, VALUE>();
     }
+
+	protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
 	
 	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
@@ -1094,7 +1104,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // -----------------------------------------------------
     //                                   Reflection Handling
     //                                   -------------------
-    private Set<String> _cachedMethodNames = new HashSet<String>(); // for performance
+    private Map<String, Object> _cachedMethodNames = newConcurrentHashMap<String, Object>(); // for performance
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         if (_cachedMethodNames.isEmpty()) {
@@ -1102,12 +1112,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 if (_cachedMethodNames.isEmpty()) {
                     final Method[] methods = this.getClass().getMethods();
                     for (Method method : methods) {
-                        _cachedMethodNames.add(method.getName());
+                        _cachedMethodNames.put(method.getName(), DUMMY_VALUE);
                     }
                 }
             }
         }
-        return _cachedMethodNames.contains(methodName);
+        return _cachedMethodNames.containsKey(methodName);
     }
 	
     // -----------------------------------------------------

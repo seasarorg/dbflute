@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
 import org.seasar.framework.util.NumberConversionUtil;
@@ -47,7 +47,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                        Fixed Property
     //                                        --------------
     protected final StatementFactory _statementFactory = createStatememtFactory();
-    protected final Map<String, ${glSqlExecution}> _executionMap = new HashMap<String, ${glSqlExecution}>();
+    protected final Map<String, ${glSqlExecution}> _executionMap = new ConcurrentHashMap<String, ${glSqlExecution}>();
 
     // ===================================================================================
     //                                                                         Constructor

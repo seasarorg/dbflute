@@ -1,11 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.sql.DatabaseMetaData;
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.extension.jdbc.PropertyType;
@@ -28,7 +27,7 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
     //                                                                           Attribute
     //                                                                           =========
     /** The map of bean meta data for cache. */
-    protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = Collections.synchronizedMap(new HashMap<Class<? extends ${glEntityInterfaceName}>, BeanMetaData>());
+    protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = new ConcurrentHashMap<Class<? extends ${glEntityInterfaceName}>, BeanMetaData>();
 
     // ===================================================================================
     //                                                                  Override for Cache
