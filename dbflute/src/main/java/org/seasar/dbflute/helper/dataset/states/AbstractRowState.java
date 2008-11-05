@@ -31,9 +31,10 @@ public abstract class AbstractRowState implements RowState {
             final PreparedStatement ps = DfConnectionUtil.prepareStatement(conn, sql);
             try {
                 bindArgs(ps, args, argTypes);
-                ps.execute(sql);
+                ps.executeUpdate();
             } catch (SQLException e) {
-                throw new IllegalStateException(e);
+                String msg = "The SQL threw the exception: " + sql;
+                throw new IllegalStateException(msg, e);
             } finally {
                 if (ps != null) {
                     try {
