@@ -94,6 +94,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      */
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
     public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
+        // List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
         List<ENTITY> resultList = _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
         return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
     }

@@ -1006,6 +1006,10 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return The command of behavior. (NotNull)
      */
     private <COMMAND extends ${glAbstractListEntityCommand}> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends ${glEntityInterfaceName}> entityList) {
+        if (entityList.isEmpty()) {
+            String msg = "The argument 'entityList' should not be empty: " + entityList;
+            throw new IllegalStateException(msg);
+        }
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setEntityType(entityList.get(0).getClass()); // *The list should not be empty!
