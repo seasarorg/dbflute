@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.Method;
 
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
@@ -18,12 +19,12 @@ public class ${myClassName} {
     //                                                                          Definition
     //                                                                          ==========
     /** Table DB-name instance map. */
-    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new ConcurrentHashMap<String, ${glDBMetaInterfaceName}>();
+    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = newConcurrentHashMap();
 
     /** The map of table DB-name and class name. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
     static {
-        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
+        Map<String, String> tmpMap = newConcurrentHashMap();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.Name}", "${table.DBMetaFullClassName}");
@@ -35,7 +36,7 @@ public class ${myClassName} {
     /** The key-to-lower map of DB-name and property-name for table. */
     protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
     static {
-        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
+        Map<String, String> tmpMap = newConcurrentHashMap();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.name}".toLowerCase(), "${table.javaBeansRulePropertyName}");
@@ -47,7 +48,7 @@ public class ${myClassName} {
     /** The key-to-lower map of property-name and DB-name for table. */
     protected static final Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
     static {
-        Map<String, String> tmpMap = new ConcurrentHashMap<String, String>();
+        Map<String, String> tmpMap = newConcurrentHashMap();
 
 #foreach ($table in $database.tables)
         tmpMap.put("${table.javaBeansRulePropertyName}".toLowerCase(), "${table.name}");
@@ -59,7 +60,7 @@ public class ${myClassName} {
     protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
         try {
             Class clazz = Class.forName(className);
-            java.lang.reflect.Method methoz = clazz.getMethod("getInstance", (Class[])null);
+            Method methoz = clazz.getMethod("getInstance", (Class[])null);
             Object result = methoz.invoke(null, (Object[])null);
             return (${glDBMetaInterfaceName})result;
         } catch (Exception e) {
@@ -174,6 +175,10 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+	protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

@@ -180,21 +180,18 @@ public interface ${myClassName} {
     //                                                                         ===========
     /**
      * Get primary unique info.
-     * 
      * @return Primary unique info. (NotNull)
      */
     public ${glUniqueInfoName} getPrimaryUniqueInfo();
 
     /**
      * Has primary-key?
-     * 
      * @return Determination.
      */
     public boolean hasPrimaryKey();
 
     /**
      * Has two or more primary-keys?
-     * 
      * @return Determination.
      */
     public boolean hasTwoOrMorePrimaryKeys();
