@@ -74,7 +74,7 @@ public abstract class AbstractRowState implements RowState {
             } else if (java.util.Date.class.isAssignableFrom(type)) {
                 if (value != null) {
                     if (value instanceof String) {
-                        final Timestamp timestamp = Timestamp.valueOf((String) value);
+                        final Timestamp timestamp = getTimestampValue((String) value);
                         ps.setTimestamp(parameterIndex, timestamp);
                     } else {
                         if (value instanceof Timestamp) {
@@ -94,6 +94,28 @@ public abstract class AbstractRowState implements RowState {
                 }
             }
         }
+    }
+
+    protected Timestamp getTimestampValue(String value) {
+        final String filteredTimestampValue = filterTimestampValue(value);
+        try {
+            return Timestamp.valueOf(filteredTimestampValue);
+        } catch (RuntimeException e) {
+            throw e;
+        }
+    }
+
+    protected String filterTimestampValue(String value) {
+        value = value.trim();
+        if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+            value = value.replaceAll("/", "-");
+        }
+        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+            if (value.length() == "2007-07-09".length()) {
+                value = value + " 00:00:00";
+            }
+        }
+        return value;
     }
 
     protected abstract SqlContext getSqlContext(DataRow row);
