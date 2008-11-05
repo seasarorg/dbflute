@@ -27,7 +27,7 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
     //                                                                           Attribute
     //                                                                           =========
     /** The map of bean meta data for cache. */
-    protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = new ConcurrentHashMap<Class<? extends ${glEntityInterfaceName}>, BeanMetaData>();
+    protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -94,7 +94,7 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
         // = = = = = = = = = =/
         return new BeanMetaDataImpl() {
             protected List<IdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<IdentifierGenerator>();
-            protected Map<String, IdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = new HashMap<String, IdentifierGenerator>();
+            protected Map<String, IdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
 
             // /= = = = = = =
             // for cache
@@ -162,6 +162,13 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
     @Override
     protected int getLimitRelationNestLevel() {
         return 2; // for Compatible to old version DBFlute
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+	protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
     }
 
     // ===================================================================================
