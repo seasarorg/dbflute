@@ -1,8 +1,14 @@
 package org.seasar.dbflute.helper.dataset.states;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
+import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
 
 /**
  * Row States. {Refer to S2Container}
@@ -15,15 +21,40 @@ public abstract class AbstractRowState implements RowState {
     }
 
     public void update(DataSource dataSource, DataRow row) {
-        throw new UnsupportedOperationException();
-        //        SqlContext ctx = getSqlContext(row);
-        //        UpdateHandler handler = new BasicUpdateHandler(dataSource, ctx.getSql());
-        //        execute(handler, ctx.getArgs(), ctx.getArgTypes());
+        final SqlContext ctx = getSqlContext(row);
+        execute(dataSource, ctx.getSql(), ctx.getArgs(), ctx.getArgTypes());
     }
 
-    // protected void execute(UpdateHandler handler, Object[] args, Class<?>[] argTypes) {
-    //     handler.execute(args, argTypes);
-    // }
-    
+    protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes) {
+        final Connection conn = DfDataSourceUtil.getConnection(dataSource);
+        try {
+            final PreparedStatement ps = DfConnectionUtil.prepareStatement(conn, sql);
+            try {
+                bindArgs(ps, args, argTypes);
+                ps.execute(sql);
+            } catch (SQLException e) {
+                throw new IllegalStateException(e);
+            } finally {
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
+            }
+        } finally {
+            DfConnectionUtil.close(conn);
+        }
+    }
+
+    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) throws SQLException {
+        if (args == null) {
+            return;
+        }
+        for (int i = 0; i < args.length; ++i) {
+            ps.setObject(i + 1, args[i]);
+        }
+    }
+
     protected abstract SqlContext getSqlContext(DataRow row);
 }

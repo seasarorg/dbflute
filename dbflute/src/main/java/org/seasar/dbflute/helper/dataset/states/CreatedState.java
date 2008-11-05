@@ -23,7 +23,7 @@ public class CreatedState extends AbstractRowState {
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("INSERT INTO ");
+        buf.append("insert into ");
         buf.append(table.getTableName());
         buf.append(" (");
         int writableColumnSize = 0;
@@ -38,7 +38,7 @@ public class CreatedState extends AbstractRowState {
             }
         }
         buf.setLength(buf.length() - 2);
-        buf.append(") VALUES (");
+        buf.append(") values (");
         for (int i = 0; i < writableColumnSize; ++i) {
             buf.append("?, ");
         }

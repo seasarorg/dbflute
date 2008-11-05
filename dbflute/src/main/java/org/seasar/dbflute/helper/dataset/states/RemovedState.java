@@ -23,14 +23,14 @@ public class RemovedState extends AbstractRowState {
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("DELETE FROM ");
+        buf.append("delete from ");
         buf.append(table.getTableName());
-        buf.append(" WHERE ");
+        buf.append(" where ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
             DataColumn column = table.getColumn(i);
             if (column.isPrimaryKey()) {
                 buf.append(column.getColumnName());
-                buf.append(" = ? AND ");
+                buf.append(" = ? and ");
                 argList.add(row.getValue(i));
                 argTypeList.add(column.getColumnType().getType());
             }

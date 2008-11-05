@@ -23,9 +23,9 @@ public class ModifiedState extends AbstractRowState {
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("UPDATE ");
+        buf.append("update ");
         buf.append(table.getTableName());
-        buf.append(" SET ");
+        buf.append(" set ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
             DataColumn column = table.getColumn(i);
             if (column.isWritable() && !column.isPrimaryKey()) {
@@ -36,12 +36,12 @@ public class ModifiedState extends AbstractRowState {
             }
         }
         buf.setLength(buf.length() - 2);
-        buf.append(" WHERE ");
+        buf.append(" where ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
             DataColumn column = table.getColumn(i);
             if (column.isPrimaryKey()) {
                 buf.append(column.getColumnName());
-                buf.append(" = ? AND ");
+                buf.append(" = ? and ");
                 argList.add(row.getValue(i));
                 argTypeList.add(column.getColumnType().getType());
             }

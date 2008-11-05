@@ -2,6 +2,7 @@ package org.seasar.dbflute.util.jdbc;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -12,27 +13,35 @@ import java.sql.Statement;
  */
 public abstract class DfConnectionUtil {
 
-    public static void close(Connection connection) {
-        if (connection == null)
+    public static void close(Connection conn) {
+        if (conn == null)
             return;
         try {
-            connection.close();
+            conn.close();
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public static Statement createStatement(Connection connection) {
+    public static Statement createStatement(Connection conn) {
         try {
-            return connection.createStatement();
+            return conn.createStatement();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    
+    public static PreparedStatement prepareStatement(Connection conn, String sql) {
+        try {
+            return conn.prepareStatement(sql);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public static DatabaseMetaData getMetaData(Connection connection) {
+    public static DatabaseMetaData getMetaData(Connection conn) {
         try {
-            return connection.getMetaData();
+            return conn.getMetaData();
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
