@@ -158,7 +158,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(); unionQuery.query(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
-    
+#if ($database.isMakeRecentlyDeprecated())
+
     /**
      * @param unionQuery The query of 'union'. (NotNull)
      * @deprecated Sorry! Please use union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery).
@@ -174,6 +175,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     public void unionAll(${myConditionQueryClassName} unionQuery) {
         query().xsetUnionAllQuery(unionQuery);
     }
+#end
 
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();

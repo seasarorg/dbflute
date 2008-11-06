@@ -173,7 +173,6 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-ConditionBean-OutsideSql]
     #set ($glOutsideSqlContextName = "${glProjectPrefix}OutsideSqlContext")
-    #set ($glOutsideSqlDaoName = "${glProjectPrefix}OutsideSqlDao")
     #set ($glOutsideSqlOptionName = "${glProjectPrefix}OutsideSqlOption")
 
     ## [Allcommon-ConditionBean-OutsideSql-Executor]

@@ -167,7 +167,6 @@ targetdatabase = $targetDatabase
     ## [Allcommon-ConditionBean]
     #set ($glFetchNarrowingBeanInterfaceName = "${glProjectPrefix}FetchNarrowingBean")
     #set ($glSimplePagingBeanName = "${glProjectPrefix}SimplePagingBean")
-    #set ($glSimpleOrderByBeanName = "${glProjectPrefix}SimpleOrderByBean")
     #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
     #set ($glConditionQueryInterfaceName = "${glProjectPrefix}ConditionQuery")
     #set ($glOrderByBeanInterfaceName = "${glProjectPrefix}OrderByBean")
@@ -897,12 +896,6 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glFetchNarrowingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/FetchNarrowingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    #if (!$database.isTargetLanguageCSharp())
-      $database.info("    parseSimpleOrderByBean()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimpleOrderByBeanName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimpleOrderByBean.${glTemplateFileExtension}",$path ,"", "")
-    #end
-
     $database.info("    parseSimplePagingBean()")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimplePagingBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimplePagingBean.${glTemplateFileExtension}",$path ,"", "")
@@ -1137,9 +1130,11 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlContextName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlContext.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.info("    parse('OutsideSqlDao');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDaoName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
+    #if ($database.isTargetLanguageCSharp())
+      $database.info("    parse('OutsideSqlDao');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDaoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     $database.info("    parse('OutsideSqlOption');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOptionName}.${glClassFileExtension}" )

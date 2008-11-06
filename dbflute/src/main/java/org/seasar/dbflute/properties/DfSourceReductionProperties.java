@@ -46,48 +46,14 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
-    public boolean isMakeBehaviorNoConditionLoadReferrer() {
-        return booleanProp("torque.isMakeBehaviorNoConditionLoadReferrer", false);
-    }
-
-    public boolean isMakeBehaviorLoopUpdate() {
-        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
-    }
-    
     public boolean isMakeFlatExpansion() {
         return booleanProp("torque.isMakeFlatExpansion", false);
     }
 
     // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    public boolean isMakeDBMetaStaticDefinition() {
-        return booleanProp("torque.isMakeDBMetaStaticDefinition", false);
-    }
-    
-    public boolean isMakeDBMetaJDBCSupport() {
-        return booleanProp("torque.isMakeDBMetaJDBCSupport", false);
-    }
-    
-    public boolean isMakeDBMetaCommonColumnHandling() {
-        return booleanProp("torque.isMakeDBMetaCommonColumnHandling", false);
-    }
-    
-    // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
     public boolean isMakeClassificationValueLabelList() {
         return booleanProp("torque.isMakeClassificationValueLabelList", false);
-    }
-    
-    // ===================================================================================
-    //                                                                           Traceable
-    //                                                                           =========
-    /**
-     * @return Determination
-     * @deprecated
-     */
-    public boolean isMakeTraceablePreparedStatement() {
-        return booleanProp("torque.isMakeTraceablePreparedStatement", false);
     }
 }

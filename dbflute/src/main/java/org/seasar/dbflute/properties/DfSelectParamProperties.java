@@ -10,6 +10,10 @@ public final class DfSelectParamProperties extends DfAbstractHelperProperties {
     public DfSelectParamProperties(Properties prop) {
         super(prop);
     }
+    
+    public boolean isStatementResultSetTypeValid() {
+        return getStatementResultSetType().trim().length() > 0;
+    }
 
     public String getStatementResultSetType() {
         final String value = stringProp("torque.statementResultSetType", "ResultSet.TYPE_FORWARD_ONLY");
@@ -25,9 +29,5 @@ public final class DfSelectParamProperties extends DfAbstractHelperProperties {
             return "java.sql." + value;
         }
         return value;
-    }
-
-    public boolean isStatementResultSetTypeValid() {
-        return getStatementResultSetType().trim().length() != 0;
     }
 }

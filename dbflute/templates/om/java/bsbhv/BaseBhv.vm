@@ -245,16 +245,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
 #if (!${referrer.isOneToOne()})
-#if ($database.isMakeBehaviorNoConditionLoadReferrer())
-    /**
-     * {Refer to overload method that has an argument of condition-bean setupper.}
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     */
-    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glConditionBeanSetupperName}<${referrerCBClassName}>() {
-            public void setup(${referrerCBClassName} cb) {}});
-    }
-#end
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
      * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
@@ -621,27 +611,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityVariableName} Entity. (NotNull)
      */
     protected void filterCopyInsertEntity(${myExtendedObjectClassName} ${myEntityVariableName}) {
-    }
-#end
-#end
-#if ($database.isMakeBehaviorLoopUpdate())
-    /**
-     * Loop update modified elements only.
-     * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
-     */
-    public void loopUpdateModifiedElementsOnly(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        for (${myExtendedObjectClassName} entity : ${myEntityListVariableName}) { if (entity.hasModification()) { update(entity); } }
-    }
-
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-    /**
-     * Loop update modified elements only non-strictly.
-     * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
-     */
-    public void loopUpdateModifiedElementsOnlyNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        for (${myExtendedObjectClassName} entity : ${myEntityListVariableName}) { if (entity.hasModification()) { updateNonstrict(entity); } }
     }
 #end
 #end

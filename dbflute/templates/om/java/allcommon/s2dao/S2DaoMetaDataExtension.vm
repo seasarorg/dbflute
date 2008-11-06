@@ -164,12 +164,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected SqlCommand initializeSqlCommand(String methodName) throws MethodNotFoundRuntimeException {
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-            if (outsideSqlContext != null && outsideSqlContext.isSpecifiedOutsideSql()) {
-                return initializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
-            }
-        }
         final Method[] methods = daoBeanDesc.getMethods(methodName);
         if (methods.length == 1 && MethodUtil.isAbstract(methods[0])) {
             setupMethod(methods[0]);
@@ -179,36 +173,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return cmd;
         }
         throw new MethodNotFoundRuntimeException(daoClass, methodName, null);
-    }
-
-    protected SqlCommand initializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) throws MethodNotFoundRuntimeException {
-        final Method[] methods = daoBeanDesc.getMethods(outsideSqlContext.getMethodName());// By real method name.
-        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
-            final Method method = methods[0];
-            if (isOutsideSqlDaoMethodSelect(method)) {
-                setupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
-            } else if (isOutsideSqlDaoMethodCall(method)) {
-                setupSpecifiedOutsideSqlCallCommand(sqlCommandKey, method, outsideSqlContext);
-            } else {
-                setupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
-            }
-        }
-        final SqlCommand cmd = (SqlCommand) sqlCommands.get(sqlCommandKey);
-        if (cmd != null) {
-            return cmd;
-        }
-        String msg = "Internal Error! The sql-command is not found:";
-        msg = msg + " sqlCommandKey=" + sqlCommandKey;
-        msg = msg + " sqlCommands=" + sqlCommands;
-        throw new IllegalStateException(msg);
-    }
-
-    protected boolean isOutsideSqlDaoMethodSelect(Method method) {
-        return method.getName().startsWith("select");
-    }
-
-    protected boolean isOutsideSqlDaoMethodCall(Method method) {
-        return method.getName().startsWith("call");
     }
 
     // ===================================================================================
@@ -577,8 +541,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                 OutsideSql Override
     //                                                                 ===================
     // -----------------------------------------------------
-    //                                     Normal OutsideSql
-    //                                     -----------------
+    //                                Traditional OutsideSql
+    //                                ----------------------
     @Override
     protected void setupSelectMethodByManual(Method method, String sql) {
         final Class<?>[] pmbTypes = method.getParameterTypes();
@@ -613,177 +577,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         super.setupUpdateMethodByManual(method, sql);
     }
 
-    // -----------------------------------------------------
-    //                                  Specified OutsideSql
-    //                                  --------------------
-    // - - - - - - - - - - - -
-    //                  Select
-    //                   - - -
-    protected void setupSpecifiedOutsideSqlSelectCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final String sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-        final Object pmb = outsideSqlContext.getParameterBean();
-        final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
-
-        // - - - - - - - - - - - - - - - -
-        // Create customized BeanMetaData.
-        // - - - - - - - - - - - - - - - -
-        final Class<?> lastestArguementType = method.getParameterTypes()[method.getParameterTypes().length-1];
-        final ResultSetHandler myResultSetHandler;
-        if (Class.class.isAssignableFrom(lastestArguementType)) {
-            // - - - - - - - -
-            // EntityHandling
-            // - - - - - - - -
-            final Class<?> customizeEntityType = (Class<?>)resultTypeSpecification;
-            final BeanMetaData myBeanMetaData = createSpecifiedOutsideSqlCustomizeBeanMetaData(customizeEntityType);
-            if (List.class.isAssignableFrom(method.getReturnType())) {
-                myResultSetHandler = createSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
-            } else {
-                throw new UnsupportedOperationException("The return type of method is unsupported: method.getReturnType()=" + method.getReturnType());
-                // myResultSetHandler = createSpecifiedOutsideSqlCustomizeBeanResultSetHandler(myBeanMetaData, customizeEntityType);
-            }
-        } else if (${glCursorHandlerName}.class.isAssignableFrom(lastestArguementType)) {
-            // - - - - - - - -
-            // CursorHandling
-            // - - - - - - - -
-            final BeanMetaData myBeanMetaData = createSpecifiedOutsideSqlCursorBeanMetaData(method);
-            myResultSetHandler = createSpecifiedOutsideSqlCursorResultSetHandler(myBeanMetaData);
-        } else {
-            String msg = "The lastestArguementType is unsupported:";
-            msg = msg + " lastestArguementType=" + lastestArguementType;
-            msg = msg + " method=" + method;
-            throw new IllegalStateException(msg);
-        }
-
-        // - - - - - - - - - - -
-        // Register Sql-Command.
-        // - - - - - - - - - - -
-        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, myResultSetHandler);
-    }
-
-    protected BeanMetaData createSpecifiedOutsideSqlCustomizeBeanMetaData(Class clazz) {
-        return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(clazz);
-    }
-
-    /**
-     * Create the handler of result set of specified outside-sql for the list of customize bean.
-     * @param specifiedBeanMetaData Specified bean meta data. (NotNull)
-     * @param customizeEntityType The type of customize entity. (NotNull)
-     * @return The handler of result set. (NotNull)
-     */
-    protected ResultSetHandler createSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(BeanMetaData specifiedBeanMetaData, Class<?> customizeEntityType) {
-        final ValueType valueType = ValueTypes.getValueType(customizeEntityType);
-        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
-            return new InternalObjectListResultSetHandler(valueType);
-        }
-        final ${glInternalRowCreator} rowCreator = createSpecifiedOutsideSqlInternalRowCreator(specifiedBeanMetaData);
-        final ${glInternalRelationRowCreator} relationRowCreator = createSpecifiedOutsideSqlInternalRelationRowCreator(specifiedBeanMetaData);
-        return new ${glInternalBeanListMetaDataResultSetHandler}(specifiedBeanMetaData, rowCreator, relationRowCreator);
-    }
-
-    protected ${glInternalRowCreator} createSpecifiedOutsideSqlInternalRowCreator(BeanMetaData bmd) {
-        final Class clazz = bmd.getBeanClass();
-        return ${glInternalRowCreator}.createInternalRowCreator(clazz);
-    }
-
-    protected ${glInternalRelationRowCreator} createSpecifiedOutsideSqlInternalRelationRowCreator(BeanMetaData bmd) {
-        return new ${glInternalRelationRowCreator}();
-    }
-
-    protected class InternalObjectListResultSetHandler implements ResultSetHandler {
-        private ValueType valueType;
-        public InternalObjectListResultSetHandler(ValueType valueType) {
-            this.valueType = valueType;
-        }
-        public Object handle(ResultSet rs) throws SQLException {
-            final List<Object> ret = new ArrayList<Object>();
-            while (rs.next()) {
-                ret.add(valueType.getValue(rs, 1));
-            }
-            return ret;
-        }
-    }
-
-    protected BeanMetaData createSpecifiedOutsideSqlCursorBeanMetaData(Method method) {
-        return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
-    }
-
-    protected ResultSetHandler createSpecifiedOutsideSqlCursorResultSetHandler(BeanMetaData specifiedBeanMetaData) {
-        return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();// This is dummy for cursor handling!
-    }
-
-    // - - - - - - - - - - - -
-    //                 Execute
-    //                 - - - -
-    protected void setupSpecifiedOutsideSqlExecuteCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final String sql = outsideSqlContext.readFilteredOutsideSql(getSqlFileEncoding(), dbms.getSuffix());
-        final Object pmb = outsideSqlContext.getParameterBean();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
-
-        final ${glInternalUpdateDynamicCommand} cmd = new ${glInternalUpdateDynamicCommand}(dataSource, statementFactory) {
-            @Override
-            public Object execute(Object[] args) {
-                if (args.length != 3) {
-                    String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.length=" + args.length;
-                    throw new IllegalStateException(msg);
-                }
-                Object arg = args[1];
-                return super.execute(new Object[] {arg});
-            }
-        };
-        
-        // It is unnecessary for DBFlute!
-        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        
-        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
-    }
-
-	// - - - - - - - - - - - -
-    //          Call Procedure
-    //           - - - - - - -
-    protected void setupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final Object pmb = outsideSqlContext.getParameterBean();
-        final String procedureName = outsideSqlContext.getOutsideSqlPath();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final ${glInternalProcedureMetaDataFactory} factory = createInternalProcedureMetaDataFactory();
-        factory.setValueTypeFactory(valueTypeFactory);
-        final Class<?> pmbType = pmb != null ? pmb.getClass() : null;
-        final ${glInternalProcedureMetaData} metaData = factory.createProcedureMetaData(procedureName, pmbType);
-        final ${glInternalProcedureCommand} cmd = createInternalProcedureCommand(method, metaData);
-        putSqlCommand(sqlCommandKey, cmd);
-    }
-
-    protected ${glInternalProcedureMetaDataFactory} createInternalProcedureMetaDataFactory() {
-        return new ${glInternalProcedureMetaDataFactory}();
-    }
-
-    protected ${glInternalProcedureCommand} createInternalProcedureCommand(Method method, ${glInternalProcedureMetaData} metaData) {
-        final ResultSetHandler resultSetHandler = createResultSetHandler(method);
-        return new ${glInternalProcedureCommand}(dataSource, resultSetHandler, statementFactory, metaData);
-    }
-	
     // -----------------------------------------------------
     //                                  Common of OutsideSql
     //                                  --------------------
@@ -839,7 +632,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return retType;
         }
     }
-    
+
+    // ===================================================================================
+    //                                                            Sql Command Registration
+    //                                                            ========================
     protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, BeanMetaData myBeanMetaData) {
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, createResultSetHandler(myBeanMetaData, method));
     }

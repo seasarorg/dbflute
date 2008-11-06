@@ -1160,8 +1160,12 @@ public class Database {
     // ===================================================================================
     //                                                                        Select-Param
     //                                                                        ============
-    public DfSelectParamProperties getSelectParamProperties() {
+    protected DfSelectParamProperties getSelectParamProperties() {
         return getProperties().getSelectParamProperties();
+    }
+    
+    public boolean isStatementResultSetTypeValid() {
+        return getSelectParamProperties().isStatementResultSetTypeValid();
     }
 
     public String getStatementResultSetType() {
@@ -1170,10 +1174,6 @@ public class Database {
 
     public String getStatementResultSetConcurrency() {
         return getSelectParamProperties().getStatementResultSetConcurrency();
-    }
-
-    public boolean isStatementResultSetTypeValid() {
-        return getSelectParamProperties().isStatementResultSetTypeValid();
     }
 
     // -----------------------------------------------------
@@ -1195,28 +1195,8 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
     }
 
-    public boolean isMakeBehaviorNoConditionLoadReferrer() {
-        return getProperties().getSourceReductionProperties().isMakeBehaviorNoConditionLoadReferrer();
-    }
-
-    public boolean isMakeBehaviorLoopUpdate() {
-        return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
-    }
-
     public boolean isMakeFlatExpansion() {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
-    }
-
-    public boolean isMakeDBMetaStaticDefinition() {
-        return getProperties().getSourceReductionProperties().isMakeDBMetaStaticDefinition();
-    }
-
-    public boolean isMakeDBMetaJDBCSupport() {
-        return getProperties().getSourceReductionProperties().isMakeDBMetaJDBCSupport();
-    }
-
-    public boolean isMakeDBMetaCommonColumnHandling() {
-        return getProperties().getSourceReductionProperties().isMakeDBMetaCommonColumnHandling();
     }
 
     public boolean isMakeClassificationValueLabelList() {
