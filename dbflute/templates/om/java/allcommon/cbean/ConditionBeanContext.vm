@@ -63,6 +63,35 @@ public class ${glConditionBeanContextName} {
     }
 
     // ===================================================================================
+    //                                                                  Type Determination
+    //                                                                  ==================
+    /**
+     * Is the argument condition-bean?
+     * @param dtoInstance DTO instance.
+     * @return Determination.
+     */
+    public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
+        if (dtoInstance instanceof ${glConditionBeanInterfaceName}) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Is the type condition-bean?
+     * @param dtoClass DtoClass.
+     * @return Determination.
+     */
+    public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
+        if (${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // ===================================================================================
     //                                         Initialize against the ClassLoader Headache
     //                                         ===========================================
 	@SuppressWarnings("unused")
@@ -91,35 +120,6 @@ public class ${glConditionBeanContextName} {
         }
         if (debugEnabled) { 
             _log.debug("{Initialize against the ClassLoader Headache}" + getLineSeparator() + sb);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                  Type Determination
-    //                                                                  ==================
-    /**
-     * Is the argument condition-bean?
-     * @param dtoInstance DTO instance.
-     * @return Determination.
-     */
-    public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
-        if (dtoInstance instanceof ${glConditionBeanInterfaceName}) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Is the type condition-bean?
-     * @param dtoClass DtoClass.
-     * @return Determination.
-     */
-    public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
-        if (${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass)) {
-            return true;
-        } else {
-            return false;
         }
     }
 
