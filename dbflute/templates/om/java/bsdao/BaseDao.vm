@@ -33,6 +33,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     public int selectCount(${myConditionBeanClassName} cb);
     public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
+#end
 #if ($table.isWritable())
 
     int insert(${myExtendedObjectClassName} entity);
@@ -44,6 +45,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.hasOptimisticLock())
     int deleteNonstrict(${myExtendedObjectClassName} entity);
 #end
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     int[] insertList(List<${myExtendedObjectClassName}> entityList);
     int[] updateList(List<${myExtendedObjectClassName}> entityList);
@@ -60,6 +62,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if (${table.hasOnlyOnePrimaryKey()})
     int deleteByQuery(${myConditionBeanClassName} cb);
 #end
+#end
 #else
 
 #if ($table.isAvailableNonPrimaryKeyWritable())
@@ -69,6 +72,5 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.isUseSequence())
 
     ${table.sequenceReturnType} selectNextVal();
-#end
 #end
 }
