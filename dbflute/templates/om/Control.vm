@@ -804,7 +804,7 @@ targetdatabase = $targetDatabase
       $database.makeDirectory($path)
 
       $database.info("    parse('SelectCBExecution');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectCBExecution}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glSelectCBExecution}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/SelectCBExecution.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
