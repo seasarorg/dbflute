@@ -1,5 +1,4 @@
 ${database.allClassCopyright}package ${glPackageBaseBhv};
-
 #set ($myClassName = "${myBaseBhvClassName}")
 
 import java.util.List;
@@ -39,7 +38,6 @@ import ${glPackageCB}.*;
 #else
   #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
 #end
-
 /**
  * The behavior of ${table.name}.
  * <pre>

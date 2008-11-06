@@ -12,18 +12,21 @@
     <include path="${includePath}"/>
 #end
 
-    <!-- S2Dao component. -->
+    <!-- The core component of behavior. -->
     <component name="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}"/>
     <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
-    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
-
+    
+    <!-- The component of S2Dao. -->
+#if ($database.isMakeDaoInterface())
     <component class="${database.extendedDaoMetaDataFactoryImplClassName}">
 #if ($database.hasSqlFileEncoding())
         <property name="sqlFileEncoding">"${database.sqlFileEncoding}"</property>
 #end
     </component>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+#end
     <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
+    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
     <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
@@ -36,7 +39,7 @@
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
 
-    <!-- The special value types. -->
+    <!-- The special value type. -->
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
 	<component name="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
 
