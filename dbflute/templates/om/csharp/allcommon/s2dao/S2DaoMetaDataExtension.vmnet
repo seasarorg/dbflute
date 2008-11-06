@@ -296,6 +296,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                             OutsideSql Override
         //                                                             ===================
+        // -------------------------------------------------
+        //                            Traditional OutsideSql
+        //                            ----------------------
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
             string[] parameterNames = MethodUtil.GetParameterNames(mi);
             Type[] parameterTypes = MethodUtil.GetParameterTypes(mi);
