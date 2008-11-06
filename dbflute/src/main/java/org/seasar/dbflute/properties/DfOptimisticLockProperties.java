@@ -38,12 +38,12 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
             throw new NullPointerException("Argument[tableName] is required.");
         }
 
-        final List exceptList = getUpdateDateExceptTableList();
+        final List<Object> exceptList = getUpdateDateExceptTableList();
         if (exceptList == null) {
             throw new IllegalStateException("getUpdateDateExceptTableList() must not return null: + " + tableName);
         }
 
-        for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
+        for (final Iterator<Object> ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
             if (DfNameHintUtil.isHitByTheHint(tableName, tableHint)) {
                 return true;
