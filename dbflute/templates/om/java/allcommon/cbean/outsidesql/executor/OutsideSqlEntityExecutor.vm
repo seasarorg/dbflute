@@ -6,13 +6,12 @@ import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
- * The cursor executor of outside-sql.
+ * The cursor executor of outsideSql.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
@@ -24,8 +23,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     /** The invoker of behavior command. (NotNull) */
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
-    protected final ${glOutsideSqlDaoName} _outsideSqlDao;
-
+    /** The option of outsideSql. (NotNull) */
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
 
     /** The DB name of table. (NotNull) */
@@ -36,14 +34,6 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     //                                                                         ===========
     public ${glOutsideSqlEntityExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._outsideSqlDao = null;
-        this._outsideSqlOption = outsideSqlOption;
-        this._tableDbName = tableDbName;
-    }
-
-    public ${glOutsideSqlEntityExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
-        this._behaviorCommandInvoker = null;
-        this._outsideSqlDao = outsideSqlDao;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
     }
@@ -58,11 +48,11 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+        final List<ENTITY> ls = invoke(createSelectListCommand(path, pmb, entityType));
         if (ls.isEmpty()) {
             return null;
         }
@@ -79,12 +69,12 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+        final List<ENTITY> ls = invoke(createSelectListCommand(path, pmb, entityType));
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(buildSearch4LogString(path, pmb, entityType));
         }

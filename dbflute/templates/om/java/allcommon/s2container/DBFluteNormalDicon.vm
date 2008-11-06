@@ -46,11 +46,6 @@
         <destroyMethod name="destroy"/>
     </component>
 
-    <!-- The dao of outsideSql. -->
-    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
-        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
-    </component>
-
 #foreach ($table in $database.tables)
 
     <!-- ${table.name} -->

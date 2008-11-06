@@ -47,9 +47,4 @@
         <destroyMethod name="destroy"/>
     </component>
 
-    <!-- The dao of outside-sql. -->
-    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
-        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
-    </component>
-
 </components>

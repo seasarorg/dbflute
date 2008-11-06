@@ -2,23 +2,20 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
-#if (!$database.isCompatibleOutsideSqlResultOldStyle())
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
-#end
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractOutsideSqlCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlExecuteCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlCallCommand};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
- * The executor of outside-sql. <br />
+ * The executor of outsideSql. <br />
  * <pre>
  * {Basic}
  *   o selectList()
@@ -40,7 +37,6 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * 
  * {Option -- Dynamic}
  *   o dynamicBinding().selectList()
- * 
  * </pre>
  * 
  * @author ${database.ClassAuthor}
@@ -52,9 +48,6 @@ public class ${glOutsideSqlBasicExecutorName} {
     //                                                                           =========
     /** The invoker of behavior command. (NotNull) */
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
-
-    /** The DAO of outside-sql. (NotNull) */
-    protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
     /** Table DB name. (NotNull) */
     protected final String _tableDbName;
@@ -70,13 +63,6 @@ public class ${glOutsideSqlBasicExecutorName} {
     //                                                                         ===========
     public ${glOutsideSqlBasicExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, String tableDbName) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._outsideSqlDao = null;
-        this._tableDbName = tableDbName;
-    }
-
-    public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
-        this._behaviorCommandInvoker = null;
-        this._outsideSqlDao = outsideSqlDao;
         this._tableDbName = tableDbName;
     }
 
@@ -90,19 +76,12 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
      */
-#if (!$database.isCompatibleOutsideSqlResultOldStyle())
     public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
-        // List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        List<ENTITY> resultList = _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
+        List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
         return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
     }
-#else
-    public <ENTITY> List<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
-        return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
-    }
-#end
 
     // ===================================================================================
     //                                                                             Execute
@@ -112,10 +91,10 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @return The count of execution.
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
      */
     public int execute(String path, Object pmb) {
-        return _outsideSqlDao.execute(path, pmb, createOutsideSqlOption());
+        return invoke(createExecuteCommand(path, pmb));
     }
 
     // [DBFlute-0.7.5]
@@ -128,7 +107,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      */
     public void call(${glProcedurePmbName} pmb) {
         if (pmb == null) { throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!"); }
-        _outsideSqlDao.call(pmb.getProcedureName(), pmb, createOutsideSqlOption());
+        invoke(createCallCommand(pmb.getProcedureName(), pmb));
     }
 
     // ===================================================================================
@@ -177,10 +156,10 @@ public class ${glOutsideSqlBasicExecutorName} {
      * # executor.cursorHandling().selectCursor(path, pmb, handler);
      * #
      * </pre>
-     * @return The cursor executor of outside-sql. (NotNull)
+     * @return The cursor executor of outsideSql. (NotNull)
      */
     public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption(), _tableDbName);
+        return new ${glOutsideSqlCursorExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);
     }
 
     /**
@@ -191,10 +170,10 @@ public class ${glOutsideSqlBasicExecutorName} {
      * # executor.entityHandling().selectEntityWithDeletedCheck(path, pmb, Xxx.class);
      * #
      * </pre>
-     * @return The cursor executor of outside-sql. (NotNull)
+     * @return The cursor executor of outsideSql. (NotNull)
      */
     public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
-        return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption(), _tableDbName);
+        return new ${glOutsideSqlEntityExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);
     }
 
     // -----------------------------------------------------
@@ -218,7 +197,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} autoPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.autoPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName);
     }
 
     /**
@@ -239,7 +218,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} manualPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.manualPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName);
     }
 
     // -----------------------------------------------------

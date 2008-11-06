@@ -31,6 +31,15 @@ import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
+ * The invoker of behavior command.
+ * <pre>
+ * public interface methods are as follows:
+ * 
+ *   o injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand);
+ *   o invoke(${glBehaviorCommand} behaviorCommand);
+ *   o isDisposable();
+ *   o isExecutionCacheEmpty();
+ * </pre>
  * @author ${database.ClassAuthor}
  */
 public class ${glBehaviorCommandInvoker} implements Disposable {

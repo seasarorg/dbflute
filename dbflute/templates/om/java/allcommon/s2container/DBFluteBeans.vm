@@ -33,7 +33,7 @@
         <property name="tableNaming" ref="tableNaming"></property>
         <property name="columnNaming" ref="columnNaming"></property>
         <property name="beanEnhancer" ref="beanEnhancer"></property>
-        <property name="sqlFileEncoding"><value>${database.daoSqlFileEncoding}</value></property>
+        <property name="sqlFileEncoding"><value>${database.sqlFileEncoding}</value></property>
 	</bean>
 	<bean id="s2daoInterceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}">
         <constructor-arg>
@@ -58,20 +58,6 @@
 	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}" autowire="byType" destroy-method="destroy"/>
 	<bean id="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}" autowire="byType" destroy-method="destroy"/>
 
-    <bean class="org.seasar.dao.spring.autoregister.FileSystemBeanAutoRegister">
-        <property name="addPackageName">
-            <value>${glPackageBaseCommonCBeanOutsidesql}</value>
-        </property>
-        <property name="addClassNames">
-            <value>OutsideSqlDao</value>
-        </property>
-        <property name="interceptorNames">
-            <list>
-                <value>s2daoInterceptor</value>
-            </list>
-        </property>
-    </bean>
-    
     <bean class="org.seasar.dao.spring.autoregister.FileSystemBeanAutoRegister">
         <property name="addPackageName">
             <value>${glPackageExtendedDao}</value>
