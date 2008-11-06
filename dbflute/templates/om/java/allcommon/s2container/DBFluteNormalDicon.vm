@@ -33,6 +33,8 @@
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
+
+    <!-- The special value type. -->
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
 	<component name="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
 

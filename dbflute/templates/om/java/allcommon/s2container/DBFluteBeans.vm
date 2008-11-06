@@ -15,31 +15,6 @@
         <property name="valueTypeFactory" ref="valueTypeFactory"></property>
 	</bean>
 
-	<bean id="daoMetaDataFactory" class="${database.extendedDaoMetaDataFactoryImplClassName}">
-        <constructor-arg index="0">
-            <ref bean="dataSource"/>
-        </constructor-arg>
-        <constructor-arg index="1">
-            <ref bean="annotationReaderFactory"/>
-        </constructor-arg>
-        <property name="resultSetHandlerFactory" ref="resultSetHandlerFactory"></property>
-        <property name="valueTypeFactory" ref="valueTypeFactory"></property>
-        <property name="daoNamingConvention" ref="daoNamingConvention"></property>
-        <property name="dtoMetaDataFactory" ref="dtoMetaDataFactory"></property>
-        <property name="beanMetaDataFactory" ref="beanMetaDataFactory"></property>
-        <property name="procedureMetaDataFactory" ref="procedureMetaDataFactory"></property>
-        <property name="propertyTypeFactoryBuilder" ref="propertyTypeFactoryBuilder"></property>
-        <property name="relationPropertyTypeFactoryBuilder" ref="relationPropertyTypeFactoryBuilder"></property>
-        <property name="tableNaming" ref="tableNaming"></property>
-        <property name="columnNaming" ref="columnNaming"></property>
-        <property name="beanEnhancer" ref="beanEnhancer"></property>
-        <property name="sqlFileEncoding"><value>${database.sqlFileEncoding}</value></property>
-	</bean>
-	<bean id="s2daoInterceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}">
-        <constructor-arg>
-            <ref bean="daoMetaDataFactory"/>
-        </constructor-arg>
-    </bean>
     <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}" autowire="byType"/>
 	<bean id="annotationReaderFactory" class="${database.extendedAnnotationReaderFactoryClassName}" autowire="byType"/>
 	<bean id="valueTypeFactory" class="org.seasar.dao.impl.ValueTypeFactoryImpl" autowire="byType"/>
@@ -54,23 +29,9 @@
 	<bean id="procedureMetaDataFactory" class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl" autowire="byType"/>
 
 	<bean id="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType"/>
+	<bean id="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
 
 	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}" autowire="byType" destroy-method="destroy"/>
-	<bean id="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}" autowire="byType" destroy-method="destroy"/>
-
-    <bean class="org.seasar.dao.spring.autoregister.FileSystemBeanAutoRegister">
-        <property name="addPackageName">
-            <value>${glPackageExtendedDao}</value>
-        </property>
-        <property name="addClassNames">
-            <value>.*Dao</value>
-        </property>
-        <property name="interceptorNames">
-            <list>
-                <value>s2daoInterceptor</value>
-            </list>
-        </property>
-    </bean>
 
 #foreach ($table in $database.tables)
 	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType"/>
