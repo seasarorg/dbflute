@@ -155,6 +155,9 @@ targetdatabase = $targetDatabase
     #set ($glUpdateEntityCommand = "${glProjectPrefix}UpdateEntityCommand")
     #set ($glUpdateNonstrictEntityCommand = "${glProjectPrefix}UpdateNonstrictEntityCommand")
 
+    ## [Allcommon-Behavior-Core-Execution]
+    #set ($glSelectCBExecution = "${glProjectPrefix}SelectCBExecution")
+
     ## [Allcommon-Behavior-Load]
     #set ($glLoadReferrerOptionName = "${glProjectPrefix}LoadReferrerOption")
 
@@ -458,6 +461,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
     #set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.bhv.core")
     #set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.bhv.core.command")
+    #set ($glPackageBaseCommonBhvCoreExecution = "${database.baseCommonPackage}.bhv.core.execution")
     #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.bhv.load")
     #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
@@ -516,6 +520,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.Bhv.Batch")
       #set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.Bhv.Core")
       #set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.Bhv.Core.Command")
+      #set ($glPackageBaseCommonBhvCoreExecution = "${database.baseCommonPackage}.Bhv.Core.Execution")
       #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.Bhv.Load")
       #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.Bhv.Setup")
       #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
@@ -794,6 +799,13 @@ targetdatabase = $targetDatabase
       $database.info("    parse('UpdateNonstrictEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateNonstrictEntityCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
+
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution}))
+      $database.makeDirectory($path)
+
+      $database.info("    parse('SelectCBExecution');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectCBExecution}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/SelectCBExecution.${glTemplateFileExtension}",$path,"", "")
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
       $database.makeDirectory($path)

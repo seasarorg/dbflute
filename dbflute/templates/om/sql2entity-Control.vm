@@ -110,8 +110,8 @@ targetdatabase = $targetDatabase
       #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
       #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
     #end
-    #set ($glPackageBaseCursor = "${database.sql2EntityBaseParameterBeanPackage}" )
-    #set ($glPackageExtendedCursor = "${database.sql2EntityExtendedParameterBeanPackage}")
+    #set ($glPackageBaseCursor = "${database.sql2EntityBaseCursorPackage}" )
+    #set ($glPackageExtendedCursor = "${database.sql2EntityExtendedCursorPackage}")
 
     ## [Other]
     #set ($glConditionBeanInitialName = "CB")
@@ -180,11 +180,11 @@ targetdatabase = $targetDatabase
 
         $database.debug("        parse('BaseTypeSafeCursor')")
         #set ( $path = "${database.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/bsdao/cursor/BsTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+        $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
 
         $database.debug("        parse('BaseTypeSafeCursorHandler')")
         #set ( $path = "${database.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/bsdao/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+        $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
 
         #set ($path = $database.getPackageAsPath(${myExtendedDaoCursorPackageName}))
         $database.makeDirectory($path)
@@ -192,13 +192,13 @@ targetdatabase = $targetDatabase
         $database.debug("        parse('ExtendedTypeSafeCursor')")
         #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/exdao/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+          $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
         #end
 
         $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
         #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/exdao/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+          $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
         #end
       #else
         #if ($database.isSql2EntityPlainEntity())
@@ -249,12 +249,12 @@ targetdatabase = $targetDatabase
 
         $database.debug("        parseBaseParameterBean(parameterBean);     // ${myBaseParameterBeanClassName}")
         #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/bsdao/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+        $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
 
         #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
           $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
-          $generator.parse("om/${glResourceDirectory}/exdao/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+          $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
         #end
       #end
     $database.debug("    }")
