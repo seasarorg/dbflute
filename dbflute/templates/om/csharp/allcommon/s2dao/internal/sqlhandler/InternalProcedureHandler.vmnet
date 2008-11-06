@@ -270,12 +270,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             if (dto == null) {
                 return null;
             }
-            int parameterIndexExceptReturn = 0;
             int size = _procedureMetaData.ParameterTypeSize;
-            for (int i = 0; i < size; i++, parameterIndexExceptReturn++) {
+            for (int i = 0; i < size; i++) {
                 InternalProcedureParameterType ppt = _procedureMetaData.GetParameterType(i);
                 if (ppt.IsOutType) {
-                    Object value = ((IDataParameter) dbCommand.Parameters[parameterIndexExceptReturn]).Value;
+                    Object value = ((IDataParameter) dbCommand.Parameters[i]).Value;
                     if (value is IDataReader) {// Not support yet
                         IDataReader reader = (IDataReader) value;
                         throw new NotImplementedException("The result set of procedure is not implemented: " + reader);
@@ -291,9 +290,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                     if (!(value is DBNull)) {
                         ppt.SetValue(dto, value);
                     }
-                    // [Under Review]: @jflute -- If it's DBNull, what can I do for you?
+                    // [Under Review]: @jflute If it's DBNull, what can I do for you?
                 } else if (ppt.IsReturnType) {
-                    --parameterIndexExceptReturn;
                     ppt.SetValue(dto, returnValue);
                 }
             }
