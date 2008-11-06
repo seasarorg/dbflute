@@ -8,7 +8,7 @@ using ${glPackageBaseCommonS2Dao};
 
 namespace ${glPackageBaseCommonJdbc} {
 
-    [Implementation(typeof(${glDaoLatestSqlProvider}))]
+    [Implementation(typeof(${glSqlLogRegistryLatestSqlProvider}))]
     public interface ${glLatestSqlProviderName} {
         String GetDisplaySql();
         IList<String> ExtractDisplaySqlList();

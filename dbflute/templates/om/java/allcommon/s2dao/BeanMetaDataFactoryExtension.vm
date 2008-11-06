@@ -21,7 +21,7 @@ import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalIdentifierGenerato
  * @author ${database.ClassAuthor}
  */
  @SuppressWarnings("unchecked")
-public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
+public class ${glBeanMetaDataFactoryExtension} extends BeanMetaDataFactoryImpl {
 
     // ===================================================================================
     //                                                                           Attribute

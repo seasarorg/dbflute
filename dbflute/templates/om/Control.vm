@@ -357,24 +357,22 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
 
     ## [Allcommon-S2Dao]
+    #set ($glBeanMetaDataFactoryExtension = "${glProjectPrefix}BeanMetaDataFactoryExtension")
+    #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
+    #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
+    #set ($glPropertyTypeFactoryBuilderExtension = "${glProjectPrefix}PropertyTypeFactoryBuilderExtension")
+    #set ($glSqlLogRegistryLatestSqlProvider = "${glProjectPrefix}SqlLogRegistryLatestSqlProvider")
+    #set ($glS2DaoSetting = "${glProjectPrefix}S2DaoSetting")
+
     #set ($glS2DaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
-    #set ($glS2DaoLatestSqlProvider = "${glProjectPrefix}S2DaoLatestSqlProvider")
-    #set ($glDaoLatestSqlProvider = "${glProjectPrefix}S2DaoLatestSqlProvider")
     #set ($glS2DaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
     #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
     #set ($glS2DaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
     #set ($glDaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
-    #set ($glS2BeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
-    #set ($glBeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
-    #set ($glS2DaoPropertyTypeFactoryBuilderExtension = "${glProjectPrefix}S2DaoPropertyTypeFactoryBuilderExtension")
-    #set ($glDaoPropertyTypeFactoryBuilderExtension = "${glProjectPrefix}S2DaoPropertyTypeFactoryBuilderExtension")
     #set ($glS2DaoSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
     #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
     #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
-    #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
-    #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
-    #set ($glS2DaoSetting = "${glProjectPrefix}S2DaoSetting")
 
     ## [Allcommon-S2Dao-Internal]
     #set ($glInternalAbstractBeanMetaDataResultSetHandler = "${glProjectPrefix}InternalAbstractBeanMetaDataResultSetHandler")
@@ -1912,11 +1910,11 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     #if ($database.isTargetLanguageJava())
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glS2BeanMetaDataFactoryImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2BeanMetaDataFactoryImpl.${glTemplateFileExtension}",$path,"", "")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glBeanMetaDataFactoryExtension}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/BeanMetaDataFactoryExtension.${glTemplateFileExtension}",$path,"", "")
 
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glS2DaoPropertyTypeFactoryBuilderExtension}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoPropertyTypeFactoryBuilderExtension.${glTemplateFileExtension}",$path,"", "")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glPropertyTypeFactoryBuilderExtension}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/PropertyTypeFactoryBuilderExtension.${glTemplateFileExtension}",$path,"", "")
     #end
 
     #if ($database.isMakeDaoInterface())
@@ -1933,8 +1931,8 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoSelectDynamicCommand.${glTemplateFileExtension}",$path,"", "")
     #end
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoLatestSqlProvider}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoLatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glSqlLogRegistryLatestSqlProvider}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/SqlLogRegistryLatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageCSharp())
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetFactory}.${glClassFileExtension}" )

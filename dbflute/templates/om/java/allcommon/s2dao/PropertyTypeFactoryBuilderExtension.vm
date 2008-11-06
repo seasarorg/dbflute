@@ -22,7 +22,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47}
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${glDaoPropertyTypeFactoryBuilderExtension} implements PropertyTypeFactoryBuilder {
+public class ${glPropertyTypeFactoryBuilderExtension} implements PropertyTypeFactoryBuilder {
 
     // ===================================================================================
     //                                                                           Attribute
