@@ -121,14 +121,13 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
         final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
 
-        // - - - - - - - - - - - - - - - -
-        // Create customized BeanMetaData.
-        // - - - - - - - - - - - - - - - -
-        final BeanMetaData bmd = createBeanMetaData();
-        final ResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
+        // - - - - - - - - - - - - -
+        // Create ResultSetHandler.
+        // - - - - - - - - - - - - -
+        final ResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
 
         // - - - - - - - - - -
-        // Create Sql-Command.
+        // Create SqlCommand.
         // - - - - - - - - - -
         return createSelectDynamicCommand(handler, argNames, argTypes, sql);
     }
@@ -141,6 +140,12 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
+    protected ResultSetHandler createOutsideSqlSelectResultSetHandler() {
+        final BeanMetaData bmd = createBeanMetaData();
+        final ResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
+        return handler;
+    }
+
     protected Object getResultTypeSpecification() {
         return _entityType;
     }

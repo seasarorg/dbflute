@@ -1,5 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.extension.jdbc.ResultSetHandler;
+
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 
 /**
@@ -30,6 +35,15 @@ public class ${glOutsideSqlSelectCursorCommand} extends ${glOutsideSqlSelectList
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
+    @Override
+    protected ResultSetHandler createOutsideSqlSelectResultSetHandler() {
+        return new ResultSetHandler() {
+            public Object handle(ResultSet rs) throws SQLException {
+                return _cursorHandler.handle(rs);
+            }
+        };
+    }
+
     @Override
     protected Object getResultTypeSpecification() {
         return _cursorHandler;

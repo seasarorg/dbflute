@@ -38,6 +38,7 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
     //                                          BeanMetaData
     //                                          ------------
     protected BeanMetaData createBeanMetaData() {
+        assertEntityType("createBeanMetaData");
         return _beanMetaDataFactory.createBeanMetaData(_entityType);
     }
 
