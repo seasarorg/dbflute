@@ -24,15 +24,15 @@
 #end
     </component>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
 #end
-    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
-    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
+    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}"/>
+    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
     <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
-    <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
     <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
-    <component class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}"/>
     <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
     <component class="org.seasar.dao.impl.DefaultTableNaming"/>
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>

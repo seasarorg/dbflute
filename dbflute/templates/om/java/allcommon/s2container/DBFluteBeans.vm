@@ -17,12 +17,11 @@
 
     <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}" autowire="byType"/>
 	<bean id="annotationReaderFactory" class="${database.extendedAnnotationReaderFactoryClassName}" autowire="byType"/>
+	<bean id="propertyTypeFactoryBuilder" class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}" autowire="byType"/>
 	<bean id="valueTypeFactory" class="org.seasar.dao.impl.ValueTypeFactoryImpl" autowire="byType"/>
     <bean id="daoNamingConvention" class="org.seasar.dao.impl.DaoNamingConventionImpl" autowire="byType"/>
 	<bean id="beanEnhancer" class="org.seasar.dao.impl.NullBeanEnhancer" autowire="byType"/>
-	<bean id="resultSetHandlerFactory" class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension" autowire="byType"/>
 	<bean id="dtoMetaDataFactory" class="org.seasar.dao.impl.DtoMetaDataFactoryImpl" autowire="byType"/>
-	<bean id="propertyTypeFactoryBuilder" class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}" autowire="byType"/>
 	<bean id="relationPropertyTypeFactoryBuilder" class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl" autowire="byType"/>
 	<bean id="tableNaming" class="org.seasar.dao.impl.DefaultTableNaming" autowire="byType"/>
 	<bean id="columnNaming" class="org.seasar.dao.impl.DefaultColumnNaming" autowire="byType"/>
