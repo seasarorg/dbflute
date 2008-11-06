@@ -1936,8 +1936,10 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoLatestSqlProvider}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoLatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetFactory}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetFactory.${glTemplateFileExtension}",$path,"", "")
+    #if ($database.isTargetLanguageCSharp())
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetFactory}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetFactory.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetWrapper}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetWrapper.${glTemplateFileExtension}",$path,"", "")
