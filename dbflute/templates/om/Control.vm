@@ -2323,8 +2323,10 @@ targetdatabase = $targetDatabase
     #set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
     $database.makeDirectory($path)
 
-    #set ($path = $database.getPackageAsPath(${glPackageBaseDao}))
-    $database.makeDirectory($path)
+    #if ($database.isMakeDaoInterface())
+      #set ($path = $database.getPackageAsPath(${glPackageBaseDao}))
+      $database.makeDirectory($path)
+    #end
 
     #set ($path = $database.getPackageAsPath(${glPackageBaseEntity}))
     $database.makeDirectory($path)
@@ -2353,8 +2355,10 @@ targetdatabase = $targetDatabase
     #set ($path = $database.getPackageAsPath(${glPackageExtendedBhv}))
     $database.makeDirectory($path)
 
-    #set ($path = $database.getPackageAsPath(${glPackageExtendedDao}))
-    $database.makeDirectory($path)
+    #if ($database.isMakeDaoInterface())
+      #set ($path = $database.getPackageAsPath(${glPackageExtendedDao}))
+      $database.makeDirectory($path)
+    #end
 
     #set ($path = $database.getPackageAsPath(${glPackageExtendedEntity}))
     $database.makeDirectory($path)
