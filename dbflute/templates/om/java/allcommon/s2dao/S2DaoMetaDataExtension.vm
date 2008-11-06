@@ -574,7 +574,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                  Common of OutsideSql
     //                                  --------------------
     protected BeanMetaDataFactory createOutsideSqlCustomizeBeanMetaDataFactory() {
-        final ${glBeanMetaDataFactoryImpl} originalBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
+        final ${glBeanMetaDataFactoryExtension} originalBmdFactory = new ${glBeanMetaDataFactoryExtension}() {
             protected BeanMetaDataImpl createBeanMetaDataImpl() {
                 return newOutsideSqlCustomizeBeanMetaDataImpl();
             }
@@ -597,8 +597,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         // Though nothing to override, it uses original class just in case.
     }
 
-    protected ${glDaoPropertyTypeFactoryBuilderExtension} createOutsideSqlPropertyTypeFactoryBuilder() {
-        final ${glDaoPropertyTypeFactoryBuilderExtension} impl = new ${glDaoPropertyTypeFactoryBuilderExtension}();
+    protected ${glPropertyTypeFactoryBuilderExtension} createOutsideSqlPropertyTypeFactoryBuilder() {
+        final ${glPropertyTypeFactoryBuilderExtension} impl = new ${glPropertyTypeFactoryBuilderExtension}();
         if (columnNaming == null) {
             String msg = "Internal Error! The columnNaming should not be null! {Failed to Injection!}";
             throw new IllegalStateException(msg);
