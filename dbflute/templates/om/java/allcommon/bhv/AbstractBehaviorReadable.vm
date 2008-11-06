@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
-import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};

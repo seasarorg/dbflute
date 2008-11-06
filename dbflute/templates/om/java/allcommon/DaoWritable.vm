@@ -1,68 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import java.util.List;
-
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
-
 /**
  * The interface of dao-writable.
  * @author ${database.ClassAuthor}
  */
 public interface ${glDaoWritableInterfaceName} extends ${glDaoReadableInterfaceName} {
-
-    /**
-     * Insert one entity that the type is entity-interface.
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     */
-    public int create(${glEntityInterfaceName} entity);
-
-    /**
-     * Update one entity that the type is entity-interface.
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     */
-    public int modify(${glEntityInterfaceName} entity);
-
-    /**
-     * Update one entity that the type is entity-interface. (modified only)
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     */
-    public int modifyModifiedOnly(${glEntityInterfaceName} entity);
-
-    /**
-     * Delete one entity that the type is entity-interface.
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     */
-    public int remove(${glEntityInterfaceName} entity);
-
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-
-    /**
-     * Insert several entities that the type is entity-interface.
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return The array of inserted count.
-     */
-    public ${batchUpdateReturnType} createList(List<${glEntityInterfaceName}> entityList);
-
-    /**
-     * Update several entities that the type is entity-interface.
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return The array of updated count.
-     */
-    public ${batchUpdateReturnType} modifyList(List<${glEntityInterfaceName}> entityList);
-
-    /**
-     * Delete several entities that the type is entity-interface.
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return The array of deleted count.
-     */
-    public ${batchUpdateReturnType} removeList(List<${glEntityInterfaceName}> entityList);
 }

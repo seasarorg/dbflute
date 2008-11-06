@@ -1,15 +1,17 @@
 ${database.allClassCopyright}package ${myBaseDaoPackageName};
-
 #set ($myClassName = "${myBaseDaoClassName}")
+
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 import java.util.List;
 
-import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
 import ${glPackageCB}.${myConditionBeanClassName};
+#end
+import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
 #set ($InterfaceName = "")
 #if ($table.isWritable())
-  #set ($InterfaceName = "${glPackageBaseCommon}.${glDaoWritableInterfaceName}")
+#set ($InterfaceName = "${glPackageBaseCommon}.${glDaoWritableInterfaceName}")
 #else
-  #set ($InterfaceName = "${glPackageBaseCommon}.${glDaoReadableInterfaceName}")
+#set ($InterfaceName = "${glPackageBaseCommon}.${glDaoReadableInterfaceName}")
 #end
 
 /**
