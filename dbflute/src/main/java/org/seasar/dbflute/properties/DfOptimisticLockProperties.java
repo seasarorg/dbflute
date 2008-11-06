@@ -7,24 +7,20 @@ import java.util.Properties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
- * Build properties for Torque.
- * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfOptimisticLockProperties extends DfAbstractHelperProperties {
-
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfOptimisticLockProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                                    Properties - Optimistic Lock
-    //                                                    ============================
+    // ===================================================================================
+    //                                                                         Update Date
+    //                                                                         ===========
     public String getUpdateDateFieldName() {
         return stringProp("torque.updateDateFieldName", "");
     }
@@ -52,6 +48,9 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
         return false;
     }
 
+    // ===================================================================================
+    //                                                                          Version No
+    //                                                                          ==========
     public String getVersionNoFieldName() {
         return stringProp("torque.versionNoFieldName", "");
     }
