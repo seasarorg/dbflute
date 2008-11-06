@@ -243,12 +243,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
     protected String buildInvocationExpressionWithoutKakko(MethodInvocation invocation, String invokeClassName, String invokeMethodName) {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
-            try {
-                final String originalName = invokeClassName;
-                invokeClassName = "OutsideSql";
-            } catch (RuntimeException ignored) {
-                log("Ignored exception occurred: msg=" + ignored.getMessage());
-            }
+            invokeClassName = "OutsideSql";
         }
         String invocationExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
