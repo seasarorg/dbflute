@@ -179,20 +179,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return The config of statement. (Nullable)
      */
 	public ${glStatementConfig} getStatementConfig();
-#if ($database.isMakeDeprecated())
-
-    // ===================================================================================
-    //                                                                          Format SQL
-    //                                                                          ==========
-    /** @deprecated Sorry! ConditionBean must be formatted as default.*/
-	public void formatSql();
-
-    /**
-	 * @return Is the SQL formatted?
-	 * @deprecated Sorry! ConditionBean must be formatted as default.
-	 */
-	public boolean isFormatSql();
-#end
 
     // ===================================================================================
     //                                                                         Display SQL

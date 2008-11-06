@@ -6,13 +6,13 @@ using System.Collections;
 namespace ${glPackageBaseCommon} {
 
     /// <summary>
-    /// The sigleton class that has generate-meta-data(GenMetaData).
+    /// The singleton class that has generate meta data.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public class ${myClassName} {
 
         // ===============================================================================
-        //                                                                       Sinpleton
+        //                                                                       Singleton
         //                                                                       =========
         /// <summary>Singleton instance.</summary>
         private static readonly ${myClassName} _instance = new ${myClassName}();
@@ -72,25 +72,6 @@ namespace ${glPackageBaseCommon} {
         /// <returns>The property-value.</returns>
         public String GetClassAuthor() {
             return "${database.ClassAuthor}";
-        }
-
-        // ===============================================================================
-        //                                                                          Naming
-        //                                                                          ======
-        /// <sumarry>
-        /// Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsJavaNameOfTableSameAsDbName() {
-            return ${database.isJavaNameOfTableSameAsDbName()};
-        }
-
-        /// <sumarry>
-        /// Is java name of column same as db name? Answer is ${database.isJavaNameOfColumnSameAsDbName()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsJavaNameOfColumnSameAsDbName() {
-            return ${database.isJavaNameOfColumnSameAsDbName()};
         }
 
         // ===============================================================================

@@ -589,6 +589,66 @@ public class Database {
         return DfGenerator.getInstance();
     }
 
+    //====================================================================================
+    //                                                                 Database Definition
+    //                                                                 ===================
+    protected Map<String, String> _databaseDefinitionMap;
+
+    public Map<String, String> getDatabaseDefinitionMap() {
+        if (_databaseDefinitionMap == null) {
+            final DfDatabaseConfig config = new DfDatabaseConfig();
+            final Map<String, Map<String, String>> databaseConfigMap = config.analyzeDatabaseBaseInfo();
+            Map<String, String> databaseDefinitionMap = databaseConfigMap.get(getDatabaseType());
+            if (databaseDefinitionMap == null) {
+                databaseDefinitionMap = databaseConfigMap.get("default");
+                if (databaseDefinitionMap == null) {
+                    String msg = "The property[databaseDefinitionMap] doesn't have the database[";
+                    throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
+                }
+            }
+            _databaseDefinitionMap = databaseDefinitionMap;
+        }
+        return _databaseDefinitionMap;
+    }
+
+    public String getDatabaseProductName() { // for ConditionBeanContext
+        return getGenerateDbName().toLowerCase();
+    }
+
+    public String getDaoGenDbName() { // for SqlClause
+        return getGenerateDbName();
+    }
+
+    public String getGenerateDbName() {
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
+        final String dbName = (String) databaseInfoMap.get("dbName");
+        if (dbName == null || dbName.trim().length() == 0) {
+            String msg = "The database doesn't have dbName in the property[databaseInfoMap]: ";
+            throw new IllegalStateException(msg + databaseInfoMap);
+        }
+        return dbName;
+    }
+
+    public String getWildCard() {
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
+        final String wildCard = (String) databaseInfoMap.get("wildCard");
+        if (wildCard == null || wildCard.trim().length() == 0) {
+            String msg = "The database doesn't have wildCard in the property[databaseInfoMap]: ";
+            throw new IllegalStateException(msg + databaseInfoMap);
+        }
+        return wildCard;
+    }
+
+    public String getSequenceNextSql() {
+        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
+        final String sequenceNextSql = (String) databaseInfoMap.get("sequenceNextSql");
+        if (sequenceNextSql == null || sequenceNextSql.trim().length() == 0) {
+            String msg = "The database doesn't have sequenceNextSql in the property[databaseInfoMap]: ";
+            throw new IllegalStateException(msg + databaseInfoMap);
+        }
+        return sequenceNextSql;
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
@@ -739,16 +799,23 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                             Available
-    //                                             ---------
-    public boolean isAvailableBehaviorGeneration() {
-        return true;
+    //                                         Prefix/Suffix
+    //                                         -------------
+    public String getProjectPrefix() {
+        return getBasicProperties().getProjectPrefix();
     }
 
-    public boolean isAvailableGenerics() {
-        return true;
+    public String getBasePrefix() {
+        return getBasicProperties().getBasePrefix();
     }
 
+    public String getBaseSuffixForEntity() {
+        return "";
+    }
+
+    // -----------------------------------------------------
+    //                                                Filter
+    //                                                ------
     public String filterGenericsString(String genericsString) {// It is very important!
         return getBasicProperties().filterGenericsString(genericsString);
     }
@@ -777,24 +844,9 @@ public class Database {
         return getBasicProperties().outputSuppressWarningsAfterLineSeparator();
     }
 
-    // ===============================================================================
-    //                                                             Properties - Prefix
-    //                                                             ===================
-    public String getProjectPrefix() {
-        return getBasicProperties().getProjectPrefix();
-    }
-
-    public String getBasePrefix() {
-        return getBasicProperties().getBasePrefix();
-    }
-
-    public String getBaseSuffixForEntity() {
-        return "";
-    }
-
-    // ===============================================================================
-    //                                                Properties - Behavior Query Path
-    //                                                ================================
+    // -----------------------------------------------------
+    //                                   Behavior Query Path
+    //                                   -------------------
     public String getBehaviorQueryPathBeginMark() {
         return getBasicProperties().getBehaviorQueryPathBeginMark();
     }
@@ -803,16 +855,16 @@ public class Database {
         return getBasicProperties().getBehaviorQueryPathEndMark();
     }
 
-    // ===============================================================================
-    //                                                          Properties - HotDeploy
-    //                                                          ======================
+    // -----------------------------------------------------
+    //                                            Hot Deploy
+    //                                            ----------
     public boolean isAvailableHotDeploy() {
         return getBasicProperties().isAvailableHotDeploy();
     }
 
-    // ===============================================================================
-    //                                                       Properties - DBFluteDicon
-    //                                                       =========================
+    // ===================================================================================
+    //                                                                    Dicon Properties
+    //                                                                    ================
     public String getDaoDiconNamespace() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconNamespace();
     }
@@ -881,9 +933,9 @@ public class Database {
         return getProperties().getDBFluteDiconProperties().getDBFluteBeansFileName();
     }
 
-    // ===============================================================================
-    //                                            Properties - Generated Class Package
-    //                                            ====================================
+    // ===================================================================================
+    //                                                  Generated Class Package Properties
+    //                                                  ==================================
     public String getPackageBase() {
         return getProperties().getGeneratedClassPackageProperties().getPackageBase();
     }
@@ -924,9 +976,9 @@ public class Database {
         return getProperties().getGeneratedClassPackageProperties().getExtendedEntityPackage();
     }
 
-    // ===============================================================================
-    //                                              Properties - Sequence and Identity
-    //                                              ==================================
+    // ===================================================================================
+    //                                                        Sequence/Identity Properties
+    //                                                        ============================
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
         return getProperties().getSequenceIdentityProperties().getSequenceDefinitionMapSequence(flexibleTableName);
     }
@@ -943,9 +995,9 @@ public class Database {
         return getProperties().getSequenceIdentityProperties().getIdentityDefinitionMapColumnName(flexibleTableName);
     }
 
-    // ===============================================================================
-    //                                                    Properties - Optimistic Lock
-    //                                                    ============================
+    // ===================================================================================
+    //                                                          Optimistic Lock Properties
+    //                                                          ==========================
     public String getUpdateDateFieldName() {
         return getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
     }
@@ -958,9 +1010,9 @@ public class Database {
         return getProperties().getOptimisticLockProperties().getVersionNoFieldName();
     }
 
-    // ===============================================================================
-    //                                                      Properties - Common Column
-    //                                                      ==========================
+    // ===================================================================================
+    //                                                            Common Column Properties
+    //                                                            ========================
     public Map<String, Object> getCommonColumnMap() {
         return getProperties().getCommonColumnProperties().getCommonColumnMap();
     }
@@ -1066,9 +1118,9 @@ public class Database {
         return getProperties().getCommonColumnProperties().removeCommonColumnSetupInvokingMark(logic);
     }
 
-    // ===============================================================================
-    //                                                     Properties - Classification
-    //                                                     ===========================
+    // ===================================================================================
+    //                                                           Classification Properties
+    //                                                           =========================
     public DfClassificationProperties getClassificationProperties() {
         return getProperties().getClassificationProperties();
     }
@@ -1158,12 +1210,12 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                        Select-Param
-    //                                                                        ============
+    //                                                         Select Parameter Properties
+    //                                                         ===========================
     protected DfSelectParamProperties getSelectParamProperties() {
         return getProperties().getSelectParamProperties();
     }
-    
+
     public boolean isStatementResultSetTypeValid() {
         return getSelectParamProperties().isStatementResultSetTypeValid();
     }
@@ -1176,9 +1228,9 @@ public class Database {
         return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
-    // -----------------------------------------------------
-    //                                         Making Option
-    //                                         -------------
+    // ===================================================================================
+    //                                                         Source Reduction Properties
+    //                                                         ===========================
     public boolean isMakeDeprecated() {
         return getProperties().getSourceReductionProperties().isMakeDeprecated();
     }
@@ -1203,9 +1255,9 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();
     }
 
-    // -----------------------------------------------------
-    //                                      S2Dao Adjustment
-    //                                      ----------------
+    // ===================================================================================
+    //                                                         S2Dao Adjustment Properties
+    //                                                         ===========================
     public boolean isVersionAfter1047() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1047();
     }
@@ -1238,13 +1290,9 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getSqlFileEncoding();
     }
 
-    // -----------------------------------------------------
-    //                                     Little Adjustment
-    //                                     -----------------
-    public boolean isUseTeeda() {
-        return getProperties().getLittleAdjustmentProperties().isUseTeeda();
-    }
-
+    // ===================================================================================
+    //                                                        Little Adjustment Properties
+    //                                                        ============================
     public boolean isAvailableDatabaseDependency() {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
@@ -1260,14 +1308,18 @@ public class Database {
     public boolean isCompatibleS2DaoSQLAnnotationValid() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
     }
-    
+
     public boolean isCompatibleBehaviorUseDaoInterface() { // This is for compatibility!
         return getProperties().getLittleAdjustmentProperties().isCompatibleBehaviorUseDaoInterface();
     }
-    
-    // -----------------------------------------------------
-    //                                                  Buri
-    //                                                  ----
+
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+    }
+
+    // ===================================================================================
+    //                                                                     Buri Properties
+    //                                                                     ===============
     public boolean isBuriGenerateBao() {
         return getProperties().getBuriProperties().isGenerateBao();
     }
@@ -1291,9 +1343,9 @@ public class Database {
         return buriTargetTableList;
     }
 
-    // -----------------------------------------------------
-    //                                      Sql Log Registry
-    //                                      ----------------
+    // ===================================================================================
+    //                                                         SQL Log Registry Properties
+    //                                                         ===========================
     public boolean isSqlLogRegistryValid() {
         return getProperties().getSqlLogRegistryProperties().isValid();
     }
@@ -1302,40 +1354,9 @@ public class Database {
         return getProperties().getSqlLogRegistryProperties().getLimitSize();
     }
 
-    // -----------------------------------------------------
-    //                                                 Other
-    //                                                 -----
-    public boolean isStopGenerateExtendedBhv() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
-    }
-
-    public boolean isStopGenerateExtendedDao() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedDao();
-    }
-
-    public boolean isStopGenerateExtendedEntity() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
-    }
-
-    public String getExtractAcceptStartBrace() {
-        return getProperties().getOtherProperties().getExtractAcceptStartBrace();
-    }
-
-    public String getExtractAcceptEndBrace() {
-        return getProperties().getOtherProperties().getExtractAcceptEndBrace();
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return getProperties().getOtherProperties().getExtractAcceptDelimiter();
-    }
-
-    public String getExtractAcceptEqual() {
-        return getProperties().getOtherProperties().getExtractAcceptEqual();
-    }
-
     // ===================================================================================
-    //                                                                        Type Mapping
-    //                                                                        ============
+    //                                                             Type Mapping Properties
+    //                                                             =======================
     public List<Object> getJavaNativeStringList() {
         return getProperties().getTypeMappingProperties().getJavaNativeStringList();
     }
@@ -1360,16 +1381,9 @@ public class Database {
         return getProperties().getTypeMappingProperties().getJdbcToJavaNativeAsStringRemovedLineSeparator();
     }
 
-    // ===============================================================================
-    //                      Properties - ToLowerInGeneratorUnderscoreMethod (Internal)
-    //                      ==========================================================
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
-    }
-
     // ===================================================================================
-    //                                                             Properties - OutsideSql
-    //                                                             =======================
+    //                                                               OutsideSql Properties
+    //                                                               =====================
     public boolean hasSqlFileEncoding() {
         return getProperties().getOutsideSqlProperties().hasSqlFileEncoding();
     }
@@ -1455,8 +1469,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                               Properties - Document
-    //                                                               =====================
+    //                                                                 Document Properties
+    //                                                                 ===================
     public boolean isAliasDelimiterInDbCommentValid() {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
     }
@@ -1466,8 +1480,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                          Simple DTO
-    //                                                                          ==========
+    //                                                               Simple DTO Properties
+    //                                                               =====================
     public boolean hasSimpleDtoDefinition() {
         return getProperties().getSimpleDtoProperties().hasSimpleDtoDefinition();
     }
@@ -1505,8 +1519,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                            Flex DTO
-    //                                                                            ========
+    //                                                                 Flex DTO Properties
+    //                                                                 ===================
     public boolean hasFlexDtoDefinition() {
         return getProperties().getFlexDtoProperties().hasFlexDtoDefinition();
     }
@@ -1540,8 +1554,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                       S2JDBC Entity
-    //                                                                       =============
+    //                                                                   S2JDBC Properties
+    //                                                                   =================
     public boolean hasS2jdbcDefinition() {
         return getProperties().getS2jdbcProperties().hasS2jdbcDefinition();
     }
@@ -1562,69 +1576,40 @@ public class Database {
         return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
     }
 
-    //====================================================================================
-    //                                                                 Database Definition
-    //                                                                 ===================
-    protected Map<String, String> _databaseDefinitionMap;
-
-    public Map<String, String> getDatabaseDefinitionMap() {
-        if (_databaseDefinitionMap == null) {
-            final DfDatabaseConfig config = new DfDatabaseConfig();
-            final Map<String, Map<String, String>> databaseConfigMap = config.analyzeDatabaseBaseInfo();
-            Map<String, String> databaseDefinitionMap = databaseConfigMap.get(getDatabaseType());
-            if (databaseDefinitionMap == null) {
-                databaseDefinitionMap = databaseConfigMap.get("default");
-                if (databaseDefinitionMap == null) {
-                    String msg = "The property[databaseDefinitionMap] doesn't have the database[";
-                    throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
-                }
-            }
-            _databaseDefinitionMap = databaseDefinitionMap;
-        }
-        return _databaseDefinitionMap;
+    // ===================================================================================
+    //                                                                    Other Properties
+    //                                                                    ================
+    public boolean isStopGenerateExtendedBhv() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
     }
 
-    public String getDatabaseProductName() { // for ConditionBeanContext
-        return getGenerateDbName().toLowerCase();
+    public boolean isStopGenerateExtendedDao() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedDao();
     }
 
-    public String getDaoGenDbName() { // for SqlClause
-        return getGenerateDbName();
+    public boolean isStopGenerateExtendedEntity() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
 
-    public String getGenerateDbName() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
-        final String dbName = (String) databaseInfoMap.get("dbName");
-        if (dbName == null || dbName.trim().length() == 0) {
-            String msg = "The database doesn't have dbName in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
-        }
-        return dbName;
+    public String getExtractAcceptStartBrace() {
+        return getProperties().getOtherProperties().getExtractAcceptStartBrace();
     }
 
-    public String getWildCard() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
-        final String wildCard = (String) databaseInfoMap.get("wildCard");
-        if (wildCard == null || wildCard.trim().length() == 0) {
-            String msg = "The database doesn't have wildCard in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
-        }
-        return wildCard;
+    public String getExtractAcceptEndBrace() {
+        return getProperties().getOtherProperties().getExtractAcceptEndBrace();
     }
 
-    public String getSequenceNextSql() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
-        final String sequenceNextSql = (String) databaseInfoMap.get("sequenceNextSql");
-        if (sequenceNextSql == null || sequenceNextSql.trim().length() == 0) {
-            String msg = "The database doesn't have sequenceNextSql in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
-        }
-        return sequenceNextSql;
+    public String getExtractAcceptDelimiter() {
+        return getProperties().getOtherProperties().getExtractAcceptDelimiter();
+    }
+
+    public String getExtractAcceptEqual() {
+        return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
 
     // ===================================================================================
-    //                                                                      Component Name
-    //                                                                      ==============
+    //                                                  Component Name Helper for Template
+    //                                                  ==================================
     public String getDaoSelectorComponentName() {
         return filterProjectSuffixForComponentName("daoSelector");
     }
@@ -1648,8 +1633,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                            Type Map
-    //                                                                            ========
+    //                                                        Type Map Helper for Template
+    //                                                        ============================
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
             return TypeMap.findJavaNativeString(jdbcType, null, null);
@@ -1716,8 +1701,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                 Helper for Template
-    //                                                                 ===================
+    //                                                         General Helper for Template
+    //                                                         ===========================
     // -----------------------------------------------------
     //                                             Character
     //                                             ---------

@@ -824,24 +824,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public ${glStatementConfig} getStatementConfig() {
         return _statementConfig;
     }
-#if ($database.isMakeDeprecated())
 
-    // ===================================================================================
-    //                                                                          Format SQL
-    //                                                                          ==========
-    /** @deprecated Sorry! ConditionBean must be formatted as default.*/
-    public void formatSql() {
-        getSqlClause().makeFormatClauseEffective();
-    }
-
-    /**
-	 * @return Is the SQL formatted?
-	 * @deprecated Sorry! ConditionBean must be formatted as default.
-	 */
-    public boolean isFormatSql() {
-        return getSqlClause().isFormatClauseEffective();
-    }
-#end
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabaseDB2())
 

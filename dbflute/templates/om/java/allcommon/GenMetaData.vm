@@ -3,8 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 #set ($myClassName = "${glGenMetaDataClassName}")
 
 /**
- * The sigleton class that has generate-meta-data(GenMetaData).
- * 
+ * The singleton class that has generate meta data.
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} {
@@ -20,7 +19,6 @@ public class ${myClassName} {
 
     /**
      * Get instance.
-     *
      * @return Singleton instance.
      */
     public static ${myClassName} getInstance() {
@@ -32,7 +30,6 @@ public class ${myClassName} {
     //                                                                               =====
     /**
      * Get the property-value of targetLanguage.
-     *
      * @return The property-value.
      */
     public String getTargetLanguage() {
@@ -41,7 +38,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of templateFileExtension.
-     *
      * @return The property-value.
      */
     public String getTemplateFileExtension() {
@@ -50,7 +46,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of classFileExtension.
-     *
      * @return The property-value.
      */
     public String getClassFileExtension() {
@@ -59,7 +54,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of templateFileEncoding.
-     *
      * @return The property-value.
      */
     public String getTemplateEncoding() {
@@ -68,32 +62,10 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of classAuthor.
-     *
      * @return The property-value.
      */
     public String getClassAuthor() {
         return "${database.ClassAuthor}";
-    }
-
-    // ===================================================================================
-    //                                                                              Naming
-    //                                                                              ======
-    /**
-     * Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isJavaNameOfTableSameAsDbName() {
-        return ${database.isJavaNameOfTableSameAsDbName()};
-    }
-
-    /**
-     * Is java name of column same as db name? Answer is ${database.isJavaNameOfColumnSameAsDbName()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isJavaNameOfColumnSameAsDbName() {
-        return ${database.isJavaNameOfColumnSameAsDbName()};
     }
 
     // ===================================================================================
@@ -122,7 +94,6 @@ public class ${myClassName} {
     //                                                                             =======
     /**
      * Get the property-value of baseCommonPackage.
-     *
      * @return The property-value.
      */
     public String getBaseCommonPackage() {
@@ -131,7 +102,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of baseBehaviorPackage.
-     *
      * @return The property-value.
      */
     public String getBaseBehaviorPackage() {
@@ -140,7 +110,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of baseDaoPackage.
-     *
      * @return The property-value.
      */
     public String getBaseDaoPackage() {
@@ -149,7 +118,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of baseEntityPackage.
-     *
      * @return The property-value.
      */
     public String getBaseEntityPackage() {
@@ -158,7 +126,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of conditionBeanPackage.
-     *
      * @return The property-value.
      */
     public String getConditionBeanPackage() {
@@ -167,7 +134,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of extendedDaoPackage.
-     *
      * @return The property-value.
      */
     public String getExtendedDaoPackage() {
@@ -176,7 +142,6 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of extendedBehaviorPackage.
-     *
      * @return The property-value.
      */
     public String getExtendedBehaviorPackage() {
@@ -185,70 +150,9 @@ public class ${myClassName} {
 
     /**
      * Get the property-value of extendedEntityPackage.
-     *
      * @return The property-value.
      */
     public String getExtendedEntityPackage() {
         return "${database.ExtendedEntityPackage}";
-    }
-
-    // ===================================================================================
-    //                                                                     Optimistic Lock
-    //                                                                     ===============
-    /**
-     * Get the property-value of updateDateFieldName.
-     *
-     * @return The property-value.
-     */
-    public String getUpdateDateFieldName() {
-        return "${database.UpdateDateFieldName}";
-    }
-
-    /**
-     * Get the property-value of versionNoFieldName.
-     *
-     * @return The property-value.
-     */
-    public String getVersionNoFieldName() {
-        return "${database.VersionNoFieldName}";
-    }
-
-    // ===================================================================================
-    //                                                                             Extract
-    //                                                                             =======
-    /**
-     * Get the value of 'extractAcceptStartBrace'.
-     *
-     * @return The property-value. (NotNull)
-     */
-    public String getExtractAcceptStartBrace() {
-        return "${database.extractAcceptStartBrace}";
-    }
-
-    /**
-     * Get the value of 'extractAcceptEndBrace'.
-     *
-     * @return The property-value. (NotNull)
-     */
-    public String getExtractAcceptEndBrace() {
-        return "${database.extractAcceptEndBrace}";
-    }
-
-    /**
-     * Get the value of 'extractAcceptDelimiter'.
-     *
-     * @return The property-value. (NotNull)
-     */
-    public String getExtractAcceptDelimiter() {
-        return "${database.extractAcceptDelimiter}";
-    }
-
-    /**
-     * Get the value of 'extractAcceptEqual'.
-     *
-     * @return The property-value. (NotNull)
-     */
-    public String getExtractAcceptEqual() {
-        return "${database.extractAcceptEqual}";
     }
 }

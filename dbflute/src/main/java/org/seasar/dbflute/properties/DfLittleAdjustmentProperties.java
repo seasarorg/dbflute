@@ -120,13 +120,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                  Friendly Framework 
-    //                                                                  ==================
-    public boolean isUseTeeda() {
-        return booleanProp("torque.isUseTeeda", false);
-    }
-
-    // ===================================================================================
     //                                                                 MultipleFK Property
     //                                                                 ===================
     // Basically Deprecated
