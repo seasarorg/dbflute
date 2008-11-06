@@ -1250,6 +1250,10 @@ public class Database {
     public boolean isMakeFlatExpansion() {
         return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
     }
+    
+    public boolean isMakeDaoInterface() {
+        return getProperties().getSourceReductionProperties().isMakeDaoInterface();
+    }
 
     public boolean isMakeClassificationValueLabelList() {
         return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();

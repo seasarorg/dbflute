@@ -2435,8 +2435,10 @@ targetdatabase = $targetDatabase
           $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
         #end
 
-        #set ( $path = "${database.getPackageAsPath(${glPackageBaseDao})}${myBaseDaoClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/bsdao/BaseDao.${glTemplateFileExtension}", $path, "table", $table)
+        #if ($database.isTargetLanguageCSharp() || $database.isMakeDaoInterface())
+          #set ( $path = "${database.getPackageAsPath(${glPackageBaseDao})}${myBaseDaoClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/bsdao/BaseDao.${glTemplateFileExtension}", $path, "table", $table)
+        #end
 
         #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
@@ -2463,10 +2465,12 @@ targetdatabase = $targetDatabase
           #end
         #end
 
-        #if (!$database.isStopGenerateExtendedDao())
-          #set ( $path = "${database.getPackageAsPath(${glPackageExtendedDao})}${myExtendedDaoClassName}.${glClassFileExtension}" )
-          #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/exdao/ExtendedDao.${glTemplateFileExtension}", $path, "table", $table)
+        #if ($database.isTargetLanguageCSharp() || $database.isMakeDaoInterface())
+          #if (!$database.isStopGenerateExtendedDao())
+            #set ( $path = "${database.getPackageAsPath(${glPackageExtendedDao})}${myExtendedDaoClassName}.${glClassFileExtension}" )
+            #if (!$files.file(${generator.OutputPath},$path).exists())
+              $generator.parse("om/${glResourceDirectory}/exdao/ExtendedDao.${glTemplateFileExtension}", $path, "table", $table)
+            #end
           #end
         #end
 

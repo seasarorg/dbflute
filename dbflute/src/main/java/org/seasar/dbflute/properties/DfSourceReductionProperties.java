@@ -49,6 +49,13 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     public boolean isMakeFlatExpansion() {
         return booleanProp("torque.isMakeFlatExpansion", false);
     }
+    
+    // ===================================================================================
+    //                                                                                 Dao
+    //                                                                                 ===
+    public boolean isMakeDaoInterface() {
+        return booleanProp("torque.isMakeDaoInterface", true); // TODO: @jflute Since 0.8.5 false 
+    }
 
     // ===================================================================================
     //                                                                      Classification
