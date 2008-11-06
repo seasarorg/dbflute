@@ -115,12 +115,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return booleanProp("torque.isCompatibleS2DaoSQLAnnotationValid", false);
     }
     
-    public boolean isCompatibleOutsideSqlResultOldStyle() {
-        return booleanProp("torque.isCompatibleOutsideSqlResultOldStyle", false);
-    }
-    
     public boolean isCompatibleBehaviorUseDaoInterface() {
-        return booleanProp("torque.isCompatibleBehaviorUseDaoInterface", true); // TODO: @jflute since 0.8.4 true
+        return booleanProp("torque.isCompatibleBehaviorUseDaoInterface", false);
     }
 
     // ===================================================================================
