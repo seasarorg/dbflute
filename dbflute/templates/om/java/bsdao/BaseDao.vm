@@ -29,6 +29,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
     List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids); // For Buri
 #end
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     public int selectCount(${myConditionBeanClassName} cb);
     public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
@@ -68,5 +69,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.isUseSequence())
 
     ${table.sequenceReturnType} selectNextVal();
+#end
 #end
 }

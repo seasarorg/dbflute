@@ -58,9 +58,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
     protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
-    /** Dao-selector instance. It's basically referred at loadReferrer. (Required for OutsideSql) */
-    protected ${glDaoSelectorInterfaceName} _daoSelector;
-
     // =====================================================================================
     //                                                                         Basic Get All
     //                                                                         =============
@@ -886,21 +883,5 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} behaviorSelector) {
         this._behaviorSelector = behaviorSelector;
-    }
-
-    /**
-     * Get the selector of DAO.
-     * @return The select of DAO. (Nullable: But normally NotNull)
-     */
-    protected ${glDaoSelectorInterfaceName} getDaoSelector() {
-        return _daoSelector;
-    }
-
-    /**
-     * Set the selector of DAO.
-     * @param daoSelector The selector of DAO. (NotNull)
-     */
-    public void setDaoSelector(${glDaoSelectorInterfaceName} daoSelector) {
-        _daoSelector = daoSelector;
     }
 }

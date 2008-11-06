@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
+import java.util.List;
+
 #if ($database.isCompatibleBehaviorUseDaoInterface())
 import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
 #end
@@ -7,7 +9,6 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 
 /**
  * The interface of behavior-writable.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadableInterfaceName} {
@@ -81,38 +82,31 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-
     // =====================================================================================
     //                                                                    Basic Batch Update
     //                                                                    ==================
     /**
      * Lump create the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @param entityList The list of entity. (NotNull and NotEmpty)
      * @return The array of created count.
      */
-    public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int[] lumpCreate(List<${glEntityInterfaceName}> entityList);
 
     /**
-     * Lump Modify the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * Lump modify the list.
+     * @param entityList The list of entity. (NotNull and NotEmpty)
      * @return Modified count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int[] lumpModify(List<${glEntityInterfaceName}> entityList);
 
     /**
      * Lump remove the list.
-     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @param entityList The list of entity. (NotNull and NotEmpty)
      * @return Removed count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int[] lumpRemove(List<${glEntityInterfaceName}> entityList);
 }
