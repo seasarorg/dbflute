@@ -156,6 +156,8 @@ targetdatabase = $targetDatabase
     #set ($glUpdateNonstrictEntityCommand = "${glProjectPrefix}UpdateNonstrictEntityCommand")
 
     ## [Allcommon-Behavior-Core-Execution]
+    #set ($glBasicSelectExecution = "${glProjectPrefix}BasicSelectExecution")
+    #set ($glOutsideSqlSelectExecution = "${glProjectPrefix}OutsideSqlSelectExecution")
     #set ($glSelectCBExecution = "${glProjectPrefix}SelectCBExecution")
 
     ## [Allcommon-Behavior-Load]
@@ -802,6 +804,14 @@ targetdatabase = $targetDatabase
 
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution}))
       $database.makeDirectory($path)
+
+      $database.info("    parse('BasicSelectExecution');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glBasicSelectExecution}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/BasicSelectExecution.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('OutsideSqlSelectExecution');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glOutsideSqlSelectExecution}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/OutsideSqlSelectExecution.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('SelectCBExecution');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glSelectCBExecution}.${glClassFileExtension}" )

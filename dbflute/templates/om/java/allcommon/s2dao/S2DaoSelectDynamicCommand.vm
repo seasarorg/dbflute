@@ -8,8 +8,6 @@ import javax.sql.DataSource;
 import org.seasar.dao.CommandContext;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
@@ -348,34 +346,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     }
 
     protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
-        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory) {
-            @Override
-            protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
-                if (args == null) {
-                    return;
-                }
-                for (int i = 0; i < args.length; ++i) {
-                    final ValueType valueType = findValueType(argTypes[i], args[i]);
-                    try {
-                        valueType.bindValue(ps, i + 1, args[i]);
-                    } catch (java.sql.SQLException e) {
-                        handleSQLException(e, ps);
-                    }
-                }
-            }
-            protected ValueType findValueType(Class argType, Object arg) {
-                ValueType valueType = ValueTypes.getValueType(arg);
-                if (valueType != null) {
-                    return valueType;
-                }
-                valueType = ValueTypes.getValueType(argType);
-                if (valueType != null) {
-                    return valueType;
-                }
-                String msg = "Unknown type：argType=" + argType + " args=" + arg;
-                throw new IllegalStateException(msg);
-            }
-        };
+        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory);
     }
 
     // -----------------------------------------------------

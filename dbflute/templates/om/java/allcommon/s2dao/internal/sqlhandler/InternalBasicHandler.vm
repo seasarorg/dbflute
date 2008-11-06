@@ -65,13 +65,26 @@ public class ${glInternalBasicHandler} {
             return;
         }
         for (int i = 0; i < args.length; ++i) {
-            ValueType valueType = getValueType(argTypes[i]);
+            final ValueType valueType = findValueType(args[i], argTypes[i]);
             try {
                 valueType.bindValue(ps, i + 1, args[i]);
             } catch (SQLException e) {
                 handleSQLException(e, ps);
             }
         }
+    }
+
+    protected ValueType findValueType(Object arg, Class<?> argType) {
+        ValueType valueType = ValueTypes.getValueType(arg);
+        if (valueType != null) {
+            return valueType;
+        }
+        valueType = ValueTypes.getValueType(argType);
+        if (valueType != null) {
+            return valueType;
+        }
+        String msg = "Unknown type：argType=" + argType + " args=" + arg;
+        throw new IllegalStateException(msg);
     }
 
     protected Class<?>[] getArgTypes(Object[] args) {
@@ -138,10 +151,6 @@ public class ${glInternalBasicHandler} {
     //                                               -------
     protected String getBindVariableText(Object bindVariable) {
         return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
-    }
-
-    protected ValueType getValueType(Class<?> clazz) {
-        return ValueTypes.getValueType(clazz);
     }
 
     // ===================================================================================

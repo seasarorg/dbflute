@@ -8,6 +8,7 @@ import org.seasar.dao.BeanMetaData;
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonBhvCoreExecution}.${glSelectCBExecution};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
@@ -110,7 +111,14 @@ public class ${glSelectListCBCommand} extends ${glAbstractBehaviorCommand} {
     }
 
     protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType, ResultSetHandler handler) {
-        return createSelectDynamicCommand(handler, new String[] { "dto" }, new Class<?>[] { cbType }, null);
+        return createSelectCBExecution(handler, new String[] { "dto" }, new Class<?>[] { cbType });
+    }
+
+    protected ${glSelectCBExecution} createSelectCBExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes) {
+        final ${glSelectCBExecution} cmd = new ${glSelectCBExecution}(_dataSource, _statementFactory, handler);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        return cmd;
     }
 
     public Object[] getSqlExecutionArgument() {

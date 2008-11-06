@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.sql.DataSource;
 
-import org.seasar.dao.CommandContext;
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.CommandContext;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -18,7 +21,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} {
+public class ${glOutsideSqlSelectExecution} extends ${glInternalAbstractDynamicCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,7 +38,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
      */
-    public ${glSelectCBExecution}(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
+    public ${glOutsideSqlSelectExecution}(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
     }
@@ -44,89 +47,86 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     //                                                                             Execute
     //                                                                             =======
     /**
-     * @param args The array of argument. (NotNull, The first element should be the instance of CB)
+     * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
      * @return The object of execution result. (Nullable)
      */
     public Object execute(Object[] args) {
-        final List<Object> bindVariableList = new ArrayList<Object>();
-        final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
-
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String finalClause;
-        if (cb.hasUnionQueryOrUnionAllQuery()) {
-            final String realClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
-            if (cb.isSelectCountIgnoreFetchScope()) {
-                // If the query uses union and it selects count, the way of select-count is as follows.
-                finalClause = "select count(*) from (" + realClause + ") dfmain";
-            } else {
-                finalClause = realClause;
-            }
+        final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        if (outsideSqlContext.isDynamicBinding()) {
+            return executeOutsideSqlAsDynamic(args, outsideSqlContext);
         } else {
-            if (cb.isSelectCountIgnoreFetchScope()) {
-                finalClause = setupRealSelectCountClause(args, bindVariableList, bindVariableTypeList);
-            } else {
-                finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
+            return executeOutsideSqlAsStatic(args, outsideSqlContext);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                    OutsideSql Execute
+    //                                    ------------------
+    /**
+     * Execute outsideSql as Dynamic.
+     * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
+     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @return Result. (Nullable)
+     */
+    protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        final Object parameterBean = outsideSqlContext.getParameterBean();
+        final Object firstArg = args[0];
+        String staticSql = getSql();
+        if (firstArg != null) {
+            final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
+
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Resolve embedded comment for parsing bind variable comment in embedded comment.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
+                final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
+                final Class<?> propertyType = propertyDesc.getPropertyType();
+                if (!propertyType.equals(String.class)) {
+                    continue;
+                }
+                final String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
+                if (outsideSqlPiece == null) {
+                    continue;
+                }
+                final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
+                staticSql = replaceString(staticSql, embeddedComment, outsideSqlPiece);
             }
         }
 
-        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
+        final ${glOutsideSqlSelectExecution} outsideSqlCommand = createDynamicSqlFactory();
+        outsideSqlCommand.setArgNames(getArgNames());
+        outsideSqlCommand.setArgTypes(getArgTypes());
+        outsideSqlCommand.setSql(staticSql);
+
+        final CommandContext ctx = outsideSqlCommand.apply(args);
+        final List<Object> bindVariableList = new ArrayList<Object>();
+        final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
+        addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
         selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
     }
 
-    // -----------------------------------------------------
-    //                                          Setup Clause
-    //                                          ------------
-    protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String realClause;
-        {
-            final ${glSelectCBExecution} dynamicSqlFactory = createDynamicSqlFactory();
-            dynamicSqlFactory.setArgNames(getArgNames());
-            dynamicSqlFactory.setArgTypes(getArgTypes());
-            if (cb.isLimitSelect_PKOnly()) {
-                dynamicSqlFactory.setSql(cb.getSqlClause().getClausePKOnly());
-            } else {
-                dynamicSqlFactory.setSql(cb.getSqlClause().getClause());
-            }
-            final CommandContext ctx = dynamicSqlFactory.apply(args);
-            realClause = ctx.getSql();
-            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        }
-        return realClause;
-    }
-    
-    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String realSelectCountClause;
-        {
-            final ${glSelectCBExecution} selectCountCommand = createDynamicSqlFactory();
-            selectCountCommand.setArgNames(getArgNames());
-            selectCountCommand.setArgTypes(getArgTypes());
-            final String selectClause = "select count(*)";
-            String fromWhereClause = cb.getSqlClause().getClauseFromWhereWithUnionTemplate();
-            
-            // Replace template marks. These are very important!
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
-
-            final String sql = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
-            selectCountCommand.setSql(sql);
-
-            final CommandContext ctx = selectCountCommand.apply(args);
-            realSelectCountClause = ctx.getSql();
-            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        }
-        return realSelectCountClause;
+    /**
+     * Execute outsideSql as static.
+     * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
+     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @return Result. (Nullable)
+     */
+    protected Object executeOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        final CommandContext ctx = apply(args);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
+        final Object[] bindVariableArray = ctx.getBindVariables();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
     }
 
     // ===================================================================================
     //                                                                 Dynamic SQL Factory
     //                                                                 ===================
-    protected ${glSelectCBExecution} createDynamicSqlFactory() {
-        return new ${glSelectCBExecution}(getDataSource(), getStatementFactory(), resultSetHandler);
+    protected ${glOutsideSqlSelectExecution} createDynamicSqlFactory() {
+        return new ${glOutsideSqlSelectExecution}(getDataSource(), getStatementFactory(), resultSetHandler);
     }
 
     // ===================================================================================

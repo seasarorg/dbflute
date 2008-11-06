@@ -4,6 +4,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonBhvCoreExecution}.${glBasicSelectExecution};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
@@ -94,7 +95,15 @@ public class ${glSelectNextValCommand} extends ${glAbstractBehaviorCommand} {
             msg = msg + " dbmeta.getSequenceNextValSql()=" + dbmeta.getSequenceNextValSql();
             throw new IllegalStateException(msg);
         }
-        return createSelectDynamicCommand(handler, new String[]{}, new Class<?>[]{}, null);
+        return createBasicSelectExecution(handler, new String[]{}, new Class<?>[]{}, nextValSql);
+    }
+
+    protected ${glBasicSelectExecution} createBasicSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
+        final ${glBasicSelectExecution} cmd = new ${glBasicSelectExecution}(_dataSource, _statementFactory, handler);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        cmd.setSql(sql);
+        return cmd;
     }
 
     protected ${glDBMetaInterfaceName} findDBMeta() {

@@ -7,6 +7,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonBhvCoreExecution}.${glOutsideSqlSelectExecution};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
@@ -126,15 +127,23 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
         // - - - - - - - - - - - - -
         final ResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
 
-        // - - - - - - - - - -
-        // Create SqlCommand.
-        // - - - - - - - - - -
-        return createSelectDynamicCommand(handler, argNames, argTypes, sql);
+        // - - - - - - - - - - -
+        // Create SqlExecution.
+        // - - - - - - - - - - -
+        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
+    }
+
+    protected ${glOutsideSqlSelectExecution} createOutsideSqlSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
+        final ${glOutsideSqlSelectExecution} cmd = new ${glOutsideSqlSelectExecution}(_dataSource, _statementFactory, handler);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        cmd.setSql(sql);
+        return cmd;
     }
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _outsideSqlPath, _parameterBean, _outsideSqlOption, getResultTypeSpecification() };
+        return new Object[] { _parameterBean };
     }
 
     // ===================================================================================

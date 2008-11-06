@@ -1,0 +1,58 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreExecution};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.CommandContext;
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBasicSelectExecution} extends ${glInternalAbstractDynamicCommand} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The handler of resultSet. */
+    protected ResultSetHandler resultSetHandler;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource Data source.
+     * @param statementFactory The factory of statement.
+     * @param resultSetHandler The handler of resultSet.
+     */
+    public ${glBasicSelectExecution}(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
+        super(dataSource, statementFactory);
+        this.resultSetHandler = resultSetHandler;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    /**
+     * @param args The array of argument. (Nullable)
+     * @return The object of execution result. (Nullable)
+     */
+    public Object execute(Object[] args) {
+        final CommandContext ctx = apply(args);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
+        final Object[] bindVariableArray = ctx.getBindVariables();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
+    }
+
+    // ===================================================================================
+    //                                                                      Select Handler
+    //                                                                      ==============
+    protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
+        return new ${glInternalBasicSelectHandler}(getDataSource(), realSql, rsh, getStatementFactory());
+    }
+}
