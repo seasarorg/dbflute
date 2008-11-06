@@ -52,8 +52,8 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     // -----------------------------------------------------
     //                         SelectDynamicCommand Creation
     //                         -----------------------------
-    protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
-        return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler);
+    protected ${glSelectCBExecution} createRealSelectCBExecution() {
+        return new ${glSelectCBExecution}(getDataSource(), getStatementFactory(), resultSetHandler);
     }
 
     // ===================================================================================
@@ -104,7 +104,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realClause;
         {
-            final ${glSelectDynamicCommand} dynamicCommand = createMySelectDynamicCommand();
+            final ${glSelectCBExecution} dynamicCommand = createRealSelectCBExecution();
             dynamicCommand.setArgNames(getArgNames());
             dynamicCommand.setArgTypes(getArgTypes());
             if (cb.isLimitSelect_PKOnly()) {
@@ -123,7 +123,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realSelectCountClause;
         {
-            final ${glSelectDynamicCommand} selectCountCommand = createMySelectDynamicCommand();
+            final ${glSelectCBExecution} selectCountCommand = createRealSelectCBExecution();
             selectCountCommand.setArgNames(getArgNames());
             selectCountCommand.setArgTypes(getArgTypes());
             final String selectClause = "select count(*)";
