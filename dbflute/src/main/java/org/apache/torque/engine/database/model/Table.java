@@ -2307,6 +2307,9 @@ public class Table {
     //                                                         Non PrimaryKey Writable
     //                                                         =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
+        if (hasPrimaryKey()) {
+            return false;
+        }
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
