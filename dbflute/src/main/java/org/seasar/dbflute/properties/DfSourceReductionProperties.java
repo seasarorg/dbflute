@@ -2,6 +2,8 @@ package org.seasar.dbflute.properties;
 
 import java.util.Properties;
 
+import org.seasar.dbflute.DfBuildProperties;
+
 /**
  * @author jflute
  */
@@ -54,6 +56,9 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     //                                                                                 Dao
     //                                                                                 ===
     public boolean isMakeDaoInterface() {
+        if (getBasicProperties().isTargetContainerSpring()) {
+            return false; // If the container is for Spring Framework, it always returns false!
+        }
         return booleanProp("torque.isMakeDaoInterface", true); // TODO: @jflute Since 0.8.5 false 
     }
 

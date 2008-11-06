@@ -324,6 +324,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
+
         DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         String defaultPackage = packageProperties.getBaseDaoPackage() + "." + getPmbeanPackageName();
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
@@ -357,6 +358,11 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return pmbeanPackage;
     }
 
+    protected boolean isMakeDaoInterface() {
+        final DfSourceReductionProperties sourceReductionProperties = DfBuildProperties.getInstance().getSourceReductionProperties();
+        return sourceReductionProperties.isMakeDaoInterface();
+    }
+    
     // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
