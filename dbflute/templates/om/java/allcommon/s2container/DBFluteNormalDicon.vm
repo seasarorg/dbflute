@@ -40,18 +40,21 @@
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
+#if ($database.isMakeDaoInterface())
 
     <!-- The selector of DAO. -->
     <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
+#end
 
 #foreach ($table in $database.tables)
-
+#if ($database.isMakeDaoInterface())
     <!-- ${table.name} -->
     <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
+#end
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
 #end
 

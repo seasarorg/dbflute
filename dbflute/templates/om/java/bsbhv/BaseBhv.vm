@@ -26,7 +26,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 import ${glPackageExtendedDao}.*;
+#end
 import ${glPackageExtendedEntity}.*;
 import ${myDBMetaPackageName}.*;
 import ${glPackageCB}.*;
@@ -77,11 +79,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                          ==========
     ${database.behaviorQueryPathBeginMark}
     ${database.behaviorQueryPathEndMark}
+#if ($database.isCompatibleBehaviorUseDaoInterface())
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected ${myExtendedDaoClassName} _dao;
+#end
 
     // ===================================================================================
     //                                                                          Table name
