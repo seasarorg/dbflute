@@ -192,13 +192,13 @@ targetdatabase = $targetDatabase
         $database.debug("        parse('ExtendedTypeSafeCursor')")
         #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+          $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
         #end
 
         $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
         #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+          $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
         #end
       #else
         #if ($database.isSql2EntityPlainEntity())

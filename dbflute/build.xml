@@ -118,7 +118,7 @@
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-main" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-mac-main" depends="expand-dist" description="==> reflect to main examples">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -165,18 +165,25 @@
   	<chmod dir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-basic" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-mac-limit-basic" depends="expand-dist" description="==> reflect to basic example">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-mysql" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-mac-limit-mysql" depends="expand-dist" description="==> reflect to mysql example">
     <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-mac-limit-spring" depends="expand-dist" description="==> reflect to spring example">
+    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect-mac-limit-pbasic" depends="expand-dist" description="==> reflect to test application">
