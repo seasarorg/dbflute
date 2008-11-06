@@ -10,9 +10,6 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -71,7 +68,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         // Execute conditionBean.
         // - - - - - - - - - - - -
         final List<Object> bindVariableList = new ArrayList<Object>(4);
-        final List<Class> bindVariableTypeList = new ArrayList<Class>(4);
+        final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>(4);
 
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String finalClause;
@@ -100,7 +97,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     // -----------------------------------------------------
     //                                          Setup Clause
     //                                          ------------
-    protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+    protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realClause;
         {
@@ -119,7 +116,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         return realClause;
     }
     
-    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realSelectCountClause;
         {
@@ -151,7 +148,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory) {
             @Override
-            protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
+            protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
                 if (args == null) {
                     return;
                 }
@@ -164,7 +161,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
                     }
                 }
             }
-            protected ValueType findValueType(Class argType, Object arg) {
+            protected ValueType findValueType(Class<?> argType, Object arg) {
                 ValueType valueType = ValueTypes.getValueType(arg);
                 if (valueType != null) {
                     return valueType;
@@ -182,19 +179,19 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     // -----------------------------------------------------
     //                                          Setup Helper
     //                                          ------------
-    protected Class[] toClassArray(List<Class> bindVariableTypeList) {
-        final Class[] bindVariableTypesArray = new Class[bindVariableTypeList.size()];
+    protected Class<?>[] toClassArray(List<Class<?>> bindVariableTypeList) {
+        final Class<?>[] bindVariableTypesArray = new Class<?>[bindVariableTypeList.size()];
         for (int i = 0; i < bindVariableTypeList.size(); i++) {
-            final Class bindVariableType = (Class) bindVariableTypeList.get(i);
+            final Class<?> bindVariableType = (Class<?>) bindVariableTypeList.get(i);
             bindVariableTypesArray[i] = bindVariableType;
         }
         return bindVariableTypesArray;
     }
 
-    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
         final Object[] bindVariables = ctx.getBindVariables();
         addBindVariableList(bindVariableList, bindVariables);
-        final Class[] bindVariableTypes = ctx.getBindVariableTypes();
+        final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
         addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
     }
 
@@ -204,7 +201,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         }
     }
 
-    protected void addBindVariableTypeList(List<Class> bindVariableTypeList, Class[] bindVariableTypes) {
+    protected void addBindVariableTypeList(List<Class<?>> bindVariableTypeList, Class<?>[] bindVariableTypes) {
         for (int i=0; i < bindVariableTypes.length; i++) {
             bindVariableTypeList.add(bindVariableTypes[i]);
         }
