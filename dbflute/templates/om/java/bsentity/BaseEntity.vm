@@ -367,6 +367,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                           Common Column Auto Filter
     //                                                           =========================
     /**
+     * Enable common column auto set up. {for after disable because the default is enabled}
+     */
+    public void enableCommonColumnAutoSetup() {
+        _canCommonColumnAutoSetup = true;
+    }
+
+    /**
      * Disables auto set-up of common columns.
      */
     public void disableCommonColumnAutoSetup() {
@@ -377,7 +384,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Can the entity set up common column by auto?
      * @return Determination.
      */
-    public boolean canCommonColumnAutoSetup() {// for Framework
+    public boolean canCommonColumnAutoSetup() { // for Framework
         return _canCommonColumnAutoSetup;
     }
 #end

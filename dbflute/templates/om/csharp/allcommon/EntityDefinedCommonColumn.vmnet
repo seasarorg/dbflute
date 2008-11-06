@@ -25,6 +25,7 @@ namespace ${glPackageBaseCommon} {
 #end
 #end
 
+        void EnableCommonColumnAutoSetup(); // for after disable because the default is enabled
         void DisableCommonColumnAutoSetup();
         bool CanCommonColumnAutoSetup();
     }

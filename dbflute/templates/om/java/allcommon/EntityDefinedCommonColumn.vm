@@ -48,6 +48,11 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
 #end
 
     /**
+	 * Enable common column auto set up. {for after disable because the default is enabled}
+	 */
+    public void enableCommonColumnAutoSetup();
+
+    /**
 	 * Disable common column auto set up.
 	 */
     public void disableCommonColumnAutoSetup();
