@@ -395,7 +395,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected boolean isMakeDaoInterface() {
-        final DfSourceReductionProperties prop = DfBuildProperties.getInstance().getSourceReductionProperties();
+        final DfMakingOptionProperties prop = DfBuildProperties.getInstance().getMakingOptionProperties();
         return prop.isMakeDaoInterface();
     }
 

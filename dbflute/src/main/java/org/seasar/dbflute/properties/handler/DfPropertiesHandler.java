@@ -26,7 +26,7 @@ import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
-import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.properties.DfMakingOptionProperties;
 import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
@@ -241,13 +241,13 @@ public final class DfPropertiesHandler {
     // -----------------------------------------------------
     //                                      Source Reduction
     //                                      ----------------
-    protected DfSourceReductionProperties _sourceReductionProperties;
+    protected DfMakingOptionProperties _makingOptionProperties;
 
-    public DfSourceReductionProperties getSourceReductionProperties(Properties prop) {
-        if (_sourceReductionProperties == null) {
-            _sourceReductionProperties = new DfSourceReductionProperties(prop);
+    public DfMakingOptionProperties getMakingOptionProperties(Properties prop) {
+        if (_makingOptionProperties == null) {
+            _makingOptionProperties = new DfMakingOptionProperties(prop);
         }
-        return _sourceReductionProperties;
+        return _makingOptionProperties;
     }
 
     // -----------------------------------------------------

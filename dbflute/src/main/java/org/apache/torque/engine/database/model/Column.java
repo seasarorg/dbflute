@@ -69,7 +69,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.properties.DfMakingOptionProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -1142,7 +1142,7 @@ public class Column {
     //                                                                       Include Query
     //                                                                       =============
     protected boolean hasQueryRestrictionByClassification() {
-        final DfSourceReductionProperties prop = getTable().getProperties().getSourceReductionProperties();
+        final DfMakingOptionProperties prop = getTable().getProperties().getMakingOptionProperties();
         return !prop.isMakeConditionQueryClassificationRestriction() && hasClassification();
     }
 

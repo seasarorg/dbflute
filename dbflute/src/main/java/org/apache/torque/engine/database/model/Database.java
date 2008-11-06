@@ -1210,56 +1210,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                         Select Parameter Properties
-    //                                                         ===========================
-    protected DfSelectParamProperties getSelectParamProperties() {
-        return getProperties().getSelectParamProperties();
-    }
-
-    public boolean isStatementResultSetTypeValid() {
-        return getSelectParamProperties().isStatementResultSetTypeValid();
-    }
-
-    public String getStatementResultSetType() {
-        return getSelectParamProperties().getStatementResultSetType();
-    }
-
-    public String getStatementResultSetConcurrency() {
-        return getSelectParamProperties().getStatementResultSetConcurrency();
-    }
-
-    // ===================================================================================
-    //                                                         Source Reduction Properties
-    //                                                         ===========================
-    public boolean isMakeDeprecated() {
-        return getProperties().getSourceReductionProperties().isMakeDeprecated();
-    }
-
-    public boolean isMakeRecentlyDeprecated() {
-        return getProperties().getSourceReductionProperties().isMakeRecentlyDeprecated();
-    }
-
-    public boolean isMakeConditionQueryEqualEmptyString() {
-        return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
-    }
-
-    public boolean isMakeEntityTraceRelation() {
-        return getProperties().getSourceReductionProperties().isMakeEntityTraceRelation();
-    }
-
-    public boolean isMakeFlatExpansion() {
-        return getProperties().getSourceReductionProperties().isMakeFlatExpansion();
-    }
-    
-    public boolean isMakeDaoInterface() {
-        return getProperties().getSourceReductionProperties().isMakeDaoInterface();
-    }
-
-    public boolean isMakeClassificationValueLabelList() {
-        return getProperties().getSourceReductionProperties().isMakeClassificationValueLabelList();
-    }
-
-    // ===================================================================================
     //                                                         S2Dao Adjustment Properties
     //                                                         ===========================
     public boolean isVersionAfter1047() {
@@ -1319,6 +1269,56 @@ public class Database {
 
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+    }
+
+    // ===================================================================================
+    //                                                            Making Option Properties
+    //                                                            ========================
+    public boolean isMakeDeprecated() {
+        return getProperties().getMakingOptionProperties().isMakeDeprecated();
+    }
+
+    public boolean isMakeRecentlyDeprecated() {
+        return getProperties().getMakingOptionProperties().isMakeRecentlyDeprecated();
+    }
+
+    public boolean isMakeConditionQueryEqualEmptyString() {
+        return getProperties().getMakingOptionProperties().isMakeConditionQueryEqualEmptyString();
+    }
+
+    public boolean isMakeEntityTraceRelation() {
+        return getProperties().getMakingOptionProperties().isMakeEntityTraceRelation();
+    }
+
+    public boolean isMakeFlatExpansion() {
+        return getProperties().getMakingOptionProperties().isMakeFlatExpansion();
+    }
+    
+    public boolean isMakeDaoInterface() {
+        return getProperties().getMakingOptionProperties().isMakeDaoInterface();
+    }
+
+    public boolean isMakeClassificationValueLabelList() {
+        return getProperties().getMakingOptionProperties().isMakeClassificationValueLabelList();
+    }
+
+    // ===================================================================================
+    //                                                         Select Parameter Properties
+    //                                                         ===========================
+    protected DfSelectParamProperties getSelectParamProperties() {
+        return getProperties().getSelectParamProperties();
+    }
+
+    public boolean isStatementResultSetTypeValid() {
+        return getSelectParamProperties().isStatementResultSetTypeValid();
+    }
+
+    public String getStatementResultSetType() {
+        return getSelectParamProperties().getStatementResultSetType();
+    }
+
+    public String getStatementResultSetConcurrency() {
+        return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
     // ===================================================================================

@@ -5,12 +5,12 @@ import java.util.Properties;
 /**
  * @author jflute
  */
-public final class DfSourceReductionProperties extends DfAbstractHelperProperties {
+public final class DfMakingOptionProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSourceReductionProperties(Properties prop) {
+    public DfMakingOptionProperties(Properties prop) {
         super(prop);
     }
 
@@ -54,10 +54,17 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     //                                                                                 Dao
     //                                                                                 ===
     public boolean isMakeDaoInterface() {
+        if (isTargetLanguageCSharp()) {
+            return true; // It is not implemented at CSharp yet
+        }
         if (isTargetContainerSpring()) {
             return false; // If the container is for Spring Framework, it always returns false!
         }
         return booleanProp("torque.isMakeDaoInterface", true); // TODO: @jflute Since 0.8.5 false 
+    }
+    
+    protected boolean isTargetLanguageCSharp() {
+        return getBasicProperties().isTargetLanguageCSharp();
     }
 
     protected boolean isTargetContainerSpring() {
