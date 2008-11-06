@@ -10,6 +10,7 @@ import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerImpl;
+import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
@@ -25,7 +26,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean validTaskEndInformation = true;
-    
+
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
@@ -50,7 +51,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected boolean isValidTaskEndInformation() {
         return validTaskEndInformation;
     }
-    
+
     protected String getDataLoadingType() {
         return getMyProperties().getDataLoadingType();
     }
@@ -131,16 +132,17 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromXls(String directoryPath, String typeName) {
-        final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        final DfXlsDataHandlerImpl xlsDataHandler;
+        if (basicProperties.isDatabaseSqlServer()) {
+            xlsDataHandler = new DfXlsDataHandlerSqlServer();
+        } else {
+            xlsDataHandler = new DfXlsDataHandlerImpl();
+        }
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
         xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (basicProperties.isDatabaseSqlServer()) {
-            xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
-        } else {
-            xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
-        }
+        xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
     }
 
     // ===================================================================================

@@ -49,7 +49,6 @@ import org.seasar.dbflute.helper.dataset.states.CreatedState;
 import org.seasar.dbflute.helper.dataset.states.SqlContext;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
-import org.seasar.dbflute.helper.dataset.writers.SqlServerSqlWriter;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
@@ -122,6 +121,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
                         tableName);
 
+                beforeHandlingTable(dataSource, dataTable);
+                
                 // Set up columnNameList.
                 final List<String> columnNameList = new ArrayList<String>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
@@ -225,9 +226,16 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             _log.info("statement.close() threw the exception!", ignored);
                         }
                     }
+                    finallyHandlingTable(dataSource, dataTable);
                 }
             }
         }
+    }
+
+    protected void beforeHandlingTable(DataSource dataSource, DataTable dataTable) {
+    }
+    
+    protected void finallyHandlingTable(DataSource dataSource, DataTable dataTable) {
     }
 
     // ===================================================================================
@@ -403,28 +411,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             return new BigDecimal(value);
         } catch (RuntimeException e) {
             throw e;
-        }
-    }
-
-    // ===================================================================================
-    //                                                                     Special Support
-    //                                                                     ===============
-    public void writeSeveralDataForSqlServer(String dataDirectoryName, final DataSource dataSource) {
-        final List<File> xlsList = getXlsList(dataDirectoryName);
-
-        for (File file : xlsList) {
-            _log.info("");
-            _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-            _log.info("writeData(" + file + ")");
-            _log.info("= = = = = = =/");
-            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
-            final DataSet dataSet = xlsReader.read();
-
-            filterValidColumn(dataSet, dataSource);
-            setupDefaultValue(dataDirectoryName, dataSet, dataSource);
-
-            final SqlServerSqlWriter sqlServerSqlWriter = new SqlServerSqlWriter(dataSource, _schemaName);
-            sqlServerSqlWriter.write(dataSet);
         }
     }
 
