@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.PreparedStatement;
 import javax.sql.DataSource;
 
 import org.seasar.dao.CommandContext;

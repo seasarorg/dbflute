@@ -69,7 +69,6 @@ public class ${glOutsideSqlSelectExecution} extends ${glInternalAbstractDynamicC
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
-        final Object parameterBean = outsideSqlContext.getParameterBean();
         final Object firstArg = args[0];
         String staticSql = getSql();
         if (firstArg != null) {

@@ -13,7 +13,7 @@ import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
  * This class is NOT overrided when re-generating.
  * </p>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} extends ${myBaseConditionQueryClassName} {
 
     // ===================================================================================

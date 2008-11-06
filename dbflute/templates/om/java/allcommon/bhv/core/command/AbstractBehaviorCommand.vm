@@ -17,7 +17,6 @@ import org.seasar.dao.ValueTypeFactory;
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandComponentSetup};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonS2Dao}.${glSelectDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalRsHandler}.${glInternalBeanListMetaDataResultSetHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRowCreator};
@@ -52,19 +51,6 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======
-    // -----------------------------------------------------
-    //                                   SelectDynamicCommnd
-    //                                   -------------------
-    protected ${glSelectDynamicCommand} createSelectDynamicCommand(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
-        final ${glSelectDynamicCommand} cmd = new ${glSelectDynamicCommand}(_dataSource, _statementFactory, handler);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        if (sql != null) {
-            cmd.setSql(sql);
-        }
-        return cmd;
-    }
-
     // -----------------------------------------------------
     //                                   UpdateDynamicCommnd
     //                                   -------------------

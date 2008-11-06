@@ -8,6 +8,6 @@ ${database.allClassCopyright}package ${myExtendedDaoPackageName};
  * This class is NOT overrided when re-generating.
  * </p>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public interface ${myClassName} extends ${myBaseDaoPackageName}.${myBaseDaoClassName} {
 }
