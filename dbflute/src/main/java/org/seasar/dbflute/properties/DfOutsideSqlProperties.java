@@ -40,7 +40,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         final String encoding = getSqlFileEncoding();
         return encoding != null && encoding.trim().length() > 0 && !encoding.trim().equalsIgnoreCase("null");
     }
-    
+
     public String getSqlFileEncoding() {
         final String value = (String) getOutsideSqlDefinitionMap().get("sqlFileEncoding");
         if (value != null && value.trim().length() > 0 && !value.trim().equalsIgnoreCase("null")) {
@@ -326,7 +326,12 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
 
         DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
-        String defaultPackage = packageProperties.getBaseDaoPackage() + "." + getPmbeanPackageName();
+        final String defaultPackage;
+        if (isMakeDaoInterface()) {
+            defaultPackage = packageProperties.getBaseDaoPackage() + "." + getPmbeanPackageName();
+        } else {
+            defaultPackage = packageProperties.getBaseBehaviorPackage() + "." + getPmbeanPackageName();
+        }
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -341,7 +346,12 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             return specifiedPackage;
         }
         DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
-        String defaultPackage = packageProperties.getExtendedDaoPackage() + "." + getPmbeanPackageName();
+        final String defaultPackage;
+        if (isMakeDaoInterface()) {
+            defaultPackage = packageProperties.getExtendedDaoPackage() + "." + getPmbeanPackageName();
+        } else {
+            defaultPackage = packageProperties.getExtendedBehaviorPackage() + "." + getPmbeanPackageName();
+        }
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -359,10 +369,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected boolean isMakeDaoInterface() {
-        final DfSourceReductionProperties sourceReductionProperties = DfBuildProperties.getInstance().getSourceReductionProperties();
-        return sourceReductionProperties.isMakeDaoInterface();
+        final DfSourceReductionProperties prop = DfBuildProperties.getInstance().getSourceReductionProperties();
+        return prop.isMakeDaoInterface();
     }
-    
+
     // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
