@@ -322,18 +322,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     public String getBaseCursorPackage() {
         DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         if (isMakeDaoInterface()) {
-            return packageProperties.getBaseDaoPackage() + getCursorPackageName();
+            return packageProperties.getBaseDaoPackage() + "." + getCursorPackageName();
         } else {
-            return packageProperties.getBaseBehaviorPackage() + getCursorPackageName();
+            return packageProperties.getBaseBehaviorPackage() + "." + getCursorPackageName();
         }
     }
 
     public String getExtendedCursorPackage() {
         DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         if (isMakeDaoInterface()) {
-            return packageProperties.getExtendedDaoPackage() + getCursorPackageName();
+            return packageProperties.getExtendedDaoPackage() + "." + getCursorPackageName();
         } else {
-            return packageProperties.getExtendedBehaviorPackage() + getCursorPackageName();
+            return packageProperties.getExtendedBehaviorPackage() + "." + getCursorPackageName();
         }
     }
 
