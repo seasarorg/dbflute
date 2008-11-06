@@ -229,28 +229,33 @@
     </copy>
   </target>
 
-  <target name="reflect-win-limit-nbasic" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-win-limit-nbasic" depends="expand-dist" description="==> reflect to nbasic example">
     <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-noracle" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-win-limit-noracle" depends="expand-dist" description="==> reflect to noracle example">
     <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-oracle" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-win-limit-oracle" depends="expand-dist" description="==> reflect to oracle example">
     <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-postgresql" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-win-limit-postgresql" depends="expand-dist" description="==> reflect to postgresql example">
     <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
-		
+
+  <target name="reflect-win-limit-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
+    <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 </project>
