@@ -24,6 +24,27 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  */
 public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} {
 
+    // =====================================================================================
+    //                                                                            Definition
+    //                                                                            ==========
+    /** Map-string map-mark. */
+    private static final String MAP_STRING_MAP_MARK = "map:";
+
+    /** Map-string list-mark. */
+    private static final String MAP_STRING_LIST_MARK = "list:";
+
+    /** Map-string start-brace. */
+    private static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+    /** Map-string end-brace. */
+    private static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+    /** Map-string delimiter. */
+    private static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+    /** Map-string equal. */
+    private static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -448,10 +469,12 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isLimitSelect_PKOnly() {
         return _isLimitSelectPKOnly;
     }
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * Limit select PK only.
      * @return this. (NotNull)
+     * @deprecated This is OLD style. You can do the same thing by specify().
      */
     public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
         _isLimitSelectPKOnly = true;
@@ -461,11 +484,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /**
      * Limit select off.
      * @return this. (NotNull)
+     * @deprecated This is OLD style. You can do the same thing by specify().
      */
     public ${glConditionBeanInterfaceName} limitSelect_Off() {
         _isLimitSelectPKOnly = false;
         return this;
     }
+#end
 
     // ===================================================================================
     //                                                                        Lock Setting

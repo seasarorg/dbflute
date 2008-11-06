@@ -1,0 +1,223 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreExecution};
+
+import java.util.List;
+import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import javax.sql.DataSource;
+
+import org.seasar.dao.CommandContext;
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.extension.jdbc.types.ValueTypes;
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.framework.beans.factory.BeanDescFactory;
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The handler of resultSet. */
+    protected ResultSetHandler resultSetHandler;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource Data source.
+     * @param statementFactory The factory of statement.
+     * @param resultSetHandler The handler of resultSet.
+     */
+    public ${glSelectCBExecution}(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
+        super(dataSource, statementFactory);
+        this.resultSetHandler = resultSetHandler;
+    }
+
+    // ===================================================================================
+    //                                                            Very Important Extension
+    //                                                            ========================
+    // -----------------------------------------------------
+    //                         SelectDynamicCommand Creation
+    //                         -----------------------------
+    protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
+        return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler);
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                           Top Execute
+    //                                           -----------
+    /**
+     * @param args The array of argument. (Nullable)
+     * @return The object of execution result. (Nullable)
+     */
+    public Object execute(Object[] args) {
+        // - - - - - - - - - - - -
+        // Execute conditionBean.
+        // - - - - - - - - - - - -
+        final List<Object> bindVariableList = new ArrayList<Object>(4);
+        final List<Class> bindVariableTypeList = new ArrayList<Class>(4);
+
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final String finalClause;
+        if (cb.hasUnionQueryOrUnionAllQuery()) {
+            final String realClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
+            if (cb.isSelectCountIgnoreFetchScope()) {
+                // If the query uses union and it selects count, the way of select-count is as follows.
+                finalClause = "select count(*) from (" + realClause + ") dfmain";
+            } else {
+                finalClause = realClause;
+            }
+        } else {
+            if (cb.isSelectCountIgnoreFetchScope()) {
+                finalClause = setupRealSelectCountClause(args, bindVariableList, bindVariableTypeList);
+            } else {
+                finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
+            }
+        }
+
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
+        final Object[] bindVariableArray = bindVariableList.toArray();
+        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
+    }
+
+    // -----------------------------------------------------
+    //                                          Setup Clause
+    //                                          ------------
+    protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final String realClause;
+        {
+            final ${glSelectDynamicCommand} dynamicCommand = createMySelectDynamicCommand();
+            dynamicCommand.setArgNames(getArgNames());
+            dynamicCommand.setArgTypes(getArgTypes());
+            if (cb.isLimitSelect_PKOnly()) {
+                dynamicCommand.setSql(cb.getSqlClause().getClausePKOnly());
+            } else {
+                dynamicCommand.setSql(cb.getSqlClause().getClause());
+            }
+            final CommandContext ctx = dynamicCommand.apply(args);
+            realClause = ctx.getSql();
+            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+        }
+        return realClause;
+    }
+    
+    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final String realSelectCountClause;
+        {
+            final ${glSelectDynamicCommand} selectCountCommand = createMySelectDynamicCommand();
+            selectCountCommand.setArgNames(getArgNames());
+            selectCountCommand.setArgTypes(getArgTypes());
+            final String selectClause = "select count(*)";
+            String fromWhereClause = cb.getSqlClause().getClauseFromWhereWithUnionTemplate();
+            
+            // Replace template marks. These are very important!
+            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
+            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
+            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
+
+            final String sql = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            selectCountCommand.setSql(sql);
+
+            final CommandContext ctx = selectCountCommand.apply(args);
+            realSelectCountClause = ctx.getSql();
+            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+        }
+        return realSelectCountClause;
+    }
+
+    protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
+        return newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory());
+    }
+
+    protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
+        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory) {
+            @Override
+            protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
+                if (args == null) {
+                    return;
+                }
+                for (int i = 0; i < args.length; ++i) {
+                    final ValueType valueType = findValueType(argTypes[i], args[i]);
+                    try {
+                        valueType.bindValue(ps, i + 1, args[i]);
+                    } catch (java.sql.SQLException e) {
+                        handleSQLException(e, ps);
+                    }
+                }
+            }
+            protected ValueType findValueType(Class argType, Object arg) {
+                ValueType valueType = ValueTypes.getValueType(arg);
+                if (valueType != null) {
+                    return valueType;
+                }
+                valueType = ValueTypes.getValueType(argType);
+                if (valueType != null) {
+                    return valueType;
+                }
+                String msg = "Unknown type：argType=" + argType + " args=" + arg;
+                throw new IllegalStateException(msg);
+            }
+        };
+    }
+
+    // -----------------------------------------------------
+    //                                          Setup Helper
+    //                                          ------------
+    protected Class[] toClassArray(List<Class> bindVariableTypeList) {
+        final Class[] bindVariableTypesArray = new Class[bindVariableTypeList.size()];
+        for (int i = 0; i < bindVariableTypeList.size(); i++) {
+            final Class bindVariableType = (Class) bindVariableTypeList.get(i);
+            bindVariableTypesArray[i] = bindVariableType;
+        }
+        return bindVariableTypesArray;
+    }
+
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+        final Object[] bindVariables = ctx.getBindVariables();
+        addBindVariableList(bindVariableList, bindVariables);
+        final Class[] bindVariableTypes = ctx.getBindVariableTypes();
+        addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
+    }
+
+    protected void addBindVariableList(List<Object> bindVariableList, Object[] bindVariables) {
+        for (int i=0; i < bindVariables.length; i++) {
+            bindVariableList.add(bindVariables[i]);
+        }
+    }
+
+    protected void addBindVariableTypeList(List<Class> bindVariableTypeList, Class[] bindVariableTypes) {
+        for (int i=0; i < bindVariableTypes.length; i++) {
+            bindVariableTypeList.add(bindVariableTypes[i]);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String replaceString(String text, String fromText, String toText) {
+        return ${glSimpleStringUtil}.replace(text, fromText, toText);
+    }
+
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+}

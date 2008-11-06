@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
+import java.util.Map;
+
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
@@ -8,27 +10,6 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * @author ${database.ClassAuthor}
  */
 public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterfaceName} {
-
-    // =====================================================================================
-    //                                                                            Definition
-    //                                                                            ==========
-    /** Map-string map-mark. */
-    public static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** Map-string list-mark. */
-    public static final String MAP_STRING_LIST_MARK = "list:";
-
-    /** Map-string start-brace. */
-    public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-    /** Map-string end-brace. */
-    public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-    /** Map-string delimiter. */
-    public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-    /** Map-string equal. */
-    public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
     // ===================================================================================
     //                                                                          Table Name
@@ -61,7 +42,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * Accept primary-key map-string.
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
-    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
+    public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap);
 
     /**
      * Accept primary-key map-string. Delimiter is at-mark and semicolon.
@@ -113,22 +94,26 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                        Limit Select
     //                                                                        ============
     /**
+     * Is limit-select PK only?
+     * @return Determination.
+     */
+    public boolean isLimitSelect_PKOnly();
+#if ($database.isMakeRecentlyDeprecated())
+
+    /**
      * Limit select PK only. This is OLD style. You can do the same thing by specify().
      * @return this. (NotNull)
+     * @deprecated This is OLD style. You can do the same thing by specify().
      */
     public ${glConditionBeanInterfaceName} limitSelect_PKOnly();
 
     /**
      * Limit select off.
      * @return this. (NotNull)
+     * @deprecated This is OLD style. You can do the same thing by specify().
      */
     public ${glConditionBeanInterfaceName} limitSelect_Off();
-
-    /**
-     * Is limit-select PK only?
-     * @return Determination.
-     */
-    public boolean isLimitSelect_PKOnly();
+#end
 
     // =====================================================================================
     //                                                                          Lock Setting

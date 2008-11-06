@@ -1463,6 +1463,14 @@ public class Database {
     public String getSql2EntityExtendedEntityPackage() {
         return getProperties().getOutsideSqlProperties().getExtendedEntityPackage();
     }
+    
+    public String getSql2EntityBaseCursorPackage() {
+        return getProperties().getOutsideSqlProperties().getBaseCursorPackage();
+    }
+    
+    public String getSql2EntityExtendedCursorPackage() {
+        return getProperties().getOutsideSqlProperties().getExtendedCursorPackage();
+    }
 
     public String getSql2EntityBaseParameterBeanPackage() {
         return getProperties().getOutsideSqlProperties().getBaseParameterBeanPackage();
