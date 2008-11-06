@@ -422,26 +422,6 @@ public interface ${myClassName} {
      * @return Column-value map-string. (NotNull)
      */
     public String extractColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
-#if ($database.isMakeDBMetaCommonColumnHandling())
-
-    /**
-     * Extract common-column-value map-string.
-     * @param entity Target entity. (NotNull)
-     * @return Common-column-value map-string. (NotNull)
-     */
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity);
-
-    /**
-     * Extract common-column-value map-string.
-     * @param entity Target entity. (NotNull)
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Common-column-value map-string. (NotNull)
-     */
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
-#end
 
     // -----------------------------------------------------
     //                                               Convert
@@ -473,68 +453,6 @@ public interface ${myClassName} {
      * @return The map of column string-value. (NotNull)
      */
     public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity);
-#if ($database.isMakeDBMetaJDBCSupport())
-
-    // ===================================================================================
-    //                                                                        JDBC Support
-    //                                                                        ============
-    /**
-     * Insert entity using specified connection.
-     * @param conn Connection. (NotNull)
-     * @param entity Entity. (NotNull)
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public int insertEntity(Connection conn, ${glEntityInterfaceName} entity);
-
-    /**
-     * Insert entity using specified connection.
-     * @param conn Connection. (NotNull)
-     * @param entity Entity. (NotNull)
-     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public int insertEntity(Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption);
-
-    /**
-     * Get prepared insert clause.
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public String getPreparedInsertClause();
-
-    /**
-     * Get prepared insert clause.
-     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public String getPreparedInsertClause(PreparedInsertClauseOption preparedInsertClauseOption);
-
-    /**
-     * The option of prepared insert clause.
-     */
-    public static class PreparedInsertClauseOption {
-
-        /** Table prefix. */
-        protected String _tablePrefix;
-
-        /**
-         * Get table prefix.
-         * 
-         * @return Table prefix. (Nullable)
-         */
-        public String getTablePrefix() {
-            return this._tablePrefix;
-        }
-
-        /**
-         * Set table prefix.
-         * 
-         * @param tablePrefix Table prefix. (Nullable)
-         */
-        public void setTablePrefix(String tablePrefix) {
-            this._tablePrefix = tablePrefix;
-        }
-    }
-#end
 
     // ===================================================================================
     //                                                                          Map String

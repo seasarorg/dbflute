@@ -448,59 +448,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             }
         }
     }
-#if ($database.isMakeDBMetaJDBCSupport())
-
-    // ===================================================================================
-    //                                                                        JDBC Support
-    //                                                                        ============
-    /**
-     * ${database.ImplementComment}
-     * @param conn Connection. (NotNull)
-     * @param entity Entity. (NotNull)
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity) {
-        return insertEntity(conn, entity, new PreparedInsertClauseOption());
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * @param conn Connection. (NotNull)
-     * @param entity Entity. (NotNull)
-     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
-     * @return Prepared insert clause. (NotNull and NotEmpty)
-     */
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption) {
-        checkDowncast(entity);
-        final String sql = getPreparedInsertClause(preparedInsertClauseOption);
-        java.sql.PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(sql);
-            final List<Object> valueList = convertToColumnValueList(entity);
-            int settingIndex = 1;
-            for (final Iterator<Object> ite = valueList.iterator(); ite.hasNext(); ) {
-                Object value = ite.next();
-                if (value == null) {
-                    ps.setNull(settingIndex, java.sql.Types.VARCHAR);// Giving a clear-cut attitude!
-                } else {
-                    ps.setObject(settingIndex, value);
-                }
-                ++settingIndex;
-            }
-            return ps.executeUpdate();
-        } catch (java.sql.SQLException e) {
-            String msg = "The sql threw the exception: sql=" + sql;
-            throw new RuntimeException(msg, e);
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (java.sql.SQLException ignored) {
-                }
-            }
-        }
-    }
-#end
 
     // ===================================================================================
     //                                                                          Map String

@@ -43,32 +43,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
 #end
     { initializeColumnInfoList(); }
-#if ($database.isMakeDBMetaStaticDefinition())
-
-    // ===================================================================================
-    //                                                                     Name Definition
-    //                                                                     ===============
-    // -----------------------------------------------------
-    //                                                 Table
-    //                                                 -----
-    public static final String TABLE_DB_NAME = "$table.name";
-    public static final String TABLE_PROPERTY_NAME = "$table.javaBeansRulePropertyName";
-
-    // -----------------------------------------------------
-    //                                        Column DB Name
-    //                                        --------------
-#foreach ($col in $table.columns)
-    public static final String DB_NAME_${col.name} = "$col.name";
-#end
-
-    // -----------------------------------------------------
-    //                                  Column Property Name
-    //                                  (JavaBeansRule)
-    //                                  --------------------
-#foreach ($col in $table.columns)
-    public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
-#end
-#end
 
     // ===================================================================================
     //                                                                            Name Map
@@ -317,50 +291,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public String extractColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
         return doExtractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
     }
-#if ($database.isMakeDBMetaCommonColumnHandling())
-#if (${table.hasAllCommonColumn()})
-
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity) {
-        return extractCommonColumnValueMapString(entity, MAP_STRING_START_BRACE, MAP_STRING_END_BRACE, MAP_STRING_DELIMITER, MAP_STRING_EQUAL);
-    }
-
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
-        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
-        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        final StringBuffer sb = new StringBuffer();
-  #foreach ($columnName in ${database.commonColumnNameList})
-    #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
-    #set ($commonColumnMap = ${database.commonColumnMap})
-    #set ($columnType = ${commonColumnMap.get(${columnName})})
-    #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-    #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-    #set ($targetColumnName = ${table.findTargetColumnNameByCommonColumnName(${columnName})})
-    #set ($col = $table.getColumnByFlexibleName($columnName))
-    #if ($col.isJavaNativeDateObject())
-
-        sb.append(delimiter).append("${targetColumnName}").append(equal);
-        sb.append((myEntity.get${javaName}() != null ? helpFormatingDate(myEntity.get${javaName}()) : ""));
-    #else
-
-        sb.append(delimiter).append("${targetColumnName}").append(equal);
-        sb.append((myEntity.get${javaName}() != null ? myEntity.get${javaName}().toString() : ""));
-    #end
-  #end
-
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
-    }
-#else
-
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity) {
-        return "map:{}";
-    }
-
-    public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
-        return "map:" + startBrace + endBrace;
-    }
-#end
-#end
 
     // -----------------------------------------------------
     //                                               Convert
@@ -369,23 +299,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public Map<String, Object> convertToColumnValueMap(${glEntityInterfaceName} entity) { return doConvertToColumnValueMap(entity); }
     public List<String> convertToColumnStringValueList(${glEntityInterfaceName} entity) { return newArrayList(convertToColumnStringValueMap(entity).values()); }
     public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity) { return doConvertToColumnStringValueMap(entity); }
-#if ($database.isMakeDBMetaJDBCSupport())
-
-    // ===================================================================================
-    //                                                                        JDBC Support
-    //                                                                        ============
-    public String getPreparedInsertClause() {
-        return getPreparedInsertClause(new PreparedInsertClauseOption());
-    }
-
-    public String getPreparedInsertClause(PreparedInsertClauseOption preparedInsertClauseOption) {
-        if (preparedInsertClauseOption.getTablePrefix() != null) {
-            final String tablePrefix = preparedInsertClauseOption.getTablePrefix();
-            return "insert into " + tablePrefix + "${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
-        }
-        return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
-    }
-#end
 
     // ===================================================================================
     //                                                               Entity Property Setup
