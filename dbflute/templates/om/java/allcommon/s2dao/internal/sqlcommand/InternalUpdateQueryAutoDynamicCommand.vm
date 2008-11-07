@@ -177,7 +177,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand, $
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
         CommandContext context;
         {
-            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, true);
             Node node = parser.parse();
             ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
             context = creator.createCommandContext(args);

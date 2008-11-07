@@ -348,6 +348,14 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
         return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory);
     }
 
+    // ===================================================================================
+    //                                                                       Parser Option
+    //                                                                       =============
+    @Override
+    protected boolean isBlockNullParameter() {
+        return true; // Because the SQL is select.
+    }
+
     // -----------------------------------------------------
     //                                          Setup Helper
     //                                          ------------

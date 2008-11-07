@@ -25,19 +25,21 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
+        protected String _specifiedSql;
+        protected bool _blockNullParameter;
         protected readonly ${glInternalSqlTokenizer} _tokenizer;
         protected readonly System.Collections.Stack _nodeStack = new System.Collections.Stack();
-        protected String _specifiedSql;// Extension!
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glInternalSqlParser}(String sql) {
+        public ${glInternalSqlParser}(String sql, bool blockNullParameter) {
             sql = sql.Trim();
             if (sql.EndsWith(";")) {
                 sql = sql.Substring(0, sql.Length - 1);
             }
             _specifiedSql = sql;
+            _blockNullParameter = blockNullParameter;
             _tokenizer = new ${glInternalSqlTokenizer}(sql);
         }
 
@@ -205,12 +207,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             Peek().AddChild(CreateBindVariableNode(expr, null));
         }
 
-        protected AbstractNode CreateEmbeddedValueNode(string expr, String textValue) {
-            return new InternalEmbeddedValueNode(expr, textValue, _specifiedSql);
+        protected AbstractNode CreateBindVariableNode(String expr, String textValue) {
+            return new InternalBindVariableNode(expr, textValue, _specifiedSql, _blockNullParameter);
         }
 
-        protected AbstractNode CreateBindVariableNode(String expr, String textValue) {
-            return new InternalBindVariableNode(expr, textValue, _specifiedSql);
+        protected AbstractNode CreateEmbeddedValueNode(string expr, String textValue) {
+            return new InternalEmbeddedValueNode(expr, textValue, _specifiedSql, _blockNullParameter);
         }
 
         protected ContainerNode CreateIfNode(string expr) {
@@ -273,7 +275,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
     	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
             ICommandContext context;
     		{
-                ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+                ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, false);
                 INode node = parser.Parse();
                 ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
                 context = creator.CreateCommandContext(args);
@@ -299,12 +301,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         protected String _testValue;
         protected String[] _names;
         protected String _specifiedSql;
+        protected bool _blockNullParameter;
 
-        public InternalBindVariableNode(String expression, String testValue, String specifiedSql) : base () {
+        public InternalBindVariableNode(String expression, String testValue
+                                      , String specifiedSql, bool blockNullParameter) : base () {
             _expression = expression;
             _testValue = testValue;
             _names = expression.Split('.');
             _specifiedSql = specifiedSql;
+            _blockNullParameter = blockNullParameter;
         }
 
         public override void Accept(ICommandContext ctx) {
@@ -314,8 +319,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
-			
-			if (valueAndType.TargetValue == null) {
+
+			if (_blockNullParameter && valueAndType.TargetValue == null) {
 			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
 			}
 			if (!IsInScope()) {
@@ -404,12 +409,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 		protected String _testValue;
         protected String[] _names;
         protected String _specifiedSql;
+        protected bool _blockNullParameter;
 
-        public InternalEmbeddedValueNode(String expression, String testValue, String specifiedSql) : base () {
+        public InternalEmbeddedValueNode(String expression, String testValue
+                                       , String specifiedSql, bool blockNullParameter) : base () {
             _expression = expression;
             _testValue = testValue;
             _names = expression.Split('.');
             _specifiedSql = specifiedSql;
+            _blockNullParameter = blockNullParameter;
         }
 
         public override void Accept(ICommandContext ctx) {
@@ -420,7 +428,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
 			
-			if (valueAndType.TargetValue == null) {
+			if (_blockNullParameter && valueAndType.TargetValue == null) {
 			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
 			}
 			if (!IsInScope()) {

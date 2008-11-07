@@ -37,10 +37,14 @@ public abstract class ${glInternalAbstractDynamicCommand} extends ${glInternalAb
     }
 	
 	protected ${glInternalSqlParser} createInternalSqlParser(String sql) {
-	    return new ${glInternalSqlParser}(sql);
+	    return new ${glInternalSqlParser}(sql, isBlockNullParameter());
 	}
 
-    public CommandContext apply(Object[] args) {// It is necessary to be public!
+    protected boolean isBlockNullParameter() { // Extension Point!
+        return false;
+    }
+
+    public CommandContext apply(Object[] args) { // It is necessary to be public!
         final CommandContext ctx = createCommandContext(args);
         rootNode.accept(ctx);
         return ctx;

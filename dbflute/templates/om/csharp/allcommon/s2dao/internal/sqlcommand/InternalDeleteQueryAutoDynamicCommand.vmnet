@@ -68,7 +68,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
     protected ICommandContext createCommandContext(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
         ICommandContext context;
         {
-            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, true);
             INode node = parser.Parse();
             ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
             context = creator.CreateCommandContext(args);

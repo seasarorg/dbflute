@@ -55,4 +55,12 @@ public class ${glBasicSelectExecution} extends ${glInternalAbstractDynamicComman
     protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
         return new ${glInternalBasicSelectHandler}(getDataSource(), realSql, rsh, getStatementFactory());
     }
+
+    // ===================================================================================
+    //                                                                       Parser Option
+    //                                                                       =============
+    @Override
+    protected boolean isBlockNullParameter() {
+        return true; // Because the SQL is select.
+    }
 }

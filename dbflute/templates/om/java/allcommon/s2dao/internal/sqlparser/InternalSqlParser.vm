@@ -44,19 +44,21 @@ public class ${glInternalSqlParser} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String specifiedSql;
+    protected boolean blockNullParameter;
     protected ${glInternalSqlTokenizer} tokenizer;
     protected Stack<Node> nodeStack = new Stack<Node>();
-    protected String specifiedSql;// Extension!
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glInternalSqlParser}(String sql) {
+    public ${glInternalSqlParser}(String sql, boolean blockNullParameter) {
         sql = sql.trim();
         if (sql.endsWith(";")) {
             sql = sql.substring(0, sql.length() - 1);
         }
-        specifiedSql = sql;// Extension!
+        specifiedSql = sql;
+        this.blockNullParameter = blockNullParameter;
         tokenizer = new ${glInternalSqlTokenizer}(sql);
     }
 
@@ -129,9 +131,9 @@ public class ${glInternalSqlParser} {
                 parseCommentBindVariable();
             }
         } else if (comment != null && 0 < comment.length()) {
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	        // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
-		    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             String before = tokenizer.getBefore();
             peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
         }
@@ -147,7 +149,7 @@ public class ${glInternalSqlParser} {
         push(ifNode);
         parseEnd();
     }
-	
+    
     protected void throwIfCommentConditionNotFoundException() {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -201,7 +203,7 @@ public class ${glInternalSqlParser} {
         msg = msg + "* * * * * * * * * */";
         throw new ${glEndCommentNotFoundException}(msg);
     }
-	
+    
     protected void parseElse() {
         final Node parent = peek();
         if (!(parent instanceof InternalIfNode)) {
@@ -267,11 +269,11 @@ public class ${glInternalSqlParser} {
     }
 
     protected AbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
-        return new InternalBindVariableNode(expr, testValue, specifiedSql);
+        return new InternalBindVariableNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
     protected AbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
-        return new InternalEmbeddedValueNode(expr, testValue, specifiedSql);
+        return new InternalEmbeddedValueNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
     protected ContainerNode createIfNode(String expr) {// Extension!
@@ -284,11 +286,11 @@ public class ${glInternalSqlParser} {
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
-	
+    
     protected final String replaceString(String text, String fromText, String toText) {
-	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
+        return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
-	
+    
     // ===================================================================================
     //                                                                           Extension
     //                                                                           =========
@@ -300,12 +302,15 @@ public class ${glInternalSqlParser} {
         protected String _testValue;
         protected String[] _names;
         protected String _specifiedSql;
+        protected boolean _blockNullParameter;
 
-        public InternalBindVariableNode(String expression, String testValue, String specifiedSql) {
+        public InternalBindVariableNode(String expression, String testValue
+                                      , String specifiedSql, boolean blockNullParameter) {
             this._expression = expression;
-			this._testValue = testValue;
+            this._testValue = testValue;
             this._names = InternalStringUtil.split(expression, ".");
             this._specifiedSql = specifiedSql;
+            this._blockNullParameter = blockNullParameter;
         }
 
         public void accept(CommandContext ctx) {
@@ -315,22 +320,22 @@ public class ${glInternalSqlParser} {
             valueAndType.setTargetValue(value);
             valueAndType.setTargetType(clazz);
             setupValueAndType(valueAndType);
-			
-			if (valueAndType.getTargetValue() == null) {
-			    throwBindOrEmbeddedParameterNullValueException(valueAndType);
-			}
-			if (!isInScope()) {
-			    // Main Root
-			    ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-			} else {
-			    if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
-				    bindArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
-				} else if (valueAndType.getTargetType().isArray()) {
-				    bindArray(ctx, valueAndType.getTargetValue());
-				} else {
-				    ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-				}
-			}
+
+            if (_blockNullParameter && valueAndType.getTargetValue() == null) {
+                throwBindOrEmbeddedParameterNullValueException(valueAndType);
+            }
+            if (!isInScope()) {
+                // Main Root
+                ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+            } else {
+                if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
+                    bindArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
+                } else if (valueAndType.getTargetType().isArray()) {
+                    bindArray(ctx, valueAndType.getTargetValue());
+                } else {
+                    ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+                }
+            }
             if (valueAndType.isValidRearOption()) {
                 ctx.addSql(valueAndType.buildRearOptionOnSql());
             }
@@ -340,57 +345,57 @@ public class ${glInternalSqlParser} {
             final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
             valueAndTypeSetuper.setupValueAndType(valueAndType);
         }
-		
-		protected void throwBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(), _specifiedSql, true);
-		}
-		
-		protected boolean isInScope() {
-		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
-		}
-		
+        
+        protected void throwBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(), _specifiedSql, true);
+        }
+        
+        protected boolean isInScope() {
+            return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+        }
+        
         protected void bindArray(CommandContext ctx, Object array) {
             if (array == null) {
                 return;
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-			    throwBindOrEmbeddedParameterEmptyListException();
+                throwBindOrEmbeddedParameterEmptyListException();
             }
             Class<?> clazz = null;
             for (int i = 0; i < length; ++i) {
                 final Object currentElement = Array.get(array, i);
                 if (currentElement != null) {
                     clazz = currentElement.getClass();
-					break;
+                    break;
                 }
             }
-			if (clazz == null) {
-			    throwBindOrEmbeddedParameterNullOnlyListException();
-			}
-			boolean existsValidElements = false;
+            if (clazz == null) {
+                throwBindOrEmbeddedParameterNullOnlyListException();
+            }
+            boolean existsValidElements = false;
             ctx.addSql("(");
             for (int i = 0; i < length; ++i) {
-				final Object currentElement = Array.get(array, i);
-				if (currentElement != null) {
-				    if (!existsValidElements) {
+                final Object currentElement = Array.get(array, i);
+                if (currentElement != null) {
+                    if (!existsValidElements) {
                         ctx.addSql("?", currentElement, clazz);
-				        existsValidElements = true;
-					} else {
+                        existsValidElements = true;
+                    } else {
                         ctx.addSql(", ?", currentElement, clazz);
-					}
-				}
+                    }
+                }
             }
             ctx.addSql(")");
         }
 
-		protected void throwBindOrEmbeddedParameterEmptyListException() {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
-		}
-		
-		protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
-		}
+        protected void throwBindOrEmbeddedParameterEmptyListException() {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+        }
+        
+        protected void throwBindOrEmbeddedParameterNullOnlyListException() {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
+        }
     }
 
     // -----------------------------------------------------
@@ -401,12 +406,15 @@ public class ${glInternalSqlParser} {
         protected String _testValue;
         protected String[] _names;
         protected String _specifiedSql;
-
-        public InternalEmbeddedValueNode(String expression, String testValue, String specifiedSql) {
+        protected boolean _blockNullParameter;
+    
+        public InternalEmbeddedValueNode(String expression, String testValue
+                                       , String specifiedSql, boolean blockNullParameter) {
             this._expression = expression;
-			this._testValue = testValue;
+            this._testValue = testValue;
             this._names = InternalStringUtil.split(expression, ".");
             this._specifiedSql = specifiedSql;
+            this._blockNullParameter = blockNullParameter;
         }
 
         public void accept(CommandContext ctx) {
@@ -416,34 +424,34 @@ public class ${glInternalSqlParser} {
             valueAndType.setTargetValue(value);
             valueAndType.setTargetType(clazz);
             setupValueAndType(valueAndType);
-			
-			if (valueAndType.getTargetValue() == null) {
-			    throwBindOrEmbeddedParameterNullValueException(valueAndType);
-			}
-			if (!isInScope()) {
-			    // Main Root
-		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	            // [UnderReview]: Should I make an original exception instead of this exception?
-		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            
+            if (_blockNullParameter && valueAndType.getTargetValue() == null) {
+                throwBindOrEmbeddedParameterNullValueException(valueAndType);
+            }
+            if (!isInScope()) {
+                // Main Root
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // [UnderReview]: Should I make an original exception instead of this exception?
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
                     throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
                 }
                 ctx.addSql(valueAndType.getTargetValue().toString());
-			} else {
-			    if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
+            } else {
+                if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
                     embedArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
-				} else if (valueAndType.getTargetType().isArray()) {
+                } else if (valueAndType.getTargetType().isArray()) {
                     embedArray(ctx, valueAndType.getTargetValue());
-				} else {
-    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    	            // [UnderReview]: Should I make an original exception instead of this exception?
-    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                } else {
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    // [UnderReview]: Should I make an original exception instead of this exception?
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
                         throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
                     }
                     ctx.addSql(valueAndType.getTargetValue().toString());
-				}
-			}
+                }
+            }
             if (valueAndType.isValidRearOption()) {
                 ctx.addSql(valueAndType.buildRearOptionOnSql());
             }
@@ -453,57 +461,57 @@ public class ${glInternalSqlParser} {
             final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
             valueAndTypeSetuper.setupValueAndType(valueAndType);
         }
-		
-		protected void throwBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(), _specifiedSql, false);
-		}
-		
-		protected boolean isInScope() {
-		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
-		}
-		
+        
+        protected void throwBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(), _specifiedSql, false);
+        }
+        
+        protected boolean isInScope() {
+            return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+        }
+        
         protected void embedArray(CommandContext ctx, Object array) {
             if (array == null) {
                 return;
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-			    throwBindOrEmbeddedParameterEmptyListException();
+                throwBindOrEmbeddedParameterEmptyListException();
             }
             String quote = null;
             for (int i = 0; i < length; ++i) {
                 final Object currentElement = Array.get(array, i);
                 if (currentElement != null) {
                     quote = !(currentElement instanceof Number) ? "'" : "";
-					break;
+                    break;
                 }
             }
-			if (quote == null) {
-			    throwBindOrEmbeddedParameterNullOnlyListException();
-			}
-			boolean existsValidElements = false;
+            if (quote == null) {
+                throwBindOrEmbeddedParameterNullOnlyListException();
+            }
+            boolean existsValidElements = false;
             ctx.addSql("(");
             for (int i = 0; i < length; ++i) {
-				final Object currentElement = Array.get(array, i);
-				if (currentElement != null) {
-				    if (!existsValidElements) {
+                final Object currentElement = Array.get(array, i);
+                if (currentElement != null) {
+                    if (!existsValidElements) {
                         ctx.addSql(quote + currentElement + quote);
-				        existsValidElements = true;
-					} else {
+                        existsValidElements = true;
+                    } else {
                         ctx.addSql(", " + quote + currentElement + quote);
-					}
-				}
+                    }
+                }
             }
             ctx.addSql(")");
         }
-		
-		protected void throwBindOrEmbeddedParameterEmptyListException() {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
-		}
-		
-		protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
-		}
+        
+        protected void throwBindOrEmbeddedParameterEmptyListException() {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+        }
+        
+        protected void throwBindOrEmbeddedParameterNullOnlyListException() {
+            ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+        }
     }
 
     // -----------------------------------------------------
@@ -636,13 +644,13 @@ public class ${glInternalSqlParser} {
         // for OutsideSql
         protected ${glConditionOptionLikeSearchName} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
             final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
-			final ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
-			if (option == null) {
-			    throwLikeSearchOptionNotFoundException(resourceBean, currentName);
-			}
-			if (option.isSplit()) {
-			    throwOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
-			}
+            final ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
+            if (option == null) {
+                throwLikeSearchOptionNotFoundException(resourceBean, currentName);
+            }
+            if (option.isSplit()) {
+                throwOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
+            }
             return option;
         }
 
@@ -654,15 +662,15 @@ public class ${glInternalSqlParser} {
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "Please confirm your method call:"  + getLineSeparator();
-			final String beanName = resourceBean.getClass().getSimpleName();
-			final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            final String beanName = resourceBean.getClass().getSimpleName();
+            final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
             msg = msg + "    " + beanName + "." + methodName + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Target ParameterBean]" + getLineSeparator() + resourceBean + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
             throw new ${glRequiredOptionNotFoundException}(msg);
         }
-		
+        
         // for OutsideSql
         protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(${glConditionOptionLikeSearchName} option, Object resourceBean, String currentName) {
             String msg = "Look! Read the message below." + getLineSeparator();
@@ -691,15 +699,15 @@ public class ${glInternalSqlParser} {
             throw new UnsupportedOperationException(msg);
         }
 
-		protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, PropertyDesc pd) {
+        protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, PropertyDesc pd) {
             try {
                 return pd.getValue(beanValue);
             } catch (RuntimeException e) {
                 throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind, e);
-				return null;// Unreachable!
+                return null;// Unreachable!
             }
-		}
-		
+        }
+        
         protected void throwPropertyHandlingFailureException(Class<?> beanType, Object beanValue, String currentName,
                 String expression, String specifiedSql, boolean bind, Exception e) {
             String msg = "Look! Read the message below." + getLineSeparator();
@@ -718,13 +726,13 @@ public class ${glInternalSqlParser} {
             msg = msg + getLineSeparator();
             msg = msg + "[Property Name]" + getLineSeparator() + currentName + getLineSeparator();
             msg = msg + getLineSeparator();
-			msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg, e);
         }
 
         protected String initCap(String name) {
-		    return ${glSimpleStringUtil}.initCap(name);
+            return ${glSimpleStringUtil}.initCap(name);
         }
 
         protected Object invokeGetter(Method method, Object target) {
@@ -765,11 +773,11 @@ public class ${glInternalSqlParser} {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
     }
-	
+    
     // -----------------------------------------------------
     //                                    Exception Provider
     //                                    ------------------
-	protected static class ParameterCommentExceptionProvider {
+    protected static class ParameterCommentExceptionProvider {
         public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class<?> targetType, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -795,7 +803,7 @@ public class ${glInternalSqlParser} {
                 throw new ${glEmbeddedValueParameterNullValueException}(msg);
             }
         }
-		
+        
         public static void throwBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -819,7 +827,7 @@ public class ${glInternalSqlParser} {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
-		
+        
         public static void throwBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -845,12 +853,12 @@ public class ${glInternalSqlParser} {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
-		
+        
         protected static String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
-	}
-	
+    }
+    
     // -----------------------------------------------------
     //                                                IfNode
     //                                                ------
@@ -988,7 +996,7 @@ public class ${glInternalSqlParser} {
         }
 
         public static final String replace(String text, String fromText,  String toText) {
-		    return ${glSimpleStringUtil}.replace(text, fromText, toText);
+            return ${glSimpleStringUtil}.replace(text, fromText, toText);
         }
 
         public static String[] split(String str, String delim) {
@@ -1003,27 +1011,27 @@ public class ${glInternalSqlParser} {
             return (String[]) list.toArray(new String[list.size()]);
         }
     }
-	
-	// ===================================================================================
+    
+    // ===================================================================================
     //                                                                             Convert
     //                                                                             =======
-	public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
-	    final String[] argNames = new String[]{"dto"};
-	    final Class<?>[] argTypes = new Class<?>[]{arg.getClass()};
-	    final Object[] args = new Object[]{arg};
-		return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
-	}
-	
-	public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+    public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
+        final String[] argNames = new String[]{"dto"};
+        final Class<?>[] argTypes = new Class<?>[]{arg.getClass()};
+        final Object[] args = new Object[]{arg};
+        return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
+    }
+    
+    public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
         final CommandContext context;
-		{
-            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+        {
+            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, false);
             final Node node = parser.parse();
             final ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
-		}
+        }
         final String preparedSql = context.getSql();
-		return ${glInternalBindVariableUtil}.getCompleteSql(preparedSql, context.getBindVariables());
-	}
+        return ${glInternalBindVariableUtil}.getCompleteSql(preparedSql, context.getBindVariables());
+    }
 }

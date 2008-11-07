@@ -136,6 +136,14 @@ public class ${glOutsideSqlSelectExecution} extends ${glInternalAbstractDynamicC
     }
 
     // ===================================================================================
+    //                                                                       Parser Option
+    //                                                                       =============
+    @Override
+    protected boolean isBlockNullParameter() {
+        return true; // Because the SQL is select.
+    }
+
+    // ===================================================================================
     //                                                                        Setup Helper
     //                                                                        ============
     protected Class<?>[] toClassArray(List<Class<?>> bindVariableTypeList) {

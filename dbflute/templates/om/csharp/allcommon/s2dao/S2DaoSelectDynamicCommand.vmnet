@@ -57,7 +57,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                          Override
         //                                          --------
         protected override ISqlParser CreateSqlParser(string sqlString) {
-            return new ${glInternalSqlParser}(sqlString);
+            return new ${glInternalSqlParser}(sqlString, true);
         }
 
         // -------------------------------------------------
