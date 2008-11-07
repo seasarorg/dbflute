@@ -20,15 +20,14 @@ public class ${myClassName} {
     //                                                                 Classification Code
     //                                                                 ===================
 #foreach ($classificationName in $database.classificationNameList)
-  #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
-  #set ($existTop = false)
-  #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-    #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
-    #set ($existTop = true)
-  #else
-    #set ($existTop = false)
-  #end
-
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#set ($existTop = true)
+#else
+#set ($existTop = false)
+#end
     // /- - - - - - - - - - - - - - - - - - - - - - - - - -
     // [${classificationName}]
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
@@ -36,7 +35,6 @@ public class ${myClassName} {
 #end
     // - - - - - - - - - -/
 #if ($existTop && $classificationTopMap.containsKey('topCode'))
-
     /**
      * The classification TOP code of ${classificationName}. <br />
 #if ($classificationTopMap.containsKey('topComment'))
@@ -44,9 +42,9 @@ public class ${myClassName} {
 #end
      */
     public static final String ${database.classificationTopCodeVariableNamePrefix}${classificationName} = "$classificationTopMap.get('topCode')";
+
 #end
 #foreach ($classificationMap in $classificationMapList)
-
     /**
      * The classification code of ${classificationMap.get('name')} on ${classificationName}. <br />
 #if ($classificationMap.containsKey('comment'))
@@ -54,9 +52,9 @@ public class ${myClassName} {
 #end
      */
     public static final String ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
-#end
-#end
 
+#end
+#end
     // ===================================================================================
     //                                                          Classification CodeNameMap
     //                                                          ==========================
@@ -96,8 +94,8 @@ public class ${myClassName} {
         }
         return null;
     }
-
 #if ($database.isMakeClassificationValueLabelList())
+
     // ===================================================================================
     //                                                       Classification ValueLabelList
     //                                                       =============================

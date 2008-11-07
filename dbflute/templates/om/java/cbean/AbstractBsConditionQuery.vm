@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.Collection;
 
 #if ($table.hasClassification())
-import ${glPackageBaseCommon}.${glClassificationDefinition};
+import static ${glPackageBaseCommon}.${glClassificationDefinition}.*;
 #end
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
@@ -46,7 +46,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isJavaNativeStringObject()})
 
     /**
-     * Equal(=). And NullOrEmptyIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -55,7 +55,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if ($database.isMakeConditionQueryEqualEmptyString())
 
     /**
-     * Equal(=). As the empty-string. And NullOrEmptyIgnored, OnceRegistered.
+     * Equal(=). As the empty-string. And NullOrEmptyIgnored, OnlyOnceRegistered.
      */
     public void set${tmpJavaName}_Equal_EmptyString() {
         reg${tmpJavaName}(CK_EQ, "");
@@ -65,18 +65,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * Equal(=). As ${classificationMap.get('name')}. And NullOrEmptyIgnored, OnceRegistered.<br />
+     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+        reg${tmpJavaName}(CK_EQ, ${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
 #end
 #end
 #if (${col.isAvailableStringNotEqual()})
 
     /**
-     * NotEqual(!=). And NullOrEmptyIgnored, OnceRegistered.
+     * NotEqual(!=). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -86,11 +86,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * NotEqual(=). As ${classificationMap.get('name')}. And NullOrEmptyIgnored, OnceRegistered.<br />
+     * NotEqual(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_NE, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+        reg${tmpJavaName}(CK_NE, ${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
 #end
 #end
@@ -98,7 +98,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableStringGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnceRegistered.
+     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -108,7 +108,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableStringLessThan()})
 
     /**
-     * LessThan(&lt;). And NullOrEmptyIgnored, OnceRegistered.
+     * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -118,7 +118,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableStringGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnceRegistered.
+     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -128,7 +128,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableStringLessEqual()})
 
     /**
-     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnceRegistered.
+     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -138,7 +138,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableStringPrefixSearch()})
 
     /**
-     * PrefixSearch(like 'xxx%'). And NullOrEmptyIgnored, OnceRegistered.
+     * PrefixSearch(like 'xxx%'). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as prefixSearch.
      */
     public void set${tmpJavaName}_PrefixSearch($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -351,7 +351,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isJavaNativeNumberObject()})
     
     /**
-     * Equal(=). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -361,19 +361,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnceRegistered.<br />
+     * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
-        reg${tmpJavaName}(CK_EQ, new ${col.JavaNative}(code));
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')}));
     }
 #end
 #end
 #if (${col.isAvailableNumberNotEqual()})
 
     /**
-     * NotEqual(!=). And NullIgnored, OnceRegistered.
+     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -383,12 +382,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnceRegistered.<br />
+     * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
-        reg${tmpJavaName}(CK_NE, new ${col.JavaNative}(code));
+        reg${tmpJavaName}(CK_NE, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')}));
     }
 #end
 #end
@@ -396,7 +394,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableNumberGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullIgnored, OnceRegistered.
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -406,7 +404,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableNumberLessThan()})
 
     /**
-     * LessThan(&lt;). And NullIgnored, OnceRegistered.
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -416,7 +414,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableNumberGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;=). And NullIgnored, OnceRegistered.
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -426,7 +424,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableNumberLessEqual()})
 
     /**
-     * LessEqual(&lt;=). And NullIgnored, OnceRegistered.
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
@@ -619,7 +617,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isJavaNativeDateObject()})
     
     /**
-     * Equal(=). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -628,7 +626,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateNotEqual()})
 
     /**
-     * NotEqual(!=). And NullIgnored, OnceRegistered.
+     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -638,7 +636,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullIgnored, OnceRegistered.
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -648,7 +646,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateLessThan()})
 
     /**
-     * LessThan(&gt;). And NullIgnored, OnceRegistered.
+     * LessThan(&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -658,7 +656,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;). And NullIgnored, OnceRegistered.
+     * GreaterEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -668,7 +666,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateLessEqual()})
 
     /**
-     * LessEqual(&gt;). And NullIgnored, OnceRegistered.
+     * LessEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -678,7 +676,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
 
     /**
-     * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param fromDate The from-date of ${col.UncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date of ${col.UncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
@@ -692,7 +690,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     /**
-     * FromTo($fromDate &lt;= COLUMN_NAME &lt; $toDate + 1). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * FromTo($fromDate &lt;= COLUMN_NAME &lt; $toDate + 1). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param fromDate The from-date of ${col.UncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date of ${col.UncapitalisedJavaName}. (Nullable)
      */
@@ -704,22 +702,34 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #if (${col.isJavaNativeBooleanObject()})
 
     /**
-     * Equal(=). And NullIgnored, OnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal($col.JavaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
+
+    /**
+     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * ${database.getMapValue($classificationMap, 'comment')}
+     */
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')}));
+    }
+#end
+#end
 #end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
     /**
-     * IsNull(is null). And OnceRegistered.
+     * IsNull(is null). And OnlyOnceRegistered.
      */
     public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
 
     /**
-     * IsNotNull(is not null). And OnceRegistered.
+     * IsNotNull(is not null). And OnlyOnceRegistered.
      */
     public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
 #end
