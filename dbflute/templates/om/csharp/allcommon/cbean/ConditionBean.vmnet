@@ -40,8 +40,10 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                    Limit Select
         //                                                                    ============
         bool IsLimitSelect_PKOnly();
+#if ($database.isMakeRecentlyDeprecated())
         ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
         ${glConditionBeanInterfaceName} LimitSelect_Off();
+#end
 
         // ===============================================================================
         //                                                                    Lock Setting

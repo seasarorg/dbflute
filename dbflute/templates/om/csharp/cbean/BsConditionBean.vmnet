@@ -122,7 +122,9 @@ namespace ${glPackageBaseCB} {
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
                 _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }
+#if ($database.isMakeRecentlyDeprecated())
             LimitSelect_Off();
+#end
             return _nss${tmpPropertyNameInitCap};
         }
 #end
@@ -154,7 +156,9 @@ namespace ${glPackageBaseCB} {
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
                 _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }
+#if ($database.isMakeRecentlyDeprecated())
             LimitSelect_Off();
+#end
             return _nss${tmpPropertyNameInitCap};
         }
   #end

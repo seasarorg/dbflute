@@ -898,7 +898,9 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     protected void doSetupSelect(SsCall callback) {
         String foreignPropertyName = callback.qf().getForeignPropertyName();
         assertSetupSelectBeforeUnion(foreignPropertyName);
+#if ($database.isMakeRecentlyDeprecated())
         limitSelect_Off();
+#end
         String foreignTableAliasName = callback.qf().getRealAliasName();
         String localRelationPath = localCQ().getRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath);

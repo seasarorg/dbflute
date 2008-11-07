@@ -174,6 +174,7 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsLimitSelect_PKOnly() {
             return _isLimitSelectPKOnly;
         }
+#if ($database.isMakeRecentlyDeprecated())
 
         public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
             _isLimitSelectPKOnly = true;
@@ -184,6 +185,7 @@ namespace ${glPackageBaseCommonCBean} {
             _isLimitSelectPKOnly = false;
             return this;
         }
+#end
 
         // ===============================================================================
         //                                                                    Lock Setting
