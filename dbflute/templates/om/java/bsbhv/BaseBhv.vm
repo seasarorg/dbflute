@@ -115,6 +115,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${glDaoWritableInterfaceName} getDaoWritable() { return getMyDao(); }
 #end
 #end
+
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
