@@ -69,15 +69,20 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** Does it output the insert SQLs as logging? */
     protected boolean _loggingInsertSql;
+
+    /** The name of schema. (Nullable) */
     protected String _schemaName;
+
+    /** The pattern of skip sheet. (Nullable) */
     protected Pattern _skipSheetPattern;
 
     /** The cache map of meta info. The key is table name. */
     protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
 
-    /** The handler of columns for getting column meta information. */
-    protected DfColumnHandler _columnHandler = new DfColumnHandler();// as helper.
+    /** The handler of columns for getting column meta information(as helper). */
+    protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
     // ===================================================================================
     //                                                                                Read
@@ -121,8 +126,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
                         tableName);
 
+                // Extension Point as Before.
                 beforeHandlingTable(dataSource, dataTable);
-                
+
                 // Set up columnNameList.
                 final List<String> columnNameList = new ArrayList<String>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
@@ -131,14 +137,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     columnNameList.add(columnName);
                 }
 
-                PreparedStatement statement = null;
+                PreparedStatement ps = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
                         final DataRow dataRow = dataTable.getRow(j);
-                        if (statement == null) {
+                        if (ps == null) {
                             final MyCreatedState myCreatedState = new MyCreatedState();
                             final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
-                            statement = dataSource.getConnection().prepareStatement(preparedSql);
+                            ps = dataSource.getConnection().prepareStatement(preparedSql);
                         }
 
                         // ColumnValue and ColumnObject
@@ -157,19 +163,26 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         final Set<String> columnNameSet = columnValueMap.keySet();
                         for (String columnName : columnNameSet) {
                             final Object obj = columnValueMap.get(columnName);
-                            if (processNotNullNotString(columnName, obj, statement, bindCount)) {
+
+                            // If the value is not null and the value has the own type except string,
+                            // It registers the value to statement by the type.
+                            if (processNotNullNotString(columnName, obj, ps, bindCount)) {
                                 bindCount++;
                                 continue;
                             }
-                            String value = (String) obj;
 
                             // - - - - - - - - - - - - - - 
                             // Against Null Headache
                             // - - - - - - - - - - - - - -
-                            if (processNull(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                            if (processNull(columnName, obj, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
+
+                            // * * * * * * * * * * * * * * * *
+                            //       Here String Only
+                            // * * * * * * * * * * * * * * * *
+                            String value = (String) obj;
 
                             // - - - - - - - - - - - - - - - - - - -
                             // Remove double quotation if it exists.
@@ -182,7 +195,15 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (processTimestamp(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                            if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Boolean Headache
+                            // - - - - - - - - - - - - - -
+                            if (processBoolean(columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
@@ -190,42 +211,43 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
-                            if (processNumber(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                            if (processNumber(columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
 
-                            statement.setObject(bindCount, value);
+                            ps.setObject(bindCount, value);
                             bindCount++;
                         }
-                        statement.addBatch();
+                        ps.addBatch();
                     }
-                    if (statement == null) {
+                    if (ps == null) {
                         String msg = "The statement should not be null:";
                         msg = msg + " currentTable=" + dataTable.getTableName();
                         msg = msg + " rowSize=" + dataTable.getRowSize();
                         throw new IllegalStateException(msg);
                     }
-                    statement.executeBatch();
+                    ps.executeBatch();
                 } catch (SQLException e) {
-                    final SQLException nextException = e.getNextException();
-                    if (nextException != null) {
+                    final SQLException nextEx = e.getNextException();
+                    if (nextEx != null) {
                         _log.warn("");
                         _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                        _log.warn("SQLException was thrown! getNextException()=" + nextException.getClass(),
-                                nextException);
+                        _log.warn("SQLException was thrown! getNextException()=" + nextEx.getClass(), nextEx);
                         _log.warn("* * * * * * * * * */");
                         _log.warn("");
                     }
-                    throw new RuntimeException(e);
+                    String msg = "Failed to register the table data: " + tableName;
+                    throw new TableDataRegistrationFailureException(msg, e);
                 } finally {
-                    if (statement != null) {
+                    if (ps != null) {
                         try {
-                            statement.close();
+                            ps.close();
                         } catch (SQLException ignored) {
                             _log.info("statement.close() threw the exception!", ignored);
                         }
                     }
+                    // Extension Point as Finally.
                     finallyHandlingTable(dataSource, dataTable);
                 }
             }
@@ -234,13 +256,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     protected void beforeHandlingTable(DataSource dataSource, DataTable dataTable) {
     }
-    
+
     protected void finallyHandlingTable(DataSource dataSource, DataTable dataTable) {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                    Column Meta Info
+    //                                                                    ================
     protected DfFlexibleMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
@@ -260,6 +282,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
     }
 
+    // ===================================================================================
+    //                                                                    Process per Type
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                     NotNull NotString
+    //                                     -----------------
     protected boolean processNotNullNotString(String columnName, Object obj, PreparedStatement statement, int bindCount)
             throws SQLException {
         if (!isNotNullNotString(obj)) {
@@ -269,6 +297,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             statement.setTimestamp(bindCount, (Timestamp) obj);
         } else if (obj instanceof BigDecimal) {
             statement.setBigDecimal(bindCount, (BigDecimal) obj);
+        } else if (obj instanceof Boolean) {
+            statement.setBoolean(bindCount, (Boolean) obj);
         } else {
             statement.setObject(bindCount, obj);
         }
@@ -279,7 +309,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return obj != null && !(obj instanceof String);
     }
 
-    protected boolean processNull(String columnName, String value, PreparedStatement statement, int bindCount,
+    // -----------------------------------------------------
+    //                                            Null Value
+    //                                            ----------
+    protected boolean processNull(String columnName, Object value, PreparedStatement statement, int bindCount,
             DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value != null) {
             return false;
@@ -309,76 +342,28 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return true;
     }
 
-    protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,
+    // -----------------------------------------------------
+    //                                             Timestamp
+    //                                             ---------
+    protected boolean processTimestamp(String columnName, String value, PreparedStatement ps, int bindCount,
             DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-            final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+            final Class<?> columnType = getColumnType(columnMetaInfo);
             if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
                 return false;
             }
         }
+        value = filterTimestampValue(value);
         if (!isTimestampValue(value)) {
             return false;
         }
-        final Timestamp timestampValue = getTimestampValue(value);
-        statement.setTimestamp(bindCount, timestampValue);
+        final Timestamp timestampValue = getTimestampValue(columnName, value);
+        ps.setTimestamp(bindCount, timestampValue);
         return true;
-    }
-
-    protected boolean processNumber(String columnName, String value, PreparedStatement statement, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
-        if (value == null) {
-            return false;
-        }
-        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo != null) {
-            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-            final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-            if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
-                return false;
-            }
-        }
-        if (!isBigDecimalValue(value)) {
-            return false;
-        }
-        final BigDecimal bigDecimalValue = getBigDecimalValue(value);
-        try {
-            final long longValue = bigDecimalValue.longValueExact();
-            statement.setLong(bindCount, longValue);
-            return true;
-        } catch (ArithmeticException e) {
-            statement.setBigDecimal(bindCount, bigDecimalValue);
-            return true;
-        }
-    }
-
-    protected boolean isTimestampValue(String value) {
-        if (value == null) {
-            return false;
-        }
-        value = filterTimestampValue(value);
-        try {
-            Timestamp.valueOf(value);
-            return true;
-        } catch (RuntimeException e) {
-        }
-        return false;
-    }
-
-    protected Timestamp getTimestampValue(String value) {
-        final String filteredTimestampValue = filterTimestampValue(value);
-        try {
-            return Timestamp.valueOf(filteredTimestampValue);
-        } catch (RuntimeException e) {
-            String msg = "The value cannot be convert to timestamp:";
-            msg = msg + " value=" + value + " filtered=" + filteredTimestampValue;
-            throw new IllegalStateException(msg, e);
-        }
     }
 
     protected String filterTimestampValue(String value) {
@@ -394,6 +379,120 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return value;
     }
 
+    protected boolean isTimestampValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        try {
+            Timestamp.valueOf(value);
+            return true;
+        } catch (RuntimeException e) {
+        }
+        return false;
+    }
+
+    protected Timestamp getTimestampValue(String columnName, String value) {
+        try {
+            return Timestamp.valueOf(value);
+        } catch (RuntimeException e) {
+            String msg = "The value cannot be convert to timestamp:";
+            msg = msg + " columnName=" + columnName + " value=" + value;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Boolean
+    //                                               -------
+    protected boolean processBoolean(String columnName, String value, PreparedStatement ps, int bindCount,
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            final Class<?> columnType = getColumnType(columnMetaInfo);
+            if (columnType != null && !Boolean.class.isAssignableFrom(columnType)) {
+                return false;
+            }
+        }
+        value = filterBooleanValue(value);
+        if (!isBooleanValue(value)) {
+            return false;
+        }
+        final Boolean booleanValue = getBooleanValue(value);
+        ps.setBoolean(bindCount, booleanValue);
+        return true;
+    }
+
+    protected String filterBooleanValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        if ("t".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
+            return "true";
+        } else if ("f".equalsIgnoreCase(value) || "0".equalsIgnoreCase(value)) {
+            return "false";
+        } else {
+            return value.toLowerCase();
+        }
+    }
+
+    protected boolean isBooleanValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
+    }
+
+    protected Boolean getBooleanValue(String value) {
+        try {
+            return new Boolean(value);
+        } catch (RuntimeException e) {
+            String msg = "The value should be boolean: value=" + value;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                Number
+    //                                                ------
+    protected boolean processNumber(String columnName, String value, PreparedStatement ps, int bindCount,
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            final Class<?> columnType = getColumnType(columnMetaInfo);
+            if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
+                return false;
+            }
+        }
+        value = filterBigDecimalValue(value);
+        if (!isBigDecimalValue(value)) {
+            return false;
+        }
+        final BigDecimal bigDecimalValue = getBigDecimalValue(columnName, value);
+        try {
+            final long longValue = bigDecimalValue.longValueExact();
+            ps.setLong(bindCount, longValue);
+            return true;
+        } catch (ArithmeticException e) {
+            ps.setBigDecimal(bindCount, bigDecimalValue);
+            return true;
+        }
+    }
+
+    protected String filterBigDecimalValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value;
+    }
+
     protected boolean isBigDecimalValue(String value) {
         if (value == null) {
             return false;
@@ -406,14 +505,29 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return false;
     }
 
-    protected BigDecimal getBigDecimalValue(String value) {
+    protected BigDecimal getBigDecimalValue(String columnName, String value) {
         try {
             return new BigDecimal(value);
         } catch (RuntimeException e) {
-            throw e;
+            String msg = "The value should be big decimal: ";
+            msg = msg + " columnName=" + columnName + " value=" + value;
+            throw new IllegalStateException(msg, e);
         }
     }
 
+    /**
+     * @param columnMetaInfo The meta information of column. (NotNull)
+     * @return The type of column. (Nullable: However Basically NotNull)
+     */
+    protected Class<?> getColumnType(DfColumnMetaInfo columnMetaInfo) {
+        final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
+        final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
+        return columnType;
+    }
+
+    // ===================================================================================
+    //                                                                        Xls Handling
+    //                                                                        ============
     protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
         final DfFlexibleMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
         final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
@@ -465,6 +579,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
     }
 
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
     protected void setupDefaultValue(String dataDirectoryName, final DataSet dataSet, final DataSource dataSource) {
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectoryName);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
@@ -541,6 +658,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return container;
     }
 
+    // ===================================================================================
+    //                                                                        Helper Class
+    //                                                                        ============
     protected static class ColumnContainer {
         protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
         protected Map<String, DataColumn> columnObjectMap = new LinkedHashMap<String, DataColumn>();
@@ -579,6 +699,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
         public TableNotFoundException(String msg) {
             super(msg);
+        }
+    }
+
+    protected static class TableDataRegistrationFailureException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public TableDataRegistrationFailureException(String msg, SQLException e) {
+            super(msg, e);
         }
     }
 

@@ -97,7 +97,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             processDataXlsTemplate();
         }
 
-        refreshResources();
+        // It doesn't refresh because it's heavy.
+        // After all the generate task will do it at once after doc task.
+        // refreshResources();
     }
 
     protected void processSchemaHtml() {

@@ -96,7 +96,7 @@ public class DfXlsWriter implements DataSetConstants {
             workbook.setSheetName(i, table.getTableName());
             final HSSFRow headerRow = sheet.createRow(0);
             for (int j = 0; j < table.getColumnSize(); ++j) {
-                final HSSFCell cell = headerRow.createCell((short) j);
+                final HSSFCell cell = headerRow.createCell(j);
                 cell.setCellValue(createRichTextString(table.getColumnName(j)));
             }
             for (int j = 0; j < table.getRowSize(); ++j) {
@@ -105,7 +105,7 @@ public class DfXlsWriter implements DataSetConstants {
                     final DataRow dataRow = table.getRow(j);
                     final Object value = dataRow.getValue(k);
                     if (value != null) {
-                        final HSSFCell cell = row.createCell((short) k);
+                        final HSSFCell cell = row.createCell(k);
                         setValue(cell, value);
                     }
                 }

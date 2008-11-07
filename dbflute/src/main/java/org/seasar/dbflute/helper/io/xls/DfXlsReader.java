@@ -167,7 +167,7 @@ public class DfXlsReader {
 
     protected void setupColumns(DataTable table, HSSFRow nameRow, HSSFRow valueRow) {
         for (int i = 0;; ++i) {
-            final HSSFCell nameCell = nameRow.getCell((short) i);
+            final HSSFCell nameCell = nameRow.getCell(i);
             if (nameCell == null) {
                 break;
             }
@@ -181,7 +181,7 @@ public class DfXlsReader {
             }
             HSSFCell valueCell = null;
             if (valueRow != null) {
-                valueCell = valueRow.getCell((short) i);
+                valueCell = valueRow.getCell(i);
             }
             if (valueCell != null) {
                 table.addColumn(columnName, getColumnType(valueCell));
@@ -207,7 +207,7 @@ public class DfXlsReader {
         Object value = null;
         try {
             for (int i = 0; i < table.getColumnSize(); ++i) {
-                cell = row.getCell((short) i);
+                cell = row.getCell(i);
                 value = getValue(cell, table);
                 final DataColumn column = table.getColumn(i);
                 final String columnName = column.getColumnName();
@@ -330,7 +330,7 @@ public class DfXlsReader {
             return false;
         }
         final List<String> notTrimTargetColumnList = _notTrimTableColumnMap.get(tableName);
-        final DataColumn column = table.getColumn(cell.getCellNum());
+        final DataColumn column = table.getColumn(cell.getColumnIndex());
         final String targetColumnName = column.getColumnName();
         for (String currentColumnName : notTrimTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {

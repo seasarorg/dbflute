@@ -2,7 +2,6 @@ package org.seasar.dbflute.jdk;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +24,6 @@ public class CalendarTest {
         cal.add(Calendar.DAY_OF_MONTH, 1);
         timestamp.setTime(cal.getTimeInMillis());
         
-        final Date date = new Date();
         _log.debug("timestamp: " + timestamp);
     }
 }
