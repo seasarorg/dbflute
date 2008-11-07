@@ -69,10 +69,19 @@ public class ${glOutsideSqlContextName} {
     //                                                                          ==========
     public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
         final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
-        final String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
+        final String resultKey;
+        if (resultTypeSpecification != null) {
+            if (resultTypeSpecification instanceof Class<?>) {
+                resultKey = ((Class<?>)resultTypeSpecification).getName();
+            } else {
+                resultKey = resultTypeSpecification.toString();
+            }
+        } else {
+            resultKey = "null";
+        }
         final String tableDbName = option.getTableDbName();
         final String generatedUniqueKey = option.generateUniqueKey();
-        return methodName + "():" + tableDbName + ":" + path + ":" + pmbKey + ":" + generatedUniqueKey + resultKey;
+        return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":" + resultKey;
     }
 
     // ===================================================================================
