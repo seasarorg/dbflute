@@ -14,10 +14,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected String _pagingRequestType = "non";
 
         protected bool _dynamicBinding;
-		
-		protected String _tableDbName;// The DB name of table. It is not related with the options of outside-SQL.
 
         protected ${glStatementConfig} _statementConfig;
+
+        protected String _sourcePagingRequestType = "non";
+
+        protected String _tableDbName;// The DB name of table. It is not related with the options of outside-SQL.
 
         // ===============================================================================
         //                                                                     Easy-to-Use
@@ -46,10 +48,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                            ====
         public ${glOutsideSqlOptionName} CopyOptionWithoutPaging() {
             ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+            copyOption.setPagingSourceRequestType(_pagingRequestType);
             if (IsDynamicBinding) {
                 copyOption.DynamicBinding();
             }
-			copyOption.TableDbName = _tableDbName;
+            copyOption.TableDbName = _tableDbName;
             return copyOption;
         }
 
@@ -78,12 +81,20 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         public String TableDbName {
             get { return _tableDbName; }
-			set { _tableDbName = value; }
+            set { _tableDbName = value; }
         }
 
         public ${glStatementConfig} StatementConfig {
             get { return _statementConfig; }
-			set { _statementConfig = value; }
+            set { _statementConfig = value; }
         }
+
+        protected void setPagingSourceRequestType(String sourcePagingRequestType) { // Very Internal
+            _sourcePagingRequestType = sourcePagingRequestType;
+        }
+
+        public bool IsSourcePagingRequestTypeAuto { get { // Very Internal
+            return "auto".Equals(_sourcePagingRequestType);
+        }}
     }
 }

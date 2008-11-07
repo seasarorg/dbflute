@@ -14,19 +14,22 @@ public class ${glOutsideSqlOptionName} {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
+    /** The request type of paging. */
     protected String _pagingRequestType = "non";
 
     protected boolean _dynamicBinding;
 
-	/** The configuration of statement. (Nullable) */
-	protected ${glStatementConfig} _statementConfig;
-	
+    /** The configuration of statement. (Nullable) */
+    protected ${glStatementConfig} _statementConfig;
+    
+    protected String _sourcePagingRequestType = "non";
+
     // -----------------------------------------------------
     //                                           Information
     //                                           -----------
-	/** The DB name of table. It is not related with the options of outside-SQL. */
+    /** The DB name of table. It is not related with the options of outside-SQL. */
     protected String _tableDbName;
-	
+
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
@@ -54,10 +57,11 @@ public class ${glOutsideSqlOptionName} {
     //                                                                                ====
     public ${glOutsideSqlOptionName} copyOptionWithoutPaging() {
         final ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+        copyOption.setPagingSourceRequestType(_pagingRequestType);
         if (isDynamicBinding()) {
             copyOption.dynamicBinding();
         }
-		copyOption.setTableDbName(_tableDbName);
+        copyOption.setTableDbName(_tableDbName);
         return copyOption;
     }
 
@@ -86,7 +90,7 @@ public class ${glOutsideSqlOptionName} {
     public boolean isDynamicBinding() {
         return _dynamicBinding;
     }
-	
+
     public ${glStatementConfig} getStatementConfig() {
         return _statementConfig;
     }
@@ -94,7 +98,15 @@ public class ${glOutsideSqlOptionName} {
     public void setStatementConfig(${glStatementConfig} statementConfig) {
         _statementConfig = statementConfig;
     }
-	
+
+    protected void setPagingSourceRequestType(String sourcePagingRequestType) { // Very Internal
+        _sourcePagingRequestType = sourcePagingRequestType;
+    }
+
+    public boolean isSourcePagingRequestTypeAuto() { // Very Internal
+        return "auto".equals(_sourcePagingRequestType);
+    }
+
     // -----------------------------------------------------
     //                                           Information
     //                                           -----------

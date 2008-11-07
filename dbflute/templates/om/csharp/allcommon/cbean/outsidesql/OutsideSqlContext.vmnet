@@ -88,17 +88,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                       Attribute
         //                                                                       =========
         // -------------------------------------------------
-        //                              Common of OutsideSql
-        //                              --------------------
-        protected bool _dynamicBinding;
-
-        protected bool _offsetByCursorForcedly;
-
-        protected bool _limitByCursorForcedly;
-
-        // -------------------------------------------------
-        //                              Specified OutsideSql
-        //                              --------------------
+        //                                             Basic
+        //                                             -----
         /// <summary>The path of outside-sql. (The mark of Specified-OutsideSql)</summary>
         protected String _outsideSqlPath;
 
@@ -111,6 +102,17 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected ${glStatementConfig} _statementConfig;
 
         protected String _tableDbName;
+
+        // -------------------------------------------------
+        //                                            Option
+        //                                            ------
+        protected bool _dynamicBinding;
+
+        protected bool _offsetByCursorForcedly;
+
+        protected bool _limitByCursorForcedly;
+
+        protected bool _autoPagingLogging;
 
         // ===============================================================================
         //                                                                        Read SQL
@@ -357,26 +359,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                        Accessor
         //                                                                        ========
         // -------------------------------------------------
-        //                              Common of OutsideSql
-        //                              --------------------
-        public bool IsDynamicBinding {
-            get { return _dynamicBinding; }
-            set { this._dynamicBinding = value; }
-        }
-
-        public bool IsOffsetByCursorForcedly {
-            get { return _offsetByCursorForcedly; }
-            set { this._offsetByCursorForcedly = value; }
-        }
-        
-        public bool IsLimitByCursorForcedly {
-            get { return _limitByCursorForcedly; }
-            set { this._limitByCursorForcedly = value; }
-        }
-
-        // -------------------------------------------------
-        //                              Specified OutsideSql
-        //                              --------------------
+        //                                             Basic
+        //                                             -----
         public String OutsideSqlPath {
             get { return _outsideSqlPath; }
             set { this._outsideSqlPath = value; }
@@ -405,6 +389,29 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public String TableDbName {
             get { return _tableDbName; }
             set { this._tableDbName = value; }
+        }
+
+        // -------------------------------------------------
+        //                                            Option
+        //                                            ------
+        public bool IsDynamicBinding {
+            get { return _dynamicBinding; }
+            set { this._dynamicBinding = value; }
+        }
+
+        public bool IsOffsetByCursorForcedly {
+            get { return _offsetByCursorForcedly; }
+            set { this._offsetByCursorForcedly = value; }
+        }
+        
+        public bool IsLimitByCursorForcedly {
+            get { return _limitByCursorForcedly; }
+            set { this._limitByCursorForcedly = value; }
+        }
+
+        public bool IsAutoPagingLogging { // for logging
+            get { return _autoPagingLogging; }
+            set { this._autoPagingLogging = value; }
         }
     }
 }

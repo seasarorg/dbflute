@@ -50,16 +50,18 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOptionName} option = _outsideSqlOption;
         final Object resultTypeSpecification = getResultTypeSpecification();
+        final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
 

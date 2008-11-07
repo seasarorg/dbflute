@@ -254,7 +254,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                         if (originalName.Contains("OutsideSqlEntityExecutor")) { // CSharp Only Contains
                             invokeClassName = invokeClassName + ".EntityHandling()";
                         } else if (originalName.Contains("OutsideSqlPagingExecutor")) { // CSharp Only Contains
-                            if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
+                            if (outsideSqlContext.IsAutoPagingLogging) {
                                 invokeClassName = invokeClassName + ".AutoPaging()";
                             } else {
                                 invokeClassName = invokeClassName + ".ManualPaging()";
@@ -673,16 +673,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             Object pmb = GetOutsideSqlParameterBean(args);
             ${glOutsideSqlOptionName} option = GetOutsideSqlOption(args);
             Object resultTypeSpecification = args[3];
+            bool autoPagingLogging = (option.IsAutoPaging || option.IsSourcePagingRequestTypeAuto);
             ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-            outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
-            outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
-            outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
             outsideSqlContext.MethodName = invocation.Method.Name;
 			outsideSqlContext.StatementConfig = option.StatementConfig;
 			outsideSqlContext.TableDbName = option.TableDbName;
+            outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
+            outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.IsAutoPagingLogging = autoPagingLogging; // for logging
 			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
             ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
 

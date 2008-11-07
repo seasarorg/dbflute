@@ -264,9 +264,8 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         log("                                                      " + callerExpression);
         log("                                                      " + equalBorder + "=/");
 
-        // logPath(behaviorCommand, stackTrace, behaviorResult);
+        logPath(behaviorCommand, stackTrace, behaviorResult);
 
-        // Specified OutsideSql
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
             final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
             if (outsideSqlContext != null) {
@@ -315,7 +314,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                     if (originalName.endsWith("OutsideSqlEntityExecutor")) {
                         invokeClassName = invokeClassName + ".entityHandling()";
                     } else if (originalName.endsWith("OutsideSqlPagingExecutor")) {
-                        if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+                        if (outsideSqlContext.isAutoPagingLogging()) {
                             invokeClassName = invokeClassName + ".autoPaging()";
                         } else {
                             invokeClassName = invokeClassName + ".manualPaging()";
