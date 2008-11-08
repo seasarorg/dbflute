@@ -11,7 +11,6 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-import org.seasar.framework.util.CaseInsensitiveMap;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
@@ -19,6 +18,7 @@ import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
+import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureParameterType};
 
@@ -199,7 +199,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
 
         @SuppressWarnings("unchecked")
         protected Map<String, Object> createRow(ResultSet rs, PropertyType[] propertyTypes) throws SQLException {
-            Map<String, Object> row = new CaseInsensitiveMap();
+            Map<String, Object> row = ${glStringKeyMap}.createAsFlexibleKey();
             for (int i = 0; i < propertyTypes.length; ++i) {
                 Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
                 row.put(propertyTypes[i].getPropertyName(), value);

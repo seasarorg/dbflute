@@ -1,0 +1,161 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelper};
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glStringSet} implements Set<String> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected HashSet<String> _internalSet = new HashSet<String>();
+
+    protected boolean _removeUnderscore;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected ${glStringSet}(boolean removeUnderscore) {
+        _removeUnderscore = removeUnderscore;
+    }
+
+    public static ${glStringSet} createAsFlexible() {
+        return new ${glStringSet}(true);
+    }
+
+    public static ${glStringSet} createAsCaseInsensitive() {
+        return new ${glStringSet}(false);
+    }
+
+    // ===================================================================================
+    //                                                                        Map Emulator
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                           Key Related
+    //                                           -----------
+    public boolean add(String value) {
+        return _internalSet.add(convertStringKey(value));
+    }
+
+    public boolean remove(Object value) {
+        return _internalSet.remove(value);
+    }
+
+    public boolean contains(Object value) {
+        return _internalSet.contains(convertStringKey(value));
+    }
+
+    // -----------------------------------------------------
+    //                                              Delegate
+    //                                              --------
+    public void clear() {
+        _internalSet.clear();
+    }
+
+    public int size() {
+        return _internalSet.size();
+    }
+
+    public boolean isEmpty() {
+        return _internalSet.isEmpty();
+    }
+
+    public boolean addAll(Collection<? extends String> c) {
+        return _internalSet.addAll(c);
+    }
+
+    public boolean containsAll(Collection<?> c) {
+        return _internalSet.containsAll(c);
+    }
+
+    public Iterator<String> iterator() {
+        return _internalSet.iterator();
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        return _internalSet.removeAll(c);
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        return _internalSet.retainAll(c);
+    }
+
+    public Object[] toArray() {
+        return _internalSet.toArray();
+    }
+
+    public <T> T[] toArray(T[] a) {
+        return _internalSet.toArray(a);
+    }
+
+    // ===================================================================================
+    //                                                                       Key Converter
+    //                                                                       =============
+    protected String convertStringKey(Object key) {
+        if (!(key instanceof String)) {
+            return null;
+        }
+        return toLowerCaseKey(removeUnderscore((String) key));
+    }
+
+    protected String removeUnderscore(String key) {
+        if (_removeUnderscore) {
+            return replace(key, "_", "");
+        }
+        return key;
+    }
+
+    protected String toLowerCaseKey(String key) {
+        return key.toLowerCase();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected static String replace(String text, String fromText, String toText) {
+        if (text == null || fromText == null || toText == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(100);
+        int pos = 0;
+        int pos2 = 0;
+        while (true) {
+            pos = text.indexOf(fromText, pos2);
+            if (pos == 0) {
+                sb.append(toText);
+                pos2 = fromText.length();
+            } else if (pos > 0) {
+                sb.append(text.substring(pos2, pos));
+                sb.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                sb.append(text.substring(pos2));
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public boolean equals(Object obj) {
+        return _internalSet.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return _internalSet.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return _internalSet.toString();
+    }
+}
