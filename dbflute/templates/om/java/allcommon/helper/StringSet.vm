@@ -39,15 +39,27 @@ public class ${glStringSet} implements Set<String> {
     //                                           Key Related
     //                                           -----------
     public boolean add(String value) {
-        return _internalSet.add(convertStringKey(value));
+        final String stringValue = convertStringValue(value);
+        if (stringValue != null) {
+            return _internalSet.add(stringValue);
+        }
+        return false;
     }
 
     public boolean remove(Object value) {
-        return _internalSet.remove(value);
+        final String stringValue = convertStringValue(value);
+        if (stringValue != null) {
+            return _internalSet.remove(stringValue);
+        }
+        return false;
     }
 
     public boolean contains(Object value) {
-        return _internalSet.contains(convertStringKey(value));
+        final String stringValue = convertStringValue(value);
+        if (stringValue != null) {
+            return _internalSet.contains(stringValue);
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -96,22 +108,22 @@ public class ${glStringSet} implements Set<String> {
     // ===================================================================================
     //                                                                       Key Converter
     //                                                                       =============
-    protected String convertStringKey(Object key) {
-        if (!(key instanceof String)) {
+    protected String convertStringValue(Object value) {
+        if (!(value instanceof String)) {
             return null;
         }
-        return toLowerCaseKey(removeUnderscore((String) key));
+        return toLowerCase(removeUnderscore((String) value));
     }
 
-    protected String removeUnderscore(String key) {
+    protected String removeUnderscore(String value) {
         if (_removeUnderscore) {
-            return replace(key, "_", "");
+            return replace(value, "_", "");
         }
-        return key;
+        return value;
     }
 
-    protected String toLowerCaseKey(String key) {
-        return key.toLowerCase();
+    protected String toLowerCase(String value) {
+        return value.toLowerCase();
     }
 
     // ===================================================================================

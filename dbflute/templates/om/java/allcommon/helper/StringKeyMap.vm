@@ -55,20 +55,19 @@ public class ${glStringKeyMap}<VALUE> implements Map<String, VALUE> {
         return null;
     }
 
+    public VALUE remove(Object key) {
+        final String stringKey = convertStringKey(key);
+        if (stringKey != null) {
+            return _internalMap.remove(stringKey);
+        }
+        return null;
+    }
+
     public final void putAll(Map<? extends String, ? extends VALUE> map) {
         final Set<? extends String> keySet = map.keySet();
         for (String key : keySet) {
             put(key, map.get(key));
         }
-    }
-
-    public VALUE remove(Object key) {
-        final String stringKey = convertStringKey(key);
-        if (stringKey != null) {
-            key = stringKey;
-            return _internalMap.remove(key);
-        }
-        return null;
     }
 
     public boolean containsKey(Object key) {
@@ -113,18 +112,18 @@ public class ${glStringKeyMap}<VALUE> implements Map<String, VALUE> {
         if (!(key instanceof String)) {
             return null;
         }
-        return toLowerCaseKey(removeUnderscore((String) key));
+        return toLowerCase(removeUnderscore((String) key));
     }
 
-    protected String removeUnderscore(String key) {
+    protected String removeUnderscore(String value) {
         if (_removeUnderscore) {
-            return replace(key, "_", "");
+            return replace(value, "_", "");
         }
-        return key;
+        return value;
     }
 
-    protected String toLowerCaseKey(String key) {
-        return key.toLowerCase();
+    protected String toLowerCase(String value) {
+        return value.toLowerCase();
     }
 
     // ===================================================================================

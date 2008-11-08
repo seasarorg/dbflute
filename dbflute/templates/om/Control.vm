@@ -1543,9 +1543,9 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glStringKeyMap}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/helper/StringKeyMap.${glTemplateFileExtension}",$path,"", "")
 
-      $database.info("    parse('${glStringSet}');")
+      $database.info("    parse('StringSet');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glStringSet}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/helper/${glStringSet}.${glTemplateFileExtension}",$path,"", "")
+      $generator.parse("om/${glResourceDirectory}/allcommon/helper/StringSet.${glTemplateFileExtension}",$path,"", "")
     #end
 
     #if ($database.isTargetLanguageJava())
