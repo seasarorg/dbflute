@@ -79,7 +79,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Integer toInteger(String s) {
+    protected static Integer toInteger(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -109,7 +109,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static int toPrimitiveInt(String s) {
+    protected static int toPrimitiveInt(String s) {
         if (s == null || s.trim().length() == 0) {
             return 0;
         }
@@ -170,7 +170,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Double toDouble(String s) {
+    protected static Double toDouble(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -205,7 +205,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Long toLong(String s) {
+    protected static Long toLong(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -235,7 +235,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static long toPrimitiveLong(String s) {
+    protected static long toPrimitiveLong(String s) {
         if (s == null || s.trim().length() == 0) {
             return 0;
         }
@@ -268,7 +268,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Float toFloat(String s) {
+    protected static Float toFloat(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -303,7 +303,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Short toShort(String s) {
+    protected static Short toShort(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -359,7 +359,7 @@ public class ${glSimpleTypeUtil} {
         }
     }
 
-    private static Byte toByte(String s) {
+    protected static Byte toByte(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
@@ -586,7 +586,7 @@ public class ${glSimpleTypeUtil} {
     // -----------------------------------------------------
     //                                  DecimalFormatSymbols
     //                                  --------------------
-    private static Map<Locale, DecimalFormatSymbols> symbolsCache = new ConcurrentHashMap<Locale, DecimalFormatSymbols>();
+    protected static Map<Locale, DecimalFormatSymbols> symbolsCache = new ConcurrentHashMap<Locale, DecimalFormatSymbols>();
     protected static DecimalFormatSymbols getDecimalFormatSymbols() {
         return getDecimalFormatSymbols(Locale.getDefault());
     }
