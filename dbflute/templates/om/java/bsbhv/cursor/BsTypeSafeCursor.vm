@@ -1,6 +1,10 @@
 ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 #set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
+import java.sql.SQLException;
+
+import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
+
 /**
  * The cursor of ${table.name}.
  * @author ${database.ClassAuthor}
@@ -60,7 +64,7 @@ public class ${myClassName} {
      * @return Is exist next result.
      * @throws java.sql.SQLException
      */
-    public boolean next() throws java.sql.SQLException {
+    public boolean next() throws SQLException {
         return _rs.next();
     }
 
@@ -73,7 +77,7 @@ public class ${myClassName} {
      * @return The value of ${col.uncapitalisedJavaName}. (Nullable)
      * @throws java.sql.SQLException
      */
-    public ${col.javaNative} get${col.javaName}() throws java.sql.SQLException {
+    public ${col.javaNative} get${col.javaName}() throws SQLException {
 #if ($col.isJavaNativeStringObject())
         return extractValueAsString("${col.name}");
 #end
@@ -96,19 +100,19 @@ public class ${myClassName} {
     //                                                                              Helper
     //                                                                              ======
 
-    protected String extractValueAsString(String name) throws java.sql.SQLException {
+    protected String extractValueAsString(String name) throws SQLException {
         return _rs.getString(name);
     }
 
-    protected Boolean extractValueAsBoolean(String name) throws java.sql.SQLException {
+    protected Boolean extractValueAsBoolean(String name) throws SQLException {
         return _rs.getBoolean(name);
     }
 
-    protected Object extractValueAsNumber(Class type, String name) throws java.sql.SQLException {
-        return org.seasar.framework.util.NumberConversionUtil.convertNumber(type, extractValueAsObject(name));
+    protected Object extractValueAsNumber(Class type, String name) throws SQLException {
+        return ${glSimpleTypeUtil}.toNumber(type, extractValueAsObject(name));
     }
 
-    protected Object extractValueAsDate(Class type, String name) throws java.sql.SQLException {
+    protected Object extractValueAsDate(Class type, String name) throws SQLException {
         if (type.isAssignableFrom(java.sql.Timestamp.class)) {
             return _rs.getTimestamp(name);
         } else if (type.isAssignableFrom(java.sql.Date.class)) {
@@ -121,10 +125,10 @@ public class ${myClassName} {
     }
 
     protected java.util.Date toDate(Object object) {
-        return org.seasar.framework.util.DateConversionUtil.toDate(object);
+        return ${glSimpleTypeUtil}.toDate(object);
     }
 
-    protected Object extractValueAsObject(String name) throws java.sql.SQLException {
+    protected Object extractValueAsObject(String name) throws SQLException {
         return _rs.getObject(name);
     }
 }

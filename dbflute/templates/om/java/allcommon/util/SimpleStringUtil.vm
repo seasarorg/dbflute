@@ -1,13 +1,19 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonUtil};
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 /**
  * @author ${database.ClassAuthor}
  */
 public class ${glSimpleStringUtil} {
 
+    protected static final String[] EMPTY_STRINGS = new String[0];
+
     // ===================================================================================
-    //                                                                              String
-    //                                                                              ======
+    //                                                                             Replace
+    //                                                                             =======
     public static String replace(String text, String fromText, String toText) {
         if(text == null || fromText == null || toText == null) {
             return null;
@@ -31,7 +37,25 @@ public class ${glSimpleStringUtil} {
             }
         } while(true);
     }
-	
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+    public static String[] split(final String str, final String delimiter) {
+        if (str == null || str.trim().length() == 0) {
+            return EMPTY_STRINGS;
+        }
+        final List<String> list = new ArrayList<String>();
+        final StringTokenizer st = new StringTokenizer(str, delimiter);
+        while (st.hasMoreElements()) {
+            list.add(st.nextToken());
+        }
+        return (String[]) list.toArray(new String[list.size()]);
+    }
+
+    // ===================================================================================
+    //                                                                     Initial Convert
+    //                                                                     ===============
     public static String initCap(String str) {
 	    assertObjectNotNull("str", str);
         return str.substring(0, 1).toUpperCase() + str.substring(1);
@@ -41,10 +65,10 @@ public class ${glSimpleStringUtil} {
 	    assertObjectNotNull("str", str);
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
-	
-    // -----------------------------------------------------
-    //                                         Assert Object
-    //                                         -------------
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     /**
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)

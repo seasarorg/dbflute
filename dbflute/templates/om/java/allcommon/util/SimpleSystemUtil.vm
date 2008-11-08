@@ -6,8 +6,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonUtil};
 public class ${glSimpleSystemUtil} {
 
     // ===================================================================================
-    //                                                                              System
-    //                                                                              ======
+    //                                                                      Line Separator
+    //                                                                      ==============
     public static String getLineSeparator() {
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Because 'CR + LF' caused many trouble!

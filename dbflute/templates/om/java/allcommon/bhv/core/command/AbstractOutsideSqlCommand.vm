@@ -19,13 +19,13 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    /** The path of outsideSql. (Required) */
+    /** The path of outside-SQL. (Required) */
     protected String _outsideSqlPath;
 
     /** The parameter-bean. (Required to set, but Nullable) */
     protected Object _parameterBean;
 
-    /** The option of outsideSql. (Required) */
+    /** The option of outside-SQL. (Required) */
     protected ${glOutsideSqlOptionName} _outsideSqlOption;
 
     /** The type of entity. (Required) */
@@ -57,7 +57,7 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
     //                                                                  Detail Information
     //                                                                  ==================
     public boolean isConditionBean() {
-        return false; // When the command is for outsideSql, it always be false.
+        return false; // When the command is for outside-SQL, it always be false.
     }
 
     public boolean isOutsideSql() {
@@ -65,7 +65,7 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
     }
 
     public boolean isSelectCount() {
-        return false; // When the command is for outsideSql, it always be false.
+        return false; // When the command is for outside-SQL, it always be false.
     }
 
     // ===================================================================================

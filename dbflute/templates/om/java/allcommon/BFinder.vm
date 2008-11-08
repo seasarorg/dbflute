@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
+import ${glPackageBaseCommonUtil}.${glSimpleResourceUtil};
 
 /**
  * The entry of DBFlute.
@@ -28,7 +29,7 @@ public class ${glBFinderName} {
             synchronized (${glBFinderName}.class) {
                 if (!org.seasar.framework.container.factory.SingletonS2ContainerFactory.hasContainer()) {
                     final String configFile = _dbfluteDiconName;
-                    if (org.seasar.framework.util.ResourceUtil.isExist(configFile)) {
+                    if (${glSimpleResourceUtil}.isExist(configFile)) {
                         org.seasar.framework.container.factory.SingletonS2ContainerFactory.setConfigPath(configFile);
                         org.seasar.framework.container.factory.SingletonS2ContainerFactory.init();
                     } else {

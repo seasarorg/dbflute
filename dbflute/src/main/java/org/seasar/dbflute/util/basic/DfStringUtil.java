@@ -31,24 +31,24 @@ public abstract class DfStringUtil {
         if (text == null || fromText == null || toText == null) {
             return null;
         }
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         int pos = 0;
         int pos2 = 0;
         while (true) {
             pos = text.indexOf(fromText, pos2);
             if (pos == 0) {
-                buf.append(toText);
+                sb.append(toText);
                 pos2 = fromText.length();
             } else if (pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
+                sb.append(text.substring(pos2, pos));
+                sb.append(toText);
                 pos2 = pos + fromText.length();
             } else {
-                buf.append(text.substring(pos2));
+                sb.append(text.substring(pos2));
                 break;
             }
         }
-        return buf.toString();
+        return sb.toString();
     }
 
     public static final boolean isEmpty(String text) {
@@ -135,7 +135,7 @@ public abstract class DfStringUtil {
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
-    
+
     public static String initCapAfterTrimming(String str) {
         if (str == null) {
             return null;
@@ -149,7 +149,7 @@ public abstract class DfStringUtil {
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
-    
+
     // ===================================================================================
     //                                                                         List String
     //                                                                         ===========

@@ -3,9 +3,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
 import java.util.HashMap;
 import javax.sql.DataSource;
 
-import org.seasar.framework.util.LongConversionUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.dao.Dbms;
+
+import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 
 /**
  * @author ${database.ClassAuthor}
@@ -74,7 +75,7 @@ public class ${glInternalIdentifierSequenceGenerator} extends ${glInternalIdenti
             if (allocated < allocationSize) {
                 return initialValue + allocated++;
             }
-            initialValue = LongConversionUtil.toPrimitiveLong(getNewInitialValue(ds));
+            initialValue = ${glSimpleTypeUtil}.toPrimitiveLong(getNewInitialValue(ds));
             allocated = 1;
             return initialValue;
         }

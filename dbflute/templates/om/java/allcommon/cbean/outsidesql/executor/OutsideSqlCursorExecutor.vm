@@ -8,7 +8,7 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
- * The cursor executor of outsideSql.
+ * The cursor executor of outside-SQL.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
@@ -20,7 +20,7 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
     /** The invoker of behavior command. (NotNull) */
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
-    /** The option of outsideSql. (NotNull) */
+    /** The option of outside-SQL. (NotNull) */
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
 
     /** The DB name of table. (NotNull) */
@@ -44,7 +44,7 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param handler The handler of cursor. (NotNull)
      * @return The result object that the cursor handler returns. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
     public Object selectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
         return invoke(createSelectCursorCommand(path, pmb, handler));

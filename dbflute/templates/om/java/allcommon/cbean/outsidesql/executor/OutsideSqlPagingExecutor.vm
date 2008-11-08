@@ -18,7 +18,7 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
- * The paging executor of outsideSql.
+ * The paging executor of outside-SQL.
  * @author ${database.ClassAuthor}
  */
 public class ${glOutsideSqlPagingExecutorName} {
@@ -29,7 +29,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     /** The invoker of behavior command. (NotNull) */
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
-    /** The option of outsideSql. (NotNull) */
+    /** The option of outside-SQL. (NotNull) */
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
 
     /** The DB name of table. (NotNull) */
@@ -77,7 +77,7 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception com.example.dbflute.basic.dbflute.allcommon.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @exception com.example.dbflute.basic.dbflute.allcommon.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
@@ -139,7 +139,7 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
     public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
                                                       , final ${glPagingBeanInterfaceName} pmb

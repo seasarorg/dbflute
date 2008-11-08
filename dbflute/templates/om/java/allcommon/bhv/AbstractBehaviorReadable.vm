@@ -239,10 +239,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                          OutsideSql
     //                                                                          ==========
     /**
-     * Get the basic executor of outsideSql. <br />
+     * Get the basic executor of outside-SQL. <br />
      * The invoker of behavior command should be not null when you call this method.
      * <pre>
-     * You can use the methods for outsideSql are as follows:
+     * You can use the methods for outside-SQL are as follows:
      * {Basic}
      *   o selectList()
      *   o execute()
@@ -264,7 +264,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * {Option -- Dynamic}
      *   o dynamicBinding().selectList()
      * </pre>
-     * @return The basic executor of outsideSql. (NotNull) 
+     * @return The basic executor of outside-SQL. (NotNull) 
      */
     public ${glOutsideSqlBasicExecutorName} outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");

@@ -6,14 +6,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonUtil};
 public class ${glSimpleAssertUtil} {
 
     // ===================================================================================
-    //                                                                              Assert
+    //                                                                              Object
     //                                                                              ======
-    // -----------------------------------------------------
-    //                                         Assert Object
-    //                                         -------------
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -29,12 +25,11 @@ public class ${glSimpleAssertUtil} {
         }
     }
 
-    // -----------------------------------------------------
-    //                                         Assert String
-    //                                         -------------
+    // ===================================================================================
+    //                                                                              String
+    //                                                                              ======
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */

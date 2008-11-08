@@ -81,6 +81,15 @@ targetdatabase = $targetDatabase
     ## [ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
+    ## [Allcommon-Util]
+    #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
+    #set ($glSimpleResourceUtil = "${glProjectPrefix}SimpleResourceUtil")
+    #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
+    #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
+    #set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
+    #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
+    #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
+
     ## [Package]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
@@ -91,6 +100,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
     #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
     #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
+    #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.util")
     #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
     #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
     #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
@@ -105,6 +115,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
       #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
       #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
+      #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
       #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
       #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
       #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")

@@ -15,7 +15,7 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmbName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
- * The executor of outsideSql. <br />
+ * The executor of outside-SQL. <br />
  * <pre>
  * {Basic}
  *   o selectList()
@@ -76,7 +76,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
     public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
@@ -91,7 +91,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @return The count of execution.
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outsideSql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
     public int execute(String path, Object pmb) {
         return invoke(createExecuteCommand(path, pmb));
@@ -156,7 +156,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * # executor.cursorHandling().selectCursor(path, pmb, handler);
      * #
      * </pre>
-     * @return The cursor executor of outsideSql. (NotNull)
+     * @return The cursor executor of outside-SQL. (NotNull)
      */
     public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
         return new ${glOutsideSqlCursorExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);
@@ -170,7 +170,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * # executor.entityHandling().selectEntityWithDeletedCheck(path, pmb, Xxx.class);
      * #
      * </pre>
-     * @return The cursor executor of outsideSql. (NotNull)
+     * @return The cursor executor of outside-SQL. (NotNull)
      */
     public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
         return new ${glOutsideSqlEntityExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);

@@ -437,8 +437,10 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Util]
     #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
+    #set ($glSimpleResourceUtil = "${glProjectPrefix}SimpleResourceUtil")
     #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
     #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
+    #set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
     #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
     #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
 
@@ -2322,11 +2324,21 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleAssertUtil}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleAssertUtil.${glTemplateFileExtension}",$path,"", "")
 
+    #if ($database.isTargetLanguageJava())
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleResourceUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleResourceUtil.${glTemplateFileExtension}",$path,"", "")
+    #end
+
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleStringUtil}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleStringUtil.${glTemplateFileExtension}",$path,"", "")
 
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleSystemUtil}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleSystemUtil.${glTemplateFileExtension}",$path,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleTypeUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleTypeUtil.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     #if ($database.isTargetLanguageJava())
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )

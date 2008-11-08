@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
-import org.seasar.framework.util.NumberConversionUtil;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
@@ -29,6 +28,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 
 /**
  * The invoker of behavior command.
@@ -655,11 +655,11 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     //                                                                      Convert Helper
     //                                                                      ==============
     protected Object convertPrimitiveWrapper(Class<?> retType, Object ret) {
-        return NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
+        return ${glSimpleTypeUtil}.toWrapper(retType, ret);
     }
 
     protected Object convertNumber(Class<?> retType, Object ret) {
-        return NumberConversionUtil.convertNumber(retType, ret);
+        return ${glSimpleTypeUtil}.toNumber(retType, ret);
     }
 
     // ===================================================================================

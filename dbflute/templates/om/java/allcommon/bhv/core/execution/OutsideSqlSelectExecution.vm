@@ -63,9 +63,9 @@ public class ${glOutsideSqlSelectExecution} extends ${glInternalAbstractDynamicC
     //                                    OutsideSql Execute
     //                                    ------------------
     /**
-     * Execute outsideSql as Dynamic.
+     * Execute outside-SQL as Dynamic.
      * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
-     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @param outsideSqlContext The context of outside-SQL. (NotNull)
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
@@ -108,9 +108,9 @@ public class ${glOutsideSqlSelectExecution} extends ${glInternalAbstractDynamicC
     }
 
     /**
-     * Execute outsideSql as static.
+     * Execute outside-SQL as static.
      * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
-     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @param outsideSqlContext The context of outside-SQL. (NotNull)
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {

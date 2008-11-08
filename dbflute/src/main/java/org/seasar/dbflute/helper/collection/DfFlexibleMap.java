@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.util.basic.DfStringUtil;
-
 /**
  * @author jflute
  */
@@ -65,7 +63,7 @@ public class DfFlexibleMap<KEY, VALUE> {
         final KEY key = getKey(i);
         return remove(key);
     }
-    
+
     // ===================================================================================
     //                                                                        Map Emulator
     //                                                                        ============
@@ -154,11 +152,38 @@ public class DfFlexibleMap<KEY, VALUE> {
     }
 
     protected String removeUnderscore(String key) {
-        return DfStringUtil.replace((String) key, "_", "");
+        return replace((String) key, "_", "");
     }
 
     protected String toLowerCaseKey(String key) {
         return ((String) key).toLowerCase();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected static String replace(String text, String fromText, String toText) {
+        if (text == null || fromText == null || toText == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(100);
+        int pos = 0;
+        int pos2 = 0;
+        while (true) {
+            pos = text.indexOf(fromText, pos2);
+            if (pos == 0) {
+                sb.append(toText);
+                pos2 = fromText.length();
+            } else if (pos > 0) {
+                sb.append(text.substring(pos2, pos));
+                sb.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                sb.append(text.substring(pos2));
+                break;
+            }
+        }
+        return sb.toString();
     }
 
     // ===================================================================================
