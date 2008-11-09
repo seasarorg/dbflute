@@ -19,22 +19,22 @@ import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 /**
  * The interface of DB meta.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public interface ${myClassName} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Map-string map-mark. */
+    /** Map-string map mark. */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
-    /** Map-string list-mark. */
+    /** Map-string list mark. */
     public static final String MAP_STRING_LIST_MARK = "list:";
 
-    /** Map-string start-brace. */
+    /** Map-string start brace. */
     public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
 
-    /** Map-string end-brace. */
+    /** Map-string end brace. */
     public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
 
     /** Map-string delimiter. */
@@ -47,20 +47,20 @@ public interface ${myClassName} {
     //                                                                          Table Info
     //                                                                          ==========
     /**
-     * Get table db-name.
-     * @return Table db-name. (NotNull)
+     * Get table DB name.
+     * @return Table DB name. (NotNull)
      */
     public String getTableDbName();
 
     /**
-     * Get table property-name(JavaBeansRule).
-     * @return Table property-name(JavaBeansRule). (NotNull)
+     * Get table property name(JavaBeansRule).
+     * @return Table property name(JavaBeansRule). (NotNull)
      */
     public String getTablePropertyName();
 
     /**
-     * Get table SQL-name.
-     * @return Table SQL-name. (NotNull)
+     * Get table SQL name.
+     * @return Table SQL name. (NotNull)
      */
     public String getTableSqlName();
 
@@ -75,18 +75,19 @@ public interface ${myClassName} {
     public boolean hasFlexibleName(String flexibleName);
 
     /**
-     * Find db name by flexible name. {Target objects are TABLE and COLUMN}
+     * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return Db name. (NotNull and NotEmpty)
+     * @return The DB name of anything. (NotNull and NotEmpty)
      */
     public String findDbName(String flexibleName);
 
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return Db name. (NotNull and NotEmpty)
+     * @return The DB name of anything. (NotNull and NotEmpty)
      */
     public String findPropertyName(String flexibleName);
+#if ($database.isMakeRecentlyDeprecated())
 
     // ===================================================================================
     //                                                                            Name Map
@@ -94,39 +95,42 @@ public interface ${myClassName} {
     /**
      * Get the key-to-lower map of DB name(lower) and property name.
      * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
+     * @deprecated Sorry! This method is unnecessary on DBFlute.
      */
     public Map<String, String> getDbNamePropertyNameKeyToLowerMap();
 
     /**
-     * Get the key-to-lower map of property name(lower) and db name.
-     * @return The key-to-lower map of property name(lower) and db name. (NotNull)
+     * Get the key-to-lower map of property name(lower) and DB name.
+     * @return The key-to-lower map of property name(lower) and DB name. (NotNull)
+     * @deprecated Sorry! This method is unnecessary on DBFlute.
      */
     public Map<String, String> getPropertyNameDbNameKeyToLowerMap();
+#end
 
     // ===================================================================================
     //                                                                           Type Name
     //                                                                           =========
     /**
-     * Get the type-name of entity.
-     * @return The type-name of entity. (NotNull)
+     * Get the type name of entity.
+     * @return The type name of entity. (NotNull)
      */ 
     public String getEntityTypeName();
 
     /**
-     * Get the type-name of condition-bean.
-     * @return The type-name of condition-bean. (Nullable: If the condition-bean does not exist)
+     * Get the type name of condition-bean.
+     * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
      */ 
     public String getConditionBeanTypeName();
 
     /**
-     * Get the type-name of dao.
-     * @return The type-name of dao. (Nullable: If the dao does not exist)
+     * Get the type name of DAO.
+     * @return The type name of DAO. (Nullable: If the DAO does not exist)
      */ 
     public String getDaoTypeName();
 
     /**
-     * Get the type-name of behavior.
-     * @return The type-name of behavior. (Nullable: If the behavior does not exist)
+     * Get the type name of behavior.
+     * @return The type name of behavior. (Nullable: If the behavior does not exist)
      */ 
     public String getBehaviorTypeName();
 
@@ -468,42 +472,42 @@ public interface ${myClassName} {
      * @return Map string builder that is prepared. (NotNull)
      */
     public ${glMapStringBuilderName} createMapStringBuilder();
-	
-	// ===================================================================================
+    
+    // ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
-	// It's very INTERNAL!
-	/**
-	 * Has the setupper of entity property by the name of property? <br />
-	 * Comparing is so flexible. {Ignore cases and underscore}
-	 * @param propertyName The name of the property. (NotNull)
-	 * @return Determination.
-	 */
-	 public boolean hasEntityPropertySetupper(String propertyName);
-	 
+    // It's very INTERNAL!
+    /**
+     * Has the setupper of entity property by the name of property? <br />
+     * Comparing is so flexible. {Ignore cases and underscore}
+     * @param propertyName The name of the property. (NotNull)
+     * @return Determination.
+     */
+     public boolean hasEntityPropertySetupper(String propertyName);
+     
     /**
      * Set up entity property. (for INTERNAL)
-	 * @param propertyName The name of the property. (NotNull)
-	 * @param entity The entity for the property. (NotNull)
-	 * @param value The value of the property. (Nullable)
+     * @param propertyName The name of the property. (NotNull)
+     * @param entity The entity for the property. (NotNull)
+     * @param value The value of the property. (Nullable)
      */
-	public void setupEntityProperty(String propertyName, Object entity, Object value);
-	
+    public void setupEntityProperty(String propertyName, Object entity, Object value);
+    
     /**
      * The setupper of entity property. <br />
-	 * This class is for Internal. Don't use this!
-	 * @param <ENTITY_TYPE> The type of entity.
+     * This class is for Internal. Don't use this!
+     * @param <ENTITY_TYPE> The type of entity.
      */
     public interface Eps<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-		
-		/**
-		 * @param entity Entity. (NotNull)
-		 * @param value Value. (Nullable)
-		 */
+        
+        /**
+         * @param entity Entity. (NotNull)
+         * @param value Value. (Nullable)
+         */
         void setup(ENTITY_TYPE entity, Object value);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                Optimistic Lock Type
     //                                                                ====================
     public static enum OptimisticLockType {

@@ -72,6 +72,8 @@ targetdatabase = $targetDatabase
     #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
     #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
     #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
+    #set ($glStringKeyMap = "${glProjectPrefix}StringKeyMap")
+    #set ($glStringSet = "${glProjectPrefix}StringSet")
 
     ## [Allcommon-JDBC]
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")

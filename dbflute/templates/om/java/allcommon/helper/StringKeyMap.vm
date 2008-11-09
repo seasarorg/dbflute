@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ${database.ClassAuthor}
@@ -14,23 +15,36 @@ public class ${glStringKeyMap}<VALUE> implements Map<String, VALUE> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected HashMap<String, VALUE> _internalMap = new HashMap<String, VALUE>();
+    protected final Map<String, VALUE> _internalMap;
 
     protected boolean _removeUnderscore;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected ${glStringKeyMap}(boolean removeUnderscore) {
+    protected ${glStringKeyMap}(boolean removeUnderscore, boolean concurrent) {
         _removeUnderscore = removeUnderscore;
+        if (concurrent) {
+            _internalMap = newConcurrentHashMap();
+        } else {
+            _internalMap = newHashMap();
+        }
     }
 
-    public static <VALUE> ${glStringKeyMap}<VALUE> createAsFlexibleKey() {
-        return new ${glStringKeyMap}<VALUE>(true);
+    public static <VALUE> ${glStringKeyMap}<VALUE> createAsFlexible() {
+        return new ${glStringKeyMap}<VALUE>(true, false);
     }
 
-    public static <VALUE> ${glStringKeyMap}<VALUE> createAsCaseInsensitiveKey() {
-        return new ${glStringKeyMap}<VALUE>(false);
+    public static <VALUE> ${glStringKeyMap}<VALUE> createAsFlexibleConcurrent() {
+        return new ${glStringKeyMap}<VALUE>(true, true);
+    }
+
+    public static <VALUE> ${glStringKeyMap}<VALUE> createAsCaseInsensitive() {
+        return new ${glStringKeyMap}<VALUE>(false, false);
+    }
+
+    public static <VALUE> ${glStringKeyMap}<VALUE> createAsCaseInsensitiveConcurrent() {
+        return new ${glStringKeyMap}<VALUE>(false, true);
     }
 
     // ===================================================================================
@@ -151,6 +165,14 @@ public class ${glStringKeyMap}<VALUE> implements Map<String, VALUE> {
             }
         }
         return sb.toString();
+    }
+
+    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     // ===================================================================================

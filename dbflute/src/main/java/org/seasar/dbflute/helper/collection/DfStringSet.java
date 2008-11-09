@@ -16,9 +16,11 @@
 package org.seasar.dbflute.helper.collection;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author jflute
@@ -27,25 +29,43 @@ import java.util.Set;
 public class DfStringSet implements Set<String> {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final Object DUMMY_VALUE = new Object();
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected HashSet<String> _internalSet = new HashSet<String>();
+    protected final Map<String, Object> _internalMap;
 
     protected boolean _removeUnderscore;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfStringSet(boolean removeUnderscore) {
+    protected DfStringSet(boolean removeUnderscore, boolean concurrent) {
         _removeUnderscore = removeUnderscore;
+        if (concurrent) {
+            _internalMap = newConcurrentHashMap();
+        } else {
+            _internalMap = newHashMap();
+        }
     }
 
     public static DfStringSet createAsFlexible() {
-        return new DfStringSet(true);
+        return new DfStringSet(true, false);
+    }
+
+    public static DfStringSet createAsFlexibleConcurrent() {
+        return new DfStringSet(true, true);
     }
 
     public static DfStringSet createAsCaseInsensitive() {
-        return new DfStringSet(false);
+        return new DfStringSet(false, false);
+    }
+
+    public static DfStringSet createAsCaseInsensitiveConcurrent() {
+        return new DfStringSet(false, true);
     }
 
     // ===================================================================================
@@ -55,25 +75,25 @@ public class DfStringSet implements Set<String> {
     //                                           Key Related
     //                                           -----------
     public boolean add(String value) {
-        final String stringValue = convertStringValue(value);
+        final String stringValue = convertStringKey(value);
         if (stringValue != null) {
-            return _internalSet.add(stringValue);
+            return _internalMap.put(stringValue, DUMMY_VALUE) != null;
         }
         return false;
     }
 
     public boolean remove(Object value) {
-        final String stringValue = convertStringValue(value);
+        final String stringValue = convertStringKey(value);
         if (stringValue != null) {
-            return _internalSet.remove(stringValue);
+            return _internalMap.remove(stringValue) != null;
         }
         return false;
     }
 
     public boolean contains(Object value) {
-        final String stringValue = convertStringValue(value);
+        final String stringValue = convertStringKey(value);
         if (stringValue != null) {
-            return _internalSet.contains(stringValue);
+            return _internalMap.containsKey(stringValue);
         }
         return false;
     }
@@ -82,49 +102,74 @@ public class DfStringSet implements Set<String> {
     //                                              Delegate
     //                                              --------
     public void clear() {
-        _internalSet.clear();
+        _internalMap.clear();
     }
 
     public int size() {
-        return _internalSet.size();
+        return _internalMap.size();
     }
 
     public boolean isEmpty() {
-        return _internalSet.isEmpty();
+        return _internalMap.isEmpty();
     }
 
     public boolean addAll(Collection<? extends String> c) {
-        return _internalSet.addAll(c);
-    }
-
-    public boolean containsAll(Collection<?> c) {
-        return _internalSet.containsAll(c);
-    }
-
-    public Iterator<String> iterator() {
-        return _internalSet.iterator();
+        boolean success = false;
+        for (String s : c) {
+            if (add(s)) {
+                success = true;
+            }
+        }
+        return success;
     }
 
     public boolean removeAll(Collection<?> c) {
-        return _internalSet.removeAll(c);
+        boolean success = false;
+        for (Object s : c) {
+            if (remove(s)) {
+                success = true;
+            }
+        }
+        return success;
+    }
+
+    public boolean containsAll(Collection<?> c) {
+        for (Object s : c) {
+            if (contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Iterator<String> iterator() {
+        return _internalMap.keySet().iterator();
     }
 
     public boolean retainAll(Collection<?> c) {
-        return _internalSet.retainAll(c);
+        boolean success = false;
+        for (Object s : c) {
+            if (!contains(s)) {
+                if (remove(s)) {
+                    success = true;
+                }
+            }
+        }
+        return success;
     }
 
     public Object[] toArray() {
-        return _internalSet.toArray();
+        return _internalMap.keySet().toArray();
     }
 
     public <T> T[] toArray(T[] a) {
-        return _internalSet.toArray(a);
+        return _internalMap.keySet().toArray(a);
     }
 
     // ===================================================================================
     //                                                                       Key Converter
     //                                                                       =============
-    protected String convertStringValue(Object value) {
+    protected String convertStringKey(Object value) {
         if (!(value instanceof String)) {
             return null;
         }
@@ -169,21 +214,29 @@ public class DfStringSet implements Set<String> {
         return sb.toString();
     }
 
+    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public boolean equals(Object obj) {
-        return _internalSet.equals(obj);
+        return _internalMap.keySet().equals(obj);
     }
 
     @Override
     public int hashCode() {
-        return _internalSet.hashCode();
+        return _internalMap.keySet().hashCode();
     }
 
     @Override
     public String toString() {
-        return _internalSet.toString();
+        return _internalMap.keySet().toString();
     }
 }

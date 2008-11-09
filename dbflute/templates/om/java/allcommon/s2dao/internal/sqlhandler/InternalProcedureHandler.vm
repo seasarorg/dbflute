@@ -199,7 +199,7 @@ public class ${glInternalProcedureHandler} extends ${glInternalBasicSelectHandle
 
         @SuppressWarnings("unchecked")
         protected Map<String, Object> createRow(ResultSet rs, PropertyType[] propertyTypes) throws SQLException {
-            Map<String, Object> row = ${glStringKeyMap}.createAsFlexibleKey();
+            Map<String, Object> row = ${glStringKeyMap}.createAsFlexible();
             for (int i = 0; i < propertyTypes.length; ++i) {
                 Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
                 row.put(propertyTypes[i].getPropertyName(), value);

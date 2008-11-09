@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author jflute
@@ -29,23 +30,36 @@ public class DfStringKeyMap<VALUE> implements Map<String, VALUE> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected HashMap<String, VALUE> _internalMap = new HashMap<String, VALUE>();
+    protected final Map<String, VALUE> _internalMap;
 
     protected boolean _removeUnderscore;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfStringKeyMap(boolean removeUnderscore) {
+    protected DfStringKeyMap(boolean removeUnderscore, boolean concurrent) {
         _removeUnderscore = removeUnderscore;
+        if (concurrent) {
+            _internalMap = newConcurrentHashMap();
+        } else {
+            _internalMap = newHashMap();
+        }
     }
 
-    public static <VALUE> DfStringKeyMap<VALUE> createAsFlexibleKey() {
-        return new DfStringKeyMap<VALUE>(true);
+    public static <VALUE> DfStringKeyMap<VALUE> createAsFlexible() {
+        return new DfStringKeyMap<VALUE>(true, false);
     }
 
-    public static <VALUE> DfStringKeyMap<VALUE> createAsCaseInsensitiveKey() {
-        return new DfStringKeyMap<VALUE>(false);
+    public static <VALUE> DfStringKeyMap<VALUE> createAsFlexibleConcurrent() {
+        return new DfStringKeyMap<VALUE>(true, true);
+    }
+
+    public static <VALUE> DfStringKeyMap<VALUE> createAsCaseInsensitive() {
+        return new DfStringKeyMap<VALUE>(false, false);
+    }
+
+    public static <VALUE> DfStringKeyMap<VALUE> createAsCaseInsensitiveConcurrent() {
+        return new DfStringKeyMap<VALUE>(false, true);
     }
 
     // ===================================================================================
@@ -166,6 +180,14 @@ public class DfStringKeyMap<VALUE> implements Map<String, VALUE> {
             }
         }
         return sb.toString();
+    }
+
+    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     // ===================================================================================

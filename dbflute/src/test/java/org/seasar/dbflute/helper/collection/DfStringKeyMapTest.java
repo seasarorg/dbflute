@@ -2,8 +2,12 @@ package org.seasar.dbflute.helper.collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
@@ -16,9 +20,35 @@ import org.seasar.dbflute.unit.DfDBFluteTestCase;
 public class DfStringKeyMapTest extends DfDBFluteTestCase {
 
     @Test
-    public void test_flexibleKey_Tx() throws Exception {
+    public void test_create_as_nonconcurrent_Tx() throws Exception {
+        // ## Arrange & Act ##
+        Map<String, Integer> map = DfStringKeyMap.createAsFlexible();
+        Field field = map.getClass().getDeclaredField("_internalMap");
+        Object internalMap = field.get(map);
+
+        // ## Assert ##
+        log(internalMap.getClass());
+        assertEquals(HashMap.class, internalMap.getClass());
+        assertTrue(internalMap instanceof HashMap);
+    }
+
+    @Test
+    public void test_create_as_concurrent_Tx() throws Exception {
+        // ## Arrange & Act ##
+        Map<String, Integer> map = DfStringKeyMap.createAsFlexibleConcurrent();
+        Field field = map.getClass().getDeclaredField("_internalMap");
+        Object internalMap = field.get(map);
+
+        // ## Assert ##
+        log(internalMap.getClass());
+        assertEquals(ConcurrentHashMap.class, internalMap.getClass());
+        assertTrue(internalMap instanceof ConcurrentHashMap);
+    }
+
+    @Test
+    public void test_create_as_flexible_Tx() throws Exception {
         // ## Arrange ##
-        Map<String, Integer> map = DfStringKeyMap.createAsFlexibleKey();
+        Map<String, Integer> map = DfStringKeyMap.createAsFlexible();
 
         // ## Act ##
         map.put("ABC_DEF", 1);
@@ -45,9 +75,9 @@ public class DfStringKeyMapTest extends DfDBFluteTestCase {
     }
 
     @Test
-    public void test_caseInsensitiveKey_Tx() throws Exception {
+    public void test_create_as_caseInsensitiveKey_Tx() throws Exception {
         // ## Arrange ##
-        Map<String, Integer> map = DfStringKeyMap.createAsCaseInsensitiveKey();
+        Map<String, Integer> map = DfStringKeyMap.createAsCaseInsensitive();
 
         // ## Act ##
         map.put("ABC_DEF", 1);

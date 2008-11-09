@@ -4,7 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
@@ -16,7 +19,33 @@ import org.seasar.dbflute.unit.DfDBFluteTestCase;
 public class DfStringSetTest extends DfDBFluteTestCase {
 
     @Test
-    public void test_flexible_Tx() throws Exception {
+    public void test_create_as_nonconcurrent_Tx() throws Exception {
+        // ## Arrange & Act ##
+        Set<String> set = DfStringSet.createAsFlexible();
+        Field field = set.getClass().getDeclaredField("_internalMap");
+        Object internalMap = field.get(set);
+
+        // ## Assert ##
+        log(internalMap.getClass());
+        assertEquals(HashMap.class, internalMap.getClass());
+        assertTrue(internalMap instanceof HashMap);
+    }
+
+    @Test
+    public void test_create_as_concurrent_Tx() throws Exception {
+        // ## Arrange & Act ##
+        Set<String> set = DfStringSet.createAsFlexibleConcurrent();
+        Field field = set.getClass().getDeclaredField("_internalMap");
+        Object internalMap = field.get(set);
+
+        // ## Assert ##
+        log(internalMap.getClass());
+        assertEquals(ConcurrentHashMap.class, internalMap.getClass());
+        assertTrue(internalMap instanceof ConcurrentHashMap);
+    }
+
+    @Test
+    public void test_create_as_flexible_Tx() throws Exception {
         // ## Arrange ##
         Set<String> set = DfStringSet.createAsFlexible();
 
@@ -43,7 +72,7 @@ public class DfStringSetTest extends DfDBFluteTestCase {
     }
 
     @Test
-    public void test_caseInsensitive_Tx() throws Exception {
+    public void test_create_as_caseInsensitive_Tx() throws Exception {
         // ## Arrange ##
         Set<String> set = DfStringSet.createAsCaseInsensitive();
 

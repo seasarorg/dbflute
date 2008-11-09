@@ -7,69 +7,47 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
+import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
 /**
- * DBMeta instance handler.
+ * The instance handler of DB meta.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
+    //                                                                        Resource Map
+    //                                                                        ============
     /** Table DB-name instance map. */
     protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = newConcurrentHashMap();
 
-    /** The map of table DB-name and class name. */
+    /** The map of table DB name and class name. This is for initialization. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
     static {
         Map<String, String> tmpMap = newConcurrentHashMap();
 
 #foreach ($table in $database.tables)
-        tmpMap.put("${table.Name}", "${table.DBMetaFullClassName}");
+        tmpMap.put("${table.name}", "${table.DBMetaFullClassName}");
 #end
 
         _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
     }
 
-    /** The key-to-lower map of DB-name and property-name for table. */
-    protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
+    /** The flexible map of table DB name. This is for conversion at finding. */
+    protected static final Map<String, String> _tableDbNameFlexibleMap;
     static {
-        Map<String, String> tmpMap = newConcurrentHashMap();
+        Map<String, String> tmpMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
 
 #foreach ($table in $database.tables)
-        tmpMap.put("${table.name}".toLowerCase(), "${table.javaBeansRulePropertyName}");
+        tmpMap.put("${table.name}", "${table.name}");
 #end
 
-        _tableDbNamePropertyNameKeyToLowerMap = Collections.unmodifiableMap(tmpMap);
-    }
-
-    /** The key-to-lower map of property-name and DB-name for table. */
-    protected static final Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
-    static {
-        Map<String, String> tmpMap = newConcurrentHashMap();
-
-#foreach ($table in $database.tables)
-        tmpMap.put("${table.javaBeansRulePropertyName}".toLowerCase(), "${table.name}");
-#end
-
-        _tablePropertyNameDbNameKeyToLowerMap = Collections.unmodifiableMap(tmpMap);
-    }
-
-    protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
-        try {
-            Class clazz = Class.forName(className);
-            Method methoz = clazz.getMethod("getInstance", (Class[])null);
-            Object result = methoz.invoke(null, (Object[])null);
-            return (${glDBMetaInterfaceName})result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        _tableDbNameFlexibleMap = Collections.unmodifiableMap(tmpMap);
     }
 
     /**
-     * @return The initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
+     * @return The initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
     public static Map<String, ${glDBMetaInterfaceName}> getDBMetaMap() {
         initializeDBMetaMap();
@@ -99,38 +77,25 @@ public class ${myClassName} {
     //                                                                         Main Method
     //                                                                         ===========
     /**
-     * Find dbmeta by table flexible-name.
+     * Find DB meta by table flexible name.
      * <pre>
-     * If the table name is 'ORDER_DETAIL', you can find the dbmeta by ...(as follows)
+     * If the table name is 'ORDER_DETAIL', you can find the DB meta by ...(as follows)
      *     'ORDER_DETAIL', 'ORDer_DeTAiL', 'order_detail'
      *     , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
      * </pre>
-     * @param tableFlexibleName Table flexible-name. (NotNull)
-     * @return The instance of dbmeta. (NotNull)
-     * @exception DBMetaNotFoundException When the dbmeta is not found.
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (NotNull)
+     * @exception DBMetaNotFoundException When the DB meta is not found.
      */
     public static ${glDBMetaInterfaceName} findDBMeta(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        if (_tableDbNameInstanceMap.containsKey(tableFlexibleName)) {
-            return byTableDbName(tableFlexibleName);
-        }
-        String toLowerKey = tableFlexibleName.toLowerCase();
-        if (_tableDbNamePropertyNameKeyToLowerMap.containsKey(toLowerKey)) {
-            String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap.get(toLowerKey);
-            String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(propertyName.toLowerCase());
-            return byTableDbName(dbName);
-        }
-        if (_tablePropertyNameDbNameKeyToLowerMap.containsKey(toLowerKey)) {
-            String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
-            return byTableDbName(dbName);
-        }
         final int dotLastIndex = tableFlexibleName.lastIndexOf(".");
         if (dotLastIndex >= 0) {
-            try {
-                return findDBMeta(tableFlexibleName.substring(dotLastIndex + 1));
-            } catch (DBMetaNotFoundException e) {
-                // Nothing
-            }
+            tableFlexibleName = tableFlexibleName.substring(dotLastIndex + ".".length());
+        }
+        final String tableDbName = _tableDbNameFlexibleMap.get(tableFlexibleName);
+        if (tableDbName != null) {
+            return byTableDbName(tableDbName);
         }
         String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
         throw new DBMetaNotFoundException(msg);
@@ -172,10 +137,21 @@ public class ${myClassName} {
         return _tableDbNameInstanceMap.get(tableName);
     }
 
+    protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Method methoz = clazz.getMethod("getInstance", (Class[])null);
+            Object result = methoz.invoke(null, (Object[])null);
+            return (${glDBMetaInterfaceName})result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-	protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
     }
 
@@ -183,13 +159,13 @@ public class ${myClassName} {
     //                                         Assert Object
     //                                         -------------
     protected static void assertObjectNotNull(String variableName, Object value) {
-	    ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
+        ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
     protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

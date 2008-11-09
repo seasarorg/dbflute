@@ -17,6 +17,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
+import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
@@ -40,52 +41,84 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<${glColumnInfoName}> _columnInfoList;
+    // -----------------------------------------------------
+    //                                  Information Resource
+    //                                  --------------------
+    // Initialized at its getter.
+    private ${glStringKeyMap}<String> _tableDbNameFlexibleMap;
+    private ${glStringKeyMap}<String> _tablePropertyNameFlexibleMap;
+    private List<${glColumnInfoName}> _columnInfoList;
+    private ${glStringKeyMap}<${glColumnInfoName}> _columnInfoFlexibleMap;
+
+    // Initialized at hasMethod().
+    private Map<String, Object> _methodNameMap = newConcurrentHashMap();
+
+    // ===================================================================================
+    //                                                                          Table Info
+    //                                                                          ==========
+    /**
+     * Get the flexible map of table DB name.
+     * @return The flexible map of table DB name. (NotNull, NotEmpty)
+     */
+    protected Map<String, String> getTableDbNameFlexibleMap() {
+        if (_tableDbNameFlexibleMap != null) {
+            return _tableDbNameFlexibleMap;
+        }
+        synchronized (this) {
+            if (_tableDbNameFlexibleMap != null) {
+                return _tableDbNameFlexibleMap;
+            }
+            _tableDbNameFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+            _tableDbNameFlexibleMap.put(getTableDbName(), getTableDbName());
+            return _tableDbNameFlexibleMap;
+        }
+    }
+
+    /**
+     * Get the flexible map of table property name.
+     * @return The flexible map of table property name. (NotNull, NotEmpty)
+     */
+    protected Map<String, String> getTablePropertyNameFlexibleMap() {
+        if (_tablePropertyNameFlexibleMap != null) {
+            return _tablePropertyNameFlexibleMap;
+        }
+        synchronized (this) {
+            if (_tablePropertyNameFlexibleMap != null) {
+                return _tablePropertyNameFlexibleMap;
+            }
+            _tablePropertyNameFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+            _tablePropertyNameFlexibleMap.put(getTableDbName(), getTablePropertyName());
+            return _tableDbNameFlexibleMap;
+        }
+    }
 
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
     /**
      * ${database.ImplementComment}
-     * @param columnFlexibleName The flexible name of the column. (NotNull)
+     * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return Determination.
      */
     public boolean hasColumn(String columnFlexibleName) {
-        if (!hasFlexibleName(columnFlexibleName)) {
-            return false;
-        }
-        final String propertyName = findPropertyName(columnFlexibleName);
-        return hasMethod("column" + initCap(propertyName));
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        return getColumnInfoFlexibleMap().containsKey(columnFlexibleName);
     }
 
     /**
      * ${database.ImplementComment}
-     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return The information of the column. (NotNull)
      */ 
     public ${glColumnInfoName} findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        if (!hasColumn(columnFlexibleName)) {
+        final ${glColumnInfoName} columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
+        if (columnInfo == null) {
             String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName();
             throw new IllegalArgumentException(msg);
         }
-        String methodName = "column" + initCap(findPropertyName(columnFlexibleName));
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            return (${glColumnInfoName})method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        return columnInfo;
     }
 
     protected ${glColumnInfoName} cci(String columnDbName, String propertyName
@@ -102,7 +135,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     /**
 	 * ${database.ImplementComment}
-     * @return The list of columns. (NotNull and NotEmpty)
+     * @return The list of columns. (NotNull, NotEmpty)
      */
     public List<${glColumnInfoName}> getColumnInfoList() {
         if (_columnInfoList != null) {
@@ -130,67 +163,100 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    protected void initializeColumnInfoList() {
-        getColumnInfoList();// Ignore return value because of initialization only!
+    /**
+     * Get the flexible map of column information.
+     * @return The flexible map of column information. (NotNull, NotEmpty)
+     */
+    protected Map<String, ${glColumnInfoName}> getColumnInfoFlexibleMap() {
+        if (_columnInfoFlexibleMap != null) {
+            return _columnInfoFlexibleMap;
+        }
+        final List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+        synchronized (this) {
+            if (_columnInfoFlexibleMap != null) {
+                return _columnInfoFlexibleMap;
+            }
+            _columnInfoFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+            for (${glColumnInfoName} columnInfo : columnInfoList) {
+                _columnInfoFlexibleMap.put(columnInfo.getColumnDbName(), columnInfo);
+            }
+            return _columnInfoFlexibleMap;
+        }
     }
-	
-    // =====================================================================================
-    //                                                                         Name Handling
-    //                                                                         =============
+
+    // ===================================================================================
+    //                                                             Resource Initialization
+    //                                                             =======================
+    protected void initializeInformationResource() { // for instance initializer of subclass.
+        // Initialize the flexible map of table DB name.
+        getTableDbNameFlexibleMap();
+
+        // Initialize the flexible map of table property name.
+        getTablePropertyNameFlexibleMap();
+
+        // Initialize the list of column information.
+        getColumnInfoList();
+
+        // Initialize the flexible map of column information. 
+        getColumnInfoFlexibleMap();
+
+        // Initialize the map of (public)method name. 
+        hasMethod("dummy");
+    }
+
+    // ===================================================================================
+    //                                                                       Name Handling
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
      * @return Determination.
      */
     public boolean hasFlexibleName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            return true;
-        }
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            return true;
-        }
-        return false;
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+
+        // It uses column before table because column is used much more than table.
+        // This is the same consideration at other methods.
+        return getColumnInfoFlexibleMap().containsKey(flexibleName)
+               || getTableDbNameFlexibleMap().containsKey(flexibleName);
     }
 
     /**
      * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return DB name. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
+     * @return DB name. (NotNull, NotEmpty)
      */
     public String findDbName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            return (String)getPropertyNameDbNameKeyToLowerMap().get(key);
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+        final ${glColumnInfoName} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        if (columnInfoMap != null) {
+            return columnInfoMap.getColumnDbName();
         }
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
-                return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
-            }
+        final String tableDbName = getTableDbNameFlexibleMap().get(flexibleName);
+        if (tableDbName != null) {
+            return tableDbName;
         }
-        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalStateException(msg);
+        String msg = "Not found DB name by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalArgumentException(msg);
     }
 
     /**
      * ${database.ImplementComment}
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return DB name. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
+     * @return DB name. (NotNull, NotEmpty)
      */
     public String findPropertyName(String flexibleName) {
-        final String key = flexibleName.toLowerCase();
-        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
-            return (String)getDbNamePropertyNameKeyToLowerMap().get(key);
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+        final ${glColumnInfoName} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        if (columnInfoMap != null) {
+            return columnInfoMap.getPropertyName();
         }
-        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
-                return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
-            }
+        final String tablePropertyName = getTablePropertyNameFlexibleMap().get(flexibleName);
+        if (tablePropertyName != null) {
+            return tablePropertyName;
         }
-        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalStateException(msg);
+        String msg = "Not found property name by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalArgumentException(msg);
     }
 
     // ===================================================================================
@@ -373,7 +439,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
         /**
          * Constructor for first step.
-         * 
          * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
          */
         public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
@@ -383,7 +448,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
         /**
          * Constructor for relation step.
-         * 
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
@@ -411,7 +475,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
         /**
          * Fix trace.
-         * 
          * @param traceRelationInfoList The trace of relation as the list of relation info. (NotNull)
          * @param traceColumnInfo The trace of column as column info. (Nullable)
          * @return Relation trace(result). (NotNull)
@@ -641,12 +704,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 												, String propertyName
 	                                            , Eps<ENTITY> setupper
 											    , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+		// Only column name is registered because the map must be flexible map.
 		entityPropertySetupperMap.put(columnName, setupper);
-		entityPropertySetupperMap.put(propertyName, setupper);
-		entityPropertySetupperMap.put(columnName.toLowerCase(), setupper);
-		entityPropertySetupperMap.put(propertyName.toLowerCase(), setupper);
 	}
-	
+
     protected <ENTITY extends ${glEntityInterfaceName}> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap, String propertyName) {
         Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
         if (setupper == null) {
@@ -824,6 +885,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * This class is for Internal. Don't use this!
      */
+	@SuppressWarnings("unchecked")
     protected static class MapStringValueAnalyzer {
         protected java.util.Map<String, ? extends Object> _valueMap;
         protected java.util.Set<String> _modifiedPropertyNames;
@@ -926,6 +988,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+	@SuppressWarnings("unchecked")
 	protected <ENTITY> ENTITY downcast(${glEntityInterfaceName} entity) {
 		checkDowncast(entity);
 		return (ENTITY)entity;
@@ -1055,20 +1118,24 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // -----------------------------------------------------
     //                                   Reflection Handling
     //                                   -------------------
-    private Map<String, Object> _cachedMethodNames = newConcurrentHashMap(); // for performance
+    /**
+     * Does it have the method?
+     * @param methodName The name of method. (NotNull, NotEmpty, PublicMethodOnly)
+     * @return Determination.
+     */
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        if (_cachedMethodNames.isEmpty()) {
-            synchronized (_cachedMethodNames) {
-                if (_cachedMethodNames.isEmpty()) {
+        if (_methodNameMap.isEmpty()) {
+            synchronized (_methodNameMap) {
+                if (_methodNameMap.isEmpty()) {
                     final Method[] methods = this.getClass().getMethods();
                     for (Method method : methods) {
-                        _cachedMethodNames.put(method.getName(), DUMMY_VALUE);
+                        _methodNameMap.put(method.getName(), DUMMY_VALUE);
                     }
                 }
             }
         }
-        return _cachedMethodNames.containsKey(methodName);
+        return _methodNameMap.containsKey(methodName);
     }
 	
     // -----------------------------------------------------
