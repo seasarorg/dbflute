@@ -6,7 +6,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 /**
  * The condition-query as interface.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public interface ${glConditionQueryInterfaceName} {
 
     // ===================================================================================

@@ -30,7 +30,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * The abstract class of DB meta.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 
     // ===================================================================================

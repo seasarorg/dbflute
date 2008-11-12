@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
 /**
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public interface ${myClassName} {
 
     public boolean hasNext();

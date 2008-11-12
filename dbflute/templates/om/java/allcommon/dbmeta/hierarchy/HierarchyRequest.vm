@@ -14,10 +14,9 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
 /**
  * The request of hierarchy.
- * 
  * @author ${database.ClassAuthor}
  * @param <LOCAL_ENTITY> The type of local entity.
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     // ===================================================================================

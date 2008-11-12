@@ -16,7 +16,7 @@ import ${glPackageCQ}.*;
 /**
  * The abstract condition-query of ${table.name}.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     // ===================================================================================

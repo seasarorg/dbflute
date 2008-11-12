@@ -222,7 +222,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * <pre>
  * @author ${database.ClassAuthor}
  * @param <LOCAL_ENTITY> The type of local entity extends Entity
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     // ===================================================================================
@@ -639,7 +639,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         return capPropReferrerName;
     }
 
-    private java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
+    private java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         try {
             return clazz.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException ex) {
@@ -710,10 +710,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         return sb.toString();
     }
     
-    private String createTypeViewFromTypeArray(Class[] array) {
+    private String createTypeViewFromTypeArray(Class<?>[] array) {
         final StringBuffer sb = new StringBuffer();
         for (int i=0; i < array.length; i++) {
-            final Class type = array[i];
+            final Class<?> type = array[i];
             if (sb.length() == 0) {
                 sb.append(type.getSimpleName());
             } else {

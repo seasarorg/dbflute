@@ -188,7 +188,6 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
         throw new IllegalStateException(msg);
     }
     
-    @SuppressWarnings("unchecked")
     protected void putSynchronizedDaoMetaDataCache(String key, DaoMetaData dmd) {
         synchronized (daoMetaDataCache) {
             daoMetaDataCache.put(key, dmd);

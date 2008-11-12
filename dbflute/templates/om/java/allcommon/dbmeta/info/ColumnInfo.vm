@@ -8,7 +8,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName}.OptimisticLockType;
 /**
  * The information of column.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} {
 
     // ===================================================================================

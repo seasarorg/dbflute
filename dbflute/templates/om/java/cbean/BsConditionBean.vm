@@ -17,7 +17,7 @@ import ${glPackageNss}.*;
 /**
  * The base condition-bean of ${table.name}.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     // ===================================================================================

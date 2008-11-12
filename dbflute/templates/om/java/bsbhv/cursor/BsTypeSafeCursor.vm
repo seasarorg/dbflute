@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 #set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
@@ -8,7 +9,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 /**
  * The cursor of ${table.name}.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} {
 
     // ===================================================================================
@@ -26,7 +27,7 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
     /** Wrapped result set. */
-    protected java.sql.ResultSet _rs;
+    protected ResultSet _rs;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -41,7 +42,7 @@ public class ${myClassName} {
      * Accept.
      * @param rs Result set. (NotNull)
      */
-    public void accept(java.sql.ResultSet rs) {
+    public void accept(ResultSet rs) {
         this._rs = rs;
     }
 
@@ -108,11 +109,11 @@ public class ${myClassName} {
         return _rs.getBoolean(name);
     }
 
-    protected Object extractValueAsNumber(Class type, String name) throws SQLException {
+    protected Object extractValueAsNumber(Class<?> type, String name) throws SQLException {
         return ${glSimpleTypeUtil}.toNumber(type, extractValueAsObject(name));
     }
 
-    protected Object extractValueAsDate(Class type, String name) throws SQLException {
+    protected Object extractValueAsDate(Class<?> type, String name) throws SQLException {
         if (type.isAssignableFrom(java.sql.Timestamp.class)) {
             return _rs.getTimestamp(name);
         } else if (type.isAssignableFrom(java.sql.Date.class)) {

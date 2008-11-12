@@ -1,17 +1,19 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelper};
 
+import java.util.Arrays;
+import java.util.List;
+
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
 import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
 
 /**
- * The implementation of map-string-builder.
- *
+ * The implementation of map-string builder.
  * @author ${database.ClassAuthor}
  */
 public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} {
 
-    protected java.util.List${database.filterGenericsString('String')} _columnNameList;
+    protected List<String> _columnNameList;
 
     protected String _msMapMark;
 
@@ -26,10 +28,10 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
     protected boolean _trimDoubleQuotation;
 
     public void setColumnNames(String[] columnNames) {
-        _columnNameList = java.util.Arrays.asList(columnNames);
+        _columnNameList = Arrays.asList(columnNames);
     }
 
-    public void setColumnNameList(java.util.List${database.filterGenericsString('String')} columnNameList) {
+    public void setColumnNameList(List<String> columnNameList) {
         _columnNameList = columnNameList;
     }
 
@@ -68,7 +70,7 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         }
         assertStringComponent();
 
-        final java.util.List${database.filterGenericsString('String')} valueList = tokenize(values, delimiter);
+        final java.util.List<String> valueList = tokenize(values, delimiter);
         assertColumnValueList(_columnNameList, valueList);
 
         final StringBuffer sb = new StringBuffer();
@@ -82,7 +84,7 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         return sb.toString(); 
     }
 
-    public String buildFromList(java.util.List${database.filterGenericsString('String')} valueList) {
+    public String buildFromList(List<String> valueList) {
         if (valueList == null) {
             String msg = "The argument[valueList] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -101,7 +103,7 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         return sb.toString(); 
     }
 
-    protected java.util.List${database.filterGenericsString('String')} tokenize(String value, String delimiter) {
+    protected List<String> tokenize(String value, String delimiter) {
         final ${glLineTokenName} lineToken = new ${glLineTokenImplName}();
         final ${glLineTokenizingOptionName} lineTokenizingOption = new ${glLineTokenizingOptionName}();
         lineTokenizingOption.setDelimiter(delimiter);
@@ -142,7 +144,7 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         }
     }
 
-    protected void assertColumnValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
+    protected void assertColumnValueList(List<String> columnNameList, List<String> valueList) {
         if (columnNameList.size() != valueList.size()) {
             String msg = "The length of columnNameList and valueList are difference. (" + columnNameList.size() + ", " + valueList.size() + ")";
             msg = msg + " columnNameList=" + columnNameList;

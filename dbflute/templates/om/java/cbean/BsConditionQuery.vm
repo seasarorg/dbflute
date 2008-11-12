@@ -12,7 +12,7 @@ import ${glPackageCQ}.*;
 /**
  * The base condition-query of ${table.name}.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     // ===================================================================================

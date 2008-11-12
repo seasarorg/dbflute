@@ -27,7 +27,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * The abstract class of SqlClause.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     // ===================================================================================

@@ -13,7 +13,7 @@ import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 /**
  * The DB meta of ${table.Name}. (Singleton)
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     private static final ${myClassName} _instance = new ${myClassName}();
