@@ -1531,12 +1531,13 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapListStringImplName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapListStringImpl.${glTemplateFileExtension}",$path,"", "")
 
-    $database.info("    parseMapStringBuilder();")
+    $database.info("    parse('MapStringBuilder');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilder.${glTemplateFileExtension}",$path,"", "")
 
-    $database.info("    parseMapStringBuilderImpl();")
+    $database.info("    parse('MapStringBuilderImpl');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderImplName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilderImpl.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageJava())
       $database.info("    parse('StringKeyMap');")
