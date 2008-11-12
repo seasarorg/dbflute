@@ -60,7 +60,7 @@ public final class DfMakingOptionProperties extends DfAbstractHelperProperties {
         if (isTargetContainerSpring()) {
             return false; // If the container is for Spring Framework, it always returns false!
         }
-        return booleanProp("torque.isMakeDaoInterface", true); // TODO: @jflute Since 0.8.5 false 
+        return booleanProp("torque.isMakeDaoInterface", false); 
     }
     
     protected boolean isTargetLanguageCSharp() {

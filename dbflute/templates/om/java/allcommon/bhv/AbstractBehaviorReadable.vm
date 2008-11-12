@@ -44,7 +44,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * The abstract class of behavior-readable.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
 
     // ===================================================================================
@@ -193,7 +193,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
-    protected void assertEntityNotDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
         if (entity == null) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -205,7 +205,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param searchKey4Log Search-key for Logging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
-    protected void assertEntityNotDeleted(List ls, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(List<? extends ${glEntityInterfaceName}> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -218,7 +218,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    protected void assertEntitySelectedAsOne(List ls, Object searchKey4Log) {
+    protected void assertEntitySelectedAsOne(List<? extends ${glEntityInterfaceName}> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -316,9 +316,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-    protected Object helpConvertingSequenceObject(Class resultClass, Object sequenceObject) {
+    protected Object helpConvertingSequenceObject(Class<?> resultClass, Object sequenceObject) {
         try {
-            final Constructor constructor = resultClass.getConstructor(new Class[]{String.class});
+            final Constructor<?> constructor = resultClass.getConstructor(new Class[]{String.class});
             return constructor.newInstance(new Object[]{sequenceObject.toString()});
         } catch (NoSuchMethodException e) {
         } catch (Exception e) {
@@ -466,6 +466,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param value The value of primary key. (Nullable)
      * @return The value of primary key. (Nullable)
      */
+    @SuppressWarnings("unchecked")
     protected <PK> PK toLowerCasePrimaryKeyIfString(PK value) {
         return (PK)toLowerCaseIfString(value);
     }
@@ -561,8 +562,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
             final List<${glEntityInterfaceName}> ls = readList(cb);
             List<List<String>> rowList = new ArrayList<List<String>>();
-            for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-                final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            for (java.util.Iterator<${glEntityInterfaceName}> ite = ls.iterator(); ite.hasNext(); ) {
+                final ${glEntityInterfaceName} entity = ite.next();
                 final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
                 rowList.add(valueList);
             }
@@ -570,8 +571,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
             final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
             final List<String> columnDbNameList = new ArrayList<String>();
-            for (final java.util.Iterator ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
-                final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            for (final java.util.Iterator<${glColumnInfoName}> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
+                final ${glColumnInfoName} columnInfo = ite.next();
                 columnDbNameList.add(columnInfo.getColumnDbName());
             }
             fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
@@ -725,6 +726,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
+    @SuppressWarnings("unchecked")
     protected <ENTITY extends ${glEntityInterfaceName}> ENTITY helpDowncastInternally(${glEntityInterfaceName} entity, Class<ENTITY> clazz) {
         assertObjectNotNull("entity", entity);
         assertObjectNotNull("clazz", clazz);
@@ -816,7 +818,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the list is empty.
      * @param ls List. (NotNull)
      */
-    protected void assertListNotNullAndEmpty(List ls) {
+    protected void assertListNotNullAndEmpty(List<?> ls) {
         assertObjectNotNull("ls", ls);
         if (!ls.isEmpty()) {
             String msg = "The list should be empty: ls=" + ls.toString();
@@ -828,7 +830,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the list is not empty.
      * @param ls List. (NotNull)
      */
-    protected void assertListNotNullAndNotEmpty(List ls) {
+    protected void assertListNotNullAndNotEmpty(List<?> ls) {
         assertObjectNotNull("ls", ls);
         if (ls.isEmpty()) {
             String msg = "The list should not be empty: ls=" + ls.toString();
@@ -840,7 +842,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the list having only one.
      * @param ls List. (NotNull)
      */
-    protected void assertListNotNullAndHasOnlyOne(List ls) {
+    protected void assertListNotNullAndHasOnlyOne(List<?> ls) {
         assertObjectNotNull("ls", ls);
         if (ls.size() != 1) {
             String msg = "The list should contain only one object: ls=" + ls.toString();
