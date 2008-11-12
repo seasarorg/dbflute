@@ -39,7 +39,6 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
     public static final String KEY_behaviorFilterMap = "behaviorFilterMap";
     protected Map<String, Object> _behaviorFilterMap;
 
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getBehaviorFilterMap() {
         if (_behaviorFilterMap == null) {
             _behaviorFilterMap = mapProp("torque." + KEY_behaviorFilterMap, DEFAULT_EMPTY_MAP);
