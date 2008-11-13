@@ -2,6 +2,7 @@
 #set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
 
 using System;
+using System.Reflection;
 
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
@@ -55,16 +56,10 @@ namespace ${glPackageBaseCommonDBMeta} {
             return (${glDBMetaInterfaceName})method.Invoke(null, null);
         }
 
-        protected static Type ForName(string className, System.Collections.IList assemblys) {
+        protected static Type ForName(string className, Assembly[] assemblys) {
             Type type = Type.GetType(className);
             if(type != null) return type;
-            foreach(String assemblyName in assemblys) {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.Load(assemblyName);
-                if (assembly == null) {
-                    String msg = "The assemblyName was not found: " + assemblyName + " assemblys=";
-                    msg = msg + Seasar.Framework.Util.ToStringUtil.ToString(assemblys);
-                    throw new SystemException(msg);
-                }
+            foreach(Assembly assembly in assemblys) {
                 type = assembly.GetType(className);
                 if(type != null) return type;
             }
