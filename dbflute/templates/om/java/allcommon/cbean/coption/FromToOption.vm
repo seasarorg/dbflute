@@ -1,6 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
-
 #set ($myClassName = "${glConditionOptionFromToName}")
+
+import java.util.Calendar;
+import java.util.Date;
+
+import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 
 /**
  * The option of from-to.
@@ -76,70 +80,88 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // ===================================================================================
     //                                                                       Internal Main
     //                                                                       =============
-    public java.util.Date filterFromDate(java.util.Date fromDate) {
+    /**
+     * Filter the date as From. It requires this method is called before getFromDateConditionKey().
+     * @param toDate The date as From. (Nullable: If the value is null, it returns null)
+     * @return The filtered date as From. (Nullable)
+     */
+    public Date filterFromDate(Date fromDate) {
         if (fromDate == null) {
             return null;
         }
         if (_compareAsDate) {
-            final java.util.Calendar cal = java.util.Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(fromDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
-            final java.util.Date cloneDate = (java.util.Date) fromDate.clone();
+            final Date cloneDate = (Date) fromDate.clone();
             cloneDate.setTime(cal.getTimeInMillis());
             return cloneDate;
         }
         return fromDate;
     }
 
-    public java.util.Date filterToDate(java.util.Date toDate) {
+    /**
+     * Filter the date as To. It requires this method is called before getToDateConditionKey().
+     * @param toDate The date as To. (Nullable: If the value is null, it returns null)
+     * @return The filtered date as To. (Nullable)
+     */
+    public Date filterToDate(Date toDate) {
         if (toDate == null) {
             return null;
         }
         if (_compareAsDate) {
-            final java.util.Calendar cal = java.util.Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(toDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
             addCalendarNextDay(cal);// Key Point!
-            final java.util.Date cloneDate = (java.util.Date) toDate.clone();
+            final Date cloneDate = (Date) toDate.clone();
             cloneDate.setTime(cal.getTimeInMillis());
             return cloneDate;
         }
         return toDate;
     }
 
-    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getFromDateConditionKey() {
+    /**
+     * Get the condition-key of the from-date. It requires this method is called after filterFromDate().
+     * @return The condition-key of the from-date. (NotNull)
+     */
+    public ${glConditionKeyName} getFromDateConditionKey() {
         if (_compareAsDate) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;
+            return ${glConditionKeyName}.CK_GREATER_EQUAL;
         }
         if (_fromDateGreaterThan) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_THAN;// Default!
+            return ${glConditionKeyName}.CK_GREATER_THAN;// Default!
         } else {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+            return ${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
         }
     }
 
-    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getToDateConditionKey() {
+    /**
+     * Get the condition-key of the to-date. It requires this method is called after filterToDate().
+     * @return The condition-key of the to-date. (NotNull)
+     */
+    public ${glConditionKeyName} getToDateConditionKey() {
         if (_compareAsDate) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;
+            return ${glConditionKeyName}.CK_LESS_THAN;
         }
         if (_toDateLessThan) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;// Default!
+            return ${glConditionKeyName}.CK_LESS_THAN;// Default!
         } else {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+            return ${glConditionKeyName}.CK_LESS_EQUAL;// Default!
         }
     }
 
     // ===================================================================================
     //                                                                     Calendar Helper
     //                                                                     ===============
-    protected void addCalendarNextDay(java.util.Calendar cal) {
-        cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+    protected void addCalendarNextDay(Calendar cal) {
+        cal.add(Calendar.DAY_OF_MONTH, 1);
     }
 
-    protected void clearCalendarHourMinuteSecondMilli(java.util.Calendar cal) {
-        cal.clear(java.util.Calendar.MILLISECOND);
-        cal.clear(java.util.Calendar.SECOND);
-        cal.clear(java.util.Calendar.MINUTE);
-        cal.set(java.util.Calendar.HOUR_OF_DAY, cal.getActualMinimum(java.util.Calendar.HOUR_OF_DAY));
+    protected void clearCalendarHourMinuteSecondMilli(Calendar cal) {
+        cal.clear(Calendar.MILLISECOND);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MINUTE);
+        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
     }
 }

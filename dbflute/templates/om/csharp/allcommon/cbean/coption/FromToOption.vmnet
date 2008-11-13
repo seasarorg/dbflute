@@ -2,6 +2,7 @@
 
 using System;
 
+using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCOption} {
@@ -14,6 +15,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     protected bool _fromDateGreaterThan;
     protected bool _toDateLessThan;
     protected bool _compareAsDate;
+    protected bool _toDateMaxValue; // CSharp Only
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -58,30 +60,34 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
         }
         if (_compareAsDate) {
             DateTime cloneDate = new DateTime(toDate.Value.Year, toDate.Value.Month, toDate.Value.Day);
+            if (cloneDate.Date.Equals(DateTime.MAX_VALUE.Date)) { // CSharp Only
+                _toDateMaxValue = true
+                return DateTime.MAX_VALUE;
+            }
             return cloneDate.AddDays(1);
         }
         return toDate;
     }
 
-    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getFromDateConditionKey() {
+    public ${glConditionKeyName} getFromDateConditionKey() {
         if (_compareAsDate) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;
+            return ${glConditionKeyName}.CK_GREATER_EQUAL;
         }
         if (_fromDateGreaterThan) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_THAN;// Default!
+            return ${glConditionKeyName}.CK_GREATER_THAN;// Default!
         } else {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+            return ${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
         }
     }
 
-    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getToDateConditionKey() {
+    public ${glConditionKeyName} getToDateConditionKey() {
         if (_compareAsDate) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;
+            return _toDateMaxValue ? ${glConditionKeyName}.CK_LESS_EQUAL : ${glConditionKeyName}.CK_LESS_THAN;
         }
         if (_toDateLessThan) {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;// Default!
+            return ${glConditionKeyName}.CK_LESS_THAN;// Default!
         } else {
-            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+            return ${glConditionKeyName}.CK_LESS_EQUAL;// Default!
         }
     }
 }
