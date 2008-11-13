@@ -11,7 +11,7 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
  * The behavior command for OutsideSql.selectList().
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlSelectCursorCommand} extends ${glOutsideSqlSelectListCommand} {
+public class ${glOutsideSqlSelectCursorCommand} extends ${glAbstractOutsideSqlSelectCommand}<Object> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -22,12 +22,10 @@ public class ${glOutsideSqlSelectCursorCommand} extends ${glOutsideSqlSelectList
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    @Override
     public String getCommandName() {
         return "selectCursor";
     }
 
-    @Override
     public Class<?> getCommandReturnType() {
         return Object.class;
     }

@@ -12,14 +12,15 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 
 /**
  * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
  */
-public class ${glSelectNextValCommand} extends ${glAbstractBehaviorCommand} {
+public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorCommand}<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The type of entity. (Required) */
-    protected Class<?> _entityType;
+    protected Class<RESULT> _entityType;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -141,7 +142,7 @@ public class ${glSelectNextValCommand} extends ${glAbstractBehaviorCommand} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<?> entityType) {
+    public void setEntityType(Class<RESULT> entityType) {
         _entityType = entityType;
     }
 }

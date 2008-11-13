@@ -2,22 +2,23 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import java.util.List;
 
-import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.ResultSetHandler;
-
-import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonBhvCoreExecution}.${glOutsideSqlSelectExecution};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.extension.jdbc.types.ValueTypes;
+import org.seasar.dao.BeanMetaData;
 
 /**
  * The behavior command for OutsideSql.selectList().
  * @author ${database.ClassAuthor}
+ * @param <ENTITY> The type of entity.
  */
-public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlCommand} {
+public class ${glOutsideSqlSelectListCommand}<ENTITY> extends ${glAbstractOutsideSqlSelectCommand}<List<ENTITY>> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The type of entity. (Required) */
+    protected Class<ENTITY> _entityType;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -31,132 +32,38 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
     }
 
     // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    public boolean isProcedure() {
-        return false;
+    //                                                                             Factory
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                          BeanMetaData
+    //                                          ------------
+    protected BeanMetaData createBeanMetaData() {
+        assertEntityType("createBeanMetaData");
+        return _beanMetaDataFactory.createBeanMetaData(_entityType);
     }
 
-    public boolean isSelect() {
-        return true;
-    }
-
-    // ===================================================================================
-    //                                                                    Process Callback
-    //                                                                    ================
-    public void beforeGettingSqlExecution() {
-        assertStatus("beforeGettingSqlExecution");
-        final String path = _outsideSqlPath;
-        final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        final Object resultTypeSpecification = getResultTypeSpecification();
-        final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
-        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
-        outsideSqlContext.setMethodName(getCommandName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
-
-        // Set up fetchNarrowingBean.
-        setupOutsideSqlFetchNarrowingBean(pmb, option);
-    }
-
-    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
-        if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
-            return;
+    // -----------------------------------------------------
+    //                                      ResultSetHandler
+    //                                      ----------------
+    protected ResultSetHandler createOutsideSqlBeanListResultSetHandler(BeanMetaData bmd) {
+        final ValueType valueType = ValueTypes.getValueType(_entityType);
+        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
+            return createObjectListResultSetHandler(valueType);
         }
-        final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
-        if (option.isManualPaging()) {
-            fetchNarrowingBean.ignoreFetchNarrowing();
-        }
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
-    }
-
-    public void afterExecuting() {
-    }
-
-    // ===================================================================================
-    //                                                               SqlExecution Handling
-    //                                                               =====================
-    public String buildSqlExecutionKey() {
-        assertStatus("buildSqlExecutionKey");
-        return generateSpecifiedOutsideSqlUniqueKey();
-    }
-
-    protected String generateSpecifiedOutsideSqlUniqueKey() {
-        final String methodName = getCommandName();
-        final String path = _outsideSqlPath;
-        final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        final Object resultTypeSpecification = getResultTypeSpecification();
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
-    }
-
-    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
-        assertStatus("createSqlExecutionCreator");
-        return new ${glSqlExecutionCreator}() {
-            public ${glSqlExecution} createSqlExecution() {
-                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-                return createOutsideSqlSelectExecution(outsideSqlContext);
-            }
-        };
-    }
-
-    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContextName} outsideSqlContext) {
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        // The attribute of Specified-OutsideSqlContext.
-        // - - - - - - - - - - - - - - - - - - - - - - -
-        final String suffix = buildDbmsSuffix();
-        final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
-        final Object pmb = outsideSqlContext.getParameterBean();
-
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
-
-        // - - - - - - - - - - - - -
-        // Create ResultSetHandler.
-        // - - - - - - - - - - - - -
-        final ResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
-
-        // - - - - - - - - - - -
-        // Create SqlExecution.
-        // - - - - - - - - - - -
-        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
-    }
-
-    protected ${glOutsideSqlSelectExecution} createOutsideSqlSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
-        final ${glOutsideSqlSelectExecution} cmd = new ${glOutsideSqlSelectExecution}(_dataSource, _statementFactory, handler);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        cmd.setSql(sql);
-        return cmd;
-    }
-
-    public Object[] getSqlExecutionArgument() {
-        assertStatus("getSqlExecutionArgument");
-        return new Object[] { _parameterBean };
+        return createBeanListMetaDataResultSetHandler(bmd);
     }
 
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
+    @Override
     protected ResultSetHandler createOutsideSqlSelectResultSetHandler() {
         final BeanMetaData bmd = createBeanMetaData();
         final ResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
         return handler;
     }
 
+    @Override
     protected Object getResultTypeSpecification() {
         return _entityType;
     }
@@ -164,10 +71,16 @@ public class ${glOutsideSqlSelectListCommand} extends ${glAbstractOutsideSqlComm
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    protected void assertStatus(String methodName) {
-        assertBasicProperty(methodName);
-        assertComponentProperty(methodName);
-        assertOutsideSqlBasic(methodName);
-        assertEntityType(methodName);
+    protected void assertEntityType(String methodName) {
+        if (_entityType == null) {
+            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setEntityType(Class<ENTITY> entityType) {
+        _entityType = entityType;
     }
 }

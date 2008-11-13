@@ -11,25 +11,29 @@ import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
+public class ${glSelectCountCBCommand} extends ${glAbstractSelectCBCommand}<Integer> {
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    @Override
     public String getCommandName() {
         return "selectCount";
     }
 
-    @Override
     public Class<?> getCommandReturnType() {
-        return int.class;
+        return Integer.class;
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isSelectCount() {
+        return true;
     }
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    @Override
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
@@ -47,13 +51,5 @@ public class ${glSelectCountCBCommand} extends ${glSelectListCBCommand} {
             }
             return null;
         }
-    }
-
-    // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    @Override
-    public boolean isSelectCount() {
-        return true;
     }
 }

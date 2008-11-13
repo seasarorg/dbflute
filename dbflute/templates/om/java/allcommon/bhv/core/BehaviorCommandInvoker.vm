@@ -96,10 +96,11 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     /**
      * Invoke the command of behavior. {Public Interface}
      * This method is an entry point!
+     * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
      * @return The result object. (Nullable)
      */
-    public Object invoke(${glBehaviorCommand} behaviorCommand) {
+    public <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
         clearContext();
         try {
             return doInvoke(behaviorCommand);
@@ -108,7 +109,12 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         }
     }
 
-    protected Object doInvoke(${glBehaviorCommand} behaviorCommand) {
+    /**
+     * @param <RESULT> The type of result.
+     * @param behaviorCommand The command of behavior. (NotNull)
+     * @return The result object. (Nullable)
+     */
+    protected <RESULT> RESULT doInvoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
         // - - - - - - - - - - - - -
         // Initialize SQL Execution
         // - - - - - - - - - - - - -
@@ -166,18 +172,19 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         // Convert and Return!
         // - - - - - - - - - -
         if (retType.isPrimitive()) {
-            return convertPrimitiveWrapper(retType, ret);
+            ret = convertPrimitiveWrapper(retType, ret);
         } else if (Number.class.isAssignableFrom(retType)) {
-            return convertNumber(retType, ret);
-        } else {
-            return ret;
+            ret = convertNumber(retType, ret);
         }
+        @SuppressWarnings("unchecked")
+        final RESULT result = (RESULT)ret;
+        return result;
     }
 
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
-    protected void initializeSqlExecution(${glBehaviorCommand} behaviorCommand) {
+    protected <RESULT> void initializeSqlExecution(${glBehaviorCommand}<RESULT> behaviorCommand) {
         final String key = behaviorCommand.buildSqlExecutionKey();
         ${glSqlExecutionCreator} creator = behaviorCommand.createSqlExecutionCreator();
         getSqlExecution(key, creator);
@@ -232,14 +239,14 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected void logSqlExecution(${glBehaviorCommand} behaviorCommand, ${glSqlExecution} execution, long beforeCmd, long afterCmd) {
+    protected <RESULT> void logSqlExecution(${glBehaviorCommand}<RESULT> behaviorCommand, ${glSqlExecution} execution, long beforeCmd, long afterCmd) {
         log("SqlExecution Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     // ===================================================================================
     //                                                                      Log Invocation
     //                                                                      ==============
-    protected void logInvocation(${glBehaviorCommand} behaviorCommand) {
+    protected <RESULT> void logInvocation(${glBehaviorCommand}<RESULT> behaviorCommand) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
 
@@ -275,7 +282,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         }
     }
 
-    protected void logPath(${glBehaviorCommand} behaviorCommand, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
+    protected <RESULT> void logPath(${glBehaviorCommand}<RESULT> behaviorCommand, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
         final ${glInvokeNameResultName} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
@@ -300,7 +307,8 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
     }
 
-    protected String buildInvocationExpressionWithoutKakko(${glBehaviorCommand} behaviorCommand, String invokeClassName, String invokeMethodName) {
+    protected <RESULT> String buildInvocationExpressionWithoutKakko(${glBehaviorCommand}<RESULT> behaviorCommand
+                                                                  , String invokeClassName, String invokeMethodName) {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
             try {
                 final String originalName = invokeClassName;
@@ -498,7 +506,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // ===================================================================================
     //                                                                          Log Return
     //                                                                          ==========
-    protected void logReturn(${glBehaviorCommand} behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+    protected <RESULT> void logReturn(${glBehaviorCommand}<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
         try {
             final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";
             if (List.class.isAssignableFrom(retType)) {

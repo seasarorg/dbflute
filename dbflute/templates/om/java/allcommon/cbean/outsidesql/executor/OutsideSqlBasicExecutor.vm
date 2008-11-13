@@ -94,7 +94,8 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
     public int execute(String path, Object pmb) {
-        return invoke(createExecuteCommand(path, pmb));
+        final Integer result = invoke(createExecuteCommand(path, pmb));
+        return result != null ? result.intValue() : 0;
     }
 
     // [DBFlute-0.7.5]
@@ -113,33 +114,31 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand} createSelectListCommand(String path, Object pmb, Class<?> entityType) {
-        return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
+    protected <ENTITY> ${glBehaviorCommand}<List<ENTITY>> createSelectListCommand(String path, Object pmb, Class<ENTITY> entityType) {
+        final ${glOutsideSqlSelectListCommand}<ENTITY> cmd = xsetupCommand(new ${glOutsideSqlSelectListCommand}<ENTITY>(), path, pmb);
+        cmd.setEntityType(entityType);
+        return cmd;
     }
 
-    protected ${glBehaviorCommand} createExecuteCommand(String path, Object pmb) {
-        return xsetupCommand(new ${glOutsideSqlExecuteCommand}(), path, pmb, null);
+    protected ${glBehaviorCommand}<Integer> createExecuteCommand(String path, Object pmb) {
+        return xsetupCommand(new ${glOutsideSqlExecuteCommand}(), path, pmb);
     }
 
-    protected ${glBehaviorCommand} createCallCommand(String path, Object pmb) {
-        return xsetupCommand(new ${glOutsideSqlCallCommand}(), path, pmb, null);
+    protected ${glBehaviorCommand}<Void> createCallCommand(String path, Object pmb) {
+        return xsetupCommand(new ${glOutsideSqlCallCommand}(), path, pmb);
     }
 
-    private <COMMAND extends ${glAbstractOutsideSqlCommand}> COMMAND xsetupCommand(COMMAND command, String path, Object pmb, Class<?> entityType) {
+    private <COMMAND extends ${glAbstractOutsideSqlCommand}<?>> COMMAND xsetupCommand(COMMAND command, String path, Object pmb) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
         command.setParameterBean(pmb);
         command.setOutsideSqlOption(createOutsideSqlOption());
-        if (entityType != null) {
-            command.setEntityType(entityType);
-        }
         return command;
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
-        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    protected <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
+        return _behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

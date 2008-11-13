@@ -138,6 +138,8 @@ targetdatabase = $targetDatabase
     #set ($glAbstractEntityCommand = "${glProjectPrefix}AbstractEntityCommand")
     #set ($glAbstractListEntityCommand = "${glProjectPrefix}AbstractListEntityCommand")
     #set ($glAbstractOutsideSqlCommand = "${glProjectPrefix}AbstractOutsideSqlCommand")
+    #set ($glAbstractOutsideSqlSelectCommand = "${glProjectPrefix}AbstractOutsideSqlSelectCommand")
+    #set ($glAbstractSelectCBCommand = "${glProjectPrefix}AbstractSelectCBCommand")
     #set ($glBatchDeleteEntityCommand = "${glProjectPrefix}BatchDeleteEntityCommand")
     #set ($glBatchDeleteNonstrictEntityCommand = "${glProjectPrefix}BatchDeleteNonstrictEntityCommand")
     #set ($glBatchInsertEntityCommand = "${glProjectPrefix}BatchInsertEntityCommand")
@@ -723,6 +725,14 @@ targetdatabase = $targetDatabase
       $database.info("    parse('AbstractOutsideSqlCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('AbstractOutsideSqlSelectCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlSelectCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlSelectCommand.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('AbstractSelectCBCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractSelectCBCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractSelectCBCommand.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('BatchDeleteEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchDeleteEntityCommand}.${glClassFileExtension}" )

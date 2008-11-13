@@ -5,8 +5,9 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
  * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
  */
-public interface ${glBehaviorCommand} {
+public interface ${glBehaviorCommand}<RESULT> {
 
     // ===================================================================================
     //                                                                   Basic Information

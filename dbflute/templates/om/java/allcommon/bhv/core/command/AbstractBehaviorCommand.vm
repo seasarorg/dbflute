@@ -24,8 +24,9 @@ import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalRelationRowCreator
 
 /**
  * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
  */
-public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorCommand}, ${glBehaviorCommandComponentSetup} {
+public abstract class ${glAbstractBehaviorCommand}<RESULT> implements ${glBehaviorCommand}<RESULT>, ${glBehaviorCommandComponentSetup} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,7 +34,7 @@ public abstract class ${glAbstractBehaviorCommand} implements ${glBehaviorComman
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    /** The table DB-name. (Required) */
+    /** The table DB name. (Required) */
     protected String _tableDbName;
 
     /** Is it initialize only? (Choice) */

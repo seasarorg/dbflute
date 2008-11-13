@@ -634,7 +634,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             cmd.setInitializeOnly(true); invoke(cmd);
         }
         {
-            ${glSelectListCBCommand} cmd = createSelectListCBCommand(newConditionBean());
+            ${glSelectListCBCommand}<${glEntityInterfaceName}> cmd = createSelectListCBCommand(newConditionBean(), ${glEntityInterfaceName}.class);
             cmd.setInitializeOnly(true); invoke(cmd);
         }
     }
@@ -642,37 +642,35 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected ${glSelectCountCBCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final ${glSelectCountCBCommand} command = xsetupSelectCommand(new ${glSelectCountCBCommand}());
-        command.setEntityType(getDBMeta().getEntityType());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
         return command;
     }
 
-    protected ${glSelectListCBCommand} createSelectListCBCommand(${glConditionBeanInterfaceName} cb) {
+    protected <ENTITY extends ${glEntityInterfaceName}> ${glSelectListCBCommand}<ENTITY> createSelectListCBCommand(${glConditionBeanInterfaceName} cb, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final ${glSelectListCBCommand} command = xsetupSelectCommand(new ${glSelectListCBCommand}());
-        command.setEntityType(getDBMeta().getEntityType());
+        final ${glSelectListCBCommand}<ENTITY> command = xsetupSelectCommand(new ${glSelectListCBCommand}<ENTITY>());
+        command.setEntityType(entityType);
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
         return command;
     }
 
-    protected ${glSelectNextValCommand} createSelectNextValCommand(Class<?> entityType) {
+    protected <RESULT> ${glSelectNextValCommand}<RESULT> createSelectNextValCommand(Class<RESULT> entityType) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
-        final ${glSelectNextValCommand} command = xsetupSelectCommand(new ${glSelectNextValCommand}());
+        final ${glSelectNextValCommand}<RESULT> command = xsetupSelectCommand(new ${glSelectNextValCommand}<RESULT>());
         command.setEntityType(entityType);
         return command;
     }
 
-    private <COMMAND extends ${glAbstractBehaviorCommand}> COMMAND xsetupSelectCommand(COMMAND command) {
+    private <COMMAND extends ${glAbstractBehaviorCommand}<?>> COMMAND xsetupSelectCommand(COMMAND command) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         return command;
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
-        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    protected <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
+        return _behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     protected void assertBehaviorCommandInvoker(String methodName) {

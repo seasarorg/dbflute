@@ -14,7 +14,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glAbstractListEntityCommand} extends ${glAbstractBehaviorCommand} {
+public abstract class ${glAbstractListEntityCommand} extends ${glAbstractBehaviorCommand}<int[]> {
 
     // ===================================================================================
     //                                                                           Attribute

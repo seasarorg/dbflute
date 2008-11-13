@@ -1,26 +1,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import org.seasar.extension.jdbc.ResultSetHandler;
+
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonBhvCoreExecution}.${glOutsideSqlSelectExecution};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
- * The behavior command for OutsideSql.execute().
+ * The abstract command for OutsideSql.selectSomething().
  * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
  */
-public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand}<Integer> {
-
-    // ===================================================================================
-    //                                                                   Basic Information
-    //                                                                   =================
-    public String getCommandName() {
-        return "execute";
-    }
-
-    public Class<?> getCommandReturnType() {
-        return Integer.class;
-    }
+public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glAbstractOutsideSqlCommand}<RESULT> {
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -30,7 +25,7 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
     }
 
     public boolean isSelect() {
-        return false;
+        return true;
     }
 
     // ===================================================================================
@@ -41,17 +36,35 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final Object resultTypeSpecification = getResultTypeSpecification();
+        final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+
+        // Set up fetchNarrowingBean.
+        setupOutsideSqlFetchNarrowingBean(pmb, option);
+    }
+
+    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
+        if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
+            return;
+        }
+        final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
+        if (option.isManualPaging()) {
+            fetchNarrowingBean.ignoreFetchNarrowing();
+        }
+        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
     }
 
     public void afterExecuting() {
@@ -70,7 +83,8 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, null);
+        final Object resultTypeSpecification = getResultTypeSpecification();
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
@@ -78,12 +92,12 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
                 final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-                return createOutsideSqlExecuteExecution(outsideSqlContext);
+                return createOutsideSqlSelectExecution(outsideSqlContext);
             }
         };
     }
 
-    protected ${glSqlExecution} createOutsideSqlExecuteExecution(${glOutsideSqlContextName} outsideSqlContext) {
+    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContextName} outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -
@@ -97,12 +111,36 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
 
-        return createUpdateDynamicCommand(argNames, argTypes, sql);
+        // - - - - - - - - - - - - -
+        // Create ResultSetHandler.
+        // - - - - - - - - - - - - -
+        final ResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
+
+        // - - - - - - - - - - -
+        // Create SqlExecution.
+        // - - - - - - - - - - -
+        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
+    }
+
+    protected ${glOutsideSqlSelectExecution} createOutsideSqlSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
+        final ${glOutsideSqlSelectExecution} cmd = new ${glOutsideSqlSelectExecution}(_dataSource, _statementFactory, handler);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        cmd.setSql(sql);
+        return cmd;
     }
 
     public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
         return new Object[] { _parameterBean };
     }
+
+    // ===================================================================================
+    //                                                                     Extension Point
+    //                                                                     ===============
+    protected abstract ResultSetHandler createOutsideSqlSelectResultSetHandler();
+
+    protected abstract Object getResultTypeSpecification();
 
     // ===================================================================================
     //                                                                       Assert Helper

@@ -107,11 +107,11 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand} createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<?> entityType) {
-        return xsetupCommand(new ${glOutsideSqlSelectListCommand}(), path, pmb, entityType);
+    protected <ENTITY> ${glBehaviorCommand}<List<ENTITY>> createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        return xsetupCommand(new ${glOutsideSqlSelectListCommand}<ENTITY>(), path, pmb, entityType);
     }
 
-    private ${glOutsideSqlSelectListCommand} xsetupCommand(${glOutsideSqlSelectListCommand} command, String path, PARAMETER_BEAN pmb, Class<?> entityType) {
+    private <ENTITY> ${glOutsideSqlSelectListCommand}<ENTITY> xsetupCommand(${glOutsideSqlSelectListCommand}<ENTITY> command, String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -121,9 +121,8 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
         return command;
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
-        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    protected <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
+        return _behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

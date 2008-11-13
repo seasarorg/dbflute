@@ -5,6 +5,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalProcedureCommand};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataFactory};
@@ -13,17 +14,15 @@ import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaDataF
  * The behavior command for OutsideSql.execute().
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
+public class ${glOutsideSqlCallCommand} extends ${glAbstractOutsideSqlCommand}<Void> {
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    @Override
     public String getCommandName() {
         return "call";
     }
 
-    @Override
     public Class<?> getCommandReturnType() {
         return void.class;
     }
@@ -31,15 +30,54 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
     // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
-    @Override
     public boolean isProcedure() {
         return true;
+    }
+
+    public boolean isSelect() {
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final String path = _outsideSqlPath;
+        final Object pmb = _parameterBean;
+        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setOutsideSqlPath(path);
+        outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setMethodName(getCommandName());
+        outsideSqlContext.setStatementConfig(option.getStatementConfig());
+        outsideSqlContext.setTableDbName(option.getTableDbName());
+		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
+        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+    }
+
+    public void afterExecuting() {
     }
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    @Override
+    public String buildSqlExecutionKey() {
+        assertStatus("buildSqlExecutionKey");
+        return generateSpecifiedOutsideSqlUniqueKey();
+    }
+
+    protected String generateSpecifiedOutsideSqlUniqueKey() {
+        final String methodName = getCommandName();
+        final String path = _outsideSqlPath;
+        final Object pmb = _parameterBean;
+        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, null);
+    }
+
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
@@ -78,17 +116,15 @@ public class ${glOutsideSqlCallCommand} extends ${glOutsideSqlExecuteCommand} {
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // InternalProcedureCommand switches argument so this override is unnecessary!
+    // InternalProcedureCommand switches argument so this is unnecessary actually!
     // - - - - - - - - - -/
-    // @Override
-    // public Object[] getSqlExecutionArgument() {
-    //     return new Object[] { _parameterBean };
-    // }
+    public Object[] getSqlExecutionArgument() {
+        return new Object[] { _parameterBean };
+    }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    @Override
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);

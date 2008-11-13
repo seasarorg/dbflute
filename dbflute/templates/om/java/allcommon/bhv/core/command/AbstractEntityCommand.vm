@@ -14,7 +14,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCommand} {
+public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCommand}<Integer> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -29,7 +29,7 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     //                                                                   Basic Information
     //                                                                   =================
     public Class<?> getCommandReturnType() {
-        return int.class;
+        return Integer.class;
     }
 
     // ===================================================================================

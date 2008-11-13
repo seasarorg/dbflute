@@ -1,17 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.dao.BeanMetaData;
-
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
  * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
  */
-public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehaviorCommand} {
+public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstractBehaviorCommand}<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -27,31 +23,6 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
 
     /** The option of outside-SQL. (Required) */
     protected ${glOutsideSqlOptionName} _outsideSqlOption;
-
-    /** The type of entity. (Required) */
-    protected Class<?> _entityType;
-
-    // ===================================================================================
-    //                                                                             Factory
-    //                                                                             =======
-    // -----------------------------------------------------
-    //                                          BeanMetaData
-    //                                          ------------
-    protected BeanMetaData createBeanMetaData() {
-        assertEntityType("createBeanMetaData");
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
-    }
-
-    // -----------------------------------------------------
-    //                                      ResultSetHandler
-    //                                      ----------------
-    protected ResultSetHandler createOutsideSqlBeanListResultSetHandler(BeanMetaData bmd) {
-        final ValueType valueType = ValueTypes.getValueType(_entityType);
-        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
-            return createObjectListResultSetHandler(valueType);
-        }
-        return createBeanListMetaDataResultSetHandler(bmd);
-    }
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -95,12 +66,6 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
         }
     }
 
-    protected void assertEntityType(String methodName) {
-        if (_entityType == null) {
-            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
-        }
-    }
-
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -114,9 +79,5 @@ public abstract class ${glAbstractOutsideSqlCommand} extends ${glAbstractBehavio
 
     public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
         _outsideSqlOption = outsideSqlOption;
-    }
-
-    public void setEntityType(Class<?> entityType) {
-        _entityType = entityType;
     }
 }

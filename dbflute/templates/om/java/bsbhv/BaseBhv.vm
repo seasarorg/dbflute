@@ -636,7 +636,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
     protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
-        return invoke(createSelectListCBCommand(cb));
+        return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class));
     }
     @SuppressWarnings("unchecked")
     protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
