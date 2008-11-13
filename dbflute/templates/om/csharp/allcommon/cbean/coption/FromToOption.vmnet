@@ -60,9 +60,9 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
         }
         if (_compareAsDate) {
             DateTime cloneDate = new DateTime(toDate.Value.Year, toDate.Value.Month, toDate.Value.Day);
-            if (cloneDate.Date.Equals(DateTime.MAX_VALUE.Date)) { // CSharp Only
-                _toDateMaxValue = true
-                return DateTime.MAX_VALUE;
+            if (cloneDate.Date.Equals(DateTime.MaxValue.Date)) { // CSharp Only
+                _toDateMaxValue = true;
+                return DateTime.MaxValue;
             }
             return cloneDate.AddDays(1);
         }
