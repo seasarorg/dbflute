@@ -68,11 +68,7 @@ public class ${glConditionBeanContextName} {
      * @return Determination.
      */
     public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
-        if (dtoInstance instanceof ${glConditionBeanInterfaceName}) {
-            return true;
-        } else {
-            return false;
-        }
+        return dtoInstance instanceof ${glConditionBeanInterfaceName};
     }
 
     /**
@@ -81,18 +77,14 @@ public class ${glConditionBeanContextName} {
      * @return Determination.
      */
     public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
-        if (${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass)) {
-            return true;
-        } else {
-            return false;
-        }
+        return ${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass);
     }
 
     // ===================================================================================
-    //                                         Initialize against the ClassLoader Headache
-    //                                         ===========================================
+    //                                                                        Cool Classes
+    //                                                                        ============
 	@SuppressWarnings("unused")
-    public static void initialize() {
+    public static void loadCoolClasses() {
         boolean debugEnabled = false; // If you watch the log, set this true.
         // Against the ClassLoader Headache!
         final StringBuilder sb = new StringBuilder();

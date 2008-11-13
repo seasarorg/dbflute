@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInstanceHandlerName}")
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,33 +16,58 @@ import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 public class ${myClassName} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
+
+    // ===================================================================================
     //                                                                        Resource Map
     //                                                                        ============
     /** Table DB-name instance map. */
     protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = newConcurrentHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
-    protected static final Map<String, String> _tableDbNameClassNameMap;
-    static {
-        Map<String, String> tmpMap = newConcurrentHashMap();
-
-#foreach ($table in $database.tables)
-        tmpMap.put("${table.name}", "${table.DBMetaFullClassName}");
-#end
-
-        _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
-    }
-
+    protected static final Map<String, String> _tableDbNameClassNameMap = newConcurrentHashMap();
+    
     /** The flexible map of table DB name. This is for conversion at finding. */
-    protected static final Map<String, String> _tableDbNameFlexibleMap;
-    static {
-        Map<String, String> tmpMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+    protected static final Map<String, String> _tableDbNameFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+    
+    /** The count of setting up resources of DB meta for internal information. */
+    protected static int setupCount = 0; 
 
-#foreach ($table in $database.tables)
-        tmpMap.put("${table.name}", "${table.name}");
-#end
-
-        _tableDbNameFlexibleMap = Collections.unmodifiableMap(tmpMap);
+    /**
+     * Set up the resource of DBMeta. Lock this class.
+     * @param tableDbNameClassNameMap The map of table DB name and class name. (NotNull)
+     */
+    public static synchronized void setupDBMetaResource(Map<String, String> tableDbNameClassNameMap) {
+        if (tableDbNameClassNameMap == null) {
+            String msg = "The argument 'tableDbNameClassNameMap' should not be null";
+            msg = msg + " at ${myClassName}.setupDBMetaResource()";
+            throw new IllegalArgumentException(msg);
+        }
+        if (tableDbNameClassNameMap.isEmpty()) {
+            String msg = "The argument 'tableDbNameClassNameMap' should not be empty";
+            msg = msg + " at ${myClassName}.setupDBMetaResource()";
+            throw new IllegalArgumentException(msg);
+        }
+        final String firstMsg = "...Setting up resources of DB meta";
+        final int tableCount = tableDbNameClassNameMap.size();
+        if (setupCount == 0) {
+            _log.info(firstMsg + ": tables=" + tableCount); // basically here
+        } else {
+            _log.info(firstMsg + " AGAIN(" + (setupCount + 1) + " times): tables=" + tableCount);
+        }
+        _tableDbNameInstanceMap.clear();
+        _tableDbNameClassNameMap.clear();
+        _tableDbNameFlexibleMap.clear();
+        final Set<String> tableDbNameSet = tableDbNameClassNameMap.keySet();
+        for (String tableDbName : tableDbNameSet) {
+            final String className = tableDbNameClassNameMap.get(tableDbName);
+            _tableDbNameClassNameMap.put(tableDbName, className);
+            _tableDbNameFlexibleMap.put(tableDbName, tableDbName);
+        }
+        ++setupCount;
     }
 
     /**
@@ -117,7 +141,8 @@ public class ${myClassName} {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
         ${glDBMetaInterfaceName} instance = getCachedDBMeta(tableDbName);
         if (instance == null) {
-            String msg = "The instance map returned null by the key: key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
+            String msg = "The instance map returned null by the key:";
+            msg = msg + " key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
             throw new DBMetaNotFoundException(msg);
         }
         return instance;
