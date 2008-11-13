@@ -65,6 +65,8 @@
         </fileset>
       </classpath>
   	  <include name="**/*"/>
+  	  <compilerarg value="-Xlint:deprecation" />
+  	  <compilerarg value="-Xlint:unchecked" />
   	</javac>
   </target>
 

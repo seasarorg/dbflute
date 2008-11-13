@@ -69,13 +69,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                               Query
     //                                                                               =====
     /**
-     * Get condition-query as interface.
-     * @return Instance of query as interface. (NotNull)
-     * @deprecated
-     */
-    public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
-
-    /**
      * Get the conditionQuery of the local table as interface.
      * @return The conditionQuery of the local table as interface. (NotNull)
      */

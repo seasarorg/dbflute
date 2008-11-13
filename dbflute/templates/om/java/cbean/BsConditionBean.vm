@@ -120,10 +120,13 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _conditionQuery;
     }
 
-    public ${glConditionQueryInterfaceName} getConditionQueryAsInterface() {
+    /**
+     * ${database.ImplementComment}
+     * @return The conditionQuery of the local table as interface. (NotNull)
+     */
+    public ${glConditionQueryInterfaceName} localCQ() {
         return getConditionQuery();
     }
-
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

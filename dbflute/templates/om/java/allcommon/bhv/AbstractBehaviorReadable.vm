@@ -634,7 +634,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             cmd.setInitializeOnly(true); invoke(cmd);
         }
         {
-            ${glSelectListCBCommand}<${glEntityInterfaceName}> cmd = createSelectListCBCommand(newConditionBean(), ${glEntityInterfaceName}.class);
+            ${glSelectListCBCommand}<? extends ${glEntityInterfaceName}> cmd
+                    = createSelectListCBCommand(newConditionBean(), getDBMeta().getEntityType());
             cmd.setInitializeOnly(true); invoke(cmd);
         }
     }
