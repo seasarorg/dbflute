@@ -158,7 +158,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(); unionQuery.query(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * @param unionQuery The query of 'union'. (NotNull)
