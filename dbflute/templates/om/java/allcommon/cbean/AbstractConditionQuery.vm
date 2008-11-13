@@ -41,6 +41,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected static final ${glConditionKeyName} CK_LT = ${glConditionKeyName}.CK_LESS_THAN;
     protected static final ${glConditionKeyName} CK_PS = ${glConditionKeyName}.CK_PREFIX_SEARCH;
     protected static final ${glConditionKeyName} CK_LS = ${glConditionKeyName}.CK_LIKE_SEARCH;
+    protected static final ${glConditionKeyName} CK_NLS = ${glConditionKeyName}.CK_NOT_LIKE_SEARCH;
     protected static final ${glConditionKeyName} CK_INS = ${glConditionKeyName}.CK_IN_SCOPE;
     protected static final ${glConditionKeyName} CK_NINS = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
     protected static final ${glConditionKeyName} CK_ISN = ${glConditionKeyName}.CK_IS_NULL;
@@ -412,6 +413,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
+    protected void regLSQ(${glConditionKeyName} key
+                        , String value
+                        , ${glConditionValueName} cvalue
+                        , String colName
+                        , String capPropName
+                        , String uncapPropName
+                        , ${glConditionOptionLikeSearchName} option) {
+        registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+    }
+
     @SuppressWarnings("deprecation")
     protected void registerLikeSearchQuery(${glConditionKeyName} key
                                          , String value

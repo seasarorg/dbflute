@@ -1033,6 +1033,10 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LikeSearch.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_likeSearch.${glTemplateFileExtension}",$path ,"", "")
 
+    $database.info("    parseConditionKey_likeSearch")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}NotLikeSearch.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_notLikeSearch.${glTemplateFileExtension}",$path ,"", "")
+
     $database.info("    parseConditionKey_inScope")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}InScope.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_inScope.${glTemplateFileExtension}",$path ,"", "")

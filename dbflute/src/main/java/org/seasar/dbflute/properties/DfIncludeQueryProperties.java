@@ -107,6 +107,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableStringLikeSearch(String tableName, String columnName) {
         return isAvailable("String", "LikeSearch", tableName, columnName);
     }
+    
+    public boolean isAvailableStringNotLikeSearch(String tableName, String columnName) {
+        return isAvailable("String", "NotLikeSearch", tableName, columnName);
+    }
 
     public boolean isAvailableStringInScope(String tableName, String columnName) {
         return isAvailable("String", "InScope", tableName, columnName);

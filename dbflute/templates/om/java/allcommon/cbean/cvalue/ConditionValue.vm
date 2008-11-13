@@ -524,10 +524,10 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                         Like Search
     //                                                                         ===========
-    /** Value of likeSearch. */
+    /** The value of likeSearch. */
     protected List<LikeSearchValue> _likeSearch;
 
-    /** Value of likeSearch for spare. */
+    /** The value of likeSearch for spare. */
     protected List<LikeSearchValue> _likeSearch4Spare;
 
     /**
@@ -543,7 +543,7 @@ public class ${myClassName} {
                 _likeSearch.add(_likeSearch4Spare.get(index));
             }
         }
-        final LikeSearchValue likeSearchValue = (LikeSearchValue)_likeSearch.remove(0);
+        final LikeSearchValue likeSearchValue = _likeSearch.remove(0);
         return (String)filterValue(likeSearchValue.generateRealValue());
     }
 
@@ -594,6 +594,96 @@ public class ${myClassName} {
         protected String _value;
         protected ${glConditionOptionLikeSearchName} _option;
         public LikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+            _value = value;
+            _option = option;
+        }
+        public String getValue() {
+            return _value;
+        }
+        public ${glConditionOptionLikeSearchName} getOption() {
+            return _option;
+        }
+        public String generateRealValue() {
+            if (_option == null) {
+                return _value;
+            }
+            return _option.generateRealValue(_value);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     Not Like Search
+    //                                                                     ===============
+    /** The value of notLikeSearch. */
+    protected List<NotLikeSearchValue> _notLikeSearch;
+
+    /** The value of notLikeSearch for spare. */
+    protected List<NotLikeSearchValue> _notLikeSearch4Spare;
+
+    /**
+     * Get the value of notLikeSearch.
+     * @return The value of notLikeSearch. (Nullable)
+     */
+    public String getNotLikeSearch() {
+        if (_notLikeSearch == null) {
+            return null;
+        }
+        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
+            }
+        }
+        final NotLikeSearchValue notLikeSearchValue = _notLikeSearch.remove(0);
+        return (String)filterValue(notLikeSearchValue.generateRealValue());
+    }
+
+    /**
+     * Set the value of notLikeSearch.
+     * @param value The value of notLikeSearch. (Nullable)
+     * @param option The option of notLikeSearch. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setNotLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+        if (_notLikeSearch == null) {
+            _notLikeSearch = new ArrayList<NotLikeSearchValue>();
+            _notLikeSearch4Spare= new ArrayList<NotLikeSearchValue>();
+        }
+        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
+            }
+        }
+        NotLikeSearchValue notLikeSearchValue = new NotLikeSearchValue(value, option);
+        _notLikeSearch.add(notLikeSearchValue);
+        _notLikeSearch4Spare.add(notLikeSearchValue);
+        return this;
+    }
+
+    /** Location of notLikeSearch. */
+    protected String _notLikeSearchLocation;
+
+    /**
+     * Get the location of notLikeSearch.
+     * @return The location of notLikeSearch. (Nullable)
+     */
+    public String getNotLikeSearchLocation() {
+        return _notLikeSearchLocation;
+    }
+
+    /**
+     * Set the location of notLikeSearch.
+     * @param location The location of notLikeSearch. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setNotLikeSearchLocation(String location) {
+        _notLikeSearchLocation = location;
+        return this;
+    }
+
+    protected static class NotLikeSearchValue {
+        protected String _value;
+        protected ${glConditionOptionLikeSearchName} _option;
+        public NotLikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
             _value = value;
             _option = option;
         }

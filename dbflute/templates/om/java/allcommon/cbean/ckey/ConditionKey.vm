@@ -8,11 +8,13 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
  * The abstract class of condition-key.
- * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Mark of replaced value. */
     public static final String MARK_OF_REPLACED_VALUE = "ReplacedValue";
 
@@ -40,6 +42,9 @@ public abstract class ${myClassName} {
     /** The condition key of likeSearch. */
     public static final ${myClassName} CK_LIKE_SEARCH = new ${myClassName}LikeSearch();
 
+    /** The condition key of notLikeSearch. */
+    public static final ${myClassName} CK_NOT_LIKE_SEARCH = new ${myClassName}NotLikeSearch();
+
     /** The condition key of inScope. */
     public static final ${myClassName} CK_IN_SCOPE = new ${myClassName}InScope();
 
@@ -55,28 +60,18 @@ public abstract class ${myClassName} {
     /** Dummy-object for IsNull and IsNotNull and so on... */
     protected static final Object DUMMY_OBJECT = new Object();
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Condition-key. */
     protected String _conditionKey;
 
     /** Operand. */
     protected String _operand;
 
-    /**
-     * Get condition-key.
-     * @return Condition-key.
-     */
-    public String getConditionKey() {
-        return _conditionKey;
-    }
-
-    /**
-     * Get operand.
-     * @return Operand.
-     */
-    public String getOperand() {
-        return _operand;
-    }
-
+    // ===================================================================================
+    //                                                                          Validation
+    //                                                                          ==========
     /**
      * Is valid registration?
      * @param conditionValue Condition value. (NotNull)
@@ -86,6 +81,9 @@ public abstract class ${myClassName} {
      */
     abstract public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName);
 
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     /**
      * Add where clause.
      * @param conditionList Condition list. (NotNull)
@@ -136,6 +134,9 @@ public abstract class ${myClassName} {
      */
     abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     /**
      * Setup condition value.
      * @param conditionValue Condition value. (NotNull)
@@ -186,6 +187,9 @@ public abstract class ${myClassName} {
      */
     abstract protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
 
+    // ===================================================================================
+    //                                                                         Bind Clause
+    //                                                                         ===========
     /**
      * Build bind clause. (for s2dao)
      * @param columnName Column name. (NotNull)
@@ -235,10 +239,12 @@ public abstract class ${myClassName} {
         return "${database.wildCard}";
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * ${database.OverrideComment}
      * Returns hash-code of this condition-key string.
-     * 
      * @return HashCode.
      */
     public int hashCode() {
@@ -248,7 +254,6 @@ public abstract class ${myClassName} {
     /**
      * ${database.OverrideComment}
      * If the condition-key of the other is same as this one, returns true.
-     * 
      * @param other Other entity. (Nullable)
      * @return Comparing result. If other is null, returns false.
      */
@@ -263,10 +268,28 @@ public abstract class ${myClassName} {
 
     /**
      * ${database.OverrideComment}
-     * 
      * @return View-string of condition key information.
      */
     public String toString() {
         return "${myClassName}: " + getConditionKey() + " " + getOperand() + " wild-card=[" + getWildCard() + "]";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get condition-key.
+     * @return Condition-key.
+     */
+    public String getConditionKey() {
+        return _conditionKey;
+    }
+
+    /**
+     * Get operand.
+     * @return Operand.
+     */
+    public String getOperand() {
+        return _operand;
     }
 }

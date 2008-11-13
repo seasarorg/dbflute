@@ -1201,6 +1201,13 @@ public class Column {
         }
         return getIncludeQueryProperties().isAvailableStringLikeSearch(getTableName(), getName());
     }
+    
+    public boolean isAvailableStringNotLikeSearch() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
+        return getIncludeQueryProperties().isAvailableStringNotLikeSearch(getTableName(), getName());
+    }
 
     public boolean isAvailableStringInScope() {
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());

@@ -40,6 +40,9 @@ public abstract class ${myClassName} {
     /** The condition key of likeSearch. */
     public static readonly ${myClassName} CK_LIKE_SEARCH = new ${myClassName}LikeSearch();
 
+    /** The condition key of notLikeSearch. */
+    public static readonly ${myClassName} CK_NOT_LIKE_SEARCH = new ${myClassName}NotLikeSearch();
+
     /** The condition key of inScope. */
     public static readonly ${myClassName} CK_IN_SCOPE = new ${myClassName}InScope();
 

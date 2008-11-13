@@ -310,6 +310,73 @@ public class ${myClassName} {
     }
 
     // ===================================================================================
+    //                                                                     Not Like Search
+    //                                                                     ===============
+    protected List<NotLikeSearchValue> _notLikeSearch;
+    protected List<NotLikeSearchValue> _notLikeSearch4Spare;
+
+    public String NotLikeSearch { get {
+        if (_notLikeSearch == null) {
+            return null;
+        }
+        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
+            }
+        }
+        NotLikeSearchValue notLikeSearchValue = (NotLikeSearchValue)_notLikeSearch.remove(0);
+        return notLikeSearchValue.generateRealValue();
+    }}
+
+    public ${myClassName} setNotLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+        if (_notLikeSearch == null) {
+            _notLikeSearch = new ArrayList<NotLikeSearchValue>();
+            _notLikeSearch4Spare= new ArrayList<NotLikeSearchValue>();
+        }
+        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
+            }
+        }
+        NotLikeSearchValue notLikeSearchValue = new NotLikeSearchValue(value, option);
+        _notLikeSearch.add(notLikeSearchValue);
+        _notLikeSearch4Spare.add(notLikeSearchValue);
+        return this;
+    }
+
+    protected String _notLikeSearchLocation;
+
+    public String getNotLikeSearchLocation() {
+        return _notLikeSearchLocation;
+    }
+
+    public ${myClassName} setNotLikeSearchLocation(String location) {
+        _notLikeSearchLocation = location;
+        return this;
+    }
+
+    protected class NotLikeSearchValue {
+        protected String _value;
+        protected ${glConditionOptionLikeSearchName} _option;
+        public NotLikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+            _value = value;
+            _option = option;
+        }
+        public String getValue() {
+            return _value;
+        }
+        public ${glConditionOptionLikeSearchName} getOption() {
+            return _option;
+        }
+        public String generateRealValue() {
+            if (_option == null) {
+                return _value;
+            }
+            return _option.generateRealValue(_value);
+        }
+    }
+
+    // ===================================================================================
     //                                                                            In Scope
     //                                                                            ========
     protected System.Collections.IList _inScope;

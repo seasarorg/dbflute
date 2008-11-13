@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCKey};
 
-#set ($myClassName = "${glConditionKeyName}LikeSearch")
+#set ($myClassName = "${glConditionKeyName}NotLikeSearch")
 import java.util.List;
 
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
@@ -8,7 +8,7 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
- * The condition-key of likeSearch.
+ * The condition-key of notLikeSearch.
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glConditionKeyName} {
@@ -17,8 +17,8 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * Constructor.
      */
     protected ${myClassName}() {
-        _conditionKey = "likeSearch";
-        _operand = "like";
+        _conditionKey = "notLikeSearch";
+        _operand = "not like";
     }
 
     /**
@@ -62,7 +62,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
             throw new IllegalArgumentException(msg);
         }
         final ${glConditionOptionLikeSearchName} myOption = (${glConditionOptionLikeSearchName})option;
-        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.getRearOption()));
+        conditionList.add(buildBindClauseWithRearOption(columnName, value.getNotLikeSearchLocation(), myOption.getRearOption()));
     }
 
     /**
@@ -83,6 +83,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param option Condition option. (NotNull)
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
-        conditionValue.setLikeSearch((String)value, (${glConditionOptionLikeSearchName})option).setLikeSearchLocation(location);
+        conditionValue.setNotLikeSearch((String)value, (${glConditionOptionLikeSearchName})option).setNotLikeSearchLocation(location);
     }
 }
