@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.impl.ResultSetWrapper;
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
@@ -39,6 +40,9 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 	/** Does it skip to cursor end? */
 	protected boolean _skipToCursorEnd;
 
+	/** Is the database DB2? */
+	protected final boolean _db2 = ${glDBDef}.isCurrentDef(${glDBDef}.DB2);
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -65,7 +69,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     //                                                                                Skip
     //                                                                                ====
     /**
-     * Skip to start-index.
+     * Skip to the point at start index.
      */
     protected void skip() {
         if (!isAvailableSkipRecord()) {
@@ -118,16 +122,14 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     //                                                                                Next
     //                                                                                ====
     /**
-     * Next.
+     * Move to the next record.
      * @return Does the result set have next record?
      * @throws SQLException
      */
     public boolean next() throws SQLException {
-#if ($database.isDatabaseDB2())
-	    if (_skipToCursorEnd) {// [DBFLUTE-243]
+	    if (_db2 && _skipToCursorEnd) { // [DBFLUTE-243]
 		    return false;
 		}
-#end
         final boolean hasNext = super.next();
         ++_requestCounter;
         if (!isAvailableLimitLoopCount()) {

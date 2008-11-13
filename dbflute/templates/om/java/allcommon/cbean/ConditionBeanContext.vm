@@ -1,12 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.LinkedHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
@@ -124,92 +121,6 @@ public class ${glConditionBeanContextName} {
     }
 
     // ===================================================================================
-    //                                                                        Product Name
-    //                                                                        ============
-    public static final String DB_NAME_DERBY = "derby";
-    public static final String DB_NAME_H2 = "h2";
-    public static final String DB_NAME_ORACLE = "oracle";
-    public static final String DB_NAME_MYSQL = "mysql";
-    public static final String DB_NAME_POSTGRESQL = "postgresql";
-    public static final String DB_NAME_FIREBIRD = "firebird";
-    public static final String DB_NAME_MSSQL = "mssql";
-    public static final String DB_NAME_DB2 = "db2";
-
-    protected static boolean databaseOracle = ${database.isDatabaseOracle()};
-    protected static boolean databasePostgreSQL = ${database.isDatabasePostgreSQL()};
-
-    protected static final Map<String, String> _driverHintDatabaseProductNameMap;
-    static {
-        final Map<String, String> tmpMap = Collections.synchronizedMap(new LinkedHashMap<String, String>());
-        tmpMap.put("org.apache.derby", DB_NAME_DERBY);
-        tmpMap.put("org.h2", DB_NAME_H2);
-        tmpMap.put("oracle", DB_NAME_ORACLE);
-        tmpMap.put("mysql", DB_NAME_MYSQL);
-        tmpMap.put("postgresql", DB_NAME_POSTGRESQL);
-        tmpMap.put("firebird", DB_NAME_FIREBIRD);
-        tmpMap.put("sqlserver", DB_NAME_MSSQL);
-        tmpMap.put("db2", DB_NAME_DB2);
-        _driverHintDatabaseProductNameMap = java.util.Collections.unmodifiableMap(tmpMap);
-    }
-
-    public static boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
-        final java.util.Set<String> keySet = _driverHintDatabaseProductNameMap.keySet();
-        for (final java.util.Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
-            final String driverHint = (String)ite.next();
-            if (driverClassName.indexOf(driverHint) >= 0) {
-                final String databaseProductName = (String)_driverHintDatabaseProductNameMap.get(driverHint);
-                setDatabaseProductName(databaseProductName);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** The database product name. */
-    private static String _databaseProductName;
-
-    /**
-     * Get database product name.
-     * @return Database product name.
-     */
-    public static String getDatabaseProductName() {
-        return _databaseProductName;
-    }
-
-    /**
-     * Set database product name.
-     * @param name Database product name. (NotNull)
-     */
-    public static void setDatabaseProductName(String name) {
-        if (_databaseProductName != null) {
-            String msg = "Already set up: current=" + _databaseProductName + " your=" + name;
-            throw new IllegalStateException(msg);
-        }
-        _databaseProductName = name;
-        if (DB_NAME_ORACLE.equalsIgnoreCase(_databaseProductName)) {
-            databaseOracle = true;
-        } else if (DB_NAME_POSTGRESQL.equalsIgnoreCase(_databaseProductName)) {
-            databasePostgreSQL = true;
-        }
-    }
-
-    /**
-     * Is the database Oracle?
-     * @return Is the database Oracle?
-     */
-    public static boolean isOracle() {
-        return databaseOracle;
-    }
-
-    /**
-     * Is the database PostgreSQL?
-     * @return Is the database PostgreSQL?
-     */
-    public static boolean isPostgreSql() {
-        return databasePostgreSQL;
-    }
-
-    // ===================================================================================
     //                                                                   SqlClause Creator
     //                                                                   =================
 	/**
@@ -232,27 +143,22 @@ public class ${glConditionBeanContextName} {
 	 * @return SQL-clause. (NotNull)
 	 */
     public static ${glSqlClauseName} createSqlClause(String tableDbName) {
-        final String databaseProductName = getDatabaseProductName();
-        if (databaseProductName == null) {
-            return new ${glSqlClauseName}${database.generateDbName}(tableDbName);
-        }
-        final String name = databaseProductName.toLowerCase();
-        if (name.equalsIgnoreCase(DB_NAME_DERBY)) {
-            return new ${glSqlClauseName}Derby(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_H2)) {
-            return new ${glSqlClauseName}H2(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_ORACLE)) {
-            return new ${glSqlClauseName}Oracle(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_FIREBIRD)) {
-            return new ${glSqlClauseName}Firebird(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_MYSQL)) {
+        if (${glDBDef}.isCurrentDef(${glDBDef}.MySQL)) {
             return new ${glSqlClauseName}MySql(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_POSTGRESQL)) {
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.PostgreSQL)) {
             return new ${glSqlClauseName}PostgreSql(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_MSSQL)) {
-            return new ${glSqlClauseName}SqlServer(tableDbName);
-        } else if (name.equalsIgnoreCase(DB_NAME_DB2)) {
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
+            return new ${glSqlClauseName}Oracle(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.DB2)) {
             return new ${glSqlClauseName}Db2(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.SQLServer)) {
+            return new ${glSqlClauseName}SqlServer(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.FireBird)) {
+            return new ${glSqlClauseName}Firebird(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.H2)) {
+            return new ${glSqlClauseName}H2(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Derby)) {
+            return new ${glSqlClauseName}Derby(tableDbName);
         } else {
             return new ${glSqlClauseName}${database.generateDbName}(tableDbName);
         }

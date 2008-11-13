@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import ${glPackageBaseCommon}.*;
-#if (!$database.isCompatibleBehaviorUseDaoInterface() && $table.isAvailableNonPrimaryKeyWritable())
+#if ($table.isAvailableNonPrimaryKeyWritable())
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 #end
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
@@ -28,9 +28,6 @@ import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
-#end
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-import ${glPackageExtendedDao}.*;
 #end
 import ${glPackageExtendedEntity}.*;
 import ${myDBMetaPackageName}.*;
@@ -81,13 +78,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                          ==========
     ${database.behaviorQueryPathBeginMark}
     ${database.behaviorQueryPathEndMark}
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected ${myExtendedDaoClassName} _dao;
-#end
 
     // ===================================================================================
     //                                                                          Table name
@@ -103,18 +93,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /** @return The instance of DBMeta as my table type. (NotNull) */
     public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-
-    // ===================================================================================
-    //                                                                        Dao Accessor
-    //                                                                        ============
-    public ${myExtendedDaoClassName} getMyDao() { return _dao; }
-    public void setMyDao(${myExtendedDaoClassName} dao) { assertObjectNotNull("dao", dao); _dao = dao; }
-    public ${glDaoReadableInterfaceName} getDaoReadable() { return getMyDao(); }
-#if ($table.isWritable())
-    public ${glDaoWritableInterfaceName} getDaoWritable() { return getMyDao(); }
-#end
-#end
 
     // ===================================================================================
     //                                                                        New Instance
@@ -584,11 +562,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
         setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
         filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-        return getMyDao().updateByQuery(cb, ${myEntityVariableName});
-#else
         return invoke(createQueryUpdateEntityCBCommand(${myEntityVariableName}, cb));
-#end
     }
 
     /**
@@ -598,11 +572,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-        return getMyDao().deleteByQuery(cb);
-#else
         return invoke(createQueryDeleteCBCommand(cb));
-#end
     }
 #end
 
@@ -654,79 +624,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-    // ===================================================================================
-    //                                                                     Delegate Method
-    //                                                                     ===============
-    // [Dao (Old Style)]
-    // -----------------------------------------------------
-    //                                                Select
-    //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) { return getMyDao().selectCount(cb); }
-    protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
-    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { return getMyDao().selectList(cb); }
-    @SuppressWarnings("unchecked")
-    protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
-#if ($table.isUseSequence())
-    protected ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
-#end
-#if ($table.isWritable())
-
-    // -----------------------------------------------------
-    //                                                Update
-    //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e) { if (!processBeforeInsert(e)) { return 1; } return getMyDao().insert(e); }
-    protected int doCallCreate(${glEntityInterfaceName} entity) { return delegateInsert(downcast(entity)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateModifiedOnly(e); }
-    protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
-#if ($table.hasOptimisticLock())
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeUpdate(e)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(e); }
-#end
-    protected int delegateDelete(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().delete(e); }
-    protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
-#if ($table.hasOptimisticLock())
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!processBeforeDelete(e)) { return 1; } return getMyDao().deleteNonstrict(e); }
-#end
-
-    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return getMyDao().insertList(helpFilterBeforeInsertInternally(ls));
-    }
-    @SuppressWarnings("unchecked")
-    protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
-    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return getMyDao().updateList(helpFilterBeforeUpdateInternally(ls));
-    }
-    @SuppressWarnings("unchecked")
-    protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
-#if ($table.hasOptimisticLock())
-    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(ls));
-    }
-#end
-    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return getMyDao().deleteList(helpFilterBeforeDeleteInternally(ls));
-    }
-    @SuppressWarnings("unchecked")
-    protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
-#if ($table.hasOptimisticLock())
-    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(ls));
-    }
-#end
-#else
-#if ($table.isAvailableNonPrimaryKeyWritable())
-    protected int delegateInsert(${myExtendedObjectClassName} entity) {
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-        return getMyDao().insert(entity);
-    }
-#end
-#end
-#else
     // ===================================================================================
     //                                                                     Delegate Method
     //                                                                     ===============
@@ -819,7 +716,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         cmd.setEntity(entity);
         return cmd;
     }
-#end
 #end
 #end
 #if ($table.hasBehaviorFilterBeforeColumn())

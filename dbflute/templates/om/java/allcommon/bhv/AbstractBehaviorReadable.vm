@@ -629,9 +629,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     //                                                                    Behavior Command
     //                                                                    ================
     public void warmUpCommand() {
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-        getDaoReadable().initializeDaoMetaData("selectList");
-#else
         {
             ${glSelectCountCBCommand} cmd = createSelectCountCBCommand(newConditionBean());
             cmd.setInitializeOnly(true); invoke(cmd);
@@ -640,7 +637,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             ${glSelectListCBCommand} cmd = createSelectListCBCommand(newConditionBean());
             cmd.setInitializeOnly(true); invoke(cmd);
         }
-#end
     }
 
     protected ${glSelectCountCBCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {

@@ -115,10 +115,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return booleanProp("torque.isCompatibleS2DaoSQLAnnotationValid", false);
     }
     
-    public boolean isCompatibleBehaviorUseDaoInterface() {
-        return booleanProp("torque.isCompatibleBehaviorUseDaoInterface", false);
-    }
-
     // ===================================================================================
     //                                                                 MultipleFK Property
     //                                                                 ===================

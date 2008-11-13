@@ -1,9 +1,6 @@
 ${database.allClassCopyright}package ${myBaseDaoPackageName};
 #set ($myClassName = "${myBaseDaoClassName}")
 
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-import ${glPackageCB}.${myConditionBeanClassName};
-#end
 import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
 #set ($InterfaceName = "")
 #if ($table.isWritable())
@@ -29,11 +26,6 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
     java.util.List<${myExtendedObjectClassName}> getEntityByIds(java.util.List<${table.primaryKeyJavaNativeAsOne}> ids); // For Buri
 #end
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-
-    public int selectCount(${myConditionBeanClassName} cb);
-    public java.util.List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
-#end
 #if ($table.isWritable())
 
     int insert(${myExtendedObjectClassName} entity);
@@ -44,24 +36,6 @@ public interface ${myClassName} extends ${InterfaceName} {
     int delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
     int deleteNonstrict(${myExtendedObjectClassName} entity);
-#end
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-
-    int[] insertList(java.util.List<${myExtendedObjectClassName}> entityList);
-    int[] updateList(java.util.List<${myExtendedObjectClassName}> entityList);
-#if ($table.hasOptimisticLock())
-    int[] updateListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
-#end
-#if (${table.hasOnlyOnePrimaryKey()})
-    int updateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);
-#end
-    int[] deleteList(java.util.List<${myExtendedObjectClassName}> entityList);
-#if ($table.hasOptimisticLock())
-    int[] deleteListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
-#end
-#if (${table.hasOnlyOnePrimaryKey()})
-    int deleteByQuery(${myConditionBeanClassName} cb);
-#end
 #end
 #else
 

@@ -98,9 +98,12 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Base-InternalMapContext]
     #set ($glInternalMapContextName = "${glProjectPrefix}InternalMapContext")
 
-    ## [Allcommon-Base-ClassificationDefinition]
-    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+    ## [Allcommon-Base-CDef]
     #set ($glCDef = "${glProjectPrefix}CDef")
+    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+
+    ## [Allcommon-Base-DBDef]
+    #set ($glDBDef = "${glProjectPrefix}DBDef")
 
     ## [Allcommon-Base-Log]
     #set ($glQLog = "${glProjectPrefix}QLog")
@@ -347,13 +350,6 @@ targetdatabase = $targetDatabase
     #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
     #set ($glSqlLogHandlerName = "${glProjectPrefix}SqlLogHandler")
     #set ($glStatementConfig = "${glProjectPrefix}StatementConfig")
-
-    ## [Allcommon-JDBC-History]
-    #set ($glPreparedExecutionBeanName = "${glProjectPrefix}PreparedExecutionBean")
-    #set ($glPreparedParameterElementName = "${glProjectPrefix}PreparedParameterElement")
-    #set ($glStatementHistoryName = "${glProjectPrefix}StatementHistory")
-    #set ($glStatementHistoryWitnessName = "${glProjectPrefix}StatementHistoryWitness")
-    #set ($glTraceablePreparedStatementName = "${glProjectPrefix}TraceablePreparedStatement")
 
     ## [Allcommon-S2Container]
     #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
@@ -1713,15 +1709,27 @@ targetdatabase = $targetDatabase
     #if ($database.hasClassificationDefinitionMap())
       $database.info("parseAllcommonClassification() {")
 
-      $database.info("    parse('ClassificationDefinition');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
-
       $database.info("    parse('CDef');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 
+      $database.info("    parse('ClassificationDefinition');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
+
       $database.info("}")
+    #end
+
+    ## -------------------------------------------------------
+    ##                                         allcommon dbdef
+    ##                                         ---------------
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+    $database.makeDirectory($path)
+
+    #if ($database.isTargetLanguageJava())
+      $database.info("    parse('DBDef');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBDef}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/DBDef.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
     ## -------------------------------------------------------

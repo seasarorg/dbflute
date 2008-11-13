@@ -611,11 +611,7 @@ public class Database {
         return _databaseDefinitionMap;
     }
 
-    public String getDatabaseProductName() { // for ConditionBeanContext
-        return getGenerateDbName().toLowerCase();
-    }
-
-    public String getDaoGenDbName() { // for SqlClause
+    public String getDaoGenDbName() { // for SqlClause. It's Old Style method.
         return getGenerateDbName();
     }
 
@@ -1263,10 +1259,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
     }
 
-    public boolean isCompatibleBehaviorUseDaoInterface() { // This is for compatibility!
-        return getProperties().getLittleAdjustmentProperties().isCompatibleBehaviorUseDaoInterface();
-    }
-
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
@@ -1402,10 +1394,6 @@ public class Database {
 
     public String getOutsideSqlPackage() {
         return getProperties().getOutsideSqlProperties().getSqlPackage();
-    }
-
-    public boolean isRemoveLineCommentFromExecutedSql() {
-        return getProperties().getOutsideSqlProperties().isRemoveLineCommentFromExecutedSql();
     }
 
     public boolean isDefaultPackageValid() {

@@ -2,9 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import java.util.List;
 
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
-#end
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 
 /**
@@ -12,14 +9,6 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
  * @author ${database.ClassAuthor}
  */
 public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadableInterfaceName} {
-#if ($database.isCompatibleBehaviorUseDaoInterface())
-
-    /**
-     * Get dao-writable.
-     * @return Dao-writable. (NotNull)
-     */
-    public ${glDaoWritableInterfaceName} getDaoWritable();
-#end
 
     // =====================================================================================
     //                                                                   Basic Entity Update

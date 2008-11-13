@@ -4,6 +4,7 @@ import javax.sql.XADataSource;
 
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
@@ -27,7 +28,7 @@ public class ${glBehaviorInitializer} {
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         showInformation(xaDataSource);
         ${glConditionBeanContextName}.initialize(); // Stop the LinkageError!
-        initializeDatabaseProductNameOfContext(xaDataSource);
+        setupDBDefByDriverClassName(xaDataSource);
         handleSqlLogRegistry();
         ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
@@ -54,48 +55,16 @@ public class ${glBehaviorInitializer} {
     // ===================================================================================
     //                                                               Database Product Name
     //                                                               =====================
-    protected void initializeDatabaseProductNameOfContext(XADataSource xaDataSource) {
-        if (getDatabaseProductNameFromContext() != null) {
-            return;
-        }
-
-        // From JDBC Driver!
-        if (setupDatabaseProductNameByDriverClassNameIfPossible(xaDataSource)) {
-            return;
-        }
- 
-        // From Default!
-        final String name = getDefaultDatabaseProductName();
-        setDatabaseProductNameToContext(name);
-    }
-
-    protected boolean setupDatabaseProductNameByDriverClassNameIfPossible(XADataSource xaDataSource) {
+    protected void setupDBDefByDriverClassName(XADataSource xaDataSource) {
         if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) {
             final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            if (driverClassName != null) {
-                if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
-                    return true;
-                }
+            final ${glDBDef} dbdef = ${glDBDef}.byDriverClassName(driverClassName);
+            if (dbdef != null) {
+                ${glDBDef}.setCurrentDef(dbdef);
+                return;
             }
         }
-        return false;
-    }
-
-    protected String getDefaultDatabaseProductName() {
-        return "${database.databaseProductName}"; // as default!
-    }
-
-    protected String getDatabaseProductNameFromContext() {
-        return ${glConditionBeanContextName}.getDatabaseProductName();
-    }
-
-    protected void setDatabaseProductNameToContext(String name) {
-        ${glConditionBeanContextName}.setDatabaseProductName(name);
-    }
-
-    protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
-        return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
     }
 
     // ===================================================================================

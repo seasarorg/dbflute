@@ -6,10 +6,8 @@ import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
-#if (!$database.isCompatibleOutsideSqlResultOldStyle())
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
-#end
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};

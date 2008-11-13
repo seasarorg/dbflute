@@ -119,17 +119,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                    RemoveLineCommentFromExecutedSql
-    //                                                    ================================
-    public boolean isRemoveLineCommentFromExecutedSql() { // Java only
-        return getBasicProperties().isDatabaseMsAccess(); // Only MS-Access does not support line comment. 
-
-        // In the meantime, this is not unsupported. At the future I don't know.
-        // final String value = (String) getOutsideSqlDefinitionMap().get("removeLineCommentFromExecutedSql");
-        // return value != null && value.trim().length() > 0 && value.trim().equalsIgnoreCase("true");
-    }
-
-    // ===================================================================================
     //                                                                      DefaultPackage
     //                                                                      ==============
     public boolean isDefaultPackageValid() { // C# only

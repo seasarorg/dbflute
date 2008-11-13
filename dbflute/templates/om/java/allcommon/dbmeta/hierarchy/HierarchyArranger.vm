@@ -407,14 +407,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 List<${glEntityInterfaceName}> referrerList = extractReferrerList(localEntity, referrerInfo);
                 if (referrerList == null) {
-#if (!$database.isOneToManyReturnNullIfNonSelect())
-                    String msg = "The referrer list should not be null: localEntity=" + localEntity + " referrerInfo=" + referrerInfo;
-                    throw new IllegalStateException(msg);
-#else
                     // Initialize the list of referrer and inject it.
                     referrerList = new ArrayList<${glEntityInterfaceName}>();
                     injectReferrerList(localEntity, referrerInfo, referrerList);
-#end
                 }
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

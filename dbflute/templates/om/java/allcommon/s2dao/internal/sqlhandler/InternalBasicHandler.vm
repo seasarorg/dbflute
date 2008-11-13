@@ -14,6 +14,7 @@ import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommon}.${glCallbackContextName};
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommon}.${glQLog};
@@ -565,10 +566,15 @@ public class ${glInternalBasicHandler} {
     }
 
     public void setSql(String sql) {
-#if ($database.isRemoveLineCommentFromExecutedSql())
-        sql = removeLineComment(sql);
-#end
+        if (isRemoveLineCommentFromSql()) {
+            sql = removeLineComment(sql);
+        }
         this.sql = sql;
+    }
+
+    protected boolean isRemoveLineCommentFromSql() {
+        // Because the MS-Access does not support line comments.
+        return ${glDBDef}.isCurrentDef(${glDBDef}.MSAccess);
     }
 
     public StatementFactory getStatementFactory() {

@@ -13,7 +13,7 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
 import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
 import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
@@ -119,7 +119,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     //                                                                     Optimistic Lock
     //                                                                     ===============
     protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result) {
-        if (${glConditionBeanContextName}.isOracle()) {
+        if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
             final int updateCount;
             try {
                 updateCount = ps.getUpdateCount();

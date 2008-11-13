@@ -1,44 +1,153 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.Iterator;
 
 /**
- * The definition class that has classification.
+ * The definition of database.
  * @author ${database.ClassAuthor}
  */
 public enum ${glDBDef} {
 
+    // ===================================================================================
+    //                                                                                ENUM
+    //                                                                                ====
     MySQL("mysql", null)
     , PostgreSQL("postgresql", "postgre")
     , Oracle("oracle", null)
     , DB2("db2", null)
     , SQLServer("sqlserver", "mssql")
+    , FireBird("firebird", null)
     , H2("h2", null)
     , Derby("derby", null)
-    , MSAccess("msaccess", null);
+    , MSAccess("msaccess", null)
+    , Unknown("unknown", null);
 
-    private static final Map<String, DBDef> _codeValueMap = new HashMap<String, DBDef>();
+    // ===================================================================================
+    //                                                                    Static Reference
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                            Code Value
+    //                                            ----------
+    private static final Map<String, ${glDBDef}> _codeValueMap = new HashMap<String, ${glDBDef}>();
     static {
-        for (DBDef value : values()) {
+        for (${glDBDef} value : values()) {
             _codeValueMap.put(value.code().toLowerCase(), value);
         }
     }
-    private static final Map<String, DBDef> _codeAliasValueMap = new HashMap<String, DBDef>();
+    private static final Map<String, ${glDBDef}> _codeAliasValueMap = new HashMap<String, ${glDBDef}>();
     static {
-        for (DBDef value : values()) {
+        for (${glDBDef} value : values()) {
             if (value.codeAlias() != null) {
                 _codeAliasValueMap.put(value.codeAlias().toLowerCase(), value);
             }
         }
     }
 
+    /**
+     * @param code The code of the DB. (Nullable: If the code is null, it returns null)
+     * @return The instance that has the code. (Nullable)
+     */
+    public static ${glDBDef} codeOf(String code) {
+        if (code == null) {
+            return null;
+        }
+        final String lowerCaseCode = code.toLowerCase();
+        ${glDBDef} def = _codeValueMap.get(lowerCaseCode);
+        if (def == null) {
+            def = _codeAliasValueMap.get(lowerCaseCode);
+        }
+        return def;
+    }
+
+    // -----------------------------------------------------
+    //                                           Driver Hint
+    //                                           -----------
+    private static final Map<String, ${glDBDef}> _driverHintMap;
+    static {
+        final Map<String, ${glDBDef}> tmpMap = new HashMap<String, ${glDBDef}>();
+        tmpMap.put("mysql", MySQL);
+        tmpMap.put("postgresql", PostgreSQL);
+        tmpMap.put("oracle", Oracle);
+        tmpMap.put("db2", DB2);
+        tmpMap.put("sqlserver", SQLServer);
+        tmpMap.put("firebird", FireBird);
+        tmpMap.put("org.h2", H2);
+        tmpMap.put("org.apache.derby", Derby);
+        _driverHintMap = Collections.unmodifiableMap(tmpMap);
+    }
+
+    public static ${glDBDef} byDriverClassName(String driverClassName) {
+        final Set<String> keySet = _driverHintMap.keySet();
+        for (final Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
+            final String driverHint = ite.next();
+            if (driverClassName.indexOf(driverHint) >= 0) {
+                final ${glDBDef} dbdef = _driverHintMap.get(driverHint);
+                if (dbdef != null) {
+                    return dbdef;
+                }
+            }
+        }
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                  Current Definition
+    //                                                                  ==================
+    /** The current definition of database. (NotNull, Default 'Unknown') */
+    private static ${glDBDef} _currentDef;
+    static {
+        _currentDef = codeOf("${database.generateDbName}");
+        if (_currentDef == null) {
+            _currentDef = Unknown;
+        }
+    }
+
+    /**
+     * @return The current definition of database. (NotNull)
+     */
+    public static ${glDBDef} getCurrentDef() {
+        return _currentDef;
+    }
+
+    /**
+     * @param currentDef The current definition of database. (NotNull)
+     */
+    public static void setCurrentDef(${glDBDef} currentDef) {
+        if (currentDef == null) {
+            String msg = "The argument 'currentDef' should not be null at ${glDBDef}.setCurrentDef()";
+            throw new IllegalArgumentException(msg);
+        }
+        _currentDef = currentDef;
+    }
+
+    /**
+     * @param dbdef The definition of database. (NotNull)
+     * @return Is the definition of database current?
+     */
+    public static boolean isCurrentDef(${glDBDef} dbdef) {
+        if (dbdef == null) {
+            String msg = "The argument 'dbdef' should not be null at ${glDBDef}.isCurrentDef()";
+            throw new IllegalArgumentException(msg);
+        }
+        return _currentDef != null ? _currentDef.equals(dbdef) : false;
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The code of the DB. (NotNull) */
     private String _code;
 
     /** The code alias of the DB. (Nullable) */
     private String _codeAlias;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * @param code The code of the DB. (NotNull)
      * @param codeAlias The code alias of the DB. (Nullable)
@@ -48,6 +157,9 @@ public enum ${glDBDef} {
         _codeAlias = codeAlias;
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * @return The code of the DB. (NotNull)
      */
@@ -60,21 +172,5 @@ public enum ${glDBDef} {
      */
     private String codeAlias() {
         return _codeAlias;
-    }
-
-    /**
-     * @param code The code of the DB. (Nullable: If the code is null, it returns null)
-     * @return The instance that has the code. (Nullable)
-     */
-    public static DBDef codeOf(String code) {
-        if (code == null) {
-            return null;
-        }
-        final String lowerCaseCode = code.toLowerCase();
-        DBDef def = _codeValueMap.get(lowerCaseCode);
-        if (def == null) {
-            def = _codeAliasValueMap.get(lowerCaseCode);
-        }
-        return def;
     }
 }
