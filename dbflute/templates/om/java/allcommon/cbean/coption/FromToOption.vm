@@ -82,7 +82,7 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     //                                                                       =============
     /**
      * Filter the date as From. It requires this method is called before getFromDateConditionKey().
-     * @param toDate The date as From. (Nullable: If the value is null, it returns null)
+     * @param fromDate The date as From. (Nullable: If the value is null, it returns null)
      * @return The filtered date as From. (Nullable)
      */
     public Date filterFromDate(Date fromDate) {
