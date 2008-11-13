@@ -67,9 +67,14 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
         return command;
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT invoke(${glBehaviorCommand} behaviorCommand) {
-        return (RESULT)_behaviorCommandInvoker.invoke(behaviorCommand);
+    /**
+     * Invoke the command of behavior.
+     * @param <RESULT> The type of result.
+     * @param behaviorCommand The command of behavior. (NotNull)
+     * @return The instance of result. (Nullable)
+     */
+    protected <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
+        return _behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

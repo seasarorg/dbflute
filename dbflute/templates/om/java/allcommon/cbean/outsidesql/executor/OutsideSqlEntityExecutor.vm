@@ -121,6 +121,12 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
         return command;
     }
 
+    /**
+     * Invoke the command of behavior.
+     * @param <RESULT> The type of result.
+     * @param behaviorCommand The command of behavior. (NotNull)
+     * @return The instance of result. (Nullable)
+     */
     protected <RESULT> RESULT invoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
         return _behaviorCommandInvoker.invoke(behaviorCommand);
     }

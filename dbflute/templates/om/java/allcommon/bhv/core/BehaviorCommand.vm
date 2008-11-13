@@ -14,7 +14,14 @@ public interface ${glBehaviorCommand}<RESULT> {
     //                                                                   =================
     public String getTableDbName();
     public String getCommandName();
+    
+    /**
+     * Get the return type of command.
+     * This type is not related to generic type because this is for conversion and check only.
+     * @return The return type of command. (NotNull)
+     */
     public Class<?> getCommandReturnType();
+
     public boolean isInitializeOnly();
 
     // ===================================================================================
