@@ -31,11 +31,11 @@ namespace ${glPackageBaseCQ} {
         //                                                                           Query
         //                                                                           =====
 #foreach ($col in $table.columns)
-  #set ($tmpJavaName = "${col.JavaName}")
-  #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+  #set ($tmpJavaName = "${col.javaName}")
+  #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
   #if (${col.isJavaNativeStringObject()})
 
-        public void Set${tmpJavaName}_Equal($col.JavaNative value) {
+        public void Set${tmpJavaName}_Equal(${col.javaNative} value) {
             reg${tmpJavaName}(CK_EQ, fRES(value));
         }
     #if ($database.isMakeConditionQueryEqualEmptyString())
@@ -48,7 +48,7 @@ namespace ${glPackageBaseCQ} {
       #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
-        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
         /// ${database.getMapValue($classificationMap, 'comment')}
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
@@ -58,14 +58,14 @@ namespace ${glPackageBaseCQ} {
     #end
     #if (${col.isAvailableStringNotEqual()})
 
-        public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_NE, fRES(value));
         }
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
-        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as notEqual. { != }
+        /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
         /// ${database.getMapValue($classificationMap, 'comment')}
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -76,44 +76,32 @@ namespace ${glPackageBaseCQ} {
     #end
     #if (${col.isAvailableStringGreaterThan()})
 
-        public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GT, fRES(value));
         }
     #end
     #if (${col.isAvailableStringLessThan()})
 
-        public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LT, fRES(value));
         }
     #end
     #if (${col.isAvailableStringGreaterEqual()})
 
-        public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GE, fRES(value));
         }
     #end
     #if (${col.isAvailableStringLessEqual()})
 
-        public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LE, fRES(value));
         }
     #end
     #if (${col.isAvailableStringPrefixSearch()})
 
-        public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
+        public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} value) {
             reg${tmpJavaName}(CK_PS, fRES(value));
-        }
-    #end
-    #if (${col.isAvailableStringLikeSearch()})
-
-        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-            regLSQ(CK_LS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
-        }
-    #end
-    #if (${col.isAvailableStringNotLikeSearch()})
-
-        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-            regLSQ(CK_NLS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
     #end
     #if (${col.isAvailableStringInScope()})
@@ -128,6 +116,18 @@ namespace ${glPackageBaseCQ} {
             reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList)));
         }
     #end
+    #if (${col.isAvailableStringLikeSearch()})
+
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+            regLSQ(CK_LS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+        }
+    #end
+    #if (${col.isAvailableStringNotLikeSearch()})
+
+        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+            regLSQ(CK_NLS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+        }
+    #end
 #if (${col.isSingleKeyForeignKey()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
@@ -138,7 +138,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -160,7 +160,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -183,7 +183,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -206,7 +206,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
 			String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerExistsSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -229,7 +229,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
 			String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotExistsSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -255,14 +255,14 @@ namespace ${glPackageBaseCQ} {
 #end
   #if (${col.isJavaNativeNumberObject()})
   
-        public void Set${tmpJavaName}_Equal($col.JavaNative value) {
+        public void Set${tmpJavaName}_Equal(${col.javaNative} value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
-        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
         /// ${database.getMapValue($classificationMap, 'comment')}
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
@@ -273,31 +273,31 @@ namespace ${glPackageBaseCQ} {
     #end
     #if (${col.isAvailableNumberNotEqual()})
 
-        public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_NE, value);
         }
     #end
     #if (${col.isAvailableNumberGreaterThan()})
 
-        public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GT, value);
         }
     #end
     #if (${col.isAvailableNumberLessThan()})
 
-        public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LT, value);
         }
     #end
     #if (${col.isAvailableNumberGreaterEqual()})
 
-        public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GE, value);
         }
     #end
     #if (${col.isAvailableNumberLessEqual()})
 
-        public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LE, value);
         }
     #end
@@ -323,7 +323,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -345,7 +345,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -368,7 +368,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.Name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -391,7 +391,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerExistsSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -414,7 +414,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
 			${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotExistsSubQuery(cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+            registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -431,7 +431,7 @@ namespace ${glPackageBaseCQ} {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDeriveReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());// for saving query-value.
-            registerDeriveSubQuery(function, cb.Query(), "${col.Name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+            registerDeriveSubQuery(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
         }
         abstract public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -439,31 +439,31 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isJavaNativeDateObject()})
-        public void Set${tmpJavaName}_Equal($col.JavaNative value) {
+        public void Set${tmpJavaName}_Equal(${col.javaNative} value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
 #if (${col.isAvailableDateNotEqual()})
-        public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_NE, value);
         }
 #end
 #if (${col.isAvailableDateGreaterThan()})
-        public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GT, value);
         }
 #end
 #if (${col.isAvailableDateLessThan()})
-        public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LT, value);
         }
 #end
 #if (${col.isAvailableDateGreaterEqual()})
-        public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_GE, value);
         }
 #end
 #if (${col.isAvailableDateLessEqual()})
-        public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_LE, value);
         }
 #end
@@ -478,7 +478,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #if (${col.isJavaNativeBooleanObject()})
   
-        public void Set${tmpJavaName}_Equal($col.JavaNative value) {
+        public void Set${tmpJavaName}_Equal(${col.javaNative} value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
 #end
@@ -489,11 +489,11 @@ namespace ${glPackageBaseCQ} {
 #end
   
         protected void reg${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            registerQuery(key, value, getCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}");
+            registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
 
         protected void registerInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}");
+            registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
 
         protected abstract ${glConditionValueName} getCValue${tmpJavaName}();

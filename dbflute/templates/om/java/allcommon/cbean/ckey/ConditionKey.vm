@@ -39,17 +39,17 @@ public abstract class ${myClassName} {
     /** The condition key of prefixSearch. */
     public static final ${myClassName} CK_PREFIX_SEARCH = new ${myClassName}PrefixSearch();
 
-    /** The condition key of likeSearch. */
-    public static final ${myClassName} CK_LIKE_SEARCH = new ${myClassName}LikeSearch();
-
-    /** The condition key of notLikeSearch. */
-    public static final ${myClassName} CK_NOT_LIKE_SEARCH = new ${myClassName}NotLikeSearch();
-
     /** The condition key of inScope. */
     public static final ${myClassName} CK_IN_SCOPE = new ${myClassName}InScope();
 
     /** The condition key of notInScope. */
     public static final ${myClassName} CK_NOT_IN_SCOPE = new ${myClassName}NotInScope();
+
+    /** The condition key of likeSearch. */
+    public static final ${myClassName} CK_LIKE_SEARCH = new ${myClassName}LikeSearch();
+
+    /** The condition key of notLikeSearch. */
+    public static final ${myClassName} CK_NOT_LIKE_SEARCH = new ${myClassName}NotLikeSearch();
 
     /** The condition key of isNull. */
     public static final ${myClassName} CK_IS_NULL = new ${myClassName}IsNull();

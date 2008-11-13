@@ -243,6 +243,72 @@ public class ${myClassName} {
     }
 
     // ===================================================================================
+    //                                                                            In Scope
+    //                                                                            ========
+    protected System.Collections.IList _inScope;
+
+    public System.Collections.IList InScope {
+        get { return _inScope; }
+        set { _inScope = value; }
+    }
+
+    public bool HasInScope { get {
+        return _inScope != null;
+    }}
+
+    public bool EqualInScope(System.Collections.IList value) {
+        return HasInScope ? _inScope.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideInScope(System.Collections.IList value) {
+        _inScope = value; return this;
+    }
+
+    protected String _inScopeLocation;
+
+    public String getInScopeLocation() {
+        return _inScopeLocation;
+    }
+
+    public ${myClassName} setInScopeLocation(String location) {
+        _inScopeLocation = location;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                        Not In Scope
+    //                                                                        ============
+    protected System.Collections.IList _notInScope;
+
+    public System.Collections.IList NotInScope {
+        get { return _notInScope; }
+        set { _notInScope = value; }
+    }
+
+    public bool HasNotInScope { get {
+        return _notInScope != null;
+    }}
+
+    public bool EqualNotInScope(System.Collections.IList value) {
+        return HasNotInScope ? _notInScope.Equals(value) : value == null;
+    }
+
+    public ${myClassName} OverrideNotInScope(System.Collections.IList value) {
+        _notInScope = value; return this;
+    }
+
+    protected String _notInScopeLocation;
+
+    public String getNotInScopeLocation() {
+        return _notInScopeLocation;
+    }
+
+    public ${myClassName} setNotInScopeLocation(String location) {
+        _notInScopeLocation = location;
+        return this;
+    }
+
+    // ===================================================================================
     //                                                                         Like Search
     //                                                                         ===========
     protected List<LikeSearchValue> _likeSearch;
@@ -374,72 +440,6 @@ public class ${myClassName} {
             }
             return _option.generateRealValue(_value);
         }
-    }
-
-    // ===================================================================================
-    //                                                                            In Scope
-    //                                                                            ========
-    protected System.Collections.IList _inScope;
-
-    public System.Collections.IList InScope {
-        get { return _inScope; }
-        set { _inScope = value; }
-    }
-
-    public bool HasInScope { get {
-        return _inScope != null;
-    }}
-
-    public bool EqualInScope(System.Collections.IList value) {
-        return HasInScope ? _inScope.Equals(value) : value == null;
-    }
-
-    public ${myClassName} OverrideInScope(System.Collections.IList value) {
-        _inScope = value; return this;
-    }
-
-    protected String _inScopeLocation;
-
-    public String getInScopeLocation() {
-        return _inScopeLocation;
-    }
-
-    public ${myClassName} setInScopeLocation(String location) {
-        _inScopeLocation = location;
-        return this;
-    }
-
-    // ===================================================================================
-    //                                                                        Not In Scope
-    //                                                                        ============
-    protected System.Collections.IList _notInScope;
-
-    public System.Collections.IList NotInScope {
-        get { return _notInScope; }
-        set { _notInScope = value; }
-    }
-
-    public bool HasNotInScope { get {
-        return _notInScope != null;
-    }}
-
-    public bool EqualNotInScope(System.Collections.IList value) {
-        return HasNotInScope ? _notInScope.Equals(value) : value == null;
-    }
-
-    public ${myClassName} OverrideNotInScope(System.Collections.IList value) {
-        _notInScope = value; return this;
-    }
-
-    protected String _notInScopeLocation;
-
-    public String getNotInScopeLocation() {
-        return _notInScopeLocation;
-    }
-
-    public ${myClassName} setNotInScopeLocation(String location) {
-        _notInScopeLocation = location;
-        return this;
     }
 
     // ===================================================================================

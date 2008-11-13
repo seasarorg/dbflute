@@ -145,28 +145,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         reg${tmpJavaName}(CK_PS, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
-#if (${col.isAvailableStringLikeSearch()})
-
-    /**
-     * LikeSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
-     * @param likeSearchOption The option of like-search. (NotNull)
-     */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
-    }
-#end
-#if (${col.isAvailableStringNotLikeSearch()})
-
-    /**
-     * NotLikeSearch(not like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
-     * @param likeSearchOption The option of not-like-search. (NotNull)
-     */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
-    }
-#end
 #if (${col.isAvailableStringInScope()})
 
     /**
@@ -197,6 +175,28 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         reg${tmpJavaName}(CK_NINS, cTL(${tmpUncapitalisedJavaName}List));
+    }
+#end
+#if (${col.isAvailableStringLikeSearch()})
+
+    /**
+     * LikeSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
+     * @param likeSearchOption The option of like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+    }
+#end
+#if (${col.isAvailableStringNotLikeSearch()})
+
+    /**
+     * NotLikeSearch(not like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
+     * @param likeSearchOption The option of not-like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
     }
 #end
 #if (${col.isSingleKeyForeignKey()})

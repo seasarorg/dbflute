@@ -522,6 +522,162 @@ public class ${myClassName} {
     }
 
     // ===================================================================================
+    //                                                                            In Scope
+    //                                                                            ========
+    /** The value of inScope. */
+    protected List<?> _inScope;
+
+    protected ${glConditionOptionInScopeName} _inScopeOption;
+
+    /**
+     * Get the value of inScope.
+     * @return The value of inScope. (Nullable)
+     */
+    @SuppressWarnings("unchecked")
+    public List<?> getInScope() {
+        if (_inScopeOption != null) {
+            return filterValue(_inScopeOption.generateRealValueList((List<String>)_inScope));
+        }
+        return filterValue(_inScope);
+    }
+
+    /**
+     * Set the value of inScope.
+     * @param value The value of inScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setInScope(List<?> value) {
+        _inScope = value;
+        return this;
+    }
+
+    public ${myClassName} setInScope(List<?> value, ${glConditionOptionInScopeName} option) {
+        _inScope = value;
+        _inScopeOption = option;
+        return this;
+    }
+
+    /**
+     * Does it has the value of inScope?
+     * @return Determination. (NotNull)
+     */
+    public boolean hasInScope() {
+        return _inScope != null;
+    }
+
+    /**
+     * Does the value equal the value of inScope?
+     * @param value The value of inScope. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalInScope(List<?> value) {
+        return hasInScope() ? _inScope.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of inScope.
+     * @param value The value of inScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideInScope(List<?> value) {
+        _inScope = value;
+        return this;
+    }
+
+    /** Location of InScope. */
+    protected String _inScopeLocation;
+
+    /**
+     * Get the location of inScope.
+     * @return The location of inScope. (Nullable)
+     */
+    public String getInScopeLocation() {
+        return _inScopeLocation;
+    }
+
+    /**
+     * Set the location of inScope.
+     * @param location The location of inScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setInScopeLocation(String location) {
+        _inScopeLocation = location;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                        Not In Scope
+    //                                                                        ============
+    /** The value of notInScope. */
+    protected List<?> _notInScope;
+
+    /**
+     * Get the value of notInScope.
+     * @return The value of notInScope. (Nullable)
+     */
+    public List<?> getNotInScope() {
+        return filterValue(_notInScope);
+    }
+
+    /**
+     * Set the value of notInScope.
+     * @param value The value of notInScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setNotInScope(List<?> value) {
+        _notInScope = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of inNotScope?
+     * @return Determination. (NotNull)
+     */
+    public boolean hasNotInScope() {
+        return _notInScope != null;
+    }
+
+    /**
+     * Does the value equal the value of inNotScope?
+     * @param value The value of inNotScope. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalNotInScope(List<?> value) {
+        return hasNotInScope() ? _notInScope.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of inNotScope.
+     * @param value The value of inNotScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideNotInScope(List<?> value) {
+        _notInScope = value;
+        return this;
+    }
+
+    /** Location of notInScope. */
+    protected String _notInScopeLocation;
+
+    /**
+     * Get the location of notInScope.
+     * @return The location of notInScope. (Nullable)
+     */
+    public String getNotInScopeLocation() {
+        return _notInScopeLocation;
+    }
+
+    /**
+     * Set the location of notInScope.
+     * @param location The location of notInScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setNotInScopeLocation(String location) {
+        _notInScopeLocation = location;
+        return this;
+    }
+
+    // ===================================================================================
     //                                                                         Like Search
     //                                                                         ===========
     /** The value of likeSearch. */
@@ -699,162 +855,6 @@ public class ${myClassName} {
             }
             return _option.generateRealValue(_value);
         }
-    }
-
-    // ===================================================================================
-    //                                                                            In Scope
-    //                                                                            ========
-    /** Value of inScope. */
-    protected List<?> _inScope;
-
-    protected ${glConditionOptionInScopeName} _inScopeOption;
-
-    /**
-     * Get the value of inScope.
-     * @return The value of inScope. (Nullable)
-     */
-    @SuppressWarnings("unchecked")
-    public List<?> getInScope() {
-        if (_inScopeOption != null) {
-            return filterValue(_inScopeOption.generateRealValueList((List<String>)_inScope));
-        }
-        return filterValue(_inScope);
-    }
-
-    /**
-     * Set the value of inScope.
-     * @param value The value of inScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} setInScope(List<?> value) {
-        _inScope = value;
-        return this;
-    }
-
-    public ${myClassName} setInScope(List<?> value, ${glConditionOptionInScopeName} option) {
-        _inScope = value;
-        _inScopeOption = option;
-        return this;
-    }
-
-    /**
-     * Does it has the value of inScope?
-     * @return Determination. (NotNull)
-     */
-    public boolean hasInScope() {
-        return _inScope != null;
-    }
-
-    /**
-     * Does the value equal the value of inScope?
-     * @param value The value of inScope. (Nullable)
-     * @return Determination. (NotNull)
-     */
-    public boolean equalInScope(List<?> value) {
-        return hasInScope() ? _inScope.equals(value) : value == null;
-    }
-
-    /**
-     * Override the value of inScope.
-     * @param value The value of inScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} overrideInScope(List<?> value) {
-        _inScope = value;
-        return this;
-    }
-
-    /** Location of InScope. */
-    protected String _inScopeLocation;
-
-    /**
-     * Get the location of inScope.
-     * @return The location of inScope. (Nullable)
-     */
-    public String getInScopeLocation() {
-        return _inScopeLocation;
-    }
-
-    /**
-     * Set the location of inScope.
-     * @param location The location of inScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} setInScopeLocation(String location) {
-        _inScopeLocation = location;
-        return this;
-    }
-
-    // ===================================================================================
-    //                                                                        Not In Scope
-    //                                                                        ============
-    /** Value of notInScope. */
-    protected List<?> _notInScope;
-
-    /**
-     * Get the value of notInScope.
-     * @return The value of notInScope. (Nullable)
-     */
-    public List<?> getNotInScope() {
-        return filterValue(_notInScope);
-    }
-
-    /**
-     * Set the value of notInScope.
-     * @param value The value of notInScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} setNotInScope(List<?> value) {
-        _notInScope = value;
-        return this;
-    }
-
-    /**
-     * Does it has the value of inNotScope?
-     * @return Determination. (NotNull)
-     */
-    public boolean hasNotInScope() {
-        return _notInScope != null;
-    }
-
-    /**
-     * Does the value equal the value of inNotScope?
-     * @param value The value of inNotScope. (Nullable)
-     * @return Determination. (NotNull)
-     */
-    public boolean equalNotInScope(List<?> value) {
-        return hasNotInScope() ? _notInScope.equals(value) : value == null;
-    }
-
-    /**
-     * Override the value of inNotScope.
-     * @param value The value of inNotScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} overrideNotInScope(List<?> value) {
-        _notInScope = value;
-        return this;
-    }
-
-    /** Location of notInScope. */
-    protected String _notInScopeLocation;
-
-    /**
-     * Get the location of notInScope.
-     * @return The location of notInScope. (Nullable)
-     */
-    public String getNotInScopeLocation() {
-        return _notInScopeLocation;
-    }
-
-    /**
-     * Set the location of notInScope.
-     * @param location The location of notInScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${myClassName} setNotInScopeLocation(String location) {
-        _notInScopeLocation = location;
-        return this;
     }
 
     // ===================================================================================
