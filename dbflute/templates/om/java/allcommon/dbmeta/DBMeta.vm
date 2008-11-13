@@ -87,7 +87,7 @@ public interface ${myClassName} {
      * @return The DB name of anything. (NotNull and NotEmpty)
      */
     public String findPropertyName(String flexibleName);
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     // ===================================================================================
     //                                                                            Name Map

@@ -48,7 +48,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                             Resource Initialization
     //                                                             =======================
     { initializeInformationResource(); }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     // ===================================================================================
     //                                                                            Name Map

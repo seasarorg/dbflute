@@ -47,10 +47,11 @@
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
+#if ($database.isMakeDaoInterface())
 
     <!-- Dao selector. -->
     <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
-
+#end
 </components>

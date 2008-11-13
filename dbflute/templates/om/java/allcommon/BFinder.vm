@@ -6,6 +6,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleResourceUtil};
 /**
  * The entry of DBFlute.
  * @author ${database.ClassAuthor}
+ * @deprecated this class will be deleted completely at next version!
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glBFinderName} {
 
@@ -22,7 +23,7 @@ public class ${glBFinderName} {
 
     // ===================================================================================
     //                                                                              Finder
-    //                                                                             ======
+    //                                                                              ======
     public static <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE find(Class<BEHAVIOR_TYPE> behaviorType) {
         assertObjectNotNull("behaviorType", behaviorType);
         if (!org.seasar.framework.container.factory.SingletonS2ContainerFactory.hasContainer()) {

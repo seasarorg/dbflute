@@ -5,6 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 /**
  * The singleton class that has generate meta data.
  * @author ${database.ClassAuthor}
+ * @deprecated this class will be deleted completely at next version!
  */
 public class ${myClassName} {
 

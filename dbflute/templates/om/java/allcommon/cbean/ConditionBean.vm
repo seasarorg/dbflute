@@ -98,7 +98,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return Determination.
      */
     public boolean isLimitSelect_PKOnly();
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Limit select PK only. This is OLD style. You can do the same thing by specify().

@@ -469,7 +469,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isLimitSelect_PKOnly() {
         return _isLimitSelectPKOnly;
     }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Limit select PK only.
@@ -898,7 +898,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     protected void doSetupSelect(SsCall callback) {
         String foreignPropertyName = callback.qf().getForeignPropertyName();
         assertSetupSelectBeforeUnion(foreignPropertyName);
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
         limitSelect_Off();
 #end
         String foreignTableAliasName = callback.qf().getRealAliasName();

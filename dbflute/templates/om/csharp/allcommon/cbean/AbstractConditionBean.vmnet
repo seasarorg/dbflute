@@ -174,7 +174,7 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsLimitSelect_PKOnly() {
             return _isLimitSelectPKOnly;
         }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
         public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
             _isLimitSelectPKOnly = true;

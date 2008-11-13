@@ -882,15 +882,17 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                         allcommon dao
     ##                                         -------------
-    $database.info("public void parseDaoInterface() {")
-    $database.info("    parseDaoReadable")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoReadableInterfaceName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/DaoReadable.${glTemplateFileExtension}",$path ,"", "")
+    #if ($database.isMakeDaoInterface())
+      $database.info("public void parseDaoInterface() {")
+      $database.info("    parseDaoReadable")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoReadableInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/DaoReadable.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.info("    parseDaoWritable")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoWritableInterfaceName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/DaoWritable.${glTemplateFileExtension}",$path ,"", "")
-    $database.info("}")
+      $database.info("    parseDaoWritable")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoWritableInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/DaoWritable.${glTemplateFileExtension}",$path ,"", "")
+      $database.info("}")
+    #end
 
     ## -----------------------------------------------------
     ##                                      allcommon entity
@@ -1791,12 +1793,14 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                         allcommon flute
     ##                                         ---------------
+    #if ($database.isMakeDeprecated())
     #if ($database.isTargetContainerSeasar() && $database.isTargetLanguageJava())
       $database.info("public void parseBFinder() {")
       $database.info("    parse('BFinder');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBFinderName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/BFinder.${glTemplateFileExtension}",$path ,"", "")
       $database.info("}")
+    #end
     #end
 
     ## -------------------------------------------------------
@@ -1822,27 +1826,31 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCacheBehaviorSelectorName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/CacheBehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.info("    parse('DaoSelector');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/DaoSelector.${glTemplateFileExtension}",$path ,"", "")
+    #if ($database.isMakeDaoInterface())
+      $database.info("    parse('DaoSelector');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/DaoSelector.${glTemplateFileExtension}",$path ,"", "")
 
-    #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
-    $database.makeDirectory($path)
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+      $database.makeDirectory($path)
 
-    $database.info("    parseCacheDaoSelector();")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCacheDaoSelectorName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/CacheDaoSelector.${glTemplateFileExtension}",$path ,"", "")
+      $database.info("    parseCacheDaoSelector();")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCacheDaoSelectorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/CacheDaoSelector.${glTemplateFileExtension}",$path ,"", "")
+    #end
     $database.info("}")
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                   Parse gen meta data
     ##                                                                                   -------------------
-    #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
-    $database.makeDirectory($path)
+    #if ($database.isMakeDeprecated())
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+      $database.makeDirectory($path)
 
-    $database.info("parseGenMetaData();")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glGenMetaDataClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/GenMetaData.${glTemplateFileExtension}",$path ,"" ,"")
+      $database.info("parseGenMetaData();")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glGenMetaDataClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/GenMetaData.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                            Parse internal map context
