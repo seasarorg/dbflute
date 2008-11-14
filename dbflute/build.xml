@@ -125,22 +125,7 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
+
     <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -156,15 +141,32 @@
     </copy>
   	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 
-    <copy todir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}">
+<!--
+    <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
-  	<chmod dir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  	<chmod dir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  	
+    <copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 
+    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
     <copy todir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+-->
+<!--
+    <copy todir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+-->
   </target>
 
   <target name="reflect-mac-limit-basic" depends="expand-dist" description="==> reflect to basic example">
