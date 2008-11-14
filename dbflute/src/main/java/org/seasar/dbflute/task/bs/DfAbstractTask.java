@@ -104,8 +104,8 @@ public abstract class DfAbstractTask extends Task {
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
                 _log.info("");
-                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-                _log.info("[Task End: " + getPerformanceView(after - before) + "]");
+                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ {Task End}");
+                _log.info("[" + getDisplayTaskName() + "]: " + getPerformanceView(after - before));
                 _log.info("");
                 _log.info("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
                 _log.info("    database  = " + getBasicProperties().getDatabaseName());
@@ -123,46 +123,6 @@ public abstract class DfAbstractTask extends Task {
             _log.info("");
         }
     }
-    
-    protected void logRuntimeException(RuntimeException e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Failed to execute DBFlute Task!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Basic Properties]" + getLineSeparator();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
-        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
-        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Runtime Exception]" + getLineSeparator();
-        msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
-        msg = msg + "exception message = " + e.getMessage() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        _log.error(msg, e);
-    }
-
-    protected void logError(Error e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Failed to execute DBFlute Task!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Basic Properties]" + getLineSeparator();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
-        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
-        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Error]" + getLineSeparator();
-        msg = msg + "error class   = " + e.getClass() + getLineSeparator();
-        msg = msg + "error message = " + e.getMessage() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        _log.error(msg, e);
-    }
 
     protected long getTaskBeforeTimeMillis() {
         return System.currentTimeMillis();
@@ -174,6 +134,19 @@ public abstract class DfAbstractTask extends Task {
 
     protected boolean isValidTaskEndInformation() {
         return true;
+    }
+
+    protected void logRuntimeException(RuntimeException e) {
+        DfAntTaskUtil.logRuntimeException(e, getDisplayTaskName());
+    }
+
+    protected void logError(Error e) {
+        DfAntTaskUtil.logError(e, getDisplayTaskName());
+    }
+
+    protected String getDisplayTaskName() {
+        final String taskName = getTaskName();
+        return DfAntTaskUtil.getDisplayTaskName(taskName);
     }
 
     protected void initializeDatabaseInfo() {

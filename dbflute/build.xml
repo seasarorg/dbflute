@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.8.5"/>
+  <property name="version" value="0.8.6"/>
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
@@ -188,6 +188,13 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-mac-limit-multipledb" depends="expand-dist" description="==> reflect to multipledb example">
+    <copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect-mac-limit-pbasic" depends="expand-dist" description="==> reflect to test application">

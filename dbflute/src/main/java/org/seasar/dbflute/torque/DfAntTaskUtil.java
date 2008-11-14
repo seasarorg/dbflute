@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
  * Ant task utility.
@@ -96,5 +97,79 @@ public final class DfAntTaskUtil {
             throw new IllegalStateException("buildContextProperties() threw the exception!", e);
         }
         return prop;
+    }
+
+    public static void logRuntimeException(RuntimeException e, String taskName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Basic Properties]" + getLineSeparator();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Database Properties]" + getLineSeparator();
+        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Runtime Exception]" + getLineSeparator();
+        msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
+        msg = msg + "exception message = " + e.getMessage() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        _log.error(msg, e);
+    }
+
+    public static void logError(Error e, String taskName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Basic Properties]" + getLineSeparator();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Database Properties]" + getLineSeparator();
+        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Error]" + getLineSeparator();
+        msg = msg + "error class   = " + e.getClass() + getLineSeparator();
+        msg = msg + "error message = " + e.getMessage() + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        _log.error(msg, e);
+    }
+
+    public static String getDisplayTaskName(String taskName) {
+        if (taskName.endsWith("jdbc-transform")) {
+            return "JDBC";
+        } else if (taskName.endsWith("doc")) {
+            return "Doc";
+        } else if (taskName.endsWith("data-model")) {
+            return "Generate";
+        } else if (taskName.endsWith("sql2entity")) {
+            return "OutsideSqlTest";
+        } else if (taskName.endsWith("outside-sql-test")) {
+            return "OutsideSqlTest";
+        } else if (taskName.endsWith("create-schema")) {
+            return "ReplaceSchema";
+        } else if (taskName.endsWith("load-data")) {
+            return "ReplaceSchema";
+        } else if (taskName.endsWith("take-finally")) {
+            return "ReplaceSchema";
+        } else {
+            return taskName;
+        }
+    }
+
+    protected static DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected static DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }

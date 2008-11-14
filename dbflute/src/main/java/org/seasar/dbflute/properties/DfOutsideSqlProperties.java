@@ -64,7 +64,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         sqlDirectory = removeEndSeparatorIfNeeds(sqlDirectory);
         String sqlPackage = getSqlPackage();
         if (sqlPackage != null && sqlPackage.trim().length() > 0) {
-            String sqlPackageDirectory = replaceDotToSeparator(sqlPackage);
+            String sqlPackageDirectory = resolveFileSeparator(sqlPackage);
             sqlDirectory = sqlDirectory + "/" + removeStartSeparatorIfNeeds(sqlPackageDirectory);
         }
         return sqlDirectory;
@@ -74,8 +74,27 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return getBasicProperties().getOutputDirectory();
     }
 
+    protected String resolveFileSeparator(String sqlPackage) {
+        DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (!prop.isFlatDirectoryPackageValid()) {
+            return replaceDotToSeparator(sqlPackage);
+        }
+        final String flatDirectoryPackage = prop.getFlatDirectoryPackage();
+        if (!sqlPackage.contains(flatDirectoryPackage)) {
+            return replaceDotToSeparator(sqlPackage);
+        }
+        sqlPackage = DfStringUtil.replace(getSqlPackage(), ".", "$$flatDirectoryDelimiter$$");
+        sqlPackage = replaceDotToSeparator(sqlPackage);
+        sqlPackage = DfStringUtil.replace(getSqlPackage(), "$$flatDirectoryDelimiter$$", ".");
+        return sqlPackage;
+    }
+
     protected String replaceDotToSeparator(String sqlPackage) {
         return DfStringUtil.replace(getSqlPackage(), ".", "/");
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     protected String removeStartSeparatorIfNeeds(String path) {
