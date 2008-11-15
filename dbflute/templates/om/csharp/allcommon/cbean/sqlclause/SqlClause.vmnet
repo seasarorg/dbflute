@@ -16,7 +16,6 @@ public interface ${glSqlClauseInterfaceName} {
     //                                                                                Clause
     //                                                                                ======
     String getClause();
-	String getClausePKOnly();
     String getClauseFromWhereWithUnionTemplate();
     String getClauseFromWhereWithWhereUnionTemplate();
 
@@ -24,20 +23,13 @@ public interface ${glSqlClauseInterfaceName} {
     //                                                                          Clause Parts
     //                                                                          ============
 	String getSelectClause();
-	String getSelectClausePKOnly();
     String getSelectHint();
-    String getIncludedSelectColumnClause();
     String getFromClause();
     String getFromBaseTableHint();
     String getFromHint();
     String getWhereClause();
     String getOrderByClause();
     String getSqlSuffix();
-
-    // ===================================================================================
-    //                                                                          Copy Parts
-    //                                                                          ==========
-    void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
 
 	// ===================================================================================
     //                                                                SelectedSelectColumn
@@ -47,13 +39,6 @@ public interface ${glSqlClauseInterfaceName} {
 										   , String foreignPropertyName
 										   , String localRelationPath);
 	
-    // ===================================================================================
-    //                                                                IncludedSelectColumn
-    //                                                                ====================
-    void ignoreIncludedSelectColumn();
-    void makeIncludedSelectColumnEffective();
-    void registerIncludedSelectColumn(String aliasName, String realColumnName);
-
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
@@ -205,6 +190,17 @@ public interface ${glSqlClauseInterfaceName} {
     //                                                                        ============
     String getClauseQueryUpdate(Map<String, String> columnParameterMap);
     String getClauseQueryDelete();
+    
+    // [DBFlute-0.8.6]
+    // ===================================================================================
+    //                                                                  Select Clause Type
+    //                                                                  ==================
+    void classifySelectClauseType(SelectClauseType selectClauseType);
+    void rollbackSelectClauseType();
+
 }
 
+    public enum SelectClauseType {
+        COLUMNS, MAX, MIN, SUM, AVG, COUNT
+    }
 }

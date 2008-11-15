@@ -438,42 +438,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         getSqlClause().makeOrderByEffective();
         return this;
     }
-	
-    // ===================================================================================
-    //                                                                        Limit Select
-    //                                                                        ============
-    /** Is limit-select PK only? */
-    protected boolean _isLimitSelectPKOnly;
-
-    /**
-     * Is limit-select PK only?
-     * @return Determination.
-     */
-    public boolean isLimitSelect_PKOnly() {
-        return _isLimitSelectPKOnly;
-    }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Limit select PK only.
-     * @return this. (NotNull)
-     * @deprecated This is OLD style. You can do the same thing by specify().
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
-        _isLimitSelectPKOnly = true;
-        return this;
-    }
-
-    /**
-     * Limit select off.
-     * @return this. (NotNull)
-     * @deprecated This is OLD style. You can do the same thing by specify().
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_Off() {
-        _isLimitSelectPKOnly = false;
-        return this;
-    }
-#end
 
     // ===================================================================================
     //                                                                        Lock Setting
@@ -498,11 +462,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
 
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().ignoreIncludedSelectColumn();
-        }
-
+        getSqlClause().classifySelectClauseType(${glSqlClauseInterfaceName}.SelectClauseType.COUNT);
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;
@@ -516,11 +476,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
 
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().makeIncludedSelectColumnEffective();
-        }
-
+        getSqlClause().rollbackSelectClauseType();
         getSqlClause().makeOrderByEffective();
         getSqlClause().makeFetchScopeEffective();
         return this;

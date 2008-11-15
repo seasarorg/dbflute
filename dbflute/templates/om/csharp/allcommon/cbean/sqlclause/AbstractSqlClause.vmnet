@@ -19,52 +19,56 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-	protected static readonly String SELECT_HINT = "/*$dto.SelectHint*/ ";
-	
+    protected static readonly SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
+    protected static readonly String SELECT_HINT = "/*$dto.SelectHint*/ ";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    /** Target table name. */
+    /** The name of table. */
     protected readonly String _tableName;
 
     // -----------------------------------------------------
     //                                       Clause Resource
     //                                       ---------------
-	/** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}}*/
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // The resources that are not often used to are lazy-loaded for performance.
+    // - - - - - - - - - -/
+    /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
     protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } */
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _specifiedSelectColumnMap;
-    
-    /** Specified derive sub-query map. */
+
+    /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
     protected Map<String, String> _specifiedDeriveSubQueryMap;
 
-    /** Included select column map. */
-    protected Map<String, String> _includedSelectColumnMap = new LinkedHashMap<String, String>();
+    /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
+    protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>();// Without linked!
 
-	/** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
-	protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>();// Without linked!
-	
+    /** The type of select clause. (NotNull) */
+    protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
+
+    /** The previous type of select clause. (Nullable: The default is null) */
+    protected SelectClauseType _previousSelectClauseType;
+
     /** Outer join map. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
 
-    /** Where list. */
+    /** The list of where clause. */
     protected List<String> _whereList = new ArrayList<String>();
 
     /** Inline where list for BaseTable. */
     protected List<String> _baseTableInlineWhereList = new ArrayList<String>();
 
-    /** Order-by clause. */
-    protected  ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+    /** The clause of order-by. (NotNull) */
+    protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
-    /** Union clause list. */
-    protected List<UnionQueryInfo> _unionQueryInfoList = new ArrayList<UnionQueryInfo>();
-
-    /** Is included-select-column effective? Default value is false. */
-    protected bool _isIncludedSelectColumnEffective = false;
+    /** The list of union clause. (Nullable: This is lazy-loaded) */
+    protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. */
     protected bool _isOrderByEffective = false;
@@ -101,7 +105,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     //                                 ---------------------
     /** The information of selected foreign table. */
     protected Map<String, String> _selectedForeignInfo;
-	
+    
     // -----------------------------------------------------
     //                                         Optional Info
     //                                         -------------
@@ -126,34 +130,27 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     //                                       ---------------
     public String getClause() {
         StringBuilder sb = new StringBuilder(512);
-		sb.append(getSelectClause());
+        sb.append(getSelectClause());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(false));
-		String sql = sb.toString();
-        return filterSubQueryIndent(sql);
+        String sql = sb.toString();
+        sql = filterSubQueryIndent(sql);
+        sql = filterUnionSelectCountIfNeeds(sql);
+        return sql;
     }
-	
-	public String getClausePKOnly() {
+
+    protected String buildClauseWithoutMainSelect() {
         StringBuilder sb = new StringBuilder(512);
-		sb.append(getSelectClausePKOnly());
-        sb.append(" ");
-        sb.append(buildClauseWithoutMainSelect(true));
-		String sql = sb.toString();
-        return filterSubQueryIndent(sql);
-	}
-	
-	protected String buildClauseWithoutMainSelect(bool pkonly) {
-	    StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(getWhereClause());
-		String unionClause = buildUnionClause(pkonly ? getSelectClausePKOnly() : getSelectClause());
-		
-		// Delete template mark! (At the future this will be unnecessary.)
-		unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");// Required!
-		unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
-		
+        String unionClause = buildUnionClause(getSelectClause());
+        
+        // Delete template mark! (At the future this will be unnecessary.)
+        unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");// Required!
+        unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
+        
         sb.append(unionClause);
         if (_isOrderByEffective && !_orderByClause.isEmpty()) {
             sb.append(" ");
@@ -162,19 +159,19 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         sb.append(" ");
         sb.append(getSqlSuffix());
         return sb.toString();
-	}
+    }
     
     // -----------------------------------------------------
     //                                       Fragment Clause
     //                                       ---------------
     public String getClauseFromWhereWithUnionTemplate() {
-	    return buildClauseFromWhereAsTemplate(false);
+        return buildClauseFromWhereAsTemplate(false);
     }
-	
+    
     public String getClauseFromWhereWithWhereUnionTemplate() {
-	    return buildClauseFromWhereAsTemplate(true);
-	}
-	
+        return buildClauseFromWhereAsTemplate(true);
+    }
+    
     protected virtual String buildClauseFromWhereAsTemplate(bool template) {
         StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
@@ -183,22 +180,24 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         sb.append(buildWhereClause(template));
         sb.append(buildUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
-	}
-	
+    }
+    
     protected virtual String buildUnionClause(String selectClause) {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
-            UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
-            String unionQueryClause = unionQueryInfo.getUnionQueryClause();
-            bool unionAll = unionQueryInfo.isUnionAll();
-            if (isFormatClauseEffective()) {
-                sb.append(getLineSeparator());
+        if (hasUnionQuery()) {
+            for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+                UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
+                String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+                bool unionAll = unionQueryInfo.isUnionAll();
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator());
+                }
+                sb.append(unionAll ? " union all " : " union ");
+                if (isFormatClauseEffective()) {
+                    sb.append(getLineSeparator());
+                }
+                sb.append(selectClause).append(" ").append(unionQueryClause);
             }
-            sb.append(unionAll ? " union all " : " union ");
-            if (isFormatClauseEffective()) {
-                sb.append(getLineSeparator());
-            }
-			sb.append(selectClause).append(" ").append(unionQueryClause);
         }
         return sb.toString();
     }
@@ -206,43 +205,53 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                        Clause Parts
     //                                                                        ============
-	public String getSelectClause() {
-	    StringBuilder sb = new StringBuilder();
-		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+    public String getSelectClause() {
+        // [DBFlute-0.8.6]
+        if (!_selectClauseType.equals(SelectClauseType.COLUMNS)) {
+            String selectClauseForScalar = buildSelectClauseForScalar();
+            if (selectClauseForScalar != null) {
+                return selectClauseForScalar;
+            }
+        }
+        // /- - - - - - - - - - - - - - - - - - - - - - - - 
+        // The type of select clause is COLUMNS since here.
+        // - - - - - - - - - -/
+        StringBuilder sb = new StringBuilder();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
         List<${glColumnInfoName}> columnInfoList = dbmeta.ColumnInfoList;
 
         // [DBFlute-0.7.4]
         Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
-		
-		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
-		    String columnName = columnInfo.ColumnDbName;
-			
+        
+        foreach (${glColumnInfoName} columnInfo in columnInfoList) {
+            String columnName = columnInfo.ColumnDbName;
+            
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
                 continue;
             }
 
-			if (sb.length() > 0) {
-			    sb.append(", ");
-			} else {
-			    sb.append("select").append(SELECT_HINT).append(" ");
-			}
-			String realColumnName = getLocalTableAliasName() + "." + columnName;
-			sb.append(realColumnName).append(" as ").append(columnName);
-			_selectClauseRealColumnAliasMap.put(realColumnName, columnName);
-		}
-	    Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
-		foreach (String tableAliasName in tableAliasNameSet) {
-		    Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
-			Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
+            if (sb.length() > 0) {
+                sb.append(", ");
+            } else {
+                sb.append("select").append(SELECT_HINT).append(" ");
+            }
+            String realColumnName = getLocalTableAliasName() + "." + columnName;
+            sb.append(realColumnName).append(" as ").append(columnName);
+            _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
+        }
+        Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
+        foreach (String tableAliasName in tableAliasNameSet) {
+            Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+            Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
 
             // [DBFlute-0.7.4]
             Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
             bool existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
 
-			foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
-			    String realColumnName = selectColumnInfo.buildRealColumnName();
+            foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
+                String realColumnName = selectColumnInfo.buildRealColumnName();
 
                 // [DBFlute-0.7.4]
                 if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
@@ -250,12 +259,9 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 }
 
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
-				_selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
-			}
-		}
-		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
-		    sb.append(getIncludedSelectColumnClause());
-		}
+                _selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
+            }
+        }
 
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
@@ -268,57 +274,62 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             }
         }
 
-		return sb.toString();
-	}
-	
-	public String getSelectClausePKOnly() {
-	    StringBuilder sb = new StringBuilder();
-		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
-		${glUniqueInfoName} uniqueInfo = dbmeta.PrimaryUniqueInfo;
-		List<${glColumnInfoName}> columnInfoList = uniqueInfo.UniqueColumnList;
-		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
-		    String columnName = columnInfo.ColumnDbName;
-			if (sb.length() > 0) {
-			    sb.append(", ");
-			} else {
-			    sb.append("select").append(SELECT_HINT).append(" ");
-			}
-			String realColumnName = getLocalTableAliasName() + "." + columnName;
-			sb.append(realColumnName).append(" as ").append(columnName);
-			_selectClauseRealColumnAliasMap.put(realColumnName, columnName);
-		}
-		if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
-		    sb.append(getIncludedSelectColumnClause());
-		}
-
-        // [DBFlute-0.7.4]
-        if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
-            foreach (String deriveSubQuery in deriveSubQuerySet) {
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator()).append("     ");
-                }
-                sb.append(", ").append(deriveSubQuery);
-            }
-        }
-
-		return sb.toString();
-	}
-	
-    public String getSelectHint() {
-        return createSelectHint();
+        return sb.toString();
     }
 
-    public String getIncludedSelectColumnClause() {
-        StringBuilder sb = new StringBuilder();
-        int count = 0;
-        for (Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
-            String aliasName = ite.next();
-            String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
-            sb.append(", ").append(realColumnName).append(" as ").append(aliasName);
-			_selectClauseRealColumnAliasMap.put(realColumnName, aliasName);
+    protected String buildSelectClauseForScalar() {
+        if (_selectClauseType.Equals(SelectClauseType.MAX)) {
+            return buildSelectClauseMax();
+        } else if (_selectClauseType.Equals(SelectClauseType.MIN)) {
+            return buildSelectClauseMin();
+        } else if (_selectClauseType.Equals(SelectClauseType.SUM)) {
+            return buildSelectClauseSum();
+        } else if (_selectClauseType.Equals(SelectClauseType.AVG)) {
+            return buildSelectClauseAvg();
+        } else if (_selectClauseType.Equals(SelectClauseType.COUNT) && !hasUnionQuery()) {
+            return buildSelectClauseCount();
+        } else {
+            return null;
         }
-        return sb.toString();
+    }
+
+    protected String buildSelectClauseMax() {
+        assertScalarSelectSpecifiedColumnOnlyOne();
+        return "select max(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+    }
+
+    protected String buildSelectClauseMin() {
+        assertScalarSelectSpecifiedColumnOnlyOne();
+        return "select min(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+    }
+
+    protected String buildSelectClauseSum() {
+        assertScalarSelectSpecifiedColumnOnlyOne();
+        return "select sum(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+    }
+
+    protected String buildSelectClauseAvg() {
+        assertScalarSelectSpecifiedColumnOnlyOne();
+        return "select avg(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+    }
+    
+    protected String buildSelectClauseCount() {
+        return "select count(*)";
+    }
+
+    protected void assertScalarSelectSpecifiedColumnOnlyOne() {
+        String columnName = getSpecifiedColumnNameAsOne();
+        if (columnName != null) {
+            return;
+        }
+        String msg = "The specified column exists one";
+        msg = msg + " when the type of select clause is for scalar:";
+        msg = msg + " column=" + columnName;
+        throw new IllegalStateException(msg);
+    }
+
+    public String getSelectHint() {
+        return createSelectHint();
     }
 
     public String getFromClause() {
@@ -372,9 +383,9 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 }
                 ++count;
             }
-			foreach (String additionalOnClause in additionalOnClauseList) {
-			    sb.append(" and ").append(additionalOnClause);
-			}
+            foreach (String additionalOnClause in additionalOnClauseList) {
+                sb.append(" and ").append(additionalOnClause);
+            }
         }
         return sb.toString();
     }
@@ -405,10 +416,10 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     public String getWhereClause() {
-	    return buildWhereClause(false);
+        return buildWhereClause(false);
     }
-	
-	protected String buildWhereClause(bool template) {
+    
+    protected String buildWhereClause(bool template) {
         StringBuilder sb = new StringBuilder();
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
@@ -426,15 +437,15 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 sb.append(" and ").append(clauseElement);
             }
         }
-		if (template && sb.length() == 0) {
-		    sb.append(getWhereClauseMark());
-		}
+        if (template && sb.length() == 0) {
+            sb.append(getWhereClauseMark());
+        }
         return sb.toString();
     }
-	
+    
     public String getOrderByClause() {
         String orderByClause = null;
-        if (!_unionQueryInfoList.isEmpty()) {
+        if (hasUnionQuery()) {
             if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
                 String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
                 throw new IllegalStateException(msg);
@@ -460,58 +471,46 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                          Copy Parts
-    //                                                                          ==========
-    public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
-        Set<String> keySet = _includedSelectColumnMap.keySet();
-        for (Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
-             String aliasName = ite.next();
-             String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
-            sqlClause.registerIncludedSelectColumn(aliasName, realColumnName);
-        }
-    }
-
-	// ===================================================================================
     //                                                                SelectedSelectColumn
     //                                                                ====================
     /**
      * Register selected select column.
      * 
      * @param foreignTableAliasName The alias name of foreign table. (NotNull)
-	 * @param localTableName The table name of local. (NotNull)
-	 * @param foreignPropertyName The property name of foreign table. (NotNull)
+     * @param localTableName The table name of local. (NotNull)
+     * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (Nullable)
      */
     public void registerSelectedSelectColumn(String foreignTableAliasName
-			                               , String localTableName
-										   , String foreignPropertyName
-										   , String localRelationPath) {
+                                           , String localTableName
+                                           , String foreignPropertyName
+                                           , String localRelationPath) {
         _selectedSelectColumnMap.put(foreignTableAliasName, createSelectedSelectColumnInfo(foreignTableAliasName, localTableName, foreignPropertyName, localRelationPath));
     }
     
-	protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName
-											                                     , String localTableName
-													                             , String foreignPropertyName
-													                             , String localRelationPath) {
-		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
+    protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName
+                                                                                 , String localTableName
+                                                                                 , String foreignPropertyName
+                                                                                 , String localRelationPath) {
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
         ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
-		int relationNo = foreignInfo.RelationNo;
-		String nextRelationPath = "_" + relationNo;
+        int relationNo = foreignInfo.RelationNo;
+        String nextRelationPath = "_" + relationNo;
         if (localRelationPath != null) {
             nextRelationPath = localRelationPath + nextRelationPath;
         }
-		Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
-		${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
+        Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
+        ${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
         foreach (${glColumnInfoName} columnInfo in foreignDBMeta.ColumnInfoList) {
             String columnDbName = columnInfo.ColumnDbName;
-			SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
-			selectColumnInfo.setTableAliasName(foreignTableAliasName);
-			selectColumnInfo.setColumnName(columnDbName);
-			selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
-			resultMap.put(columnDbName, selectColumnInfo);
+            SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
+            selectColumnInfo.setTableAliasName(foreignTableAliasName);
+            selectColumnInfo.setColumnName(columnDbName);
+            selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
+            resultMap.put(columnDbName, selectColumnInfo);
         }
-		return resultMap;
-	}
+        return resultMap;
+    }
 
     public class SelectedSelectColumnInfo {
         protected String tableAliasName;
@@ -543,24 +542,6 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             this.columnAliasName = columnAliasName;
         }
     }
-	
-    // ===================================================================================
-    //                                                                IncludedSelectColumn
-    //                                                                ====================
-    public void ignoreIncludedSelectColumn() {
-        _isIncludedSelectColumnEffective = false;
-    }
-
-    public void makeIncludedSelectColumnEffective() {
-        if (!_includedSelectColumnMap.isEmpty()) {
-            _isIncludedSelectColumnEffective = true;
-        }
-    }
-
-    public void registerIncludedSelectColumn(String aliasName, String realColumnName) {
-        _isIncludedSelectColumnEffective = true;
-        _includedSelectColumnMap.put(aliasName, realColumnName);
-    }
 
     // ===================================================================================
     //                                                                           OuterJoin
@@ -581,7 +562,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
-		protected bool _onClauseInline;
+        protected bool _onClauseInline;
         public String getAliasName() {
             return _aliasName;
         }
@@ -689,11 +670,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-		if (onClauseInline) {
+        if (onClauseInline) {
             key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value);
-		} else {
+        } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
-		}
+        }
         arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
@@ -701,25 +682,25 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-		if (onClauseInline) {
+        if (onClauseInline) {
             key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
             arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
-		} else {
+        } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
             arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
-		}
+        }
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-		if (onClauseInline) {
+        if (onClauseInline) {
             joinInfo.addAdditionalOnClause(value);
             arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
-		} else {
-		    joinInfo.addInlineWhereClause(value);
+        } else {
+            joinInfo.addInlineWhereClause(value);
             arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
-		}
+        }
     }
 
     protected void assertNotYetOuterJoin(String aliasName) {
@@ -798,7 +779,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             List<String> orderByList = new ArrayList<String>();
             {
                 String[] splitArray = orderByProperty.Split('/');
-				foreach (String element in splitArray) {
+                foreach (String element in splitArray) {
                     orderByList.add(element);
                 }
             }
@@ -809,8 +790,8 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 
             List<String> registeredOrderByList = new ArrayList<String>();
             {
-			    String[] splitArray = registeredOrderByProperty.Split('/');
-				foreach (String element in splitArray) {
+                String[] splitArray = registeredOrderByProperty.Split('/');
+                foreach (String element in splitArray) {
                     registeredOrderByList.add(element);
                 }
             }
@@ -862,47 +843,58 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             throw new RuntimeException(msg, e);
         }
     }
-	
-	public virtual void addNullsFirstToPreviousOrderBy() {
-	    _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
-	}
-	
-	public virtual void addNullsLastToPreviousOrderBy() {
-	    _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
-	}
-	
-	protected virtual OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
-	    return new OrderByNullsSetupperBySupported();
-	}
-	
-	protected class OrderByNullsSetupperBySupported : OrderByNullsSetupper {
-	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
-		    return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
-		}
-	}
-	
-	protected virtual OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
+    
+    public virtual void addNullsFirstToPreviousOrderBy() {
+        _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
+    }
+    
+    public virtual void addNullsLastToPreviousOrderBy() {
+        _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
+    }
+    
+    protected virtual OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
+        return new OrderByNullsSetupperBySupported();
+    }
+    
+    protected class OrderByNullsSetupperBySupported : OrderByNullsSetupper {
+        public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
+            return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
+        }
+    }
+    
+    protected virtual OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
+        return new OrderByNullsSetupperByCaseWhen();
+    }
 
-	protected class OrderByNullsSetupperByCaseWhen : OrderByNullsSetupper {
-	    public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
-    	    String thenNumber = nullsFirst ? "1" : "0";
-    	    String elseNumber = nullsFirst ? "0" : "1";
-    	    String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
-			return caseWhen + ", " + orderByElementClause;
-		}
-	}
+    protected class OrderByNullsSetupperByCaseWhen : OrderByNullsSetupper {
+        public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
+            String thenNumber = nullsFirst ? "1" : "0";
+            String elseNumber = nullsFirst ? "0" : "1";
+            String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
+            return caseWhen + ", " + orderByElementClause;
+        }
+    }
 
     // ===================================================================================
     //                                                                          UnionQuery
     //                                                                          ==========
     public void registerUnionQuery(String unionQueryClause, bool unionAll) {
         assertStringNotNullAndNotTrimmedEmpty("unionQueryClause", unionQueryClause);
-         UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
+        UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
         unionQueryInfo.setUnionQueryClause(unionQueryClause);
         unionQueryInfo.setUnionAll(unionAll);
+        addUnionQueryInfo(unionQueryInfo);
+    }
+
+    protected void addUnionQueryInfo(UnionQueryInfo unionQueryInfo) {
+        if (_unionQueryInfoList == null) {
+            _unionQueryInfoList = new ArrayList<UnionQueryInfo>(); 
+        }
         _unionQueryInfoList.add(unionQueryInfo);
+    }
+
+    protected boolean hasUnionQuery() {
+        return _unionQueryInfoList != null && !_unionQueryInfoList.isEmpty();
     }
 
     protected class UnionQueryInfo {
@@ -1058,7 +1050,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         }
         return this;
     }
-	
+    
     public virtual bool isFetchStartIndexSupported() {
         return true; // Default
     }
@@ -1087,11 +1079,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return _isFetchScopeEffective;
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                                Lock
     //                                                                                ====
-	public abstract ${glSqlClauseInterfaceName} lockForUpdate();
-	
+    public abstract ${glSqlClauseInterfaceName} lockForUpdate();
+    
     // ===================================================================================
     //                                                                            Resolver
     //                                                                            ========
@@ -1105,7 +1097,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         // } else {
         //     return name;
         // }
-		return name;
+        return name;
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
@@ -1114,47 +1106,47 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return foreignInfo.RelationNo;
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-	public String getLocalTableAliasName() {
-	    return "dflocal";
-	}
-	
-	public String getForeignTableAliasPrefix() {
-	    return "dfrelation";
-	}
+    public String getLocalTableAliasName() {
+        return "dflocal";
+    }
+    
+    public String getForeignTableAliasPrefix() {
+        return "dfrelation";
+    }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
-	public String getWhereClauseMark() {
-	    return "#df:whereClause#";
-	}
-	
-	public String getWhereFirstConditionMark() {
-	    return "#df:whereFirstCondition#";
-	}
-	
-	public String getUnionSelectClauseMark() {
-	    return "#df:unionSelectClause#";
-	}
-	
-	public String getUnionWhereClauseMark() {
-	    return "#df:unionWhereClause#";
-	}
-	
-	public String getUnionWhereFirstConditionMark() {
-	    return "#df:unionWhereFirstCondition#";
-	}
-	
+    public String getWhereClauseMark() {
+        return "#df:whereClause#";
+    }
+    
+    public String getWhereFirstConditionMark() {
+        return "#df:whereFirstCondition#";
+    }
+    
+    public String getUnionSelectClauseMark() {
+        return "#df:unionSelectClause#";
+    }
+    
+    public String getUnionWhereClauseMark() {
+        return "#df:unionWhereClause#";
+    }
+    
+    public String getUnionWhereFirstConditionMark() {
+        return "#df:unionWhereFirstCondition#";
+    }
+    
 //    // =====================================================================================
 //    //                                                            Where Clause Simple Filter
 //    //                                                            ==========================
 //    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
-//		if (_whereClauseSimpleFilterList == null) {
-//		    _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterfaceName}>();
-//		}
+//        if (_whereClauseSimpleFilterList == null) {
+//            _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterfaceName}>();
+//        }
 //        _whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
 //    }
 //
@@ -1172,30 +1164,30 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 //        }
 //        return clauseElement;
 //    }
-	
+    
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
-	public bool isSelectedForeignInfoEmpty() {
-		if (_selectedForeignInfo == null) {
-		    return true;
-		}
+    public bool isSelectedForeignInfoEmpty() {
+        if (_selectedForeignInfo == null) {
+            return true;
+        }
         return _selectedForeignInfo.isEmpty();
-	}
+    }
 
-	public bool hasSelectedForeignInfo(String relationPath) {
-		if (_selectedForeignInfo == null) {
-		    return false;
-		}
-	    return _selectedForeignInfo.containsKey(relationPath);
-	}
+    public bool hasSelectedForeignInfo(String relationPath) {
+        if (_selectedForeignInfo == null) {
+            return false;
+        }
+        return _selectedForeignInfo.containsKey(relationPath);
+    }
 
-	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName) {
-		if (_selectedForeignInfo == null) {
-		    _selectedForeignInfo = new HashMap<String, String>();
-		}
-		_selectedForeignInfo.put(relationPath, foreignPropertyName);
-	}
+    public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName) {
+        if (_selectedForeignInfo == null) {
+            _selectedForeignInfo = new HashMap<String, String>();
+        }
+        _selectedForeignInfo.put(relationPath, foreignPropertyName);
+    }
     
     // ===================================================================================
     //                                                                       Format Clause
@@ -1472,7 +1464,35 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     protected virtual bool isUpdateSubQueryUseLocalTableSupported() {
         return true;
     }
-    
+
+    // [DBFlute-0.8.6]
+    // ===================================================================================
+    //                                                                  Select Clause Type
+    //                                                                  ==================
+    public void classifySelectClauseType(SelectClauseType selectClauseType) {
+        changeSelectClauseType(selectClauseType);
+    }
+
+    protected void changeSelectClauseType(SelectClauseType selectClauseType) {
+        savePreviousSelectClauseType();
+        _selectClauseType = selectClauseType;
+    }
+
+    protected void savePreviousSelectClauseType() {
+        _previousSelectClauseType = _selectClauseType;
+    }
+
+    public void rollbackSelectClauseType() {
+        _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
+    }
+
+    protected String filterUnionSelectCountIfNeeds(String sql) {
+        if (_selectClauseType.equals(SelectClauseType.COUNT) && hasUnionQuery()) {
+            sql = "select count(*) from (" + sql + ") dfmain";
+        }
+        return sql;
+    }
+
     // [DBFlute-0.7.9]
     // ===================================================================================
     //                                                                       Assist Helper
@@ -1485,37 +1505,37 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
-	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+        return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
-	
+    
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 
     protected String toStringView(Object obj) {
-	    return ${glTraceViewUtilName}.ToStringView(obj);
+        return ${glTraceViewUtilName}.ToStringView(obj);
     }
     
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
     protected void assertObjectNotNull(String variableName, Object value) {
-	    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
+        ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-	    ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
-	
+    
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-	public String toString() {
-	    return ToString();
-	}
+    public String toString() {
+        return ToString();
+    }
 }
 
 }

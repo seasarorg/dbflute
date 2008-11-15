@@ -207,12 +207,7 @@ public class ${glConditionBeanContextName} {
     //                                                                         Display SQL
     //                                                                         ===========
 	public static String convertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
-	    final String twoWaySql;
-	    if (cb.isLimitSelect_PKOnly()) {
-		    twoWaySql = cb.getSqlClause().getClausePKOnly();
-		} else {
-		    twoWaySql = cb.getSqlClause().getClause();
-		}
+		final String twoWaySql = cb.getSqlClause().getClause();
 	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb);
 	}
 

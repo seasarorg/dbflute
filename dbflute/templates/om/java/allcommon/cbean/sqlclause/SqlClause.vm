@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
-
 #set ($myClassName = "${glSqlClauseInterfaceName}")
+
 import java.util.Map;
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
@@ -8,8 +8,7 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
- * The interface of SQL-clause.
- * 
+ * The interface of SQL clause.
  * @author ${database.ClassAuthor}
  */
 public interface ${myClassName} {
@@ -32,19 +31,6 @@ public interface ${myClassName} {
      * @return The clause of all parts. (NotNull)
      */
     public String getClause();
-
-    /**
-     * Get clause of all parts as PK-only.
-     * <pre>
-	 * # select [base-table-columns], [join-table-columns]
-     * #   from [base-table] left outer join [join-table] [join-alias] on [join-condition]
-     * #  where [base-table].[column] = [value] and [join-alias].[column] is null
-     * #  order by [base-table].[column] asc, [join-alias].[column] desc
-     * #  for update
-     * </pre>
-     * @return The clause of all parts as PK-Only. (NotNull)
-     */
-	public String getClausePKOnly();
 
     // -----------------------------------------------------
     //                                       Fragment Clause
@@ -79,23 +65,11 @@ public interface ${myClassName} {
      */
 	public String getSelectClause();
 	
-	/**
-     * Get The clause of 'select' as PK-only. This is an internal method.
-     * @return The clause of select PK-only. {[select ...] from table...} (NotNull)
-     */
-	public String getSelectClausePKOnly();
-	
     /**
      * Get the hint of 'select'. This is an internal method.
      * @return The hint of 'select'. {select [select-hint] * from table...} (NotNull)
      */
     public String getSelectHint();
-
-    /**
-     * Get the clause of included-select-column. This is an internal method.
-     * @return The clause of included-select-column. {select ... , [included-select-column clause] from table...} (NotNull)
-     */
-    public String getIncludedSelectColumnClause();
 
     /**
      * Get the clause of 'from'. This is an internal method.
@@ -133,15 +107,6 @@ public interface ${myClassName} {
      */
     public String getSqlSuffix();
 
-    // ===================================================================================
-    //                                                                          Copy Parts
-    //                                                                          ==========
-    /**
-     * Copy included-select-column.
-     * @param sqlClause SQL-clause. (NotNull)
-     */
-    public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
-
 	// ===================================================================================
     //                                                                SelectedSelectColumn
     //                                                                ====================
@@ -157,26 +122,6 @@ public interface ${myClassName} {
 										   , String foreignPropertyName
 										   , String localRelationPath);
 	
-    // ===================================================================================
-    //                                                                IncludedSelectColumn
-    //                                                                ====================
-    /**
-     * Ignore included-select-column.
-     */
-    public void ignoreIncludedSelectColumn();
-
-    /**
-     * Make included-select-column effective.
-     */
-    public void makeIncludedSelectColumnEffective();
-
-    /**
-     * Register included-select-column.
-     * @param aliasName The alias name of the included-select-column. (NotNull)
-     * @param realColumnName The real column name of the included-select-column. (NotNull)
-     */
-    public void registerIncludedSelectColumn(String aliasName, String realColumnName);
-
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
@@ -488,4 +433,27 @@ public interface ${myClassName} {
      * @return Is the SQLException from unique constraint?
      */	
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode);
+    
+    // [DBFlute-0.8.6]
+    // ===================================================================================
+    //                                                                  Select Clause Type
+    //                                                                  ==================
+    /**
+     * Classify the type of select clause into specified type.
+     * @param selectClauseType The type of select clause. (NotNull)
+     */
+    public void classifySelectClauseType(SelectClauseType selectClauseType);
+
+    /**
+     * Roll-back the type of select clause into previous one.
+     * If it has no change, classify its type into default type.
+     */
+    public void rollbackSelectClauseType();
+
+    /**
+     * The type of select clause.
+     */
+    public static enum SelectClauseType {
+        COLUMNS, MAX, MIN, SUM, AVG, COUNT
+    }
 }

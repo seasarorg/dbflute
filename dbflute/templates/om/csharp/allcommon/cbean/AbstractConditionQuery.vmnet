@@ -222,10 +222,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        reflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
-        getSqlClause().copyIncludedSelectColumn(unionQuery.getSqlClause());// Reflect IncludedSelectColumn!
+        reflectRelationOnUnionQuery(this, unionQuery); // Reflect Relation!
         if (getSqlClause().isFormatClauseEffective()) {
-            unionQuery.getSqlClause().makeFormatClauseEffective();// Reflect FormatClause!
+            unionQuery.getSqlClause().makeFormatClauseEffective(); // Reflect FormatClause!
         }
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);

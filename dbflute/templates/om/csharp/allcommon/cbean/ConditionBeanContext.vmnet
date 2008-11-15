@@ -68,11 +68,11 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "Has the target record been deleted by other thread?" + GetLineSeparator();
             msg = msg + "It is precondition that the record exists on your database." + GetLineSeparator();
             msg = msg + GetLineSeparator();
-    		if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
-    		    ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-    			String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
-    			msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
-    		} else {
+            if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
+                ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+                String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
+                msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+            } else {
                 msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4Log + GetLineSeparator();
             }
             msg = msg + "* * * * * * * * * */" + GetLineSeparator();
@@ -92,11 +92,11 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "Please confirm your search condition. Does it really select the only one?" + GetLineSeparator();
             msg = msg + "Please confirm your database. Does it really exist the only one?" + GetLineSeparator();
             msg = msg + GetLineSeparator();
-    		if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
-    		    ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-    			String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
-    			msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
-    		} else {
+            if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
+                ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+                String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
+                msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+            } else {
                 msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4Log + GetLineSeparator();
             }
             msg = msg + "* * * * * * * * * */" + GetLineSeparator();
@@ -121,20 +121,15 @@ namespace ${glPackageBaseCommonCBean} {
             return displaySql.Substring(0, basePointIndex) + GetLineSeparator() + " " + displaySql.Substring(basePointIndex);
         }
 
-    	// ===============================================================================
+        // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
-    	public static String ConvertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
-    	    String twoWaySql;
-    	    if (cb.IsLimitSelect_PKOnly()) {
-    		    twoWaySql = cb.SqlClause.getClausePKOnly();
-    		} else {
-    		    twoWaySql = cb.SqlClause.getClause();
-    		}
-    	    return ${glInternalSqlParser}.ConvertTwoWaySql2DisplaySql(twoWaySql, cb);
-    	}
-	
-    	// ===============================================================================
+        public static String ConvertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
+            String twoWaySql = cb.SqlClause.getClause();
+            return ${glInternalSqlParser}.ConvertTwoWaySql2DisplaySql(twoWaySql, cb);
+        }
+    
+        // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
         private static String GetLineSeparator() {

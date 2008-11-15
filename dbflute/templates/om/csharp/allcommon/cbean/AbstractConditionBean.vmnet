@@ -167,27 +167,6 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // ===============================================================================
-        //                                                                    Limit Select
-        //                                                                    ============
-        protected bool _isLimitSelectPKOnly;
-
-        public bool IsLimitSelect_PKOnly() {
-            return _isLimitSelectPKOnly;
-        }
-#if ($database.isMakeDeprecated())
-
-        public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
-            _isLimitSelectPKOnly = true;
-            return this;
-        }
-
-        public ${glConditionBeanInterfaceName} LimitSelect_Off() {
-            _isLimitSelectPKOnly = false;
-            return this;
-        }
-#end
-
-        // ===============================================================================
         //                                                                    Lock Setting
         //                                                                    ============
         public ${glConditionBeanInterfaceName} LockForUpdate() {
@@ -201,12 +180,7 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
 
-            // If the query uses union query, it needs included-select-column.
-            if (!HasUnionQueryOrUnionAllQuery()) {
-                this.SqlClause.ignoreIncludedSelectColumn();
-            }
-
-            this.SqlClause.ignoreIncludedSelectColumn();
+            this.SqlClause.classifySelectClauseType(${glSqlClauseInterfaceName}.SelectClauseType.COUNT);
             this.SqlClause.ignoreOrderBy();
             this.SqlClause.ignoreFetchScope();
             return this;
@@ -215,12 +189,7 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = false;
 
-            // If the query uses union query, it needs included-select-column.
-            if (!HasUnionQueryOrUnionAllQuery()) {
-                this.SqlClause.makeIncludedSelectColumnEffective();
-            }
-		
-            this.SqlClause.makeIncludedSelectColumnEffective();
+            this.SqlClause.rollbackSelectClauseType();
             this.SqlClause.makeOrderByEffective();
             this.SqlClause.makeFetchScopeEffective();
             return this;

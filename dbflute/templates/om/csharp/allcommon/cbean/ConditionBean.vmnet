@@ -37,15 +37,6 @@ namespace ${glPackageBaseCommonCBean} {
         bool HasUnionQueryOrUnionAllQuery();
 
         // ===============================================================================
-        //                                                                    Limit Select
-        //                                                                    ============
-        bool IsLimitSelect_PKOnly();
-#if ($database.isMakeDeprecated())
-        ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
-        ${glConditionBeanInterfaceName} LimitSelect_Off();
-#end
-
-        // ===============================================================================
         //                                                                    Lock Setting
         //                                                                    ============
         $glConditionBeanInterfaceName LockForUpdate();

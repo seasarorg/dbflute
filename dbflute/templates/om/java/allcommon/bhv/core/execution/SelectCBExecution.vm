@@ -51,24 +51,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
         final List<Object> bindVariableList = new ArrayList<Object>();
         final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
 
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String finalClause;
-        if (cb.hasUnionQueryOrUnionAllQuery()) {
-            final String realClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
-            if (cb.isSelectCountIgnoreFetchScope()) {
-                // If the query uses union and it selects count, the way of select-count is as follows.
-                finalClause = "select count(*) from (" + realClause + ") dfmain";
-            } else {
-                finalClause = realClause;
-            }
-        } else {
-            if (cb.isSelectCountIgnoreFetchScope()) {
-                finalClause = setupRealSelectCountClause(args, bindVariableList, bindVariableTypeList);
-            } else {
-                finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
-            }
-        }
-
+        final String finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
         final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
         selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
@@ -85,41 +68,12 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
             final ${glSelectCBExecution} dynamicSqlFactory = createDynamicSqlFactory();
             dynamicSqlFactory.setArgNames(getArgNames());
             dynamicSqlFactory.setArgTypes(getArgTypes());
-            if (cb.isLimitSelect_PKOnly()) {
-                dynamicSqlFactory.setSql(cb.getSqlClause().getClausePKOnly());
-            } else {
-                dynamicSqlFactory.setSql(cb.getSqlClause().getClause());
-            }
+            dynamicSqlFactory.setSql(cb.getSqlClause().getClause());
             final CommandContext ctx = dynamicSqlFactory.apply(args);
             realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
         return realClause;
-    }
-    
-    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String realSelectCountClause;
-        {
-            final ${glSelectCBExecution} selectCountCommand = createDynamicSqlFactory();
-            selectCountCommand.setArgNames(getArgNames());
-            selectCountCommand.setArgTypes(getArgTypes());
-            final String selectClause = "select count(*)";
-            String fromWhereClause = cb.getSqlClause().getClauseFromWhereWithUnionTemplate();
-            
-            // Replace template marks. These are very important!
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
-            fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
-
-            final String sql = cb.getSqlClause().filterSubQueryIndent(selectClause + " " + fromWhereClause);
-            selectCountCommand.setSql(sql);
-
-            final CommandContext ctx = selectCountCommand.apply(args);
-            realSelectCountClause = ctx.getSql();
-            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        }
-        return realSelectCountClause;
     }
 
     // ===================================================================================

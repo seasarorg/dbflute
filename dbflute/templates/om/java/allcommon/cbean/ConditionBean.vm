@@ -83,31 +83,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public boolean hasUnionQueryOrUnionAllQuery();
 
-    // ===================================================================================
-    //                                                                        Limit Select
-    //                                                                        ============
-    /**
-     * Is limit-select PK only?
-     * @return Determination.
-     */
-    public boolean isLimitSelect_PKOnly();
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Limit select PK only. This is OLD style. You can do the same thing by specify().
-     * @return this. (NotNull)
-     * @deprecated This is OLD style. You can do the same thing by specify().
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_PKOnly();
-
-    /**
-     * Limit select off.
-     * @return this. (NotNull)
-     * @deprecated This is OLD style. You can do the same thing by specify().
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_Off();
-#end
-
     // =====================================================================================
     //                                                                          Lock Setting
     //                                                                          ============

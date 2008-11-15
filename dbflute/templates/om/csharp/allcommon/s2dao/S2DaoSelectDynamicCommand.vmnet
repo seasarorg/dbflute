@@ -109,23 +109,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
 
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
-            String finalClause = null;
-            if (cb.HasUnionQueryOrUnionAllQuery()) {
-                String realClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
-                if (cb.IsSelectCountIgnoreFetchScope()) {
-                    // If the query uses union and it selects count, the way of select-count is as follows.
-    				finalClause = "select count(*) from (" + realClause + ") dfmain";
-                } else {
-    			    finalClause = realClause;
-                }
-            } else {
-                if (cb.IsSelectCountIgnoreFetchScope()) {
-                    finalClause = SetupRealSelectCountClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
-                } else {
-                    finalClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
-                }
-            }
-		
+            String finalClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
+        
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
             bindVariableList.CopyTo(bindVariableArray, 0);
@@ -287,54 +272,25 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                      Setup Clause
         //                                      ------------
-    	protected String SetupRealClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+        protected String SetupRealClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             String realClause = null;
             {
                 ${glSelectDynamicCommand} dynamicCommand = CreateMySelectDynamicCommand();
                 dynamicCommand.ArgNames = ArgNames;
                 dynamicCommand.ArgTypes = ArgTypes;
-    			if (cb.IsLimitSelect_PKOnly()) {
-                    dynamicCommand.Sql = cb.SqlClause.getClausePKOnly();
-    			} else {
-    			    dynamicCommand.Sql = cb.SqlClause.getClause();
-    			}
+                dynamicCommand.Sql = cb.SqlClause.getClause();
                 ICommandContext ctx = dynamicCommand.Apply(args);
                 realClause = ctx.Sql;
                 AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
             }
             return realClause;
         }
-	
-        protected String SetupRealSelectCountClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
-            String realSelectCountClause = null;
-            {
-                ${glSelectDynamicCommand} selectCountCommand = CreateMySelectDynamicCommand();
-                selectCountCommand.ArgNames = ArgNames;
-                selectCountCommand.ArgTypes = ArgTypes;
-    			String selectClause = "select count(*)";
-    			String fromWhereClause = cb.SqlClause.getClauseFromWhereWithUnionTemplate();
-    			
-        		// Replace template marks. These are very important!
-        		fromWhereClause = ReplaceString(fromWhereClause, cb.SqlClause.getUnionSelectClauseMark(), selectClause);
-        		fromWhereClause = ReplaceString(fromWhereClause, cb.SqlClause.getUnionWhereClauseMark(), "");
-        		fromWhereClause = ReplaceString(fromWhereClause, cb.SqlClause.getUnionWhereFirstConditionMark(), "");
-
-				String sql = cb.SqlClause.filterSubQueryIndent(selectClause + " " + fromWhereClause);
-    			selectCountCommand.Sql = sql;
-
-                ICommandContext ctx = selectCountCommand.Apply(args);
-                realSelectCountClause = ctx.Sql;
-                AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
-            }
-            return realSelectCountClause;
-        }
-
+    
         protected ${glInternalBasicSelectHandler} CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
             return new ${glInternalBasicSelectHandler}(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
-		
+        
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
@@ -372,9 +328,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                  General Helper
         //                                                                  ==============
         protected String ReplaceString(String text, String fromText, String toText) {
-    	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+            return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
-		
+        
         protected class DataReaderCursol : IDataReaderHandler {
             protected ${glPackageBaseCommonJdbc}.${glCursorHandlerName} _cursorHandler;
             public DataReaderCursol(${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler) {
