@@ -5,8 +5,6 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCoreExecution}.${glSelectCBExecution};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
@@ -41,28 +39,6 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
 
     public boolean isSelect() {
         return true;
-    }
-
-    // ===================================================================================
-    //                                                                    Process Callback
-    //                                                                    ================
-    public void beforeGettingSqlExecution() {
-        assertStatus("beforeGettingSqlExecution");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xsetupSelectCountIgnoreFetchScope();
-        } else {
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-        }
-        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
-    }
-
-    public void afterExecuting() {
-        assertStatus("afterExecuting");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        if (isSelectCount()) {
-            cb.xafterCareSelectCountIgnoreFetchScope();
-        }
     }
 
     // ===================================================================================

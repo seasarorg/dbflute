@@ -249,6 +249,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     protected <RESULT> void logInvocation(${glBehaviorCommand}<RESULT> behaviorCommand) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
+        filterBehaviorResult(behaviorCommand, behaviorResult);
 
         final String invokeClassName;
         final String invokeMethodName;
@@ -279,6 +280,18 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                 log("path: " + behaviorCommand.getOutsideSqlPath());
                 log("option: " + behaviorCommand.getOutsideSqlOption());
             }
+        }
+    }
+
+    protected <RESULT> void filterBehaviorResult(${glBehaviorCommand}<RESULT> behaviorCommand, ${glInvokeNameResultName} behaviorResult) {
+        final String simpleClassName = behaviorResult.getSimpleClassName();
+        if (simpleClassName == null) {
+            return;
+        }
+        if (simpleClassName.contains("Behavior") && simpleClassName.endsWith("$SLFunction")) {
+            final String behaviorClassName = findBehaviorClassNameFromDBMeta(behaviorCommand.getTableDbName());
+            behaviorResult.setSimpleClassName(behaviorClassName);
+            behaviorResult.setMethodName("scalarSelect()." + behaviorResult.getMethodName());
         }
     }
 
@@ -315,9 +328,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                 if (behaviorCommand.isOutsideSql()) {
                     final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
                     final String tableDbName = outsideSqlContext.getTableDbName();
-                    final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
-                    final String behaviorTypeName = dbmeta.getBehaviorTypeName();
-                    final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
+                    final String behaviorClassName = findBehaviorClassNameFromDBMeta(tableDbName);
                     invokeClassName = behaviorClassName + ".outsideSql()";
                     if (originalName.endsWith("OutsideSqlEntityExecutor")) {
                         invokeClassName = invokeClassName + ".entityHandling()";
@@ -501,6 +512,13 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
             return simpleClassName;
         }
         return "${glProjectPrefix}" + simpleClassName.substring(prefixLength);
+    }
+
+    protected String findBehaviorClassNameFromDBMeta(String tableDbName) {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
+        final String behaviorTypeName = dbmeta.getBehaviorTypeName();
+        final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
+        return removeBasePrefixFromSimpleClassName(behaviorClassName);
     }
 
     // ===================================================================================

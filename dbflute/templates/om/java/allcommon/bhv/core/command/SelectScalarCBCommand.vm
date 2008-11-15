@@ -1,38 +1,41 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import java.util.List;
-
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
  * @author ${database.ClassAuthor}
- * @param <ENTITY> The type of entity.
+ * @param <RESULT> The type of result.
  */
-public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> extends ${glAbstractSelectCBCommand}<List<ENTITY>> {
+public class ${glSelectScalarCBCommand}<RESULT> extends ${glAbstractSelectCBCommand}<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
-    protected Class<ENTITY> _entityType;
+    /** The type of result. (NotNull) */
+    protected Class<RESULT> _resultType;
+
+    /** The type of select clause. (NotNull) */
+    protected ${glSqlClauseName}.SelectClauseType _selectClauseType;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "selectList";
+        assertStatus("getCommandName");
+        final String resultTypeName = _resultType.getSimpleName();
+        final String scalarMethodName = _selectClauseType.toString().toLowerCase();
+        return "scalarSelect(" + resultTypeName + ")." + scalarMethodName;
     }
 
     public Class<?> getCommandReturnType() {
-        return List.class;
+        assertStatus("getCommandReturnType");
+        return _resultType;
     }
 
     // ===================================================================================
@@ -48,12 +51,14 @@ public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> e
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ${glConditionBeanInterfaceName} cb = _conditionBean;
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
+        cb.getSqlClause().classifySelectClauseType(_selectClauseType); // *Point!
     }
 
     public void afterExecuting() {
         assertStatus("afterExecuting");
+        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        cb.getSqlClause().rollbackSelectClauseType();
     }
 
     // ===================================================================================
@@ -63,15 +68,10 @@ public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> e
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                BeanMetaData bmd = createBeanMetaData();
-                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
+                ResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };
-    }
-
-    protected BeanMetaData createBeanMetaData() {
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
     }
 
     // ===================================================================================
@@ -80,15 +80,22 @@ public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> e
     @Override
     protected void assertStatus(String methodName) {
         super.assertStatus(methodName);
-        if (_entityType == null) {
-            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
+        if (_resultType == null) {
+            throw new IllegalStateException(buildAssertMessage("_resultType", methodName));
+        }
+        if (_selectClauseType == null) {
+            throw new IllegalStateException(buildAssertMessage("_selectClauseType", methodName));
         }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<ENTITY> entityType) {
-        _entityType = entityType;
+    public void setResultType(Class<RESULT> resultType) {
+        _resultType = resultType;
+    }
+
+    public void setSelectClauseType(${glSqlClauseName}.SelectClauseType selectClauseType) {
+        _selectClauseType = selectClauseType;
     }
 }

@@ -191,6 +191,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
+        return new SLFunction<${myConditionBeanClassName}, RESULT>(newMyConditionBean(), resultType);
+    }
+
+    // ===================================================================================
     //                                                                      Various Select
     //                                                                      ==============
     /**

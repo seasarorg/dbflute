@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClauseInterfaceName}")
+#set ($myClassName = "${glSqlClauseName}")
 
 using System;
 using System.Collections;
@@ -10,7 +10,7 @@ using ${glPackageBaseCommonJavaLike};
 namespace ${glPackageBaseCommonSqlClause} {
 
 // JavaLike
-public interface ${glSqlClauseInterfaceName} {
+public interface ${myClassName} {
 
     // =====================================================================================
     //                                                                                Clause
@@ -182,6 +182,7 @@ public interface ${glSqlClauseInterfaceName} {
     void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
     bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
+    String getSpecifiedColumnNameAsLatestInOneTable();
     void clearSpecifiedSelectColumn();
     
     // [DBFlute-0.7.9]
@@ -200,7 +201,33 @@ public interface ${glSqlClauseInterfaceName} {
 
 }
 
-    public enum SelectClauseType {
-        COLUMNS, MAX, MIN, SUM, AVG, COUNT
+    public class SelectClauseType {
+        public static readonly SelectClauseType COLUMNS = new SelectClauseType("columns");
+        public static readonly SelectClauseType COUNT = new SelectClauseType("count");
+        public static readonly SelectClauseType MAX = new SelectClauseType("max");
+        public static readonly SelectClauseType MIN = new SelectClauseType("min");
+        public static readonly SelectClauseType SUM = new SelectClauseType("sum");
+        public static readonly SelectClauseType AVG = new SelectClauseType("avg");
+        protected String _code;
+        protected SelectClauseType(String code) {
+            _code = code;
+        }
+        protected String Code { get { return _code; } }
+        public bool equals(Object obj) {
+            return Equals(obj);
+        }
+        public override bool Equals(Object obj) {
+            if (!(obj is SelectClauseType)) {
+                return false;
+            }
+            SelectClauseType targetType = (SelectClauseType)obj;
+            return _code.Equals(targetType.Code);
+        }
+        public String toString() {
+            return ToString();
+        }
+        public override String ToString() {
+            return _code;
+        }
     }
 }

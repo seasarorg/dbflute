@@ -19,8 +19,8 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
-    protected Class<RESULT> _entityType;
+    /** The type of result. (NotNull) */
+    protected Class<RESULT> _resultType;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -30,7 +30,7 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     }
 
     public Class<?> getCommandReturnType() {
-        return _entityType;
+        return _resultType;
     }
 
     // ===================================================================================
@@ -77,7 +77,7 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                ResultSetHandler handler = createObjectResultSetHandler(_entityType);
+                ResultSetHandler handler = createObjectResultSetHandler(_resultType);
                 return createSelectNextValExecution(handler);
             }
         };
@@ -142,7 +142,7 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<RESULT> entityType) {
-        _entityType = entityType;
+    public void setResultType(Class<RESULT> resultType) {
+        _resultType = resultType;
     }
 }

@@ -462,7 +462,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
 
-        getSqlClause().classifySelectClauseType(${glSqlClauseInterfaceName}.SelectClauseType.COUNT);
+        getSqlClause().classifySelectClauseType(${glSqlClauseName}.SelectClauseType.COUNT);
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;
@@ -633,6 +633,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             _localCQ = localCQ;
             _querySetupper = querySetupper;
         }
+        public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
+        }
         public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
@@ -648,10 +652,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         public void avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
-        }
-        public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
         }
 
         protected void assertAliasName(String aliasName) {

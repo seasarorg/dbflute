@@ -26,7 +26,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The abstract class of SQL clause.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
+public abstract class ${myClassName} implements ${glSqlClauseName} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -146,8 +146,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect());
         String sql = sb.toString();
-        sql = filterSubQueryIndent(sql);
         sql = filterUnionSelectCountIfNeeds(sql);
+        sql = filterSubQueryIndent(sql);
         return sql;
     }
 
@@ -214,15 +214,25 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
     }
 
+    protected String filterUnionSelectCountIfNeeds(String sql) {
+        if (_selectClauseType.equals(SelectClauseType.COUNT) && hasUnionQuery()) {
+            sql = "select count(*) from (" + sql + ") dfmain";
+        }
+        return sql;
+    }
+
     // ===================================================================================
     //                                                                        Clause Parts
     //                                                                        ============
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (!_selectClauseType.equals(SelectClauseType.COLUMNS)) {
-            String selectClauseForScalar = buildSelectClauseForScalar();
-            if (selectClauseForScalar != null) {
-                return selectClauseForScalar;
+            if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+                if (!hasUnionQuery()) { // if union query does NOT exist
+                    return buildSelectClauseCount();
+                }
+            } else {
+                return buildSelectClauseForScalar();
             }
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
@@ -288,6 +298,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
         return sb.toString();
     }
+    
+    protected String buildSelectClauseCount() {
+        return "select count(*)";
+    }
 
     protected String buildSelectClauseForScalar() {
         if (_selectClauseType.equals(SelectClauseType.MAX)) {
@@ -298,45 +312,43 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             return buildSelectClauseSum();
         } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
             return buildSelectClauseAvg();
-        } else if (_selectClauseType.equals(SelectClauseType.COUNT) && !hasUnionQuery()) {
-            return buildSelectClauseCount();
-        } else {
-            return null;
         }
+        String msg = "The type of select clause is not for scalar:";
+        msg = msg + " type=" + _selectClauseType;
+        throw new IllegalStateException(msg);
     }
 
     protected String buildSelectClauseMax() {
-        assertScalarSelectSpecifiedColumnOnlyOne();
-        return "select max(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select max(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseMin() {
-        assertScalarSelectSpecifiedColumnOnlyOne();
-        return "select min(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select min(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseSum() {
-        assertScalarSelectSpecifiedColumnOnlyOne();
-        return "select sum(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
+        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select sum(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseAvg() {
-        assertScalarSelectSpecifiedColumnOnlyOne();
-        return "select avg(dflocal." + getSpecifiedColumnNameAsOne()  + ")";
-    }
-    
-    protected String buildSelectClauseCount() {
-        return "select count(*)";
+        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select avg(dflocal." + columnName  + ")";
     }
 
-    protected void assertScalarSelectSpecifiedColumnOnlyOne() {
-        String columnName = getSpecifiedColumnNameAsOne();
+    protected void assertScalarSelectSpecifiedColumnOnlyOne(String columnName) {
         if (columnName != null) {
             return;
         }
         String msg = "The specified column exists one";
         msg = msg + " when the type of select clause is for scalar:";
-        msg = msg + " column=" + columnName;
+        msg = msg + " specifiedSelectColumnMap=" + _specifiedSelectColumnMap;
         throw new IllegalStateException(msg);
     }
 
@@ -1354,7 +1366,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>();
         }
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
-            _specifiedSelectColumnMap.put(tableAliasName, new HashMap<String, String>());
+            _specifiedSelectColumnMap.put(tableAliasName, new LinkedHashMap<String, String>());
         }
         Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         elementMap.put(columnName, null); // The value is dummy for extension at the future.
@@ -1378,6 +1390,16 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
             if (elementMap != null && elementMap.size() == 1) {
                 return elementMap.keySet().iterator().next();
+            }
+        }
+        return null;
+    }
+
+    public String getSpecifiedColumnNameAsLatestInOneTable() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
+            if (elementMap != null && !elementMap.isEmpty()) {
+                return new ArrayList<String>(elementMap.keySet()).get(elementMap.size() - 1);
             }
         }
         return null;
@@ -1511,13 +1533,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     public void rollbackSelectClauseType() {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
-    }
-
-    protected String filterUnionSelectCountIfNeeds(String sql) {
-        if (_selectClauseType.equals(SelectClauseType.COUNT) && hasUnionQuery()) {
-            sql = "select count(*) from (" + sql + ") dfmain";
-        }
-        return sql;
     }
 
     // [DBFlute-0.7.5]

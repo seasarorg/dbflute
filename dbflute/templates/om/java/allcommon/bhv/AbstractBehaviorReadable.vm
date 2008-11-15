@@ -15,14 +15,18 @@ import java.lang.reflect.Constructor;
 
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractBehaviorCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectNextValCommand};
+import ${glPackageBaseCommonBhvCoreCommand}.${glSelectScalarCBCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
+import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
@@ -30,10 +34,9 @@ import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glScalarQuery};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
-import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
@@ -158,9 +161,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public List<ENTITY> callbackSelectList(CB cb);
     }
 
-    // =====================================================================================
-    //                                                                             List Read
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           List Read
+    //                                                                           =========
     /**
      * ${database.ImplementComment}
      * @param cb Condition-bean.
@@ -233,6 +236,86 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+    }
+
+    // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    public class SLFunction<CB extends ${glConditionBeanInterfaceName}, RESULT> {
+        protected CB _conditionBean;
+        protected Class<RESULT> _resultType;
+
+        public SLFunction(CB conditionBean, Class<RESULT> resultType) {
+            _conditionBean = conditionBean;
+            _resultType = resultType;
+        }
+
+        public RESULT max(${glScalarQuery}<CB> scalarQuery) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MAX);
+        }
+
+        public RESULT min(${glScalarQuery}<CB> scalarQuery) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MIN);
+        }
+
+        public RESULT sum(${glScalarQuery}<CB> scalarQuery) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.SUM);
+        }
+
+        public RESULT avg(${glScalarQuery}<CB> scalarQuery) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.AVG);
+        }
+
+        protected RESULT exec(${glScalarQuery}<CB> scalarQuery, ${glSqlClauseName}.SelectClauseType selectClauseType) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            assertObjectNotNull("selectClauseType", selectClauseType);
+            scalarQuery.query(_conditionBean);
+            assertScalarSelectRequiredSpecifyColumn();
+            return invoke(createSelectScalarCBCommand(_conditionBean, _resultType, selectClauseType));
+        }
+
+        protected void assertScalarSelectRequiredSpecifyColumn() {
+            if (_conditionBean.getSqlClause().getSpecifiedColumnNameAsLatestInOneTable() == null) {
+                throwScalarSelectNotFoundSpecifyColumn();
+            }
+        }
+
+        protected void throwScalarSelectNotFoundSpecifyColumn() {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The specified column for scalar select was Not Found in the condition-bean!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should specify the only one column as function target." + getLineSeparator();
+            msg = msg + "And don't specify multiple columns." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
+            msg = msg + "            cb.query().setXxx_...();" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ConditionBean Type]" + getLineSeparator() + _conditionBean.getClass().getName() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Result Type]" + getLineSeparator() + _resultType.getName() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new ScalarSelectNotFoundSpecifyColumn(msg);
+        }
+    }
+
+    public static class ScalarSelectNotFoundSpecifyColumn extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ScalarSelectNotFoundSpecifyColumn(String msg) {
+            super(msg);
+        }
     }
 
     // ===================================================================================
@@ -657,10 +740,22 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return command;
     }
 
-    protected <RESULT> ${glSelectNextValCommand}<RESULT> createSelectNextValCommand(Class<RESULT> entityType) {
+    protected <RESULT> ${glSelectNextValCommand}<RESULT> createSelectNextValCommand(Class<RESULT> resultType) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
         final ${glSelectNextValCommand}<RESULT> command = xsetupSelectCommand(new ${glSelectNextValCommand}<RESULT>());
-        command.setEntityType(entityType);
+        command.setResultType(resultType);
+        return command;
+    }
+
+    protected <RESULT> ${glSelectScalarCBCommand}<RESULT> createSelectScalarCBCommand(${glConditionBeanInterfaceName} cb
+                                                                              , Class<RESULT> resultType
+                                                                              , ${glSqlClauseName}.SelectClauseType selectClauseType) {
+        assertBehaviorCommandInvoker("createSelectScalarCBCommand");
+        final ${glSelectScalarCBCommand}<RESULT> command = xsetupSelectCommand(new ${glSelectScalarCBCommand}<RESULT>());
+        command.setConditionBeanType(cb.getClass());
+        command.setConditionBean(cb);
+        command.setResultType(resultType);
+        command.setSelectClauseType(selectClauseType);
         return command;
     }
 

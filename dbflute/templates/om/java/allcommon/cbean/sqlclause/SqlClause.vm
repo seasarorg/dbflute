@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
-#set ($myClassName = "${glSqlClauseInterfaceName}")
+#set ($myClassName = "${glSqlClauseName}")
 
 import java.util.Map;
 
@@ -409,6 +409,7 @@ public interface ${myClassName} {
     public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
 	public boolean hasSpecifiedDeriveSubQuery(String aliasName);
     public String getSpecifiedColumnNameAsOne();
+    public String getSpecifiedColumnNameAsLatestInOneTable();
     public void clearSpecifiedSelectColumn();
     
     // [DBFlute-0.7.5]
@@ -454,6 +455,6 @@ public interface ${myClassName} {
      * The type of select clause.
      */
     public static enum SelectClauseType {
-        COLUMNS, MAX, MIN, SUM, AVG, COUNT
+        COLUMNS, COUNT, MAX, MIN, SUM, AVG
     }
 }

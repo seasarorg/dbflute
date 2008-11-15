@@ -180,7 +180,7 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
 
-            this.SqlClause.classifySelectClauseType(${glSqlClauseInterfaceName}.SelectClauseType.COUNT);
+            this.SqlClause.classifySelectClauseType(${glSqlClauseName}.SelectClauseType.COUNT);
             this.SqlClause.ignoreOrderBy();
             this.SqlClause.ignoreFetchScope();
             return this;
@@ -376,6 +376,10 @@ namespace ${glPackageBaseCommonCBean} {
             _localCQ = localCQ;
             _querySetupper = querySetupper;
         }
+        public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.Invoke("count", subQuery, _localCQ, aliasName.Trim());
+        }
         public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.Invoke("max", subQuery, _localCQ, aliasName.Trim());
@@ -391,10 +395,6 @@ namespace ${glPackageBaseCommonCBean} {
         public void Avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.Invoke("avg", subQuery, _localCQ, aliasName.Trim());
-        }
-        public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.Invoke("count", subQuery, _localCQ, aliasName.Trim());
         }
 
         protected void assertAliasName(String aliasName) {

@@ -157,6 +157,7 @@ targetdatabase = $targetDatabase
     #set ($glSelectCountCBCommand = "${glProjectPrefix}SelectCountCBCommand")
     #set ($glSelectListCBCommand = "${glProjectPrefix}SelectListCBCommand")
     #set ($glSelectNextValCommand = "${glProjectPrefix}SelectNextValCommand")
+    #set ($glSelectScalarCBCommand = "${glProjectPrefix}SelectScalarCBCommand")
     #set ($glUpdateEntityCommand = "${glProjectPrefix}UpdateEntityCommand")
     #set ($glUpdateNonstrictEntityCommand = "${glProjectPrefix}UpdateNonstrictEntityCommand")
 
@@ -194,6 +195,7 @@ targetdatabase = $targetDatabase
     #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
+    #set ($glScalarQuery = "${glProjectPrefix}ScalarQuery")
     #set ($glSubQuery = "${glProjectPrefix}SubQuery")
     #set ($glUnionQuery = "${glProjectPrefix}UnionQuery")
 
@@ -802,6 +804,10 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectNextValCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectNextValCommand.${glTemplateFileExtension}",$path,"", "")
 
+      $database.info("    parse('SelectScalarCBCommand');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectScalarCBCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectScalarCBCommand.${glTemplateFileExtension}",$path,"", "")
+
       $database.info("    parse('UpdateEntityCommand');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateEntityCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateEntityCommand.${glTemplateFileExtension}",$path,"", "")
@@ -979,6 +985,10 @@ targetdatabase = $targetDatabase
     $database.info("    parseSelectResource()")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SelectResource.${glTemplateFileExtension}",$path ,"", "")
+
+    $database.info("    parse('ScalarQuery')")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glScalarQuery}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ScalarQuery.${glTemplateFileExtension}",$path ,"", "")
 
     $database.info("    parse('SubQuery')")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSubQuery}.${glClassFileExtension}" )

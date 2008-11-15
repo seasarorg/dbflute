@@ -1,12 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 
 /**
  * @author ${database.ClassAuthor}
@@ -25,6 +24,22 @@ public class ${glSelectCountCBCommand} extends ${glAbstractSelectCBCommand}<Inte
     }
 
     // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        cb.xsetupSelectCountIgnoreFetchScope(); // *Point!
+        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
+    }
+
+    public void afterExecuting() {
+        assertStatus("afterExecuting");
+        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        cb.xafterCareSelectCountIgnoreFetchScope();
+    }
+
+    // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
     public boolean isSelectCount() {
@@ -38,18 +53,9 @@ public class ${glSelectCountCBCommand} extends ${glAbstractSelectCBCommand}<Inte
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                ResultSetHandler handler = new InternalCountResultSetHandler();
+                ResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };
-    }
-
-    protected static class InternalCountResultSetHandler implements ResultSetHandler {
-        public Object handle(ResultSet rs) throws SQLException {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-            return null;
-        }
     }
 }
