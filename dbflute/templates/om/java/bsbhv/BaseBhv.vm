@@ -193,6 +193,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
+    /**
+     * Select the scalar value derived by a function. <br />
+     * Call a function method after this method called like as follows:
+     * <pre>
+     * ${table.uncapitalisedJavaName}Bhv.scalarSelect(Date.class).max(new ScalarQuery(${myConditionBeanClassName} cb) {
+     *     cb.specify().columnXxxDatetime(); // the required specification of target column
+     *     cb.query().setXxxName_PrefixSearch("S"); // query as you like it
+     * });
+     * </pre>
+     * @param <RESULT> The type of result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar value derived by a function. (Nullable)
+     */
     public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
         return new SLFunction<${myConditionBeanClassName}, RESULT>(newMyConditionBean(), resultType);
     }

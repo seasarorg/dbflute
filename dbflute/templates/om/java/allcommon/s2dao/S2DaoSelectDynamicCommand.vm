@@ -303,11 +303,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
             final ${glSelectDynamicCommand} dynamicCommand = createMySelectDynamicCommand();
             dynamicCommand.setArgNames(getArgNames());
             dynamicCommand.setArgTypes(getArgTypes());
-            if (cb.isLimitSelect_PKOnly()) {
-                dynamicCommand.setSql(cb.getSqlClause().getClausePKOnly());
-            } else {
-                dynamicCommand.setSql(cb.getSqlClause().getClause());
-            }
+            dynamicCommand.setSql(cb.getSqlClause().getClause());
             final CommandContext ctx = dynamicCommand.apply(args);
             realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);

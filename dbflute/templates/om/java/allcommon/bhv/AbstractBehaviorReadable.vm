@@ -250,21 +250,65 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             _resultType = resultType;
         }
 
+        /**
+         * Select the maximum value. <br />
+         * <pre>
+         * memberBhv.scalarSelect(Date.class).max(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberBirthday(); // the required specification of target column
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The maximum value. (Nullable)
+         */
         public RESULT max(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MAX);
         }
 
+        /**
+         * Select the minimum value. <br />
+         * <pre>
+         * memberBhv.scalarSelect(Date.class).min(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberBirthday(); // the required specification of target column
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The minimum value. (Nullable)
+         */
         public RESULT min(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MIN);
         }
 
+        /**
+         * Select the summary value. <br />
+         * <pre>
+         * purchaseBhv.scalarSelect(Integer.class).sum(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().columnPurchaseCount(); // the required specification of target column
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The summary value. (Nullable)
+         */
         public RESULT sum(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.SUM);
         }
 
+        /**
+         * Select the average value. <br />
+         * <pre>
+         * purchaseBhv.scalarSelect(Integer.class).avg(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().columnPurchaseCount(); // the required specification of target column
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The average value. (Nullable)
+         */
         public RESULT avg(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.AVG);
@@ -273,6 +317,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         protected RESULT exec(${glScalarQuery}<CB> scalarQuery, ${glSqlClauseName}.SelectClauseType selectClauseType) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             assertObjectNotNull("selectClauseType", selectClauseType);
+            assertObjectNotNull("conditionBean", _conditionBean);
+            assertObjectNotNull("resultType", _resultType);
             scalarQuery.query(_conditionBean);
             assertScalarSelectRequiredSpecifyColumn();
             return invoke(createSelectScalarCBCommand(_conditionBean, _resultType, selectClauseType));
