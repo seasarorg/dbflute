@@ -61,7 +61,8 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     protected ${glStatementConfig} _statementConfig;
 
     // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
-    protected boolean _forDeriveReferrer;
+    protected boolean _forDerivedReferrer;
+    protected boolean _forScalarSelect;
     protected boolean _forUnion;
     protected boolean _forExistsSubQuery;
     protected boolean _forInScopeSubQuery;
@@ -502,23 +503,29 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected ${glConditionBeanInterfaceName} _baseCB;
         protected SpQyCall<CQ> _qyCall;
         protected CQ _query;
-        protected boolean _forDeriveReferrer;
-        protected boolean alreadySpecifyRequiredColumn;
+        protected boolean _forDerivedReferrer;
+        protected boolean _forScalarSelect;
+        protected boolean _alreadySpecifyRequiredColumn;
+
         /**
          * @param baseCB The condition-bean of base level. (NotNull)
-         * @param qyCall The callback for condition-query. (NotNull)
-         * @param forDeriveReferrer Is this for derive referrer?
+         * @param qyCall The call-back for condition-query. (NotNull)
+         * @param forDerivedReferrer Is this for derive referrer?
+         * @param forScalarSelect Is this for scalar select?
          */
-        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, boolean forDeriveReferrer) {
+        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
+                                      , boolean forDerivedReferrer, boolean forScalarSelect) {
             _baseCB = baseCB;
             _qyCall = qyCall;
-            _forDeriveReferrer = forDeriveReferrer;
+            _forDerivedReferrer = forDerivedReferrer;
+            _forScalarSelect = forScalarSelect;
         }
+
         protected void doColumn(String columnName) {
             assertColumn(columnName);
             if (_query == null) { _query = _qyCall.qy(); }
-            if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
-                alreadySpecifyRequiredColumn = true;
+            if (isRequiredColumnSpecificationEnabled()) {
+                _alreadySpecifyRequiredColumn = true;
                 doSpecifyRequiredColumn();
             }
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
@@ -530,12 +537,20 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             }
             _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName);
         }
+
+        protected boolean isRequiredColumnSpecificationEnabled() {
+            return !_forDerivedReferrer && !_forScalarSelect && !_alreadySpecifyRequiredColumn;
+        }
+
         protected void assertColumn(String columnName) {
             if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
         }
+
         protected void assertForeign(String foreignPropertyName) {
-            if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarSelect) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
         }
+
         protected abstract void doSpecifyRequiredColumn();
         protected abstract String getTableDbName();
         
@@ -567,13 +582,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "* * * * * * * * * */";
             throw new SpecifyColumnNotSetupSelectColumnException(msg);
         }
-        protected void throwDeriveReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
+
+        protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of derived-referrer!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for derived-referrer." + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
@@ -598,8 +614,41 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + getLineSeparator();
             msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerInvalidForeignSpecificationException(msg);
+            throw new DerivedReferrerInvalidForeignSpecificationException(msg);
         }
+
+        protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of scalar select!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for scalar select." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Integer.class).max(new ScalarSelect<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().specifyMemberStatus().columnDisplayOrder(); // *No!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarSelect() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new ScalarSelectInvalidForeignSpecificationException(msg);
+        }
+
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
@@ -617,9 +666,16 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
     }
     
-    public static class DeriveReferrerInvalidForeignSpecificationException extends RuntimeException {
+    public static class DerivedReferrerInvalidForeignSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public DeriveReferrerInvalidForeignSpecificationException(String msg) {
+        public DerivedReferrerInvalidForeignSpecificationException(String msg) {
+            super(msg);
+        }
+    }
+    
+    public static class ScalarSelectInvalidForeignSpecificationException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ScalarSelectInvalidForeignSpecificationException(String msg) {
             super(msg);
         }
     }
@@ -628,11 +684,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected ${glConditionBeanInterfaceName} _baseCB;
         protected LOCAL_CQ _localCQ;
         protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+
         public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
             _baseCB = baseCB;
             _localCQ = localCQ;
             _querySetupper = querySetupper;
         }
+
         public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
@@ -656,7 +714,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
         protected void assertAliasName(String aliasName) {
             if (aliasName == null || aliasName.trim().length() == 0) {
-                throwDeriveReferrerInvalidAliasNameException();
+                throwDerivedReferrerInvalidAliasNameException();
             }
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_baseCB.getTableDbName());
             Method[] methods = dbmeta.getEntityType().getMethods();
@@ -672,13 +730,14 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
                 }
             }
             if (!existsSetterMethod) {
-                throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+                throwDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
             }
         }
-        protected void throwDeriveReferrerInvalidAliasNameException() {
+
+        protected void throwDerivedReferrerInvalidAliasNameException() {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The alias name for derive-referrer was Invalid!" + getLineSeparator();
+            msg = msg + "The alias name for derived-referrer was Invalid!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
@@ -706,12 +765,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + getLineSeparator();
             msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerInvalidAliasNameException(msg);
+            throw new DerivedReferrerInvalidAliasNameException(msg);
         }
-        protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
+
+        protected void throwDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
+            msg = msg + "A property for derived-referrer was Not Found in the entity!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();
@@ -744,7 +804,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + getLineSeparator();
             msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerEntityPropertyNotFoundException(msg);
+            throw new DerivedReferrerEntityPropertyNotFoundException(msg);
         }
         protected String replaceString(String text, String fromText, String toText) {
             return ${glSimpleStringUtil}.replace(text, fromText, toText);
@@ -758,16 +818,16 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
     }
     
-    public static class DeriveReferrerInvalidAliasNameException extends RuntimeException {
+    public static class DerivedReferrerInvalidAliasNameException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public DeriveReferrerInvalidAliasNameException(String msg) {
+        public DerivedReferrerInvalidAliasNameException(String msg) {
             super(msg);
         }
     }
     
-    public static class DeriveReferrerEntityPropertyNotFoundException extends RuntimeException {
+    public static class DerivedReferrerEntityPropertyNotFoundException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public DeriveReferrerEntityPropertyNotFoundException(String msg) {
+        public DerivedReferrerEntityPropertyNotFoundException(String msg) {
             super(msg);
         }
     }
@@ -930,19 +990,23 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForDeriveReferrer() {
-        _forDeriveReferrer = true;
+    public void xsetupForDerivedReferrer() { // Very Internal
+        _forDerivedReferrer = true;
     }
 
-    public void xsetupForUnion() {
+    public void xsetupForScalarSelect() { // Very Internal
+        _forScalarSelect = true;
+    }
+
+    public void xsetupForUnion() { // Very Internal
         _forUnion = true;
     }
 
-    public void xsetupForExistsSubQuery() {
+    public void xsetupForExistsSubQuery() { // Very Internal
         _forExistsSubQuery = true;
     }
 
-    public void xsetupForInScopeSubQuery() {
+    public void xsetupForInScopeSubQuery() { // Very Internal
         _forInScopeSubQuery = true;
     }
 

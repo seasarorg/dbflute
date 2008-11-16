@@ -207,7 +207,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return The scalar value derived by a function. (Nullable)
      */
     public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
-        return new SLFunction<${myConditionBeanClassName}, RESULT>(newMyConditionBean(), resultType);
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForScalarSelect();
+        return new SLFunction<${myConditionBeanClassName}, RESULT>(cb, resultType);
     }
 
     // ===================================================================================

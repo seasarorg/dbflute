@@ -170,7 +170,8 @@ namespace ${glPackageBaseCB} {
         //                                                                         =======
         protected ${myConditionBeanClassName}Specification _specification;
         public ${myConditionBeanClassName}Specification Specify() {
-            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDeriveReferrer); } return _specification;
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDeriveReferrer, _forScalarSelect); }
+            return _specification;
         }
         protected class MySpQyCall : SpQyCall<${myConditionQueryClassName}> {
 			protected ${myClassName} _myCB;
@@ -195,7 +196,8 @@ namespace ${glPackageBaseCB} {
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #end
-        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDeriveReferrer) : base(baseCB, qyCall, forDeriveReferrer) { _myQyCall = qyCall; }
+        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDeriveReferrer, bool forScalarSelect)
+        : base(baseCB, qyCall, forDeriveReferrer, forScalarSelect) { _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end
@@ -223,7 +225,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${foreignKey.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDeriveReferrer); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDeriveReferrer, _forScalarSelect); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
@@ -241,7 +243,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDeriveReferrer); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDeriveReferrer, _forScalarSelect); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {

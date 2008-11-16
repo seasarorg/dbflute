@@ -22,7 +22,8 @@ namespace ${glPackageBaseCommonCBean} {
         protected ${glStatementConfig} _statementConfig;
 
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
-        protected bool _forDeriveReferrer;
+        protected bool _forDerivedReferrer;
+        protected bool _forScalarSelect;
         protected bool _forUnion;
         protected bool _forExistsSubQuery;
         protected bool _forInScopeSubQuery;
@@ -79,10 +80,10 @@ namespace ${glPackageBaseCommonCBean} {
         public void XSetPaging(bool paging) {// Very Internal!
             throw new UnsupportedOperationException("This method is unsupported on ConditionBean!");
         }
-		public void Paging(int pageSize, int pageNumber) {
-		    FetchFirst(pageSize);
-		    FetchPage(pageNumber);
-		}
+        public void Paging(int pageSize, int pageNumber) {
+            FetchFirst(pageSize);
+            FetchPage(pageNumber);
+        }
 
         // -------------------------------------------------
         //                                     Fetch Setting
@@ -216,17 +217,21 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
-    	public virtual String ToDisplaySql() {
-    	    return ${glConditionBeanContextName}.ConvertConditionBean2DisplaySql(this);
-    	}
-		
+        public virtual String ToDisplaySql() {
+            return ${glConditionBeanContextName}.ConvertConditionBean2DisplaySql(this);
+        }
+        
     
-		// [DBFlute-0.7.4]
+        // [DBFlute-0.7.4]
         // ===============================================================================
         //                                                                    Purpose Type
         //                                                                    ============
-        public void XSetupForDeriveReferrer() {
-            _forDeriveReferrer = true;
+        public void XSetupForDerivedReferrer() {
+            _forDerivedReferrer = true;
+        }
+    
+        public void XSetupForScalarSelect() {
+            _forScalarSelect = true;
         }
     
         public void XSetupForUnion() {
@@ -240,32 +245,37 @@ namespace ${glPackageBaseCommonCBean} {
         public void XSetupForInScopeSubQuery() {
             _forInScopeSubQuery = true;
         }
-	
+    
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
-		public override String ToString() {
-		    return ToDisplaySql();
-		}
+        public override String ToString() {
+            return ToDisplaySql();
+        }
     }
-	
+
     // [DBFlute-0.7.4]
     public abstract class AbstractSpecification<CQ> where CQ : ${glConditionQueryInterfaceName} {
         protected ${glConditionBeanInterfaceName} _baseCB;
         protected SpQyCall<CQ> _qyCall;
         protected CQ _query;
-        protected bool _forDeriveReferrer;
-        protected bool alreadySpecifyRequiredColumn;
-        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall, bool forDeriveReferrer) {
+        protected bool _forDerivedReferrer;
+        protected bool _forScalarSelect;
+        protected bool _alreadySpecifyRequiredColumn;
+
+        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
+                                      , bool forDerivedReferrer, forScalarSelect) {
             _baseCB = baseCB;
             _qyCall = qyCall;
-            _forDeriveReferrer = forDeriveReferrer;
+            _forDerivedReferrer = forDerivedReferrer;
+            _forScalarSelect = forScalarSelect;
         }
+
         protected void doColumn(String columnName) {
             assertColumn(columnName);
             if (_query == null) { _query = _qyCall.qy(); }
-            if (!_forDeriveReferrer && !alreadySpecifyRequiredColumn) {
-                alreadySpecifyRequiredColumn = true;
+            if (isRequiredColumnSpecificationEnabled()) {
+                _alreadySpecifyRequiredColumn = true;
                 doSpecifyRequiredColumn();
             }
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
@@ -277,12 +287,20 @@ namespace ${glPackageBaseCommonCBean} {
             }
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }
+
+        protected boolean isRequiredColumnSpecificationEnabled() {
+            return !_forDerivedReferrer && !_forScalarSelect && !_alreadySpecifyRequiredColumn;
+        }
+
         protected void assertColumn(String columnName) {
             if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
         }
+
         protected void assertForeign(String foreignPropertyName) {
-            if (_forDeriveReferrer) { throwDeriveReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
         }
+
         protected abstract void doSpecifyRequiredColumn();
         protected abstract String getTableDbName();
         
@@ -314,13 +332,14 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "* * * * * * * * * */";
             throw new SpecifyColumnNotSetupSelectColumnException(msg);
         }
-        protected void throwDeriveReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
+
+        protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified a foreign table column in spite of derive-sub-query!" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of derived-referrer!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specified a local table column at condition-bean for derive-sub-query." + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for derived-referrer." + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
@@ -345,8 +364,41 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + getLineSeparator();
             msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerInvalidForeignSpecificationException(msg);
+            throw new DerivedReferrerInvalidForeignSpecificationException(msg);
         }
+        
+        protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of scalar select!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for scalar select." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Integer.class).max(new ScalarSelect<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().specifyMemberStatus().columnDisplayOrder(); // *No!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarSelect() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new ScalarSelectInvalidForeignSpecificationException(msg);
+        }
+
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
@@ -362,8 +414,13 @@ namespace ${glPackageBaseCommonCBean} {
         }
     }
     
-    public class DeriveReferrerInvalidForeignSpecificationException : SystemException {
-        public DeriveReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
+    public class DerivedReferrerInvalidForeignSpecificationException : SystemException {
+        public DerivedReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
+        }
+    }
+    
+    public class ScalarSelectInvalidForeignSpecificationException : SystemException {
+        public ScalarSelectInvalidForeignSpecificationException(String msg) : base(msg) {
         }
     }
 
@@ -371,11 +428,13 @@ namespace ${glPackageBaseCommonCBean} {
         protected ${glConditionBeanInterfaceName} _baseCB;
         protected LOCAL_CQ _localCQ;
         protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+
         public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
             _baseCB = baseCB;
             _localCQ = localCQ;
             _querySetupper = querySetupper;
         }
+
         public void Count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.Invoke("count", subQuery, _localCQ, aliasName.Trim());
@@ -399,7 +458,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         protected void assertAliasName(String aliasName) {
             if (aliasName == null || aliasName.Trim().Length == 0) {
-                throwDeriveReferrerInvalidAliasNameException();
+                throwDerivedReferrerInvalidAliasNameException();
             }
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_baseCB.TableDbName);
             PropertyInfo[] properties = dbmeta.EntityType.GetProperties();
@@ -415,10 +474,11 @@ namespace ${glPackageBaseCommonCBean} {
                 }
             }
             if (!existsSetterMethod) {
-                throwDeriveReferrerEntityPropertyNotFoundException(aliasName, dbmeta.EntityType);
+                throwDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.EntityType);
             }
         }
-        protected void throwDeriveReferrerInvalidAliasNameException() {
+
+        protected void throwDerivedReferrerInvalidAliasNameException() {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The alias name for derive-referrer was Invalid!" + getLineSeparator();
@@ -445,9 +505,10 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + getLineSeparator();
             msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerInvalidAliasNameException(msg);
+            throw new DerivedReferrerInvalidAliasNameException(msg);
         }
-        protected void throwDeriveReferrerEntityPropertyNotFoundException(String aliasName, Type entityType) {
+
+        protected void throwDerivedReferrerEntityPropertyNotFoundException(String aliasName, Type entityType) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "A property for derive-referrer was Not Found in the entity!" + getLineSeparator();
@@ -483,8 +544,9 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + getLineSeparator();
             msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new DeriveReferrerEntityPropertyNotFoundException(msg);
+            throw new DerivedReferrerEntityPropertyNotFoundException(msg);
         }
+
         protected String replaceString(String text, String fromText, String toText) {
             return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
@@ -496,13 +558,13 @@ namespace ${glPackageBaseCommonCBean} {
     public delegate void RAQSetupper<REFERRER_CB, LOCAL_CQ>(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName)
             where REFERRER_CB : ${glConditionBeanInterfaceName} where LOCAL_CQ : ${glConditionQueryInterfaceName};
     
-    public class DeriveReferrerInvalidAliasNameException : SystemException {
-        public DeriveReferrerInvalidAliasNameException(String msg) : base(msg) {
+    public class DerivedReferrerInvalidAliasNameException : SystemException {
+        public DerivedReferrerInvalidAliasNameException(String msg) : base(msg) {
         }
     }
     
-    public class DeriveReferrerEntityPropertyNotFoundException : SystemException {
-        public DeriveReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
+    public class DerivedReferrerEntityPropertyNotFoundException : SystemException {
+        public DerivedReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
         }
     }
 }

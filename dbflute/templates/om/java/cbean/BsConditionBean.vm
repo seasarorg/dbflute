@@ -229,8 +229,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     protected Specification _specification;
     public Specification specify() {
         if (_specification == null) { _specification = new Specification(this, new SpQyCall<${myConditionQueryClassName}>() {
-            public boolean has() { return true; } public ${myConditionQueryClassName} qy() { return query(); } }, _forDeriveReferrer); } return _specification;
+            public boolean has() { return true; } public ${myConditionQueryClassName} qy() { return query(); } }, _forDerivedReferrer, _forScalarSelect); }
+        return _specification;
     }
+
     public static class Specification extends AbstractSpecification<${myConditionQueryClassName}> {
         protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
 #foreach ($foreignKey in $table.foreignKeys)
@@ -247,7 +249,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         protected ${tmpCBClassName}.Specification _${tmpPropertyName};
 #end
 #end
-        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer) { super(baseCB, qyCall, forDeriveReferrer); _myQyCall = qyCall; }
+        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer, boolean forScalarSelect)
+        { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect); _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void column${col.javaName}() { doColumn("${col.name}"); }
 #end
@@ -278,7 +281,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
                     public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }, _forDeriveReferrer);
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _forDerivedReferrer, _forScalarSelect);
             }
             return _${tmpPropertyName};
         }
@@ -294,7 +298,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
                     public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }, _forDeriveReferrer);
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _forDerivedReferrer, _forScalarSelect);
             }
             return _${tmpPropertyName};
         }

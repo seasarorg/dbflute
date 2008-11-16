@@ -307,25 +307,25 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     }
 
     protected String buildSelectClauseMax() {
-        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select max(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseMin() {
-        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select min(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseSum() {
-        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select sum(dflocal." + columnName  + ")";
     }
 
     protected String buildSelectClauseAvg() {
-        String columnName = getSpecifiedColumnNameAsLatestInOneTable();
+        String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select avg(dflocal." + columnName  + ")";
     }
@@ -1371,16 +1371,6 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
             if (elementMap != null && elementMap.size() == 1) {
                 return elementMap.keySet().iterator().next();
-            }
-        }
-        return null;
-    }
-
-    public String getSpecifiedColumnNameAsLatestInOneTable() {
-        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
-            Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
-            if (elementMap != null && !elementMap.isEmpty()) {
-                return new ArrayList<String>(elementMap.keySet()).get(elementMap.size() - 1);
             }
         }
         return null;

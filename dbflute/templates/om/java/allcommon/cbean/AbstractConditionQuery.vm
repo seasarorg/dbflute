@@ -739,9 +739,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String tableAliasName = "dfsublocal_" + subQueryLevel;
         final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
-            throwDeriveReferrerInvalidColumnSpecificationException(function, aliasName);
+            throwDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
-        assertDeriveReferrerColumnType(function, subQuery, deriveColumnName);
+        assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
         final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
@@ -764,7 +764,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return selectClause + " " + fromWhereClause;
     }
 
-    protected void throwDeriveReferrerInvalidColumnSpecificationException(String function, String aliasName) {
+    protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derive-referrer was Invalid!" + getLineSeparator();
@@ -806,27 +806,27 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + getLineSeparator();
         msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
-        throw new DeriveReferrerInvalidColumnSpecificationException(msg);
+        throw new DerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public static class DeriveReferrerInvalidColumnSpecificationException extends RuntimeException {
+    public static class DerivedReferrerInvalidColumnSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public DeriveReferrerInvalidColumnSpecificationException(String msg) {
+        public DerivedReferrerInvalidColumnSpecificationException(String msg) {
             super(msg);
         }
     }
     
-    protected void assertDeriveReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+    protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwDeriveReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+                throwDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
     }
 
-    protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+    protected void throwDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
@@ -843,16 +843,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + getLineSeparator();
         msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
-        throw new DeriveReferrerUnmatchedColumnTypeException(msg);
+        throw new DerivedReferrerUnmatchedColumnTypeException(msg);
     }
 
-    public static class DeriveReferrerUnmatchedColumnTypeException extends RuntimeException {
+    public static class DerivedReferrerUnmatchedColumnTypeException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public DeriveReferrerUnmatchedColumnTypeException(String msg) {
+        public DerivedReferrerUnmatchedColumnTypeException(String msg) {
             super(msg);
         }
     }
-    
+
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------

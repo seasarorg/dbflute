@@ -207,9 +207,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery, "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
@@ -239,9 +239,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
@@ -295,9 +295,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerExistsSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
@@ -353,7 +353,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     public void xderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDeriveReferrer(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query());// for saving query-value.
         registerDeriveSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
     }
@@ -473,9 +473,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery, "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
@@ -505,9 +505,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerInScopeSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
@@ -561,9 +561,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-	 * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
-	 * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
-	 */
+     * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
+     * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
+     */
     public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} ${referrer.table.uncapitalisedJavaName}CBquery) {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(${referrer.table.uncapitalisedJavaName}CBquery);// for saving query-value.
         registerExistsSubQuery(${referrer.table.uncapitalisedJavaName}CBquery, "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
@@ -619,7 +619,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     public void xderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDeriveReferrer(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query());// for saving query-value.
         registerDeriveSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
     }

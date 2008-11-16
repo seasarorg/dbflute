@@ -241,10 +241,24 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
-    public class SLFunction<CB extends ${glConditionBeanInterfaceName}, RESULT> {
+    /**
+     * The scalar function. <br />
+     * This is not static class because this uses the method 'invoke(BehaviorCommand)'
+     * @param <CB> The type of condition-bean.
+     * @param <RESULT> The type of result.
+     */
+    public class SLFunction<CB extends ${glConditionBeanInterfaceName}, RESULT> { // SL: ScaLar
+
+        /** The condition-bean for scalar select. (NotNull) */
         protected CB _conditionBean;
+
+        /** The condition-bean for scalar select. (NotNull) */
         protected Class<RESULT> _resultType;
 
+        /**
+         * @param conditionBean The condition-bean initialized only for scalar select. (NotNull)
+         * @param resultType The type os result. (NotNull)
+         */
         public SLFunction(CB conditionBean, Class<RESULT> resultType) {
             _conditionBean = conditionBean;
             _resultType = resultType;
@@ -325,26 +339,45 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
 
         protected void assertScalarSelectRequiredSpecifyColumn() {
-            if (_conditionBean.getSqlClause().getSpecifiedColumnNameAsLatestInOneTable() == null) {
-                throwScalarSelectNotFoundSpecifyColumn();
+            final String columnName = _conditionBean.getSqlClause().getSpecifiedColumnNameAsOne();
+            if (columnName == null) {
+                throwScalarSelectInvalidColumnSpecificationException();
             }
         }
 
-        protected void throwScalarSelectNotFoundSpecifyColumn() {
+        protected void throwScalarSelectInvalidColumnSpecificationException() {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The specified column for scalar select was Not Found in the condition-bean!" + getLineSeparator();
+            msg = msg + "The specified column for scalar select was Invalid!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specify the only one column as function target." + getLineSeparator();
-            msg = msg + "And don't specify multiple columns." + getLineSeparator();
+            msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
             msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery() {" + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            // *No! It's empty!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
+            msg = msg + "            cb.specify().columnMemberBirthday();" + getLineSeparator();
+            msg = msg + "            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
             msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
             msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
-            msg = msg + "            cb.query().setXxx_...();" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
             msg = msg + "    });" + getLineSeparator();
             msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
@@ -353,13 +386,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + getLineSeparator();
             msg = msg + "[Result Type]" + getLineSeparator() + _resultType.getName() + getLineSeparator();
             msg = msg + "* * * * * * * * * */";
-            throw new ScalarSelectNotFoundSpecifyColumn(msg);
+            throw new ScalarSelectInvalidColumnSpecificationException(msg);
         }
     }
 
-    public static class ScalarSelectNotFoundSpecifyColumn extends RuntimeException {
+    public static class ScalarSelectInvalidColumnSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        public ScalarSelectNotFoundSpecifyColumn(String msg) {
+        public ScalarSelectInvalidColumnSpecificationException(String msg) {
             super(msg);
         }
     }

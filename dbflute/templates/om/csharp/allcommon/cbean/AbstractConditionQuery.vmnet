@@ -544,9 +544,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
-            throwDeriveReferrerInvalidColumnSpecificationException(function, aliasName);
+            throwDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
-        assertDeriveReferrerColumnType(function, subQuery, deriveColumnName);
+        assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
         String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
@@ -569,7 +569,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return selectClause + " " + fromWhereClause;
     }
 
-    protected void throwDeriveReferrerInvalidColumnSpecificationException(String function, String aliasName) {
+    protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derive-referrer was Invalid!" + getLineSeparator();
@@ -611,25 +611,25 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + getLineSeparator();
         msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
-        throw new DeriveReferrerInvalidColumnSpecificationException(msg);
+        throw new DerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public class DeriveReferrerInvalidColumnSpecificationException : SystemException {
-        public DeriveReferrerInvalidColumnSpecificationException(String msg) : base(msg) {
+    public class DerivedReferrerInvalidColumnSpecificationException : SystemException {
+        public DerivedReferrerInvalidColumnSpecificationException(String msg) : base(msg) {
         }
     }
     
-    protected void assertDeriveReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+    protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
-                throwDeriveReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+                throwDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
     }
 
-    protected void throwDeriveReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType) {
+    protected void throwDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
@@ -646,11 +646,11 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + getLineSeparator();
         msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.Name + ")" + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
-        throw new DeriveReferrerUnmatchedColumnTypeException(msg);
+        throw new DerivedReferrerUnmatchedColumnTypeException(msg);
     }
 
-    public class DeriveReferrerUnmatchedColumnTypeException : SystemException {
-        public DeriveReferrerUnmatchedColumnTypeException(String msg) : base(msg) {
+    public class DerivedReferrerUnmatchedColumnTypeException : SystemException {
+        public DerivedReferrerUnmatchedColumnTypeException(String msg) : base(msg) {
         }
     }
 
