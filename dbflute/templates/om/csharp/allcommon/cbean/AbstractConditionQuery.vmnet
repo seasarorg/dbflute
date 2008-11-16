@@ -572,7 +572,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The specified the column for derive-referrer was Invalid!" + getLineSeparator();
+        msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();

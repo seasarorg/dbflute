@@ -548,7 +548,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
         protected void assertForeign(String foreignPropertyName) {
             if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
-            if (_forScalarSelect) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
         }
 
         protected abstract void doSpecifyRequiredColumn();

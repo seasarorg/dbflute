@@ -356,7 +356,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
             msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
             msg = msg + "            // *No! It's empty!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
@@ -365,7 +365,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
             msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
             msg = msg + "            cb.specify().columnMemberBirthday();" + getLineSeparator();
             msg = msg + "            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!" + getLineSeparator();
@@ -375,7 +375,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Good!]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
             msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
             msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();

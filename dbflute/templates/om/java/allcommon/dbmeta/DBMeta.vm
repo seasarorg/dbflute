@@ -84,25 +84,6 @@ public interface ${myClassName} {
      * @return The DB name of anything. (NotNull and NotEmpty)
      */
     public String findPropertyName(String flexibleName);
-#if ($database.isMakeDeprecated())
-
-    // ===================================================================================
-    //                                                                            Name Map
-    //                                                                            ========
-    /**
-     * Get the key-to-lower map of DB name(lower) and property name.
-     * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
-     * @deprecated Sorry! This method is unnecessary on DBFlute.
-     */
-    public Map<String, String> getDbNamePropertyNameKeyToLowerMap();
-
-    /**
-     * Get the key-to-lower map of property name(lower) and DB name.
-     * @return The key-to-lower map of property name(lower) and DB name. (NotNull)
-     * @deprecated Sorry! This method is unnecessary on DBFlute.
-     */
-    public Map<String, String> getPropertyNameDbNameKeyToLowerMap();
-#end
 
     // ===================================================================================
     //                                                                           Type Name
