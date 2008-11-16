@@ -132,7 +132,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         StringBuilder sb = new StringBuilder(512);
         sb.append(getSelectClause());
         sb.append(" ");
-        sb.append(buildClauseWithoutMainSelect(false));
+        sb.append(buildClauseWithoutMainSelect());
         String sql = sb.toString();
         sql = filterUnionSelectCountIfNeeds(sql);
         sql = filterSubQueryIndent(sql);

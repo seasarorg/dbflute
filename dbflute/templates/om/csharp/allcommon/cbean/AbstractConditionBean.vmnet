@@ -181,7 +181,7 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
 
-            this.SqlClause.classifySelectClauseType(${glSqlClauseName}.SelectClauseType.COUNT);
+            this.SqlClause.classifySelectClauseType(SelectClauseType.COUNT);
             this.SqlClause.ignoreOrderBy();
             this.SqlClause.ignoreFetchScope();
             return this;
