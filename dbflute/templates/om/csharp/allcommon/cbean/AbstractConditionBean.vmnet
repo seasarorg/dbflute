@@ -264,7 +264,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected bool _alreadySpecifyRequiredColumn;
 
         protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
-                                      , bool forDerivedReferrer, forScalarSelect) {
+                                      , bool forDerivedReferrer, bool forScalarSelect) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
@@ -288,7 +288,7 @@ namespace ${glPackageBaseCommonCBean} {
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }
 
-        protected boolean isRequiredColumnSpecificationEnabled() {
+        protected bool isRequiredColumnSpecificationEnabled() {
             return !_forDerivedReferrer && !_forScalarSelect && !_alreadySpecifyRequiredColumn;
         }
 

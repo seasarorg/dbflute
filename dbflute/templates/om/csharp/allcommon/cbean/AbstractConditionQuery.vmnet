@@ -251,15 +251,6 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                                            Register
     //                                                                            ========
     // -----------------------------------------------------
-    //                                       Include-As-Mine
-    //                                       ---------------
-    protected virtual void registerIncludedSelectColumn(String aliasName, String realColumnName) {
-        assertAliasName(aliasName);
-        assertColumnName(realColumnName);
-        getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
-    }
-	
-    // -----------------------------------------------------
     //                                          Normal Query
     //                                          ------------
     protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
