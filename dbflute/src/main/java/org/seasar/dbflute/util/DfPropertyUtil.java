@@ -14,9 +14,9 @@ import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
 
 public class DfPropertyUtil {
 
-    //========================================================================================
-    //																				PropGetter
-    //																				==========
+    // ===============================================================================
+    //                                                               Property Accessor
+    //                                                               =================
     public static String stringProp(Properties prop, String key) {
         if (prop == null) {
             String msg = "Argument[prop] must not be null: " + getLogStrKey(key);
@@ -99,9 +99,9 @@ public class DfPropertyUtil {
         return "key==[" + key + "] value==[" + value + "]";
     }
 
-    //========================================================================================
-    //																				TagStrUtil
-    //																				==========
+    // ===============================================================================
+    //                                                                     Tag Utility
+    //                                                                     ===========
     @SuppressWarnings("unchecked")
     public static String convertTag(String targetStr, Map convertMap) {
         Set keySet = convertMap.keySet();
@@ -131,9 +131,9 @@ public class DfPropertyUtil {
         }
     }
 
-    //========================================================================================
-    //																				StringUtil
-    //																				==========
+    // ===============================================================================
+    //                                                                  String Utility
+    //                                                                  ==============
     public static String convertAll(String targetStr, String oldStr, String newStr) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");

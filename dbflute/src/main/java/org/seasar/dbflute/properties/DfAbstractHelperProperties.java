@@ -366,9 +366,9 @@ public abstract class DfAbstractHelperProperties {
     }
 
     // ===============================================================================
-    //                                                               Properties Object
-    //                                                               =================
-    protected DfPropertiesHandler getPropertiesHandler() {
+    //                                                            Other Property Entry
+    //                                                            ====================
+    protected DfPropertiesHandler handler() {
         return DfPropertiesHandler.getInstance();
     }
 
@@ -378,6 +378,14 @@ public abstract class DfAbstractHelperProperties {
 
     protected DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfPropertiesHandler.getInstance().getLittleAdjustmentProperties(getProperties());
+    }
+
+    protected DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties() {
+        return DfPropertiesHandler.getInstance().getS2DaoAdjustmentProperties(getProperties());
     }
 
     // ===============================================================================
