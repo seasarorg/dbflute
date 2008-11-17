@@ -64,7 +64,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         sqlDirectory = removeEndSeparatorIfNeeds(sqlDirectory);
         String sqlPackage = getSqlPackage();
         if (sqlPackage != null && sqlPackage.trim().length() > 0) {
-            String sqlPackageDirectory = resolveFileSeparator(sqlPackage);
+            String sqlPackageDirectory = resolveSqlPackageFileSeparator(sqlPackage);
             sqlDirectory = sqlDirectory + "/" + removeStartSeparatorIfNeeds(sqlPackageDirectory);
         }
         return sqlDirectory;
@@ -74,7 +74,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return getBasicProperties().getOutputDirectory();
     }
 
-    protected String resolveFileSeparator(String sqlPackage) {
+    protected String resolveSqlPackageFileSeparator(String sqlPackage) {
         DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (!prop.isFlatDirectoryPackageValid()) {
             return replaceDotToSeparator(sqlPackage);
@@ -83,14 +83,20 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (!sqlPackage.contains(flatDirectoryPackage)) {
             return replaceDotToSeparator(sqlPackage);
         }
-        sqlPackage = DfStringUtil.replace(getSqlPackage(), ".", "$$flatDirectoryDelimiter$$");
-        sqlPackage = replaceDotToSeparator(sqlPackage);
-        sqlPackage = DfStringUtil.replace(getSqlPackage(), "$$flatDirectoryDelimiter$$", ".");
-        return sqlPackage;
+        return resolveSqlPackageFileSeparatorWithFlatDirectory(sqlPackage, flatDirectoryPackage);
+    }
+    
+    protected String resolveSqlPackageFileSeparatorWithFlatDirectory(String sqlPackage, String flatDirectoryPackage) {
+        final int startIndex = sqlPackage.indexOf(flatDirectoryPackage);
+        String front = sqlPackage.substring(0, startIndex);
+        String rear = sqlPackage.substring(startIndex + flatDirectoryPackage.length());
+        front = replaceDotToSeparator(front);
+        rear = replaceDotToSeparator(rear);
+        return front + flatDirectoryPackage + rear;
     }
 
     protected String replaceDotToSeparator(String sqlPackage) {
-        return DfStringUtil.replace(getSqlPackage(), ".", "/");
+        return DfStringUtil.replace(sqlPackage, ".", "/");
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
