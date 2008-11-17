@@ -7,6 +7,10 @@ import java.util.Properties;
 import org.junit.Test;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
 
+/**
+ * @author jflute
+ * @since 0.8.3 (2008/11/17 Monday)
+ */
 public class DfOutsideSqlPropertiesTest extends DfDBFluteTestCase {
 
     @Test
