@@ -808,7 +808,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                             Classification Resource
     //                                                             =======================
-    protected static final String NAME_CLASSIFICATION_RESOURCE = "classificationResource.dfprop";
+    protected static final String NAME_CLASSIFICATION_RESOURCE = "classificationResource";
     protected List<DfClassificationTop> _classificationResourceList;
 
     protected List<DfClassificationTop> getClassificationResourceList() {
@@ -822,8 +822,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
         final String environmentTypePath = isEnvironmentDefault() ? "/" : getEnvironmentType() + "/";
-        final String path = "./dfprop/" + environmentTypePath + NAME_CLASSIFICATION_RESOURCE;
-        return analyzer.analyze(path, null); // Encoding is auto detect now. (and default UTF-8)
+        return analyzer.analyze("./dfprop/" + environmentTypePath, NAME_CLASSIFICATION_RESOURCE, "dfprop");
     }
 
     protected void reflectClassificationResourceToDefinition() {

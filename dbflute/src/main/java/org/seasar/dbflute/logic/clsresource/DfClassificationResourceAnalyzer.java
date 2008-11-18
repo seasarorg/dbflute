@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.clsresource;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,36 +29,58 @@ public class DfClassificationResourceAnalyzer {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfClassificationResourceAnalyzer.class);
+    
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
     // ===================================================================================
     //                                                                             Analyze
     //                                                                             =======
-    public List<DfClassificationTop> analyze(String path, String encoding) {
-        final List<String> lineList;
-        {
-            final File file = new File(path);
-            if (!file.exists()) {
-                return new ArrayList<DfClassificationTop>();
-            }
-            try {
-                if (encoding == null) {
-                    encoding = extractEncoding(file);
+    public List<DfClassificationTop> analyze(final String dirName, final String resourceName, final String extension) {
+        final File dir = new File(dirName);
+        if (!dir.exists()) {
+            return new ArrayList<DfClassificationTop>();
+        }
+        if (!dir.isDirectory()) {
+            return new ArrayList<DfClassificationTop>();
+        }
+        final File[] listFiles = dir.listFiles(new FileFilter() {
+            public boolean accept(File currentFile) {
+                if (currentFile.isDirectory()) {
+                    return false;
                 }
+                final String currentFileName = currentFile.getName();
+                if (!currentFileName.startsWith(resourceName)) {
+                    return false;
+                }
+                if (!currentFileName.endsWith(extension)) {
+                    return false;
+                }
+                return true;
+            }
+        });
+        final List<DfClassificationTop> topList = new ArrayList<DfClassificationTop>();
+        for (File file : listFiles) {
+            final List<String> lineList;
+            try {
+                String encoding = extractEncoding(file);
                 if (encoding == null) {
-                    encoding = "UTF-8";
+                    encoding = DEFAULT_ENCODING;
                 }
                 _log.info("...Analyzing classification resources: encoding=" + encoding);
                 lineList = createLineList(file, encoding);
             } catch (RuntimeException ignored) {
-                _log.info("Failed to analyze classification resources: " + path, ignored);
-                return new ArrayList<DfClassificationTop>();
+                String msg = "Failed to analyze classification resources: ";
+                msg = msg + " " + dirName + "/" + resourceName + "." + extension;
+                _log.info(msg, ignored);
+                continue;
             }
+            final List<DfClassificationTop> classificationTopList = analyze(lineList);
+            for (DfClassificationTop top : classificationTopList) {
+                _log.info("    " + top.getClassificationName() + ", " + top.getTopComment());
+            }
+            topList.addAll(classificationTopList);
         }
-        final List<DfClassificationTop> classificationTopList = analyze(lineList);
-        for (DfClassificationTop top : classificationTopList) {
-            _log.info("    " + top.getClassificationName() + ", " + top.getTopComment());
-        }
-        return classificationTopList;
+        return topList;
     }
 
     protected List<DfClassificationTop> analyze(final List<String> lineList) {
