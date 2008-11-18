@@ -26,8 +26,7 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} {
         return execute(args, getArgTypes(args));
     }
 
-    @SuppressWarnings("unchecked")
-    public int execute(Object[] args, Class[] argTypes) {
+    public int execute(Object[] args, Class<?>[] argTypes) {
         Connection connection = getConnection();
         try {
             return execute(connection, args, argTypes);
@@ -36,8 +35,7 @@ public class ${glInternalBasicUpdateHandler} extends ${glInternalBasicHandler} {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public int execute(Connection connection, Object[] args, Class[] argTypes) {
+    public int execute(Connection connection, Object[] args, Class<?>[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = prepareStatement(connection);
         try {

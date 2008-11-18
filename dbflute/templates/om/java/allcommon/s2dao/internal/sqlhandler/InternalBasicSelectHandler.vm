@@ -42,8 +42,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         return execute(args, getArgTypes(args));
     }
 
-    @SuppressWarnings("unchecked")
-    public Object execute(Object[] args, Class[] argTypes) {
+    public Object execute(Object[] args, Class<?>[] argTypes) {
         Connection conn = getConnection();
         try {
             return execute(conn, args, argTypes);
@@ -52,8 +51,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public Object execute(Connection conn, Object[] args, Class[] argTypes) {
+    public Object execute(Connection conn, Object[] args, Class<?>[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = null;
         try {
