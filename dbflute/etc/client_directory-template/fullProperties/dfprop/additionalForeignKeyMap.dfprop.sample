@@ -17,11 +17,13 @@
 #                ; localTableName  = PURCHASE  ; foreignTableName  = MEMBER
 #                ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID
 #            }
-#            ; FK_PARENT_CHILD_ID = map:{
-#                ; localTableName  = PARENT  ; foreignTableName  = CHILD
-#                ; localColumnName = PARENT_ID ; foreignColumnName = CHILD_ID
-#                ; fixedCondition = $$foreignAlias$$.CHILD_TYPE = 'BIG'
-#                ; fixedSuffix = AsBig
+#            ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{
+#                ; localTableName  = MEMBER    ; foreignTableName  = MEMBER_ADDRESS
+#                ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID
+#                ; fixedCondition = 
+#             $$foreignAlias$$.VALID_BEGIN_DATE <= /*targetDate(Date)*/null
+#         and $$foreignAlias$$.VALID_END_DATE >= /*targetDate(Date)*/null 
+#                ; fixedSuffix = AsValid
 #            }
 #        }
 #
@@ -34,7 +36,13 @@ map:{
         ; localTableName  = PURCHASE   ; foreignTableName  = SUMMARY_PRODUCT
         ; localColumnName = PRODUCT_ID ; foreignColumnName  = PRODUCT_ID
     }
+    ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{
+        ; localTableName  = MEMBER    ; foreignTableName  = MEMBER_ADDRESS
+        ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID
+        ; fixedCondition = 
+     $$foreignAlias$$.VALID_BEGIN_DATE <= /*targetDate(Date)*/null
+ and $$foreignAlias$$.VALID_END_DATE >= /*targetDate(Date)*/null
+        ; fixedSuffix = AsValid
+    }
 }
 # ----------------/
-
-
