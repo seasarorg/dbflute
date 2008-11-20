@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.Collection;
 
 #if ($table.hasClassification())
-import static ${glPackageBaseCommon}.${glClassificationDefinition}.*;
+import ${glPackageBaseCommon}.${glCDef};
 #end
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
@@ -69,7 +69,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, ${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+        reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
     }
 #end
 #end
@@ -90,7 +90,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_NE, ${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+        reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
     }
 #end
 #end
@@ -379,7 +379,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')}));
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
     }
 #end
 #end
@@ -400,7 +400,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_NE, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')}));
+        reg${tmpJavaName}(CK_NE, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
     }
 #end
 #end

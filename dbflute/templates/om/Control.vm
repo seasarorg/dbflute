@@ -1451,7 +1451,7 @@ targetdatabase = $targetDatabase
     #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMeta}))
     $database.makeDirectory($path)
 
-    $database.info("    parseDBMetaInstanceHandler();")
+    $database.info("    parse('DBMetaInstanceHandler');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInstanceHandlerName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMetaInstanceHandler.${glTemplateFileExtension}",$path,"", "")
 
@@ -1741,10 +1741,11 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.info("    parse('ClassificationDefinition');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
-
+      #if ($database.isTargetLanguageCSharp() || ($database.isTargetLanguageJava() && $database.isMakeRecentlyDeprecated()))
+        $database.info("    parse('ClassificationDefinition');")
+        #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
+      #end
       $database.info("}")
     #end
 
