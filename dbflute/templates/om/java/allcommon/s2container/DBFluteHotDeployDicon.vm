@@ -12,10 +12,14 @@
     <include path="${includePath}"/>
 #end
 
-    <!-- The core component of behavior. -->
+    <!-- The core component of DBFlute. (Basically internal components except for behaviorSelector) -->
     <component name="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}"/>
     <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
-    
+    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}"/>
+    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
+        <destroyMethod name="destroy"/>
+    </component>
+
     <!-- The component of S2Dao. -->
 #if ($database.isMakeDaoInterface())
     <component class="${database.extendedDaoMetaDataFactoryImplClassName}">
@@ -43,10 +47,6 @@
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
 	<component name="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
 
-    <!-- Behavior selector. -->
-    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
-        <destroyMethod name="destroy"/>
-    </component>
 #if ($database.isMakeDaoInterface())
 
     <!-- Dao selector. -->

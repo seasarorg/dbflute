@@ -45,7 +45,7 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplN
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
- * The abstract class of behavior-readable.
+ * The abstract class of readable behavior.
  * @author ${database.ClassAuthor}
  */
 public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
@@ -665,10 +665,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         if (_behaviorSelector == null) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Not found the selector of behavior as behavior's attributed!" + getLineSeparator();
+            msg = msg + "Not found the selector of behavior as behavior's attribute!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the definition of the selector at your 'dbflute.dicon'." + getLineSeparator();
+            msg = msg + "Please confirm the definition of the selector at your component configuration of DBFlute." + getLineSeparator();
             msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();

@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 import java.util.*;
 
 #if ($table.hasClassification())
-import static ${glPackageBaseCommon}.${glClassificationDefinition}.*;
+import ${glPackageBaseCommon}.${glCDef};
 #end
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
@@ -158,7 +158,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void classify${col.javaName}${classificationMap.get('name')}() {
-        set${col.javaName}(new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')}));
+        set${col.javaName}(new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
     }
 
 #end
@@ -180,18 +180,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        return helpEqCls(_${col.uncapitalisedJavaName}, ${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')});
+        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
     }
 
 #end
 #end
-#end
-#if (${table.hasClassification()})
-    private boolean helpEqCls(Object value, String code) {
-        if (value == null) { return false; }
-        return code.equalsIgnoreCase(value.toString());
-    }
-
 #end
     // ===================================================================================
     //                                                           Classification Name/Alias
@@ -201,21 +195,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #if (${col.hasClassification()})
 #if (${col.hasClassificationName()})
     /**
-     * Get the value of the column '${col.uncapitalisedJavaName}' as classification-name.
-     * @return The value of the column '${col.uncapitalisedJavaName}' as classification-name. (Nullable)
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        return find${col.classificationName}Name(_${col.uncapitalisedJavaName} + "");
+        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        return cls != null ? cls.name() : null;
     }
 
 #end
 #if (${col.hasClassificationAlias()})
     /**
-     * Get the value of the column '${col.UncapitalisedJavaName}' as classification-alias.
-     * @return The value of the column '${col.UncapitalisedJavaName}' as classification-alias. (Nullable)
+     * Get the value of the column '${col.UncapitalisedJavaName}' as classification alias.
+     * @return The value of the column '${col.UncapitalisedJavaName}' as classification alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        return find${col.classificationName}Alias(_${col.uncapitalisedJavaName} + "");
+        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        return cls != null ? cls.alias() : null;
     }
 
 #end

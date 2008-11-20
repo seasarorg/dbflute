@@ -77,9 +77,8 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Base-Entity]
     #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
-
-    ## [Allcommon-Base-BFinder]
-    #set ($glBFinderName = "${glProjectPrefix}BFinder")
+    #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
+    #set ($glCommonColumnBasicAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
 
     ## [Allcommon-Base-CacheAbstractSelector]
     #set ($glCacheAbstractSelector = "${glProjectPrefix}CacheAbstractSelector")
@@ -91,9 +90,6 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Base-BehaviorSelector]
     #set ($glBehaviorSelectorInterfaceName = "${glProjectPrefix}BehaviorSelector")
     #set ($glCacheBehaviorSelectorName = "${glProjectPrefix}CacheBehaviorSelector")
-
-    ## [Allcommon-Base-GenMetaData]
-    #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
 
     ## [Allcommon-Base-InternalMapContext]
     #set ($glInternalMapContextName = "${glProjectPrefix}InternalMapContext")
@@ -627,16 +623,18 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                          annotation
     ##                                                                          ==========
-    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonAnnotation}))
-    $database.makeDirectory($path)
+    #if ($database.isMakeDaoInterface())
+      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonAnnotation}))
+      $database.makeDirectory($path)
 
-    $database.info("public void parseAllcommonAnnotation) {")
-    $database.info("    parse('OutsideSql');")
+      $database.info("public void parseAllcommonAnnotation) {")
+      $database.info("    parse('OutsideSql');")
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonAnnotation})}${glOutsideSqlAnnotation}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/annotation/OutsideSql.${glTemplateFileExtension}",$path,"", "")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonAnnotation})}${glOutsideSqlAnnotation}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/annotation/OutsideSql.${glTemplateFileExtension}",$path,"", "")
 
-    $database.info("}")
+      $database.info("}")
+    #end
 
     ## ===================================================================================
     ##                                                                            behavior
@@ -909,14 +907,24 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                      allcommon entity
     ##                                      ----------------
-    $database.info("public void parseEntityInterface() {")
+    $database.info("public void parse('Entity') {")
     $database.info("    parseEntity();")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/Entity.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.info("    parseEntityDefinedCommonColumn();")
+    $database.info("    parse('EntityDefinedCommonColumn');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumnInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      $database.info("    parse('CommonColumnAutoSetupper');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.info("    parse('CommonColumnBasicAutoSetupper');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnBasicAutoSetupper}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnBasicAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
+    #end
     $database.info("}")
 
     ## -----------------------------------------------------
@@ -1819,19 +1827,6 @@ targetdatabase = $targetDatabase
     #end
 
     ## -------------------------------------------------------
-    ##                                         allcommon flute
-    ##                                         ---------------
-    #if ($database.isMakeDeprecated())
-    #if ($database.isTargetContainerSeasar() && $database.isTargetLanguageJava())
-      $database.info("public void parseBFinder() {")
-      $database.info("    parse('BFinder');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBFinderName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/BFinder.${glTemplateFileExtension}",$path ,"", "")
-      $database.info("}")
-    #end
-    #end
-
-    ## -------------------------------------------------------
     ##                                      allcommon selector
     ##                                      ------------------
     #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
@@ -1867,18 +1862,6 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/CacheDaoSelector.${glTemplateFileExtension}",$path ,"", "")
     #end
     $database.info("}")
-
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                   Parse gen meta data
-    ##                                                                                   -------------------
-    #if ($database.isMakeDeprecated())
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
-      $database.makeDirectory($path)
-
-      $database.info("parseGenMetaData();")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glGenMetaDataClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/GenMetaData.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                            Parse internal map context

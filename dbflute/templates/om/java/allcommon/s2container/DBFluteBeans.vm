@@ -14,6 +14,8 @@
         <property name="beanMetaDataFactory" ref="beanMetaDataFactory"></property>
         <property name="valueTypeFactory" ref="valueTypeFactory"></property>
 	</bean>
+    <bean id="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}" autowire="byType"/>
+	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}" autowire="byType" destroy-method="destroy"/>
 
     <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryExtension}" autowire="byType"/>
 	<bean id="propertyTypeFactoryBuilder" class="${glPackageBaseCommonS2Dao}.${glPropertyTypeFactoryBuilderExtension}" autowire="byType"/>
@@ -30,8 +32,6 @@
 
 	<bean id="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType"/>
 	<bean id="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
-
-	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}" autowire="byType" destroy-method="destroy"/>
 
 #foreach ($table in $database.tables)
 	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType"/>

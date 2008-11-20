@@ -52,8 +52,8 @@ public class ${myClassName} {
         private String _code; private String _alias;
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }
-        public static ${classificationName} codeOf(String code) {
-            if (code == null) { return null; } return _codeValueMap.get(code.toLowerCase());
+        public static ${classificationName} codeOf(Object code) {
+            if (code == null) { return null; } return _codeValueMap.get(code.toString().toLowerCase());
         }
     }
 

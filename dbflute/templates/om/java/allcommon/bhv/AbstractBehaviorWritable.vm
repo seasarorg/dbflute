@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glCommonColumnAutoSetupper};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractListEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
@@ -37,7 +38,7 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
 
 /**
- * The abstract class of behavior-writable.
+ * The abstract class of writable behavior.
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
@@ -59,36 +60,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /** Map-string equal. */
     private static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-#if ($database.isExistCommonColumnSetupElement())
 
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
-#end
-
-#if ($database.hasCommonColumnSetupResource())
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-#foreach ($resource in $database.commonColumnSetupResourceList)
-    /** The property of ${resource.propertyName}. */
-    protected ${resource.className} ${resource.propertyVariableName};
+    protected ${glCommonColumnAutoSetupper} _commonColumnAutoSetupper;
 
-    /**
-     * @return The value of ${resource.propertyName}.
-     */
-    public ${resource.className} get${resource.propertyNameInitCap}() {
-        return ${resource.propertyVariableName};
-    }
-
-    /**
-     * @param ${resource.propertyName} The value of ${resource.propertyName}.
-     */
-    public void set${resource.propertyNameInitCap}(${resource.className} ${resource.propertyName}) {
-        this.${resource.propertyVariableName} = ${resource.propertyName};
-    }
-
-#end
-#end
     // ===================================================================================
     //                                                                       Entity Update
     //                                                                       =============
@@ -649,53 +626,38 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
-#if ($database.isAvailableBehaviorInsertSequenceInjection())
         injectSequenceToPrimaryKeyIfNeeds(targetEntity);
-#end
-		setupCommonColumnOfInsertIfNeeds(targetEntity);
+        setupCommonColumnOfInsertIfNeeds(targetEntity);
     }
 
     /**
      * Set up common columns of insert if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-	protected void setupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
-#if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
-            return;
-        }
-        final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-		if (!entity.canCommonColumnAutoSetup()) {
-		    return;
-		}
-        if (_log.isDebugEnabled()) {
-            String msg = "...Filtering entity of INSERT about the column columns of " + getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
-            _log.debug(msg);
-        }
-#foreach ($columnName in ${database.commonColumnNameList})
-  #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
-  #set ($entityCommonColumnMap = ${database.commonColumnMap})
-  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
-  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
-    #set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
-    #if ($database.isCommonColumnSetupInvokingLogic($logic))
-      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+    protected void setupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
+        final ${glCommonColumnAutoSetupper} setupper = getCommonColumnAutoSetupper();
+        assertCommonColumnAutoSetupperNotNull();
+        setupper.handleCommonColumnOfInsertIfNeeds(targetEntity);
+    }
 
-        ${filteredLogic}
-    #else
+    private void assertCommonColumnAutoSetupperNotNull() {
+        if (_commonColumnAutoSetupper == null) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Not found the auto set-upper of common column as behavior's attribute!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the definition of the set-upper at your component configuration of DBFlute." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
+            msg = msg + "  _behaviorCommandInvoker   : " + _behaviorCommandInvoker + getLineSeparator();
+            msg = msg + "  _behaviorSelector         : " + _behaviorSelector + getLineSeparator();
+            msg = msg + "  _commonColumnAutoSetupper : " + _commonColumnAutoSetupper + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
+    }
 
-        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
-        entity.set${javaName}(${uncapitalisedJavaName});
-    #end
-  #end
-#end
-#end
-	}
-	
     /**
      * Filter the entity of insert.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -727,50 +689,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
     protected void frameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
-	    setupCommonColumnOfUpdateIfNeeds(targetEntity);
+        setupCommonColumnOfUpdateIfNeeds(targetEntity);
     }
 
     /**
      * Set up common columns of update if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-	protected void setupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
-#if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
-            return;
-        }
-        final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
-		if (!entity.canCommonColumnAutoSetup()) {
-		    return;
-		}
-        if (_log.isDebugEnabled()) {
-            String msg = "...Filtering entity of UPDATE about the column columns of " + getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
-            _log.debug(msg);
-        }
-#foreach ($columnName in ${database.commonColumnNameList})
-  #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
-  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
-  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
-  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
-    #set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
-    #if ($database.isCommonColumnSetupInvokingLogic($logic))
-      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
-        ${filteredLogic}
-    #else
-
-        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
-        entity.set${javaName}(${uncapitalisedJavaName});
-    #end
-  #end
-#end
-#end
-	}
-	
+    protected void setupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
+        final ${glCommonColumnAutoSetupper} setupper = getCommonColumnAutoSetupper();
+        assertCommonColumnAutoSetupperNotNull();
+        setupper.handleCommonColumnOfUpdateIfNeeds(targetEntity);
+    }
+    
     /**
      * Filter the entity of update.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -803,7 +734,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected void frameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
     }
-	
+    
     /**
      * Filter the entity of delete.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -909,33 +840,33 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                     Delegate Method Internal Helper
     //                                                     ===============================
     protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
-	    final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
             if (!processBeforeInsert(entity)) { continue; }
-			filteredList.add(entity);
+            filteredList.add(entity);
         }
-		return filteredList;
+        return filteredList;
     }
 
     protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
-	    final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
             if (!processBeforeUpdate(entity)) { continue; }
-			filteredList.add(entity);
+            filteredList.add(entity);
         }
-		return filteredList;
+        return filteredList;
     }
 
     protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
-		final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
             if (!processBeforeDelete(entity)) { continue; }
-			filteredList.add(entity);
+            filteredList.add(entity);
         }
-		return filteredList;
+        return filteredList;
     }
     
     // ===================================================================================
@@ -1037,5 +968,24 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         cmd.setEntityType(entity.getClass());
         cmd.setEntity(entity);
         return cmd;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the auto set-upper of common column.
+     * @return The auto set-upper of common column. (Nullable: But normally NotNull)
+     */
+    protected ${glCommonColumnAutoSetupper} getCommonColumnAutoSetupper() {
+        return _commonColumnAutoSetupper;
+    }
+
+    /**
+     * Set the auto set-upper of common column.
+     * @param commonColumnAutoSetupper The auto set-upper of common column. (NotNull)
+     */
+    public void setCommonColumnAutoSetupper(${glCommonColumnAutoSetupper} commonColumnAutoSetupper) {
+        this._commonColumnAutoSetupper = commonColumnAutoSetupper;
     }
 }

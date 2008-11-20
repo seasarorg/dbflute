@@ -81,6 +81,7 @@ targetdatabase = $targetDatabase
     #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
 
     ## [ClassificationDefinition]
+    #set ($glCDef = "${glProjectPrefix}CDef")
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
     ## [Allcommon-Util]
