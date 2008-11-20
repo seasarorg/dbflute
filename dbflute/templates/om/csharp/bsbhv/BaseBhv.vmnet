@@ -226,8 +226,8 @@ namespace ${glPackageExtendedBhv} {
 #end
 
         // ===============================================================================
-        //                                                                 Pullout Foreign
-        //                                                                 ===============
+        //                                                                Pull out Foreign
+        //                                                                ================
         #region Pullout Foreign
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")

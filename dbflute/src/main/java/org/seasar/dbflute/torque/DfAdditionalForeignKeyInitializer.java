@@ -71,7 +71,7 @@ public class DfAdditionalForeignKeyInitializer {
             final String fixedCondition = getFixedCondition(foreignKeyName);
             final String fixedSuffix = getFixedSuffix(foreignKeyName);
 
-            _log.info("    " + foreignKeyName);
+            _log.info(foreignKeyName);
             if (localTableName.equals("*")) {
                 processAllTableFK(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, fixedSuffix);
             } else {
@@ -132,7 +132,11 @@ public class DfAdditionalForeignKeyInitializer {
             fk.setFixedSuffix(fixedSuffix);
         }
         table.addForeignKey(fk);
-        getTable(foreignTableName).addReferrer(fk);
+        final boolean canBeReferrer = getTable(foreignTableName).addReferrer(fk);
+        if (!canBeReferrer) {
+            String msg = "    *Cannot add referrer!";
+            _log.info(msg);
+        }
         for (String foreignColumnName : foreignColumnNameList) {
             final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
             foreignColumn.addReferrer(fk);
@@ -141,13 +145,16 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected void showResult(String foreignTableName, List<String> foreignColumnNameList, String fixedCondition,
             Table table, List<String> localColumnNameList) {
-        String msg = "       Add foreign key " + table.getName() + "." + localColumnNameList;
+        String msg = "    Add foreign key " + table.getName() + "." + localColumnNameList;
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
-            msg = msg + " to " + foreignTableName + "." + foreignColumnNameList + " with " + fixedCondition;
+            msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
+            _log.info(msg);
+            String withFixedCondition = "    with " + fixedCondition;
+            _log.info(withFixedCondition);
         } else {
             msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
+            _log.info(msg);
         }
-        _log.info(msg);
     }
 
     protected List<String> getForeignColumnNameList(String foreignName, final String foreignTableName) {

@@ -56,7 +56,10 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,6 +67,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -78,7 +82,7 @@ public class ForeignKey {
     //                                                                           Attribute
     //                                                                           =========
     private String _name;
-    
+
     private Table _localTable;
     private String _foreignTableName;
 
@@ -91,6 +95,7 @@ public class ForeignKey {
     private String _foreignPropertyNamePrefix;
     private String _fixedCondition;
     private String _fixedSuffix;
+    private Map<String, String> _dynamicFixedConditionMap = new LinkedHashMap<String, String>();
 
     // ===================================================================================
     //                                                                                Load
@@ -106,35 +111,6 @@ public class ForeignKey {
 
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
         _foreignPropertyNamePrefix = propertyNamePrefix;
-    }
-
-    /**
-     * @return Determination.
-     */
-    public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
-        final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
-        {
-            final Table fkTable = _localTable.getDatabase().getTable(_foreignTableName);
-            final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
-            for (Column column : foreignTablePrimaryKeyList) {
-                foreginTablePrimaryKeyNameList.add(column.getName());
-            }
-        }
-        if (foreginTablePrimaryKeyNameList.size() != _foreignColumns.size()) {
-            return false;
-        }
-        for (String foreginTablePrimaryKeyName : foreginTablePrimaryKeyNameList) {
-            boolean exists = false;
-            for (String foreignColumn : _foreignColumns) {
-                if (foreginTablePrimaryKeyName.equalsIgnoreCase(foreignColumn)) {
-                    exists = true;
-                }
-            }
-            if (!exists) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -169,6 +145,9 @@ public class ForeignKey {
         _foreignLocalMap.putAll(foreignColumnNameList, localColumnNameList);
     }
 
+    // ===================================================================================
+    //                                                                          Class Name
+    //                                                                          ==========
     // -----------------------------------------------------
     //                                    Foreign Class Name
     //                                    ------------------
@@ -251,9 +230,9 @@ public class ForeignKey {
         return getReferrerTableNestSelectSetupperClassName();
     }
 
-    // ==========================================================================================
-    //                                                                              Determination
-    //                                                                              =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Is this relation 'one-to-one'?
      * @return Determination.
@@ -282,9 +261,42 @@ public class ForeignKey {
         return _localTable.getName().equals(_foreignTableName);
     }
 
-    // ==========================================================================================
-    //                                                            Get Columns & ColumnList Method
-    //                                                            ===============================
+    public boolean canBeReferrer() {
+        return isForeignColumnsSameAsForeignTablePrimaryKeys() && !hasFixedCondition();
+    }
+
+    /**
+     * @return Determination.
+     */
+    protected boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
+        final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
+        {
+            final Table fkTable = _localTable.getDatabase().getTable(_foreignTableName);
+            final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
+            for (Column column : foreignTablePrimaryKeyList) {
+                foreginTablePrimaryKeyNameList.add(column.getName());
+            }
+        }
+        if (foreginTablePrimaryKeyNameList.size() != _foreignColumns.size()) {
+            return false;
+        }
+        for (String foreginTablePrimaryKeyName : foreginTablePrimaryKeyNameList) {
+            boolean exists = false;
+            for (String foreignColumn : _foreignColumns) {
+                if (foreginTablePrimaryKeyName.equalsIgnoreCase(foreignColumn)) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                     Get Columns & ColumnList Method
+    //                                                     ===============================
     // -----------------------------------------------------
     //                                         Local Element
     //                                         -------------
@@ -969,6 +981,141 @@ public class ForeignKey {
         return result;
     }
 
+    // ===================================================================================
+    //                                                                     Fixed Condition
+    //                                                                     ===============
+    public boolean hasFixedCondition() {
+        return _fixedCondition != null && _fixedCondition.trim().length() > 0;
+    }
+
+    public boolean hasFixedSuffix() {
+        return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
+    }
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+    // DynamicFixedCondition is for Java only at DBFlute-0.8.6
+    // * * * * * * * * * */
+
+    public boolean hasDynamicFixedCondition() {
+        analyzeDynamicFixedConditionIfNeeds();
+        return hasFixedCondition() && !_dynamicFixedConditionMap.isEmpty();
+    }
+
+    protected void analyzeDynamicFixedConditionIfNeeds() {
+        if (!_dynamicFixedConditionMap.isEmpty()) {
+            return; // already initialized
+        }
+        if (!hasFixedCondition() || !_fixedCondition.contains("/*") || !_fixedCondition.contains("*/")) {
+            return; // No fixedCondition or No dynamicFixedCondition
+        }
+        final Map<String, String> fixedConditionReplacementMap = new LinkedHashMap<String, String>();
+        String currentString = _fixedCondition;
+        while (true) {
+            if (currentString == null || currentString.trim().length() == 0) {
+                break;
+            }
+            final int startIndex = currentString.indexOf("/*");
+            if (startIndex < 0) {
+                break;
+            }
+            final int endIndex = currentString.indexOf("*/");
+            if (endIndex < 0) {
+                break;
+            }
+            if (startIndex >= endIndex) {
+                break;
+            }
+            final String peace = currentString.substring(startIndex + "/*".length(), endIndex);
+
+            // Modify the variable 'currentString' for next loop!
+            currentString = currentString.substring(endIndex + "*/".length());
+
+            final int typeStartIndex = peace.indexOf("(");
+            if (typeStartIndex < 0) {
+                continue;
+            }
+            final int typeEndIndex = peace.indexOf(")");
+            if (typeEndIndex < 0) {
+                continue;
+            }
+            if (typeStartIndex >= typeEndIndex) {
+                continue;
+            }
+            String parameterType = peace.substring(typeStartIndex + "(".length(), typeEndIndex);
+            parameterType = filterDynamicFixedConditionParameterType(parameterType);
+            String parameterName = peace.substring(0, typeStartIndex);
+            _dynamicFixedConditionMap.put(parameterName, parameterType);
+            final String parameterMapName = "parameterMap" + getForeignPropertyNameInitCap();
+            final String after = "/*$$locationBase$$." + parameterMapName + "." + parameterName + "*/";
+            fixedConditionReplacementMap.put("/*" + peace + "*/", after);
+        }
+        if (fixedConditionReplacementMap.isEmpty()) {
+            return;
+        }
+        final Set<String> keySet = fixedConditionReplacementMap.keySet();
+        for (String key : keySet) {
+            final String value = fixedConditionReplacementMap.get(key);
+            _fixedCondition = DfStringUtil.replace(_fixedCondition, key, value);
+        }
+    }
+
+    protected String filterDynamicFixedConditionParameterType(String parameterType) {
+        if (parameterType == null || parameterType.trim().length() == 0) {
+            return "String";
+        } else if (parameterType.equals("Date")) {
+            return "java.util.Date";
+        } else if (parameterType.equals("Timestamp")) {
+            return "java.sql.Timestamp";
+        } else if (parameterType.equals("BigDecimal")) {
+            return "java.math.BigDecimal";
+        } else if (parameterType.equals("BigInteger")) {
+            return "java.math.BigInteger";
+        } else if (parameterType.equals("List")) {
+            return "java.util.List";
+        } else if (parameterType.equals("Map")) {
+            return "java.util.Map";
+        } else {
+            return parameterType;
+        }
+    }
+
+    public String getDynamicFixedConditionArgs() {
+        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        for (String parameterName : parameterNameSet) {
+            final String paramterType = _dynamicFixedConditionMap.get(parameterName);
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("final ").append(paramterType).append(" ").append(parameterName);
+        }
+        return sb.toString();
+    }
+
+    public String getDynamicFixedConditionVariables() {
+        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        for (String parameterName : parameterNameSet) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(parameterName);
+        }
+        return sb.toString();
+    }
+
+    public String getDynamicFixedConditionParameterMapSetup() {
+        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        for (String parameterName : parameterNameSet) {
+            sb.append("parameterMap.put(\"").append(parameterName).append("\", ").append(parameterName).append(");");
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String initCap(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
@@ -993,14 +1140,6 @@ public class ForeignKey {
         }
         sb.append("    </foreign-key>");
         return sb.toString();
-    }
-
-    public boolean hasFixedCondition() {
-        return _fixedCondition != null && _fixedCondition.trim().length() > 0;
-    }
-
-    public boolean hasFixedSuffix() {
-        return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
     }
 
     // ===================================================================================

@@ -19,12 +19,18 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                           With Nested Foreign Table
     //                                                           =========================
-#foreach ($foreignKeys in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-    public ${foreignKeys.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(); }});
-		return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+    public ${fk.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+		return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
     }
 #end
 

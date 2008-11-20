@@ -169,19 +169,24 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                        Setup Select
     //                                                                        ============
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
-#set ($nestSelectSetuppperClassName = "${foreignKey.foreignTableNestSelectSetupperClassName}")
-
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($nestSelectSetuppperClassName = "${fk.foreignTableNestSelectSetupperClassName}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
     protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
-    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(); } });
-        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end
@@ -217,10 +222,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     public static class Specification extends AbstractSpecification<${myConditionQueryClassName}> {
         protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
-#set ($tmpCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}.Specification _${tmpPropertyName};
 #end
 #foreach ($referrer in $table.referrers)
@@ -240,11 +245,11 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #foreach ($col in $table.primaryKey)
             column${col.javaName}();// PK
 #end
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
             if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
-#foreach ($col in $foreignKey.localColumnList)
+#foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 column${col.javaName}();// FK
 #end
@@ -253,17 +258,21 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #end
         }
         protected String getTableDbName() { return "$table.name"; }
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
-#set ($tmpCBClassName = "${foreignKey.foreignTableExtendedConditionBeanClassName}")
-#set ($tmpCQClassName = "${foreignKey.foreignTableExtendedConditionQueryClassName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}.Specification specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
                     public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+#else
                     public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+#end
                     , _forDerivedReferrer, _forScalarSelect);
             }
             return _${tmpPropertyName};

@@ -1275,21 +1275,17 @@ public class Table {
     /**
      * Adds the foreign key from another table that refers to this table.
      * @param fk A foreign key referring to this table
+     * @return Can the foreign key be referrer?
      */
-    public void addReferrer(ForeignKey fk) {
-        if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
-            String msg = "Relation Building Information:" + getLineSeparator();
-            msg = msg + "Cannot add referrer!" + getLineSeparator();
-            msg = msg + "Because the foreign columns are NOT the same as";
-            msg = msg + " the primary keys of the foreign table:" + getLineSeparator();
-            msg = msg + fk.toString();
-            _log.info(msg);
-            return;
+    public boolean addReferrer(ForeignKey fk) {
+        if (!fk.canBeReferrer()) {
+            return false;
         }
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
         _referrers.add(fk);
+        return true;
     }
 
     public List<ForeignKey> getReferrerList() {

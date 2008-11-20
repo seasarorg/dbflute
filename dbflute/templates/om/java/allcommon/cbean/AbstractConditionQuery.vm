@@ -359,19 +359,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                            Register
     //                                                                            ========
     // -----------------------------------------------------
-    //                                       Include-As-Mine
-    //                                       ---------------
-    /**
-     * Register included-select-column.
-     * @param aliasName Alias name. This should not contain comma. (NotNull)
-     * @param realColumnName Real column name. This should not contain comma. (NotNull)
-     * @deprecated Unsupported!
-     */
-    protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
-        throw new UnsupportedOperationException();
-    }
-
-    // -----------------------------------------------------
     //                                                 Query
     //                                                 -----
     protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
@@ -1020,13 +1007,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============
-    protected String prepareFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "dto." + getLocationBase());
         return fixedCondition;
     }
-
+    
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
@@ -1245,7 +1233,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-	    return ${glTraceViewUtilName}.convertObjectArrayToStringView(objArray);
+        return ${glTraceViewUtilName}.convertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------
