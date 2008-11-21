@@ -65,6 +65,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
@@ -1060,27 +1062,9 @@ public class ForeignKey {
     }
 
     protected String filterDynamicFixedConditionParameterType(String parameterType) {
-        if (parameterType == null || parameterType.trim().length() == 0) {
-            return "String";
-        } else if (parameterType.equals("Date")) {
-            return "java.util.Date";
-        } else if (parameterType.equals("Timestamp")) {
-            return "java.sql.Timestamp";
-        } else if (parameterType.equals("BigDecimal")) {
-            return "java.math.BigDecimal";
-        } else if (parameterType.equals("BigInteger")) {
-            return "java.math.BigInteger";
-        } else if (parameterType.startsWith("List<")) {
-            return "java.util." + parameterType;
-        } else if (parameterType.startsWith("Map<")) {
-            return "java.util." + parameterType;
-        } else if (parameterType.equals("List")) {
-            return "java.util.List";
-        } else if (parameterType.equals("Map")) {
-            return "java.util.Map";
-        } else {
-            return parameterType;
-        }
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        final DfStandardApiPackageResolver packageResolver = new DfStandardApiPackageResolver(basicProperties);
+        return packageResolver.resolvePackageName(parameterType);
     }
 
     public String getDynamicFixedConditionArgs() {

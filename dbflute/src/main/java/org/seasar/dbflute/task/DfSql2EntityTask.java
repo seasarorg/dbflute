@@ -57,6 +57,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
+import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
@@ -152,6 +153,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
         final DfJdbcDeterminer jdbcDeterminer = createJdbcDeterminer();
+        final DfStandardApiPackageResolver packageResolver = new DfStandardApiPackageResolver(getBasicProperties());
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
@@ -413,32 +415,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (typeName == null) {
                     return typeName;
                 }
-                final DfBasicProperties prop = getBasicProperties();
-                if (prop.isTargetLanguageJava()) {
-                    if (typeName.startsWith("List<") && typeName.endsWith(">")) {
-                        return "java.util." + typeName;
-                    }
-                    if (typeName.startsWith("Map<") && typeName.endsWith(">")) {
-                        return "java.util." + typeName;
-                    }
-                    if (typeName.equals("BigDecimal")) {
-                        return "java.math." + typeName;
-                    }
-                    if (typeName.equals("Time")) {
-                        return "java.sql." + typeName;
-                    }
-                    if (typeName.equals("Timestamp")) {
-                        return "java.sql." + typeName;
-                    }
-                    if (typeName.equals("Date")) {
-                        return "java.util." + typeName;
-                    }
-                } else if (prop.isTargetLanguageCSharp()) {
-                    if (typeName.startsWith("IList<") && typeName.endsWith(">")) {
-                        return "System.Collections.Generic." + typeName;
-                    }
-                }
-                return typeName;
+                return packageResolver.resolvePackageName(typeName);
             }
 
             @Override
