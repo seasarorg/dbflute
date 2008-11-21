@@ -1070,6 +1070,10 @@ public class ForeignKey {
             return "java.math.BigDecimal";
         } else if (parameterType.equals("BigInteger")) {
             return "java.math.BigInteger";
+        } else if (parameterType.startsWith("List<")) {
+            return "java.util." + parameterType;
+        } else if (parameterType.startsWith("Map<")) {
+            return "java.util." + parameterType;
         } else if (parameterType.equals("List")) {
             return "java.util.List";
         } else if (parameterType.equals("Map")) {
