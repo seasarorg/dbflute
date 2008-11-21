@@ -128,7 +128,7 @@ namespace ${glPackageBaseCQ} {
             regLSQ(CK_NLS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
     #end
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -313,7 +313,7 @@ namespace ${glPackageBaseCQ} {
             reg${tmpJavaName}(CK_NINS, cTL<${col.JavaNative}>(valueList));
         }
     #end
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")

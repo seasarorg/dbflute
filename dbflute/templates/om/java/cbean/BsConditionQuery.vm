@@ -66,7 +66,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
     protected ${glConditionValueName} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
 #if (${col.isJavaNativeStringObject()})
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -184,12 +184,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #end
-    #if (${col.isJavaNativeNumberObject()})
-      #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
-        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#if (${col.isJavaNativeNumberObject()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
+#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }

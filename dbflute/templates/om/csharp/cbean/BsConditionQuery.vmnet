@@ -57,7 +57,7 @@ namespace ${glPackageBaseCQ} {
         protected override ${glConditionValueName} getCValue${tmpJavaName}() { return this.${tmpJavaName}; }
 
 #if (${col.isJavaNativeStringObject()})
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
@@ -189,7 +189,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isJavaNativeNumberObject()})
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")

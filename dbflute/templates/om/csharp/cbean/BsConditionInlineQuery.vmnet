@@ -75,7 +75,7 @@ namespace ${glPackageCIQ} {
         }
 
 #if (${col.isJavaNativeStringObject()})
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -178,7 +178,7 @@ namespace ${glPackageCIQ} {
 #end
 #end
 #if (${col.isJavaNativeNumberObject()})
-#if (${col.isSingleKeyForeignKey()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
