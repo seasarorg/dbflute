@@ -929,6 +929,14 @@ public class Database {
         return getProperties().getDBFluteDiconProperties().getDBFluteBeansFileName();
     }
 
+    public boolean isQuillDataSourceNameValid() {
+        return getProperties().getDBFluteDiconProperties().isQuillDataSourceNameValid();
+    }
+
+    public String getQuillDataSourceName() {
+        return getProperties().getDBFluteDiconProperties().getQuillDataSourceName();
+    }
+
     // ===================================================================================
     //                                                  Generated Class Package Properties
     //                                                  ==================================
@@ -1281,7 +1289,7 @@ public class Database {
     public boolean isMakeFlatExpansion() {
         return getProperties().getMakingOptionProperties().isMakeFlatExpansion();
     }
-    
+
     public boolean isMakeDaoInterface() {
         return getProperties().getMakingOptionProperties().isMakeDaoInterface();
     }
@@ -1447,11 +1455,11 @@ public class Database {
     public String getSql2EntityExtendedEntityPackage() {
         return getProperties().getOutsideSqlProperties().getExtendedEntityPackage();
     }
-    
+
     public String getSql2EntityBaseCursorPackage() {
         return getProperties().getOutsideSqlProperties().getBaseCursorPackage();
     }
-    
+
     public String getSql2EntityExtendedCursorPackage() {
         return getProperties().getOutsideSqlProperties().getExtendedCursorPackage();
     }

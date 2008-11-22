@@ -23,6 +23,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
             _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
         }
+#if ($database.isQuillDataSourceNameValid())
+        public override string DataSourceName {
+            get { return "${database.quillDataSourceName}"; }
+        }
+#end
     }
 
     public class InternalBasicCommandFactory : BasicCommandFactory {

@@ -199,4 +199,16 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     public String getDBFluteBeansFileName() {
         return stringProp("torque.dbfluteBeansFileName", "dbfluteBeans.xml");
     }
+
+    // ===================================================================================
+    //                                                                    Quill DataSource
+    //                                                                    ================
+    public boolean isQuillDataSourceNameValid() {
+        String name = getQuillDataSourceName();
+        return name != null && name.trim().length() > 0 && !name.trim().equalsIgnoreCase("null");
+    }
+
+    public String getQuillDataSourceName() {
+        return stringProp("torque.quillDataSourceName", null);
+    }
 }
