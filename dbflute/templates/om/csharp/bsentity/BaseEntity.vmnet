@@ -148,9 +148,8 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         public bool Is${col.javaName}${classificationMap.get('name')} {
             get {
-                if (_${col.uncapitalisedJavaName} == null) { return false; }
-                String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
-                return code.ToLower().Equals(_${col.uncapitalisedJavaName}.ToString().ToLower());
+                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                return cls != null ? cls.Equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
             }
         }
 
