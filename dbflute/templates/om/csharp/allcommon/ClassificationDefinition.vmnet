@@ -9,6 +9,7 @@ namespace ${glPackageBaseCommon} {
     /// The definition class that has classification.
     /// Author: ${database.ClassAuthor}
     /// </summary>
+    [Obsolete]
     public static class ${myClassName} {
 
         // ===============================================================================

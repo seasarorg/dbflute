@@ -52,7 +52,7 @@ namespace ${glPackageBaseCQ} {
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-            reg${tmpJavaName}(CK_EQ, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+            reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
       #end
     #end
@@ -69,7 +69,7 @@ namespace ${glPackageBaseCQ} {
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-            reg${tmpJavaName}(CK_NE, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+            reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
       #end
     #end
@@ -259,14 +259,14 @@ namespace ${glPackageBaseCQ} {
             reg${tmpJavaName}(CK_EQ, value);
         }
     #if (${col.hasClassification()})
-      #foreach ($classificationMap in $col.ClassificationMapList)
+      #foreach ($classificationMap in $col.classificationMapList)
 
         /// <summary>
         /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-            String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
             reg${tmpJavaName}(CK_EQ, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
       #end
@@ -276,6 +276,19 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) {
             reg${tmpJavaName}(CK_NE, value);
         }
+    #end
+    #if (${col.hasClassification()})
+      #foreach ($classificationMap in $col.classificationMapList)
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
+        /// $database.buildClassificationApplicationComment($classificationMap)
+        /// </summary>
+        public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+            String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
+            reg${tmpJavaName}(CK_NE, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
+        }
+      #end
     #end
     #if (${col.isAvailableNumberGreaterThan()})
 
@@ -477,10 +490,23 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isJavaNativeBooleanObject()})
-  
+
         public void Set${tmpJavaName}_Equal(${col.javaNative} value) {
             reg${tmpJavaName}(CK_EQ, value);
         }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
+        /// $database.buildClassificationApplicationComment($classificationMap)
+        /// </summary>
+        public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+            String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
+            reg${tmpJavaName}(CK_EQ, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
+        }
+#end
+#end
 #end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 

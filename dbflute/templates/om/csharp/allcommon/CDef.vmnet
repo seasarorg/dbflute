@@ -6,7 +6,7 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommon} {
 
-    public class ${myClassName} {
+    public static class ${myClassName} {
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
@@ -32,18 +32,21 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationMap in $classificationMapList)
             /** $database.buildClassificationApplicationComment($classificationMap) */
             public static readonly ${classificationName} ${classificationMap.get('name')} = new ${classificationName}($database.buildClassificationCodeAliasVariables($classificationMap));
-
 #end
             private static readonly Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
             static ${classificationName}() {
-                foreach (${classificationName} value in values()) { _codeValueMap.put(value.Code.ToLower(), value); }
+#foreach ($classificationMap in $classificationMapList)
+                _codeValueMap.put(${classificationMap.get('name')}.Code.ToLower(), ${classificationMap.get('name')});
+#end
             }
+            protected String _code;
             protected String _alias;
             public ${classificationName}(String code, String alias) {
                 _code = code;
                 _alias = alias;
             }
             public String Code { get { return _code; } }
+            public String Name { get { return "${classificationMap.get('name')}"; } }
             public String Alias { get { return _alias; } }
             public static ${classificationName} CodeOf(Object code) {
                 if (code == null) { return null; } return _codeValueMap.get(code.ToString().ToLower());

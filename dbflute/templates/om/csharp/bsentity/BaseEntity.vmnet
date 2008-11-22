@@ -108,7 +108,7 @@ namespace ${myExtendedEntityPackageName} {
         #region Classify Method
 #foreach ($col in $table.Columns)
 #if (${col.hasClassification()})
-#foreach ($classificationMap in $col.ClassificationMapList)
+#foreach ($classificationMap in $col.classificationMapList)
         /// <summary>
         /// Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}.
         /// <![CDATA[
@@ -116,7 +116,7 @@ namespace ${myExtendedEntityPackageName} {
         /// ]]>
         /// </summary>
         public void Classify${col.javaName}${classificationMap.get('name')}() {
-            String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
 #if (${col.isJavaNativeStringObject()})
             ${col.javaName} = code;
         }
@@ -149,7 +149,7 @@ namespace ${myExtendedEntityPackageName} {
         public bool Is${col.javaName}${classificationMap.get('name')} {
             get {
                 if (_${col.uncapitalisedJavaName} == null) { return false; }
-                String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+                String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
                 return code.ToLower().Equals(_${col.uncapitalisedJavaName}.ToString().ToLower());
             }
         }
@@ -169,14 +169,16 @@ namespace ${myExtendedEntityPackageName} {
 #if (${col.hasClassificationName()})
         public String ${col.javaName}Name {
             get {
-                return ${glPackageBaseCommon}.${glClassificationDefinition}.Find${col.classificationName}Name(_${col.UncapitalisedJavaName} + "");
+                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                return cls != null ? cls.Name : null;
             }
         }
 #end
 #if (${col.hasClassificationAlias()})
         public String ${col.javaName}Alias {
             get {
-                return ${glPackageBaseCommon}.${glClassificationDefinition}.Find${col.classificationName}Alias(_${col.UncapitalisedJavaName} + "");
+                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                return cls != null ? cls.Alias : null;
             }
         }
 

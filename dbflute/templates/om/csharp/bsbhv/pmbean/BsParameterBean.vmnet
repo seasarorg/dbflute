@@ -118,7 +118,7 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-            this.${database.initCap($propertyName)} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};
+            this.${database.initCap($propertyName)} = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
         }
 #end
 #end
