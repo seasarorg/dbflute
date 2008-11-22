@@ -31,11 +31,13 @@ namespace ${glPackageBaseCommon} {
         public class ${classificationName} {
 #foreach ($classificationMap in $classificationMapList)
             /** $database.buildClassificationApplicationComment($classificationMap) */
-            public static readonly ${classificationName} ${classificationMap.get('name')} = new ${classificationName}($database.buildClassificationApplicationComment($classificationMap));
+            public static readonly ${classificationName} ${classificationMap.get('name')} = new ${classificationName}($database.buildClassificationCodeAliasVariables($classificationMap));
 
 #end
             private static readonly Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
-            static ${classificationName}() { foreach (${classificationName} value in values()) { _codeValueMap.put(value.Code.ToLower(), value); } }
+            static ${classificationName}() {
+                foreach (${classificationName} value in values()) { _codeValueMap.put(value.Code.ToLower(), value); }
+            }
             protected String _alias;
             public ${classificationName}(String code, String alias) {
                 _code = code;
@@ -43,8 +45,9 @@ namespace ${glPackageBaseCommon} {
             }
             public String Code { get { return _code; } }
             public String Alias { get { return _alias; } }
-
-#end
+            public static ${classificationName} CodeOf(Object code) {
+                if (code == null) { return null; } return _codeValueMap.get(code.ToString().ToLower());
+            }
         }
 
 #end

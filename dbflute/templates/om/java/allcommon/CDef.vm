@@ -37,7 +37,7 @@ public class ${myClassName} {
         ,
 #end
         /** $database.buildClassificationApplicationComment($classificationMap) */
-        ${classificationMap.get('name')}($database.buildClassificationApplicationComment($classificationMap))
+        ${classificationMap.get('name')}($database.buildClassificationCodeAliasVariables($classificationMap))
 #set ($count = $count + 1)
 #end
         ;

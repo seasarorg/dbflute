@@ -66,7 +66,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
-     * ${database.getMapValue($classificationMap, 'comment')}
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
@@ -87,7 +87,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * NotEqual(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
-     * ${database.getMapValue($classificationMap, 'comment')}
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
         reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
@@ -376,7 +376,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
-     * ${database.getMapValue($classificationMap, 'comment')}
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
@@ -397,7 +397,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
-     * ${database.getMapValue($classificationMap, 'comment')}
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
         reg${tmpJavaName}(CK_NE, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
@@ -727,7 +727,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
-     * ${database.getMapValue($classificationMap, 'comment')}
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')}));
