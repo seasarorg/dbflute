@@ -650,6 +650,20 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         return sb.toString();
     }
+    
+    public String buildClassificationCodeNameAliasVariables(Map<String, String> classificationMap) {
+        final StringBuilder sb = new StringBuilder();
+        final String code = classificationMap.get("code");
+        final String name = classificationMap.get("name");
+        final String alias = classificationMap.get("alias");
+        sb.append("\"").append(code).append("\", ").append("\"").append(name).append("\", ");
+        if (alias != null && alias.trim().length() > 0) {
+            sb.append("\"").append(alias).append("\"");
+        } else {
+            sb.append("null");
+        }
+        return sb.toString();
+    }
 
     // ===================================================================================
     //                                                           Classification Deployment

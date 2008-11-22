@@ -1176,6 +1176,10 @@ public class Database {
     public String buildClassificationCodeAliasVariables(Map<String, String> classificationMap) {
         return getClassificationProperties().buildClassificationCodeAliasVariables(classificationMap);
     }
+    
+    public String buildClassificationCodeNameAliasVariables(Map<String, String> classificationMap) {
+        return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationMap);
+    }
 
     // --------------------------------------
     //                             Deployment
