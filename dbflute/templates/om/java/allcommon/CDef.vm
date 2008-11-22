@@ -36,14 +36,8 @@ public class ${myClassName} {
 #if ($count != 0)
         ,
 #end
-#if ($classificationMap.containsKey('comment'))
-        /** ${classificationMap.get('comment')} */
-#end
-#if ($classificationMap.containsKey('alias'))
-        ${classificationMap.get('name')}("${classificationMap.get('code')}", "${classificationMap.get('alias')}")
-#else
-        ${classificationMap.get('name')}("${classificationMap.get('code')}", null)
-#end
+        /** $database.buildClassificationApplicationComment($classificationMap) */
+        ${classificationMap.get('name')}($database.buildClassificationApplicationComment($classificationMap))
 #set ($count = $count + 1)
 #end
         ;

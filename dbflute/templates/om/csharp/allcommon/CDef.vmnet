@@ -1,5 +1,9 @@
 #set ($myClassName = "${glCDef}")
 
+using System;
+
+using ${glPackageBaseCommonJavaLike};
+
 namespace ${glPackageBaseCommon} {
 
     public class ${myClassName} {
@@ -24,21 +28,22 @@ namespace ${glPackageBaseCommon} {
          * $classificationTopMap.get('topComment')
          */
 #end
-        public enum ${classificationName} {
-#set ($count = 0)
+        public class ${classificationName} {
 #foreach ($classificationMap in $classificationMapList)
-#if ($count != 0)
-            ,
+            /** $database.buildClassificationApplicationComment($classificationMap) */
+            public static readonly ${classificationName} ${classificationMap.get('name')} = new ${classificationName}($database.buildClassificationApplicationComment($classificationMap));
+
 #end
-#if ($classificationMap.containsKey('comment'))
-            /** ${classificationMap.get('comment')} */
-#end
-#if ($classificationMap.containsKey('alias'))
-            ${classificationMap.get('name')}
-#else
-            ${classificationMap.get('name')}
-#end
-#set ($count = $count + 1)
+            private static readonly Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+            static ${classificationName}() { foreach (${classificationName} value in values()) { _codeValueMap.put(value.Code.ToLower(), value); } }
+            protected String _alias;
+            public ${classificationName}(String code, String alias) {
+                _code = code;
+                _alias = alias;
+            }
+            public String Code { get { return _code; } }
+            public String Alias { get { return _alias; } }
+
 #end
         }
 

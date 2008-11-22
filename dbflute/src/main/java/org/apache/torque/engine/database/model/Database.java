@@ -1169,6 +1169,14 @@ public class Database {
         return getClassificationProperties().getClassificationMapList(classificationName);
     }
 
+    public String buildClassificationApplicationComment(Map<String, String> classificationMap) {
+        return getClassificationProperties().buildClassificationApplicationComment(classificationMap);
+    }
+    
+    public String buildClassificationCodeAliasVariables(Map<String, String> classificationMap) {
+        return getClassificationProperties().buildClassificationCodeAliasVariables(classificationMap);
+    }
+
     // --------------------------------------
     //                             Deployment
     //                             ----------
