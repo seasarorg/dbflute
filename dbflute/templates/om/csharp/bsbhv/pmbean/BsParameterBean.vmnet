@@ -3,8 +3,9 @@
 
 using System;
 using System.Text;
-#if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
+using ${glPackageBaseCommon};
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
 
@@ -118,7 +119,7 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-            this.${database.initCap($propertyName)} = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
+            this.${database.initCap($propertyName)} = ${glCDef}.${classificationName}.${classificationMap.get('name')}.Code;
         }
 #end
 #end
