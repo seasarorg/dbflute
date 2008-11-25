@@ -5,6 +5,7 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.Tx;
 using Seasar.Extension.Tx.Impl;
 using Seasar.Quill.Database.DataSource.Impl;
+using Seasar.Quill.Database.Tx.Impl;
 
 namespace ${glPackageBaseCommonS2Dao} {
 
