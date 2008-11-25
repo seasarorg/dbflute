@@ -1,8 +1,0 @@
-${database.allClassCopyright}package ${glPackageBaseCommon};
-
-/**
- * The interface of dao-writable.
- * @author ${database.ClassAuthor}
- */
-public interface ${glDaoWritableInterfaceName} extends ${glDaoReadableInterfaceName} {
-}

@@ -1,9 +1,0 @@
-${database.allClassCopyright}package ${glPackageBaseCommon};
-
-/**
- * The interface of dao-readable.
- * @author ${database.ClassAuthor}
- */
-public interface ${glDaoReadableInterfaceName} {
-	public void initializeDaoMetaData(String methodName);// Very Internal Method!
-}
