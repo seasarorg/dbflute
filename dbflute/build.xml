@@ -269,4 +269,10 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
+
+  <target name="reflect-win-limit-buri" depends="expand-dist" description="==> reflect to buri example">
+    <copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 </project>
