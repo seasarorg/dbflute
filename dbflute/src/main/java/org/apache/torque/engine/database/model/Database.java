@@ -1271,10 +1271,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
     }
 
-    public boolean isCompatibleS2DaoSQLAnnotationValid() { // This is for compatibility!
-        return getProperties().getLittleAdjustmentProperties().isCompatibleS2DaoSQLAnnotationValid();
-    }
-
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
@@ -1304,10 +1300,6 @@ public class Database {
 
     public boolean isMakeDaoInterface() {
         return getProperties().getMakingOptionProperties().isMakeDaoInterface();
-    }
-
-    public boolean isMakeClassificationValueLabelList() {
-        return getProperties().getMakingOptionProperties().isMakeClassificationValueLabelList();
     }
 
     // ===================================================================================

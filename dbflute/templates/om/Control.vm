@@ -96,7 +96,6 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Base-CDef]
     #set ($glCDef = "${glProjectPrefix}CDef")
-    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
     ## [Allcommon-Base-DBDef]
     #set ($glDBDef = "${glProjectPrefix}DBDef")
@@ -1741,11 +1740,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 
-      #if ($database.isTargetLanguageCSharp() || ($database.isTargetLanguageJava() && $database.isMakeRecentlyDeprecated()))
-        $database.info("    parse('ClassificationDefinition');")
-        #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
-      #end
       $database.info("}")
     #end
 

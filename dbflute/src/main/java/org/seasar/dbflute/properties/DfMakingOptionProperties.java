@@ -57,10 +57,12 @@ public final class DfMakingOptionProperties extends DfAbstractHelperProperties {
         if (isTargetLanguageCSharp()) {
             return true; // It is not implemented at CSharp yet
         }
-        if (isTargetContainerSpring()) {
-            return false; // If the container is for Spring Framework, it always returns false!
+        final boolean makeDaoInterface = booleanProp("torque.isMakeDaoInterface", false);
+        if (makeDaoInterface) {
+            String msg = "Dao interfaces are unsupported since DBFlute-0.8.7!";
+            throw new UnsupportedOperationException(msg);
         }
-        return booleanProp("torque.isMakeDaoInterface", false); 
+        return false; 
     }
     
     protected boolean isTargetLanguageCSharp() {
@@ -69,12 +71,5 @@ public final class DfMakingOptionProperties extends DfAbstractHelperProperties {
 
     protected boolean isTargetContainerSpring() {
         return getBasicProperties().isTargetContainerSpring();
-    }
-
-    // ===================================================================================
-    //                                                                      Classification
-    //                                                                      ==============
-    public boolean isMakeClassificationValueLabelList() {
-        return booleanProp("torque.isMakeClassificationValueLabelList", false);
     }
 }
