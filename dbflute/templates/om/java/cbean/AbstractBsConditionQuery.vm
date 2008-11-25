@@ -730,7 +730,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')}));
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
     }
 #end
 #end
