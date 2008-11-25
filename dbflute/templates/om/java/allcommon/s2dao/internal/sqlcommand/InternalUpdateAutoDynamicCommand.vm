@@ -10,6 +10,7 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 
+import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
 
 /**
@@ -23,7 +24,8 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
     /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalUpdateAutoDynamicCommand}.class);
 
-    private static final Integer NO_UPDATE = new Integer(0);
+    /** The result for no update as normal execution. */
+    private static final Integer NO_UPDATE = new Integer(1);
 
 	// ===================================================================================
     //                                                                           Attribute
@@ -48,8 +50,8 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
         final BeanMetaData bmd = getBeanMetaData();
         final PropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames());
         if (propertyTypes.length == 0) {
-            if (_log.isDebugEnabled()) {
-                _log.debug(createNoUpdateLogMessage(bean, bmd));
+            if (isLogEnabled()) {
+                log(createNoUpdateLogMessage(bean, bmd));
             }
             return NO_UPDATE;
         }
@@ -168,6 +170,20 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
         return sb.toString();
     }
 
+    // ===================================================================================
+    //                                                                  Execute Status Log
+    //                                                                  ==================
+    protected void log(String msg) {
+        ${glXLog}.log(msg);
+    }
+
+    protected boolean isLogEnabled() {
+        return ${glXLog}.isLogEnabled();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     protected boolean isVersionNoAutoIncrementOnMemory() {
         return versionNoAutoIncrementOnMemory;
     }
