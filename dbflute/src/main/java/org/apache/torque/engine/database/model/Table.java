@@ -2299,9 +2299,9 @@ public class Table {
         return filteredCommonColumn;
     }
 
-    // ===============================================================================
-    //                                                         Non PrimaryKey Writable
-    //                                                         =======================
+    // ===================================================================================
+    //                                                             Non PrimaryKey Writable
+    //                                                             =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
         if (hasPrimaryKey()) {
             return false;
@@ -2309,9 +2309,9 @@ public class Table {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
-    // ===============================================================================
-    //                                                 Adding Schema to Table SQL-Name
-    //                                                 ===============================
+    // ===================================================================================
+    //                                                     Adding Schema to Table SQL-Name
+    //                                                     ===============================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
     }
@@ -2324,11 +2324,16 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                  Friendly Framework
-    //                                                                  ==================
+    //                                                            Buri(Friendly Framework)
+    //                                                            ========================
     public boolean isBuriTarget() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName());
+    }
+    
+    public boolean isBuriInternal() {
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        return buriProperties.isUseBuri() && buriProperties.isBuriInternalTable(getJavaName());
     }
 
     // ===================================================================================

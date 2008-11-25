@@ -40,7 +40,10 @@ import ${glPackageCB}.*;
   #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
 #end
 /**
- * The behavior of ${table.name}.
+ * The behavior of ${table.basicInfoDispString}. <br />
+#if ($table.isBuriIternal())
+ * {Buri Internal}
+#end
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -645,7 +648,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 #end
+#if ($table.isBuriTarget())
 
+    // ===================================================================================
+    //                                                                      Buri Interface
+    //                                                                      ==============
+    public void toNextStatus() { // Making...
+    }
+    
+    public void getEntities() { // Making...
+    }
+#end
+    
     // ===================================================================================
     //                                                                     Delegate Method
     //                                                                     ===============

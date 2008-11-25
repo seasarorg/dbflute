@@ -111,6 +111,18 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                              Buri Table Information
+    //                                                              ======================
+    public boolean isBuriInternalTable(String javaName) {
+        if (javaName == null || javaName.trim().length() == 0) {
+            return false;
+        }
+        final String str = javaName.trim().toLowerCase();
+        return "buripath".equals(str) && "buridata".equals(str) && "buribranch".equals(str) && "buristate".equals(str)
+                && "buripathdata".equals(str);
+    }
+
+    // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
     protected String getBuriPropertyRequired(String key) {
