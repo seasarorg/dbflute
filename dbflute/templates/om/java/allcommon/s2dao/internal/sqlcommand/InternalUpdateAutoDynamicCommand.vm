@@ -21,9 +21,6 @@ public class ${glInternalUpdateAutoDynamicCommand} extends ${glInternalAbstractS
 	// ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalUpdateAutoDynamicCommand}.class);
-
     /** The result for no update as normal execution. */
     private static final Integer NO_UPDATE = new Integer(1);
 
