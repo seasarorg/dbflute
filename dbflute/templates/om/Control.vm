@@ -360,6 +360,7 @@ targetdatabase = $targetDatabase
     #set ($glPropertyTypeFactoryBuilderExtension = "${glProjectPrefix}PropertyTypeFactoryBuilderExtension")
     #set ($glSqlLogRegistryLatestSqlProvider = "${glProjectPrefix}SqlLogRegistryLatestSqlProvider")
     #set ($glS2DaoSetting = "${glProjectPrefix}S2DaoSetting")
+    #set ($glTxSetting = "${glProjectPrefix}TxSetting")
 
     #set ($glS2DaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
@@ -1977,6 +1978,9 @@ targetdatabase = $targetDatabase
     #if ($database.isTargetLanguageCSharp())
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glS2DaoSetting}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoSetting.${glTemplateFileExtension}",$path,"", "")
+
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glTxSetting}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/TxSetting.${glTemplateFileExtension}",$path,"", "")
     #end
 
     #if ($database.isTargetLanguageJava())

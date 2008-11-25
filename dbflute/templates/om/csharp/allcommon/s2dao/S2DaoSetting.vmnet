@@ -24,7 +24,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
         }
 #if ($database.isQuillDataSourceNameValid())
-        public override string DataSourceName {
+        public override String DataSourceName {
             get { return "${database.quillDataSourceName}"; }
         }
 #end

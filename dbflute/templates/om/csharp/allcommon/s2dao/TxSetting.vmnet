@@ -1,0 +1,36 @@
+
+using System;
+using System.Data;
+using Seasar.Extension.ADO;
+using Seasar.Extension.Tx;
+using Seasar.Extension.Tx.Impl;
+using Seasar.Quill.Database.DataSource.Impl;
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    public class ${glTxSetting} : AbstractTransactionSetting {
+        protected override void SetupTransaction(IDataSource dataSource) {
+            _transactionContext = new TransactionContext();
+            TransactionContext txContext = (TransactionContext)_transactionContext;
+            txContext.DataSouce = dataSource;
+            txContext.IsolationLevel = IsolationLevel.ReadCommitted;
+
+            Type dataSourceType = dataSource.GetType();
+            if (typeof(SelectableDataSourceProxyWithDictionary).IsAssignableFrom(dataSourceType)) {
+                ((SelectableDataSourceProxyWithDictionary)dataSource).SetTransactionContext(txContext);
+            } else if (typeof(TxDataSource).IsAssignableFrom(dataSourceType)) {
+                ((TxDataSource)dataSource).Context = txContext;
+            }
+
+            LocalRequiredTxHandler handler = new LocalRequiredTxHandler();
+            handler.Context = txContext;
+            _transactionInterceptor = new TransactionInterceptor(handler);
+            ((TransactionInterceptor)_transactionInterceptor).TransactionStateHandler = txContext;
+        }
+#if ($database.isQuillDataSourceNameValid())
+        public override String DataSourceName {
+            get { return "${database.quillDataSourceName}"; }
+        }
+#end
+    }
+}
