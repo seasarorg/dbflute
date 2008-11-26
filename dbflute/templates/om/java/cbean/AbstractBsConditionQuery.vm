@@ -154,18 +154,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         reg${tmpJavaName}(CK_INS, cTL(${tmpUncapitalisedJavaName}List));
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * InScope(in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
-     * @param ${tmpUncapitalisedJavaName} The collection of ${col.uncapitalisedJavaName} as inScope.
-     * @param inScopeOption The option of in-scope. (NotNull)
-     * @deprecated
-     */
-    public void set${tmpJavaName}_InScope(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName} inScopeOption) {
-        registerInScopeQuery(CK_INS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", inScopeOption);
-    }
-#end
 #end
 #if (${col.isAvailableStringNotInScope()})
 

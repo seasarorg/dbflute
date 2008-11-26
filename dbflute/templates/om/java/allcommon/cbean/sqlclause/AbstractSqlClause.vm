@@ -1252,10 +1252,10 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     }
 
     public String filterSubQueryIndent(String sql) {
-        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "") : sql;
+        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "", sql) : sql;
     }
 
-    protected String filterSubQueryIndent(String sql, String preIndent) {
+    protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
         if (!isFormatClauseEffective()) {
             return sql;
         }
@@ -1296,7 +1296,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
                 // - - - - - - - -
                 // In begin to end
                 // - - - - - - - -
-                if (line.contains(endMarkPrefix + subQueryIdentity)) {// The end
+                if (line.contains(endMarkPrefix + subQueryIdentity)) { // The end
                     final int markIndex = line.indexOf(endMarkPrefix);
                     final int terminalIndex = line.indexOf(identityTerminal);
                     if (terminalIndex < 0) {
@@ -1305,7 +1305,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
                     }
                     final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
                     subSb.append(clause).append(getLineSeparator());
-                    final String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent);
+                    final String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
@@ -1325,18 +1325,18 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
             String msg = "End Mark Not Found!";
             msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
             msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
             msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         if (filteredSql.contains(beginMarkPrefix)) {
             String msg = "Any begin marks are not filtered!";
             msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
             msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + sql + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
             msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         return filteredSql;

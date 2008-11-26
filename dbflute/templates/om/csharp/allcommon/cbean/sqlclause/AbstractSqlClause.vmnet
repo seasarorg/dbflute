@@ -1236,10 +1236,10 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     }
 
     public String filterSubQueryIndent(String sql) {
-        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "") : sql;
+        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "", sql) : sql;
     }
 
-    protected String filterSubQueryIndent(String sql, String preIndent) {
+    protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
         if (!isFormatClauseEffective()) {
             return sql;
         }
@@ -1289,7 +1289,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
                     }
                     String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
                     subSb.append(clause).append(getLineSeparator());
-                    String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent);
+                    String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
@@ -1310,8 +1310,8 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
             msg = msg + subQueryIdentity + getLineSeparator();
             msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + sql + getLineSeparator();
             msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         if (filteredSql.Contains(beginMarkPrefix)) {
@@ -1319,8 +1319,8 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
             msg = msg + subQueryIdentity + getLineSeparator();
             msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + sql + getLineSeparator();
             msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         return filteredSql;
