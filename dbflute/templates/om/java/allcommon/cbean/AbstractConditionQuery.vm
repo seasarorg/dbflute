@@ -581,6 +581,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         String clause = null;
         if (getSqlClause().isFormatClauseEffective()) {
@@ -603,10 +604,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
         String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
 
@@ -646,6 +643,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
         existsOption = existsOption != null ? existsOption + " " : "";
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         String clause = null;
         if (getSqlClause().isFormatClauseEffective()) {
@@ -673,9 +671,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
@@ -711,6 +706,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                         , String propertyName, String aliasName) {
         assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
         final String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         final String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
         final String clause;
         if (getSqlClause().isFormatClauseEffective()) {
@@ -735,9 +731,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                         , String realColumnName, String relatedColumnName
                                         , String propertyName, String aliasName) {
         final int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
         final String tableAliasName = "dfsublocal_" + subQueryLevel;
         final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
@@ -1221,21 +1214,28 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return newList;
     }
     
-    public void doNss(NssCall callback) {// Very Internal
+    public void doNss(NssCall callback) { // Very Internal
         String foreignPropertyName = callback.qf().getForeignPropertyName();
         String foreignTableAliasName = callback.qf().getRealAliasName();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
         getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
     }
     
-    public static interface NssCall {// Very Internal
+    public static interface NssCall { // Very Internal
         public ${glConditionQueryInterfaceName} qf();
     }
 
     protected void registerOuterJoin(${glConditionQueryInterfaceName} cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
     }
-    
+
+    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        if (_subQueryLevel <= subQueryLevel) {
+            _subQueryLevel = subQueryLevel + 1;
+        }
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
