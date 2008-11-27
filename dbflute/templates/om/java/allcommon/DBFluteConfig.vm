@@ -30,7 +30,6 @@ public class ${myClassName} {
 	protected boolean _useSqlLogRegistry;
 #end
 	protected UniqueConstraintDeterminator _uniqueConstraintDeterminator;
-	protected boolean _sqlExceptionOldStyleHandling = ${database.isCompatibleSQLExceptionHandlingOldStyle()};// This is for compatibility!
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 #if ($database.isOutsideSqlPackageValid())
@@ -160,26 +159,6 @@ public class ${myClassName} {
     public static interface UniqueConstraintDeterminator {
         public boolean isUniqueConstraintException(Throwable t);
     }
-
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                                             SQL Exception Old Style
-    //                                                             =======================
-	public boolean isSqlExceptionOldStyleHandling() {
-	    return _sqlExceptionOldStyleHandling;
-	}
-
-    /**
-     * @param sqlExceptionOldStyleHandling The value of the config.
-     * @deprecated This is for compatibility!
-     */
-	public void setSqlExceptionOldStyleHandling(boolean sqlExceptionOldStyleHandling) {
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting sqlExceptionOldStyleHandling: " + sqlExceptionOldStyleHandling);
-		}
-	    _sqlExceptionOldStyleHandling = sqlExceptionOldStyleHandling;
-	}
 
     // ===================================================================================
     //                                                                          Log Format

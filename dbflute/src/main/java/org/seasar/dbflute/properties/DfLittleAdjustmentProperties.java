@@ -103,13 +103,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             throw new IllegalStateException(msg);
         }
     }
-
-    // ===================================================================================
-    //                                                                       Compatibility
-    //                                                                       =============
-    public boolean isCompatibleSQLExceptionHandlingOldStyle() {
-        return booleanProp("torque.isCompatibleSQLExceptionHandlingOldStyle", false);
-    }
     
     // ===================================================================================
     //                                                                 MultipleFK Property

@@ -188,9 +188,6 @@ public class ${glInternalBasicHandler} {
         }
         
         public void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid, String completeSql) {
-            if (isSqlExceptionOldStyleHandling()) {
-                throw new SQLRuntimeException(e);
-            }
             if (uniqueConstraintValid && isUniqueConstraintException(e)) {
                 throwEntityAlreadyExistsException(e, statement, completeSql);
             }
@@ -207,10 +204,6 @@ public class ${glInternalBasicHandler} {
     
         protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
             return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
-        }
-    
-        protected boolean isSqlExceptionOldStyleHandling() {
-            return ${glDBFluteConfig}.getInstance().isSqlExceptionOldStyleHandling();
         }
     
         protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {

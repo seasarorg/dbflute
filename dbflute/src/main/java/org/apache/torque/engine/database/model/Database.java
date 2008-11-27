@@ -1243,10 +1243,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
-    public boolean isCompatibleSQLExceptionHandlingOldStyle() { // This is for compatibility!
-        return getProperties().getLittleAdjustmentProperties().isCompatibleSQLExceptionHandlingOldStyle();
-    }
-
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
