@@ -1224,36 +1224,12 @@ public class Database {
     // ===================================================================================
     //                                                         S2Dao Adjustment Properties
     //                                                         ===========================
-    public boolean isVersionAfter1047() {
-        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1047();
-    }
-
-    public boolean isVersionAfter1046() {
-        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1046();
-    }
-
-    public boolean isVersionAfter1043() {
-        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1043();
-    }
-
-    public boolean isVersionAfter1040() {
-        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1040();
-    }
-
     public String getExtendedAnnotationReaderFactoryClassName() {
         return getProperties().getS2DaoAdjustmentProperties().getExtendedAnnotationReaderFactoryClassName();
     }
 
     public String getExtendedDaoMetaDataFactoryImplClassName() {
         return getProperties().getS2DaoAdjustmentProperties().getExtendedDaoMetaDataFactoryImplClassName();
-    }
-
-    public boolean hasDaoSqlFileEncoding() {
-        return getProperties().getOutsideSqlProperties().hasSqlFileEncoding();
-    }
-
-    public String getDaoSqlFileEncoding() {
-        return getProperties().getOutsideSqlProperties().getSqlFileEncoding();
     }
 
     // ===================================================================================
