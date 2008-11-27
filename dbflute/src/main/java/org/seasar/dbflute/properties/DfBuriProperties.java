@@ -83,8 +83,8 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Detail Property
-    //                                                                     ===============
+    //                                                                    Output Directory
+    //                                                                    ================
     /**
      * @return The directory for output. (NotNull)
      */
@@ -95,6 +95,19 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         }
         return getBasicProperties().getOutputDirectory() + "/" + value;
     }
+
+    // ===================================================================================
+    //                                                                 Activity Definition
+    //                                                                 ===================
+    public String getBuriPackage() { // required if generate status classes
+        return getBuriPropertyIfNullEmpty("buriPackage");
+    }
+    
+    // map:{
+    //     ; activityDefinitionMap = map:{
+    //         ; [package].[name] = list:{ abc, def }
+    //     }
+    // }
 
     public String getBaseBaoPackage() { // required if generate BAO
         return getBuriPropertyIfNullEmpty("baseBaoPackage");
