@@ -400,7 +400,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     @Override
     protected void doModifyNonstrict(${glEntityInterfaceName} entity) {
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.hasOptimisticLock())
         updateNonstrict((${myExtendedObjectClassName})entity);
 #else
         update((${myExtendedObjectClassName})entity);
