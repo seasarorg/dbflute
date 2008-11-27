@@ -193,7 +193,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
@@ -225,7 +225,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
@@ -281,7 +281,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
@@ -459,7 +459,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${col.foreignKey.foreignTable.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use inScope${col.foreignKey.foreignPropertyNameInitCap}(subQuery) method.
@@ -491,7 +491,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use inScope${relationPropertyNameInitCap}(subQuery) method.
@@ -547,7 +547,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param ${referrer.table.uncapitalisedJavaName}CBquery Query.
      * @deprecated Please use exists${relationPropertyNameInitCap}(subQuery) method.
