@@ -605,21 +605,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
         String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique.
-        // But when it's inScope this replacement is unnecessary so comment out here. 
-        // (Override base alias name at sub-query on SQL)
-        // fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
-
-        // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
-
-        // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
-        
+        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName, selectClause);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -673,27 +659,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique. 
-        fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
-
-        // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + "."); // Very Important!
-        
-        String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
-        String firstConditionAfter = " and ";
-        if (getSqlClause().isFormatClauseEffective()) {
-            firstConditionAfter = getLineSeparator() + "   and ";
-        }
-        
-        // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        
+        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                       , selectClause, tableAliasName, realColumnName);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -730,36 +697,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getDeriveSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
                                         , String realColumnName, String relatedColumnName
                                         , String propertyName, String aliasName) {
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
             throwDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
         assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
-        final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique. 
-        fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
-
-        // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
-        
-        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
-        String firstConditionAfter = " and ";
-        if (getSqlClause().isFormatClauseEffective()) {
-            firstConditionAfter = getLineSeparator() + "   and ";
-        }
-        
-        // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        
+        String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                       , selectClause, tableAliasName, realColumnName);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -852,6 +800,59 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    // -----------------------------------------------------
+    //                                       SubQuery Common
+    //                                       ---------------
+    protected String buildPlainSubQueryFronWhereClause(${glConditionQueryInterfaceName} subQuery
+                                                     , String relatedColumnName
+                                                     , String propertyName
+                                                     , String selectClause) {
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
+
+        // Replace the alias names for local table with alias name of sub-query unique.
+        // But when it's inScope this replacement is unnecessary so comment out here. 
+        // (Override base alias name at sub-query on SQL)
+        // fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+
+        // Resolve the location path for the condition-query of sub-query. 
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
+
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
+        return fromWhereClause;
+    }
+
+    protected String buildCorrelationSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
+                                                           , String relatedColumnName
+                                                           , String propertyName
+                                                           , String selectClause
+                                                           , String tableAliasName
+                                                           , String realColumnName) {
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
+
+        // Replace the alias names for local table with alias name of sub-query unique. 
+        fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+
+        // Resolve the location path for the condition-query of sub-query. 
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
+        
+        String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+        String firstConditionAfter = " and ";
+        if (getSqlClause().isFormatClauseEffective()) {
+            firstConditionAfter = getLineSeparator() + "   and ";
+        }
+
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        return fromWhereClause;
+    }
+    
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
