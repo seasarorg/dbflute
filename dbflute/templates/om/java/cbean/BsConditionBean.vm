@@ -216,7 +216,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     protected Specification _specification;
     public Specification specify() {
         if (_specification == null) { _specification = new Specification(this, new SpQyCall<${myConditionQueryClassName}>() {
-            public boolean has() { return true; } public ${myConditionQueryClassName} qy() { return query(); } }, _forDerivedReferrer, _forScalarSelect); }
+            public boolean has() { return true; } public ${myConditionQueryClassName} qy() { return query(); } }, _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
         return _specification;
     }
 
@@ -236,8 +236,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         protected ${tmpCBClassName}.Specification _${tmpPropertyName};
 #end
 #end
-        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer, boolean forScalarSelect)
-        { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect); _myQyCall = qyCall; }
+        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, boolean forDeriveReferrer, boolean forScalarSelect, boolean forScalarSubQuery)
+        { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect, forScalarSubQuery); _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void column${col.javaName}() { doColumn("${col.name}"); }
 #end
@@ -273,7 +273,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #else
                     public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
 #end
-                    , _forDerivedReferrer, _forScalarSelect);
+                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery);
             }
             return _${tmpPropertyName};
         }
@@ -290,7 +290,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
                     public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
                     public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
-                    , _forDerivedReferrer, _forScalarSelect);
+                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery);
             }
             return _${tmpPropertyName};
         }

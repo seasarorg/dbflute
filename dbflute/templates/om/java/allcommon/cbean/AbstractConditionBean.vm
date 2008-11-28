@@ -63,6 +63,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
     protected boolean _forDerivedReferrer;
     protected boolean _forScalarSelect;
+    protected boolean _forScalarSubQuery;
     protected boolean _forUnion;
     protected boolean _forExistsSubQuery;
     protected boolean _forInScopeSubQuery;
@@ -505,6 +506,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected CQ _query;
         protected boolean _forDerivedReferrer;
         protected boolean _forScalarSelect;
+        protected boolean _forScalarSubQuery;
         protected boolean _alreadySpecifyRequiredColumn;
 
         /**
@@ -512,13 +514,15 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
          * @param qyCall The call-back for condition-query. (NotNull)
          * @param forDerivedReferrer Is this for derive referrer?
          * @param forScalarSelect Is this for scalar select?
+         * @param forScalarSubQuery  Is this for scalar sub-query?
          */
         protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
-                                      , boolean forDerivedReferrer, boolean forScalarSelect) {
+                                      , boolean forDerivedReferrer, boolean forScalarSelect, boolean forScalarSubQuery) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
             _forScalarSelect = forScalarSelect;
+            _forScalarSubQuery = forScalarSubQuery;
         }
 
         protected void doColumn(String columnName) {
@@ -539,7 +543,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
 
         protected boolean isRequiredColumnSpecificationEnabled() {
-            return !_forDerivedReferrer && !_forScalarSelect && !_alreadySpecifyRequiredColumn;
+            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifyRequiredColumn;
         }
 
         protected void assertColumn(String columnName) {
@@ -549,6 +553,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected void assertForeign(String foreignPropertyName) {
             if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
             if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarSubQuery) { throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName); }
         }
 
         protected abstract void doSpecifyRequiredColumn();
@@ -595,7 +600,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "    [Wrong]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
             msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
@@ -605,7 +610,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             msg = msg + "    [Good!]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
             msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+            msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
             msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
             msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
             msg = msg + "        }" + getLineSeparator();
@@ -649,6 +654,40 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             throw new ScalarSelectInvalidForeignSpecificationException(msg);
         }
 
+        protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You specified a foreign table column in spite of derived-query!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "You should specified a local table column at condition-bean for derived-query." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Wrong]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().specifyMemberStatusName().columnDisplayOrder(); // *No!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + "    " + getLineSeparator();
+            msg = msg + "    [Good!]" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
+            msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
+            msg = msg + "            subCB.specify().columnMemberBirthday();// *Point!" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new ScalarSubQueryInvalidForeignSpecificationException(msg);
+        }
+
         protected String getLineSeparator() {
             return ${glSimpleSystemUtil}.getLineSeparator();
         }
@@ -669,6 +708,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public static class DerivedReferrerInvalidForeignSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
         public DerivedReferrerInvalidForeignSpecificationException(String msg) {
+            super(msg);
+        }
+    }
+    
+    public static class ScalarSubQueryInvalidForeignSpecificationException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ScalarSubQueryInvalidForeignSpecificationException(String msg) {
             super(msg);
         }
     }
@@ -996,6 +1042,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     public void xsetupForScalarSelect() { // Very Internal
         _forScalarSelect = true;
+    }
+
+    public void xsetupForScalarSubQuery() { // Very Internal
+        _forScalarSubQuery = true;
     }
 
     public void xsetupForUnion() { // Very Internal

@@ -406,8 +406,10 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected virtual String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
-        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName, selectClause);
+        String tableAliasName = getSqlClause().getLocalTableAliasName();
+        String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
+        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName
+                                                                 , selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -462,15 +464,16 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     // [DBFlute-0.7.9]
     // -----------------------------------------------------
-    //                                        DeriveSubQuery
-    //                                        --------------
-    protected void registerDeriveSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
-                                        , String columnName, String relatedColumnName
-                                        , String propertyName, String aliasName) {
-        assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
-        String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+    //                               DerivedReferrerSubQuery
+    //                               -----------------------
+    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+                                                 , String columnName, String relatedColumnName
+                                                 , String propertyName, String aliasName) {
+        assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
+        String realColumnName = getDerivedReferrerSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
+        String subQueryClause = getDerivedReferrerSubQuerySql(function, subQuery, realColumnName
+                                                            , relatedColumnName, propertyName, aliasName);
         String ln = getLineSeparator();
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -481,13 +484,13 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
-    protected String getDeriveSubQueryRealColumnName(String columnName) {
+    protected String getDerivedReferrerSubQueryRealColumnName(String columnName) {
         return getRealColumnName(columnName);
     }
 
-    protected String getDeriveSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
-                                        , String realColumnName, String relatedColumnName
-                                        , String propertyName, String aliasName) {
+    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+                                                 , String realColumnName, String relatedColumnName
+                                                 , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -608,13 +611,17 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected String buildPlainSubQueryFronWhereClause(${glConditionQueryInterfaceName} subQuery
                                                      , String relatedColumnName
                                                      , String propertyName
-                                                     , String selectClause) {
+                                                     , String selectClause
+                                                     , String tableAliasName) {
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
         
         // Replace the alias names for local table with alias name of sub-query unique.
-        // But when it's inScope this replacement is unnecessary so comment out here. 
+        // However when it's inScope this replacement is unnecessary so comment out here. 
         // (Override base alias name at sub-query on SQL)
-		// fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+        // So if the argument 'tableAliasName' is not null, replace it. 
+        if (tableAliasName != null) {
+            fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+        }
 
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");

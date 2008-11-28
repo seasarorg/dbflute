@@ -596,8 +596,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
-        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName, selectClause);
+        String tableAliasName = getSqlClause().getLocalTableAliasName();
+        String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
+        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName
+                                                                 , selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -653,15 +655,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     // [DBFlute-0.7.4]
     // -----------------------------------------------------
-    //                                        DeriveSubQuery
-    //                                        --------------
-    protected void registerDeriveSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
-                                        , String columnName, String relatedColumnName
-                                        , String propertyName, String aliasName) {
-        assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
-        String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+    //                               DerivedReferrerSubQuery
+    //                               -----------------------
+    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+                                                 , String columnName, String relatedColumnName
+                                                 , String propertyName, String aliasName) {
+        assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
+        String realColumnName = getDerivedReferrerSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
+        String subQueryClause = getDerivedReferrerSubQuerySql(function, subQuery, realColumnName
+                                                            , relatedColumnName, propertyName, aliasName);
         String ln = getLineSeparator();
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -672,13 +675,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
-    protected String getDeriveSubQueryRealColumnName(String columnName) {
+    protected String getDerivedReferrerSubQueryRealColumnName(String columnName) {
         return getRealColumnName(columnName);
     }
 
-    protected String getDeriveSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
-                                        , String realColumnName, String relatedColumnName
-                                        , String propertyName, String aliasName) {
+    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+                                                 , String realColumnName, String relatedColumnName
+                                                 , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -686,7 +689,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             throwDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
         assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
-        subQuery.getSqlClause().clearSpecifiedSelectColumn();
+        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         if (subQuery.getSqlClause().hasUnionQuery()) {
             String ln = getLineSeparator();
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
@@ -759,7 +762,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             super(msg);
         }
     }
-    
+
     protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
@@ -797,19 +800,223 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    // [DBFlute-0.8.8]
+    // -----------------------------------------------------
+    //                                        ScalarSubQuery
+    //                                        --------------
+    protected void registerScalarSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+                                              , String columnName, String relatedColumnName
+                                              , String propertyName, String operand
+                                              , boolean correlation) {
+        assertObjectNotNull("ScalarSubQuery(" + columnName + ")", subQuery);
+        
+        // This column is primary key for a correlation condition.
+        String realColumnName = getScalarSubQueryRealColumnName(columnName);
+
+        // Get the specified column before it disappears at sub-query making.
+        String deriveRealColumnName;
+        {
+            String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+            if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
+                throwScalarSubQueryInvalidColumnSpecificationException(function);
+            }
+            deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
+        }
+
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
+        String subQueryClause = getScalarSubQuerySql(function, subQuery, realColumnName
+                                                         , relatedColumnName, propertyName, correlation);
+        String ln = getLineSeparator();
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String endIndent = "       ";
+        String clause = deriveRealColumnName + " " + operand + " ("
+                      + beginMark + subQueryClause + ln + endIndent
+                      + ") " + endMark;
+        registerWhereClause(clause);
+    }
+
+    protected String getScalarSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    protected String getScalarSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+                                              , String realColumnName, String relatedColumnName
+                                              , String propertyName, boolean correlation) {
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
+            throwScalarSubQueryInvalidColumnSpecificationException(function);
+        }
+        assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
+        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        if (subQuery.getSqlClause().hasUnionQuery()) {
+            String ln = getLineSeparator();
+            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String selectClause = "select " + tableAliasName + "." + deriveColumnName;
+            String fromWhereClause;
+            if (correlation) {
+                fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                        , selectClause, tableAliasName, realColumnName);
+            } else {
+                fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName
+                                                                  , selectClause, tableAliasName);
+            }
+            String mainSql = selectClause + " " + fromWhereClause;
+            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln
+                 + "  from (" + beginMark
+                 + mainSql + ln
+                 + "       ) dfsubquerymain" + endMark;
+        } else {
+            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            String fromWhereClause;
+            if (correlation) {
+                fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                        , selectClause, tableAliasName, realColumnName);
+            } else {
+                fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName
+                                                                  , selectClause, tableAliasName);
+            }
+            return selectClause + " " + fromWhereClause;
+        }
+    }
+
+    protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
+        msg = msg + "            // *No! It's empty!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    });" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Wrong]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnMemberBirthday();" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnMemberName(); // *No! It's duplicated!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    });" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [Good!]" + getLineSeparator();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
+        msg = msg + "        }" + getLineSeparator();
+        msg = msg + "    });" + getLineSeparator();
+        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new ScalarSubQueryInvalidColumnSpecificationException(msg);
+    }
+
+    public static class ScalarSubQueryInvalidColumnSpecificationException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ScalarSubQueryInvalidColumnSpecificationException(String msg) {
+            super(msg);
+        }
+    }
+
+    protected void assertScalarSubQueryColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
+        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
+            if (!Number.class.isAssignableFrom(deriveColumnType)) {
+                throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+            }
+        }
+    }
+
+    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
+        msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
+        msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
+        msg = msg + "    sum()   : Number" + getLineSeparator();
+        msg = msg + "    avg()   : Number" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new ScalarSubQueryUnmatchedColumnTypeException(msg);
+    }
+
+    public static class ScalarSubQueryUnmatchedColumnTypeException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ScalarSubQueryUnmatchedColumnTypeException(String msg) {
+            super(msg);
+        }
+    }
+
+    public static class SSQFunction<CB extends ${glConditionBeanInterfaceName}> {
+        protected SSQSetupper<CB> _setupper;
+        protected boolean _correlation;
+        public SSQFunction(SSQSetupper<CB> setupper) {
+            _setupper = setupper;
+        }
+        public SSQFunction<CB> correlation() {
+            _correlation = true;
+            return this;
+        }
+        public void max(${glSubQuery}<CB> subQuery) {
+            _setupper.setup("max", subQuery, _correlation);
+        }
+        public void min(${glSubQuery}<CB> subQuery) {
+            _setupper.setup("min", subQuery, _correlation);
+        }
+        public void sum(${glSubQuery}<CB> subQuery) {
+            _setupper.setup("sum", subQuery, _correlation);
+        }
+        public void avg(${glSubQuery}<CB> subQuery) {
+            _setupper.setup("avg", subQuery, _correlation);
+        }
+    }
+
+    protected static interface SSQSetupper<CB extends ${glConditionBeanInterfaceName}> {
+        public void setup(String function, ${glSubQuery}<CB> subQuery, boolean correlation);
+    }
+
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
     protected String buildPlainSubQueryFronWhereClause(${glConditionQueryInterfaceName} subQuery
                                                      , String relatedColumnName
                                                      , String propertyName
-                                                     , String selectClause) {
+                                                     , String selectClause
+                                                     , String tableAliasName) {
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique.
-        // But when it's inScope this replacement is unnecessary so comment out here. 
+        // However when it's inScope this replacement is unnecessary so comment out here. 
         // (Override base alias name at sub-query on SQL)
-        // fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+        // So if the argument 'tableAliasName' is not null, replace it. 
+        if (tableAliasName != null) {
+            fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+        }
 
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");

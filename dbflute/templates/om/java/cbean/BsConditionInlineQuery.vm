@@ -7,6 +7,7 @@ import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageCB}.*;
 import ${glPackageBaseCQ}.*;
 import ${glPackageCQ}.*;
 
@@ -157,10 +158,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+        throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
     }
 #end
 #end
@@ -244,16 +245,27 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DeriveSubQuery at inline() is unsupported! Sorry!");
+        throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
     }
 #end
 #end
 #end
 #end
 #end
+#if ($table.hasOnlyOnePrimaryKey())
 
+    // ===================================================================================
+    //                                                                       Derived Query
+    //                                                                       =============
+    public String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
+        throw new UnsupportedOperationException("ScalarSubQuery at inline() is unsupported! Sorry!");
+    }
+#end
+
+    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
 }

@@ -7,6 +7,7 @@ import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageCIQ}.*;
+import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 
 /**
@@ -48,7 +49,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return On-clause query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} on() {
-        if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
+        if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported on-clause for local table!"); }
         ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
     }
 
@@ -169,8 +170,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
@@ -288,8 +289,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DeriveSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
@@ -440,6 +441,21 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
 #end
 #end
+#if ($table.hasOnlyOnePrimaryKey())
+    // ===================================================================================
+    //                                                                       Derived Query
+    //                                                                       =============
+    protected Map<String, ${myConditionQueryClassName}> _scalarSubQueryMap;
+    public Map<String, ${myConditionQueryClassName}> getScalarSubQuery() { return _scalarSubQueryMap; }
+    public String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
+        if (_scalarSubQueryMap == null) { _scalarSubQueryMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_scalarSubQueryMap.size() + 1);
+        _scalarSubQueryMap.put(key, subQuery); return "scalarSubQuery." + key;
+    }
+#end
+
+    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
     protected String getMapClassNameInternally() { return Map.class.getName(); }
 }
