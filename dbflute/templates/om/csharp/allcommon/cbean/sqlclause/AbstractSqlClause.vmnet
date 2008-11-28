@@ -236,7 +236,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
                 if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
                     // Here it must be with union query.
                     // So the primary Key is target for saving unique.
-                    if (!columnInfo.isPrimary()) {
+                    if (!columnInfo.IsPrimary) {
                         continue;
                     }
                 } else {
