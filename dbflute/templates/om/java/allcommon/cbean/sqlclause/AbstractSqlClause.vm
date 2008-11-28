@@ -211,7 +211,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     }
 
     protected String filterUnionCountOrScalar(String sql) {
-        if (_selectClauseType.equals(SelectClauseType.COLUMNS) || !hasUnionQuery()) {
+        if (!isSelectClauseTypeCountOrScalar() || !hasUnionQuery()) {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
@@ -226,7 +226,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     //                                                                        ============
     public String getSelectClause() {
         // [DBFlute-0.8.6]
-        if (!_selectClauseType.equals(SelectClauseType.COLUMNS) && !hasUnionQuery()) {
+        if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
             return buildSelectClauseCountOrScalar("dflocal");
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
@@ -245,7 +245,15 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
 
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
-                continue;
+                if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
+                    // Here it must be with union query.
+                    // So the primary Key is target for saving unique.
+                    if (!columnInfo.isPrimary()) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
             }
 
             if (sb.length() > 0) {
@@ -289,6 +297,21 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         }
 
         return sb.toString();
+    }
+
+    protected boolean isSelectClauseTypeCountOrScalar() {
+        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.SUM)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
+            return true;
+        }
+        return false;
     }
 
     protected String buildSelectClauseCountOrScalar(String aliasName) {

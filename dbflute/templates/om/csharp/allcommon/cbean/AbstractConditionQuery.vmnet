@@ -623,7 +623,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
-		
+		return fromWhereClause;
     }
 
     protected String buildCorrelationSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
