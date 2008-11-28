@@ -134,7 +134,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect());
         String sql = sb.toString();
-        sql = filterUnionSelectCountIfNeeds(sql);
+        sql = filterUnionCountOrScalar(sql);
         sql = filterSubQueryIndent(sql);
         return sql;
     }
@@ -202,11 +202,19 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         return sb.toString();
     }
 
-    protected String filterUnionSelectCountIfNeeds(String sql) {
-        if (_selectClauseType.equals(SelectClauseType.COUNT) && hasUnionQuery()) {
-            sql = "select count(*) from (" + sql + ") dfmain";
+    protected String filterUnionCountOrScalar(String sql) {
+        if (_selectClauseType.equals(SelectClauseType.COLUMNS) || !hasUnionQuery()) {
+            return sql;
         }
-        return sql;
+        String selectClause = buildSelectClauseCountOrScalar("dfmain");
+        if (isFormatClauseEffective()) {
+            String ln = getLineSeparator();
+            String beginMark = resolveSubQueryBeginMark("dfmain");
+            String endMark = resolveSubQueryEndMark("dfmain");
+            return selectClause + ln + "  from (" + beginMark + ln + sql + ln + "       ) dfmain" + endMark;
+        } else {
+            return selectClause + " from (" + sql + ") dfmain";
+        }
     }
 
     // ===================================================================================
@@ -214,14 +222,8 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     //                                                                        ============
     public String getSelectClause() {
         // [DBFlute-0.8.6]
-        if (!_selectClauseType.equals(SelectClauseType.COLUMNS)) {
-            if (_selectClauseType.equals(SelectClauseType.COUNT)) {
-                if (!hasUnionQuery()) { // if union query does NOT exist
-                    return buildSelectClauseCount();
-                }
-            } else {
-                return buildSelectClauseForScalar();
-            }
+        if (!_selectClauseType.equals(SelectClauseType.COLUMNS) && !hasUnionQuery()) {
+            return buildSelectClauseCountOrScalar("dflocal");
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -291,43 +293,49 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         return "select count(*)";
     }
 
-    protected String buildSelectClauseForScalar() {
-        if (_selectClauseType.equals(SelectClauseType.MAX)) {
-            return buildSelectClauseMax();
+    protected String buildSelectClauseCountOrScalar(String aliasName) {
+        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+            return buildSelectClauseCount();
+        } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
+            return buildSelectClauseMax(aliasName);
         } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
-            return buildSelectClauseMin();
+            return buildSelectClauseMin(aliasName);
         } else if (_selectClauseType.equals(SelectClauseType.SUM)) {
-            return buildSelectClauseSum();
+            return buildSelectClauseSum(aliasName);
         } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
-            return buildSelectClauseAvg();
+            return buildSelectClauseAvg(aliasName);
         }
         String msg = "The type of select clause is not for scalar:";
         msg = msg + " type=" + _selectClauseType;
         throw new IllegalStateException(msg);
     }
 
-    protected String buildSelectClauseMax() {
-        String columnName = getSpecifiedColumnNameAsOne();
-        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
-        return "select max(dflocal." + columnName  + ")";
+    protected String buildSelectClauseCount() {
+        return "select count(*)";
     }
 
-    protected String buildSelectClauseMin() {
+    protected String buildSelectClauseMax(String aliasName) {
         String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
-        return "select min(dflocal." + columnName  + ")";
+        return "select max(" + aliasName + "." + columnName  + ")";
     }
 
-    protected String buildSelectClauseSum() {
+    protected String buildSelectClauseMin(String aliasName) {
         String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
-        return "select sum(dflocal." + columnName  + ")";
+        return "select min(" + aliasName + "." + columnName  + ")";
     }
 
-    protected String buildSelectClauseAvg() {
+    protected String buildSelectClauseSum(String aliasName) {
         String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
-        return "select avg(dflocal." + columnName  + ")";
+        return "select sum(" + aliasName + "." + columnName  + ")";
+    }
+
+    protected String buildSelectClauseAvg(String aliasName) {
+        String columnName = getSpecifiedColumnNameAsOne();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select avg(" + aliasName + "." + columnName  + ")";
     }
 
     protected void assertScalarSelectSpecifiedColumnOnlyOne(String columnName) {
