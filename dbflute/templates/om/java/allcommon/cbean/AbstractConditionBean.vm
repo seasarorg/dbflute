@@ -741,6 +741,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             assertAliasName(aliasName);
             _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
         }
+        public void countDistinct(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.setup("count(distinct", subQuery, _localCQ, aliasName.trim());
+        }
         public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());

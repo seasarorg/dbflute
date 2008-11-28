@@ -438,6 +438,10 @@ namespace ${glPackageBaseCommonCBean} {
             assertAliasName(aliasName);
             _querySetupper.Invoke("count", subQuery, _localCQ, aliasName.Trim());
         }
+        public void CountDistinct(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
+            assertAliasName(aliasName);
+            _querySetupper.Invoke("count(distinct", subQuery, _localCQ, aliasName.Trim());
+        }
         public void Max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.Invoke("max", subQuery, _localCQ, aliasName.Trim());

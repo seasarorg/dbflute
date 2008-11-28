@@ -660,6 +660,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
                                                  , String columnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
+        assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
         assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
         String realColumnName = getDerivedReferrerSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
@@ -690,6 +691,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
             String ln = getLineSeparator();
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
@@ -699,12 +701,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             String mainSql = selectClause + " " + fromWhereClause;
-            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln
+            return "select " + function + connect + "dfsubquerymain." + deriveColumnName + ")" + ln
                  + "  from (" + beginMark
                  + mainSql + ln
                  + "       ) dfsubquerymain" + endMark;
         } else {
-            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            String selectClause = "select " + function + connect + tableAliasName + "." + deriveColumnName + ")";
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
@@ -712,6 +714,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
+        String method = xconvertFunctionToMethod(function);
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
@@ -723,7 +726,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -733,7 +736,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
@@ -744,7 +747,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         msg = msg + "    [Good!]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -1053,7 +1056,36 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return fromWhereClause;
     }
-    
+
+    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        if (_subQueryLevel <= subQueryLevel) {
+            _subQueryLevel = subQueryLevel + 1;
+        }
+    }
+
+    protected String xbuildFunctionConnector(String function) {
+        if (function != null && function.endsWith("(distinct")) { // For example 'count(distinct'
+            return " ";
+        } else {
+            return "(";
+        }
+    }
+
+    protected String xconvertFunctionToMethod(String function) {
+        if (function != null && function.contains("(")) { // For example 'count(distinct'
+            int index = function.indexOf("(");
+            String front = function.substring(0, index);
+            if (function.length() > front.length() + "(".length()) {
+                String rear = function.substring(index + "(".length());
+                function = front + initCap(rear);
+            } else {
+                function = front;
+            }
+        }
+        return function;
+    }
+
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
@@ -1429,13 +1461,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected void registerOuterJoin(${glConditionQueryInterfaceName} cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
-    }
-
-    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
     }
 
     // ===================================================================================

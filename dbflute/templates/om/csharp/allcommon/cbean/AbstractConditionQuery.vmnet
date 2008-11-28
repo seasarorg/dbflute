@@ -469,6 +469,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
                                                  , String columnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
+        assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
         assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
         String realColumnName = getDerivedReferrerSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
@@ -499,6 +500,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
         assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
+        String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
             String ln = getLineSeparator();
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
@@ -521,6 +523,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
     protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
+        String method = xconvertFunctionToMethod(function);
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
@@ -532,7 +535,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -542,7 +545,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
@@ -553,7 +556,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         msg = msg + "    [Good!]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + function + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -657,6 +660,35 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
         fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return fromWhereClause;
+    }
+
+    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        if (_subQueryLevel <= subQueryLevel) {
+            _subQueryLevel = subQueryLevel + 1;
+        }
+    }
+
+    protected String xbuildFunctionConnector(String function) {
+        if (function != null && function.EndsWith("(distinct")) { // For example 'count(distinct'
+            return " ";
+        } else {
+            return "(";
+        }
+    }
+
+    protected String xconvertFunctionToMethod(String function) {
+        if (function != null && function.Contains("(")) { // For example 'count(distinct'
+            int index = function.IndexOf("(");
+            String front = function.Substring(0, index);
+            if (function.Length > front.Length + "(".Length) {
+                String rear = function.Substring(index + "(".Length);
+                function = front + initCap(rear);
+            } else {
+                function = front;
+            }
+        }
+        return function;
     }
 
     // -----------------------------------------------------
@@ -983,13 +1015,6 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected System.Collections.IList fRESL(System.Collections.IList ls) {
         return filterRemoveEmptyStringFromList(ls);
-    }
-
-    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
     }
 
     // ===================================================================================
