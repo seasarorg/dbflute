@@ -583,18 +583,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        String clause = null;
-        if (getSqlClause().isFormatClauseEffective()) {
-            String ln = getLineSeparator();
-            int subQueryLevel = subQuery.getSubQueryLevel();
-            String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String endIndent = "       ";
-            clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
-        } else {
-            clause = realColumnName + " " + inScopeOption + "in (" + subQueryClause + ")";
-        }
+        String ln = getLineSeparator();
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String endIndent = "       ";
+        String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
         registerWhereClause(clause);
     }
 
@@ -631,18 +626,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        String clause = null;
-        if (getSqlClause().isFormatClauseEffective()) {
-            String ln = getLineSeparator();
-            int subQueryLevel = subQuery.getSubQueryLevel();
-            String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String endIndent = "       ";
-            clause = existsOption + "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
-        } else {
-            clause = existsOption + "exists (" + subQueryClause + ")";
-        }
+        String ln = getLineSeparator();
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String endIndent = "       ";
+        String clause = existsOption + "exists (" + beginMark + subQueryClause + ln + endIndent + ")" + endMark;
         registerWhereClause(clause);
     }
 
@@ -672,21 +662,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                         , String columnName, String relatedColumnName
                                         , String propertyName, String aliasName) {
         assertObjectNotNull("DeriveSubQuery(" + columnName + ")", subQuery);
-        final String realColumnName = getDeriveSubQueryRealColumnName(columnName);
+        String realColumnName = getDeriveSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
-        final String clause;
-        if (getSqlClause().isFormatClauseEffective()) {
-            final String ln = getLineSeparator();
-            final int subQueryLevel = subQuery.getSubQueryLevel();
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final String endIndent = "       ";
-            clause = "(" + beginMark + subQueryClause + ln + endIndent + ") as " + aliasName + endMark;
-        } else {
-            clause = "(" + subQueryClause + ") as " + aliasName;
-        }
+        String subQueryClause = getDeriveSubQuerySql(function, subQuery, realColumnName, relatedColumnName, propertyName, aliasName);
+        String ln = getLineSeparator();
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String endIndent = "       ";
+        String clause = "(" + beginMark + subQueryClause + ln + endIndent + ") " + aliasName + endMark;
         getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
@@ -705,10 +690,25 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         assertDerivedReferrerColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn();
-        String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
-        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                       , selectClause, tableAliasName, realColumnName);
-        return selectClause + " " + fromWhereClause;
+        if (subQuery.getSqlClause().hasUnionQuery()) {
+            String ln = getLineSeparator();
+            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
+            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String selectClause = "select " + tableAliasName + "." + deriveColumnName;
+            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                           , selectClause, tableAliasName, realColumnName);
+            String mainSql = selectClause + " " + fromWhereClause;
+            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln
+                 + "  from (" + beginMark
+                 + mainSql + ln
+                 + "       ) dfsubquerymain" + endMark;
+        } else {
+            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                           , selectClause, tableAliasName, realColumnName);
+            return selectClause + " " + fromWhereClause;
+        }
     }
 
     protected void throwDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {

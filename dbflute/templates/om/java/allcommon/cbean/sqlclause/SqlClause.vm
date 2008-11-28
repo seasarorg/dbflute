@@ -209,6 +209,7 @@ public interface ${myClassName} {
     //                                                                               Union
     //                                                                               =====
     public void registerUnionQuery(String unionClause, boolean unionAll);
+    public boolean hasUnionQuery();
 
     // ===================================================================================
     //                                                                          FetchScope

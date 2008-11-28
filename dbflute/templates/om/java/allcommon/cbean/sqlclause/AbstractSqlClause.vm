@@ -221,9 +221,9 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
         if (isFormatClauseEffective()) {
             String ln = getLineSeparator();
-            String beginMark = resolveSubQueryBeginMark("dfmain");
+            String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
             String endMark = resolveSubQueryEndMark("dfmain");
-            return selectClause + ln + "  from (" + beginMark + ln + sql + ln + "       ) dfmain" + endMark;
+            return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
         } else {
             return selectClause + " from (" + sql + ") dfmain";
         }
@@ -918,7 +918,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         _unionQueryInfoList.add(unionQueryInfo);
     }
 
-    protected boolean hasUnionQuery() {
+    public boolean hasUnionQuery() {
         return _unionQueryInfoList != null && !_unionQueryInfoList.isEmpty();
     }
 
