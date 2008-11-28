@@ -189,13 +189,9 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
                 UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
                 String unionQueryClause = unionQueryInfo.getUnionQueryClause();
                 bool unionAll = unionQueryInfo.isUnionAll();
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator());
-                }
+                sb.append(getLineSeparator());
                 sb.append(unionAll ? " union all " : " union ");
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator());
-                }
+                sb.append(getLineSeparator());
                 sb.append(selectClause).append(" ").append(unionQueryClause);
             }
         }
@@ -207,14 +203,10 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
-        if (isFormatClauseEffective()) {
-            String ln = getLineSeparator();
-            String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
-            String endMark = resolveSubQueryEndMark("dfmain");
-            return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
-        } else {
-            return selectClause + " from (" + sql + ") dfmain";
-        }
+        String ln = getLineSeparator();
+        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        String endMark = resolveSubQueryEndMark("dfmain");
+        return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
     }
 
     // ===================================================================================
@@ -279,9 +271,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
             Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             foreach (String deriveSubQuery in deriveSubQuerySet) {
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator()).append("     ");
-                }
+                sb.append(getLineSeparator()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
             }
         }
@@ -354,9 +344,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
 
     public String getFromClause() {
         StringBuilder sb = new StringBuilder();
-        if (isFormatClauseEffective()) {
-            sb.append(getLineSeparator()).append("  ");
-        }
+        sb.append(getLineSeparator()).append("  ");
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -379,9 +367,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
-            if (isFormatClauseEffective()) {
-                sb.append(getLineSeparator()).append("   ");
-            }
+            sb.append(getLineSeparator()).append("   ");
             sb.append(" left outer join ");
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableName);
@@ -446,14 +432,10 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             String clauseElement = (String)ite.next();
             // clauseElement = filterWhereClauseSimply(clauseElement); *Non Support on C#
             if (count == 0) {
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator()).append(" ");
-                }
+                sb.append(getLineSeparator()).append(" ");
                 sb.append("where ").append(template  ? getWhereFirstConditionMark() : "").append(clauseElement);
             } else {
-                if (isFormatClauseEffective()) {
-                    sb.append(getLineSeparator()).append("  ");
-                }
+                sb.append(getLineSeparator()).append("  ");
                 sb.append(" and ").append(clauseElement);
             }
         }
@@ -474,7 +456,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         } else {
             orderByClause = _orderByClause.getOrderByClause();
         }
-        if (isFormatClauseEffective() && orderByClause != null && orderByClause.Trim().Length > 0) {
+        if (orderByClause != null && orderByClause.Trim().Length > 0) {
             return getLineSeparator() + " " + orderByClause;
         } else {
             return orderByClause;
@@ -483,7 +465,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
 
     public String getSqlSuffix() {
         String sqlSuffix = createSqlSuffix();
-        if (isFormatClauseEffective() && sqlSuffix != null && sqlSuffix.Trim().Length > 0) {
+        if (sqlSuffix != null && sqlSuffix.Trim().Length > 0) {
             return getLineSeparator() + sqlSuffix;
         } else {
             return sqlSuffix;
@@ -1208,17 +1190,6 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         }
         _selectedForeignInfo.put(relationPath, foreignPropertyName);
     }
-    
-    // ===================================================================================
-    //                                                                       Format Clause
-    //                                                                       =============
-    public bool isFormatClauseEffective() {
-        return _formatClause;
-    }
-
-    public void makeFormatClauseEffective() {
-        _formatClause = true;
-    }
 
     // ===================================================================================
     //                                                                    Sub Query Indent
@@ -1244,13 +1215,10 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     }
 
     public String filterSubQueryIndent(String sql) {
-        return isFormatClauseEffective() ? filterSubQueryIndent(sql, "", sql) : sql;
+        return filterSubQueryIndent(sql, "", sql);
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        if (!isFormatClauseEffective()) {
-            return sql;
-        }
         String lineSeparator = getLineSeparator();
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
@@ -1413,10 +1381,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         StringBuilder sb = new StringBuilder();
-        String ln = "";
-        if (isFormatClauseEffective()) {
-            ln = getLineSeparator();
-        }
+        String ln = getLineSeparator();
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
@@ -1464,10 +1429,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
-            String ln = "";
-            if (isFormatClauseEffective()) {
-                ln = getLineSeparator();
-            }
+            String ln = getLineSeparator();
             sb.append("delete from ").append(_tableName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");

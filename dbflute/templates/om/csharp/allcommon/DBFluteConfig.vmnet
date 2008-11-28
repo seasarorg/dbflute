@@ -19,7 +19,6 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
 	protected ${glStatementConfig} _defaultStatementConfig;
-	protected bool _conditionBeanFormatSql = true;
 	protected bool _queryLogLevelInfo;
 	protected bool _executeStatusLogLevelInfo;
 #if ($database.isSqlLogRegistryValid())
@@ -92,22 +91,6 @@ public class ${myClassName} {
             _defaultStatementConfig = value;
         }
     }
-	
-    // ===================================================================================
-    //                                                            ConditionBean Format Sql
-    //                                                            ========================
-	public bool IsConditionBeanFormatSql {
-	    get {
-	        return _conditionBeanFormatSql;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting conditionBeanFormatSql: " + value);
-		    }
-	        _conditionBeanFormatSql = value;
-		}
-	}
 	
     // ===================================================================================
     //                                                                Query Log Level Info
@@ -305,7 +288,6 @@ public class ${myClassName} {
     //                                                                        ============
 	public void Clear() { // the only properties that update OK while executing
 	    _defaultStatementConfig = null;
-	    _conditionBeanFormatSql = true; // as default
 	    _queryLogLevelInfo = false;
 	    _executeStatusLogLevelInfo = false;
 	    _useSqlLogRegistry = false;

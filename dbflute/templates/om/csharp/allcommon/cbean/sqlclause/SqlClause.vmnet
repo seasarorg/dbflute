@@ -163,12 +163,6 @@ public interface ${myClassName} {
 	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 	
     // ===================================================================================
-    //                                                                       Format Clause
-    //                                                                       =============
-	bool isFormatClauseEffective();
-    void makeFormatClauseEffective();
-	
-    // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
     String resolveSubQueryBeginMark(String subQueryIdentity);

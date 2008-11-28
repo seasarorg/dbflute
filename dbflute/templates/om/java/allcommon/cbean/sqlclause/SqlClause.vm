@@ -388,12 +388,6 @@ public interface ${myClassName} {
     public boolean isSelectedForeignInfoEmpty();
     public boolean hasSelectedForeignInfo(String relationPath);
     public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
-    
-    // ===================================================================================
-    //                                                                       Format Clause
-    //                                                                       =============
-    public boolean isFormatClauseEffective();
-    public void makeFormatClauseEffective();
 
     // ===================================================================================
     //                                                                    Sub Query Indent

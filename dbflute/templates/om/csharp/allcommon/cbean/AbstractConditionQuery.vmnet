@@ -223,9 +223,6 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             throw new IllegalArgumentException(msg);
         }
         reflectRelationOnUnionQuery(this, unionQuery); // Reflect Relation!
-        if (getSqlClause().isFormatClauseEffective()) {
-            unionQuery.getSqlClause().makeFormatClauseEffective(); // Reflect FormatClause!
-        }
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);// If CSharp, The property of 'Union' should be 'InitCap'.
@@ -644,10 +641,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");
         
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
-        String firstConditionAfter = " and ";
-        if (getSqlClause().isFormatClauseEffective()) {
-            firstConditionAfter = getLineSeparator() + "   and ";
-        }
+        String firstConditionAfter = getLineSeparator() + "   and ";
         
         // Replace template marks. These are very important!
         fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);

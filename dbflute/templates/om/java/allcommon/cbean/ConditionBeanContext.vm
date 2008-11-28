@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -123,9 +122,6 @@ public class ${glConditionBeanContextName} {
     public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
         final String tableSqlName = cb.getTableSqlName();
 		final ${glSqlClauseName} sqlClause = createSqlClause(tableSqlName);
-		if (${glDBFluteConfig}.getInstance().isConditionBeanFormatSql()) {
-		    sqlClause.makeFormatClauseEffective();
-		}
         return sqlClause;
     }
 
