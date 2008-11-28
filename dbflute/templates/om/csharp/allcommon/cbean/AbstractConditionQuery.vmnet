@@ -510,12 +510,12 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             String mainSql = selectClause + " " + fromWhereClause;
-            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln
+            return "select " + function + connect + "dfsubquerymain." + deriveColumnName + ")" + ln
                  + "  from (" + beginMark
                  + mainSql + ln
                  + "       ) dfsubquerymain" + endMark;
         } else {
-            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            String selectClause = "select " + function + connect + tableAliasName + "." + deriveColumnName + ")";
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
