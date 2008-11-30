@@ -510,9 +510,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
-                throw new NotImplementedException(msg);
+                throw new NotSupportedException(msg);
             }
-            String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
             String selectClause = "select " + tableAliasName + "." + primaryKeyName 
                                      + ", " + tableAliasName + "." + relatedColumnName
                                      + ", " + tableAliasName + "." + deriveColumnName;
