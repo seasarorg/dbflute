@@ -100,7 +100,7 @@ public enum ${glDBDef} {
     /** The current definition of database. (NotNull, Default 'Unknown') */
     private static ${glDBDef} _currentDef;
     static {
-        _currentDef = codeOf("${database.generateDbName}");
+        _currentDef = codeOf("${database.defaultDBDef}");
         if (_currentDef == null) {
             _currentDef = Unknown;
         }

@@ -615,6 +615,21 @@ public class Database {
         return getGenerateDbName();
     }
 
+    public String getDefaultDBDef() {
+        String dbdef = getSpecialGuestDatabaseDBDef();
+        if (dbdef != null) {
+            return dbdef;
+        }
+        return getGenerateDbName();
+    }
+
+    protected String getSpecialGuestDatabaseDBDef() {
+        if (getBasicProperties().isDatabaseMsAccess()) {
+            return "msaccess";
+        }
+        return null;
+    }
+
     public String getGenerateDbName() {
         final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
         final String dbName = (String) databaseInfoMap.get("dbName");
@@ -1172,11 +1187,11 @@ public class Database {
     public String buildClassificationApplicationComment(Map<String, String> classificationMap) {
         return getClassificationProperties().buildClassificationApplicationComment(classificationMap);
     }
-    
+
     public String buildClassificationCodeAliasVariables(Map<String, String> classificationMap) {
         return getClassificationProperties().buildClassificationCodeAliasVariables(classificationMap);
     }
-    
+
     public String buildClassificationCodeNameAliasVariables(Map<String, String> classificationMap) {
         return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationMap);
     }
