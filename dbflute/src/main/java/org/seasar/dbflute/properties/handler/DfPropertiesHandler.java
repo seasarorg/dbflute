@@ -16,6 +16,7 @@ import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfMakingOptionProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -26,7 +27,6 @@ import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
-import org.seasar.dbflute.properties.DfMakingOptionProperties;
 import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
