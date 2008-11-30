@@ -102,7 +102,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     public String getBuriPackage() { // required if generate status classes
         return getBuriPropertyIfNullEmpty("buriPackage");
     }
-    
+
     // map:{
     //     ; activityDefinitionMap = map:{
     //         ; [package].[name] = list:{ abc, def }
@@ -131,8 +131,11 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             return false;
         }
         final String str = javaName.trim().toLowerCase();
-        return "buripath".equals(str) && "buridata".equals(str) && "buribranch".equals(str) && "buristate".equals(str)
-                && "buripathdata".equals(str);
+        return "buripath".equals(str) || "buridata".equals(str) || "buribranch".equals(str) || "buristate".equals(str)
+                || "buripathdata".equals(str) || "buripathdatauser".equals(str) || "buripathhistorydata".equals(str)
+                || "buripathhistorydatauser".equals(str) || "buridatapathhistory".equals(str)
+                || "buristateundolog".equals(str) || "buristateundolog".equals(str) || "buritransaction".equals(str)
+                || "buriuser".equals(str);
     }
 
     // ===================================================================================
