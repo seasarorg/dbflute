@@ -237,7 +237,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
                     // Here it must be with union query.
                     // So the primary Key is target for saving unique.
                     // But if it does not have primary keys, all column is target.
-                    if (dbmeta.hasPrimaryKey()) {
+                    if (dbmeta.HasPrimaryKey) {
                         if (!columnInfo.IsPrimary) {
                             continue;
                         }
