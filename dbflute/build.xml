@@ -205,9 +205,6 @@
   </target>
 
   <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
     <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
