@@ -768,17 +768,17 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     
     protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
         return new SSQFunction<${myConditionBeanClassName}>(new SSQSetupper<${myConditionBeanClassName}>() {
-            public void setup(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, boolean correlation) {
-                xscalarSubQuery(function, subQuery, operand, correlation);
+            public void setup(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery) {
+                xscalarSubQuery(function, subQuery, operand);
             }
         });
     }
 
-    protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand, boolean correlation) {
+    protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand) {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.query(cb);
         String subQueryPropertyName = keepScalarSubQuery(cb.query()); // for saving query-value.
-        registerScalarSubQuery(function, cb.query(), "${table.primaryKeyNameAsOne}", "${table.primaryKeyNameAsOne}", subQueryPropertyName, operand, correlation);
+        registerScalarSubQuery(function, cb.query(), subQueryPropertyName, operand, "${table.primaryKeyNameAsOne}");
     }
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 #end

@@ -408,7 +408,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                  , String relatedColumnName, String propertyName) {
         String tableAliasName = getSqlClause().getLocalTableAliasName();
         String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
-        String fromWhereClause = buildPlainSubQueryFronWhereClause(subQuery, relatedColumnName, propertyName
+        String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                  , selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
@@ -506,14 +506,16 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String selectClause = "select " + tableAliasName + "." + deriveColumnName;
-            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                           , selectClause, tableAliasName, realColumnName);
+            String selectClause = "select " + tableAliasName + "." + relatedColumnName 
+                                     + ", " + tableAliasName + "." + deriveColumnName;
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
+                                                                     , selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
+            String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
             return "select " + function + connect + "dfsubquerymain." + deriveColumnName + ")" + ln
                  + "  from (" + beginMark
                  + mainSql + ln
-                 + "       ) dfsubquerymain" + endMark;
+                 + "       ) dfsubquerymain" + endMark + ln + " where " + joinCondition;
         } else {
             String selectClause = "select " + function + connect + tableAliasName + "." + deriveColumnName + ")";
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
@@ -611,7 +613,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
-    protected String buildPlainSubQueryFronWhereClause(${glConditionQueryInterfaceName} subQuery
+    protected String buildPlainSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
                                                      , String relatedColumnName
                                                      , String propertyName
                                                      , String selectClause
