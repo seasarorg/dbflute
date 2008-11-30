@@ -778,7 +778,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.query(cb);
         String subQueryPropertyName = keepScalarSubQuery(cb.query()); // for saving query-value.
-        registerScalarSubQuery(function, cb.query(), subQueryPropertyName, operand, "${table.primaryKeyNameAsOne}");
+        registerScalarSubQuery(function, cb.query(), subQueryPropertyName, operand);
     }
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 #end

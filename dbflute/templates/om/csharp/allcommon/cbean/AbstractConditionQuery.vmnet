@@ -506,7 +506,15 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String selectClause = "select " + tableAliasName + "." + relatedColumnName 
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
+            if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
+                String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
+                msg = msg + " table=" + subQuery.getTableDbName();
+                throw new NotImplementedException(msg);
+            }
+            String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
+                                     + ", " + tableAliasName + "." + relatedColumnName
                                      + ", " + tableAliasName + "." + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                      , selectClause, tableAliasName);

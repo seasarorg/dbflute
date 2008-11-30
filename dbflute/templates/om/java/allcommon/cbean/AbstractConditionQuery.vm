@@ -697,7 +697,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String selectClause = "select " + tableAliasName + "." + relatedColumnName 
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+            if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
+                String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
+                msg = msg + " table=" + subQuery.getTableDbName();
+                throw new UnsupportedOperationException(msg);
+            }
+            String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
+                                     + ", " + tableAliasName + "." + relatedColumnName
                                      + ", " + tableAliasName + "." + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                      , selectClause, tableAliasName);
@@ -810,8 +818,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                        ScalarSubQuery
     //                                        --------------
     protected void registerScalarSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
-                                              , String propertyName, String operand
-                                              , String primaryKeyName) {
+                                        , String propertyName, String operand) {
         assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
         
         // Get the specified column before it disappears at sub-query making.
@@ -825,7 +832,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
 
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName, primaryKeyName);
+        String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
         String ln = getLineSeparator();
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -843,7 +850,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected String getScalarSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
-                                              , String propertyName, String primaryKeyName) {
+                                        , String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -852,6 +859,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+        if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
+            msg = msg + " table=" + subQuery.getTableDbName();
+            throw new UnsupportedOperationException(msg);
+        }
+        String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         if (subQuery.getSqlClause().hasUnionQuery()) {
             String ln = getLineSeparator();
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
