@@ -41,7 +41,7 @@ import ${glPackageCB}.*;
 #end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
-#if ($table.isBuriIternal())
+#if ($table.isBuriInternal())
  * {Buri Internal}
 #end
  * <pre>
