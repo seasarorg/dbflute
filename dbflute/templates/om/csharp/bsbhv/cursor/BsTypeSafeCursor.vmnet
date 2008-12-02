@@ -59,7 +59,7 @@ namespace ${myExtendedDaoCursorPackageName} {
             get { return (${col.javaNative})ExtractValueAsNumber(typeof(${col.javaNative}), "${col.name}"); }
 #end
 #if ($col.isJavaNativeDateObject())
-            get { return new ${col.javaNative}(ExtractValueAsDateTime(typeof(${col.javaNative}), "${col.name}")); }
+            get { return ExtractValueAsDateTime(typeof(${col.javaNative}), "${col.name}"); }
 #end
 #if ($col.isJavaNativeBinaryObject())
             get { return (${col.javaNative})ExtractValueAsObject("${col.name}"); }
@@ -71,7 +71,7 @@ namespace ${myExtendedDaoCursorPackageName} {
         //                                                                          Helper
         //                                                                          ======
         protected virtual String ExtractValueAsString(String name) {
-            return (String)_reader[name];
+            return _reader[name] as String;
         }
 
         protected virtual bool? ExtractValueAsBoolean(String name) {
@@ -88,8 +88,12 @@ namespace ${myExtendedDaoCursorPackageName} {
             return value;
         }
 
-        protected virtual DateTime ExtractValueAsDateTime(Type type, String name) {
-            return (DateTime)ExtractValueAsObject(name);
+        protected virtual DateTime? ExtractValueAsDateTime(Type type, String name) {
+            Object ret = ExtractValueAsObject(name);
+            if (ret == DBNull.Value) {
+                return null;
+            }
+            return new DateTime?((DateTime)ret);
         }
 
         protected virtual Object ExtractValueAsObject(String name) {

@@ -138,23 +138,25 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     public Map<String, Map<String, List<String>>> getActivityDefinitionMap() {
         if (_activityDefinitionMap == null) {
             _activityDefinitionMap = new LinkedHashMap<String, Map<String, List<String>>>();
-            final Map<String, Object> map = getBuriPropertyAsMap("activityDefinitionMap");
-            final Set<String> packageNameSet = map.keySet();
-            for (String packageName : packageNameSet) {
-                final Object packageValue = map.get(packageName);
-                assertPackageValueIsMap(packageValue);
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> processMap = (Map<String, Object>) packageValue;
-                final Map<String, List<String>> processResultMap = new LinkedHashMap<String, List<String>>();
-                final Set<String> processNameSet = processMap.keySet();
-                for (String processName : processNameSet) {
-                    final Object processValue = processMap.get(processName);
-                    assertProcessValueIsList(processValue);
+            final Map<String, Object> activityDefinitionMap = getBuriPropertyAsMap("activityDefinitionMap");
+            if (activityDefinitionMap != null) {
+                final Set<String> packageNameSet = activityDefinitionMap.keySet();
+                for (String packageName : packageNameSet) {
+                    final Object packageValue = activityDefinitionMap.get(packageName);
+                    assertPackageValueIsMap(packageValue);
                     @SuppressWarnings("unchecked")
-                    final List<String> activityList = (List<String>) processValue;
-                    processResultMap.put(processName, activityList);
+                    final Map<String, Object> processMap = (Map<String, Object>) packageValue;
+                    final Map<String, List<String>> processResultMap = new LinkedHashMap<String, List<String>>();
+                    final Set<String> processNameSet = processMap.keySet();
+                    for (String processName : processNameSet) {
+                        final Object processValue = processMap.get(processName);
+                        assertProcessValueIsList(processValue);
+                        @SuppressWarnings("unchecked")
+                        final List<String> activityList = (List<String>) processValue;
+                        processResultMap.put(processName, activityList);
+                    }
+                    _activityDefinitionMap.put(packageName, processResultMap);
                 }
-                _activityDefinitionMap.put(packageName, processResultMap);
             }
         }
         return _activityDefinitionMap;
