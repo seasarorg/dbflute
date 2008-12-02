@@ -48,12 +48,17 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             try {
                 rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
             } catch (SQLException e) {
+                // Basically it does not come here.
+                // But if it's schema requirement or reservation word, it comes here. 
                 try {
                     final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
                     rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema));
                 } catch (SQLException ignored) {
-                    ignoredMessage = ignored.getMessage();
-                    throw e;
+                    rs = retryForReservationWordTable(stmt, tableMetaInfo, primaryKeyColumnName);
+                    if (rs == null) {
+                        ignoredMessage = ignored.getMessage();
+                        throw e;
+                    }
                 }
             }
             final ResultSetMetaData md = rs.getMetaData();
@@ -84,5 +89,23 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
     protected String buildMetaDataSql(String primaryKeyColumnName, String tableName) {
         return "select " + primaryKeyColumnName + " from " + tableName + " where 1 = 0";
+    }
+
+    protected ResultSet retryForReservationWordTable(Statement stmt, DfTableMetaInfo tableMetaInfo,
+            String primaryKeyColumnName) {
+        String tableName = tableMetaInfo.getTableName();
+        tableName = "\"" + tableName + "\"";
+        ResultSet rs = null;
+        try {
+            rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
+        } catch (SQLException e) {
+            tableName = "[" + tableName + "]";
+            try {
+                rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
+            } catch (SQLException ignored) {
+            }
+        }
+        // 'SchemaName + ReservationWord' is unsupported!
+        return rs;
     }
 }
