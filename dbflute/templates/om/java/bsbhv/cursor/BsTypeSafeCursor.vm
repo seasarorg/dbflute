@@ -39,7 +39,7 @@ public class ${myClassName} {
     //                                                                             Prepare
     //                                                                             =======
     /**
-     * Accept.
+     * Accept result set.
      * @param rs Result set. (NotNull)
      */
     public void accept(ResultSet rs) {
@@ -61,7 +61,7 @@ public class ${myClassName} {
     //                                                                            Delegate
     //                                                                            ========
     /**
-     * Next result.
+     * Move to next result.
      * @return Is exist next result.
      * @throws java.sql.SQLException
      */
@@ -98,9 +98,8 @@ public class ${myClassName} {
 
 #end
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected String extractValueAsString(String name) throws SQLException {
         return _rs.getString(name);
     }

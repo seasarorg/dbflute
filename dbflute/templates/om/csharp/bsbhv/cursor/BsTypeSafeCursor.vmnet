@@ -68,14 +68,18 @@ namespace ${myExtendedDaoCursorPackageName} {
 
 #end
         // ===============================================================================
-        //                                                                          Helper
-        //                                                                          ======
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected virtual String ExtractValueAsString(String name) {
-            return _reader[name] as String;
+            Object objValue = ExtractValueAsObject(name);
+            if (objValue == null || objValue.Equals(DBNull.Value)) { return null; }
+            return (String)objValue;
         }
 
         protected virtual bool? ExtractValueAsBoolean(String name) {
-            return new bool?((bool)_reader[name]);
+            Object objValue = ExtractValueAsObject(name);
+            if (objValue == null || objValue.Equals(DBNull.Value)) { return null; }
+            return new bool?((bool)objValue);
         }
 
         protected virtual Object ExtractValueAsNumber(Type type, String name) {
@@ -89,11 +93,9 @@ namespace ${myExtendedDaoCursorPackageName} {
         }
 
         protected virtual DateTime? ExtractValueAsDateTime(Type type, String name) {
-            Object ret = ExtractValueAsObject(name);
-            if (ret == DBNull.Value) {
-                return null;
-            }
-            return new DateTime?((DateTime)ret);
+            Object objValue = ExtractValueAsObject(name);
+            if (objValue == null || objValue.Equals(DBNull.Value)) { return null; }
+            return new DateTime?((DateTime)objValue);
         }
 
         protected virtual Object ExtractValueAsObject(String name) {
