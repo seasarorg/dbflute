@@ -645,7 +645,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return selectEntity(cb);
     }
 
-    public List<${myExtendedObjectClassName}> xgetEntityListForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
+    public List<${myExtendedObjectClassName}> xgetEntitiesForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
         ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.query().set${table.primaryKeyAsOne.javaName}_InScope(ids);
         return selectList(cb);
