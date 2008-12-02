@@ -1,9 +1,13 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
+import org.seasar.dbflute.helper.collection.DfStringKeyMap;
 
 /**
  * @author jflute
@@ -28,6 +32,17 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         }
         return buriDefinitionMap;
     }
+
+    // [Buri Definition]
+    // map:{
+    //     ; targetTableList = list:{ DOCUMENT }
+    //     ; outputDirectory = ./../
+    //     ; activityDefinitionMap = map:{
+    //         ; [package] = map:{
+    //             ; [process] = list:{ [activity1], [activity2] }
+    //         }
+    //     }
+    // }
 
     // ===================================================================================
     //                                                                       Determination
@@ -99,6 +114,68 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                 Activity Definition
     //                                                                 ===================
+    protected Map<String, Map<String, List<String>>> _activityDefinitionMap;
+
+    public Map<String, Map<String, List<String>>> getActivityDefinitionMap() {
+        if (_activityDefinitionMap == null) {
+            _activityDefinitionMap = new LinkedHashMap<String, Map<String, List<String>>>();
+            final Map<String, Object> map = getBuriPropertyAsMap("activityDefinitionMap");
+            final Set<String> packageNameSet = map.keySet();
+            for (String packageName : packageNameSet) {
+                final Object packageValue = map.get(packageName);
+                assertPackageValueIsMap(packageValue);
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> processMap = (Map<String, Object>) packageValue;
+                final Map<String, List<String>> processResultMap = new LinkedHashMap<String, List<String>>();
+                final Set<String> processNameSet = processMap.keySet();
+                for (String processName : processNameSet) {
+                    final Object processValue = processMap.get(processName);
+                    assertProcessValueIsList(processValue);
+                    @SuppressWarnings("unchecked")
+                    final List<String> activityList = (List<String>) packageValue;
+                    processResultMap.put(processName, activityList);
+                }
+                _activityDefinitionMap.put(packageName, processResultMap);
+            }
+        }
+        return _activityDefinitionMap;
+    }
+
+    protected void assertPackageValueIsMap(Object packageValue) {
+        if (!(packageValue instanceof Map)) {
+            String msg = "The type of package value should be Map: " + packageValue;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertProcessValueIsList(Object processValue) {
+        if (!(processValue instanceof List)) {
+            String msg = "The type of package value should be List: " + processValue;
+            throw new IllegalStateException(msg);
+        }
+    }
+    
+    public Map<String, List<String>> getProcessMap(String packageName) {
+        return getActivityDefinitionMap().get(packageName);
+    }
+    
+    public List<String> getActivityList(String packageName, String processName) {
+        final Map<String, List<String>> processMap = getProcessMap(packageName);
+        return processMap.get(processName);
+    }
+
+    public List<String> getPackageProcessPathList() {
+        final List<String> packageProcessPathList = new ArrayList<String>();
+        final Map<String, Map<String, List<String>>> activityDefinitionMap = getActivityDefinitionMap();
+        final Set<String> packageNameSet = activityDefinitionMap.keySet();
+        for (String packageName : packageNameSet) {
+            final Map<String, List<String>> processMap = activityDefinitionMap.get(packageName);
+            final Set<String> processName = processMap.keySet();
+            packageProcessPathList.add(packageName + "." + processName);
+        }
+        return packageProcessPathList;
+    }
+
     public String getBuriPackage() { // required if generate status classes
         return getBuriPropertyIfNullEmpty("buriPackage");
     }
@@ -126,16 +203,89 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                              Buri Table Information
     //                                                              ======================
+    protected Map<String, String> _tableJavaNameCaseInsensitiveMap = DfStringKeyMap.createAsCaseInsensitive();
+    {
+        putTableJavaNameMap("BuriPath"); // 1
+        putTableJavaNameMap("BuriData"); // 2
+        putTableJavaNameMap("BuriBranch"); // 3
+        putTableJavaNameMap("BuriState"); // 4
+        putTableJavaNameMap("BuriStateUser"); // 5
+        putTableJavaNameMap("BuriUser"); // 6
+        putTableJavaNameMap("BuriTransaction"); // 7
+        putTableJavaNameMap("BuriStateUndoLog"); // 8
+        putTableJavaNameMap("BuriPathData"); // 9
+        putTableJavaNameMap("BuriPathDataUser"); // 10
+        putTableJavaNameMap("BuriPathHistoryData"); // 11
+        putTableJavaNameMap("BuriPathHistoryDataUser"); // 12
+        putTableJavaNameMap("BuriDataPathHistory"); // 13
+    }
+
+    protected void putTableJavaNameMap(String tableName) {
+        _tableJavaNameCaseInsensitiveMap.put(tableName, tableName);
+    }
+
     public boolean isBuriInternalTable(String javaName) {
         if (javaName == null || javaName.trim().length() == 0) {
             return false;
         }
-        final String str = javaName.trim().toLowerCase();
-        return "buripath".equals(str) || "buridata".equals(str) || "buribranch".equals(str) || "buristate".equals(str)
-                || "buripathdata".equals(str) || "buripathdatauser".equals(str) || "buripathhistorydata".equals(str)
-                || "buripathhistorydatauser".equals(str) || "buridatapathhistory".equals(str)
-                || "buristateundolog".equals(str) || "buristateundolog".equals(str) || "buritransaction".equals(str)
-                || "buriuser".equals(str);
+        return arrangeBuriTableJavaName(javaName) != null;
+    }
+
+    public String arrangeBuriTableJavaName(String javaName) {
+        if (javaName == null || javaName.trim().length() == 0) {
+            return null;
+        }
+        final String key = javaName.trim().toLowerCase();
+        return _tableJavaNameCaseInsensitiveMap.get(key);
+    }
+
+    // ===================================================================================
+    //                                                             Buri Column Information
+    //                                                             =======================
+    protected Map<String, String> _columnJavaNameCaseInsensitiveMap = DfStringKeyMap.createAsCaseInsensitive();
+    {
+        putColumnJavaNameMap("StateId");
+        putColumnJavaNameMap("PathId");
+        putColumnJavaNameMap("DataId");
+        putColumnJavaNameMap("BranchId");
+        putColumnJavaNameMap("StateUserId");
+        putColumnJavaNameMap("BuriUserId");
+        putColumnJavaNameMap("StateUndoLogId");
+        putColumnJavaNameMap("ParentBranchId");
+        putColumnJavaNameMap("InsertUserId");
+        putColumnJavaNameMap("HistoryId");
+        putColumnJavaNameMap("UserIdVal");
+        putColumnJavaNameMap("UserIdNum");
+        putColumnJavaNameMap("PkeyVal");
+        putColumnJavaNameMap("PkeyNum");
+        putColumnJavaNameMap("DataType");
+        putColumnJavaNameMap("TableName");
+        putColumnJavaNameMap("ParticipantName");
+        putColumnJavaNameMap("ParticipantType");
+        putColumnJavaNameMap("Btid");
+        putColumnJavaNameMap("PathName");
+        putColumnJavaNameMap("RealPathName");
+        putColumnJavaNameMap("PathType");
+        putColumnJavaNameMap("Action");
+        putColumnJavaNameMap("InsertDate");
+        putColumnJavaNameMap("AutoRunTime");
+        putColumnJavaNameMap("ProcessDate");
+        putColumnJavaNameMap("AbortDate");
+        putColumnJavaNameMap("VersionNo");
+        putColumnJavaNameMap("DeleteDate");
+        putColumnJavaNameMap("CreateBtid");
+    }
+
+    protected void putColumnJavaNameMap(String columnName) {
+        _columnJavaNameCaseInsensitiveMap.put(columnName, columnName);
+    }
+
+    public String arrangeBuriColumnJavaName(String javaName) {
+        if (javaName == null || javaName.trim().length() == 0) {
+            return null;
+        }
+        final String key = javaName.trim().toLowerCase();
+        return _columnJavaNameCaseInsensitiveMap.get(key);
     }
 
     // ===================================================================================

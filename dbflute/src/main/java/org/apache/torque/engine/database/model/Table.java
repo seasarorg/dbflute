@@ -76,6 +76,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -483,38 +484,22 @@ public class Table {
             if (needsJavaNameConvert()) {
                 _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
             } else {
-                _javaName = getName();// for sql2entity
+                _javaName = getName(); // for sql2entity mainly
             }
+            _javaName = filterBuriJavaNameIfNeeds(_javaName);
         }
         return _javaName;
     }
 
-    /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
-     */
-    public String getUncapitalisedJavaName() {
-        return StringUtils.uncapitalise(getJavaName());
-    }
-
-    protected boolean _needsJavaBeansRulePropertyNameConvert = true;
-
-    public void setupNeedsJavaBeansRulePropertyNameConvertFalse() {
-        _needsJavaNameConvert = false;
-    }
-
-    public boolean needsJavaBeansRulePropertyNameConvert() {
-        return _needsJavaNameConvert;
-    }
-
-    /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
-     */
-    public String getJavaBeansRulePropertyName() {
-        if (needsJavaBeansRulePropertyNameConvert()) {
-            return getDatabase().decapitalizePropertyName(getDatabase().convertJavaNameByJdbcNameAsTable(getName()));
-        } else {
-            return getDatabase().decapitalizePropertyName(getJavaName());// for sql2entity
+    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        if (buriProperties.isUseBuri() && isBuriInternal()) {
+            final String arranged = buriProperties.arrangeBuriTableJavaName(_javaName);
+            if (arranged != null) {
+                return arranged;
+            }
         }
+        return javaName;
     }
 
     /**
@@ -522,6 +507,26 @@ public class Table {
      */
     public void setJavaName(String javaName) {
         this._javaName = javaName;
+    }
+
+    // -----------------------------------------------------
+    //                               Uncapitalised Java Name
+    //                               -----------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalised java name)
+     */
+    public String getUncapitalisedJavaName() {
+        return StringUtils.uncapitalise(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                         Java Beans Rule Property Name
+    //                         -----------------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalised java name)
+     */
+    public String getJavaBeansRulePropertyName() {
+        return DfJavaBeansUtil.decapitalizePropertyName(getJavaName());
     }
 
     // -----------------------------------------------------
@@ -2330,7 +2335,7 @@ public class Table {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName());
     }
-    
+
     public boolean isBuriInternal() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.isUseBuri() && buriProperties.isBuriInternalTable(getJavaName());

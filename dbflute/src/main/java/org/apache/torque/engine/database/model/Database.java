@@ -1333,7 +1333,15 @@ public class Database {
         }
         return buriTargetTableList;
     }
-
+    
+    public Map<String, List<String>> getBuriProcessMap(String packageName) {
+        return getProperties().getBuriProperties().getProcessMap(packageName);
+    }
+    
+    public List<String> getBuriActivityList(String packageName, String processName) {
+        return getProperties().getBuriProperties().getActivityList(packageName, processName);
+    }
+    
     // ===================================================================================
     //                                                         SQL Log Registry Properties
     //                                                         ===========================
@@ -1751,20 +1759,6 @@ public class Database {
             return "";
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
-    }
-
-    // for Seasar's property.
-    public String decapitalizePropertyName(String javaName) {
-        if (javaName == null || javaName.length() == 0) {
-            return javaName;
-        }
-        if (javaName.length() > 1 && Character.isUpperCase(javaName.charAt(1))
-                && Character.isUpperCase(javaName.charAt(0))) {
-            return javaName;
-        }
-        char chars[] = javaName.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
     }
 
     public boolean isInitNumber(String str) {

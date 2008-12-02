@@ -67,9 +67,11 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfMakingOptionProperties;
+import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -108,11 +110,10 @@ public class Column {
     //                                                  Type
     //                                                  ----
     private String _javaType;
-    
+
     private String _torqueType;
 
     private String _dbType;
-
 
     private String _columnSize;
 
@@ -326,32 +327,20 @@ public class Column {
             } else {
                 _javaName = getName();
             }
+            _javaName = filterBuriJavaNameIfNeeds(_javaName); // for Buri
         }
         return _javaName;
     }
 
-    /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
-     */
-    public String getUncapitalisedJavaName() {
-        return StringUtils.uncapitalise(getJavaName());
-    }
-
-    /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
-     */
-    public String getJavaBeansRulePropertyName() {
-        final Database db = getTable().getDatabase();
-        return db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName()));
-    }
-
-    public String getJavaBeansRulePropertyNameInitCap() {
-        final Database db = getTable().getDatabase();
-        return initCap(db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName())));
-    }
-
-    protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        if (buriProperties.isUseBuri() && getTable().isBuriInternal()) {
+            final String arranged = buriProperties.arrangeBuriColumnJavaName(_javaName);
+            if (arranged != null) {
+                return arranged;
+            }
+        }
+        return javaName;
     }
 
     /**
@@ -359,6 +348,34 @@ public class Column {
      */
     public void setJavaName(String javaName) {
         this._javaName = javaName;
+    }
+
+    // -----------------------------------------------------
+    //                               Uncapitalised Java Name
+    //                               -----------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalised java name)
+     */
+    public String getUncapitalisedJavaName() {
+        return StringUtils.uncapitalise(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                         Java Beans Rule Property Name
+    //                         -----------------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalised java name)
+     */
+    public String getJavaBeansRulePropertyName() {
+        return DfJavaBeansUtil.decapitalizePropertyName(getJavaName());
+    }
+
+    public String getJavaBeansRulePropertyNameInitCap() {
+        return initCap(getJavaBeansRulePropertyName());
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     // -----------------------------------------------------
@@ -384,7 +401,7 @@ public class Column {
     public Object getTorqueType() {
         return _torqueType;
     }
-    
+
     // -----------------------------------------------------
     //                                              Position
     //                                              --------
@@ -403,7 +420,7 @@ public class Column {
     public void setPosition(int v) {
         this._position = v;
     }
-    
+
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
@@ -633,14 +650,14 @@ public class Column {
     //                                               DB Type
     //                                               -------
     // for documents basically
-    public void setDbType(String dbType) { 
+    public void setDbType(String dbType) {
         this._dbType = dbType;
     }
 
     public String getDbType() {
         return _dbType;
     }
-    
+
     public String getDbTypeExpression() {
         return _dbType != null ? _dbType : "UnknownType";
     }
@@ -1201,7 +1218,7 @@ public class Column {
         }
         return getIncludeQueryProperties().isAvailableStringLikeSearch(getTableName(), getName());
     }
-    
+
     public boolean isAvailableStringNotLikeSearch() {
         if (hasQueryRestrictionByClassification()) {
             return false;

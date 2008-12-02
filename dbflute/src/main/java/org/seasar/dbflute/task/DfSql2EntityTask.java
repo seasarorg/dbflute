@@ -883,7 +883,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Table tbl = new Table();
             tbl.setName(entityName);
             tbl.setupNeedsJavaNameConvertFalse();
-            tbl.setupNeedsJavaBeansRulePropertyNameConvertFalse();
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
             _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "

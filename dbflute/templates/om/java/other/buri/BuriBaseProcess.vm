@@ -1,0 +1,26 @@
+${database.allClassCopyright}package ${myBuriPackageName};
+
+/**
+ * The definition of ${myBuriPackageClassName}.
+ * @author ${database.ClassAuthor}
+ */
+public class ${myBuriPackageClassName} {
+#foreach ($processName in $processNameSet)
+#set ($activityList = $database.getBuriActivityList($packageName, $processName))
+
+    public enum ${processName} {
+#set ($count = 0)
+#foreach ($activityName in $activityList)
+#if ($count != 0)
+        ,
+#end
+        ${activityName}
+#set ($count = $count + 1)
+#end
+        ;
+        public static String processPath() {
+            return "${packageName}.${processName}";
+        }
+    }
+#end
+}
