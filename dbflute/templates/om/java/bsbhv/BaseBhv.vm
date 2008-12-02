@@ -227,22 +227,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public List<Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
-#if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $table.isBuriTarget())
-
-    public ${myExtendedObjectClassName} getEntityForBuri(${table.primaryKeyArgsString}) { // For Buri
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-        return selectEntity(cb);
-    }
-
-    public List<${myExtendedObjectClassName}> getEntityListForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.query().set${table.primaryKeyAsOne.javaName}_InScope(ids);
-        return selectList(cb);
-    }
-#end
 #if ($table.isUseSequence())
 
     // ===================================================================================
@@ -648,11 +632,25 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 #end
-#if ($table.isBuriTarget() && $table.hasTableProcess())
+#if ($table.isBuriTarget())
 
     // ===================================================================================
     //                                                                      Buri Interface
     //                                                                      ==============
+    public ${myExtendedObjectClassName} xgetEntityForBuri(${table.primaryKeyArgsString}) { // For Buri
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+        return selectEntity(cb);
+    }
+
+    public List<${myExtendedObjectClassName}> xgetEntityListForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.query().set${table.primaryKeyAsOne.javaName}_InScope(ids);
+        return selectList(cb);
+    }
+
     // protected org.escafe.buri.engine.processor.SimpleBuriProcessor _simpleBuriProcessor;
     // public void setSimpleBuriProcessor(org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor) {
     //     _simpleBuriProcessor = simpleBuriProcessor;

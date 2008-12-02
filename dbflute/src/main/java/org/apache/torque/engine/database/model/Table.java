@@ -2332,19 +2332,22 @@ public class Table {
     //                                                            Buri(Friendly Framework)
     //                                                            ========================
     public boolean isBuriTarget() {
+        if (!hasOnlyOnePrimaryKey()) {
+            return false;
+        }
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName());
+        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName()) && hasTableProcess();
+    }
+
+    protected boolean hasTableProcess() {
+        return !getTableProcessForMethodNameList().isEmpty();
     }
 
     public boolean isBuriInternal() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.isUseBuri() && buriProperties.isBuriInternalTable(getJavaName());
     }
-    
-    public boolean hasTableProcess() {
-        return !getTableProcessForMethodNameList().isEmpty();
-    }
-    
+
     public List<String> getTableProcessForMethodNameList() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.getTableProcessForMethodNameList(getName());
