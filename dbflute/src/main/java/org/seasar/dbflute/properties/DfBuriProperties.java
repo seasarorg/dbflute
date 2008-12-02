@@ -1,6 +1,7 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.collection.DfStringKeyMap;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute
@@ -62,39 +64,56 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         return !getBuriDefinitionMap().isEmpty();
     }
 
-    public boolean isGenerateBao() {
-        if (!isUseBuri()) {
-            return false;
-        }
-        final String baseBaoPackage = getBaseBaoPackage();
-        return baseBaoPackage != null && baseBaoPackage.trim().length() > 0;
-    }
-
     public boolean isTargetTable(String tableName) {
         if (!isUseBuri()) {
             return false;
         }
-        final List<String> targetTableList = getTargetTableList();
-        if (targetTableList.isEmpty()) {
-            return true;
-        }
-        for (String tableNameHint : targetTableList) {
-            if (isHitByTheHint(tableName, tableNameHint)) {
-                return true;
-            }
-        }
-        return false;
+        return getTargetProcessMap().containsKey(tableName);
     }
 
     // ===================================================================================
-    //                                                                   Target Table List
+    //                                                                   Table Process Map
     //                                                                   =================
-    protected List<String> getTargetTableList() {
-        final List<String> ls = getBuriPropertyAsList("targetTableList");
-        if (ls == null) {
+    protected Map<String, List<String>> _tableProcessMap;
+
+    protected Map<String, List<String>> getTargetProcessMap() {
+        if (_tableProcessMap == null) {
+            _tableProcessMap = DfStringKeyMap.createAsFlexible();
+            final Map<String, Object> buriPropertyAsMap = getBuriPropertyAsMap("tableProcessMap");
+            if (buriPropertyAsMap != null) {
+                final Set<String> tableNameSet = buriPropertyAsMap.keySet();
+                for (String tableName : tableNameSet) {
+                    final Object processMappingValue = buriPropertyAsMap.get(tableName);
+                    if (processMappingValue == null) {
+                        continue;
+                    }
+                    assertProcessMappingValueIsList(processMappingValue);
+                    @SuppressWarnings("unchecked")
+                    List<String> processList = (List<String>) processMappingValue;
+                    _tableProcessMap.put(tableName, processList);
+                }
+            }
+        }
+        return _tableProcessMap;
+    }
+
+    public List<String> getTableProcessForMethodNameList(String tableName) {
+        final List<String> processList = getTargetProcessMap().get(tableName);
+        if (processList == null) {
             return new ArrayList<String>();
         }
-        return ls;
+        final ArrayList<String> resultList = new ArrayList<String>();
+        for (String process : processList) {
+            resultList.add(DfStringUtil.replace(process, ".", "_"));
+        }
+        return resultList;
+    }
+
+    protected void assertProcessMappingValueIsList(Object processMappingValue) {
+        if (!(processMappingValue instanceof List)) {
+            String msg = "The type of process mapping value should be List: " + processMappingValue;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
@@ -132,7 +151,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
                     final Object processValue = processMap.get(processName);
                     assertProcessValueIsList(processValue);
                     @SuppressWarnings("unchecked")
-                    final List<String> activityList = (List<String>) packageValue;
+                    final List<String> activityList = (List<String>) processValue;
                     processResultMap.put(processName, activityList);
                 }
                 _activityDefinitionMap.put(packageName, processResultMap);
@@ -150,18 +169,19 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
 
     protected void assertProcessValueIsList(Object processValue) {
         if (!(processValue instanceof List)) {
-            String msg = "The type of package value should be List: " + processValue;
+            String msg = "The type of process value should be List: " + processValue;
             throw new IllegalStateException(msg);
         }
     }
-    
+
     public Map<String, List<String>> getProcessMap(String packageName) {
-        return getActivityDefinitionMap().get(packageName);
+        final Map<String, List<String>> map = getActivityDefinitionMap().get(packageName);
+        return map != null ? map : new HashMap<String, List<String>>();
     }
-    
+
     public List<String> getActivityList(String packageName, String processName) {
         final Map<String, List<String>> processMap = getProcessMap(packageName);
-        return processMap.get(processName);
+        return processMap != null ? processMap.get(processName) : new ArrayList<String>();
     }
 
     public List<String> getPackageProcessPathList() {
@@ -174,30 +194,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             packageProcessPathList.add(packageName + "." + processName);
         }
         return packageProcessPathList;
-    }
-
-    public String getBuriPackage() { // required if generate status classes
-        return getBuriPropertyIfNullEmpty("buriPackage");
-    }
-
-    // map:{
-    //     ; activityDefinitionMap = map:{
-    //         ; [package].[name] = list:{ abc, def }
-    //     }
-    // }
-
-    public String getBaseBaoPackage() { // required if generate BAO
-        return getBuriPropertyIfNullEmpty("baseBaoPackage");
-    }
-
-    public String getExtendedBaoPackage() { // required if generate BAO
-        final String key = "extendedBaoPackage";
-        final String baseBaoPackage = getBaseBaoPackage();
-        if (baseBaoPackage != null && baseBaoPackage.trim().length() > 0) {
-            return getBuriPropertyRequired(key);
-        } else {
-            return getBuriPropertyIfNullEmpty(key);
-        }
     }
 
     // ===================================================================================

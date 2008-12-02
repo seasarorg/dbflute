@@ -2340,6 +2340,15 @@ public class Table {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         return buriProperties.isUseBuri() && buriProperties.isBuriInternalTable(getJavaName());
     }
+    
+    public boolean hasTableProcess() {
+        return !getTableProcessForMethodNameList().isEmpty();
+    }
+    
+    public List<String> getTableProcessForMethodNameList() {
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        return buriProperties.getTableProcessForMethodNameList(getName());
+    }
 
     // ===================================================================================
     //                                                                     Behavior Filter

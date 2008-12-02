@@ -1,0 +1,29 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+/**
+ * The definition of Buri.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBuriDef} {
+#foreach ($packageName in $database.getBuriPackageList())
+#set ($count = 0)
+#set ($processList = $database.getBuriProcessList($packageName))
+#foreach ($processName in $processList)
+#set ($activityList = $database.getBuriActivityList($packageName, $processName))
+    public enum ${packageName}_${processName} {
+#set ($count = 0)
+#foreach ($activityName in $activityList)
+#if ($count != 0)
+        ,
+#end
+        ${activityName}
+#set ($count = $count + 1)
+#end
+        ;
+        public static String path() {
+            return "${packageName}.${processName}";
+        }
+    }
+#end
+#end
+}

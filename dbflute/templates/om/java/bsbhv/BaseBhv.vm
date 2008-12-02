@@ -648,16 +648,25 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 #end
-#if ($table.isBuriTarget())
+#if ($table.isBuriTarget() && $table.hasTableProcess())
 
     // ===================================================================================
     //                                                                      Buri Interface
     //                                                                      ==============
-    public void toNextStatus() { // Making...
+    // protected org.escafe.buri.engine.processor.SimpleBuriProcessor _simpleBuriProcessor;
+    // public void setSimpleBuriProcessor(org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor) {
+    //     _simpleBuriProcessor = simpleBuriProcessor;
+    // }
+#foreach ($processName in $table.tableProcessForMethodNameList)
+
+    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        Class<org.escafe.buri.engine.processor.SimpleBuriProcessor> type = org.escafe.buri.engine.processor.SimpleBuriProcessor.class;
+        org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor = org.seasar.framework.container.SingletonS2Container.getComponent(type);
+        simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}.path(), ${myEntityVariableName});
     }
-    
-    public void getEntities() { // Making...
+    public void getEntities(${glBuriDef}.${processName} activity) { // Making...
     }
+#end
 #end
     
     // ===================================================================================

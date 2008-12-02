@@ -578,10 +578,6 @@ public class Database {
         getGeneratorInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
     }
 
-    public void enableBuriBaoOutputDirectory() {
-        getGeneratorInstance().setOutputPath(getProperties().getBuriProperties().getOutputDirectory());
-    }
-
     // ===================================================================================
     //                                                                           Generator
     //                                                                           =========
@@ -1311,37 +1307,22 @@ public class Database {
     // ===================================================================================
     //                                                                     Buri Properties
     //                                                                     ===============
-    public boolean isBuriGenerateBao() {
-        return getProperties().getBuriProperties().isGenerateBao();
+    public boolean isUseBuri() {
+        return getProperties().getBuriProperties().isUseBuri();
     }
 
-    public String getBuriBaseBaoPackage() {
-        return getProperties().getBuriProperties().getBaseBaoPackage();
+    public List<String> getBuriPackageList() {
+        return new ArrayList<String>(getProperties().getBuriProperties().getActivityDefinitionMap().keySet());
     }
 
-    public String getBuriExtendedBaoPackage() {
-        return getProperties().getBuriProperties().getExtendedBaoPackage();
+    public List<String> getBuriProcessList(String packageName) {
+        return new ArrayList<String>(getProperties().getBuriProperties().getProcessMap(packageName).keySet());
     }
 
-    public List<Table> getBuriTargetTableList() {
-        final ArrayList<Table> buriTargetTableList = new ArrayList<Table>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            if (table.isBuriTarget()) {
-                buriTargetTableList.add(table);
-            }
-        }
-        return buriTargetTableList;
-    }
-    
-    public Map<String, List<String>> getBuriProcessMap(String packageName) {
-        return getProperties().getBuriProperties().getProcessMap(packageName);
-    }
-    
     public List<String> getBuriActivityList(String packageName, String processName) {
         return getProperties().getBuriProperties().getActivityList(packageName, processName);
     }
-    
+
     // ===================================================================================
     //                                                         SQL Log Registry Properties
     //                                                         ===========================

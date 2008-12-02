@@ -100,6 +100,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Base-DBDef]
     #set ($glDBDef = "${glProjectPrefix}DBDef")
 
+    ## [Allcommon-Base-BuriDef]
+    #set ($glBuriDef = "${glProjectPrefix}BuriDef")
+
     ## [Allcommon-Base-Log]
     #set ($glQLog = "${glProjectPrefix}QLog")
     #set ($glXLog = "${glProjectPrefix}XLog")
@@ -1757,6 +1760,18 @@ targetdatabase = $targetDatabase
     #end
 
     ## -------------------------------------------------------
+    ##                                       allcommon buridef
+    ##                                       -----------------
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+    $database.makeDirectory($path)
+
+    #if ($database.isTargetLanguageJava() && $database.isUseBuri())
+      $database.info("    parse('BuriDef');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBuriDef}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+
+    ## -------------------------------------------------------
     ##                                   allcommon s2container
     ##                                   ---------------------
     #if ($database.isTargetLanguageJava())
@@ -2657,47 +2672,6 @@ targetdatabase = $targetDatabase
           #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
           #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.OutputPath},$path).exists())
             $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-          #end
-        #end
-      #end
-      $database.info("}")
-	  $database.enableGenerateOutputDirectory()
-    #end
-
-    ## ===================================================================================
-    ##                                                                            Buri Bao
-    ##                                                                            ========
-    #if ($database.isBuriGenerateBao() && $database.isTargetLanguageJava())
-      $database.enableBuriBaoOutputDirectory()
-      $database.info("parseBuriBao() {")
-      #set ($myBaseBaoPackageName = "${database.buriBaseBaoPackage}")
-      #set ($myExtendedBaoPackageName = "${database.buriExtendedBaoPackage}")
-
-      #set ($path = $database.getPackageAsPath(${myBaseBaoPackageName}))
-      $database.makeDirectory($path)
-
-      #set ($path = $database.getPackageAsPath(${myExtendedBaoPackageName}))
-      $database.makeDirectory($path)
-
-      #foreach ($table in $database.buriTargetTableList)
-        #set ($myBaseBaoClassName = "${glProjectPrefix}Bs${table.javaName}Bao")
-        #set ($myExtendedBaoClassName = "${glProjectPrefix}${table.javaName}Bao")
-
-        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
-        #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
-
-        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
-        #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
-
-        $database.info("    parse('${myExtendedBaoClassName}');")
-
-        #set ( $path = "${database.getPackageAsPath(${myBaseBaoPackageName})}${myBaseBaoClassName}.java" )
-        $generator.parse("om/${glResourceDirectory}/other/buri/BuriBaseBao.${glTemplateFileExtension}", $path, "table", $table)
-
-        #if (!$database.isStopGenerateExtendedEntity())
-          #set ( $path = "${database.getPackageAsPath(${myExtendedBaoPackageName})}${myExtendedBaoClassName}.java" )
-          #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/other/buri/BuriExtendedBao.${glTemplateFileExtension}", $path, "table", $table)
           #end
         #end
       #end
