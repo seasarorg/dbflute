@@ -413,7 +413,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
-                String msg = "The entity must should primary-key: entity=" + entity;
+                String msg = "The entity should have primary-key: entity=" + entity;
                 throw new ArgumentOutOfRangeException(msg + entity);
             }
         }
