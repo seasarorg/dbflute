@@ -168,20 +168,20 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
 
             Assembly asm = GetType().Assembly;// In same assembly!
-            String text = ReadOutsideSql(sqlFileEncoding, standardPath, dbmsPath, asm);
+            String text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
                 return text;
             }
 
             if (_resultTypeSpecification != null) {
                 asm = _resultTypeSpecification.GetType().Assembly;// In customize entity assembly!
-                text = ReadOutsideSql(sqlFileEncoding, standardPath, dbmsPath, asm);
+                text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
                 if (text != null) {
                     return text;
                 }
             }
 
-            String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
+            text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
             if (text != null) {
                 return text;
             }
@@ -189,7 +189,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return null;// Unreachable!
         }
         
-        protected String ReadOutsideSql(String sqlFileEncoding, String standardPath, String dbmsPath, Assembly asm) {
+        protected String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix
+                                      , String standardPath, String dbmsPath, Assembly asm) {
             if (IsExistResource(dbmsPath, asm)) {
                 return ReadText(dbmsPath, sqlFileEncoding, asm);
             } else if ("_postgresql".Equals(dbmsSuffix) && IsExistResource("_postgre", asm)) {
