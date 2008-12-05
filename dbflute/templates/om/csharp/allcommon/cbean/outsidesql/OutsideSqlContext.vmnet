@@ -166,7 +166,30 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
             String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
+
             Assembly asm = GetType().Assembly;// In same assembly!
+            String text = ReadOutsideSql(sqlFileEncoding, standardPath, dbmsPath, asm);
+            if (text != null) {
+                return text;
+            }
+
+            if (_resultTypeSpecification != null) {
+                asm = _resultTypeSpecification.GetType().Assembly;// In customize entity assembly!
+                text = ReadOutsideSql(sqlFileEncoding, standardPath, dbmsPath, asm);
+                if (text != null) {
+                    return text;
+                }
+            }
+
+            String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
+            if (text != null) {
+                return text;
+            }
+            ThrowOutsideSqlNotFoundException(standardPath);
+            return null;// Unreachable!
+        }
+        
+        protected String ReadOutsideSql(String sqlFileEncoding, String standardPath, String dbmsPath, Assembly asm) {
             if (IsExistResource(dbmsPath, asm)) {
                 return ReadText(dbmsPath, sqlFileEncoding, asm);
             } else if ("_postgresql".Equals(dbmsSuffix) && IsExistResource("_postgre", asm)) {
@@ -175,14 +198,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return ReadText("_mssql", sqlFileEncoding, asm); // Patch for name difference
             } else if (IsExistResource(standardPath, asm)) {
                 return ReadText(standardPath, sqlFileEncoding, asm);
-            } else {
-                String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
-                if (text != null) {
-                    return text;
-                }
-                ThrowOutsideSqlNotFoundException(standardPath);
-                return null;// Non Reachable.
             }
+            return null;
         }
 
         protected String BuildDbmsPath(String standardPath, String dbmsSuffix) {
