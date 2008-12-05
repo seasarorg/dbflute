@@ -10,6 +10,9 @@
 #foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
     <include path="${includePath}"/>
 #end
+#if ($database.isUseBuri())
+    <include path="buri/dicon/buriSimple.dicon"/>
+#end
 
     <!-- The core component of DBFlute. (Basically internal components except for behaviorSelector) -->
     <component name="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}"/>

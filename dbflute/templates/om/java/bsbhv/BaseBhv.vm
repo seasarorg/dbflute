@@ -651,16 +651,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return selectList(cb);
     }
 
-    // protected org.escafe.buri.engine.processor.SimpleBuriProcessor _simpleBuriProcessor;
-    // public void setSimpleBuriProcessor(org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor) {
-    //     _simpleBuriProcessor = simpleBuriProcessor;
-    // }
+    protected org.escafe.buri.engine.processor.SimpleBuriProcessor _simpleBuriProcessor;
+    public void setSimpleBuriProcessor(org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor) {
+        _simpleBuriProcessor = simpleBuriProcessor;
+    }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        Class<org.escafe.buri.engine.processor.SimpleBuriProcessor> type = org.escafe.buri.engine.processor.SimpleBuriProcessor.class;
-        org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor = org.seasar.framework.container.SingletonS2Container.getComponent(type);
-        simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}.path(), ${myEntityVariableName});
+        _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}.path(), ${myEntityVariableName});
+    }
+    public void toNextStatusAction_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, String action) {
+        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}.path(), ${myEntityVariableName}, action);
     }
     public void getEntities(${glBuriDef}.${processName} activity) { // Making...
     }
