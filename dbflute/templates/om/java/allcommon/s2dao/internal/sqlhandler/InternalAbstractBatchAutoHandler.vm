@@ -14,6 +14,7 @@ import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
 import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException};
 import ${glPackageBaseCommonException}.${glEntityDuplicatedException};
 import ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException};
@@ -119,7 +120,7 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
     //                                                                     Optimistic Lock
     //                                                                     ===============
     protected void handleBatchUpdateResultWithOptimisticLock(PreparedStatement ps, List<?> list, int[] result) {
-        if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
+        if (isCurrentDBDef(${glDBDef}.Oracle)) {
             final int updateCount;
             try {
                 updateCount = ps.getUpdateCount();
@@ -131,6 +132,10 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         } else {
             handleBatchUpdateResultWithOptimisticLockByResult(list, result);
         }
+    }
+    
+    protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+	    return ${glResourceContext}.isCurrentDBDef(currentDBDef);
     }
 
     protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount) {

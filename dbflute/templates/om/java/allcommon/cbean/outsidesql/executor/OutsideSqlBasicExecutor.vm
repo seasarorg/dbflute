@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
@@ -52,6 +53,9 @@ public class ${glOutsideSqlBasicExecutorName} {
     /** Table DB name. (NotNull) */
     protected final String _tableDbName;
 
+	/** The current database definition. (NotNull) */
+    protected ${glDBDef} _currentDBDef;
+
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 	
@@ -61,9 +65,11 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlBasicExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, String tableDbName) {
+    public ${glOutsideSqlBasicExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+                                 , String tableDbName, ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._tableDbName = tableDbName;
+        this._currentDBDef = currentDBDef;
     }
 
     // ===================================================================================
@@ -133,6 +139,7 @@ public class ${glOutsideSqlBasicExecutorName} {
         command.setOutsideSqlPath(path);
         command.setParameterBean(pmb);
         command.setOutsideSqlOption(createOutsideSqlOption());
+        command.setCurrentDBDef(_currentDBDef);
         return command;
     }
 
@@ -163,7 +170,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);
+        return new ${glOutsideSqlCursorExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
     }
 
     /**
@@ -177,7 +184,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
-        return new ${glOutsideSqlEntityExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName);
+        return new ${glOutsideSqlEntityExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
     }
 
     // -----------------------------------------------------
@@ -201,7 +208,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} autoPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.autoPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName);
+        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     /**
@@ -222,7 +229,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} manualPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.manualPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName);
+        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     // -----------------------------------------------------

@@ -7,6 +7,7 @@ import javax.sql.XADataSource;
 
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
+import ${glPackageBaseCommon}.${glDBCurrent};
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
@@ -51,12 +52,12 @@ public class ${glBehaviorInitializer} {
      */
     public ${glBehaviorInitializer}(XADataSource xaDataSource) {
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        ${glDBFluteConfig}.getInstance().unlock();
         initializeDBMetaResource();
         handleSqlLogRegistry();
         loadCoolClasses();
         if (xaDataSource != null) {
             showInformation(xaDataSource);
-            setupDBDefByDriverClassName(xaDataSource);
         }
         ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
@@ -91,21 +92,6 @@ public class ${glBehaviorInitializer} {
             sb.append("    url    = " + url).append(getLineSeparator());
             sb.append("    user   = " + user);
             _log.info("{Injection Information}" + getLineSeparator() + sb);
-        }
-    }
-
-    // ===================================================================================
-    //                                                               Database Product Name
-    //                                                               =====================
-    protected void setupDBDefByDriverClassName(XADataSource xaDataSource) {
-        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) {
-            final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            final ${glDBDef} dbdef = ${glDBDef}.byDriverClassName(driverClassName);
-            if (dbdef != null) {
-                ${glDBDef}.setCurrentDef(dbdef);
-                return;
-            }
         }
     }
 

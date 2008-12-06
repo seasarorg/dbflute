@@ -1,5 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectCursorCommand};
@@ -26,13 +27,20 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
+	/** The current database definition. (NotNull) */
+    protected ${glDBDef} _currentDBDef;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlCursorExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+    public ${glOutsideSqlCursorExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+                                  , ${glOutsideSqlOptionName} outsideSqlOption
+                                  , String tableDbName
+                                  , ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
+        this._currentDBDef = currentDBDef;
     }
 
     // ===================================================================================
@@ -63,6 +71,7 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
         command.setOutsideSqlPath(path);
         command.setParameterBean(pmb);
         command.setOutsideSqlOption(_outsideSqlOption);
+        command.setCurrentDBDef(_currentDBDef);
         command.setCursorHandler(handler);
         return command;
     }

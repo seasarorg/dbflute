@@ -1,5 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
@@ -23,6 +24,9 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
 
     /** The option of outside-SQL. (Required) */
     protected ${glOutsideSqlOptionName} _outsideSqlOption;
+
+    /** The current database definition. (Required) */
+    protected ${glDBDef} _currentDBDef;
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -55,6 +59,15 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
     }
 
     // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String buildDbmsSuffix() {
+        assertOutsideSqlBasic("buildDbmsSuffix");
+        final String productName = _currentDBDef.code();
+        return (productName != null ? "_" + productName.toLowerCase() : "");
+    }
+
+    // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertOutsideSqlBasic(String methodName) {
@@ -63,6 +76,9 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
         }
         if (_outsideSqlOption == null) {
             throw new IllegalStateException(buildAssertMessage("_outsideSqlOption", methodName));
+        }
+        if (_currentDBDef == null) {
+            throw new IllegalStateException(buildAssertMessage("_currentDBDef", methodName));
         }
     }
 
@@ -79,5 +95,9 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
 
     public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
         _outsideSqlOption = outsideSqlOption;
+    }
+
+    public void setCurrentDBDef(${glDBDef} currentDBDef) {
+        _currentDBDef = currentDBDef;
     }
 }

@@ -1,0 +1,19 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glInvokerAssistant} {
+
+    public ${glDBDef} assistCurrentDBDef();
+    public ${glSqlClauseCreator} assistSqlClauseCreator();
+    public String assistOutsideSqlPackage();
+    public String assistLogDateFormat();
+    public String assistLogTimestampFormat();
+    public ${glStatementConfig} assistDefaultStatementConfig();
+    public boolean assistInternalDebug();
+}

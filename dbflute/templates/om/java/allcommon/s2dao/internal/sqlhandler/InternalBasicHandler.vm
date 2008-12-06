@@ -206,7 +206,7 @@ public class ${glInternalBasicHandler} {
             if (!${glResourceContext}.isExistResourceContextOnThread()) {
                 return false;
             }
-            return ${glResourceContext}.getResourceContextOnThread().isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
+            return ${glResourceContext}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
         }
 #if ($database.isMakeDeprecated())
 
@@ -577,7 +577,11 @@ public class ${glInternalBasicHandler} {
 
     protected boolean isRemoveLineCommentFromSql() {
         // Because the MS-Access does not support line comments.
-        return ${glDBDef}.isCurrentDef(${glDBDef}.MSAccess);
+        return isCurrentDBDef(${glDBDef}.MSAccess);
+    }
+    
+    protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+	    return ${glResourceContext}.isCurrentDBDef(currentDBDef);
     }
 
     public StatementFactory getStatementFactory() {

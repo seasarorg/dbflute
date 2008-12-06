@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-
 #set ($myClassName = "${glDBFluteConfig}")
+
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -79,31 +79,27 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                Query Log Level Info
     //                                                                ====================
-	public boolean isQueryLogLevelInfo() {
-	    return _queryLogLevelInfo;
-	}
-	
 	public void setQueryLogLevelInfo(boolean queryLogLevelInfo) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
 		    _log.info("...Setting queryLogLevelInfo: " + queryLogLevelInfo);
 		}
-	    _queryLogLevelInfo = queryLogLevelInfo;
+		${glQLog}.unlock();
+		${glQLog}.setQueryLogLevelInfo(queryLogLevelInfo);
+		${glQLog}.lock();
 	}
 	
     // ===================================================================================
     //                                                       Execute Status Log Level Info
     //                                                       =============================
-	public boolean isExecuteStatusLogLevelInfo() {
-	    return _executeStatusLogLevelInfo;
-	}
-	
 	public void setExecuteStatusLogLevelInfo(boolean executeStatusLogLevelInfo) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
 		    _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
 		}
-	    _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
+		${glXLog}.unlock();
+        ${glXLog}.setExecuteStatusLogLevelInfo(executeStatusLogLevelInfo);
+		${glXLog}.lock();
 	}
 	
     // [DBFlute-0.8.2]

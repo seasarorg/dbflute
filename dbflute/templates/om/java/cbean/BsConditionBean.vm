@@ -137,6 +137,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     public ${glConditionQueryInterfaceName} localCQ() {
         return getConditionQuery();
     }
+
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
@@ -175,6 +176,28 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();
     }
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseDB2())
+
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                     Isolation Level
+    //                                                                     ===============
+    // *Database Dependency
+    public void lockWithRR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRR(); } }
+    public void lockWithRS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRS(); } }
+    public void lockWithCS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithCS(); } }
+    public void lockWithUR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithUR(); } }
+
+    protected boolean helpIsSqlClauseDb2() {
+        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2;
+    }
+
+    protected ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2 helpGettingSqlClauseDb2() {
+        return (${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2)getSqlClause();
+    }
+#end
+#end
 
     // ===================================================================================
     //                                                                        Setup Select

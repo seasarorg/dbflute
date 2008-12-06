@@ -15,6 +15,7 @@ import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.util.TypeUtil;
 
 import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 
 /**
  * @author ${database.ClassAuthor}
@@ -129,15 +130,19 @@ public class ${glInternalProcedureMetaDataFactory} {
         }
         final Class<?> type = field.getType();
         if (List.class.isAssignableFrom(type)) {// is for out parameter cursor.
-            if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
+            if (isCurrentDBDef(${glDBDef}.Oracle)) {
                 return ValueTypes.ORACLE_RESULT_SET;
-            } else if (${glDBDef}.isCurrentDef(${glDBDef}.PostgreSQL)) {
+            } else if (isCurrentDBDef(${glDBDef}.PostgreSQL)) {
                 return ValueTypes.POSTGRE_RESULT_SET;
             } else {
                 return ValueTypes.SERIALIZABLE_BYTE_ARRAY;
             }
         }
         return valueTypeFactory.getValueTypeByClass(type);
+    }
+    
+    protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+	    return ${glResourceContext}.isCurrentDBDef(currentDBDef);
     }
 
     protected boolean isInstanceField(final Field field) {

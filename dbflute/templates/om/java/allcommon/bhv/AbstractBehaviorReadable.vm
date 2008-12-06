@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
@@ -59,9 +60,14 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
     protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
-    // =====================================================================================
-    //                                                                         Basic Get All
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    protected abstract ${glDBDef} getCurrentDBDef();
+
+    // ===================================================================================
+    //                                                                       Basic Get All
+    //                                                                       =============
     /**
      * Get count all.
      * @return Count all.
@@ -70,9 +76,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return callGetCountAll();
     }
 
-    // =====================================================================================
-    //                                                                            Count Read
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Count Read
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
@@ -83,9 +89,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return callReadCount(cb);
     }
 
-    // =====================================================================================
-    //                                                                           Entity Read 
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Entity Read 
+    //                                                                         ===========
     /**
      * ${database.ImplementComment}
      * @param cb Condition-bean. (NotNull)
@@ -118,9 +124,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (${glEntityInterfaceName})ls.get(0);
     }
 
-    // =====================================================================================
-    //                                                           Entity Read Internal Helper
-    //                                                           ===========================
+    // ===================================================================================
+    //                                                         Entity Read Internal Helper
+    //                                                         ===========================
     protected <ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}>
             ENTITY helpSelectEntityInternally(CB cb, InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
@@ -430,7 +436,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glOutsideSqlBasicExecutorName} outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return new ${glOutsideSqlBasicExecutorName}(_behaviorCommandInvoker, getTableDbName());
+        return new ${glOutsideSqlBasicExecutorName}(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef());
     }
 
     // ===================================================================================

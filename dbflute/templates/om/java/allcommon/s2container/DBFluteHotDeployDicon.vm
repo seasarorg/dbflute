@@ -15,6 +15,7 @@
     <!-- The core component of DBFlute. (Basically internal components except for behaviorSelector) -->
     <component name="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}"/>
     <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
+    <component name="invokerAssistant" class="${glPackageBaseCommonBhvCore}.${glInvokerAssistantImpl}"/>
     <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}"/>
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
         <destroyMethod name="destroy"/>

@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
@@ -33,13 +33,20 @@ public class ${glOutsideSqlPagingExecutorName} {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
+	/** The current database definition. (NotNull) */
+    protected ${glDBDef} _currentDBDef;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlPagingExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+    public ${glOutsideSqlPagingExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+                                  , ${glOutsideSqlOptionName} outsideSqlOption
+                                  , String tableDbName
+                                  , ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
+        this._currentDBDef = currentDBDef;
     }
 
     // ===================================================================================
@@ -165,7 +172,7 @@ public class ${glOutsideSqlPagingExecutorName} {
 
     protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> createCountExecutor() {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_behaviorCommandInvoker, countOption, _tableDbName);
+        return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
     }
 
     protected void setupScrollableCursorIfNeeds() {
@@ -174,10 +181,6 @@ public class ${glOutsideSqlPagingExecutorName} {
         }
         ${glStatementConfig} statementConfig = _outsideSqlOption.getStatementConfig();
         if (statementConfig != null && statementConfig.getResultSetType() != null) {
-            return;
-        }
-        ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
-        if (defaultStatementConfig != null && defaultStatementConfig.hasResultSetType()) {
             return;
         }
         if (statementConfig == null) {
@@ -200,6 +203,7 @@ public class ${glOutsideSqlPagingExecutorName} {
         command.setOutsideSqlPath(path);
         command.setParameterBean(pmb);
         command.setOutsideSqlOption(_outsideSqlOption);
+        command.setCurrentDBDef(_currentDBDef);
         command.setEntityType(entityType);
         return command;
     }

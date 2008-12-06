@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
@@ -254,7 +254,7 @@ public class ${glOutsideSqlContextName} {
     protected String buildBehaviorSqlPackageName() {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
-        final String outsideSqlPackage = ${glDBFluteConfig}.getInstance().getOutsideSqlPackage();
+        final String outsideSqlPackage = ${glResourceContext}.outsideSqlPackage();
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
             final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
             String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));

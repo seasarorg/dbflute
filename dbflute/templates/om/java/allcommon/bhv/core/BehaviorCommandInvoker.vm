@@ -14,13 +14,10 @@ import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glXLog};
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
@@ -52,6 +49,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // -----------------------------------------------------
     //                                      Injection Target
     //                                      ----------------
+    protected ${glInvokerAssistant} _invokerAssistant;
     protected DataSource _dataSource;
     protected BeanMetaDataFactory _beanMetaDataFactory;
     protected ValueTypeFactory _valueTypeFactory;
@@ -59,9 +57,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // -----------------------------------------------------
     //                                        Fixed Property
     //                                        --------------
-    protected final StatementFactory _statementFactory = createStatememtFactory();
     protected final Map<String, ${glSqlExecution}> _executionMap = new ConcurrentHashMap<String, ${glSqlExecution}>();
-    protected final ${glSqlClauseCreator} _sqlClauseCreator = new ${glSqlClauseCreatorImpl}();
 
     // -----------------------------------------------------
     //                                        Dispose Status
@@ -83,10 +79,19 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
      */
     public void injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand) {
         behaviorCommand.setDataSource(_dataSource);
-        behaviorCommand.setStatementFactory(_statementFactory);
+        behaviorCommand.setStatementFactory(createStatememtFactory());
         behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);
         behaviorCommand.setValueTypeFactory(_valueTypeFactory);
         behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
+    }
+
+    protected StatementFactory createStatememtFactory() {
+        final ${glStatementConfig} defaultStatementConfig = _invokerAssistant.assistDefaultStatementConfig();
+        final boolean internalDebug = _invokerAssistant.assistInternalDebug();
+        ${glInternalStatementFactory} factory = new ${glInternalStatementFactory}();
+        factory.setDefaultStatementConfig(defaultStatementConfig);
+        factory.setInternalDebug(internalDebug);
+        return factory;
     }
 
     protected String getSqlFileEncoding() {
@@ -187,9 +192,21 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     }
 
     protected void setupResourceContext() {
+        assertInvokerAssistant();
         ${glResourceContext} resourceContext = new ${glResourceContext}();
-        resourceContext.setSqlClauseCreator(_sqlClauseCreator);
+        resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
+        resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
+        resourceContext.setOutsideSqlPackage(_invokerAssistant.assistOutsideSqlPackage());
+        resourceContext.setLogDateFormat(_invokerAssistant.assistLogDateFormat());
+        resourceContext.setLogTimestampFormat(_invokerAssistant.assistLogTimestampFormat());
         ${glResourceContext}.setResourceContextOnThread(resourceContext);
+    }
+
+    protected void assertInvokerAssistant() {
+        if (_invokerAssistant == null) {
+            String msg = "The attribute 'invokerAssistant' should not be null!";
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
@@ -222,7 +239,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                     _executionMap.put(key, executionCreator.createSqlExecution());
                 } else {
                     if (isLogEnabled()) {
-                        log("...Getting sqlExecution as cache because the previous thread have already initilized.");
+                        log("...Getting sqlExecution as cache because the previous thread have already initialized.");
                     }
                 }
             }
@@ -661,15 +678,6 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         return ${glXLog}.isLogEnabled();
     }
 
-    protected StatementFactory createStatememtFactory() {
-        final ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
-        final boolean internalDebug = ${glDBFluteConfig}.getInstance().isInternalDebug();
-        ${glInternalStatementFactory} factory = new ${glInternalStatementFactory}();
-        factory.setDefaultStatementConfig(defaultStatementConfig);
-        factory.setInternalDebug(internalDebug);
-        return factory;
-    }
-
     // ===================================================================================
     //                                                                             Dispose
     //                                                                             =======
@@ -731,6 +739,10 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public void setInvokerAssistant(${glInvokerAssistant} invokerAssistant) {
+        _invokerAssistant = invokerAssistant;
+    }
+
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
     }

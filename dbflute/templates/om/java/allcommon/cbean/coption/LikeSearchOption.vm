@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import ${glPackageBaseCommon}.${glDBCurrent};
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
 
@@ -205,7 +206,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
             String tmp = replace(value, _escape, _escape + _escape);
             tmp = replace(tmp, "%", _escape + "%");
             tmp = replace(tmp, "_", _escape + "_");
-            if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
+            if (isCurrentDBDef(${glDBDef}.Oracle)) {
                 tmp = replace(tmp, "\uff05", _escape + "\uff05");
                 tmp = replace(tmp, "\uff3f", _escape + "\uff3f");
             }
@@ -224,6 +225,10 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
             String msg = "The like was wrong string: " + _like;
             throw new IllegalStateException(msg);
         }
+    }
+
+    protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+	    return ${glDBCurrent}.getInstance().isCurrentDBDef(currentDBDef);
     }
 
     // ===================================================================================

@@ -1,5 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
+import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 
 /**
@@ -46,34 +47,96 @@ public class ${glResourceContext} {
     }
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected ${glSqlClauseCreator} _sqlClauseCreator;
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public static ${glDBDef} currentDBDef() {
+        if (!isExistResourceContextOnThread()) {
+            return ${glDBDef}.Unknown;
+        }
+        ${glDBDef} currentDBDef = getResourceContextOnThread().getCurrentDBDef();
+        if (currentDBDef == null) {
+            return ${glDBDef}.Unknown;
+        }
+        return currentDBDef;
+    }
 
-    // ===================================================================================
-    //                                                                   Unique Constraint
-    //                                                                   =================
+    public static boolean isCurrentDBDef(${glDBDef} targetDBDef) {
+        return currentDBDef().equals(targetDBDef);
+    }
+
     /**
      * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
      * @param sqlState SQLState of the SQLException. (Nullable)
      * @param errorCode ErrorCode of the SQLException. (Nullable)
      * @return Is the SQLException from unique constraint?
      */
-    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        if (_sqlClauseCreator == null) {
+    public static boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        if (!isExistResourceContextOnThread()) {
             return false;
         }
-        return _sqlClauseCreator.createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
+        ${glSqlClauseCreator} sqlClauseCreator = getResourceContextOnThread().getSqlClauseCreator();
+        if (sqlClauseCreator == null) {
+            return false;
+        }
+        return sqlClauseCreator.createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
     }
+    
+    public static String outsideSqlPackage() {
+        if (!isExistResourceContextOnThread()) {
+            return null;
+        }
+        return getResourceContextOnThread().getOutsideSqlPackage();
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glDBDef} _currentDBDef;
+    protected ${glSqlClauseCreator} _sqlClauseCreator;
+    protected String _outsideSqlPackage;
+    protected String _logDateFormat;
+    protected String _logTimestampFormat;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public ${glDBDef} getCurrentDBDef() {
+        return _currentDBDef;
+    }
+
+    public void setCurrentDBDef(${glDBDef} currentDBDef) {
+        _currentDBDef = currentDBDef;
+    }
+
     public ${glSqlClauseCreator} getSqlClauseCreator() {
         return _sqlClauseCreator;
     }
 
     public void setSqlClauseCreator(${glSqlClauseCreator} sqlClauseCreator) {
         _sqlClauseCreator = sqlClauseCreator;
+    }
+
+    public String getOutsideSqlPackage() {
+        return _outsideSqlPackage;
+    }
+
+    public void setOutsideSqlPackage(String outsideSqlPackage) {
+        _outsideSqlPackage = outsideSqlPackage;
+    }
+
+    public String getLogDateFormat() {
+        return _logDateFormat;
+    }
+
+    public void setLogDateFormat(String logDateFormat) {
+        _logDateFormat = logDateFormat;
+    }
+
+    public String getLogTimestampFormat() {
+        return _logTimestampFormat;
+    }
+
+    public void setLogTimestampFormat(String logTimestampFormat) {
+        _logTimestampFormat = logTimestampFormat;
     }
 }
