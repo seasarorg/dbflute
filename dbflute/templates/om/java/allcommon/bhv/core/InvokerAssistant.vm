@@ -9,11 +9,33 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
  */
 public interface ${glInvokerAssistant} {
 
+    /**
+     * @return The current database definition. (NotNull)
+     */
     public ${glDBDef} assistCurrentDBDef();
+
+    /**
+     * @return The create of SQL clause. (NotNull)
+     */
     public ${glSqlClauseCreator} assistSqlClauseCreator();
-    public String assistOutsideSqlPackage();
-    public String assistLogDateFormat();
-    public String assistLogTimestampFormat();
+
+    /**
+     * @return The parameter of resource. (NotNull)
+     */
+    public ${glResourceParameter} assistResourceParameter();
+
+    /**
+     * @return The default configure of statement. (NotNull)
+     */
     public ${glStatementConfig} assistDefaultStatementConfig();
+
+    /**
+     * @return Is the internal debug valid? (NotNull)
+     */
     public boolean assistInternalDebug();
+
+    /**
+     * To be disposable.
+     */
+    public void toBeDisposable();
 }

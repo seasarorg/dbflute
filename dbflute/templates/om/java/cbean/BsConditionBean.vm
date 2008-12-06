@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 
 import java.util.Map;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
@@ -344,6 +345,17 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #end
     }
 
+    // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+    @Override
+    protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
+    @Override
+    protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
+
+    // ===================================================================================
+    //                                                                            Internal
+    //                                                                            ========
     // Very Internal (for Suppressing Warn about 'Not Use Import')
     protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }

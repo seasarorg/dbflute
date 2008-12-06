@@ -135,9 +135,11 @@ public class ${glInternalBasicHandler} {
     }
 
     protected String getCompleteSql(Object[] args) {
-        return ${glInternalBindVariableUtil}.getCompleteSql(sql, args);
+        String logDateFormat = ${glResourceContext}.getLogDateFormat();
+        String logTimestampFormat = ${glResourceContext}.getLogTimestampFormat();
+        return ${glInternalBindVariableUtil}.getCompleteSql(sql, args, logDateFormat, logTimestampFormat);
     }
-	
+
     protected ${glSqlLogHandlerName} getSqlLogHander() {
         if (!${glCallbackContextName}.isExistCallbackContextOnThread()) {
             return null;
@@ -153,7 +155,9 @@ public class ${glInternalBasicHandler} {
     //                                               Various
     //                                               -------
     protected String getBindVariableText(Object bindVariable) {
-        return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
+        String logDateFormat = ${glResourceContext}.getLogDateFormat();
+        String logTimestampFormat = ${glResourceContext}.getLogTimestampFormat();
+        return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================

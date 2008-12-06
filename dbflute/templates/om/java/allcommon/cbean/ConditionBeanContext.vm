@@ -159,9 +159,11 @@ public class ${glConditionBeanContextName} {
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
-	public static String convertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
+	public static String convertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb
+	                                                   , String logDateFormat
+	                                                   , String logTimestampFormat) {
 		final String twoWaySql = cb.getSqlClause().getClause();
-	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb);
+	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
 	}
 
     // ===================================================================================

@@ -9,8 +9,6 @@ import javax.sql.DataSource;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
-import org.seasar.framework.util.Disposable;
-import org.seasar.framework.util.DisposableUtil;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glXLog};
@@ -33,15 +31,14 @@ import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
  * The invoker of behavior command.
  * <pre>
  * public interface methods are as follows:
- * 
+ *   o clearExecutionCache();
+ *   o isExecutionCacheEmpty();
  *   o injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand);
  *   o invoke(${glBehaviorCommand} behaviorCommand);
- *   o isDisposable();
- *   o isExecutionCacheEmpty();
  * </pre>
  * @author ${database.ClassAuthor}
  */
-public class ${glBehaviorCommandInvoker} implements Disposable {
+public class ${glBehaviorCommandInvoker} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,19 +52,25 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     protected ValueTypeFactory _valueTypeFactory;
 
     // -----------------------------------------------------
-    //                                        Fixed Property
-    //                                        --------------
+    //                                       Execution Cache
+    //                                       ---------------
     protected final Map<String, ${glSqlExecution}> _executionMap = new ConcurrentHashMap<String, ${glSqlExecution}>();
-
-    // -----------------------------------------------------
-    //                                        Dispose Status
-    //                                        --------------
-    protected boolean disposable;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glBehaviorCommandInvoker}() {
+    }
+
+    // ===================================================================================
+    //                                                                     Execution Cache
+    //                                                                     ===============
+    public void clearExecutionCache() {
+        _executionMap.clear();
+    }
+
+    public boolean isExecutionCacheEmpty() {
+        return _executionMap.isEmpty();
     }
 
     // ===================================================================================
@@ -86,6 +89,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     }
 
     protected StatementFactory createStatememtFactory() {
+        assertInvokerAssistant();
         final ${glStatementConfig} defaultStatementConfig = _invokerAssistant.assistDefaultStatementConfig();
         final boolean internalDebug = _invokerAssistant.assistInternalDebug();
         ${glInternalStatementFactory} factory = new ${glInternalStatementFactory}();
@@ -196,17 +200,8 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         ${glResourceContext} resourceContext = new ${glResourceContext}();
         resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
-        resourceContext.setOutsideSqlPackage(_invokerAssistant.assistOutsideSqlPackage());
-        resourceContext.setLogDateFormat(_invokerAssistant.assistLogDateFormat());
-        resourceContext.setLogTimestampFormat(_invokerAssistant.assistLogTimestampFormat());
+        resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ${glResourceContext}.setResourceContextOnThread(resourceContext);
-    }
-
-    protected void assertInvokerAssistant() {
-        if (_invokerAssistant == null) {
-            String msg = "The attribute 'invokerAssistant' should not be null!";
-            throw new IllegalStateException(msg);
-        }
     }
 
     // ===================================================================================
@@ -249,13 +244,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                 msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
                 throw new IllegalStateException(msg);
             }
-            if (!disposable) {
-                synchronized (this) {
-                    if (!disposable) {
-                        toBeDisposable();
-                    }
-                }
-            }
+            toBeDisposable(); // for HotDeploy
         }
         return execution;
     }
@@ -681,22 +670,9 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     // ===================================================================================
     //                                                                             Dispose
     //                                                                             =======
-    public void toBeDisposable() {
-        DisposableUtil.add(this);
-        disposable = true;
-    }
-
-    public void dispose() {
-        _executionMap.clear();
-        disposable = false;
-    }
-
-    public boolean isDisposable() {
-        return disposable;
-    }
-
-    public boolean isExecutionCacheEmpty() {
-        return _executionMap.isEmpty();
+    protected void toBeDisposable() {
+        assertInvokerAssistant();
+        _invokerAssistant.toBeDisposable();
     }
 
     // ===================================================================================
@@ -726,6 +702,13 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);
             }
+        }
+    }
+
+    protected void assertInvokerAssistant() {
+        if (_invokerAssistant == null) {
+            String msg = "The attribute 'invokerAssistant' should not be null!";
+            throw new IllegalStateException(msg);
         }
     }
 

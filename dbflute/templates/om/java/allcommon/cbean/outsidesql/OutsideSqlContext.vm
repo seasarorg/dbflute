@@ -254,7 +254,7 @@ public class ${glOutsideSqlContextName} {
     protected String buildBehaviorSqlPackageName() {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
-        final String outsideSqlPackage = ${glResourceContext}.outsideSqlPackage();
+        final String outsideSqlPackage = ${glResourceContext}.getOutsideSqlPackage();
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
             final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
             String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));

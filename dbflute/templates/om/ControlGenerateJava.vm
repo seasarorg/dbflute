@@ -107,6 +107,7 @@ targetdatabase = $targetDatabase
     #set ($glInvokerAssistant = "${glProjectPrefix}InvokerAssistant")
     #set ($glInvokerAssistantImpl = "${glProjectPrefix}InvokerAssistantImpl")
     #set ($glResourceContext = "${glProjectPrefix}ResourceContext")
+    #set ($glResourceParameter = "${glProjectPrefix}ResourceParameter")
     #set ($glSqlExecution = "${glProjectPrefix}SqlExecution")
     #set ($glSqlExecutionCreator = "${glProjectPrefix}SqlExecutionCreator")
 
@@ -596,6 +597,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('ResourceContext');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glResourceContext}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/ResourceContext.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('ResourceParameter');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glResourceParameter}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/ResourceParameter.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('SqlExecution');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecution}.${glClassFileExtension}" )

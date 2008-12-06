@@ -4,7 +4,7 @@ import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 
 /**
- * The context of internal resource.
+ * The context of resource.
  * @author ${database.ClassAuthor}
  */
 public class ${glResourceContext} {
@@ -81,11 +81,39 @@ public class ${glResourceContext} {
         return sqlClauseCreator.createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
     }
     
-    public static String outsideSqlPackage() {
+    public static String getOutsideSqlPackage() {
+        ${glResourceParameter} resourceParameter = resourceParameter();
+        if (resourceParameter == null) {
+            return null;
+        }
+        return resourceParameter.getOutsideSqlPackage();
+    }
+    
+    public static String getLogDateFormat() {
+        ${glResourceParameter} resourceParameter = resourceParameter();
+        if (resourceParameter == null) {
+            return null;
+        }
+        return resourceParameter.getLogDateFormat();
+    }
+    
+    public static String getLogTimestampFormat() {
+        ${glResourceParameter} resourceParameter = resourceParameter();
+        if (resourceParameter == null) {
+            return null;
+        }
+        return resourceParameter.getLogTimestampFormat();
+    }
+    
+    protected static ${glResourceParameter} resourceParameter() {
         if (!isExistResourceContextOnThread()) {
             return null;
         }
-        return getResourceContextOnThread().getOutsideSqlPackage();
+        ${glResourceParameter} resourceParameter = getResourceContextOnThread().getResourceParameter();
+        if (resourceParameter == null) {
+            return null;
+        }
+        return resourceParameter;
     }
 
     // ===================================================================================
@@ -93,9 +121,7 @@ public class ${glResourceContext} {
     //                                                                           =========
     protected ${glDBDef} _currentDBDef;
     protected ${glSqlClauseCreator} _sqlClauseCreator;
-    protected String _outsideSqlPackage;
-    protected String _logDateFormat;
-    protected String _logTimestampFormat;
+    protected ${glResourceParameter} _resourceParameter;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -116,27 +142,11 @@ public class ${glResourceContext} {
         _sqlClauseCreator = sqlClauseCreator;
     }
 
-    public String getOutsideSqlPackage() {
-        return _outsideSqlPackage;
+    public ${glResourceParameter} getResourceParameter() {
+        return _resourceParameter;
     }
 
-    public void setOutsideSqlPackage(String outsideSqlPackage) {
-        _outsideSqlPackage = outsideSqlPackage;
-    }
-
-    public String getLogDateFormat() {
-        return _logDateFormat;
-    }
-
-    public void setLogDateFormat(String logDateFormat) {
-        _logDateFormat = logDateFormat;
-    }
-
-    public String getLogTimestampFormat() {
-        return _logTimestampFormat;
-    }
-
-    public void setLogTimestampFormat(String logTimestampFormat) {
-        _logTimestampFormat = logTimestampFormat;
+    public void setResourceParameter(${glResourceParameter} resourceParameter) {
+        _resourceParameter = resourceParameter;
     }
 }

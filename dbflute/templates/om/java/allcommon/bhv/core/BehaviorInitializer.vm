@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.XADataSource;
+#if ($database.isTargetContainerSeasar())
 
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
+#end
 
-import ${glPackageBaseCommon}.${glDBCurrent};
-import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -81,7 +81,8 @@ public class ${glBehaviorInitializer} {
     //                                                                         Information
     //                                                                         ===========
     protected void showInformation(XADataSource xaDataSource) {
-        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) {
+#if ($database.isTargetContainerSeasar())
+        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) { // by Seasar
             final StringBuilder sb = new StringBuilder();
             final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
@@ -93,6 +94,15 @@ public class ${glBehaviorInitializer} {
             sb.append("    user   = " + user);
             _log.info("{Injection Information}" + getLineSeparator() + sb);
         }
+#end
+#if ($database.isTargetContainerSpring())
+        if (xaDataSource != null) { // by Spring
+            final StringBuilder sb = new StringBuilder();
+            sb.append("  [XADataSource]:").append(getLineSeparator());
+            sb.append("    " + xaDataSource).append(getLineSeparator());
+            _log.info("{Injection Information}" + getLineSeparator() + sb);
+        }
+#end
     }
 
     // ===================================================================================

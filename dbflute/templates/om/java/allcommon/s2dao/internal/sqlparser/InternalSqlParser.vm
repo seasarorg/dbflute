@@ -1015,14 +1015,19 @@ public class ${glInternalSqlParser} {
     // ===================================================================================
     //                                                                             Convert
     //                                                                             =======
-    public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
+    public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg
+                                                   , String logDateFormat
+                                                   , String logTimestampFormat) {
         final String[] argNames = new String[]{"dto"};
         final Class<?>[] argTypes = new Class<?>[]{arg.getClass()};
         final Object[] args = new Object[]{arg};
-        return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
+        return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args, logDateFormat, logTimestampFormat);
     }
     
-    public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+    public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames
+                                                   , Class<?>[] argTypes, Object[] args
+                                                   , String logDateFormat
+                                                   , String logTimestampFormat) {
         final CommandContext context;
         {
             final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, false);
@@ -1032,6 +1037,6 @@ public class ${glInternalSqlParser} {
             node.accept(context);
         }
         final String preparedSql = context.getSql();
-        return ${glInternalBindVariableUtil}.getCompleteSql(preparedSql, context.getBindVariables());
+        return ${glInternalBindVariableUtil}.getCompleteSql(preparedSql, context.getBindVariables(), logDateFormat, logTimestampFormat);
     }
 }

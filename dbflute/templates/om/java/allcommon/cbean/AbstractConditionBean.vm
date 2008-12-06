@@ -998,8 +998,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * @return SQL for display. (NotNull and NotEmpty)
      */
     public String toDisplaySql() {
-        return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
+        return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
     }
+    protected abstract String getLogDateFormat();
+    protected abstract String getLogTimestampFormat();
     
     // [DBFlute-0.7.4]
     // ===================================================================================
