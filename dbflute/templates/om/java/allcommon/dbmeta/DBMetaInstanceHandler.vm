@@ -1,11 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
-#set ($myClassName = "${glDBMetaInstanceHandlerName}")
+#set ($myClassName = "${glDBMetaInstanceHandler}")
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
+import ${glPackageBaseCommonException}.${glDBMetaNotFoundException};
 import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
@@ -13,19 +14,19 @@ import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
  * The instance handler of DB meta.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${myClassName} implements ${glDBMetaProvider} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
+    /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
 
     // ===================================================================================
     //                                                                        Resource Map
     //                                                                        ============
     /** Table DB-name instance map. */
-    protected static final Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = newConcurrentHashMap();
+    protected static final Map<String, ${glDBMeta}> _tableDbNameInstanceMap = newConcurrentHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
     protected static final Map<String, String> _tableDbNameClassNameMap = newConcurrentHashMap();
@@ -73,7 +74,7 @@ public class ${myClassName} {
     /**
      * @return The initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
-    public static Map<String, ${glDBMetaInterfaceName}> getDBMetaMap() {
+    public static Map<String, ${glDBMeta}> getDBMetaMap() {
         initializeDBMetaMap();
         return _tableDbNameInstanceMap;
     }
@@ -109,9 +110,23 @@ public class ${myClassName} {
      * </pre>
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception DBMetaNotFoundException When the DB meta is not found.
+     * @exception ${glPackageBaseCommonException}.${glDBMetaNotFoundException} When the DB meta is not found.
      */
-    public static ${glDBMetaInterfaceName} findDBMeta(String tableFlexibleName) {
+    public static ${glDBMeta} findDBMeta(String tableFlexibleName) {
+        ${glDBMeta} dbmeta = byTableFlexibleName(tableFlexibleName);
+        if (dbmeta == null) {
+            String msg = "The DB meta was not found by the table flexible name: " + tableFlexibleName;
+            msg = msg + " key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
+            throw new ${glDBMetaNotFoundException}(msg);
+        }
+        return dbmeta;
+    }
+
+    /**
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     */
+    protected static ${glDBMeta} byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         final int dotLastIndex = tableFlexibleName.lastIndexOf(".");
         if (dotLastIndex >= 0) {
@@ -121,34 +136,19 @@ public class ${myClassName} {
         if (tableDbName != null) {
             return byTableDbName(tableDbName);
         }
-        String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
-        throw new DBMetaNotFoundException(msg);
-    }
-
-    public static class DBMetaNotFoundException extends IllegalStateException {
-        private static final long serialVersionUID = 1L;
-        public DBMetaNotFoundException(String msg) {
-            super(msg);
-        }
+        return null;
     }
 
     /**
-     * Get instance by table DB-name.
-     * @param tableDbName Table DB-name. (NotNull)
-     * @return Instance. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
+     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
      */
-    protected static ${glDBMetaInterfaceName} byTableDbName(String tableDbName) {
+    protected static ${glDBMeta} byTableDbName(String tableDbName) {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
-        ${glDBMetaInterfaceName} instance = getCachedDBMeta(tableDbName);
-        if (instance == null) {
-            String msg = "The instance map returned null by the key:";
-            msg = msg + " key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
-            throw new DBMetaNotFoundException(msg);
-        }
-        return instance;
+        return getCachedDBMeta(tableDbName);
     }
     
-    protected static ${glDBMetaInterfaceName} getCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
+    protected static ${glDBMeta} getCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
         if (_tableDbNameInstanceMap.containsKey(tableName)) {
             return _tableDbNameInstanceMap.get(tableName);
         }
@@ -162,15 +162,26 @@ public class ${myClassName} {
         return _tableDbNameInstanceMap.get(tableName);
     }
 
-    protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
+    protected static ${glDBMeta} getDBMeta(String className) {
         try {
             Class<?> clazz = Class.forName(className);
             Method methoz = clazz.getMethod("getInstance", (Class[])null);
             Object result = methoz.invoke(null, (Object[])null);
-            return (${glDBMetaInterfaceName})result;
+            return (${glDBMeta})result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // ===================================================================================
+    //                                                             Provider Implementation
+    //                                                             =======================
+    /**
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     */
+    public ${glDBMeta} provideDBMeta(String tableFlexibleName) {
+        return byTableFlexibleName(tableFlexibleName);
     }
 
     // ===================================================================================

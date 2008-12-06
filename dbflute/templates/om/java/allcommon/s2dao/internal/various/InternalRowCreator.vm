@@ -13,8 +13,8 @@ import org.seasar.dao.impl.RowCreatorImpl;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -34,7 +34,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBMetaInterfaceName} _dbmeta;
+    protected ${glDBMeta} _dbmeta;
     
     // ===================================================================================
     //                                                                         Constructor
@@ -64,7 +64,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
         PropertyType pt = null;
         String propertyName = null;
         final Object row;
-        final ${glDBMetaInterfaceName} dbmeta;
+        final ${glDBMeta} dbmeta;
         if (_dbmeta != null) {
             dbmeta = _dbmeta;
             row = dbmeta.newEntity();
@@ -111,7 +111,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
         }
     }
     
-    protected void throwNonsenseClassCastException(Object entity, ${glDBMetaInterfaceName} dbmeta, ClassCastException e) {
+    protected void throwNonsenseClassCastException(Object entity, ${glDBMeta} dbmeta, ClassCastException e) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
@@ -151,7 +151,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
      * @param row The instance of row. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
-    public static ${glDBMetaInterfaceName} findDBMeta(Object row) {
+    public static ${glDBMeta} findDBMeta(Object row) {
         return DBMetaCacheHandler.findDBMeta(row);
     }
 
@@ -160,7 +160,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
      * @param tableName The name of table. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
-    public static ${glDBMetaInterfaceName} findDBMeta(Class<?> rowType, String tableName) {
+    public static ${glDBMeta} findDBMeta(Class<?> rowType, String tableName) {
         return DBMetaCacheHandler.findDBMeta(rowType, tableName);
     }
 
@@ -169,12 +169,12 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
         /** The key of DBMeta cache. */
         protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
 
-        public static ${glDBMetaInterfaceName} findDBMeta(Object row) {
+        public static ${glDBMeta} findDBMeta(Object row) {
             if (!(row instanceof ${glEntityInterfaceName})) {
                 return null;
             }
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) row;
-            ${glDBMetaInterfaceName} dbmeta = findCachedDBMeta(entity.getClass());
+            ${glDBMeta} dbmeta = findCachedDBMeta(entity.getClass());
             if (dbmeta != null) {
                 return dbmeta;
             }
@@ -183,45 +183,41 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
             return dbmeta;
         }
         
-        public static ${glDBMetaInterfaceName} findDBMeta(Class<?> rowType, String tableName) {
-            ${glDBMetaInterfaceName} dbmeta = findCachedDBMeta(rowType);
+        public static ${glDBMeta} findDBMeta(Class<?> rowType, String tableName) {
+            ${glDBMeta} dbmeta = findCachedDBMeta(rowType);
             if (dbmeta != null) {
                 return dbmeta;
             }
-            try {
-                dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableName);
-            } catch (${glDBMetaInstanceHandlerName}.DBMetaNotFoundException ignored) {
-                return null;
-            }
+            dbmeta = ${glResourceContext}.provideDBMeta(tableName);
             cacheDBMeta(rowType, dbmeta);
             return dbmeta;
         }
 
-        protected static ${glDBMetaInterfaceName} findCachedDBMeta(Class<?> rowType) {
-            Map<Class<?>, ${glDBMetaInterfaceName}> dbmetaCache = findDBMetaCache();
+        protected static ${glDBMeta} findCachedDBMeta(Class<?> rowType) {
+            Map<Class<?>, ${glDBMeta}> dbmetaCache = findDBMetaCache();
             if (dbmetaCache == null) {
-                dbmetaCache = new HashMap<Class<?>, ${glDBMetaInterfaceName}>();
+                dbmetaCache = new HashMap<Class<?>, ${glDBMeta}>();
                 ${glInternalMapContextName}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
             }
             return dbmetaCache.get(rowType);
         }
         
-        protected static void cacheDBMeta(${glEntityInterfaceName} entity, ${glDBMetaInterfaceName} dbmeta) {
+        protected static void cacheDBMeta(${glEntityInterfaceName} entity, ${glDBMeta} dbmeta) {
             cacheDBMeta(entity.getClass(), dbmeta);
         }
         
-        protected static void cacheDBMeta(Class<?> type, ${glDBMetaInterfaceName} dbmeta) {
-            final Map<Class<?>, ${glDBMetaInterfaceName}> dbmetaCache = findDBMetaCache();
+        protected static void cacheDBMeta(Class<?> type, ${glDBMeta} dbmeta) {
+            final Map<Class<?>, ${glDBMeta}> dbmetaCache = findDBMetaCache();
             dbmetaCache.put(type, dbmeta);
         }
         
         @SuppressWarnings("unchecked")
-        protected static Map<Class<?>, ${glDBMetaInterfaceName}> findDBMetaCache() {
-            return (Map<Class<?>, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
+        protected static Map<Class<?>, ${glDBMeta}> findDBMetaCache() {
+            return (Map<Class<?>, ${glDBMeta}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
         }
     }
 
-    protected static ${glDBMetaInterfaceName} findDBMetaByClass(Class<?> beanClass) {
+    protected static ${glDBMeta} findDBMetaByClass(Class<?> beanClass) {
         final Object instance = newInstance(beanClass);
         if (!(instance instanceof ${glEntityInterfaceName})) {
             return null;
@@ -249,7 +245,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+    public void setDBMeta(${glDBMeta} dbmeta) {
         this._dbmeta = dbmeta;
     }
 }

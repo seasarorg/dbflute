@@ -16,8 +16,7 @@ import org.seasar.dao.SqlCommand;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalCommandContextHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
@@ -103,7 +102,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} implements SqlCommand, $
      */
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(entity.getTableDbName());
+        ${glDBMeta} dbmeta = entity.getDBMeta();
         Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
         if (modifiedPropertyNames.isEmpty()) {
             return null;

@@ -6,6 +6,8 @@ import org.seasar.framework.util.DisposableUtil;
 import ${glPackageBaseCommon}.${glDBCurrent};
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
@@ -18,6 +20,7 @@ public class ${glInvokerAssistantImpl} implements ${glInvokerAssistant}, Disposa
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final ${glDBMetaProvider} _dbmetaProvider = createDBMetaProvider();
     protected final ${glSqlClauseCreator} _sqlClauseCreator = createSqlClauseCreator();
     protected ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
     protected boolean _disposable;
@@ -29,11 +32,19 @@ public class ${glInvokerAssistantImpl} implements ${glInvokerAssistant}, Disposa
         return new ${glSqlClauseCreatorImpl}();
     }
 
+    protected ${glDBMetaProvider} createDBMetaProvider() {
+        return new ${glDBMetaInstanceHandler}();
+    }
+
     // ===================================================================================
     //                                                                 Assistant Main Work
     //                                                                 ===================
     public ${glDBDef} assistCurrentDBDef() {
         return ${glDBCurrent}.getInstance().currentDBDef();
+    }
+
+    public ${glDBMetaProvider} assistDBMetaProvider() {
+        return _dbmetaProvider;
     }
 
     public ${glSqlClauseCreator} assistSqlClauseCreator() {

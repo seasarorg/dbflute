@@ -10,8 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ${glPackageBaseCommonBhvCore}.${glResourceContext};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonException}.${glDBMetaNotFoundException};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleResourceUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -252,7 +252,11 @@ public class ${glOutsideSqlContextName} {
     }
 
     protected String buildBehaviorSqlPackageName() {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+        final ${glDBMeta} dbmeta = ${glResourceContext}.provideDBMeta(_tableDbName);
+        if (dbmeta == null) {
+            String msg = "The DB meta was not found by the table DB name: " + _tableDbName;
+            throw new ${glDBMetaNotFoundException}(msg);
+        }
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String outsideSqlPackage = ${glResourceContext}.getOutsideSqlPackage();
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {

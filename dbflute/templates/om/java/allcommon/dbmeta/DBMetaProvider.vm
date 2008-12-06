@@ -1,0 +1,15 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
+
+/**
+ * The interface of DB meta.
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glDBMetaProvider} {
+
+    /**
+     * Provide the DB meta.
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     */
+    public ${glDBMeta} provideDBMeta(String tableFlexibleName);
+}

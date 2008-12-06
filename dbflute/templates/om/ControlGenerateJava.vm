@@ -229,8 +229,11 @@ targetdatabase = $targetDatabase
     #set ($glWhereClauseSimpleFilterInterfaceName = "${glProjectPrefix}WhereClauseSimpleFilter")
 
     ## [Allcommon-DBMeta]
+    #set ($glDBMeta = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaProvider = "${glProjectPrefix}DBMetaProvider")
+    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaHierarchy]
@@ -262,6 +265,7 @@ targetdatabase = $targetDatabase
     #set ($glBindVariableParameterNullValueException = "${glProjectPrefix}BindVariableParameterNullValueException")
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glDangerousResultSizeException = "${glProjectPrefix}DangerousResultSizeException")
+    #set ($glDBMetaNotFoundException = "${glProjectPrefix}DBMetaNotFoundException")
     #set ($glEmbeddedValueCommentNotFoundPropertyException = "${glProjectPrefix}EmbeddedValueCommentNotFoundPropertyException")
     #set ($glEmbeddedValueParameterNullValueException = "${glProjectPrefix}EmbeddedValueParameterNullValueException")
     #set ($glEndCommentNotFoundException = "${glProjectPrefix}EndCommentNotFoundException")
@@ -1203,13 +1207,17 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.info("public void parseDBMetaClass() {")
-    $database.info("    parseDBMeta();")
+    $database.info("    parse('DBMeta');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMeta.${glTemplateFileExtension}",$path,"", "")
 
-    $database.info("    parseAbstractDBMeta();")
+    $database.info("    parse('AbstractDBMeta');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/AbstractDBMeta.${glTemplateFileExtension}",$path,"", "")
+
+    $database.info("    parse('DBMetaProvider');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaProvider}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMetaProvider.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageJava())
       #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy}))
@@ -1346,6 +1354,10 @@ targetdatabase = $targetDatabase
     $database.info("    parse('DangerousResultSizeException');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeException}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/exception/DangerousResultSizeException.${glTemplateFileExtension}",$path,"", "")
+
+    $database.info("    parse('DBMetaNotFoundException');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glDBMetaNotFoundException}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/exception/DBMetaNotFoundException.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('EntityAlreadyUpdatedException');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glEntityAlreadyUpdatedException}.${glClassFileExtension}" )

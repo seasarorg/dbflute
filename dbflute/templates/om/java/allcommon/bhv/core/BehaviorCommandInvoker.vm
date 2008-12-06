@@ -16,8 +16,8 @@ import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonException}.${glDBMetaNotFoundException};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
@@ -198,8 +198,9 @@ public class ${glBehaviorCommandInvoker} {
     protected void setupResourceContext() {
         assertInvokerAssistant();
         ${glResourceContext} resourceContext = new ${glResourceContext}();
-        resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
+        resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
+        resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ${glResourceContext}.setResourceContextOnThread(resourceContext);
     }
@@ -532,7 +533,11 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     protected String findBehaviorClassNameFromDBMeta(String tableDbName) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableDbName);
+        final ${glDBMeta} dbmeta = ${glResourceContext}.provideDBMeta(tableDbName);
+        if (dbmeta == null) {
+            String msg = "The DB meta was not found by the table DB name: " + tableDbName;
+            throw new ${glDBMetaNotFoundException}(msg);
+        }
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
         return removeBasePrefixFromSimpleClassName(behaviorClassName);

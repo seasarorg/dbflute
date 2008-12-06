@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
 import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 
 /**
@@ -49,6 +51,9 @@ public class ${glResourceContext} {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    /**
+     * @return The current database definition. (NotNull)
+     */
     public static ${glDBDef} currentDBDef() {
         if (!isExistResourceContextOnThread()) {
             return ${glDBDef}.Unknown;
@@ -62,6 +67,21 @@ public class ${glResourceContext} {
 
     public static boolean isCurrentDBDef(${glDBDef} targetDBDef) {
         return currentDBDef().equals(targetDBDef);
+    }
+
+    /**
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (Nullable)
+     */
+    public static ${glDBMeta} provideDBMeta(String tableFlexibleName) {
+        if (!isExistResourceContextOnThread()) {
+            return null;
+        }
+        ${glDBMetaProvider} provider = getResourceContextOnThread().getDBMetaProvider();
+        if (provider == null) {
+            return null;
+        }
+        return provider.provideDBMeta(tableFlexibleName);
     }
 
     /**
@@ -120,6 +140,7 @@ public class ${glResourceContext} {
     //                                                                           Attribute
     //                                                                           =========
     protected ${glDBDef} _currentDBDef;
+    protected ${glDBMetaProvider} _dbmetaProvider;
     protected ${glSqlClauseCreator} _sqlClauseCreator;
     protected ${glResourceParameter} _resourceParameter;
 
@@ -132,6 +153,14 @@ public class ${glResourceContext} {
 
     public void setCurrentDBDef(${glDBDef} currentDBDef) {
         _currentDBDef = currentDBDef;
+    }
+
+    public ${glDBMetaProvider} getDBMetaProvider() {
+        return _dbmetaProvider;
+    }
+
+    public void setDBMetaProvider(${glDBMetaProvider} dbmetaProvider) {
+        _dbmetaProvider = dbmetaProvider;
     }
 
     public ${glSqlClauseCreator} getSqlClauseCreator() {

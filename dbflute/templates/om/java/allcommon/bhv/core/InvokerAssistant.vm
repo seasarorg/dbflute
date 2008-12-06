@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
 import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 
@@ -13,6 +14,11 @@ public interface ${glInvokerAssistant} {
      * @return The current database definition. (NotNull)
      */
     public ${glDBDef} assistCurrentDBDef();
+
+    /**
+     * @return The provider of DB meta. (NotNull)
+     */
+    public ${glDBMetaProvider} assistDBMetaProvider();
 
     /**
      * @return The create of SQL clause. (NotNull)
