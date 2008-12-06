@@ -51,7 +51,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /** SQL clause instance. */
     protected final ${glSqlClauseName} _sqlClause;
     {
-        _sqlClause = ${glConditionBeanContextName}.createSqlClause(this);
+        _sqlClause = createSqlClause();
     }
 
     /** Safety max result size. */
@@ -78,6 +78,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public ${glSqlClauseName} getSqlClause() {
         return _sqlClause;
     }
+
+	/**
+	 * Create SQL clause. {for condition-bean}
+	 * @param cb Condition-bean. (NotNull) 
+	 * @return SQL clause. (NotNull)
+	 */
+    protected abstract ${glSqlClauseName} createSqlClause();
 
     // ===================================================================================
     //                                                                 Where Clause Filter

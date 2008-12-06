@@ -1,0 +1,79 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
+
+/**
+ * The context of internal resource.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glResourceContext} {
+
+    // ===================================================================================
+    //                                                                        Thread Local
+    //                                                                        ============
+    /** The thread-local for this. */
+    private static final ThreadLocal<${glResourceContext}> threadLocal = new ThreadLocal<${glResourceContext}>();
+
+    /**
+     * Get the context of resource by the key.
+     * @return The context of resource. (Nullable)
+     */
+    public static ${glResourceContext} getResourceContextOnThread() {
+        return threadLocal.get();
+    }
+
+    /**
+     * Set the context of resource.
+     * @param resourceCountext The context of resource. (NotNull)
+     */
+    public static void setResourceContextOnThread(${glResourceContext} resourceCountext) {
+        threadLocal.set(resourceCountext);
+    }
+
+    /**
+     * Is existing the context of resource on thread?
+     * @return Determination.
+     */
+    public static boolean isExistResourceContextOnThread() {
+        return (threadLocal.get() != null);
+    }
+
+    /**
+     * Clear the context of resource on thread.
+     */
+    public static void clearResourceContextOnThread() {
+        threadLocal.set(null);
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glSqlClauseCreator} _sqlClauseCreator;
+
+    // ===================================================================================
+    //                                                                   Unique Constraint
+    //                                                                   =================
+    /**
+     * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
+     * @param sqlState SQLState of the SQLException. (Nullable)
+     * @param errorCode ErrorCode of the SQLException. (Nullable)
+     * @return Is the SQLException from unique constraint?
+     */
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        if (_sqlClauseCreator == null) {
+            return false;
+        }
+        return _sqlClauseCreator.createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glSqlClauseCreator} getSqlClauseCreator() {
+        return _sqlClauseCreator;
+    }
+
+    public void setSqlClauseCreator(${glSqlClauseCreator} sqlClauseCreator) {
+        _sqlClauseCreator = sqlClauseCreator;
+    }
+}

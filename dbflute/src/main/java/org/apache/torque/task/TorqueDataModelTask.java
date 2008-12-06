@@ -79,24 +79,43 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                       =============
     @Override
     protected void doExecute() {
+        setupControlTemplate();
+        super.doExecute();
+        setupBehaviorQueryPath();
+        showSkippedFileInformation();
+        refreshResources();
+    }
+
+    protected void setupControlTemplate() {
         final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
         if (jdbcProperties.hasS2jdbcDefinition()) {
             _log.info("* * * * * * * * * *");
             _log.info("* Process S2JDBC  *");
             _log.info("* * * * * * * * * *");
             setControlTemplate("om/java/other/s2jdbc/s2jdbc-Control.vm");
+            return;
         }
-        if (!getBasicProperties().isTargetLanguageMain()) {
+        if (getBasicProperties().isTargetLanguageMain()) {
+            final String language;
+            if (getBasicProperties().isTargetLanguageJava()) {
+                language = "Java";
+            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                language = "CSharp";
+            } else {
+                String msg = "Unknown Main Language: " + getBasicProperties().getTargetLanguage();
+                throw new IllegalStateException(msg);
+            }
+            _log.info("* * * * * * * * * * *");
+            _log.info("* Process " + language + "     *");
+            _log.info("* * * * * * * * * * *");
+            setControlTemplate("om/ControlGenerate" + language + ".vm");
+        } else {
             final String language = getBasicProperties().getTargetLanguage();
             _log.info("* * * * * * * * * *");
             _log.info("* Process " + language + "     *");
             _log.info("* * * * * * * * * *");
             setControlTemplate("om/" + language + "/Control-" + language + ".vm");
         }
-        super.doExecute();
-        setupBehaviorQueryPath();
-        showSkippedFileInformation();
-        refreshResources();
     }
 
     @Override

@@ -8,6 +8,8 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
 import ${glPackageBaseCommonCBean}.${glSubQuery};
 import ${glPackageBaseCommonCBean}.${glUnionQuery};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 #if ($table.hasForeignKeyOrReferrerAsOne())
@@ -24,6 +26,14 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                           Attribute
     //                                                                           =========
     protected ${myConditionQueryClassName} _conditionQuery;
+
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
+    @Override
+    protected ${glSqlClauseName} createSqlClause() {
+        return new ${glSqlClauseCreatorImpl}().createSqlClause(this);
+    }
 
     // ===================================================================================
     //                                                                          Table Name

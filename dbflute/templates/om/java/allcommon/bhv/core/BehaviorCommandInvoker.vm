@@ -19,6 +19,8 @@ import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
@@ -59,6 +61,7 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
     //                                        --------------
     protected final StatementFactory _statementFactory = createStatememtFactory();
     protected final Map<String, ${glSqlExecution}> _executionMap = new ConcurrentHashMap<String, ${glSqlExecution}>();
+    protected final ${glSqlClauseCreator} _sqlClauseCreator = new ${glSqlClauseCreatorImpl}();
 
     // -----------------------------------------------------
     //                                        Dispose Status
@@ -115,6 +118,8 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
      * @return The result object. (Nullable)
      */
     protected <RESULT> RESULT doInvoke(${glBehaviorCommand}<RESULT> behaviorCommand) {
+        setupResourceContext();
+
         // - - - - - - - - - - - - -
         // Initialize SQL Execution
         // - - - - - - - - - - - - -
@@ -179,6 +184,12 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         @SuppressWarnings("unchecked")
         final RESULT result = (RESULT)ret;
         return result;
+    }
+
+    protected void setupResourceContext() {
+        ${glResourceContext} resourceContext = new ${glResourceContext}();
+        resourceContext.setSqlClauseCreator(_sqlClauseCreator);
+        ${glResourceContext}.setResourceContextOnThread(resourceContext);
     }
 
     // ===================================================================================
@@ -633,6 +644,9 @@ public class ${glBehaviorCommandInvoker} implements Disposable {
         }
         if (${glInternalMapContextName}.isExistInternalMapContextOnThread()) {
             ${glInternalMapContextName}.clearInternalMapContextOnThread();
+        }
+        if (${glResourceContext}.isExistResourceContextOnThread()) {
+            ${glResourceContext}.clearResourceContextOnThread();
         }
     }
 

@@ -40,6 +40,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
@@ -104,20 +105,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfS2jdbcProperties jdbcProperties = getProperties().getS2jdbcProperties();
-        if (jdbcProperties.hasS2jdbcDefinition()) {
-            _log.info("* * * * * * * * * *");
-            _log.info("* Process S2JDBC  *");
-            _log.info("* * * * * * * * * *");
-            setControlTemplate("om/java/other/s2jdbc/s2jdbc-sql2entity-Control.vm");
-        }
-        if (!getBasicProperties().isTargetLanguageMain()) {
-            final String language = getBasicProperties().getTargetLanguage();
-            _log.info("* * * * * * * * * *");
-            _log.info("* Process " + language + "     *");
-            _log.info("* * * * * * * * * *");
-            setControlTemplate("om/" + language + "/sql2entity-Control-" + language + ".vm");
-        }
+        setupControlTemplate();
         setupDataSource();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();
@@ -142,6 +130,37 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         refreshResources();
     }
 
+    protected void setupControlTemplate() {
+        final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
+        if (jdbcProperties.hasS2jdbcDefinition()) {
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process S2JDBC  *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/java/other/s2jdbc/s2jdbc-sql2entity-Control.vm");
+            return;
+        }
+        if (getBasicProperties().isTargetLanguageMain()) {
+            final String language;
+            if (getBasicProperties().isTargetLanguageJava()) {
+                language = "Java";
+            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                language = "CSharp";
+            } else {
+                String msg = "Unknown Main Language: " + getBasicProperties().getTargetLanguage();
+                throw new IllegalStateException(msg);
+            }
+            _log.info("* * * * * * * * * * *");
+            _log.info("* Process " + language + "     *");
+            _log.info("* * * * * * * * * * *");
+            setControlTemplate("om/ControlSql2Entity" + language + ".vm");
+        } else {
+            final String language = getBasicProperties().getTargetLanguage();
+            _log.info("* * * * * * * * * *");
+            _log.info("* Process " + language + "     *");
+            _log.info("* * * * * * * * * *");
+            setControlTemplate("om/" + language + "/sql2entity-Control-" + language + ".vm");
+        }
+    }
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================

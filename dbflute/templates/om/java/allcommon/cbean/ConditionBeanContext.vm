@@ -3,8 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
@@ -112,47 +110,6 @@ public class ${glConditionBeanContextName} {
     }
 
     // ===================================================================================
-    //                                                                   SqlClause Creator
-    //                                                                   =================
-	/**
-	 * Create SQL-clause. {for condition-bean}
-	 * @param cb Condition-bean. (NotNull) 
-	 * @return SQL-clause. (NotNull)
-	 */
-    public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
-        final String tableSqlName = cb.getTableSqlName();
-		final ${glSqlClauseName} sqlClause = createSqlClause(tableSqlName);
-        return sqlClause;
-    }
-
-	/**
-	 * Create SQL-clause. {for SimplePagingBean}
-	 * @param tableDbName The DB name of table. (NotNull) 
-	 * @return SQL-clause. (NotNull)
-	 */
-    public static ${glSqlClauseName} createSqlClause(String tableDbName) {
-        if (${glDBDef}.isCurrentDef(${glDBDef}.MySQL)) {
-            return new ${glSqlClauseName}MySql(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.PostgreSQL)) {
-            return new ${glSqlClauseName}PostgreSql(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
-            return new ${glSqlClauseName}Oracle(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.DB2)) {
-            return new ${glSqlClauseName}Db2(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.SQLServer)) {
-            return new ${glSqlClauseName}SqlServer(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.FireBird)) {
-            return new ${glSqlClauseName}Firebird(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.H2)) {
-            return new ${glSqlClauseName}H2(tableDbName);
-        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Derby)) {
-            return new ${glSqlClauseName}Derby(tableDbName);
-        } else {
-            return new ${glSqlClauseName}${database.generateDbName}(tableDbName);
-        }
-    }
-
-    // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
     public static void throwEntityAlreadyDeletedException(Object searchKey4Log) {
@@ -206,20 +163,6 @@ public class ${glConditionBeanContextName} {
 		final String twoWaySql = cb.getSqlClause().getClause();
 	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb);
 	}
-
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                                                   Unique Constraint
-    //                                                                   =================
-    /**
-     * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
-     * @param sqlState SQLState of the SQLException. (Nullable)
-     * @param errorCode ErrorCode of the SQLException. (Nullable)
-     * @return Is the SQLException from unique constraint?
-     */
-    public static boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
-    }
 
     // ===================================================================================
     //                                                                              Helper

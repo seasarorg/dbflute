@@ -6,7 +6,6 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 
 /**
  * The interface of simple filter for where clause.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${myClassName} {
@@ -22,7 +21,6 @@ public interface ${myClassName} {
 
     /**
      * Filter clause element.
-     * 
      * @param clauseElement Clause element of where. (NotNull and NotEmpty)
      * @return Filtered where clause. (NotNull and NotEmpty)
      */
@@ -32,7 +30,6 @@ public interface ${myClassName} {
      * The simple filter for where clause to embedded. <br />
      * *Attension -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
-     * 
      * @author ${database.ClassAuthor}
      */
     public static class WhereClauseToEmbeddedSimpleFilter implements ${myClassName} {
@@ -40,17 +37,16 @@ public interface ${myClassName} {
         protected java.util.Set<${glColumnInfoName}> _filterTargetColumnInfoSet;
 
         public WhereClauseToEmbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
-            this._filterTargetColumnInfoSet = new java.util.HashSet${database.filterGenericsString(${glColumnInfoName})}();
+            this._filterTargetColumnInfoSet = new java.util.HashSet<${glColumnInfoName}>();
             this._filterTargetColumnInfoSet.add(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedSimpleFilter(java.util.Set<${glColumnInfoName}> filterTargetColumnInfoSet) {
             this._filterTargetColumnInfoSet = filterTargetColumnInfoSet;
         }
 
         /**
          * Filter clause element.
-         * 
          * @param clauseElement Clause element of where. (NotNull and NotEmpty)
          * @return Filtered where clause. (NotNull and NotEmpty)
          */
@@ -77,9 +73,7 @@ public interface ${myClassName} {
             return clauseElement;
         }
 
-        protected final String replace(String text, String fromText,
-                String toText) {
-
+        protected final String replace(String text, String fromText, String toText) {
             if (text == null || fromText == null || toText == null) {
                 return null;
             }
@@ -108,7 +102,6 @@ public interface ${myClassName} {
      * The simple filter for where clause to embedded and quoted. <br />
      * *Attension -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
-     * 
      * @author ${database.ClassAuthor}
      */
     public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
@@ -117,7 +110,7 @@ public interface ${myClassName} {
             super(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedQuotedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedQuotedSimpleFilter(java.util.Set<${glColumnInfoName}> filterTargetColumnInfoSet) {
             super(filterTargetColumnInfoSet);
         }
 

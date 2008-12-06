@@ -28,7 +28,9 @@ public class ${myClassName} {
 #else
 	protected boolean _useSqlLogRegistry;
 #end
+#if ($database.isMakeDeprecated())
 	protected UniqueConstraintDeterminator _uniqueConstraintDeterminator;
+#end
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
 #if ($database.isOutsideSqlPackageValid())
@@ -119,15 +121,24 @@ public class ${myClassName} {
 		}
 	    _useSqlLogRegistry = useSqlLogRegistry;
 	}
+#if ($database.isMakeDeprecated())
 
     // [DBFlute-0.7.7]
     // ===================================================================================
     //                                                                   Unique Constraint
     //                                                                   =================
+    /**
+     * @return The determinator of unique constraint. (Nullable)
+     * @deprecated
+     */
 	public UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
 	    return _uniqueConstraintDeterminator;
 	}
 
+    /**
+     * @param uniqueConstraintDeterminator The determinator of unique constraint. (Nullable)
+     * @deprecated
+     */
 	public void setUniqueConstraintDeterminator(UniqueConstraintDeterminator uniqueConstraintDeterminator) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
@@ -139,6 +150,7 @@ public class ${myClassName} {
     public static interface UniqueConstraintDeterminator {
         public boolean isUniqueConstraintException(Throwable t);
     }
+#end
 
     // ===================================================================================
     //                                                                          Log Format

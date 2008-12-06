@@ -14,9 +14,12 @@ import org.seasar.extension.jdbc.types.ValueTypes;
 
 import ${glPackageBaseCommon}.${glCallbackContextName};
 import ${glPackageBaseCommon}.${glDBDef};
+#if ($database.isMakeDeprecated())
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+#end
 import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommon}.${glQLog};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
@@ -194,17 +197,25 @@ public class ${glInternalBasicHandler} {
         }
     
         protected boolean isUniqueConstraintException(SQLException e) {
+#if ($database.isMakeDeprecated())
             ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
             if (determinator != null) {
                 return determinator.isUniqueConstraintException(e);
             }
-            return ${glConditionBeanContextName}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
+#end
+            if (!${glResourceContext}.isExistResourceContextOnThread()) {
+                return false;
+            }
+            return ${glResourceContext}.getResourceContextOnThread().isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
         }
-    
+#if ($database.isMakeDeprecated())
+
+        @SuppressWarnings("deprecation")
         protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
             return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
         }
-    
+#end
+
         protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();

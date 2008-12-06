@@ -63,51 +63,26 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                            Class Name
     ##                                            ----------
-    ## [Allcommon-Annotation]
     #set ($glOutsideSqlAnnotation = "OutsideSql")
-
-    ## [Allcommon-Base-Context]
     #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
     #set ($glCallbackContextName = "${glProjectPrefix}CallbackContext")
-
-    ## [Allcommon-Base-Dao]
     #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
     #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
-
-    ## [Allcommon-Base-Entity]
     #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
     #set ($glCommonColumnBasicAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
-
-    ## [Allcommon-Base-CacheAbstractSelector]
     #set ($glCacheAbstractSelector = "${glProjectPrefix}CacheAbstractSelector")
-
-    ## [Allcommon-Base-DaoSelector]
     #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
     #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
-
-    ## [Allcommon-Base-BehaviorSelector]
     #set ($glBehaviorSelectorInterfaceName = "${glProjectPrefix}BehaviorSelector")
     #set ($glCacheBehaviorSelectorName = "${glProjectPrefix}CacheBehaviorSelector")
-
-    ## [Allcommon-Base-InternalMapContext]
     #set ($glInternalMapContextName = "${glProjectPrefix}InternalMapContext")
-
-    ## [Allcommon-Base-CDef]
     #set ($glCDef = "${glProjectPrefix}CDef")
-
-    ## [Allcommon-Base-DBDef]
     #set ($glDBDef = "${glProjectPrefix}DBDef")
-
-    ## [Allcommon-Base-BuriDef]
     #set ($glBuriDef = "${glProjectPrefix}BuriDef")
-
-    ## [Allcommon-Base-Log]
     #set ($glQLog = "${glProjectPrefix}QLog")
     #set ($glXLog = "${glProjectPrefix}XLog")
-
-    ## [Allcommon-Base-DBFluteConfig]
     #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 
     ## [Allcommon-Behavior]
@@ -128,6 +103,7 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorCommandComponentSetup = "${glProjectPrefix}BehaviorCommandComponentSetup")
     #set ($glBehaviorCommandInvoker = "${glProjectPrefix}BehaviorCommandInvoker")
     #set ($glBehaviorInitializer = "${glProjectPrefix}BehaviorInitializer")
+    #set ($glResourceContext = "${glProjectPrefix}ResourceContext")
     #set ($glSqlExecution = "${glProjectPrefix}SqlExecution")
     #set ($glSqlExecutionCreator = "${glProjectPrefix}SqlExecutionCreator")
 
@@ -242,6 +218,8 @@ targetdatabase = $targetDatabase
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
+    #set ($glSqlClauseCreator = "${glProjectPrefix}SqlClauseCreator")
+    #set ($glSqlClauseCreatorImpl = "${glProjectPrefix}SqlClauseCreatorImpl")
     #set ($glOrderByClauseName = "${glProjectPrefix}OrderByClause")
     #set ($glOrderByElementName = "${glProjectPrefix}OrderByElement")
     #set ($glWhereClauseSimpleFilterInterfaceName = "${glProjectPrefix}WhereClauseSimpleFilter")
@@ -701,6 +679,10 @@ targetdatabase = $targetDatabase
       $database.info("    parse('BehaviorInitializer');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorInitializer}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorInitializer.${glTemplateFileExtension}",$path,"", "")
+
+      $database.info("    parse('ResourceContext');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glResourceContext}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/ResourceContext.${glTemplateFileExtension}",$path,"", "")
 
       $database.info("    parse('SqlExecution');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecution}.${glClassFileExtension}" )
@@ -1271,7 +1253,16 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
     #if ($database.isTargetLanguageJava())
+      $database.info("parse('SqlClauseCreator');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseCreator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
+      $database.info("parse('SqlClauseCreatorImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseCreatorImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreatorImpl.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+
+    #if ($database.isTargetLanguageJava())
       $database.info("    parse('WhereClauseSimpleFilter');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glWhereClauseSimpleFilterInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/WhereClauseSimpleFilter.${glTemplateFileExtension}",$path ,"" ,"")

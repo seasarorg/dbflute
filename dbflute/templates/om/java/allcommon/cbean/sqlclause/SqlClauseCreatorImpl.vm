@@ -1,0 +1,49 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+
+/**
+ * The creator of SQL clause.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSqlClauseCreatorImpl} implements ${glSqlClauseCreator} {
+
+	/**
+	 * Create SQL clause. {for condition-bean}
+	 * @param cb Condition-bean. (NotNull) 
+	 * @return SQL clause. (NotNull)
+	 */
+    public ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
+        final String tableSqlName = cb.getTableSqlName();
+		final ${glSqlClauseName} sqlClause = createSqlClause(tableSqlName);
+        return sqlClause;
+    }
+
+	/**
+	 * Create SQL clause.
+	 * @param tableDbName The DB name of table. (NotNull) 
+	 * @return SQL clause. (NotNull)
+	 */
+    public ${glSqlClauseName} createSqlClause(String tableDbName) {
+        if (${glDBDef}.isCurrentDef(${glDBDef}.MySQL)) {
+            return new ${glSqlClauseName}MySql(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.PostgreSQL)) {
+            return new ${glSqlClauseName}PostgreSql(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Oracle)) {
+            return new ${glSqlClauseName}Oracle(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.DB2)) {
+            return new ${glSqlClauseName}Db2(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.SQLServer)) {
+            return new ${glSqlClauseName}SqlServer(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.FireBird)) {
+            return new ${glSqlClauseName}Firebird(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.H2)) {
+            return new ${glSqlClauseName}H2(tableDbName);
+        } else if (${glDBDef}.isCurrentDef(${glDBDef}.Derby)) {
+            return new ${glSqlClauseName}Derby(tableDbName);
+        } else {
+            return new ${glSqlClauseName}${database.generateDbName}(tableDbName);
+        }
+    }
+}
