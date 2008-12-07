@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumnName};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIteratorName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
@@ -23,7 +23,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     //                                                                           Attribute
     //                                                                           =========
     /** The dbmeta of desination. */
-    protected ${glDBMetaInterfaceName} destinationDBMeta;
+    protected ${glDBMeta} destinationDBMeta;
 
     /** The iterator of hierarychy source. */
     protected ${glHierarchySourceIteratorName} sourceIterator;
@@ -84,7 +84,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param sourceColumn The column of source. (NotNull)
      * @param relationTrace The relation trace of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glDBMetaInterfaceName}.RelationTrace relationTrace) {
+    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glDBMeta}.RelationTrace relationTrace) {
         setupElement(sourceColumn, relationTrace.getTraceColumn());
         addRelationToLastElement(relationTrace.getTraceRelation());
     }
@@ -95,7 +95,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @param relationTrace The relation trace of destination. (NotNull)
      */
-    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glDBMetaInterfaceName}.RelationTrace relationTrace) {
+    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glDBMeta}.RelationTrace relationTrace) {
         setupElement(sourceColumnInfo, relationTrace.getTraceColumn());
         addRelationToLastElement(relationTrace.getTraceRelation());
     }
@@ -172,8 +172,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             firstSourceColumnInfo4Check = sourceColumnInfo;
             return;
         }
-        final ${glDBMetaInterfaceName} expectedDBMeta = firstSourceColumnInfo4Check.getDBMeta();
-        final ${glDBMetaInterfaceName} actualDBMeta = sourceColumnInfo.getDBMeta();
+        final ${glDBMeta} expectedDBMeta = firstSourceColumnInfo4Check.getDBMeta();
+        final ${glDBMeta} actualDBMeta = sourceColumnInfo.getDBMeta();
         if (!expectedDBMeta.equals(actualDBMeta)) {
             String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -196,8 +196,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             final ${glHierarchyRequestElementName} currentElement = currentElement();
             final List<${glRelationInfoName}> relationInfoList = currentElement.getRelationInfoList();
             if (relationInfoList.isEmpty()) {
-                final ${glDBMetaInterfaceName} actualDBMeta = currentElement().getDestinationDBMeta();
-                final ${glDBMetaInterfaceName} expectedDBMeta = destinationDBMeta;
+                final ${glDBMeta} actualDBMeta = currentElement().getDestinationDBMeta();
+                final ${glDBMeta} expectedDBMeta = destinationDBMeta;
                 if (!expectedDBMeta.equals(actualDBMeta)) {
                     String msg = "The wrong destinationColumnInfo!" + getLineSeparator();
                     msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -270,11 +270,11 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glDBMetaInterfaceName} getDestinationDBMeta() {
+    public ${glDBMeta} getDestinationDBMeta() {
         return destinationDBMeta;
     }
 
-    public void setDestinationDBMeta(${glDBMetaInterfaceName} destinationDBMeta) {
+    public void setDestinationDBMeta(${glDBMeta} destinationDBMeta) {
         this.destinationDBMeta = destinationDBMeta;
     }
 

@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
 #set ($myClassName = "${glUniqueInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The class of unique info.
@@ -14,7 +14,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBMetaInterfaceName} dbmeta;
+    protected ${glDBMeta} dbmeta;
     protected java.util.List${database.filterGenericsString(${glColumnInfoName})} uniqueColumnList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
     protected boolean primary;
 
@@ -38,11 +38,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glDBMetaInterfaceName} getDBMeta() {
+    public ${glDBMeta} getDBMeta() {
         return dbmeta;
     }
 
-    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+    public void setDBMeta(${glDBMeta} dbmeta) {
         this.dbmeta = dbmeta;
     }
 

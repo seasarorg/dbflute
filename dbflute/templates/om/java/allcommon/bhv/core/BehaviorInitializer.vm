@@ -10,7 +10,7 @@ import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 #end
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -67,7 +67,7 @@ public class ${glBehaviorInitializer} {
     //                                                                              DBMeta
     //                                                                              ======
     protected void initializeDBMetaResource() {
-        ${glDBMetaInstanceHandlerName}.setupDBMetaResource(_tableDbNameClassNameMap);
+        ${glDBMetaInstanceHandler}.setupDBMetaResource(_tableDbNameClassNameMap);
     }
 
     // ===================================================================================

@@ -4,7 +4,7 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The interface of behavior-readable.
@@ -28,7 +28,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * Get the instance of DBMeta.
      * @return The instance of DBMeta. (NotNull)
      */
-    public ${glDBMetaInterfaceName} getDBMeta();
+    public ${glDBMeta} getDBMeta();
 
     // ===================================================================================
     //                                                                        New Instance

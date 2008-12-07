@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
 import java.util.List;
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
@@ -26,7 +26,7 @@ public class ${myClassName} {
     protected ${glHierarchySourceColumnName} sourceColumn;
 
     /** The dbmeta of destination. */
-    protected ${glDBMetaInterfaceName} destinationDBMeta;
+    protected ${glDBMeta} destinationDBMeta;
 
     /** The column info of destination. */
     protected ${glColumnInfoName} destinationColumnInfo;
@@ -98,11 +98,11 @@ public class ${myClassName} {
         this.sourceColumn = sourceColumn;
     }
 
-    public void setDestinationDBMeta(${glDBMetaInterfaceName} destinationDBMeta) {
+    public void setDestinationDBMeta(${glDBMeta} destinationDBMeta) {
         this.destinationDBMeta = destinationDBMeta;
     }
 
-    public ${glDBMetaInterfaceName} getDestinationDBMeta() {
+    public ${glDBMeta} getDestinationDBMeta() {
         return destinationDBMeta;
     }
 

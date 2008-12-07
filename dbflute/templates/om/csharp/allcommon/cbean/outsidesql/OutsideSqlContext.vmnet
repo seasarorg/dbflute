@@ -240,7 +240,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected String BuildBehaviorSqlPackageName() {
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableDbName);
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableDbName);
             String behaviorTypeName = dbmeta.BehaviorTypeName;
             String outsideSqlPackage = ${glDBFluteConfig}.GetInstance().OutsideSqlPackage;
             if (outsideSqlPackage != null && outsideSqlPackage.Trim().Length > 0) {

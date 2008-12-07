@@ -71,7 +71,7 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
     //                                                                       Lock Override
     //                                                                       =============
     public override ${glSqlClauseInterfaceName} lockForUpdate() {
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableName);
         if (dbmeta.HasPrimaryKey) {
             String primaryKeyColumnName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
             _lockSqlSuffix = " for update of " + _tableName + "." + primaryKeyColumnName;

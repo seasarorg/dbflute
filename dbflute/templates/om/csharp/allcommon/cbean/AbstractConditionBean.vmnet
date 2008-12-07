@@ -463,7 +463,7 @@ namespace ${glPackageBaseCommonCBean} {
             if (aliasName == null || aliasName.Trim().Length == 0) {
                 throwDerivedReferrerInvalidAliasNameException();
             }
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_baseCB.TableDbName);
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_baseCB.TableDbName);
             PropertyInfo[] properties = dbmeta.EntityType.GetProperties();
             String targetPropertyName = aliasName.Replace("_", "").ToLower();
             bool existsSetterMethod = false;

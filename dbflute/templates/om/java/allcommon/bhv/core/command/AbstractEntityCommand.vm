@@ -9,7 +9,7 @@ import org.seasar.dao.BeanMetaData;
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * @author ${database.ClassAuthor}
@@ -105,12 +105,12 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected ${glDBMetaInterfaceName} findDBMeta() {
+    protected ${glDBMeta} findDBMeta() {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
         // Cannot use the handler of DBMeta instance
         // because the customize-entity is contained to find here.
         // - - - - - - - - - -/
-        // ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+        // ${glDBMetaInstanceHandler}.findDBMeta(_tableDbName);
 
         final Class<?> beanType = _entityType;
         if (beanType == null) {

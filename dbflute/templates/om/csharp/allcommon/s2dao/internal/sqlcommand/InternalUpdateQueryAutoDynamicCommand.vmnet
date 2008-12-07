@@ -90,7 +90,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
      */
     protected String buildQueryUpdateTwoWaySql(${glConditionBeanInterfaceName} cb, ${glEntityInterfaceName} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(entity.TableDbName);
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(entity.TableDbName);
         System.Collections.Generic.IDictionary<String, Object> modifiedPropertyNames = entity.ModifiedPropertyNames;
         if (modifiedPropertyNames.Count == 0) {
             return null;

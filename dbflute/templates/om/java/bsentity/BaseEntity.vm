@@ -11,9 +11,9 @@ import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 #else
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 #end
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 #if (!$isSql2Entity)
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 #end
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;
@@ -135,15 +135,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    public ${glDBMetaInterfaceName} getDBMeta() {
+    public ${glDBMeta} getDBMeta() {
         return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
     }
 #else
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    public ${glDBMetaInterfaceName} getDBMeta() {
-        return ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+    public ${glDBMeta} getDBMeta() {
+        return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
     }
 #end
 

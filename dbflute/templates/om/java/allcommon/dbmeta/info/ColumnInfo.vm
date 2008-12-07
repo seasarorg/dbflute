@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
 #set ($myClassName = "${glColumnInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName}.OptimisticLockType;
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta}.OptimisticLockType;
 
 /**
  * The information of column.
@@ -14,7 +14,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBMetaInterfaceName} dbmeta;
+    protected ${glDBMeta} dbmeta;
     protected String columnDbName;
     protected String propertyName;
     protected Class<?> propertyType;
@@ -26,21 +26,21 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) {
+    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName) {
         this(dbmeta, columnDbName, null, null, false, null, null);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary, Integer columnSize) {
         this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, null);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
         this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName
+    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary, Integer columnSize
                            , Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
         this.dbmeta = dbmeta;
@@ -136,11 +136,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glDBMetaInterfaceName} getDBMeta() {
+    public ${glDBMeta} getDBMeta() {
         return dbmeta;
     }
 
-    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+    public void setDBMeta(${glDBMeta} dbmeta) {
         this.dbmeta = dbmeta;
     }
 

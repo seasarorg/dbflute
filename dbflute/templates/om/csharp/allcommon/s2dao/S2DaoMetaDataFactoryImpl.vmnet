@@ -325,8 +325,8 @@ namespace ${glPackageBaseCommonS2Dao} {
     //                                                                         ===========
     public class InternalRowCreator : RowCreatorImpl {
 
-        protected ${glDBMetaInterfaceName} _dbmeta;
-        public ${glDBMetaInterfaceName} DBMeta { set { _dbmeta = value; } }
+        protected ${glDBMeta} _dbmeta;
+        public ${glDBMeta} DBMeta { set { _dbmeta = value; } }
 
         public static InternalRowCreator CreateInternalRowCreator(Type beanClass) {
             InternalRowCreator rowCreator = new InternalRowCreator();
@@ -336,7 +336,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return rowCreator;
         }
 
-        protected static ${glDBMetaInterfaceName} FindDBMetaByClass(Type beanClass) {
+        protected static ${glDBMeta} FindDBMetaByClass(Type beanClass) {
             Object instance = NewInstance(beanClass);
             if (!(instance is ${glEntityInterfaceName})) {
                 return null;
@@ -350,7 +350,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
             Object row;
-            ${glDBMetaInterfaceName} dbmeta;
+            ${glDBMeta} dbmeta;
             if (_dbmeta != null) {
                 dbmeta = _dbmeta;
                 row = dbmeta.NewEntity();
@@ -376,11 +376,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             return row;
         }
 
-		public static ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		public static ${glDBMeta} FindDBMeta(Object row) {
 		    return DBMetaCacheHandler.FindDBMeta(row);
         }
 
-		public static ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
+		public static ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
 		    return DBMetaCacheHandler.FindDBMeta(rowType, tableName);
         }
     }
@@ -388,12 +388,12 @@ namespace ${glPackageBaseCommonS2Dao} {
 	public class DBMetaCacheHandler {
 	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
 		
-		public static ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		public static ${glDBMeta} FindDBMeta(Object row) {
 		    if (!(row is ${glEntityInterfaceName})) {
 			    return null;
 			}
 			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
-            ${glDBMetaInterfaceName} dbmeta = FindCachedDBMeta(entity.GetType());
+            ${glDBMeta} dbmeta = FindCachedDBMeta(entity.GetType());
 			if (dbmeta != null) {
 			    return dbmeta;
 			}
@@ -402,13 +402,13 @@ namespace ${glPackageBaseCommonS2Dao} {
 		    return dbmeta;
         }
         
-        public static ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
-            ${glDBMetaInterfaceName} dbmeta = FindCachedDBMeta(rowType);
+        public static ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
+            ${glDBMeta} dbmeta = FindCachedDBMeta(rowType);
             if (dbmeta != null) {
                 return dbmeta;
             }
             try {
-                dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableName);
+                dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableName);
             } catch (DBMetaNotFoundException) {
                 return null;
             }
@@ -416,10 +416,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             return dbmeta;
         }
 
-        protected static ${glDBMetaInterfaceName} FindCachedDBMeta(Type rowType) {
-            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = FindDBMetaCache();
+        protected static ${glDBMeta} FindCachedDBMeta(Type rowType) {
+            System.Collections.Generic.IDictionary<Type, ${glDBMeta}> dbmetaCache = FindDBMetaCache();
             if (dbmetaCache == null) {
-                dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMetaInterfaceName}>();
+                dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMeta}>();
                 ${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
             }
             if (dbmetaCache.ContainsKey(rowType)) {
@@ -428,17 +428,17 @@ namespace ${glPackageBaseCommonS2Dao} {
             return null;
         }
         
-        protected static void CacheDBMeta(${glEntityInterfaceName} entity, ${glDBMetaInterfaceName} dbmeta) {
+        protected static void CacheDBMeta(${glEntityInterfaceName} entity, ${glDBMeta} dbmeta) {
             CacheDBMeta(entity.GetType(), dbmeta);
         }
         
-        protected static void CacheDBMeta(Type type, ${glDBMetaInterfaceName} dbmeta) {
-            System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = FindDBMetaCache();
+        protected static void CacheDBMeta(Type type, ${glDBMeta} dbmeta) {
+            System.Collections.Generic.IDictionary<Type, ${glDBMeta}> dbmetaCache = FindDBMetaCache();
             dbmetaCache.Add(type, dbmeta);
         }
         
-        protected static System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}> FindDBMetaCache() {
-            return (System.Collections.Generic.IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
+        protected static System.Collections.Generic.IDictionary<Type, ${glDBMeta}> FindDBMetaCache() {
+            return (System.Collections.Generic.IDictionary<Type, ${glDBMeta}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
         }
 	}
 	
@@ -447,7 +447,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override void SetupRelationKeyValue(RelationRowCreationResource res) {
             IRelationPropertyType rpt = res.RelationPropertyType;
             IBeanMetaData bmd = rpt.BeanMetaData;
-            ${glDBMetaInterfaceName} dbmeta = FindDBMeta(bmd.BeanType, bmd.TableName);
+            ${glDBMeta} dbmeta = FindDBMeta(bmd.BeanType, bmd.TableName);
             for (int i = 0; i < rpt.KeySize; ++i) {
                 String columnName = rpt.GetMyKey(i) + res.BaseSuffix;
 
@@ -479,14 +479,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        protected Object CreateRelationRowInstance(${glDBMetaInterfaceName} dbmeta) {
+        protected Object CreateRelationRowInstance(${glDBMeta} dbmeta) {
             if (dbmeta != null) {
                 return dbmeta.NewEntity();
             }
             return null;
         }
 
-        protected ${glDBMetaInterfaceName} FindDBMeta(Type rowType, String tableName) {
+        protected ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
             return InternalRowCreator.FindDBMeta(rowType, tableName);
         }
 
@@ -523,7 +523,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             if (value != null) {
                 res.IncrementValidValueCount();
-				${glDBMetaInterfaceName} dbmeta = FindDBMeta(res.Row);
+				${glDBMeta} dbmeta = FindDBMeta(res.Row);
 				String propertyName = pt.PropertyName;
 				if (dbmeta != null && dbmeta.HasEntityPropertySetupper(propertyName)) {
 				    dbmeta.SetupEntityProperty(propertyName, res.Row, value);
@@ -534,7 +534,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 		
-		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		protected ${glDBMeta} FindDBMeta(Object row) {
 		    return InternalRowCreator.FindDBMeta(row);
         }
 

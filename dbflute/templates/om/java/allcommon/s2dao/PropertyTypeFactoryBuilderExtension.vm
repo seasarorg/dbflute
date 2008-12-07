@@ -16,7 +16,7 @@ import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.impl.AbstractPropertyTypeFactory;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47}
@@ -47,7 +47,7 @@ public class ${glPropertyTypeFactoryBuilderExtension} implements PropertyTypeFac
     //                                                                     ===============
     protected static class FastPropertyTypeFactoryExtension extends AbstractPropertyTypeFactory {
 
-        protected ${glDBMetaInterfaceName} _dbmeta;
+        protected ${glDBMeta} _dbmeta;
         protected String[] _noPersisteneProps;
 
         public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
@@ -77,7 +77,7 @@ public class ${glPropertyTypeFactoryBuilderExtension} implements PropertyTypeFac
             return _dbmeta != null;
         }
 
-        protected ${glDBMetaInterfaceName} findDBMeta() {
+        protected ${glDBMeta} findDBMeta() {
             try {
                 final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) beanClass.newInstance();
                 return entity.getDBMeta();

@@ -9,8 +9,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
     public interface ${myClassName} {
 
         String RelationPropertyName { get; }
-        ${glDBMetaInterfaceName} LocalDBMeta { get; }
-        ${glDBMetaInterfaceName} TargetDBMeta { get; }
+        ${glDBMeta} LocalDBMeta { get; }
+        ${glDBMeta} TargetDBMeta { get; }
         Map<${glColumnInfoName},${glColumnInfoName}> LocalTargetColumnInfoMap { get; }
         bool IsOneToOne { get; }
         bool IsReferrer { get; }

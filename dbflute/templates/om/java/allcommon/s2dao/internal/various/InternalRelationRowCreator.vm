@@ -17,7 +17,7 @@ import org.seasar.dao.impl.RelationRowCreatorImpl;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * @author ${database.ClassAuthor}
@@ -42,7 +42,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     protected void setupRelationKeyValue(RelationRowCreationResource res) {
         final RelationPropertyType rpt = res.getRelationPropertyType();
         final BeanMetaData bmd = rpt.getBeanMetaData();
-        final ${glDBMetaInterfaceName} dbmeta = findDBMeta(bmd.getBeanClass(), bmd.getTableName());
+        final ${glDBMeta} dbmeta = findDBMeta(bmd.getBeanClass(), bmd.getTableName());
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 
@@ -74,14 +74,14 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
         }
     }
 
-    protected Object createRelationRowInstance(${glDBMetaInterfaceName} dbmeta) {
+    protected Object createRelationRowInstance(${glDBMeta} dbmeta) {
         if (dbmeta != null) {
             return dbmeta.newEntity();
         }
         return null;
     }
 
-    protected ${glDBMetaInterfaceName} findDBMeta(Class<?> rowType, String tableName) {
+    protected ${glDBMeta} findDBMeta(Class<?> rowType, String tableName) {
         return ${glInternalRowCreator}.findDBMeta(rowType, tableName);
     }
 
@@ -123,7 +123,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
         
         if (value != null) {
             res.incrementValidValueCount();
-            final ${glDBMetaInterfaceName} dbmeta = findDBMeta(res.getRow());
+            final ${glDBMeta} dbmeta = findDBMeta(res.getRow());
             final String propertyName = pt.getPropertyName();
             if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
                 dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
@@ -138,7 +138,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
      * @param row The instance of row. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
-    protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
+    protected ${glDBMeta} findDBMeta(Object row) {
         return ${glInternalRowCreator}.findDBMeta(row);
     }
 

@@ -94,12 +94,12 @@ namespace ${myExtendedEntityPackageName} {
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        public ${glDBMetaInterfaceName} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+        public ${glDBMeta} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
 #else
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        public ${glDBMetaInterfaceName} DBMeta { get { return ${glDBMetaInstanceHandlerName}.FindDBMeta(TableDbName); } }
+        public ${glDBMeta} DBMeta { get { return ${glDBMetaInstanceHandler}.FindDBMeta(TableDbName); } }
 #end
 
         // ===============================================================================

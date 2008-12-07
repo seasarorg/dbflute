@@ -91,7 +91,7 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        public override ${glDBMetaInterfaceName} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+        public override ${glDBMeta} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
         public ${myDBMetaClassName} MyDBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
 
         // ===============================================================================

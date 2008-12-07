@@ -15,8 +15,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                       Attribute
         //                                                                       =========
         protected String foreignPropertyName;
-        protected ${glDBMetaInterfaceName} localDBMeta;
-        protected ${glDBMetaInterfaceName} foreignDBMeta;
+        protected ${glDBMeta} localDBMeta;
+        protected ${glDBMeta} foreignDBMeta;
         protected Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap;
         protected Map<${glColumnInfoName}, ${glColumnInfoName}> foreignLocalColumnInfoMap;
         protected int relationNo;
@@ -54,7 +54,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             get { return ForeignPropertyName; }
         }
 
-        public ${glDBMetaInterfaceName} TargetDBMeta {
+        public ${glDBMeta} TargetDBMeta {
             get { return ForeignDBMeta; }
         }
 
@@ -74,12 +74,12 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set {this.foreignPropertyName = value; }
         }
 
-        public ${glDBMetaInterfaceName} LocalDBMeta {
+        public ${glDBMeta} LocalDBMeta {
             get { return localDBMeta; }
             set { this.localDBMeta = value; }
         }
 
-        public ${glDBMetaInterfaceName} ForeignDBMeta {
+        public ${glDBMeta} ForeignDBMeta {
             get { return foreignDBMeta; }
             set { this.foreignDBMeta = value; }
         }

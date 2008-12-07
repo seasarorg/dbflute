@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
@@ -35,14 +35,14 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      * Initialize condition-bean meta data. <br />
      */
     public void initializeConditionBeanMetaData() {
-        final Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
-        final Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
+        final Map<String, ${glDBMeta}> dbmetaMap = ${glDBMetaInstanceHandler}.getDBMetaMap();
+        final Collection<${glDBMeta}> dbmetas = dbmetaMap.values();
         long before = 0;
 	    if (_log.isInfoEnabled()) {
 		    before = System.currentTimeMillis();
 		    _log.info("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
 		}
-        for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
+        for (${glDBMeta} dbmeta : dbmetas) {
 		    final ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
             bhv.warmUpCommand();
         }
@@ -83,7 +83,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      */
     public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
+        final ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.findDBMeta(tableFlexibleName);
         return select(getBehaviorType(dbmeta));
     }
 
@@ -92,7 +92,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      * @param dbmeta Dbmeta. (NotNull)
      * @return Behavior-type. (NotNull)
      */
-    protected Class<${glBehaviorReadableInterfaceName}> getBehaviorType(${glDBMetaInterfaceName} dbmeta) {
+    protected Class<${glBehaviorReadableInterfaceName}> getBehaviorType(${glDBMeta} dbmeta) {
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         if (behaviorTypeName == null) {
             String msg = "The dbmeta.getBehaviorTypeName() should not return null: dbmeta=" + dbmeta;

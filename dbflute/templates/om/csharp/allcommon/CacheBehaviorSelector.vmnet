@@ -28,14 +28,14 @@ namespace ${glPackageBaseCommon} {
         //                                                                      Initialize
         //                                                                      ==========
         public void InitializeConditionBeanMetaData() {
-            Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.GetDBMetaMap();
-            Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
+            Map<String, ${glDBMeta}> dbmetaMap = ${glDBMetaInstanceHandler}.GetDBMetaMap();
+            Collection<${glDBMeta}> dbmetas = dbmetaMap.values();
             DateTime? before = null;
             if (_log.IsInfoEnabled) {
                 before = DateTime.Now;
                 _log.Info("/= = = = = = = = = = = = = = = = = InitializeConditionBeanMetaData()");
             }
-            foreach (${glDBMetaInterfaceName} dbmeta in dbmetas) {
+            foreach (${glDBMeta} dbmeta in dbmetas) {
                 ${glDaoReadableInterfaceName} dao = DaoSelector.ByName(dbmeta.TableDbName);
                 MethodInfo method = dao.GetType().GetMethod("InitializeDaoMetaData");
                 if (method == null) {
@@ -66,7 +66,7 @@ namespace ${glPackageBaseCommon} {
 
         public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableFlexibleName);
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
             return InternalSelect<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
         }
 
@@ -83,7 +83,7 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-        protected static Type GetBehaviorType(${glDBMetaInterfaceName} dbmeta) {
+        protected static Type GetBehaviorType(${glDBMeta} dbmeta) {
             String behaviorTypeName = dbmeta.BehaviorTypeName;
             if (behaviorTypeName == null) {
                 String msg = "The dbmeta.BehaviorTypeName should not return null: dbmeta=" + dbmeta;

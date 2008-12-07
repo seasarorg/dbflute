@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
 #set ($myClassName = "${glForeignInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The class of foreign information.
@@ -16,8 +16,8 @@ public class ${myClassName} implements ${glRelationInfoName} {
     //                                                                           Attribute
     //                                                                           =========
     protected String foreignPropertyName;
-    protected ${glDBMetaInterfaceName} localDBMeta;
-    protected ${glDBMetaInterfaceName} foreignDBMeta;
+    protected ${glDBMeta} localDBMeta;
+    protected ${glDBMeta} foreignDBMeta;
     protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap;
     protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} foreignLocalColumnInfoMap;
     protected int relationNo;
@@ -62,7 +62,7 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return getForeignPropertyName();
     }
 
-    public ${glDBMetaInterfaceName} getTargetDBMeta() {
+    public ${glDBMeta} getTargetDBMeta() {
         return getForeignDBMeta();
     }
 
@@ -85,19 +85,19 @@ public class ${myClassName} implements ${glRelationInfoName} {
         this.foreignPropertyName = foreignPropertyName;
     }
 
-    public ${glDBMetaInterfaceName} getLocalDBMeta() {
+    public ${glDBMeta} getLocalDBMeta() {
         return localDBMeta;
     }
 
-    public void setLocalDBMeta(${glDBMetaInterfaceName} localDBMeta) {
+    public void setLocalDBMeta(${glDBMeta} localDBMeta) {
         this.localDBMeta = localDBMeta;
     }
 
-    public ${glDBMetaInterfaceName} getForeignDBMeta() {
+    public ${glDBMeta} getForeignDBMeta() {
         return foreignDBMeta;
     }
 
-    public void setForeignDBMeta(${glDBMetaInterfaceName} foreignDBMeta) {
+    public void setForeignDBMeta(${glDBMeta} foreignDBMeta) {
         this.foreignDBMeta = foreignDBMeta;
     }
 

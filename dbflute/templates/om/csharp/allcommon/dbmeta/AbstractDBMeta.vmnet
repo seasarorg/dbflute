@@ -12,7 +12,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    public abstract class ${myClassName} : ${glDBMetaInterfaceName} {
+    public abstract class ${myClassName} : ${glDBMeta} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -154,7 +154,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return HasProperty(propertyName);
         }
 
-        public ${glDBMetaInterfaceName} FindForeignDBMeta(String foreignPropertyName) {
+        public ${glDBMeta} FindForeignDBMeta(String foreignPropertyName) {
             return FindForeignInfo(foreignPropertyName).ForeignDBMeta;
         }
 
@@ -170,7 +170,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
     
         protected ${glForeignInfoName} cfi(String propName
-                                , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+                                , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
                                 , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
                                 , int relNo, bool oneToOne) {// createForeignInfo()
             ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
@@ -192,7 +192,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return HasProperty(propertyName);
         }
 
-        public ${glDBMetaInterfaceName} FindReferrerDBMeta(String referrerPropertyName) {
+        public ${glDBMeta} FindReferrerDBMeta(String referrerPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
             return FindReferrerInfo(referrerPropertyName).ReferrerDBMeta;
         }
@@ -209,7 +209,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         protected ${glReferrerInfoName} cri(String propName
-                                 , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                                 , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
                                  , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
                                  , bool oneToOne) {// createReferrerInfo()
             ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();

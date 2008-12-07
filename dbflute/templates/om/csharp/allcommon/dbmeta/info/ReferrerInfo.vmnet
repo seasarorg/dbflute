@@ -15,8 +15,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                       Attribute
         //                                                                       =========
         protected String referrerPropertyName;
-        protected ${glDBMetaInterfaceName} localDBMeta;
-        protected ${glDBMetaInterfaceName} referrerDBMeta;
+        protected ${glDBMeta} localDBMeta;
+        protected ${glDBMeta} referrerDBMeta;
         protected Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap;
         protected Map<${glColumnInfoName}, ${glColumnInfoName}> referrerLocalColumnInfoMap;
         protected bool oneToOne;
@@ -64,7 +64,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             get { return ReferrerPropertyName; }
         }
 
-        public ${glDBMetaInterfaceName} TargetDBMeta {
+        public ${glDBMeta} TargetDBMeta {
             get { return ReferrerDBMeta; }
         }
 
@@ -84,12 +84,12 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { this.referrerPropertyName = value; }
         }
 
-        public ${glDBMetaInterfaceName} LocalDBMeta {
+        public ${glDBMeta} LocalDBMeta {
 			get { return localDBMeta; }
             set { this.localDBMeta = value; }
         }
 
-        public ${glDBMetaInterfaceName} ReferrerDBMeta {
+        public ${glDBMeta} ReferrerDBMeta {
 			get { return referrerDBMeta; }
             set { this.referrerDBMeta = value; }
         }

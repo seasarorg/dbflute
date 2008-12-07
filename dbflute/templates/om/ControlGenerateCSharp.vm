@@ -230,10 +230,8 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-DBMeta]
     #set ($glDBMeta = "${glProjectPrefix}DBMeta")
-    #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
-    #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaHierarchy]
     #set ($glHierarchyArrangerName = "${glProjectPrefix}HierarchyArranger")
@@ -1337,7 +1335,7 @@ targetdatabase = $targetDatabase
 
     $database.info("public void parseDBMetaClass() {")
     $database.info("    parseDBMeta();")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInterfaceName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMeta}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMeta.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parseAbstractDBMeta();")
@@ -1452,7 +1450,7 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.info("    parse('DBMetaInstanceHandler');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInstanceHandlerName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInstanceHandler}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/DBMetaInstanceHandler.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("}")

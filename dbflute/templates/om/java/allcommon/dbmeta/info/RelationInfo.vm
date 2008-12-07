@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
 import java.util.Map;
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The class of referrer information.
@@ -13,9 +13,9 @@ public interface ${myClassName} {
 
     public String getRelationPropertyName();
 
-    public ${glDBMetaInterfaceName} getLocalDBMeta();
+    public ${glDBMeta} getLocalDBMeta();
 
-    public ${glDBMetaInterfaceName} getTargetDBMeta();
+    public ${glDBMeta} getTargetDBMeta();
 
     public Map<${glColumnInfoName}, ${glColumnInfoName}> getLocalTargetColumnInfoMap();
 

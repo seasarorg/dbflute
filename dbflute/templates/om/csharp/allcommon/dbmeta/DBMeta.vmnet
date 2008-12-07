@@ -1,4 +1,4 @@
-#set ($myClassName = "${glDBMetaInterfaceName}")
+#set ($myClassName = "${glDBMeta}")
 
 using System;
 

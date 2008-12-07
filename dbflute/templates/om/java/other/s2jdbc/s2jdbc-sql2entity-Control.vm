@@ -35,45 +35,6 @@ targetdatabase = $targetDatabase
     #set ($glBasePrefix = ${database.BasePrefix})
     #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
 
-    #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
-    #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
-
-    ## [Common-Entity]
-    #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
-    #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
-
-    ## [ConditionBean]
-    #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
-
-    ## [Allcommon-ConditionBean-Option]
-    #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
-
-    ## [DBMeta]
-    #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
-    #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
-    #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
-
-    ## [Allcommon-DBMetaInfo]
-    #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
-    #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
-    #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
-    #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
-    #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
-
-    ## [Helper]
-    #set ($glMapListStringName = "${glProjectPrefix}MapListString")
-    #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
-    #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
-    #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
-
-    ## [Allcommon-JDBC]
-    #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
-    #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
-    #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
-
-    ## [ClassificationDefinition]
-    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
-
     ## [Package]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")

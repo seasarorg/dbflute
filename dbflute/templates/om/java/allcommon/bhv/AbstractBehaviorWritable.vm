@@ -22,7 +22,7 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glBatchDeleteNonstrictEntityComman
 import ${glPackageBaseCommonBhvCoreCommand}.${glQueryDeleteCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glQueryUpdateEntityCBCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 
@@ -358,7 +358,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      */
     protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
-        final ${glDBMetaInterfaceName} dbmeta = entity.getDBMeta();
+        final ${glDBMeta} dbmeta = entity.getDBMeta();
         if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
             return;
         }

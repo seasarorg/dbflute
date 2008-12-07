@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected ${glDBMetaInterfaceName} dbmeta;
+        protected ${glDBMeta} dbmeta;
         protected String columnDbName;
         protected String propertyName;
         protected Type propertyType;
@@ -24,14 +24,14 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) : this (dbmeta, columnDbName, null, null, false, null, null) {
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName) : this (dbmeta, columnDbName, null, null, false, null, null) {
         }
 
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
             : this (dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE) {
         }
 
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
             this.propertyName = propertyName;
@@ -105,7 +105,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        public ${glDBMetaInterfaceName} DBMeta {
+        public ${glDBMeta} DBMeta {
             get { return dbmeta; }
             set { dbmeta = value; }
         }

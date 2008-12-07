@@ -1,5 +1,5 @@
-#set ($myClassName = "${glDBMetaInstanceHandlerName}")
-#set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
+#set ($myClassName = "${glDBMetaInstanceHandler}")
+#set ($instanceMapGenericDefinition = "String, ${glDBMeta}")
 
 using System;
 using System.Reflection;
@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMetaInterfaceName}>();
+        protected static readonly Map<String, ${glDBMeta}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMeta}>();
         protected static readonly Map<String, String> _tableDbNameClassNameMap;
         protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
         protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
@@ -45,7 +45,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        protected static ${glDBMetaInterfaceName} GetDBMeta(String className) {
+        protected static ${glDBMeta} GetDBMeta(String className) {
 			Type clazz = ForName(className, AppDomain.CurrentDomain.GetAssemblies());
             if (clazz == null) {
                 String msg = "The className was not found: " + className + " assemblys=";
@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new SystemException(msg);
             }
             System.Reflection.MethodInfo method = clazz.GetMethod("GetInstance");
-            return (${glDBMetaInterfaceName})method.Invoke(null, null);
+            return (${glDBMeta})method.Invoke(null, null);
         }
 
         protected static Type ForName(string className, Assembly[] assemblys) {
@@ -67,7 +67,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // Returns the initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
-        public static Map<String, ${glDBMetaInterfaceName}> GetDBMetaMap() {
+        public static Map<String, ${glDBMeta}> GetDBMetaMap() {
             InitializeDBMetaMap();
             return _tableDbNameInstanceMap;
         }
@@ -104,7 +104,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         /// </summary>
         /// <param name="tableFlexibleName">Table flexible-name. (NotNull and NotEmpty)</param>
         /// <returns>DBMeta. (NotNull)</returns>
-        public static ${glDBMetaInterfaceName} FindDBMeta(String tableFlexibleName) {
+        public static ${glDBMeta} FindDBMeta(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             if (_tableDbNameInstanceMap.containsKey(tableFlexibleName)) {
                 return ByTableDbName(tableFlexibleName);
@@ -131,7 +131,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             throw new DBMetaNotFoundException(msg);
         }
 
-        protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
+        protected static ${glDBMeta} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
                 return GetCachedDBMeta(tableDbName);
@@ -141,7 +141,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        protected static ${glDBMetaInterfaceName} GetCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
+        protected static ${glDBMeta} GetCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
             if (_tableDbNameInstanceMap.containsKey(tableName)) {
                 return _tableDbNameInstanceMap.get(tableName);
             }

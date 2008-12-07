@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommon} {
 
         public virtual ${glDaoReadableInterfaceName} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableFlexibleName);
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
             return InternalSelect<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
         }
 
@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-        protected static Type GetDaoType(${glDBMetaInterfaceName} dbmeta) {
+        protected static Type GetDaoType(${glDBMeta} dbmeta) {
             String daoTypeName = dbmeta.DaoTypeName;
             if (daoTypeName == null) {
                 String msg = "The dbmeta.DaoTypeName should not return null: dbmeta=" + dbmeta;

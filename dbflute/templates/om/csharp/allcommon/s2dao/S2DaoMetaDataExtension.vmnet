@@ -183,7 +183,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!"SelectNextVal".Equals(methodInfo.Name)) {
                 return false;
             }
-            ${glDBMetaInterfaceName} dbmeta = FindDBMeta();
+            ${glDBMeta} dbmeta = FindDBMeta();
             if (!dbmeta.HasSequence) {
                 String msg = "If the method 'SelectNextVal()' exists, DBMeta.HasSequence should return true:";
                 msg = msg + " dbmeta.HasSequence=" + dbmeta.HasSequence + " method=" + methodInfo;
@@ -573,7 +573,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-        protected ${glDBMetaInterfaceName} FindDBMeta() {
+        protected ${glDBMeta} FindDBMeta() {
             Type beanType = this.BeanType;
             if (beanType == null) {
                 return null;
@@ -605,7 +605,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
             ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ClassUtil.NewInstance(beanType);
-            ${glDBMetaInterfaceName} dbmeta = entity.DBMeta;
+            ${glDBMeta} dbmeta = entity.DBMeta;
             foreach (PropertyInfo pi in beanType.GetProperties()) {
                 IPropertyType pt = null;
                 RelnoAttribute relnoAttr = _beanAnnotationReader.GetRelnoAttribute(pi);
@@ -637,7 +637,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
             }
         }
-        protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
+        protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, ${glDBMeta} dbmeta) {
             if (IsRelationProperty(pi, dbmeta)) {
                 return null;
             }
@@ -657,14 +657,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             columnName = (columnName != null ? columnName : pi.Name);
             return columnName;
         }
-        protected bool IsRelationProperty(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
+        protected bool IsRelationProperty(PropertyInfo pi, ${glDBMeta} dbmeta) {
             String propertyName = pi.Name;
             if (dbmeta.HasForeign(propertyName) || dbmeta.HasReferrer(propertyName)) {
                 return true;
             }
             return _beanAnnotationReader.GetRelnoAttribute(pi) != null;
         }
-        protected bool IsPersistentProperty(PropertyInfo pi, ${glDBMetaInterfaceName} dbmeta) {
+        protected bool IsPersistentProperty(PropertyInfo pi, ${glDBMeta} dbmeta) {
             String propertyName = pi.Name;
             if (dbmeta.HasColumn(propertyName) || _beanAnnotationReader.GetColumn(pi) != null) {
                 if (!IsElementOfNoPersistentProps(pi)) {

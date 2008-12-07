@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
 #set ($myClassName = "${glReferrerInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The class of referrer information.
@@ -16,8 +16,8 @@ public class ${myClassName} implements ${glRelationInfoName} {
     //                                                                           Attribute
     //                                                                           =========
     protected String referrerPropertyName;
-    protected ${glDBMetaInterfaceName} localDBMeta;
-    protected ${glDBMetaInterfaceName} referrerDBMeta;
+    protected ${glDBMeta} localDBMeta;
+    protected ${glDBMeta} referrerDBMeta;
     protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localReferrerColumnInfoMap;
     protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} referrerLocalColumnInfoMap;
     protected boolean oneToOne;
@@ -72,7 +72,7 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return getReferrerPropertyName();
     }
 
-    public ${glDBMetaInterfaceName} getTargetDBMeta() {
+    public ${glDBMeta} getTargetDBMeta() {
         return getReferrerDBMeta();
     }
 
@@ -95,19 +95,19 @@ public class ${myClassName} implements ${glRelationInfoName} {
         this.referrerPropertyName = referrerPropertyName;
     }
 
-    public ${glDBMetaInterfaceName} getLocalDBMeta() {
+    public ${glDBMeta} getLocalDBMeta() {
         return localDBMeta;
     }
 
-    public void setLocalDBMeta(${glDBMetaInterfaceName} localDBMeta) {
+    public void setLocalDBMeta(${glDBMeta} localDBMeta) {
         this.localDBMeta = localDBMeta;
     }
 
-    public ${glDBMetaInterfaceName} getReferrerDBMeta() {
+    public ${glDBMeta} getReferrerDBMeta() {
         return referrerDBMeta;
     }
 
-    public void setReferrerDBMeta(${glDBMetaInterfaceName} referrerDBMeta) {
+    public void setReferrerDBMeta(${glDBMeta} referrerDBMeta) {
         this.referrerDBMeta = referrerDBMeta;
     }
 

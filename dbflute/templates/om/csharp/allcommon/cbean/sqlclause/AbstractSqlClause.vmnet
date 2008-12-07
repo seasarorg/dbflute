@@ -221,7 +221,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         StringBuilder sb = new StringBuilder();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableName);
         List<${glColumnInfoName}> columnInfoList = dbmeta.ColumnInfoList;
 
         // [DBFlute-0.7.4]
@@ -516,7 +516,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
                                                                                  , String localTableName
                                                                                  , String foreignPropertyName
                                                                                  , String localRelationPath) {
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
         ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         int relationNo = foreignInfo.RelationNo;
         String nextRelationPath = "_" + relationNo;
@@ -524,7 +524,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             nextRelationPath = localRelationPath + nextRelationPath;
         }
         Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
-        ${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
+        ${glDBMeta} foreignDBMeta = foreignInfo.ForeignDBMeta;
         foreach (${glColumnInfoName} columnInfo in foreignDBMeta.ColumnInfoList) {
             String columnDbName = columnInfo.ColumnDbName;
             SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
@@ -1125,7 +1125,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
-         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
+         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
          ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         return foreignInfo.RelationNo;
     }
@@ -1387,7 +1387,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
             return null;
         }
         String aliasName = getLocalTableAliasName();
-        ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        ${glDBMeta} dbmeta = findDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
@@ -1433,7 +1433,7 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
 
     public String getClauseQueryDelete() {
         String aliasName = getLocalTableAliasName();
-        ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        ${glDBMeta} dbmeta = findDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryDelete() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
@@ -1494,8 +1494,8 @@ public abstract class ${myClassName} : ${glSqlClauseName} {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected ${glDBMetaInterfaceName} findDBMeta() {
-        return ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName); 
+    protected ${glDBMeta} findDBMeta() {
+        return ${glDBMetaInstanceHandler}.FindDBMeta(_tableName); 
     }
 
     // ===================================================================================

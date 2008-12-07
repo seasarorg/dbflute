@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
@@ -58,7 +58,7 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
      * @return Whether the method is target. (For example if it has primary key, returns false.)
      */
     protected ${glSqlExecution} createNonPrimaryInsertSqlExecution(BeanMetaData bmd) {
-        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        final ${glDBMeta} dbmeta = findDBMeta();
         if (dbmeta.hasPrimaryKey()) {
             return null;
         }

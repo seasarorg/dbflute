@@ -23,7 +23,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        ${glDBMetaInterfaceName} DBMeta { get; }
+        ${glDBMeta} DBMeta { get; }
 
         // ===============================================================================
         //                                                                    New Instance

@@ -35,7 +35,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        public abstract ${glDBMetaInterfaceName} DBMeta { get; }
+        public abstract ${glDBMeta} DBMeta { get; }
 
         // ===============================================================================
         //                                                                    New Instance

@@ -31,7 +31,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The abstract class of DB meta.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
+public abstract class ${myClassName} implements ${glDBMeta} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -306,7 +306,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
-    public ${glDBMetaInterfaceName} findForeignDBMeta(String foreignPropertyName) {
+    public ${glDBMeta} findForeignDBMeta(String foreignPropertyName) {
         return findForeignInfo(foreignPropertyName).getForeignDBMeta();
     }
 
@@ -335,7 +335,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
     
     protected ${glForeignInfoName} cfi(String propName
-                            , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} foreignDbm
+                            , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
                             , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
                             , int relNo, boolean oneToOne) {// createForeignInfo()
         final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
@@ -365,7 +365,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */ 
-    public ${glDBMetaInterfaceName} findReferrerDBMeta(String referrerPropertyName) {
+    public ${glDBMeta} findReferrerDBMeta(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         return findReferrerInfo(referrerPropertyName).getReferrerDBMeta();
     }
@@ -395,7 +395,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     protected ${glReferrerInfoName} cri(String propName
-                             , ${glDBMetaInterfaceName} localDbm, ${glDBMetaInterfaceName} referrerDbm
+                             , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
                              , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
                              , boolean oneToOne) {// createReferrerInfo()
         final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();

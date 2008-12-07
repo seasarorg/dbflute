@@ -506,7 +506,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
@@ -584,7 +584,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
     
     protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(subQuery.getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
@@ -872,7 +872,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                                 ===================
     public ${glConditionValueName} invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
         String propertyName = columnCapPropName;
         PropertyInfo property = helpGettingCQProperty(this, propertyName);
@@ -888,7 +888,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         String propertyName = container.getPropertyName();
         ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(cq.getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "Set" + columnCapPropName + "_" + initCap(conditionKeyName);
         MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{value.GetType()}, propertyName);
@@ -901,7 +901,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         String propertyName = container.getPropertyName();
         ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
         String ascDesc = isAsc ? "Asc" : "Desc";
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(cq.getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "AddOrderBy_" + columnCapPropName + "_" + ascDesc;
         MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{}, propertyName);

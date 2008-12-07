@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected ${glDBMetaInterfaceName} dbmeta;
+        protected ${glDBMeta} dbmeta;
         protected List<${glColumnInfoName}> uniqueColumnList = new ArrayList<${glColumnInfoName}>();
         protected bool primary;
 
@@ -35,7 +35,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-       public ${glDBMetaInterfaceName} DBMeta {
+       public ${glDBMeta} DBMeta {
            get { return dbmeta; }
            set { this.dbmeta = value; }
        }

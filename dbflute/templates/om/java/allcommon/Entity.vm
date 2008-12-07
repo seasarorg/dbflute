@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Set;
 import java.util.LinkedHashSet;
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * The interface of entity.
@@ -17,7 +17,7 @@ public interface ${glEntityInterfaceName} {
      * Get the instance of target dbmeta.
      * @return DBMeta. (NotNull)
      */
-    public ${glDBMetaInterfaceName} getDBMeta();
+    public ${glDBMeta} getDBMeta();
 
     // ===================================================================================
     //                                                                          Table Name

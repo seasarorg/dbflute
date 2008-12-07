@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
@@ -334,7 +334,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
         // Temporary variables for local
         ${glEntityInterfaceName} localEntity = topInfo.getLocalEntity();// as Default
-        ${glDBMetaInterfaceName} localDBMeta = request.getDestinationDBMeta();// as Default
+        ${glDBMeta} localDBMeta = request.getDestinationDBMeta();// as Default
         String localRelationPath = ${glHierarchyRequestElementName}.TOP_KEY;// as Default
 
         // ==============
@@ -614,7 +614,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     //                                                                         Other Logic
     //                                                                         ===========
     @SuppressWarnings("unchecked")
-    protected LOCAL_ENTITY newLocalEntity(final ${glDBMetaInterfaceName} destinationDBMeta) {
+    protected LOCAL_ENTITY newLocalEntity(final ${glDBMeta} destinationDBMeta) {
         final LOCAL_ENTITY localEntity;
         try {
             localEntity = (LOCAL_ENTITY) destinationDBMeta.getEntityType().newInstance();
