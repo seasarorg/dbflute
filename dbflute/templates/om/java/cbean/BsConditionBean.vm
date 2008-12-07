@@ -28,7 +28,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
+    private final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
     protected ${myConditionQueryClassName} _conditionQuery;
 
     // ===================================================================================
@@ -38,7 +38,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     protected ${glSqlClause} createSqlClause() {
         return new ${glSqlClauseCreatorImpl}().createSqlClause(this);
     }
-
+    
     // ===================================================================================
     //                                                                     DBMeta Provider
     //                                                                     ===============

@@ -38,7 +38,7 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
         final ${glOutsideSqlOption} option = _outsideSqlOption;
         final Object resultTypeSpecification = getResultTypeSpecification();
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
-        final ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
+        final ${glOutsideSqlContext} outsideSqlContext = createOutsideSqlContext();
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);

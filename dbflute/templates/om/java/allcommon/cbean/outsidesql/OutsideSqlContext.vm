@@ -9,8 +9,8 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleResourceUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -109,6 +109,12 @@ public class ${glOutsideSqlContext} {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
+    /** The provider of DB meta. (NotNull) */
+    protected final ${glDBMetaProvider} _dbmetaProvider;
+
+    /** The package of outside-SQL. (Nullable: If null, use behavior package path) */
+    protected final String _outsideSqlPackage;
+
     /** The path of outside-SQL. (The mark of specified outside-SQL) */
     protected String _outsideSqlPath;
 
@@ -134,6 +140,22 @@ public class ${glOutsideSqlContext} {
     protected boolean _limitByCursorForcedly;
 
     protected boolean _autoPagingLogging; // for logging
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * @param dbmetaProvider The provider of DB meta. (NotNull)
+     * @param outsideSqlPackage The package of outside SQL. (Nullable: If null, use behavior package path)
+     */
+    public ${glOutsideSqlContext}(${glDBMetaProvider} dbmetaProvider, String outsideSqlPackage) {
+        if (dbmetaProvider == null) {
+            String msg = "The argument 'dbmetaProvider' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        _dbmetaProvider = dbmetaProvider;
+        _outsideSqlPackage = outsideSqlPackage;
+    }
 
     // ===================================================================================
     //                                                                            Read SQL
@@ -251,9 +273,9 @@ public class ${glOutsideSqlContext} {
     }
 
     protected String buildBehaviorSqlPackageName() {
-        final ${glDBMeta} dbmeta = ${glResourceContext}.provideDBMetaChecked(_tableDbName);
+        final ${glDBMeta} dbmeta = _dbmetaProvider.provideDBMetaChecked(_tableDbName);
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
-        final String outsideSqlPackage = ${glResourceContext}.getOutsideSqlPackage();
+        final String outsideSqlPackage = _outsideSqlPackage;
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
             final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
             String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));

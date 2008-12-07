@@ -1,7 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
@@ -61,6 +63,10 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected ${glOutsideSqlContext} createOutsideSqlContext() {
+        return new ${glOutsideSqlContext}(${glResourceContext}.dbmetaProvider(), ${glResourceContext}.getOutsideSqlPackage());
+    }
+
     protected String buildDbmsSuffix() {
         assertOutsideSqlBasic("buildDbmsSuffix");
         final String productName = _currentDBDef.code();

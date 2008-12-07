@@ -55,7 +55,7 @@ public class ${myClassName} {
 		    _log.info("...Setting currentDBDef: " + currentDBDef);
 		}
 		if (currentDBDef == null) {
-		    String msg = "The argument '" + currentDBDef + "' should not be null!";
+		    String msg = "The argument 'currentDBDef' should not be null!";
 		    throw new IllegalArgumentException(msg);
 		}
         _currentDBDef = currentDBDef;

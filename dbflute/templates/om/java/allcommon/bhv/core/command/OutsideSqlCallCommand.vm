@@ -46,7 +46,7 @@ public class ${glOutsideSqlCallCommand} extends ${glAbstractOutsideSqlCommand}<V
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOption} option = _outsideSqlOption;
-        final ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
+        final ${glOutsideSqlContext} outsideSqlContext = createOutsideSqlContext();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());

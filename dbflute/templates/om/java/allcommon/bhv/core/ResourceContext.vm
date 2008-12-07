@@ -70,6 +70,22 @@ public class ${glResourceContext} {
     }
 
     /**
+     * @return The provider of DB meta. (NotNull)
+     */
+    public static ${glDBMetaProvider} dbmetaProvider() {
+        if (!isExistResourceContextOnThread()) {
+            String msg = "The resource context should exist!";
+            throw new IllegalStateException(msg);
+        }
+        ${glDBMetaProvider} provider = getResourceContextOnThread().getDBMetaProvider();
+        if (provider == null) {
+            String msg = "The provider of DB meta should exist!";
+            throw new IllegalStateException(msg);
+        }
+        return provider;
+    }
+
+    /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (Nullable)
      */
@@ -90,11 +106,13 @@ public class ${glResourceContext} {
      */
     public static ${glDBMeta} provideDBMetaChecked(String tableFlexibleName) {
         if (!isExistResourceContextOnThread()) {
-            return null;
+            String msg = "The resource context should exist: " + tableFlexibleName;
+            throw new IllegalStateException(msg);
         }
         ${glDBMetaProvider} provider = getResourceContextOnThread().getDBMetaProvider();
         if (provider == null) {
-            return null;
+            String msg = "The provider of DB meta should exist: " + tableFlexibleName;
+            throw new IllegalStateException(msg);
         }
         return provider.provideDBMetaChecked(tableFlexibleName);
     }
