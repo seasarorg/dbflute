@@ -7,8 +7,7 @@ import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonBhvCoreExecution}.${glBasicSelectExecution};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
  * @author ${database.ClassAuthor}
@@ -21,6 +20,9 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     //                                                                           =========
     /** The type of result. (NotNull) */
     protected Class<RESULT> _resultType;
+    
+    /** The provider of DB meta. (NotNull) */
+    protected ${glDBMeta} _dbmeta;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -84,7 +86,8 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     }
 
     protected ${glSqlExecution} createSelectNextValExecution(ResultSetHandler handler) {
-        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        assertStatus("createSelectNextValExecution");
+        final ${glDBMeta} dbmeta = findDBMeta();
         if (!dbmeta.hasSequence()) {
             String msg = "If the method 'selectNextVal()' exists, DBMeta.hasSequence() should return true:";
             msg = msg + " dbmeta.hasSequence()=" + dbmeta.hasSequence();
@@ -107,8 +110,8 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
         return cmd;
     }
 
-    protected ${glDBMetaInterfaceName} findDBMeta() {
-        return ${glDBMetaInstanceHandlerName}.findDBMeta(_tableDbName);
+    protected ${glDBMeta} findDBMeta() {
+        return _dbmeta;
     }
 
     public Object[] getSqlExecutionArgument() {
@@ -137,6 +140,9 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
+        if (_dbmeta == null) {
+            throw new IllegalStateException(buildAssertMessage("_dbmeta", methodName));
+        }
     }
 
     // ===================================================================================
@@ -144,5 +150,9 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     //                                                                            ========
     public void setResultType(Class<RESULT> resultType) {
         _resultType = resultType;
+    }
+
+    public void setDBMeta(${glDBMeta} dbmeta) {
+        _dbmeta = dbmeta;
     }
 }

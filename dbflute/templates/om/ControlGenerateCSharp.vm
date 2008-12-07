@@ -68,7 +68,9 @@ targetdatabase = $targetDatabase
     #set ($glCallbackContextName = "${glProjectPrefix}CallbackContext")
     #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
     #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
+    #set ($glEntity = "${glProjectPrefix}Entity")
     #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
+    #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
     #set ($glCommonColumnBasicAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
@@ -152,7 +154,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-ConditionBean]
     #set ($glFetchNarrowingBeanInterfaceName = "${glProjectPrefix}FetchNarrowingBean")
     #set ($glSimplePagingBeanName = "${glProjectPrefix}SimplePagingBean")
+    #set ($glConditionBean = "${glProjectPrefix}ConditionBean")
     #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
+    #set ($glConditionQuery = "${glProjectPrefix}ConditionQuery")
     #set ($glConditionQueryInterfaceName = "${glProjectPrefix}ConditionQuery")
     #set ($glOrderByBeanInterfaceName = "${glProjectPrefix}OrderByBean")
     #set ($glPagingBeanInterfaceName = "${glProjectPrefix}PagingBean")
@@ -225,8 +229,10 @@ targetdatabase = $targetDatabase
     #set ($glWhereClauseSimpleFilterInterfaceName = "${glProjectPrefix}WhereClauseSimpleFilter")
 
     ## [Allcommon-DBMeta]
+    #set ($glDBMeta = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaHierarchy]

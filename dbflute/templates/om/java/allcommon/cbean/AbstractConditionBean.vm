@@ -11,8 +11,8 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -79,12 +79,21 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         return _sqlClause;
     }
 
-	/**
-	 * Create SQL clause. {for condition-bean}
-	 * @param cb Condition-bean. (NotNull) 
-	 * @return SQL clause. (NotNull)
-	 */
+    /**
+     * Create SQL clause. {for condition-bean}
+     * @param cb Condition-bean. (NotNull) 
+     * @return SQL clause. (NotNull)
+     */
     protected abstract ${glSqlClauseName} createSqlClause();
+
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    /**
+     * Get the provider of DB meta.
+     * @return The provider of DB meta. (NotNull)
+     */
+    protected abstract ${glDBMetaProvider} getDBMetaProvider();
 
     // ===================================================================================
     //                                                                 Where Clause Filter
@@ -515,6 +524,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected boolean _forScalarSelect;
         protected boolean _forScalarSubQuery;
         protected boolean _alreadySpecifyRequiredColumn;
+        protected ${glDBMetaProvider} _dbmetaProvider;
 
         /**
          * @param baseCB The condition-bean of base level. (NotNull)
@@ -522,14 +532,17 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
          * @param forDerivedReferrer Is this for derive referrer?
          * @param forScalarSelect Is this for scalar select?
          * @param forScalarSubQuery  Is this for scalar sub-query?
+         * @param dbmetaProvider The provider of DB meta. (NotNull)
          */
         protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
-                                      , boolean forDerivedReferrer, boolean forScalarSelect, boolean forScalarSubQuery) {
+                                      , boolean forDerivedReferrer, boolean forScalarSelect, boolean forScalarSubQuery
+                                      , ${glDBMetaProvider} dbmetaProvider) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
             _forScalarSelect = forScalarSelect;
             _forScalarSubQuery = forScalarSubQuery;
+            _dbmetaProvider = dbmetaProvider;
         }
 
         protected void doColumn(String columnName) {
@@ -737,11 +750,16 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         protected ${glConditionBeanInterfaceName} _baseCB;
         protected LOCAL_CQ _localCQ;
         protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+        protected ${glDBMetaProvider} _dbmetaProvider;
 
-        public RAFunction(${glConditionBeanInterfaceName} baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper) {
+        public RAFunction(${glConditionBeanInterfaceName} baseCB
+                        , LOCAL_CQ localCQ
+                        , RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper
+                        , ${glDBMetaProvider} dbmetaProvider) {
             _baseCB = baseCB;
             _localCQ = localCQ;
             _querySetupper = querySetupper;
+            _dbmetaProvider = dbmetaProvider;
         }
 
         public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
@@ -773,7 +791,8 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             if (aliasName == null || aliasName.trim().length() == 0) {
                 throwDerivedReferrerInvalidAliasNameException();
             }
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_baseCB.getTableDbName());
+            String tableDbName = _baseCB.getTableDbName();
+            ${glDBMeta} dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
             Method[] methods = dbmeta.getEntityType().getMethods();
             String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
             boolean existsSetterMethod = false;
@@ -934,7 +953,8 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
             String msg = "The argument[primaryKeyMap] must not be empty.";
             throw new IllegalArgumentException(msg);
         }
-        List<${glColumnInfoName}> columnInfoList = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName()).getPrimaryUniqueInfo().getUniqueColumnList();
+        ${glDBMeta} dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        List<${glColumnInfoName}> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
         for (${glColumnInfoName} columnInfo : columnInfoList) {
             String columnDbName = columnInfo.getColumnDbName();
             if (!primaryKeyMap.containsKey(columnDbName)) {

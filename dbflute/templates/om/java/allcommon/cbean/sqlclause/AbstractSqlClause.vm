@@ -14,8 +14,8 @@ import java.util.StringTokenizer;
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
@@ -40,8 +40,11 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    /** The name of table. */
+    /** The name of table for SQL. */
     protected final String _tableName;
+
+    /** The DB meta of target table. */
+    protected ${glDBMetaProvider} _dbmetaProvider;
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -128,10 +131,15 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     //                                                                         ===========
     public ${myClassName}(String tableName) {
         if (tableName == null) {
-            String msg = "Argument[tableName] must not be null.";
+            String msg = "Argument[tableName] should not be null.";
             throw new IllegalArgumentException(msg);
         }
         _tableName = tableName;
+    }
+
+    public ${glSqlClauseName} provider(${glDBMetaProvider} dbmetaProvider) {
+        _dbmetaProvider = dbmetaProvider;
+        return this;
     }
 
     // ===================================================================================
@@ -233,7 +241,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         StringBuilder sb = new StringBuilder();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
+        ${glDBMeta} dbmeta = findDBMeta(_tableName);
         List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
 
         // [DBFlute-0.7.4]
@@ -528,7 +536,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
                                                                                  , String localTableName
                                                                                  , String foreignPropertyName
                                                                                  , String localRelationPath) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(localTableName);
+        final ${glDBMeta} dbmeta = findDBMeta(localTableName);
         final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         final int relationNo = foreignInfo.getRelationNo();
         String nextRelationPath = "_" + relationNo;
@@ -536,7 +544,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
             nextRelationPath = localRelationPath + nextRelationPath;
         }
         final Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
-        final ${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.getForeignDBMeta();
+        final ${glDBMeta} foreignDBMeta = foreignInfo.getForeignDBMeta();
         final List<${glColumnInfoName}> columnInfoList = foreignDBMeta.getColumnInfoList();
         for (${glColumnInfoName} columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
@@ -1141,7 +1149,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(localTableName);
+        final ${glDBMeta} dbmeta = findDBMeta(localTableName);
         final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         return foreignInfo.getRelationNo();
     }
@@ -1406,7 +1414,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
             return null;
         }
         final String aliasName = getLocalTableAliasName();
-        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        final ${glDBMeta} dbmeta = findDBMeta(_tableName);
         if (dbmeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
             msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
@@ -1452,7 +1460,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
 
     public String getClauseQueryDelete() {
         final String aliasName = getLocalTableAliasName();
-        final ${glDBMetaInterfaceName} dbmeta = findDBMeta();
+        final ${glDBMeta} dbmeta = findDBMeta(_tableName);
         if (dbmeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The target table of queryDelete() should have only one primary key:";
             msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
@@ -1517,12 +1525,16 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
     }
 
-    // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected ${glDBMetaInterfaceName} findDBMeta() {
-        return ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName); 
+    protected ${glDBMeta} findDBMeta(String tableName) {
+        if (_dbmetaProvider == null) {
+            String msg = "The DB meta provider should not be null when using findDBMeta(): ";
+            msg = msg + " tableName=" + tableName;
+            throw new IllegalStateException(msg);
+        }
+        return _dbmetaProvider.provideDBMetaChecked(tableName);
     }
     
     // ===================================================================================

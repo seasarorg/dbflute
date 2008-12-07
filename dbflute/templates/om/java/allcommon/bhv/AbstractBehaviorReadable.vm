@@ -829,6 +829,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         assertBehaviorCommandInvoker("createSelectNextValCommand");
         final ${glSelectNextValCommand}<RESULT> command = xsetupSelectCommand(new ${glSelectNextValCommand}<RESULT>());
         command.setResultType(resultType);
+        command.setDBMeta(getDBMeta());
         return command;
     }
 

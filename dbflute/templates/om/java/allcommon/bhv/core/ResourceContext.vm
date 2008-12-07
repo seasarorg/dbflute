@@ -85,6 +85,21 @@ public class ${glResourceContext} {
     }
 
     /**
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (NotNull)
+     */
+    public static ${glDBMeta} provideDBMetaChecked(String tableFlexibleName) {
+        if (!isExistResourceContextOnThread()) {
+            return null;
+        }
+        ${glDBMetaProvider} provider = getResourceContextOnThread().getDBMetaProvider();
+        if (provider == null) {
+            return null;
+        }
+        return provider.provideDBMetaChecked(tableFlexibleName);
+    }
+
+    /**
      * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
      * @param sqlState SQLState of the SQLException. (Nullable)
      * @param errorCode ErrorCode of the SQLException. (Nullable)

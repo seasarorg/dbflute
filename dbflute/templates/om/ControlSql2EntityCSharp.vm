@@ -56,8 +56,10 @@ targetdatabase = $targetDatabase
     #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
 
     ## [DBMeta]
+    #set ($glDBMeta = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaInfo]

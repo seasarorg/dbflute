@@ -43,10 +43,13 @@ targetdatabase = $targetDatabase
     #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
 
     ## [Common-Entity]
+    #set ($glEntity = "${glProjectPrefix}Entity")
     #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
+    #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
 
     ## [ConditionBean]
+    #set ($glConditionBean = "${glProjectPrefix}ConditionBean")
     #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
 
     ## [OutsideSql]
@@ -56,8 +59,10 @@ targetdatabase = $targetDatabase
     #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
 
     ## [DBMeta]
+    #set ($glDBMeta = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaInfo]

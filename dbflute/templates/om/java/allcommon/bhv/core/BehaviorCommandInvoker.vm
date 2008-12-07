@@ -17,7 +17,6 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonException}.${glDBMetaNotFoundException};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
@@ -533,11 +532,7 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     protected String findBehaviorClassNameFromDBMeta(String tableDbName) {
-        final ${glDBMeta} dbmeta = ${glResourceContext}.provideDBMeta(tableDbName);
-        if (dbmeta == null) {
-            String msg = "The DB meta was not found by the table DB name: " + tableDbName;
-            throw new ${glDBMetaNotFoundException}(msg);
-        }
+        final ${glDBMeta} dbmeta = ${glResourceContext}.provideDBMetaChecked(tableDbName);
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
         return removeBasePrefixFromSimpleClassName(behaviorClassName);

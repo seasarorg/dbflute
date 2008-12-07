@@ -2,8 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glSqlClauseInterfaceName}Oracle")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 
 /**
@@ -98,7 +97,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} lockForUpdate() {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
+        final ${glDBMeta} dbmeta = findDBMeta(_tableName);
         if (dbmeta.hasPrimaryKey()) {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;

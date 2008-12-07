@@ -188,6 +188,7 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
             if (dbmeta != null) {
                 return dbmeta;
             }
+            // No check because the table name is not always for domain.
             dbmeta = ${glResourceContext}.provideDBMeta(tableName);
             cacheDBMeta(rowType, dbmeta);
             return dbmeta;

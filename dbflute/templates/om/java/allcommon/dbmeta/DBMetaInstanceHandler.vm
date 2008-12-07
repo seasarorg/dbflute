@@ -184,6 +184,15 @@ public class ${myClassName} implements ${glDBMetaProvider} {
         return byTableFlexibleName(tableFlexibleName);
     }
 
+    /**
+     * @param tableFlexibleName The flexible name of table. (NotNull)
+     * @return The instance of DB meta. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glDBMetaNotFoundException} When the DB meta is not found.
+     */
+    public ${glDBMeta} provideDBMetaChecked(String tableFlexibleName) {
+        return findDBMeta(tableFlexibleName);
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

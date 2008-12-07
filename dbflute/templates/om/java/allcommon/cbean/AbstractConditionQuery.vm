@@ -16,8 +16,8 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionFromToName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -52,7 +52,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /** Object for DUMMY. */
     protected static final Object DUMMY_OBJECT = new Object();
-    
+
     /** The property of condition-query. */
     protected static final String CQ_PROPERTY = "conditionQuery";
 
@@ -104,6 +104,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         _sqlClause = sqlClause;
         _aliasName = aliasName;
         _nestLevel = nestLevel;
+    }
+
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    /**
+     * Get the provider of DB meta.
+     * @return The provider of DB meta. (NotNull)
+     */
+    protected abstract ${glDBMetaProvider} getDBMetaProvider();
+
+    protected ${glDBMeta} findDBMeta(String tableFlexibleName) {
+        return getDBMetaProvider().provideDBMetaChecked(tableFlexibleName);
     }
 
     // ===================================================================================
@@ -491,7 +504,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         if (value == null) {
             return;
         }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "set" + columnCapPropName + "_LikeSearch";
         Method method = null;
@@ -697,7 +710,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+            ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
@@ -777,7 +790,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
@@ -859,7 +872,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+        ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + subQuery.getTableDbName();
@@ -939,7 +952,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected void assertScalarSubQueryColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(subQuery.getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
@@ -1265,7 +1278,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      */
     public ${glConditionValueName} invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "get" + columnCapPropName;
         final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, columnFlexibleName);
@@ -1287,7 +1300,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         final String propertyName = container.getPropertyName();
         final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
         final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{value.getClass()}, propertyName);
@@ -1305,7 +1318,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String propertyName = container.getPropertyName();
         final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
         final String ascDesc = isAsc ? "Asc" : "Desc";
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cq.getTableDbName());
+        final ${glDBMeta} dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
         final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{}, propertyName);
