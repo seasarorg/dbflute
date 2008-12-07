@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionOptionSimpleStringName}")
+#set ($myClassName = "${glSimpleStringOption}")
 
 using System;
 
@@ -13,7 +13,7 @@ public class ${myClassName} : ${glConditionOptionInterfaceName} {
     // protected ${glConditionOptionPartsSplitName} _splitOptionParts;
     // protected ${glConditionOptionPartsToUpperLowerCaseName} _toUpperLowerCaseOptionParts;
     // protected ${glConditionOptionPartsToSingleByteName} _toSingleByteCaseOptionParts;
-    // protected ${glConditionOptionPartsAgentJapaneseName} _japaneseOptionPartsAgent;
+    // protected ${glJapaneseOptionPartsAgent} _japaneseOptionPartsAgent;
 
     // =====================================================================================
     //                                                                           Rear Option

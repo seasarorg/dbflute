@@ -74,8 +74,8 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected virtual void PostCreateRow(Object row, IBeanMetaData bmd) {
-            if (row is ${glEntityInterfaceName}) { // DBFlute Target
-                ((${glEntityInterfaceName})row).ClearModifiedPropertyNames();
+            if (row is ${glEntity}) { // DBFlute Target
+                ((${glEntity})row).ClearModifiedPropertyNames();
             } else { // Basically Unreachable
                 bmd.ClearModifiedPropertyNames(row);
             }

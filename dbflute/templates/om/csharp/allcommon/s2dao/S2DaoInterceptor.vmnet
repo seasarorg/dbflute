@@ -83,7 +83,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // - - - - - - - - - - - - -
             // Preprocess conditionBean
             // - - - - - - - - - - - - -
-            ${glConditionBeanInterfaceName} cb = PreprocessConditionBean(invocation);
+            ${glConditionBean} cb = PreprocessConditionBean(invocation);
 
             // - - - - - - - - -
             // Set up sqlCommand
@@ -146,7 +146,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void InitializeSqlCommand(IMethodInvocation invocation) {
             Type targetType = GetComponentDef(invocation).ComponentType;
             IDaoMetaData dmd = _daoMetaDataFactory.GetDaoMetaData(targetType);
-            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(targetType)) {
+            if (typeof(${glOutsideSqlDao}).IsAssignableFrom(targetType)) {
                 return;// Do nothing!
             } else {
                 Object[] arguments = invocation.Arguments;
@@ -172,7 +172,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             ISqlCommand cmd;
             Type targetType = GetComponentDef(invocation).ComponentType;
             IDaoMetaData dmd = _daoMetaDataFactory.GetDaoMetaData(targetType);
-            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(targetType)) {
+            if (typeof(${glOutsideSqlDao}).IsAssignableFrom(targetType)) {
                 cmd = dmd.GetSqlCommand(GenerateSpecifiedOutsideSqlUniqueKey(invocation));
             } else {
                 cmd = dmd.GetSqlCommand(invocation.Method.Name);
@@ -184,12 +184,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             Object[] args = invocation.Arguments;
             String path = (String)args[0];
             Object pmb = args[1];
-            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            ${glOutsideSqlOption} option = (${glOutsideSqlOption})args[2];
             Object resultTypeSpecification = null;
             if (args.Length > 3) {
                 resultTypeSpecification = args[3];
             }
-            return ${glOutsideSqlContextName}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultTypeSpecification);
+            return ${glOutsideSqlContext}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultTypeSpecification);
         }
 
         // ===============================================================================
@@ -230,7 +230,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // Specified OutsideSql
             if (IsSpecifiedOutsideSql(invocation)) {
                 Object[] args = invocation.Arguments;
-                ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
                 if (outsideSqlContext != null) {
                     Log("path: " + outsideSqlContext.OutsideSqlPath);
                 } else {
@@ -245,7 +245,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 try {
                     String originalName = invokeClassName;
                     if (IsSpecifiedOutsideSql()) {
-                        ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                        ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
                         String tableDbName = outsideSqlContext.TableDbName;
                         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableDbName);
                         String behaviorTypeName = dbmeta.BehaviorTypeName;
@@ -273,7 +273,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if ("SelectPage".Equals(invokeMethodName)) { // Special Handling!
                 bool resultTypeInteger = false;
                 if (IsSpecifiedOutsideSql()) {
-                    ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+                    ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
                     Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
                     if (resultTypeSpecification != null && resultTypeSpecification is Type) {
                         Type resultType = (Type)resultTypeSpecification;
@@ -611,11 +611,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                             Log(daoResultPrefix + "Selected list: " + ls.Count + " first=" + ls[0] + "]");
                         }
                     }
-                } else if (typeof(${glEntityInterfaceName}).IsAssignableFrom(retType)) {
+                } else if (typeof(${glEntity}).IsAssignableFrom(retType)) {
                     if (ret == null) {
                         Log(daoResultPrefix + "Selected entity: null" + "]");
                     } else {
-                        ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ret;
+                        ${glEntity} entity = (${glEntity})ret;
                         Log(daoResultPrefix + "Selected entity: " + entity + "]");
                     }
                 } else {
@@ -653,7 +653,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 	
     	protected bool IsSpecifiedOutsideSql(IMethodInvocation invocation) {
-    	    return typeof(${glOutsideSqlDaoName}).IsAssignableFrom(GetComponentDef(invocation).ComponentType);
+    	    return typeof(${glOutsideSqlDao}).IsAssignableFrom(GetComponentDef(invocation).ComponentType);
     	}
 		
         // - - - - - - - - - -
@@ -671,10 +671,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             String path = GetOutsideSqlPath(args);
             Object pmb = GetOutsideSqlParameterBean(args);
-            ${glOutsideSqlOptionName} option = GetOutsideSqlOption(args);
+            ${glOutsideSqlOption} option = GetOutsideSqlOption(args);
             Object resultTypeSpecification = args[3];
             bool autoPagingLogging = (option.IsAutoPaging || option.IsSourcePagingRequestTypeAuto);
-            ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
@@ -686,7 +686,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
             outsideSqlContext.IsAutoPagingLogging = autoPagingLogging; // for logging
 			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
-            ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
+            ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
             SetupOutsideSqlFetchNarrowingBean(pmb, option);
@@ -703,8 +703,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             String path = GetOutsideSqlPath(args);
             Object pmb = GetOutsideSqlParameterBean(args);
-            ${glOutsideSqlOptionName} option = GetOutsideSqlOption(args);
-            ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            ${glOutsideSqlOption} option = GetOutsideSqlOption(args);
+            ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
             outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
             outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
             outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
@@ -714,7 +714,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.StatementConfig = option.StatementConfig;
 			outsideSqlContext.TableDbName = option.TableDbName;
 			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
-            ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
+            ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
             SetupOutsideSqlFetchNarrowingBean(pmb, option);
@@ -729,11 +729,11 @@ namespace ${glPackageBaseCommonS2Dao} {
     	protected Object GetOutsideSqlParameterBean(Object[] args) {
             return args[1];
     	}
-    	protected ${glOutsideSqlOptionName} GetOutsideSqlOption(Object[] args) {
-            return (${glOutsideSqlOptionName})args[2];
+    	protected ${glOutsideSqlOption} GetOutsideSqlOption(Object[] args) {
+            return (${glOutsideSqlOption})args[2];
     	}
 	
-        protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
+        protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {
             if (pmb == null || !${glFetchNarrowingBeanContextName}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
                 return;
             }
@@ -747,13 +747,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                     ConditionBean
         //                                     -------------
-        protected ${glConditionBeanInterfaceName} PreprocessConditionBean(IMethodInvocation invocation) {
-            ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+        protected ${glConditionBean} PreprocessConditionBean(IMethodInvocation invocation) {
+            ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
             if (outsideSqlContext != null) {
                 return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
             }
 			
-            ${glConditionBeanInterfaceName} cb = null;
+            ${glConditionBean} cb = null;
             {
                 Object[] args = invocation.Arguments;
                 if (args == null || !(args.Length >= 1)) {
@@ -772,7 +772,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return null;
                 }
 
-                cb = (${glConditionBeanInterfaceName})arg0;
+                cb = (${glConditionBean})arg0;
             }
 
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
@@ -785,7 +785,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return cb;
         }
 
-        public void PostprocessConditionBean(IMethodInvocation invocation, ${glConditionBeanInterfaceName} cb) {
+        public void PostprocessConditionBean(IMethodInvocation invocation, ${glConditionBean} cb) {
             if (cb == null) {
                 return;
             }
@@ -798,8 +798,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                Clear Thread Local
         //                                ------------------
         protected void ClearThreadLocal() {
-            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContextName}.ClearOutsideSqlContextOnThread();
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
             }
             if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -812,28 +812,28 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
                 ${glConditionBeanContextName}.ClearConditionBeanOnThread();
             }
-            if (${glInternalMapContextName}.IsExistInternalMapOnThread()) {
-                ${glInternalMapContextName}.ClearInternalMapOnThread();
+            if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
+                ${glInternalMapContext}.ClearInternalMapOnThread();
             }
         }
 
         // ===============================================================================
         //                                                                  Context Helper
         //                                                                  ==============
-        protected ${glOutsideSqlContextName} GetOutsideSqlContext() {
-            if (!${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+        protected ${glOutsideSqlContext} GetOutsideSqlContext() {
+            if (!${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
                 return null;
             }
-            return ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            return ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
         }
         
         protected bool IsSpecifiedOutsideSql() {
-            ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+            ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
             return outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql;
         }
 
         protected void PutObjectToMapContext(String key, Object value) {
-            ${glInternalMapContextName}.SetObject(key, value);
+            ${glInternalMapContext}.SetObject(key, value);
         }
 
         // ===============================================================================

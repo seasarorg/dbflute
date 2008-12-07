@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glSqlClauseInterfaceName}SqlServer")
+#set ($myClassName = "${glSqlClause}SqlServer")
 
 /**
  * SqlClause for MSSQL.
@@ -82,7 +82,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * ${database.ImplementComment} {Implement}
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} lockForUpdate() {
+    public ${glSqlClause} lockForUpdate() {
         _lockFromHint = " with (updlock)";
         return this;
     }

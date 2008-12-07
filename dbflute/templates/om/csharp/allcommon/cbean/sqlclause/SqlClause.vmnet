@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClauseName}")
+#set ($myClassName = "${glSqlClause}")
 
 using System;
 using System.Collections;

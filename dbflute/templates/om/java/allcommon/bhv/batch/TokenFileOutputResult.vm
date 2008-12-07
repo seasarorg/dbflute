@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * @author ${database.ClassAuthor}
@@ -10,16 +10,16 @@ public class ${glTokenFileOutputResultName} {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected java.util.List${database.filterGenericsString(${glEntityInterfaceName})} _selectedList;
+    protected java.util.List${database.filterGenericsString(${glEntity})} _selectedList;
 
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} getSelectedList() {
+    public java.util.List${database.filterGenericsString(${glEntity})} getSelectedList() {
         return _selectedList;
     }
 
-    public void setSelectedList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectedList) {
+    public void setSelectedList(java.util.List${database.filterGenericsString(${glEntity})} selectedList) {
         _selectedList = selectedList;
     }
 }

@@ -1,8 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 #if ($database.isExistCommonColumnSetupElement())
-import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
 
 /**
@@ -48,12 +48,12 @@ public class ${glCommonColumnBasicAutoSetupper} implements ${glCommonColumnAutoS
      * Handle common columns of insert if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
+    public void handleCommonColumnOfInsertIfNeeds(${glEntity} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glEntityDefinedCommonColumnInterfaceName})) {
+        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
             return;
         }
-        final ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
         if (!entity.canCommonColumnAutoSetup()) {
             return;
         }
@@ -89,12 +89,12 @@ public class ${glCommonColumnBasicAutoSetupper} implements ${glCommonColumnAutoS
      * Handle common columns of update if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
+    public void handleCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glEntityDefinedCommonColumnInterfaceName})) {
+        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
             return;
         }
-        final ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
         if (!entity.canCommonColumnAutoSetup()) {
             return;
         }

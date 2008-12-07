@@ -12,17 +12,14 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
-import ${glPackageBaseCommon}.${glCallbackContextName};
+import ${glPackageBaseCommon}.${glCallbackContext};
 import ${glPackageBaseCommon}.${glDBDef};
-#if ($database.isMakeDeprecated())
-import ${glPackageBaseCommon}.${glDBFluteConfig};
-#end
-import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommon}.${glInternalMapContext};
 import ${glPackageBaseCommon}.${glQLog};
 import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 import ${glPackageBaseCommonException}.${glSQLFailureException};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
@@ -141,10 +138,10 @@ public class ${glInternalBasicHandler} {
     }
 
     protected ${glSqlLogHandlerName} getSqlLogHander() {
-        if (!${glCallbackContextName}.isExistCallbackContextOnThread()) {
+        if (!${glCallbackContext}.isExistCallbackContextOnThread()) {
             return null;
         }
-        return ${glCallbackContextName}.getCallbackContextOnThread().getSqlLogHandler();
+        return ${glCallbackContext}.getCallbackContextOnThread().getSqlLogHandler();
     }
 
     protected boolean isContainsLineSeparatorInSql() {
@@ -183,8 +180,15 @@ public class ${glInternalBasicHandler} {
         return completeSql;
     }
 
+    /**
+     * The handler of SQLException.
+     */
     public static class SQLExceptionHandler {
 
+        /**
+         * @param e The instance of SQLException. (NotNull)
+         * @param statement The instance of statement. (Nullable)
+         */
         public void handleSQLException(SQLException e, Statement statement) {
             handleSQLException(e, statement, false);
         }
@@ -201,24 +205,11 @@ public class ${glInternalBasicHandler} {
         }
     
         protected boolean isUniqueConstraintException(SQLException e) {
-#if ($database.isMakeDeprecated())
-            ${glDBFluteConfig}.UniqueConstraintDeterminator determinator = getUniqueConstraintDeterminator();
-            if (determinator != null) {
-                return determinator.isUniqueConstraintException(e);
-            }
-#end
             if (!${glResourceContext}.isExistResourceContextOnThread()) {
                 return false;
             }
             return ${glResourceContext}.isUniqueConstraintException(extractSQLState(e), e.getErrorCode());
         }
-#if ($database.isMakeDeprecated())
-
-        @SuppressWarnings("deprecation")
-        protected ${glDBFluteConfig}.UniqueConstraintDeterminator getUniqueConstraintDeterminator() {
-            return ${glDBFluteConfig}.getInstance().getUniqueConstraintDeterminator();
-        }
-#end
 
         protected void throwEntityAlreadyExistsException(SQLException e, Statement statement, String completeSql) {
             String msg = "Look! Read the message below." + getLineSeparator();
@@ -396,12 +387,12 @@ public class ${glInternalBasicHandler} {
         }
 
         protected String extractBehaviorInvokeName() {
-            final Object behaviorInvokeName = ${glInternalMapContextName}.getObject("df:BehaviorInvokeName");
+            final Object behaviorInvokeName = ${glInternalMapContext}.getObject("df:BehaviorInvokeName");
             if (behaviorInvokeName == null) {
                 return null;
             }
-            final Object clientInvokeName = ${glInternalMapContextName}.getObject("df:ClientInvokeName");
-            final Object byPassInvokeName = ${glInternalMapContextName}.getObject("df:ByPassInvokeName");
+            final Object clientInvokeName = ${glInternalMapContext}.getObject("df:ClientInvokeName");
+            final Object byPassInvokeName = ${glInternalMapContext}.getObject("df:ByPassInvokeName");
             final StringBuilder sb = new StringBuilder();
             boolean existsPath = false;
             if (clientInvokeName != null) {
@@ -423,16 +414,16 @@ public class ${glInternalBasicHandler} {
             return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
         }
 
-        protected ${glConditionBeanInterfaceName} getConditionBean() {
+        protected ${glConditionBean} getConditionBean() {
             return ${glConditionBeanContextName}.getConditionBeanOnThread();
         }
 
         protected boolean hasOutsideSqlContext() {
-            return ${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread();
+            return ${glOutsideSqlContext}.isExistOutsideSqlContextOnThread();
         }
 
-        protected ${glOutsideSqlContextName} getOutsideSqlContext() {
-            return ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        protected ${glOutsideSqlContext} getOutsideSqlContext() {
+            return ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
         }
 
         protected String getLineSeparator() {

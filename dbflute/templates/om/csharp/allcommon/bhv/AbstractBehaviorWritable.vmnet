@@ -1,4 +1,4 @@
-#set ($myClassName = "${glBehaviorWritableAbstractName}")
+#set ($myClassName = "${glAbstractBehaviorWritable}")
 
 using System;
 using System.Collections;
@@ -10,7 +10,7 @@ using ${glPackageBaseCommonException};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    public abstract class $myClassName : ${glBehaviorReadableAbstractName}, ${glBehaviorWritableInterfaceName} {
+    public abstract class $myClassName : ${glAbstractBehaviorReadable}, ${glBehaviorWritable} {
 
         // ===============================================================================
         //                                                                      Definition
@@ -20,18 +20,18 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                   Entity Update
         //                                                                   =============
-        public virtual void Create(${glEntityInterfaceName} entity) {
+        public virtual void Create(${glEntity} entity) {
             AssertEntityNotNull(entity);
             CallCreate(entity);
         }
 
-        public virtual void Modify(${glEntityInterfaceName} entity) {
+        public virtual void Modify(${glEntity} entity) {
             AssertEntityNotNull(entity);
             int modifiedCount = CallModify(entity);
             AssertUpdatedEntity(entity, modifiedCount);
         }
 
-        protected static void AssertUpdatedEntity(${glEntityInterfaceName} entity, int updatedCount) {
+        protected static void AssertUpdatedEntity(${glEntity} entity, int updatedCount) {
             if (updatedCount == 0) {
                 String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
                 throw new ${glEntityAlreadyDeletedException}(msg);
@@ -43,13 +43,13 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        public virtual void Remove(${glEntityInterfaceName} entity) {
+        public virtual void Remove(${glEntity} entity) {
             AssertEntityNotNull(entity);
             int removedCount = CallRemove(entity);
             AssertDeletedEntity(entity, removedCount);
         }
 
-        protected static void AssertDeletedEntity(${glEntityInterfaceName} entity, int deletedCount) {
+        protected static void AssertDeletedEntity(${glEntity} entity, int deletedCount) {
             if (deletedCount == 0) {
                 String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
                 throw new ${glEntityAlreadyDeletedException}(msg);
@@ -65,7 +65,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                    InsertOrUpdate
         //                                    --------------
         protected void HelpInsertOrUpdateInternally<ENTITY_TYPE, CB_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback)
-                    where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+                    where ENTITY_TYPE : ${glEntity} where CB_TYPE : ${glConditionBean} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 callback.CallbackInsert(entity);
@@ -94,7 +94,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected interface InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} where CB_TYPE : ${glConditionBeanInterfaceName} {
+        protected interface InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> where ENTITY_TYPE : ${glEntity} where CB_TYPE : ${glConditionBean} {
             void CallbackInsert(ENTITY_TYPE entity);
             void CallbackUpdate(ENTITY_TYPE entity);
             CB_TYPE CallbackNewMyConditionBean();
@@ -103,7 +103,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected void HelpInsertOrUpdateInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback)
-                where ENTITY_TYPE : ${glEntityInterfaceName} {
+                where ENTITY_TYPE : ${glEntity} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 callback.CallbackInsert(entity);
@@ -118,7 +118,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntity} {
             void CallbackInsert(ENTITY_TYPE entity);
             void CallbackUpdateNonstrict(ENTITY_TYPE entity);
         }
@@ -126,7 +126,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Delete
         //                                            ------
-        protected void HelpDeleteInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntity} {
             AssertEntityNotNull(entity);
             AssertEntityHasVersionNoValue(entity);
             AssertEntityHasUpdateDateValue(entity);
@@ -134,11 +134,11 @@ namespace ${glPackageBaseCommonBhv} {
             AssertUpdatedEntity(entity, deletedCount);
         }
 
-        protected interface InternalDeleteCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected interface InternalDeleteCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntity} {
             int CallbackDelegateDelete(ENTITY_TYPE entity);
         }
 
-        protected void HelpDeleteNonstrictInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteNonstrictInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntity} {
             AssertEntityNotNull(entity);
             int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
             if (deletedCount == 0) {
@@ -151,11 +151,11 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected interface InternalDeleteNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected interface InternalDeleteNonstrictCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntity} {
             int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
         }
 
-        protected void HelpDeleteNonstrictIgnoreDeletedInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void HelpDeleteNonstrictIgnoreDeletedInternally<ENTITY_TYPE>(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) where ENTITY_TYPE : ${glEntity} {
             AssertEntityNotNull(entity);
             int deletedCount = callback.CallbackDelegateDeleteNonstrict(entity);
             if (deletedCount == 0) {
@@ -167,7 +167,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
        }
 
-        protected interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> where ENTITY_TYPE : ${glEntity} {
             int CallbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
         }
 
@@ -177,7 +177,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Create
         //                                            ------
-        protected virtual bool ProcessBeforeInsert(${glEntityInterfaceName} entity) {
+        protected virtual bool ProcessBeforeInsert(${glEntity} entity) {
             AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             FrameworkFilterEntityOfInsert(entity);
             FilterEntityOfInsert(entity);
@@ -185,32 +185,32 @@ namespace ${glPackageBaseCommonBhv} {
             return true;
         }
 
-        protected virtual int CallCreate(${glEntityInterfaceName} entity) {
+        protected virtual int CallCreate(${glEntity} entity) {
             if (!ProcessBeforeInsert(entity)) { return 1; }
             return DoCallCreate(entity);
         }
 
-        protected virtual void FrameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+        protected virtual void FrameworkFilterEntityOfInsert(${glEntity} targetEntity) {
             InjectSequenceToPrimaryKeyIfNeeds(targetEntity);
             SetupCommonColumnOfInsertIfNeeds(targetEntity);
         }
 		
-        protected void InjectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
+        protected void InjectSequenceToPrimaryKeyIfNeeds(${glEntity} entity) {
             ${glDBMeta} dbmeta = entity.DBMeta;
             if (!dbmeta.HasSequence || dbmeta.HasTwoOrMorePrimaryKeys || entity.HasPrimaryKeyValue) {
                 return;
             }
             SetupNextValueToPrimaryKey(entity);
         }
-        protected virtual void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity) {// Expect Override of Sub Class!
+        protected virtual void SetupNextValueToPrimaryKey(${glEntity} entity) {// Expect Override of Sub Class!
         }
 
-        protected virtual void SetupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
+        protected virtual void SetupCommonColumnOfInsertIfNeeds(${glEntity} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
-            ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
             if (!entity.CanCommonColumnAutoSetup()) {
                 return;
             }
@@ -240,18 +240,18 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        protected virtual void FilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+        protected virtual void FilterEntityOfInsert(${glEntity} targetEntity) {
         }
 
-        protected virtual void AssertEntityOfInsert(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityOfInsert(${glEntity} entity) {
         }
 
-        protected abstract int DoCallCreate(${glEntityInterfaceName} entity);
+        protected abstract int DoCallCreate(${glEntity} entity);
 
         // -------------------------------------------------
         //                                            Modify
         //                                            ------
-        protected virtual bool ProcessBeforeUpdate(${glEntityInterfaceName} entity) {
+        protected virtual bool ProcessBeforeUpdate(${glEntity} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FrameworkFilterEntityOfUpdate(entity);
             FilterEntityOfUpdate(entity);
@@ -259,21 +259,21 @@ namespace ${glPackageBaseCommonBhv} {
             return true;
         }
 
-        protected virtual int CallModify(${glEntityInterfaceName} entity) {
+        protected virtual int CallModify(${glEntity} entity) {
             if (!ProcessBeforeUpdate(entity)) { return 1; }
             return DoCallModify(entity);
         }
 
-        protected virtual void FrameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+        protected virtual void FrameworkFilterEntityOfUpdate(${glEntity} targetEntity) {
             SetupCommonColumnOfUpdateIfNeeds(targetEntity);
         }
 
-        protected virtual void SetupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
+        protected virtual void SetupCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
                 return;
             }
-            ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
             if (!entity.CanCommonColumnAutoSetup()) {
                 return;
             }
@@ -302,18 +302,18 @@ namespace ${glPackageBaseCommonBhv} {
 #end
         }
 
-        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntity} targetEntity) {
         }
 
-        protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntity} entity) {
         }
 
-        protected abstract int DoCallModify(${glEntityInterfaceName} entity);
+        protected abstract int DoCallModify(${glEntity} entity);
 
         // -------------------------------------------------
         //                                            Remove
         //                                            ------
-        protected virtual bool ProcessBeforeDelete(${glEntityInterfaceName} entity) {
+        protected virtual bool ProcessBeforeDelete(${glEntity} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FrameworkFilterEntityOfDelete(entity);
             FilterEntityOfDelete(entity);
@@ -321,21 +321,21 @@ namespace ${glPackageBaseCommonBhv} {
             return true;
         }
 
-        protected virtual int CallRemove(${glEntityInterfaceName} entity) {
+        protected virtual int CallRemove(${glEntity} entity) {
             if (!ProcessBeforeDelete(entity)) { return 1; }
             return DoCallRemove(entity);
         }
 
-        protected virtual void FrameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+        protected virtual void FrameworkFilterEntityOfDelete(${glEntity} targetEntity) {
         }
 
-        protected virtual void FilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+        protected virtual void FilterEntityOfDelete(${glEntity} targetEntity) {
         }
 
-        protected virtual void AssertEntityOfDelete(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityOfDelete(${glEntity} entity) {
         }
 
-        protected abstract int DoCallRemove(${glEntityInterfaceName} entity);
+        protected abstract int DoCallRemove(${glEntity} entity);
 
         // -------------------------------------------------
         //                                            Helper
@@ -344,14 +344,14 @@ namespace ${glPackageBaseCommonBhv} {
             if (obj == null) {
                 return false;
             }
-            if (obj is ${glEntityDefinedCommonColumnInterfaceName}) {
+            if (obj is ${glEntityDefinedCommonColumn}) {
                 return true;
             } else {
                 return false;
             }
         }
 
-        protected void AssertEntityHasVersionNoValue(${glEntityInterfaceName} entity) {
+        protected void AssertEntityHasVersionNoValue(${glEntity} entity) {
             if (!DBMeta.HasVersionNo) {
                 return;
             }
@@ -372,7 +372,7 @@ namespace ${glPackageBaseCommonBhv} {
             throw new OptimisticLockColumnValueNullException(msg);
         }
 
-        protected void AssertEntityHasUpdateDateValue(${glEntityInterfaceName} entity) {
+        protected void AssertEntityHasUpdateDateValue(${glEntity} entity) {
             if (!DBMeta.HasUpdateDate) {
                 return;
             }

@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
  * @author ${database.ClassAuthor}
@@ -49,7 +49,7 @@ public interface ${glBehaviorCommand}<RESULT> {
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean();
+    public ${glConditionBean} getConditionBean();
     public String getOutsideSqlPath();
-    public ${glOutsideSqlOptionName} getOutsideSqlOption();
+    public ${glOutsideSqlOption} getOutsideSqlOption();
 }

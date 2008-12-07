@@ -6,27 +6,27 @@ import ${glPackageBaseCommonJdbc}.${glSqlLogHandlerName};
  * The context of callback.
  * @author ${database.ClassAuthor}
  */
-public class ${glCallbackContextName} {
+public class ${glCallbackContext} {
 
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<${glCallbackContextName}> _threadLocal = new ThreadLocal<${glCallbackContextName}>();
+    private static final ThreadLocal<${glCallbackContext}> _threadLocal = new ThreadLocal<${glCallbackContext}>();
 
     /**
      * Get callback-context on thread.
      * @return The context of callback. (Nullable)
      */
-    public static ${glCallbackContextName} getCallbackContextOnThread() {
-        return (${glCallbackContextName}) _threadLocal.get();
+    public static ${glCallbackContext} getCallbackContextOnThread() {
+        return (${glCallbackContext}) _threadLocal.get();
     }
 
     /**
      * Set callback-context on thread.
      * @param callbackContext The context of callback. (NotNull)
      */
-    public static void setCallbackContextOnThread(${glCallbackContextName} callbackContext) {
+    public static void setCallbackContextOnThread(${glCallbackContext} callbackContext) {
         if (callbackContext == null) {
             String msg = "The argument[callbackContext] must not be null.";
             throw new IllegalArgumentException(msg);

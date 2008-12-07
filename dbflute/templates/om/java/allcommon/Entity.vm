@@ -8,7 +8,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  * The interface of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityInterfaceName} {
+public interface ${glEntity} {
 
     // ===================================================================================
     //                                                                              DBMeta

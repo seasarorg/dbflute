@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 import java.util.Map;
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
@@ -119,7 +119,7 @@ public interface ${myClassName} {
      * Get the type of entity.
      * @return The type of entity. (NotNull)
      */ 
-    public Class<? extends ${glEntityInterfaceName}> getEntityType();
+    public Class<? extends ${glEntity}> getEntityType();
 
     // ===================================================================================
     //                                                                     Object Instance
@@ -128,7 +128,7 @@ public interface ${myClassName} {
      * New the instance of entity.
      * @return The instance of entity. (NotNull)
      */ 
-    public ${glEntityInterfaceName} newEntity();
+    public ${glEntity} newEntity();
 
     // ===================================================================================
     //                                                                         Column Info
@@ -329,7 +329,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
-    public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> primaryKeyMap);
+    public void acceptPrimaryKeyMap(${glEntity} entity, Map<String, ? extends Object> primaryKeyMap);
 
     /**
      * Accept primary-key map-string.
@@ -338,7 +338,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      */
-    public void acceptPrimaryKeyMapString(${glEntityInterfaceName} entity, String primaryKeyMapString);
+    public void acceptPrimaryKeyMapString(${glEntity} entity, String primaryKeyMapString);
 
     /**
      * Accept column-value map.
@@ -347,7 +347,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      */
-    public void acceptColumnValueMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> columnValueMap);
+    public void acceptColumnValueMap(${glEntity} entity, Map<String, ? extends Object> columnValueMap);
 
     /**
      * Accept column-value map-string.
@@ -356,7 +356,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param columnValueMapString Column-value map-string. (NotNull)
      */
-    public void acceptColumnValueMapString(${glEntityInterfaceName} entity, String columnValueMapString);
+    public void acceptColumnValueMapString(${glEntity} entity, String columnValueMapString);
 
     // -----------------------------------------------------
     //                                               Extract
@@ -374,7 +374,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return Primary-key map-string. (NotNull)
      */
-    public String extractPrimaryKeyMapString(${glEntityInterfaceName} entity);
+    public String extractPrimaryKeyMapString(${glEntity} entity);
 
     /**
      * Extract primary-key map-string.
@@ -385,14 +385,14 @@ public interface ${myClassName} {
      * @param equal Equal. (NotNull)
      * @return Primary-key map-string. (NotNull)
      */
-    public String extractPrimaryKeyMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
+    public String extractPrimaryKeyMapString(${glEntity} entity, String startBrace, String endBrace, String delimiter, String equal);
 
     /**
      * Extract column-value map-string. Delimiter is at-mark and semicolon.
      * @param entity Target entity. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
-    public String extractColumnValueMapString(${glEntityInterfaceName} entity);
+    public String extractColumnValueMapString(${glEntity} entity);
 
     /**
      * Extract column-value map-string.
@@ -403,7 +403,7 @@ public interface ${myClassName} {
      * @param equal Equal. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
-    public String extractColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
+    public String extractColumnValueMapString(${glEntity} entity, String startBrace, String endBrace, String delimiter, String equal);
 
     // -----------------------------------------------------
     //                                               Convert
@@ -413,28 +413,28 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
-    public List<Object> convertToColumnValueList(${glEntityInterfaceName} entity);
+    public List<Object> convertToColumnValueList(${glEntity} entity);
 
     /**
      * Convert entity to column value as map.
      * @param entity Target entity. (NotNull)
      * @return The map of column value. (NotNull)
      */
-    public Map<String, Object> convertToColumnValueMap(${glEntityInterfaceName} entity);
+    public Map<String, Object> convertToColumnValueMap(${glEntity} entity);
 
     /**
      * Convert entity to column string-value as list.
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
-    public List<String> convertToColumnStringValueList(${glEntityInterfaceName} entity);
+    public List<String> convertToColumnStringValueList(${glEntity} entity);
 
     /**
      * Convert entity to column string-value as map.
      * @param entity Target entity. (NotNull)
      * @return The map of column string-value. (NotNull)
      */
-    public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity);
+    public Map<String, String> convertToColumnStringValueMap(${glEntity} entity);
 
     // ===================================================================================
     //                                                                          Map String
@@ -476,7 +476,7 @@ public interface ${myClassName} {
      * This class is for Internal. Don't use this!
      * @param <ENTITY_TYPE> The type of entity.
      */
-    public interface Eps<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+    public interface Eps<ENTITY_TYPE extends ${glEntity}> {
         
         /**
          * @param entity Entity. (NotNull)

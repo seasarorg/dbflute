@@ -8,7 +8,7 @@ using ${glPackageBaseCommonDBMeta};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    public interface ${glBehaviorReadableInterfaceName} {
+    public interface ${glBehaviorReadable} {
 
         // ===============================================================================
         //                                                                Initialized Mark
@@ -28,8 +28,8 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                    New Instance
         //                                                                    ============
-        ${glEntityInterfaceName} NewEntity();
-        ${glConditionBeanInterfaceName} NewConditionBean();
+        ${glEntity} NewEntity();
+        ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                                   Basic Get All
@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read count.</returns>
-        int ReadCount(${glConditionBeanInterfaceName} cb);
+        int ReadCount(${glConditionBean} cb);
 
         /// <summary>
         /// Read entity.
@@ -52,7 +52,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read entity. (Nullable)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb);
+        ${glEntity} ReadEntity(${glConditionBean} cb);
 
         /// <summary>
         /// Read entity with deleted check.
@@ -61,20 +61,20 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Read entity. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb);
+        ${glEntity} ReadEntityWithDeletedCheck(${glConditionBean} cb);
 
         /// <summary>
         /// Read list.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read list. (NotNull)</returns>
-        ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb);
+        ${glListResultBeanName}<${glEntity}> ReadList(${glConditionBean} cb);
 
         /// <summary>
         /// Read page.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb);
+        ${glPagingResultBeanName}<${glEntity}> ReadPage(${glConditionBean} cb);
     }
 }

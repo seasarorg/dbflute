@@ -127,8 +127,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                 Object Instance
         //                                                                 ===============
-        public abstract ${glEntityInterfaceName} NewEntity();
-        public abstract ${glConditionBeanInterfaceName} NewConditionBean();
+        public abstract ${glEntity} NewEntity();
+        public abstract ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                                     Unique Info
@@ -258,7 +258,7 @@ namespace ${glPackageBaseCommonDBMeta} {
 													, String propertyName
     	                                            , EntityPropertySetupper<ENTITY> setupper
     											    , Map<String, EntityPropertySetupper<ENTITY>> _entityPropertySetupperMap
-													) where ENTITY : ${glEntityInterfaceName} {
+													) where ENTITY : ${glEntity} {
 		    _entityPropertySetupperMap.put(columnName, setupper);
 		    _entityPropertySetupperMap.put(propertyName, setupper);
 		    _entityPropertySetupperMap.put(columnName.ToLower(), setupper);
@@ -268,7 +268,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
-//        protected abstract void checkDowncast(${glEntityInterfaceName} entity);
+//        protected abstract void checkDowncast(${glEntity} entity);
 // 
 //        protected String helpGettingColumnStringValue(Object value) {
 //            if (value instanceof java.sql.Timestamp) {

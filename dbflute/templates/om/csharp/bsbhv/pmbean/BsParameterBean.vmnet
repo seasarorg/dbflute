@@ -17,7 +17,7 @@ namespace ${glPackageExtendedParameterBean} {
     /// </summary>
     [System.Serializable]
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-    public partial class ${myClassName} : ${glProcedurePmbName} {
+    public partial class ${myClassName} : ${glProcedurePmb} {
 #else
     public partial class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 #end
@@ -51,7 +51,7 @@ namespace ${glPackageExtendedParameterBean} {
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         protected ${propertyType} _${propertyName};
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
-        protected ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} _${propertyName}InternalLikeSearchOption;
+        protected ${glPackageBaseCommonCOption}.${glLikeSearchOption} _${propertyName}InternalLikeSearchOption;
 
 #end
 #end
@@ -105,12 +105,12 @@ namespace ${glPackageExtendedParameterBean} {
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${propertyName}Option) {
+        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${propertyName}Option) {
             this.${database.initCap($propertyName)} = ${propertyName};
             _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
         }
 
-        public ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
+        public ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
             return _${propertyName}InternalLikeSearchOption;
         }}
 #end

@@ -18,9 +18,9 @@ import org.seasar.dao.RowCreator;
 import org.seasar.dao.impl.RelationKey;
 import org.seasar.dao.impl.RelationRowCache;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 
 /**
  * @author ${database.ClassAuthor}
@@ -170,7 +170,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
         if (!hasConditionBean()) {
             return true;
         }
-        ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().isSelectedForeignInfoEmpty()) {
             return true;
         }
@@ -184,7 +184,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
      * @return Determination.
      */
     protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
             return true;
         }
@@ -201,14 +201,14 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     }
 
     protected boolean hasOutsideSqlContext() {
-        return ${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread();
+        return ${glOutsideSqlContext}.isExistOutsideSqlContextOnThread();
     }
 
     protected boolean isSpecifiedOutsideSql() {
         if (!hasOutsideSqlContext()) {
             return false;
         }
-        final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        final ${glOutsideSqlContext} context = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
         return context.isSpecifiedOutsideSql();
     }
 }

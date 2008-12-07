@@ -2,14 +2,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
 #set ($myClassName = "${glConditionOptionInScopeName}")
 
-import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
 
 /**
  * The class of in-scope-option.
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
+public class ${myClassName} extends ${glSimpleStringOption} {
 
     // =====================================================================================
     //                                                                                 Split
@@ -71,7 +71,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     // =====================================================================================
     //                                                                              Japanese
     //                                                                              ========
-    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+    public ${glJapaneseOptionPartsAgent} localJapanese() {
         return doLocalJapanese();
     }
 

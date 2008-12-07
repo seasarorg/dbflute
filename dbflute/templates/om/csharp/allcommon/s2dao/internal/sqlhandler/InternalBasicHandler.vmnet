@@ -109,10 +109,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected virtual ${glSqlLogHandlerName} GetSqlLogHander() {
-            if (!${glCallbackContextName}.IsExistCallbackContextOnThread()) {
+            if (!${glCallbackContext}.IsExistCallbackContextOnThread()) {
                 return null;
             }
-            return ${glCallbackContextName}.GetCallbackContextOnThread().SqlLogHandler;
+            return ${glCallbackContext}.GetCallbackContextOnThread().SqlLogHandler;
         }
 
         protected virtual bool IsContainsLineSeparatorInSql() {
@@ -442,12 +442,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected String ExtractBehaviorInvokeName() {
-            Object behaviorInvokeName = ${glInternalMapContextName}.GetObject("df:BehaviorInvokeName");
+            Object behaviorInvokeName = ${glInternalMapContext}.GetObject("df:BehaviorInvokeName");
             if (behaviorInvokeName == null) {
                 return null;
             }
-            Object clientInvokeName = ${glInternalMapContextName}.GetObject("df:ClientInvokeName");
-            Object byPassInvokeName = ${glInternalMapContextName}.GetObject("df:ByPassInvokeName");
+            Object clientInvokeName = ${glInternalMapContext}.GetObject("df:ClientInvokeName");
+            Object byPassInvokeName = ${glInternalMapContext}.GetObject("df:ByPassInvokeName");
             StringBuilder sb = new StringBuilder();
             bool existsPath = false;
             if (clientInvokeName != null) {
@@ -469,16 +469,16 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
         }
 
-        protected ${glConditionBeanInterfaceName} GetConditionBean() {
+        protected ${glConditionBean} GetConditionBean() {
             return ${glConditionBeanContextName}.GetConditionBeanOnThread();
         }
 
         protected bool HasOutsideSqlContext() {
-            return ${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread();
+            return ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread();
         }
 
-        protected ${glOutsideSqlContextName} GetOutsideSqlContext() {
-            return ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+        protected ${glOutsideSqlContext} GetOutsideSqlContext() {
+            return ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
         }
 
         protected String GetLineSeparator() {

@@ -23,7 +23,7 @@ namespace ${glPackageCQ} {
         /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
         /// <param name="aliasName">My alias name. (NotNull)</param>
         /// <param name="nestLevel">Nest level.</param>
-        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel)
+        public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
         // ===============================================================================

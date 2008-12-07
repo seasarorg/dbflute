@@ -6,7 +6,7 @@ import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageCB}.*;
 import ${glPackageBaseCQ}.*;
 import ${glPackageCQ}.*;
@@ -25,7 +25,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
+    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
         _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
@@ -36,7 +36,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                             Override about Register
     //                                                             =======================
     @Override
-    protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+    protected void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
         throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
     }
 
@@ -66,7 +66,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     @Override
-    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");
     }

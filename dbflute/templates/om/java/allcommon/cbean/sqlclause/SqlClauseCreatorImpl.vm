@@ -4,7 +4,7 @@ import ${glPackageBaseCommon}.${glDBCurrent};
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 
 /**
  * The creator of SQL clause.
@@ -17,9 +17,9 @@ public class ${glSqlClauseCreatorImpl} implements ${glSqlClauseCreator} {
 	 * @param cb Condition-bean. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
+    public ${glSqlClause} createSqlClause(${glConditionBean} cb) {
         final String tableSqlName = cb.getTableSqlName();
-		final ${glSqlClauseName} sqlClause = createSqlClause(tableSqlName);
+		final ${glSqlClause} sqlClause = createSqlClause(tableSqlName);
         return sqlClause;
     }
 
@@ -28,26 +28,26 @@ public class ${glSqlClauseCreatorImpl} implements ${glSqlClauseCreator} {
 	 * @param tableDbName The DB name of table. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClauseName} createSqlClause(String tableDbName) {
+    public ${glSqlClause} createSqlClause(String tableDbName) {
         ${glDBMetaProvider} dbmetaProvider = new ${glDBMetaInstanceHandler}();
         if (isCurrentDBDef(${glDBDef}.MySQL)) {
-            return new ${glSqlClauseName}MySql(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}MySql(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.PostgreSQL)) {
-            return new ${glSqlClauseName}PostgreSql(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}PostgreSql(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.Oracle)) {
-            return new ${glSqlClauseName}Oracle(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}Oracle(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.DB2)) {
-            return new ${glSqlClauseName}Db2(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}Db2(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.SQLServer)) {
-            return new ${glSqlClauseName}SqlServer(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}SqlServer(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.FireBird)) {
-            return new ${glSqlClauseName}Firebird(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}Firebird(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.H2)) {
-            return new ${glSqlClauseName}H2(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}H2(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(${glDBDef}.Derby)) {
-            return new ${glSqlClauseName}Derby(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}Derby(tableDbName).provider(dbmetaProvider);
         } else {
-            return new ${glSqlClauseName}${database.generateDbName}(tableDbName).provider(dbmetaProvider);
+            return new ${glSqlClause}${database.generateDbName}(tableDbName).provider(dbmetaProvider);
         }
     }
 

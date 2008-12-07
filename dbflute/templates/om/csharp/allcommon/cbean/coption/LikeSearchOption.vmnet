@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionOptionLikeSearchName}")
+#set ($myClassName = "${glLikeSearchOption}")
 
 using System;
 
@@ -7,7 +7,7 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCOption} {
 
-public class ${myClassName} : ${glConditionOptionSimpleStringName} {
+public class ${myClassName} : ${glSimpleStringOption} {
 
     public static readonly String LIKE_PREFIX = "prefix";
     public static readonly String LIKE_SUFFIX = "suffix";

@@ -18,7 +18,7 @@ import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
@@ -35,9 +35,9 @@ import ${glPackageCB}.*;
 
 #set ($myExtendClassName = "")
 #if ($table.isWritable())
-  #set ($myExtendClassName = "${glBehaviorWritableAbstractName}")
+  #set ($myExtendClassName = "${glAbstractBehaviorWritable}")
 #else
-  #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
+  #set ($myExtendClassName = "${glAbstractBehaviorReadable}")
 #end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
@@ -100,8 +100,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
-    public ${glEntityInterfaceName} newEntity() { return newMyEntity(); }
-    public ${glConditionBeanInterfaceName} newConditionBean() { return newMyConditionBean(); }
+    public ${glEntity} newEntity() { return newMyEntity(); }
+    public ${glConditionBean} newConditionBean() { return newMyConditionBean(); }
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
     public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
@@ -351,7 +351,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doCreate(${glEntityInterfaceName} ${myEntityVariableName}) {
+    protected void doCreate(${glEntity} ${myEntityVariableName}) {
         insert((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
@@ -372,7 +372,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doModify(${glEntityInterfaceName} entity) {
+    protected void doModify(${glEntity} entity) {
         update((${myExtendedObjectClassName})entity);
     }
 #if ($table.hasOptimisticLock())
@@ -391,7 +391,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     @Override
-    protected void doModifyNonstrict(${glEntityInterfaceName} entity) {
+    protected void doModifyNonstrict(${glEntity} entity) {
 #if ($table.hasOptimisticLock())
         updateNonstrict((${myExtendedObjectClassName})entity);
 #else
@@ -420,7 +420,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doCreateOrUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
+    protected void doCreateOrUpdate(${glEntity} ${myEntityVariableName}) {
         insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
 #if ($table.hasOptimisticLock())
@@ -441,7 +441,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     @Override
-    protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity) {
+    protected void doCreateOrUpdateNonstrict(${glEntity} entity) {
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
         insertOrUpdateNonstrict((${myExtendedObjectClassName})entity);
 #else
@@ -465,7 +465,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doRemove(${glEntityInterfaceName} ${myEntityVariableName}) {
+    protected void doRemove(${glEntity} ${myEntityVariableName}) {
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
 #if ($table.hasOptimisticLock())
@@ -686,12 +686,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateSelectCount(${myConditionBeanClassName} cb) {
         return invoke(createSelectCountCBCommand(cb));
     }
-    protected int doCallReadCount(${glConditionBeanInterfaceName} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
+    protected int doCallReadCount(${glConditionBean} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
         return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class));
     }
     @SuppressWarnings("unchecked")
-    protected List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
+    protected List<${glEntity}> doCallReadList(${glConditionBean} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
     protected ${table.sequenceReturnType} delegateSelectNextVal() { return invoke(createSelectNextValCommand(${table.sequenceReturnType}.class)); }
 #end
@@ -703,11 +703,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateInsert(${myExtendedObjectClassName} e) {
         if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e));
     }
-    protected int doCallCreate(${glEntityInterfaceName} entity) {return delegateInsert(downcast(entity)); }
+    protected int doCallCreate(${glEntity} entity) {return delegateInsert(downcast(entity)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e) {
         if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e));
     }
-    protected int doCallModify(${glEntityInterfaceName} entity) { return delegateUpdate(downcast(entity)); }
+    protected int doCallModify(${glEntity} entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) {
         if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e));
@@ -716,7 +716,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateDelete(${myExtendedObjectClassName} e) {
         if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e));
     }
-    protected int doCallRemove(${glEntityInterfaceName} entity) { return delegateDelete(downcast(entity)); }
+    protected int doCallRemove(${glEntity} entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) {
         if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e));
@@ -728,13 +728,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doCreateList(List<${glEntityInterfaceName}> ls) { return delegateInsertList((List)ls); }
+    protected int[] doCreateList(List<${glEntity}> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doModifyList(List<${glEntityInterfaceName}> ls) { return delegateUpdateList((List)ls); }
+    protected int[] doModifyList(List<${glEntity}> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
@@ -746,7 +746,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doRemoveList(List<${glEntityInterfaceName}> ls) { return delegateDeleteList((List)ls); }
+    protected int[] doRemoveList(List<${glEntity}> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
@@ -759,7 +759,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(e); // If this table use identity, the entity does not have primary-key.
         return invoke(createInsertEntityCommand(e));
     }
-    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
         final ${glInsertEntityCommand} cmd = new ${glInsertEntityCommand}();
         cmd.setTableDbName(getTableDbName());
@@ -777,7 +777,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                     ===============
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
-    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    protected void filterEntityOfInsert(${glEntity} targetEntity) {
         super.filterEntityOfInsert(targetEntity);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
@@ -787,7 +787,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
-    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    protected void filterEntityOfUpdate(${glEntity} targetEntity) {
         super.filterEntityOfUpdate(targetEntity);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
@@ -827,7 +827,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                Optimistic Lock Info
     //                                                                ====================
     @Override
-    protected boolean hasVersionNoValue(${glEntityInterfaceName} entity) {
+    protected boolean hasVersionNoValue(${glEntity} entity) {
 #if ($table.isUseVersionNo())
         return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
 #else
@@ -836,7 +836,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected boolean hasUpdateDateValue(${glEntityInterfaceName} entity) {
+    protected boolean hasUpdateDateValue(${glEntity} entity) {
 #if ($table.isUseUpdateDate())
         return downcast(entity).get${table.updateDateJavaName}() != null;
 #else
@@ -847,7 +847,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
-    protected ${myExtendedObjectClassName} downcast(${glEntityInterfaceName} entity) {
+    protected ${myExtendedObjectClassName} downcast(${glEntity} entity) {
         return helpDowncastInternally(entity, ${myExtendedObjectClassName}.class);
     }
 }

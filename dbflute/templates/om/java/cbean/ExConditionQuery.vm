@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageCQ};
 
 #set ($myClassName = "${myConditionQueryClassName}")
 
-import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonCBean}.${glConditionQuery};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
 
 /**
@@ -26,7 +26,7 @@ public class ${myClassName} extends ${myBaseConditionQueryClassName} {
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
      */
-    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 	

@@ -22,7 +22,7 @@ import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.OgnlUtil;
 
 import ${glPackageBaseCommonCBean}.${glMapParameterBeanInterfaceName};
-import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
 import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyException};
 import ${glPackageBaseCommonException}.${glBindVariableParameterNullValueException};
 import ${glPackageBaseCommonException}.${glEmbeddedValueCommentNotFoundPropertyException};
@@ -568,7 +568,7 @@ public class ${glInternalSqlParser} {
             Class<?> clazz = valueAndType.getTargetType();
 
             // LikeSearchOption handling here is for OutsideSql.
-            ${glConditionOptionLikeSearchName} likeSearchOption = null;
+            ${glLikeSearchOption} likeSearchOption = null;
             String rearOption = null;
 
             for (int pos = 1; pos < _names.length; ++pos) {
@@ -628,7 +628,7 @@ public class ${glInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected boolean isLastLoop4LikeSearch(int pos, ${glConditionOptionLikeSearchName} likeSearchOption) {
+        protected boolean isLastLoop4LikeSearch(int pos, ${glLikeSearchOption} likeSearchOption) {
             return _names.length == (pos + 1) && likeSearchOption != null;
         }
 
@@ -642,9 +642,9 @@ public class ${glInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected ${glConditionOptionLikeSearchName} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
+        protected ${glLikeSearchOption} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
             final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
-            final ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
+            final ${glLikeSearchOption} option = (${glLikeSearchOption}) pb.getValue(resourceBean);
             if (option == null) {
                 throwLikeSearchOptionNotFoundException(resourceBean, currentName);
             }
@@ -672,7 +672,7 @@ public class ${glInternalSqlParser} {
         }
         
         // for OutsideSql
-        protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(${glConditionOptionLikeSearchName} option, Object resourceBean, String currentName) {
+        protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(${glLikeSearchOption} option, Object resourceBean, String currentName) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + getLineSeparator();

@@ -6,7 +6,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
-    public class ${glOutsideSqlOptionName} {
+    public class ${glOutsideSqlOption} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -46,8 +46,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                            Copy
         //                                                                            ====
-        public ${glOutsideSqlOptionName} CopyOptionWithoutPaging() {
-            ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+        public ${glOutsideSqlOption} CopyOptionWithoutPaging() {
+            ${glOutsideSqlOption} copyOption = new ${glOutsideSqlOption}();
             copyOption.setPagingSourceRequestType(_pagingRequestType);
             if (IsDynamicBinding) {
                 copyOption.DynamicBinding();

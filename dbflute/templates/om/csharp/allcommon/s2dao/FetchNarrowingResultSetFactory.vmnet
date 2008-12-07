@@ -31,8 +31,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return dataReader;
             }
             ${glFetchNarrowingResultSetWrapper} wrapper = null;
-            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
                 wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, outsideSqlContext.IsOffsetByCursorForcedly, outsideSqlContext.IsLimitByCursorForcedly);
             } else {
                 wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, false, false);
@@ -47,8 +47,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!cb.IsFetchNarrowingEffective) {
                 return false;// It is not necessary to control.
             }
-            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
                 if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
                     return true;
                 }

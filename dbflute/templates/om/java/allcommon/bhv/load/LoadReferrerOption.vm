@@ -2,10 +2,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvLoad};
 
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glEntityListSetupperName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 
 /**
  * The class of load referrer option.
@@ -13,7 +13,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
  * ${database.filterGenericsParamOutput('<REFERRER_ENTITY>', 'The type of referrer entity.')}
  * @author ${database.ClassAuthor}
  */
-public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glConditionBeanInterfaceName}, REFERRER_ENTITY extends ${glEntityInterfaceName}> {
+public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glConditionBean}, REFERRER_ENTITY extends ${glEntity}> {
 
     // ===================================================================================
     //                                                                           Attribute

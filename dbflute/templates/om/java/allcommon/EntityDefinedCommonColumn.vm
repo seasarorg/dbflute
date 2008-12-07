@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
  * The interface of entity defined common column.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityInterfaceName} {
+public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.CommonColumnMap})

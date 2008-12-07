@@ -5,15 +5,15 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommon} {
 
-    public class ${glAccessContextName} {
+    public class ${glAccessContext} {
 
         private static LocalDataStoreSlot _accessContextSlot = Thread.AllocateDataSlot();
 
-        public static ${glAccessContextName} GetAccessContextOnThread() {
-            return (${glAccessContextName})Thread.GetData(_accessContextSlot);
+        public static ${glAccessContext} GetAccessContextOnThread() {
+            return (${glAccessContext})Thread.GetData(_accessContextSlot);
         }
 
-        public static void SetAccessContextOnThread(${glAccessContextName} context) {
+        public static void SetAccessContextOnThread(${glAccessContext} context) {
             if (context == null) {
                 String msg = "The argument[context] must not be null.";
                 throw new ArgumentNullException(msg);
@@ -31,7 +31,7 @@ namespace ${glPackageBaseCommon} {
 		
 		public static String GetAccessUserOnThread() {
             if (IsExistAccessContextOnThread()) {
-                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessUser = userContextOnThread.AccessUser;
                 if (accessUser != null) {
                     return accessUser;
@@ -42,7 +42,7 @@ namespace ${glPackageBaseCommon} {
 		
 		public static String GetAccessProcessOnThread() {
             if (IsExistAccessContextOnThread()) {
-                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessProcess = userContextOnThread.AccessProcess;
                 if (accessProcess != null) {
                     return accessProcess;
@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommon} {
 		
 		public static String GetAccessModuleOnThread() {
             if (IsExistAccessContextOnThread()) {
-                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessModule = userContextOnThread.AccessModule;
                 if (accessModule != null) {
                     return accessModule;
@@ -64,7 +64,7 @@ namespace ${glPackageBaseCommon} {
 		
 		public static DateTime? GetAccessTimestampOnThread() {
             if (IsExistAccessContextOnThread()) {
-                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 DateTime? accessTimestamp = userContextOnThread.AccessTimestamp;
                 if (accessTimestamp != null) {
                     return accessTimestamp;
@@ -75,7 +75,7 @@ namespace ${glPackageBaseCommon} {
 
 		public static Object GetAccessValueOnThread(String key) {
             if (IsExistAccessContextOnThread()) {
-                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 IDictionary<String, Object> accessValueMap = userContextOnThread.AccessValueMap;
                 if (accessValueMap != null) {
                     return accessValueMap[key];

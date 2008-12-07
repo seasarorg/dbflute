@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * The auto set-upper of common column.
@@ -12,11 +12,11 @@ public interface ${glCommonColumnAutoSetupper} {
      * Handle common columns of insert if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity);
+    public void handleCommonColumnOfInsertIfNeeds(${glEntity} targetEntity);
 
     /**
      * Handle common columns of update if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity);
+    public void handleCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity);
 }

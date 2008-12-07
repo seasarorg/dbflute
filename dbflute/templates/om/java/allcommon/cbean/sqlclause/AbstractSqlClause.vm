@@ -26,7 +26,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The abstract class of SQL clause.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glSqlClauseName} {
+public abstract class ${myClassName} implements ${glSqlClause} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -137,7 +137,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         _tableName = tableName;
     }
 
-    public ${glSqlClauseName} provider(${glDBMetaProvider} dbmetaProvider) {
+    public ${glSqlClause} provider(${glDBMetaProvider} dbmetaProvider) {
         _dbmetaProvider = dbmetaProvider;
         return this;
     }
@@ -790,18 +790,18 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         return _orderByClause;
     }
 
-    public ${glSqlClauseInterfaceName} clearOrderBy() {
+    public ${glSqlClause} clearOrderBy() {
         _isOrderByEffective = false;
         _orderByClause.clear();
         return this;
     }
 
-    public ${glSqlClauseInterfaceName} ignoreOrderBy() {
+    public ${glSqlClause} ignoreOrderBy() {
         _isOrderByEffective = false;
         return this;
     }
 
-    public ${glSqlClauseInterfaceName} makeOrderByEffective() {
+    public ${glSqlClause} makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
             _isOrderByEffective = true;
         }
@@ -962,7 +962,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} fetchFirst(int fetchSize) {
+    public ${glSqlClause} fetchFirst(int fetchSize) {
         _isFetchScopeEffective = true;
         if (fetchSize <= 0) {
             String msg = "Argument[fetchSize] should be plus: " + fetchSize;
@@ -981,7 +981,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
      * @param fetchSize Fetch size. (NotMinus)
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
+    public ${glSqlClause} fetchScope(int fetchStartIndex, int fetchSize) {
         _isFetchScopeEffective = true;
         if (fetchStartIndex < 0) {
             String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
@@ -1000,7 +1000,7 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
      * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} fetchPage(int fetchPageNumber) {
+    public ${glSqlClause} fetchPage(int fetchPageNumber) {
         _isFetchScopeEffective = true;
         if (fetchPageNumber <= 0) {
             fetchPageNumber = 1;
@@ -1079,13 +1079,13 @@ public abstract class ${myClassName} implements ${glSqlClauseName} {
         return _isFetchScopeEffective;
     }
 
-    public ${glSqlClauseInterfaceName} ignoreFetchScope() {
+    public ${glSqlClause} ignoreFetchScope() {
         _isFetchScopeEffective = false;
         doClearFetchPageClause();
         return this;
     }
 
-    public ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
+    public ${glSqlClause} makeFetchScopeEffective() {
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }

@@ -31,11 +31,11 @@ public class ${myClassName} : ${glConditionKeyName} {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        if (!(option is ${glConditionOptionLikeSearchName})) {
-            String msg = "The argument[option] should be ${glConditionOptionLikeSearchName}: columnName=" + columnName + " value=" + value;
+        if (!(option is ${glLikeSearchOption})) {
+            String msg = "The argument[option] should be ${glLikeSearchOption}: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        ${glConditionOptionLikeSearchName} myOption = (${glConditionOptionLikeSearchName})option;
+        ${glLikeSearchOption} myOption = (${glLikeSearchOption})option;
         conditionList.add(buildBindClauseWithRearOption(columnName, value.getNotLikeSearchLocation(), myOption.getRearOption()));
     }
 
@@ -44,7 +44,7 @@ public class ${myClassName} : ${glConditionKeyName} {
     }
 
     protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
-        conditionValue.setNotLikeSearch((String)value, (${glConditionOptionLikeSearchName})option).setNotLikeSearchLocation(location);
+        conditionValue.setNotLikeSearch((String)value, (${glLikeSearchOption})option).setNotLikeSearchLocation(location);
     }
 }
 	

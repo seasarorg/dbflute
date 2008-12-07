@@ -14,11 +14,11 @@ namespace ${glPackageBaseCommonCBean} {
 
         private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
 
-        public static ${glConditionBeanInterfaceName} GetConditionBeanOnThread() {
-            return (${glConditionBeanInterfaceName})Thread.GetData(_slot);
+        public static ${glConditionBean} GetConditionBeanOnThread() {
+            return (${glConditionBean})Thread.GetData(_slot);
         }
 
-        public static void SetConditionBeanOnThread(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        public static void SetConditionBeanOnThread(${glConditionBean} ${glAttachedCBArgsVariableName}) {
             if (${glAttachedCBArgsVariableName} == null) {
                 String msg = "The argument[${glAttachedCBArgsVariableName}] must not be null.";
                 throw new ArgumentNullException(msg);
@@ -35,7 +35,7 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         public static bool IsTheArgumentConditionBean(Object dtoInstance) {
-            if (dtoInstance is ${glConditionBeanInterfaceName}) {
+            if (dtoInstance is ${glConditionBean}) {
                 return true;
             } else {
                 return false;
@@ -43,7 +43,7 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         public static bool IsTheTypeConditionBean(Type dtoType) {
-            if (typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(dtoType)) {
+            if (typeof(${glConditionBean}).IsAssignableFrom(dtoType)) {
                 return true;
             } else {
                 return false;
@@ -68,8 +68,8 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "Has the target record been deleted by other thread?" + GetLineSeparator();
             msg = msg + "It is precondition that the record exists on your database." + GetLineSeparator();
             msg = msg + GetLineSeparator();
-            if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
-                ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+            if (searchKey4Log != null && searchKey4Log is ${glConditionBean}) {
+                ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
                 String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
                 msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
             } else {
@@ -92,8 +92,8 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "Please confirm your search condition. Does it really select the only one?" + GetLineSeparator();
             msg = msg + "Please confirm your database. Does it really exist the only one?" + GetLineSeparator();
             msg = msg + GetLineSeparator();
-            if (searchKey4Log != null && searchKey4Log is ${glConditionBeanInterfaceName}) {
-                ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+            if (searchKey4Log != null && searchKey4Log is ${glConditionBean}) {
+                ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
                 String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
                 msg = msg + "[Display SQL]" + GetLineSeparator() + dispalySql + GetLineSeparator();
             } else {
@@ -124,7 +124,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
-        public static String ConvertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
+        public static String ConvertConditionBean2DisplaySql(${glConditionBean} cb) {
             String twoWaySql = cb.SqlClause.getClause();
             return ${glInternalSqlParser}.ConvertTwoWaySql2DisplaySql(twoWaySql, cb);
         }

@@ -39,21 +39,21 @@ targetdatabase = $targetDatabase
     #set ($glBasePrefix = ${database.BasePrefix})
     #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
 
-    #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
-    #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
+    #set ($glDaoReadable = "${glProjectPrefix}DaoReadable")
+    #set ($glDaoWritable = "${glProjectPrefix}DaoWritable")
 
     ## [Common-Entity]
-    #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
-    #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
+    #set ($glEntity = "${glProjectPrefix}Entity")
+    #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
 
     ## [ConditionBean]
-    #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
+    #set ($glConditionBean = "${glProjectPrefix}ConditionBean")
 
     ## [OutsideSql]
-    #set ($glProcedurePmbName = "${glProjectPrefix}ProcedurePmb")
+    #set ($glProcedurePmb = "${glProjectPrefix}ProcedurePmb")
 
     ## [Allcommon-ConditionBean-Option]
-    #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
+    #set ($glLikeSearchOption = "${glProjectPrefix}LikeSearchOption")
 
     ## [DBMeta]
     #set ($glDBMeta = "${glProjectPrefix}DBMeta")

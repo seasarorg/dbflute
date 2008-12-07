@@ -77,8 +77,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ISqlCommand InitializeSqlCommand(String methodName) {
-            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
                 if (outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql) {
                     return InitializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
                 }
@@ -94,7 +94,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             throw new MethodNotFoundRuntimeException(_daoType, methodName, null);
         }
 
-        protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContext} outsideSqlContext) {
             MethodInfo method = _daoInterface.GetMethod(outsideSqlContext.MethodName);// By real method name.
             if (method != null && method.IsAbstract) {
                 if (IsOutsideSqlDaoMethodSelect(method)) {
@@ -290,7 +290,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool IsFirstArgumentConditionBean(MethodInfo mi) {
             Type[] pmbTypes = MethodUtil.GetParameterTypes(mi);
-            return pmbTypes.Length > 0 && typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(pmbTypes[0]);
+            return pmbTypes.Length > 0 && typeof(${glConditionBean}).IsAssignableFrom(pmbTypes[0]);
         }
 
         // ===============================================================================
@@ -337,7 +337,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - -
         //              Select
         //               - - -
-        protected void SetupSpecifiedOutsideSqlSelectCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected void SetupSpecifiedOutsideSqlSelectCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContext} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - - - - - - - -
             // The attribute of Specified-OutsideSqlContext.
             // - - - - - - - - - - - - - - - - - - - - - - -
@@ -446,7 +446,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - -
         //             Execute
         //             - - - -
-        protected void SetupSpecifiedOutsideSqlExecuteCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected void SetupSpecifiedOutsideSqlExecuteCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContext} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - - - - - - - -
             // The attribute of Specified-OutsideSqlContext.
             // - - - - - - - - - - - - - - - - - - - - - - -
@@ -480,7 +480,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - - - -
         //          Call Procedure
         //           - - - - - - -
-        protected void SetupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected void SetupSpecifiedOutsideSqlCallCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContext} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - - - - - - - -
             // The attribute of Specified-OutsideSqlContext.
             // - - - - - - - - - - - - - - - - - - - - - - -
@@ -578,10 +578,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (beanType == null) {
                 return null;
             }
-            if (!typeof(${glEntityInterfaceName}).IsAssignableFrom(beanType)) {
+            if (!typeof(${glEntity}).IsAssignableFrom(beanType)) {
                 return null;
             }
-            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})Activator.CreateInstance(beanType);
+            ${glEntity} entity = (${glEntity})Activator.CreateInstance(beanType);
             return entity.DBMeta;
         }
 
@@ -604,7 +604,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 base.SetupProperty(beanType, dbMetaData, dbms);
                 return;
             }
-            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ClassUtil.NewInstance(beanType);
+            ${glEntity} entity = (${glEntity})ClassUtil.NewInstance(beanType);
             ${glDBMeta} dbmeta = entity.DBMeta;
             foreach (PropertyInfo pi in beanType.GetProperties()) {
                 IPropertyType pt = null;
@@ -709,7 +709,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 			}
 		}
 		protected bool IsEntity(Type beanType) {
-            return typeof(${glEntityInterfaceName}).IsAssignableFrom(beanType);
+            return typeof(${glEntity}).IsAssignableFrom(beanType);
         }
         public override bool HasModifiedPropertyNamesPropertyName {
             get {
@@ -843,7 +843,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         public bool IsDBFluteEntity(Type beanClass) {
-            return typeof(${glEntityInterfaceName}).IsAssignableFrom(beanClass);
+            return typeof(${glEntity}).IsAssignableFrom(beanClass);
         }
 
         public IBeanMetaData GetMetaFromCache(Type beanClass) {

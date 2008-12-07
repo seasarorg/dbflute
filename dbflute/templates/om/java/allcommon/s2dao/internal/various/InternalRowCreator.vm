@@ -11,8 +11,8 @@ import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.dao.impl.RowCreatorImpl;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommon}.${glEntity};
+import ${glPackageBaseCommon}.${glInternalMapContext};
 import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -170,10 +170,10 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
         protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
 
         public static ${glDBMeta} findDBMeta(Object row) {
-            if (!(row instanceof ${glEntityInterfaceName})) {
+            if (!(row instanceof ${glEntity})) {
                 return null;
             }
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) row;
+            final ${glEntity} entity = (${glEntity}) row;
             ${glDBMeta} dbmeta = findCachedDBMeta(entity.getClass());
             if (dbmeta != null) {
                 return dbmeta;
@@ -198,12 +198,12 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
             Map<Class<?>, ${glDBMeta}> dbmetaCache = findDBMetaCache();
             if (dbmetaCache == null) {
                 dbmetaCache = new HashMap<Class<?>, ${glDBMeta}>();
-                ${glInternalMapContextName}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
+                ${glInternalMapContext}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
             }
             return dbmetaCache.get(rowType);
         }
         
-        protected static void cacheDBMeta(${glEntityInterfaceName} entity, ${glDBMeta} dbmeta) {
+        protected static void cacheDBMeta(${glEntity} entity, ${glDBMeta} dbmeta) {
             cacheDBMeta(entity.getClass(), dbmeta);
         }
         
@@ -214,16 +214,16 @@ public class ${glInternalRowCreator} extends RowCreatorImpl {
         
         @SuppressWarnings("unchecked")
         protected static Map<Class<?>, ${glDBMeta}> findDBMetaCache() {
-            return (Map<Class<?>, ${glDBMeta}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
+            return (Map<Class<?>, ${glDBMeta}>)${glInternalMapContext}.getObject(DBMETA_CACHE_KEY);
         }
     }
 
     protected static ${glDBMeta} findDBMetaByClass(Class<?> beanClass) {
         final Object instance = newInstance(beanClass);
-        if (!(instance instanceof ${glEntityInterfaceName})) {
+        if (!(instance instanceof ${glEntity})) {
             return null;
         }
-        return ((${glEntityInterfaceName})instance).getDBMeta();
+        return ((${glEntity})instance).getDBMeta();
     }
 
     protected static Object newInstance(Class<?> clazz) {

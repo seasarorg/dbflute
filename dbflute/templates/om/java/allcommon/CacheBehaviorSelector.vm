@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
+import ${glPackageBaseCommonBhv}.${glBehaviorReadable};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
@@ -13,20 +13,20 @@ import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
  * The implementation of behavior-selector.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} implements ${glBehaviorSelectorInterfaceName} {
+public class ${glCacheBehaviorSelector} extends ${glCacheAbstractSelector} implements ${glBehaviorSelector} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glCacheBehaviorSelectorName}.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glCacheBehaviorSelector}.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The cache of behavior. (It's the generic hell!) */
-    protected Map<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}> _behaviorCache
-            = new ConcurrentHashMap<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}>();
+    protected Map<Class<? extends ${glBehaviorReadable}>, ${glBehaviorReadable}> _behaviorCache
+            = new ConcurrentHashMap<Class<? extends ${glBehaviorReadable}>, ${glBehaviorReadable}>();
 
     // ===================================================================================
     //                                                                          Initialize
@@ -43,7 +43,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
 		    _log.info("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
 		}
         for (${glDBMeta} dbmeta : dbmetas) {
-		    final ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
+		    final ${glBehaviorReadable} bhv = byName(dbmeta.getTableDbName());
             bhv.warmUpCommand();
         }
 	    if (_log.isInfoEnabled()) {
@@ -62,7 +62,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
-    public <BEHAVIOR extends ${glBehaviorReadableInterfaceName}> BEHAVIOR select(Class<BEHAVIOR> behaviorType) {
+    public <BEHAVIOR extends ${glBehaviorReadable}> BEHAVIOR select(Class<BEHAVIOR> behaviorType) {
         if (_behaviorCache.containsKey(behaviorType)) {
             return (BEHAVIOR)_behaviorCache.get(behaviorType);
         }
@@ -81,7 +81,7 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      * @param tableFlexibleName Table flexible-name. (NotNull)
      * @return Behavior-readable. (NotNull)
      */
-    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName) {
+    public ${glBehaviorReadable} byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         final ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.findDBMeta(tableFlexibleName);
         return select(getBehaviorType(dbmeta));
@@ -92,15 +92,15 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
      * @param dbmeta Dbmeta. (NotNull)
      * @return Behavior-type. (NotNull)
      */
-    protected Class<${glBehaviorReadableInterfaceName}> getBehaviorType(${glDBMeta} dbmeta) {
+    protected Class<${glBehaviorReadable}> getBehaviorType(${glDBMeta} dbmeta) {
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         if (behaviorTypeName == null) {
             String msg = "The dbmeta.getBehaviorTypeName() should not return null: dbmeta=" + dbmeta;
             throw new IllegalStateException(msg);
         }
-        final Class<${glBehaviorReadableInterfaceName}> behaviorType;
+        final Class<${glBehaviorReadable}> behaviorType;
         try {
-            behaviorType = (Class<${glBehaviorReadableInterfaceName}>)Class.forName(behaviorTypeName);
+            behaviorType = (Class<${glBehaviorReadable}>)Class.forName(behaviorTypeName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("The class does not exist: " + behaviorTypeName, e);
         }

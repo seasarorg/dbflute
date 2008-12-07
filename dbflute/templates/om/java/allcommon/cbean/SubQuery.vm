@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-public interface ${glSubQuery}<SUB_CB extends ${glConditionBeanInterfaceName}> {
+public interface ${glSubQuery}<SUB_CB extends ${glConditionBean}> {
     public void query(SUB_CB subCB);
 }

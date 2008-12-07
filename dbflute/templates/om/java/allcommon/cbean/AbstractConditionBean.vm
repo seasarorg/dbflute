@@ -9,7 +9,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
@@ -22,7 +22,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The condition-bean as abstract.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} {
+public abstract class ${myClassName} implements ${glConditionBean} {
 
     // =====================================================================================
     //                                                                            Definition
@@ -49,7 +49,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                                           Attribute
     //                                                                           =========
     /** SQL clause instance. */
-    protected final ${glSqlClauseName} _sqlClause;
+    protected final ${glSqlClause} _sqlClause;
     {
         _sqlClause = createSqlClause();
     }
@@ -75,7 +75,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * ${database.ImplementComment}
      * @return Sql clause. (NotNull)
      */
-    public ${glSqlClauseName} getSqlClause() {
+    public ${glSqlClause} getSqlClause() {
         return _sqlClause;
     }
 
@@ -84,7 +84,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * @param cb Condition-bean. (NotNull) 
      * @return SQL clause. (NotNull)
      */
-    protected abstract ${glSqlClauseName} createSqlClause();
+    protected abstract ${glSqlClause} createSqlClause();
 
     // ===================================================================================
     //                                                                     DBMeta Provider
@@ -464,7 +464,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} lockForUpdate() {
+    public ${glConditionBean} lockForUpdate() {
         getSqlClause().lockForUpdate();
         return this;
     }
@@ -477,10 +477,10 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * This method is for INTERNAL. Don't invoke this!
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
+    public ${glConditionBean} xsetupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
 
-        getSqlClause().classifySelectClauseType(${glSqlClauseName}.SelectClauseType.COUNT);
+        getSqlClause().classifySelectClauseType(${glSqlClause}.SelectClauseType.COUNT);
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;
@@ -491,7 +491,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
      * This method is for INTERNAL. Don't invoke this!
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
+    public ${glConditionBean} xafterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
 
         getSqlClause().rollbackSelectClauseType();
@@ -516,8 +516,8 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected static abstract class AbstractSpecification<CQ extends ${glConditionQueryInterfaceName}> {
-        protected ${glConditionBeanInterfaceName} _baseCB;
+    protected static abstract class AbstractSpecification<CQ extends ${glConditionQuery}> {
+        protected ${glConditionBean} _baseCB;
         protected SpQyCall<CQ> _qyCall;
         protected CQ _query;
         protected boolean _forDerivedReferrer;
@@ -534,7 +534,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
          * @param forScalarSubQuery  Is this for scalar sub-query?
          * @param dbmetaProvider The provider of DB meta. (NotNull)
          */
-        protected AbstractSpecification(${glConditionBeanInterfaceName} baseCB, SpQyCall<CQ> qyCall
+        protected AbstractSpecification(${glConditionBean} baseCB, SpQyCall<CQ> qyCall
                                       , boolean forDerivedReferrer, boolean forScalarSelect, boolean forScalarSubQuery
                                       , ${glDBMetaProvider} dbmetaProvider) {
             _baseCB = baseCB;
@@ -713,7 +713,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
     }
     
-    protected static interface SpQyCall<CQ extends ${glConditionQueryInterfaceName}> {
+    protected static interface SpQyCall<CQ extends ${glConditionQuery}> {
         public boolean has(); 
         public CQ qy(); 
     }
@@ -746,13 +746,13 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
     }
 
-    public static class RAFunction<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
-        protected ${glConditionBeanInterfaceName} _baseCB;
+    public static class RAFunction<REFERRER_CB extends ${glConditionBean}, LOCAL_CQ extends ${glConditionQuery}> {
+        protected ${glConditionBean} _baseCB;
         protected LOCAL_CQ _localCQ;
         protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
         protected ${glDBMetaProvider} _dbmetaProvider;
 
-        public RAFunction(${glConditionBeanInterfaceName} baseCB
+        public RAFunction(${glConditionBean} baseCB
                         , LOCAL_CQ localCQ
                         , RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper
                         , ${glDBMetaProvider} dbmetaProvider) {
@@ -890,7 +890,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
         }
     }
 
-    public static interface RAQSetupper<REFERRER_CB extends ${glConditionBeanInterfaceName}, LOCAL_CQ extends ${glConditionQueryInterfaceName}> {
+    public static interface RAQSetupper<REFERRER_CB extends ${glConditionBean}, LOCAL_CQ extends ${glConditionQuery}> {
         public void setup(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
     }
     
@@ -938,7 +938,7 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     }
     
     protected static interface SsCall {
-        public ${glConditionQueryInterfaceName} qf();
+        public ${glConditionQuery} qf();
     }
     
     // ===================================================================================

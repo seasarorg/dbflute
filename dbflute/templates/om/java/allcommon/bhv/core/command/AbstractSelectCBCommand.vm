@@ -4,8 +4,8 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCoreExecution}.${glSelectCBExecution};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
  * @author ${database.ClassAuthor}
@@ -17,10 +17,10 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
     //                                                                           Attribute
     //                                                                           =========
     /** The type of condition-bean. (Derived from conditionBean) */
-    protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
+    protected Class<? extends ${glConditionBean}> _conditionBeanType;
 
     /** The instance of condition-bean. (Required) */
-    protected ${glConditionBeanInterfaceName} _conditionBean;
+    protected ${glConditionBean} _conditionBean;
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -49,7 +49,7 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
         return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
     }
 
-    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType, ResultSetHandler handler) {
+    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBean}> cbType, ResultSetHandler handler) {
         return createSelectCBExecution(handler, new String[] { "dto" }, new Class<?>[] { cbType });
     }
 
@@ -68,7 +68,7 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
+    public ${glConditionBean} getConditionBean() {
         return _conditionBean;
     }
 
@@ -76,7 +76,7 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
         return null;
     }
 
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
         return null;
     }
 
@@ -97,11 +97,11 @@ public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractB
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
+    public void setConditionBeanType(Class<? extends ${glConditionBean}> conditionBeanType) {
         _conditionBeanType = conditionBeanType;
     }
 
-    public void setConditionBean(${glConditionBeanInterfaceName} conditionBean) {
+    public void setConditionBean(${glConditionBean} conditionBean) {
         _conditionBean = conditionBean;
     }
 }

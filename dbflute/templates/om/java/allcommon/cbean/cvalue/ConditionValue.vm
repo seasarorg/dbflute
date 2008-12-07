@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 
@@ -709,7 +709,7 @@ public class ${myClassName} {
      * @param option The option of likeSearch. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+    public ${myClassName} setLikeSearch(String value, ${glLikeSearchOption} option) {
         if (_likeSearch == null) {
             _likeSearch = new ArrayList<LikeSearchValue>();
             _likeSearch4Spare= new ArrayList<LikeSearchValue>();
@@ -748,15 +748,15 @@ public class ${myClassName} {
 
     protected static class LikeSearchValue {
         protected String _value;
-        protected ${glConditionOptionLikeSearchName} _option;
-        public LikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+        protected ${glLikeSearchOption} _option;
+        public LikeSearchValue(String value, ${glLikeSearchOption} option) {
             _value = value;
             _option = option;
         }
         public String getValue() {
             return _value;
         }
-        public ${glConditionOptionLikeSearchName} getOption() {
+        public ${glLikeSearchOption} getOption() {
             return _option;
         }
         public String generateRealValue() {
@@ -799,7 +799,7 @@ public class ${myClassName} {
      * @param option The option of notLikeSearch. (Nullable)
      * @return this. (NotNull)
      */
-    public ${myClassName} setNotLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+    public ${myClassName} setNotLikeSearch(String value, ${glLikeSearchOption} option) {
         if (_notLikeSearch == null) {
             _notLikeSearch = new ArrayList<NotLikeSearchValue>();
             _notLikeSearch4Spare= new ArrayList<NotLikeSearchValue>();
@@ -838,15 +838,15 @@ public class ${myClassName} {
 
     protected static class NotLikeSearchValue {
         protected String _value;
-        protected ${glConditionOptionLikeSearchName} _option;
-        public NotLikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+        protected ${glLikeSearchOption} _option;
+        public NotLikeSearchValue(String value, ${glLikeSearchOption} option) {
             _value = value;
             _option = option;
         }
         public String getValue() {
             return _value;
         }
-        public ${glConditionOptionLikeSearchName} getOption() {
+        public ${glLikeSearchOption} getOption() {
             return _option;
         }
         public String generateRealValue() {

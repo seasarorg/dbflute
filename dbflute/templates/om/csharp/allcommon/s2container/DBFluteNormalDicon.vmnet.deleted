@@ -18,11 +18,11 @@
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
 
     <!-- The selector of dao. -->
-    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}"/>
+    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelector}"/>
     <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}"/>
 
     <!-- The dao of outsideSql. -->
-    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
+    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDao}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
 

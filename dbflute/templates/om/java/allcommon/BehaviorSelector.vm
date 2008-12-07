@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
+import ${glPackageBaseCommonBhv}.${glBehaviorReadable};
 
 /**
  * The interface of behavior-selector.
  * @author ${database.ClassAuthor}
  */
-public interface ${glBehaviorSelectorInterfaceName} {
+public interface ${glBehaviorSelector} {
 
     /**
      * Initialize condition-bean meta data. <br />
@@ -19,12 +19,12 @@ public interface ${glBehaviorSelectorInterfaceName} {
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
-    public <BEHAVIOR extends ${glBehaviorReadableInterfaceName}> BEHAVIOR select(Class<BEHAVIOR> behaviorType);
+    public <BEHAVIOR extends ${glBehaviorReadable}> BEHAVIOR select(Class<BEHAVIOR> behaviorType);
 
     /**
      * Select behavior-readable.
      * @param tableFlexibleName Table flexible-name. (NotNull)
      * @return Behavior-readable. (NotNull)
      */
-    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName);
+    public ${glBehaviorReadable} byName(String tableFlexibleName);
 }

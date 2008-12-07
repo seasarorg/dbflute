@@ -7,8 +7,8 @@ import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonBhvCoreExecution}.${glOutsideSqlSelectExecution};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
  * The abstract command for OutsideSql.selectSomething().
@@ -35,10 +35,10 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
         assertStatus("beforeGettingSqlExecution");
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final ${glOutsideSqlOption} option = _outsideSqlOption;
         final Object resultTypeSpecification = getResultTypeSpecification();
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
-        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+        final ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
@@ -50,13 +50,13 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+        ${glOutsideSqlContext}.setOutsideSqlContextOnThread(outsideSqlContext);
 
         // Set up fetchNarrowingBean.
         setupOutsideSqlFetchNarrowingBean(pmb, option);
     }
 
-    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
+    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {
         if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
             return;
         }
@@ -82,22 +82,22 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
         final String methodName = getCommandName();
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
+        final ${glOutsideSqlOption} option = _outsideSqlOption;
         final Object resultTypeSpecification = getResultTypeSpecification();
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
+        return ${glOutsideSqlContext}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultTypeSpecification);
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
                 return createOutsideSqlSelectExecution(outsideSqlContext);
             }
         };
     }
 
-    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContextName} outsideSqlContext) {
+    protected ${glSqlExecution} createOutsideSqlSelectExecution(${glOutsideSqlContext} outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -

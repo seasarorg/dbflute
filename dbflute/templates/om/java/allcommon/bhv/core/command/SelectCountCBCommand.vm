@@ -4,7 +4,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 
 /**
@@ -28,14 +28,14 @@ public class ${glSelectCountCBCommand} extends ${glAbstractSelectCBCommand}<Inte
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         cb.xsetupSelectCountIgnoreFetchScope(); // *Point!
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
     }
 
     public void afterExecuting() {
         assertStatus("afterExecuting");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         cb.xafterCareSelectCountIgnoreFetchScope();
     }
 

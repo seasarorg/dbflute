@@ -22,7 +22,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel)
+        public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
         // ===============================================================================
@@ -334,7 +334,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
-        public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        public override void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
             ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
             ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;

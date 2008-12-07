@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClause}${database.DaoGenDbName}")
 
 using System;
 
@@ -35,7 +35,7 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
         _fetchScopeSelectHint = "";
     }
 
-    public override ${glSqlClauseInterfaceName} lockForUpdate() {
+    public override ${glSqlClause} lockForUpdate() {
         _lockSqlSuffix = " for update with lock";
         return this;
     }

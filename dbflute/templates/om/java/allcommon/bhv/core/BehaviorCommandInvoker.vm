@@ -10,12 +10,12 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.ValueTypeFactory;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommon}.${glXLog};
-import ${glPackageBaseCommon}.${glInternalMapContextName};
+import ${glPackageBaseCommon}.${glInternalMapContext};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
@@ -292,7 +292,7 @@ public class ${glBehaviorCommandInvoker} {
         logPath(behaviorCommand, stackTrace, behaviorResult);
 
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+            final ${glOutsideSqlContext} outsideSqlContext = getOutsideSqlContext();
             if (outsideSqlContext != null) {
                 log("path: " + behaviorCommand.getOutsideSqlPath());
                 log("option: " + behaviorCommand.getOutsideSqlOption());
@@ -343,7 +343,7 @@ public class ${glBehaviorCommandInvoker} {
             try {
                 final String originalName = invokeClassName;
                 if (behaviorCommand.isOutsideSql()) {
-                    final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+                    final ${glOutsideSqlContext} outsideSqlContext = getOutsideSqlContext();
                     final String tableDbName = outsideSqlContext.getTableDbName();
                     final String behaviorClassName = findBehaviorClassNameFromDBMeta(tableDbName);
                     invokeClassName = behaviorClassName + ".outsideSql()";
@@ -369,7 +369,7 @@ public class ${glBehaviorCommandInvoker} {
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
             boolean resultTypeInteger = false;
             if (behaviorCommand.isOutsideSql()) {
-                final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+                final ${glOutsideSqlContext} outsideSqlContext = getOutsideSqlContext();
                 final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
                 if (resultTypeSpecification != null && resultTypeSpecification instanceof Class<?>) {
                     final Class<?> resultType = (Class<?>)resultTypeSpecification;
@@ -557,18 +557,18 @@ public class ${glBehaviorCommandInvoker} {
                         log(daoResultPrefix + "Selected list: " + ls.size() + " first=" + ls.get(0) + "]");
                     }
                 }
-            } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+            } else if (${glEntity}.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(daoResultPrefix + "Selected entity: null" + "]");
                 } else {
-                    final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
+                    final ${glEntity} entity = (${glEntity}) ret;
                     log(daoResultPrefix + "Selected entity: " + entity + "]");
                 }
-            } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+            } else if (${glEntity}.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(daoResultPrefix + "Selected entity: null" + "]");
                 } else {
-                    final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
+                    final ${glEntity} entity = (${glEntity}) ret;
                     log(daoResultPrefix + "Selected entity: " + entity + "]");
                 }
             } else if (int[].class.isAssignableFrom(retType)) {
@@ -622,20 +622,20 @@ public class ${glBehaviorCommandInvoker} {
     // ===================================================================================
     //                                                                      Context Helper
     //                                                                      ==============
-    protected ${glOutsideSqlContextName} getOutsideSqlContext() {
-        if (!${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+    protected ${glOutsideSqlContext} getOutsideSqlContext() {
+        if (!${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
             return null;
         }
-        return ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        return ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
     }
     
     protected void putObjectToMapContext(String key, Object value) {
-        ${glInternalMapContextName}.setObject(key, value);
+        ${glInternalMapContext}.setObject(key, value);
     }
 
     protected void clearContext() {
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            ${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
+        if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+            ${glOutsideSqlContext}.clearOutsideSqlContextOnThread();
         }
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -648,8 +648,8 @@ public class ${glBehaviorCommandInvoker} {
         if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
             ${glConditionBeanContextName}.clearConditionBeanOnThread();
         }
-        if (${glInternalMapContextName}.isExistInternalMapContextOnThread()) {
-            ${glInternalMapContextName}.clearInternalMapContextOnThread();
+        if (${glInternalMapContext}.isExistInternalMapContextOnThread()) {
+            ${glInternalMapContext}.clearInternalMapContextOnThread();
         }
         if (${glResourceContext}.isExistResourceContextOnThread()) {
             ${glResourceContext}.clearResourceContextOnThread();
@@ -696,8 +696,8 @@ public class ${glBehaviorCommandInvoker} {
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);
             }
-        } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
-            if (ret != null && !(ret instanceof ${glEntityInterfaceName})) {
+        } else if (${glEntity}.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof ${glEntity})) {
                 String msg = "The retType is difference from actual return: ";
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);

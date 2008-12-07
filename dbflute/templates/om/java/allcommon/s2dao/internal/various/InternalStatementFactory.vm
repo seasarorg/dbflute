@@ -8,9 +8,9 @@ import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.StatementFactory;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
@@ -76,10 +76,10 @@ public class ${glInternalStatementFactory} implements StatementFactory {
     protected ${glStatementConfig} findStatementConfigOnThread() {
         final ${glStatementConfig} config;
         if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-            final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+            final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
             config = cb.getStatementConfig();
-        } else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        } else if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContext} context = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
             config = context.getStatementConfig();
         } else {
             config = null;

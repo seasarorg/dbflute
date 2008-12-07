@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
  * The parameter-bean for procedure.
  * @author ${database.ClassAuthor}
  */
-public interface ${glProcedurePmbName} {
+public interface ${glProcedurePmb} {
 
     /**
      * Get the value of procedure name.

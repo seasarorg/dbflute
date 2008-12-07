@@ -7,7 +7,7 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCOption} {
 
-public class ${myClassName} : ${glConditionOptionSimpleStringName} {
+public class ${myClassName} : ${glSimpleStringOption} {
 
     // ===================================================================================
     //                                                                           Attribute

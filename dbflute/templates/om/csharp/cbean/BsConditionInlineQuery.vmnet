@@ -25,7 +25,7 @@ namespace ${glPackageCIQ} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ)
+        public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ)
             : base(childQuery, sqlClause, aliasName, nestLevel) {
             _myCQ = myCQ;
             _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
@@ -36,7 +36,7 @@ namespace ${glPackageCIQ} {
         // ===================================================================================
         //                                                             Override about Register
         //                                                             =======================
-        public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        public override void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
             throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
         }
     
@@ -61,7 +61,7 @@ namespace ${glPackageCIQ} {
             return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
         }
     
-        protected override void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+        protected override void registerExistsSubQuery(${glConditionQuery} subQuery
                                      , String columnName, String relatedColumnName, String propertyName) {
             throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");
         }

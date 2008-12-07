@@ -4,9 +4,9 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 
 /**
  * @author ${database.ClassAuthor}
@@ -21,7 +21,7 @@ public class ${glSelectScalarCBCommand}<RESULT> extends ${glAbstractSelectCBComm
     protected Class<RESULT> _resultType;
 
     /** The type of select clause. (NotNull) */
-    protected ${glSqlClauseName}.SelectClauseType _selectClauseType;
+    protected ${glSqlClause}.SelectClauseType _selectClauseType;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -50,14 +50,14 @@ public class ${glSelectScalarCBCommand}<RESULT> extends ${glAbstractSelectCBComm
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
         cb.getSqlClause().classifySelectClauseType(_selectClauseType); // *Point!
     }
 
     public void afterExecuting() {
         assertStatus("afterExecuting");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         cb.getSqlClause().rollbackSelectClauseType();
     }
 
@@ -95,7 +95,7 @@ public class ${glSelectScalarCBCommand}<RESULT> extends ${glAbstractSelectCBComm
         _resultType = resultType;
     }
 
-    public void setSelectClauseType(${glSqlClauseName}.SelectClauseType selectClauseType) {
+    public void setSelectClauseType(${glSqlClause}.SelectClauseType selectClauseType) {
         _selectClauseType = selectClauseType;
     }
 }

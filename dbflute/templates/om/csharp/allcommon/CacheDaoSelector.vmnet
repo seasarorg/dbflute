@@ -12,20 +12,20 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                  Implementation
         //                                                                  ==============
-        public virtual DAO Select<DAO>() where DAO : ${glDaoReadableInterfaceName} {
+        public virtual DAO Select<DAO>() where DAO : ${glDaoReadable} {
             Type daoType = typeof(DAO);
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
             DAO dao = (DAO)component.GetComponentObject(daoType);
             return dao;
         }
 
-        public virtual ${glDaoReadableInterfaceName} ByName(String tableFlexibleName) {
+        public virtual ${glDaoReadable} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
-            return InternalSelect<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
+            return InternalSelect<${glDaoReadable}>(GetDaoType(dbmeta));
         }
 
-        protected virtual DAO InternalSelect<DAO>(Type daoType) where DAO : ${glDaoReadableInterfaceName} {
+        protected virtual DAO InternalSelect<DAO>(Type daoType) where DAO : ${glDaoReadable} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
             DAO dao = (DAO)component.GetComponentObject(daoType);
             return dao;

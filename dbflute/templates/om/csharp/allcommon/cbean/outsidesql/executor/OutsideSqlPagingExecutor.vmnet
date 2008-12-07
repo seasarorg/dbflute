@@ -13,14 +13,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected ${glOutsideSqlDaoName} _outsideSqlDao;
-        protected ${glOutsideSqlOptionName} _outsideSqlOption;
+        protected ${glOutsideSqlDao} _outsideSqlDao;
+        protected ${glOutsideSqlOption} _outsideSqlOption;
         protected String _tableDbName;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+        public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption, String tableDbName) {
             this._outsideSqlDao = outsideSqlDao;
             this._outsideSqlOption = outsideSqlOption;
             this._tableDbName = tableDbName;
@@ -41,7 +41,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 #end
 
         public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
-            ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
+            ${glOutsideSqlOption} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
             ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
             DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, typeof(ENTITY), countExecutor, this);
             ${glPagingInvokerName}<ENTITY> invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);

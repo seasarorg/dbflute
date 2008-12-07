@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.Map;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 import ${glPackageBaseCommonDBMetaInfo}.*;
@@ -77,7 +77,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                     Object Instance
     //                                                                     ===============
-    public ${glEntityInterfaceName} newEntity() { return newMyEntity(); }
+    public ${glEntity} newEntity() { return newMyEntity(); }
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
 
     // ===================================================================================
@@ -253,41 +253,41 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
-    public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> primaryKeyMap) {
+    public void acceptPrimaryKeyMap(${glEntity} entity, Map<String, ? extends Object> primaryKeyMap) {
         doAcceptPrimaryKeyMap((${myExtendedObjectClassName})entity, primaryKeyMap, _epsMap);
     }
 
-    public void acceptPrimaryKeyMapString(${glEntityInterfaceName} entity, String primaryKeyMapString) {
+    public void acceptPrimaryKeyMapString(${glEntity} entity, String primaryKeyMapString) {
         MapStringUtil.acceptPrimaryKeyMapString(primaryKeyMapString, entity);
     }
 
-    public void acceptColumnValueMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> columnValueMap) {
+    public void acceptColumnValueMap(${glEntity} entity, Map<String, ? extends Object> columnValueMap) {
         doAcceptColumnValueMap((${myExtendedObjectClassName})entity, columnValueMap, _epsMap);
     }
 
-    public void acceptColumnValueMapString(${glEntityInterfaceName} entity, String columnValueMapString) {
+    public void acceptColumnValueMapString(${glEntity} entity, String columnValueMapString) {
         MapStringUtil.acceptColumnValueMapString(columnValueMapString, entity);
     }
 
     // -----------------------------------------------------
     //                                               Extract
     //                                               -------
-    public String extractPrimaryKeyMapString(${glEntityInterfaceName} entity) { return MapStringUtil.extractPrimaryKeyMapString(entity); }
-    public String extractPrimaryKeyMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
+    public String extractPrimaryKeyMapString(${glEntity} entity) { return MapStringUtil.extractPrimaryKeyMapString(entity); }
+    public String extractPrimaryKeyMapString(${glEntity} entity, String startBrace, String endBrace, String delimiter, String equal) {
         return doExtractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
     }
-    public String extractColumnValueMapString(${glEntityInterfaceName} entity) { return MapStringUtil.extractColumnValueMapString(entity); }
-    public String extractColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
+    public String extractColumnValueMapString(${glEntity} entity) { return MapStringUtil.extractColumnValueMapString(entity); }
+    public String extractColumnValueMapString(${glEntity} entity, String startBrace, String endBrace, String delimiter, String equal) {
         return doExtractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
     }
 
     // -----------------------------------------------------
     //                                               Convert
     //                                               -------
-    public List<Object> convertToColumnValueList(${glEntityInterfaceName} entity) { return newArrayList(convertToColumnValueMap(entity).values()); }
-    public Map<String, Object> convertToColumnValueMap(${glEntityInterfaceName} entity) { return doConvertToColumnValueMap(entity); }
-    public List<String> convertToColumnStringValueList(${glEntityInterfaceName} entity) { return newArrayList(convertToColumnStringValueMap(entity).values()); }
-    public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity) { return doConvertToColumnStringValueMap(entity); }
+    public List<Object> convertToColumnValueList(${glEntity} entity) { return newArrayList(convertToColumnValueMap(entity).values()); }
+    public Map<String, Object> convertToColumnValueMap(${glEntity} entity) { return doConvertToColumnValueMap(entity); }
+    public List<String> convertToColumnStringValueList(${glEntity} entity) { return newArrayList(convertToColumnStringValueMap(entity).values()); }
+    public Map<String, String> convertToColumnStringValueMap(${glEntity} entity) { return doConvertToColumnStringValueMap(entity); }
 
     // ===================================================================================
     //                                                               Entity Property Setup

@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
  * The behavior command for OutsideSql.execute().
@@ -40,8 +40,8 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         assertStatus("beforeGettingSqlExecution");
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+        final ${glOutsideSqlOption} option = _outsideSqlOption;
+        final ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
@@ -51,7 +51,7 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
 		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+        ${glOutsideSqlContext}.setOutsideSqlContextOnThread(outsideSqlContext);
     }
 
     public void afterExecuting() {
@@ -69,21 +69,21 @@ public class ${glOutsideSqlExecuteCommand} extends ${glAbstractOutsideSqlCommand
         final String methodName = getCommandName();
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
-        final ${glOutsideSqlOptionName} option = _outsideSqlOption;
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, null);
+        final ${glOutsideSqlOption} option = _outsideSqlOption;
+        return ${glOutsideSqlContext}.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, null);
     }
 
     public ${glSqlExecutionCreator} createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new ${glSqlExecutionCreator}() {
             public ${glSqlExecution} createSqlExecution() {
-                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
                 return createOutsideSqlExecuteExecution(outsideSqlContext);
             }
         };
     }
 
-    protected ${glSqlExecution} createOutsideSqlExecuteExecution(${glOutsideSqlContextName} outsideSqlContext) {
+    protected ${glSqlExecution} createOutsideSqlExecuteExecution(${glOutsideSqlContext} outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -

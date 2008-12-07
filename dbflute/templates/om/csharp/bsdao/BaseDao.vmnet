@@ -12,9 +12,9 @@ using ${myExtendedEntityPackageName};
 using ${glPackageCB};
 #set ($InterfaceName = "")
 #if ($table.hasPrimaryKey())
-  #set ($InterfaceName = "${glDaoWritableInterfaceName}")
+  #set ($InterfaceName = "${glDaoWritable}")
 #else
-  #set ($InterfaceName = "${glDaoReadableInterfaceName}")
+  #set ($InterfaceName = "${glDaoReadable}")
 #end
 
 namespace ${myExtendedDaoPackageName} {

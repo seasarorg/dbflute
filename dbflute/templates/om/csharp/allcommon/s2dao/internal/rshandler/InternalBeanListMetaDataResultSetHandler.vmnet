@@ -152,7 +152,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             if (!HasConditionBean()) {
                 return true;
             }
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.SqlClause.isSelectedForeignInfoEmpty()) {
                 return true;
             }
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         // You should call HasConditionBean() before calling this!
         protected bool HasSelectedForeignInfo(String relationNoSuffix) {
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.SqlClause.hasSelectedForeignInfo(relationNoSuffix)) {
                 return true;
             }
@@ -173,14 +173,14 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected bool HasOutsideSqlContext() {
-            return ${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread();
+            return ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread();
         }
 
         protected bool IsSpecifiedOutsideSql() {
             if (!HasOutsideSqlContext()) {
                 return false;
             }
-            ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            ${glOutsideSqlContext} context = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
             return context.IsSpecifiedOutsideSql;
         }
     }

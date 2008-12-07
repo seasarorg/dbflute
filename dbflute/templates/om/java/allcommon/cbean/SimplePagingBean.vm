@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
@@ -18,7 +18,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
     //                                                                           Attribute
     //                                                                           =========
     /** SQL clause instance. */
-    protected final ${glSqlClauseName} _sqlClause;
+    protected final ${glSqlClause} _sqlClause;
     {
         _sqlClause = new ${glSqlClauseCreatorImpl}().createSqlClause("Dummy");
     }
@@ -370,7 +370,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * Get sqlClause.
      * @return SqlClause. (NotNull)
      */
-    protected ${glSqlClauseName} getSqlClause() {
+    protected ${glSqlClause} getSqlClause() {
         return _sqlClause;
     }
 }

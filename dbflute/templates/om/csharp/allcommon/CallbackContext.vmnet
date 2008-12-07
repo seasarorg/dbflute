@@ -6,15 +6,15 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommon} {
 
-    public class ${glCallbackContextName} {
+    public class ${glCallbackContext} {
 
         private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
 
-        public static ${glCallbackContextName} GetCallbackContextOnThread() {
-            return (${glCallbackContextName})Thread.GetData(_slot);
+        public static ${glCallbackContext} GetCallbackContextOnThread() {
+            return (${glCallbackContext})Thread.GetData(_slot);
         }
 
-        public static void SetCallbackContextOnThread(${glCallbackContextName} context) {
+        public static void SetCallbackContextOnThread(${glCallbackContext} context) {
             if (context == null) {
                 String msg = "The argument[context] must not be null.";
                 throw new ArgumentNullException(msg);

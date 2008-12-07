@@ -7,27 +7,27 @@ import java.util.HashMap;
  * The context of DB access.
  * @author ${database.ClassAuthor}
  */
-public class ${glAccessContextName} {
+public class ${glAccessContext} {
 
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<${glAccessContextName}> _threadLocal = new ThreadLocal<${glAccessContextName}>();
+    private static final ThreadLocal<${glAccessContext}> _threadLocal = new ThreadLocal<${glAccessContext}>();
 
     /**
      * Get access-context on thread.
      * @return The context of DB access.. (Nullable)
      */
-    public static ${glAccessContextName} getAccessContextOnThread() {
-        return (${glAccessContextName}) _threadLocal.get();
+    public static ${glAccessContext} getAccessContextOnThread() {
+        return (${glAccessContext}) _threadLocal.get();
     }
 
     /**
      * Set access-context on thread.
      * @param accessContext The context of DB access.. (NotNull)
      */
-    public static void setAccessContextOnThread(${glAccessContextName} accessContext) {
+    public static void setAccessContextOnThread(${glAccessContext} accessContext) {
         if (accessContext == null) {
             String msg = "The argument[accessContext] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -63,7 +63,7 @@ public class ${glAccessContextName} {
      */
     public static String getAccessUserOnThread() {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final String accessUser = userContextOnThread.getAccessUser();
             if (accessUser != null) {
                 return accessUser;
@@ -82,7 +82,7 @@ public class ${glAccessContextName} {
      */
     public static String getAccessProcessOnThread() {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final String accessProcess = userContextOnThread.getAccessProcess();
             if (accessProcess != null) {
                 return accessProcess;
@@ -101,7 +101,7 @@ public class ${glAccessContextName} {
      */
     public static String getAccessModuleOnThread() {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final String accessModule = userContextOnThread.getAccessModule();
             if (accessModule != null) {
                 return accessModule;
@@ -120,7 +120,7 @@ public class ${glAccessContextName} {
      */
     public static java.util.Date getAccessDateOnThread() {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final java.util.Date accessDate = userContextOnThread.getAccessDate();
             if (accessDate != null) {
                 return accessDate;
@@ -142,7 +142,7 @@ public class ${glAccessContextName} {
      */
     public static java.sql.Timestamp getAccessTimestampOnThread() {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final java.sql.Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
             if (accessTimestamp != null) {
                 return accessTimestamp;
@@ -165,7 +165,7 @@ public class ${glAccessContextName} {
      */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
-            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final ${glAccessContext} userContextOnThread = getAccessContextOnThread();
             final Map<String, Object> accessValueMap = userContextOnThread.getAccessValueMap();
             if (accessValueMap != null) {
                 return accessValueMap.get(key);

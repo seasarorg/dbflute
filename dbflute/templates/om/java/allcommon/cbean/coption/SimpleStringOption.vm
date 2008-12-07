@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
-#set ($myClassName = "${glConditionOptionSimpleStringName}")
+#set ($myClassName = "${glSimpleStringOption}")
 
 import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsSplitName};
 import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToUpperLowerCaseName};
 import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToSingleByteName};
-import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 
 /**
@@ -18,7 +18,7 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     protected ${glConditionOptionPartsSplitName} _splitOptionParts;
     protected ${glConditionOptionPartsToUpperLowerCaseName} _toUpperLowerCaseOptionParts;
     protected ${glConditionOptionPartsToSingleByteName} _toSingleByteCaseOptionParts;
-    protected ${glConditionOptionPartsAgentJapaneseName} _japaneseOptionPartsAgent;
+    protected ${glJapaneseOptionPartsAgent} _japaneseOptionPartsAgent;
 
     // =====================================================================================
     //                                                                           Rear Option
@@ -127,13 +127,13 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                              Japanese
     //                                                                              ========
-    protected ${glConditionOptionPartsAgentJapaneseName} doLocalJapanese() {
+    protected ${glJapaneseOptionPartsAgent} doLocalJapanese() {
         return getJapaneseOptionPartsAgent();
     }
 
-    protected ${glConditionOptionPartsAgentJapaneseName} getJapaneseOptionPartsAgent() {
+    protected ${glJapaneseOptionPartsAgent} getJapaneseOptionPartsAgent() {
         if (_japaneseOptionPartsAgent == null) {
-            _japaneseOptionPartsAgent = new ${glConditionOptionPartsAgentJapaneseName}();
+            _japaneseOptionPartsAgent = new ${glJapaneseOptionPartsAgent}();
         }
         return _japaneseOptionPartsAgent;
     }
@@ -163,7 +163,7 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         deepCopy._splitOptionParts = _splitOptionParts != null ? (${glConditionOptionPartsSplitName})_splitOptionParts.createDeepCopy() : null;
         deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (${glConditionOptionPartsToUpperLowerCaseName})_toUpperLowerCaseOptionParts.createDeepCopy() : null;
         deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (${glConditionOptionPartsToSingleByteName})_toSingleByteCaseOptionParts.createDeepCopy() : null;
-        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (${glConditionOptionPartsAgentJapaneseName})_japaneseOptionPartsAgent.createDeepCopy() : null;
+        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (${glJapaneseOptionPartsAgent})_japaneseOptionPartsAgent.createDeepCopy() : null;
         return deepCopy;
     }
     protected ${myClassName} newDeepCopyInstance() {

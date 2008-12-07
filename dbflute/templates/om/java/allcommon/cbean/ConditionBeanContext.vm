@@ -19,21 +19,21 @@ public class ${glConditionBeanContextName} {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<${glConditionBeanInterfaceName}> _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
+    private static final ThreadLocal<${glConditionBean}> _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBean})}();
 
     /**
      * Get condition-bean on thread.
      * @return Condition-bean context. (Nullable)
      */
-    public static ${glConditionBeanInterfaceName} getConditionBeanOnThread() {
-        return (${glConditionBeanInterfaceName})_threadLocal.get();
+    public static ${glConditionBean} getConditionBeanOnThread() {
+        return (${glConditionBean})_threadLocal.get();
     }
 
     /**
      * Set condition-bean on thread.
      * @param cb Condition-bean. (NotNull)
      */
-    public static void setConditionBeanOnThread(${glConditionBeanInterfaceName} cb) {
+    public static void setConditionBeanOnThread(${glConditionBean} cb) {
         if (cb == null) {
             String msg = "The argument[cb] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -65,7 +65,7 @@ public class ${glConditionBeanContextName} {
      * @return Determination.
      */
     public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
-        return dtoInstance instanceof ${glConditionBeanInterfaceName};
+        return dtoInstance instanceof ${glConditionBean};
     }
 
     /**
@@ -74,7 +74,7 @@ public class ${glConditionBeanContextName} {
      * @return Determination.
      */
     public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
-        return ${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass);
+        return ${glConditionBean}.class.isAssignableFrom(dtoClass);
     }
 
     // ===================================================================================
@@ -90,10 +90,10 @@ public class ${glConditionBeanContextName} {
             if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
 		{
-            Class<?> clazz = ${glPackageBaseCommon}.${glAccessContextName}.class;
-            clazz = ${glPackageBaseCommon}.${glCallbackContextName}.class;
+            Class<?> clazz = ${glPackageBaseCommon}.${glAccessContext}.class;
+            clazz = ${glPackageBaseCommon}.${glCallbackContext}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
-            clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
+            clazz = ${glPackageBaseCommonCOption}.${glLikeSearchOption}.class;
             clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
@@ -123,8 +123,8 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
         msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
         msg = msg + getLineSeparator();
-		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
-		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBean}) {
+		    final ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
 			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
@@ -142,8 +142,8 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
         msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
         msg = msg + getLineSeparator();
-		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
-		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBean}) {
+		    final ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
 			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
@@ -159,7 +159,7 @@ public class ${glConditionBeanContextName} {
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
-	public static String convertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb
+	public static String convertConditionBean2DisplaySql(${glConditionBean} cb
 	                                                   , String logDateFormat
 	                                                   , String logTimestampFormat) {
 		final String twoWaySql = cb.getSqlClause().getClause();

@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
-#set ($myClassName = "${glBehaviorWritableAbstractName}")
+#set ($myClassName = "${glAbstractBehaviorWritable}")
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommon}.${glCommonColumnAutoSetupper};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractListEntityCommand};
@@ -21,7 +21,7 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glBatchDeleteEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glBatchDeleteNonstrictEntityCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glQueryDeleteCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glQueryUpdateEntityCBCommand};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
@@ -41,7 +41,7 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
  * The abstract class of writable behavior.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
+public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} implements ${glBehaviorWritable} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -77,11 +77,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void create(${glEntityInterfaceName} entity) {
+    public void create(${glEntity} entity) {
         doCreate(entity);
     }
 
-    protected abstract void doCreate(${glEntityInterfaceName} entity);
+    protected abstract void doCreate(${glEntity} entity);
 
     // -----------------------------------------------------
     //                                                Modify
@@ -94,11 +94,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void modify(${glEntityInterfaceName} entity) {
+    public void modify(${glEntity} entity) {
         doModify(entity);
     }
 
-    protected abstract void doModify(${glEntityInterfaceName} entity);
+    protected abstract void doModify(${glEntity} entity);
 
     /**
      * Modify non strict.
@@ -107,11 +107,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void modifyNonstrict(${glEntityInterfaceName} entity) {
+    public void modifyNonstrict(${glEntity} entity) {
         doModifyNonstrict(entity);
     }
 
-    protected abstract void doModifyNonstrict(${glEntityInterfaceName} entity);
+    protected abstract void doModifyNonstrict(${glEntity} entity);
 
     // -----------------------------------------------------
     //                                      Create or Modify
@@ -124,12 +124,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void createOrModify(${glPackageBaseCommon}.${glEntity} entity) {
         assertEntityNotNull(entity);
         doCreateOrUpdate(entity);
     }
 
-    protected abstract void doCreateOrUpdate(${glEntityInterfaceName} entity);
+    protected abstract void doCreateOrUpdate(${glEntity} entity);
 
     /**
      * ${database.ImplementComment}
@@ -138,12 +138,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntity} entity) {
         assertEntityNotNull(entity);
         doCreateOrUpdateNonstrict(entity);
     }
 
-    protected abstract void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
+    protected abstract void doCreateOrUpdateNonstrict(${glEntity} entity);
 
     // -----------------------------------------------------
     //                                                Remove
@@ -155,12 +155,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void remove(${glPackageBaseCommon}.${glEntity} entity) {
         assertEntityNotNull(entity);
         callRemove(entity);
     }
 
-    protected abstract void doRemove(${glEntityInterfaceName} entity);
+    protected abstract void doRemove(${glEntity} entity);
 
     // ===================================================================================
     //                                                       Entity Update Internal Helper
@@ -168,7 +168,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY entity, InternalUpdateCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpUpdateInternally(ENTITY entity, InternalUpdateCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         assertEntityHasVersionNoValue(entity);
         assertEntityHasUpdateDateValue(entity);
@@ -183,11 +183,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalUpdateCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalUpdateCallback<ENTITY extends ${glEntity}> {
         public int callbackDelegateUpdate(ENTITY entity);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY entity, InternalUpdateNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpUpdateNonstrictInternally(ENTITY entity, InternalUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
         if (updatedCount == 0) {
@@ -199,14 +199,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalUpdateNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalUpdateNonstrictCallback<ENTITY extends ${glEntity}> {
         public int callbackDelegateUpdateNonstrict(ENTITY entity);
     }
 
     // -----------------------------------------------------
     //                                        InsertOrUpdate
     //                                        --------------
-    protected <ENTITY extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+    protected <ENTITY extends ${glEntity}, CB_TYPE extends ${glConditionBean}>
             void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
@@ -236,14 +236,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalInsertOrUpdateCallback<ENTITY extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+    protected static interface InternalInsertOrUpdateCallback<ENTITY extends ${glEntity}, CB_TYPE extends ${glConditionBean}> {
         public void callbackInsert(ENTITY entity);
         public void callbackUpdate(ENTITY entity);
         public CB_TYPE callbackNewMyConditionBean();
         public int callbackSelectCount(CB_TYPE cb);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
@@ -258,7 +258,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY extends ${glEntity}> {
         public void callbackInsert(ENTITY entity);
         public void callbackUpdateNonstrict(ENTITY entity);
     }
@@ -266,7 +266,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY entity, InternalDeleteCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpDeleteInternally(ENTITY entity, InternalDeleteCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         assertEntityHasVersionNoValue(entity);
         assertEntityHasUpdateDateValue(entity);
@@ -281,11 +281,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalDeleteCallback<ENTITY extends ${glEntity}> {
         public int callbackDelegateDelete(ENTITY entity);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY entity, InternalDeleteNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpDeleteNonstrictInternally(ENTITY entity, InternalDeleteNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
@@ -298,11 +298,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteNonstrictCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalDeleteNonstrictCallback<ENTITY extends ${glEntity}> {
         public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
+    protected <ENTITY extends ${glEntity}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
@@ -314,7 +314,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY extends ${glEntity}> {
         public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
@@ -326,7 +326,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity list. (NotNull and NotEmpty)
      * @return The array of created count.
      */
-    public int[] lumpCreate(List<${glEntityInterfaceName}> entityList) {
+    public int[] lumpCreate(List<${glEntity}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callCreateList(entityList);
     }
@@ -337,7 +337,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Modified count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public int[] lumpModify(List<${glEntityInterfaceName}> entityList) {
+    public int[] lumpModify(List<${glEntity}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callModifyList(entityList);
     }
@@ -348,7 +348,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Removed count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public int[] lumpRemove(List<${glEntityInterfaceName}> entityList) {
+    public int[] lumpRemove(List<${glEntity}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callRemoveList(entityList);
     }
@@ -357,7 +357,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Inject sequence to primary key if it needs.
      * @param entity Entity. (NotNull)
      */
-    protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
+    protected void injectSequenceToPrimaryKeyIfNeeds(${glEntity} entity) {
         final ${glDBMeta} dbmeta = entity.getDBMeta();
         if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
             return;
@@ -456,7 +456,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                         result.setColumnNameList(columnNameList);
                     }
 
-                    ${glEntityInterfaceName} entity = null;
+                    ${glEntity} entity = null;
                     try {
                         // Create entity by the list of value composed of String.
                         entity = createEntityByStringValueList(columnNameList, valueList);
@@ -487,7 +487,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             return fileTokenizingCallback;
         }
 
-        protected ${glEntityInterfaceName} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
+        protected ${glEntity} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
             final ${glMapStringBuilderName} builder = new ${glMapStringBuilderImplName}();
             builder.setMsMapMark(MAP_STRING_MAP_MARK);
             builder.setMsStartBrace(MAP_STRING_START_BRACE);
@@ -497,7 +497,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             builder.setColumnNameList(columnNameList);
             final String mapString = builder.buildFromList(valueList);
 
-            final ${glEntityInterfaceName} entity = getDBMeta().newEntity();
+            final ${glEntity} entity = getDBMeta().newEntity();
             getDBMeta().acceptColumnValueMapString(entity, mapString);
             return entity;
         }
@@ -532,18 +532,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
-    protected int callCreate(${glEntityInterfaceName} entity) {
+    protected int callCreate(${glEntity} entity) {
         if (!processBeforeInsert(entity)) { return 1;/*as Normal End*/ }
         return doCallCreate(entity);
     }
-    protected abstract int doCallCreate(${glEntityInterfaceName} entity);
+    protected abstract int doCallCreate(${glEntity} entity);
 
     /**
      * Process before insert.
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeInsert(${glEntityInterfaceName} entity) {
+    protected boolean processBeforeInsert(${glEntity} entity) {
         if (!determineExecuteInsert(entity)) { return false; }
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         frameworkFilterEntityOfInsert(entity);
@@ -561,18 +561,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Updated count.
      */
-    protected int callModify(${glEntityInterfaceName} entity) {
+    protected int callModify(${glEntity} entity) {
         if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
         return doCallModify(entity);
     }
-    protected abstract int doCallModify(${glEntityInterfaceName} entity);
+    protected abstract int doCallModify(${glEntity} entity);
 
     /**
      * Process before update.
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeUpdate(${glEntityInterfaceName} entity) {
+    protected boolean processBeforeUpdate(${glEntity} entity) {
         if (!determineExecuteUpdate(entity)) { return false; }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfUpdate(entity);
@@ -589,18 +589,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
-    protected int callRemove(${glEntityInterfaceName} entity) {
+    protected int callRemove(${glEntity} entity) {
         if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
         return doCallRemove(entity);
     }
-    protected abstract int doCallRemove(${glEntityInterfaceName} entity);
+    protected abstract int doCallRemove(${glEntity} entity);
 
     /**
      * Process before delete.
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeDelete(${glEntityInterfaceName} entity) {
+    protected boolean processBeforeDelete(${glEntity} entity) {
         if (!determineExecuteDelete(entity)) { return false; }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfDelete(entity);
@@ -617,7 +617,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteInsert(${glEntityInterfaceName} entity) {
+    protected boolean determineExecuteInsert(${glEntity} entity) {
         return true;
     }
 
@@ -625,7 +625,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {Framework Method} Filter the entity of insert.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfInsert(${glEntity} targetEntity) {
         injectSequenceToPrimaryKeyIfNeeds(targetEntity);
         setupCommonColumnOfInsertIfNeeds(targetEntity);
     }
@@ -634,7 +634,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Set up common columns of insert if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void setupCommonColumnOfInsertIfNeeds(${glEntityInterfaceName} targetEntity) {
+    protected void setupCommonColumnOfInsertIfNeeds(${glEntity} targetEntity) {
         final ${glCommonColumnAutoSetupper} setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
         setupper.handleCommonColumnOfInsertIfNeeds(targetEntity);
@@ -662,14 +662,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Filter the entity of insert.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    protected void filterEntityOfInsert(${glEntity} targetEntity) {
     }
 
     /**
      * Assert the entity of insert.
      * @param entity Entity that the type is entity interface. (NotNull)
      */
-    protected void assertEntityOfInsert(${glEntityInterfaceName} entity) {
+    protected void assertEntityOfInsert(${glEntity} entity) {
     }
 
     // -----------------------------------------------------
@@ -680,7 +680,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteUpdate(${glEntityInterfaceName} entity) {
+    protected boolean determineExecuteUpdate(${glEntity} entity) {
         return true;
     }
 
@@ -688,7 +688,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {Framework Method} Filter the entity of update.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void frameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfUpdate(${glEntity} targetEntity) {
         setupCommonColumnOfUpdateIfNeeds(targetEntity);
     }
 
@@ -696,7 +696,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Set up common columns of update if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void setupCommonColumnOfUpdateIfNeeds(${glEntityInterfaceName} targetEntity) {
+    protected void setupCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity) {
         final ${glCommonColumnAutoSetupper} setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
         setupper.handleCommonColumnOfUpdateIfNeeds(targetEntity);
@@ -706,14 +706,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Filter the entity of update.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    protected void filterEntityOfUpdate(${glEntity} targetEntity) {
     }
 
     /**
      * Assert the entity of update.
      * @param entity Entity that the type is entity interface. (NotNull)
      */
-    protected void assertEntityOfUpdate(${glEntityInterfaceName} entity) {
+    protected void assertEntityOfUpdate(${glEntity} entity) {
     }
 
     // -----------------------------------------------------
@@ -724,7 +724,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteDelete(${glEntityInterfaceName} entity) {
+    protected boolean determineExecuteDelete(${glEntity} entity) {
         return true;
     }
 
@@ -732,21 +732,21 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {Framework Method} Filter the entity of delete.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void frameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfDelete(${glEntity} targetEntity) {
     }
     
     /**
      * Filter the entity of delete.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    protected void filterEntityOfDelete(${glEntity} targetEntity) {
     }
 
     /**
      * Assert the entity of delete.
      * @param entity Entity that the type is entity interface. (NotNull)
      */
-    protected void assertEntityOfDelete(${glEntityInterfaceName} entity) {
+    protected void assertEntityOfDelete(${glEntity} entity) {
     }
 
     /**
@@ -754,38 +754,38 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
-    public int[] callCreateList(List<${glEntityInterfaceName}> entityList) {
+    public int[] callCreateList(List<${glEntity}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeInsertInternally(entityList);
         return doCreateList(entityList);
     }
-    protected abstract int[] doCreateList(List<${glEntityInterfaceName}> entityList);
+    protected abstract int[] doCreateList(List<${glEntity}> entityList);
 
     /**
      * ${database.ImplementComment}
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Updated count.
      */
-    public int[] callModifyList(List<${glEntityInterfaceName}> entityList) {
+    public int[] callModifyList(List<${glEntity}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return doModifyList(entityList);
     }
-    protected abstract int[] doModifyList(List<${glEntityInterfaceName}> entityList);
+    protected abstract int[] doModifyList(List<${glEntity}> entityList);
 
     /**
      * ${database.ImplementComment}
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
-    public int[] callRemoveList(List<${glEntityInterfaceName}> entityList) {
+    public int[] callRemoveList(List<${glEntity}> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return doRemoveList(entityList);
     }
-    protected abstract int[] doRemoveList(List<${glEntityInterfaceName}> entityList);
+    protected abstract int[] doRemoveList(List<${glEntity}> entityList);
 
-    protected void assertEntityHasVersionNoValue(${glEntityInterfaceName} entity) {
+    protected void assertEntityHasVersionNoValue(${glEntity} entity) {
         if (!getDBMeta().hasVersionNo()) {
             return;
         }
@@ -807,7 +807,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
-    protected void assertEntityHasUpdateDateValue(${glEntityInterfaceName} entity) {
+    protected void assertEntityHasUpdateDateValue(${glEntity} entity) {
         if (!getDBMeta().hasUpdateDate()) {
             return;
         }
@@ -839,7 +839,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // ===================================================================================
     //                                                     Delegate Method Internal Helper
     //                                                     ===============================
-    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends ${glEntity}> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
@@ -849,7 +849,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return filteredList;
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends ${glEntity}> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
@@ -859,7 +859,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return filteredList;
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends ${glEntity}> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
             final ENTITY entity = ite.next();
@@ -872,32 +872,32 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
         return xsetupEntityCommand(new ${glInsertEntityCommand}(), entity);
     }
 
-    protected ${glUpdateEntityCommand} createUpdateEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glUpdateEntityCommand} createUpdateEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createUpdateEntityCommand");
         return xsetupEntityCommand(new ${glUpdateEntityCommand}(), entity);
     }
 
-    protected ${glUpdateNonstrictEntityCommand} createUpdateNonstrictEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glUpdateNonstrictEntityCommand} createUpdateNonstrictEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createUpdateNonstrictEntityCommand");
         return xsetupEntityCommand(new ${glUpdateNonstrictEntityCommand}(), entity);
     }
 
-    protected ${glDeleteEntityCommand} createDeleteEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glDeleteEntityCommand} createDeleteEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createDeleteEntityCommand");
         return xsetupEntityCommand(new ${glDeleteEntityCommand}(), entity);
     }
 
-    protected ${glDeleteNonstrictEntityCommand} createDeleteNonstrictEntityCommand(${glEntityInterfaceName} entity) {
+    protected ${glDeleteNonstrictEntityCommand} createDeleteNonstrictEntityCommand(${glEntity} entity) {
         assertBehaviorCommandInvoker("createDeleteNonstrictEntityCommand");
         return xsetupEntityCommand(new ${glDeleteNonstrictEntityCommand}(), entity);
     }
 
-    private <COMMAND extends ${glAbstractEntityCommand}> COMMAND xsetupEntityCommand(COMMAND command, ${glEntityInterfaceName} entity) {
+    private <COMMAND extends ${glAbstractEntityCommand}> COMMAND xsetupEntityCommand(COMMAND command, ${glEntity} entity) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setEntityType(entity.getClass());
@@ -905,27 +905,27 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return command;
     }
 
-    protected ${glBatchInsertEntityCommand} createBatchInsertEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchInsertEntityCommand} createBatchInsertEntityCommand(List<? extends ${glEntity}> entityList) {
         assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
         return xsetupListEntityCommand(new ${glBatchInsertEntityCommand}(), entityList);
     }
 
-    protected ${glBatchUpdateEntityCommand} createBatchUpdateEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchUpdateEntityCommand} createBatchUpdateEntityCommand(List<? extends ${glEntity}> entityList) {
         assertBehaviorCommandInvoker("createBatchUpdateEntityCommand");
         return xsetupListEntityCommand(new ${glBatchUpdateEntityCommand}(), entityList);
     }
 
-    protected ${glBatchUpdateNonstrictEntityCommand} createBatchUpdateNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchUpdateNonstrictEntityCommand} createBatchUpdateNonstrictEntityCommand(List<? extends ${glEntity}> entityList) {
         assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
         return xsetupListEntityCommand(new ${glBatchUpdateNonstrictEntityCommand}(), entityList);
     }
 
-    protected ${glBatchDeleteEntityCommand} createBatchDeleteEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchDeleteEntityCommand} createBatchDeleteEntityCommand(List<? extends ${glEntity}> entityList) {
         assertBehaviorCommandInvoker("createBatchDeleteEntityCommand");
         return xsetupListEntityCommand(new ${glBatchDeleteEntityCommand}(), entityList);
     }
 
-    protected ${glBatchDeleteNonstrictEntityCommand} createBatchDeleteNonstrictEntityCommand(List<? extends ${glEntityInterfaceName}> entityList) {
+    protected ${glBatchDeleteNonstrictEntityCommand} createBatchDeleteNonstrictEntityCommand(List<? extends ${glEntity}> entityList) {
         assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
         return xsetupListEntityCommand(new ${glBatchDeleteNonstrictEntityCommand}(), entityList);
     }
@@ -936,7 +936,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList The list of entity. (NotNull, NotEmpty)
      * @return The command of behavior. (NotNull)
      */
-    private <COMMAND extends ${glAbstractListEntityCommand}> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends ${glEntityInterfaceName}> entityList) {
+    private <COMMAND extends ${glAbstractListEntityCommand}> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends ${glEntity}> entityList) {
         if (entityList.isEmpty()) {
             String msg = "The argument 'entityList' should not be empty: " + entityList;
             throw new IllegalStateException(msg);
@@ -948,7 +948,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return command;
     }
 
-    protected ${glQueryDeleteCBCommand} createQueryDeleteCBCommand(${glConditionBeanInterfaceName} cb) {
+    protected ${glQueryDeleteCBCommand} createQueryDeleteCBCommand(${glConditionBean} cb) {
         assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
         final ${glQueryDeleteCBCommand} cmd = new ${glQueryDeleteCBCommand}();
         cmd.setTableDbName(getTableDbName());
@@ -958,7 +958,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return cmd;
     }
 
-    protected ${glQueryUpdateEntityCBCommand} createQueryUpdateEntityCBCommand(${glEntityInterfaceName} entity, ${glConditionBeanInterfaceName} cb) {
+    protected ${glQueryUpdateEntityCBCommand} createQueryUpdateEntityCBCommand(${glEntity} entity, ${glConditionBean} cb) {
         assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
         final ${glQueryUpdateEntityCBCommand} cmd = new ${glQueryUpdateEntityCBCommand}();
         cmd.setTableDbName(getTableDbName());

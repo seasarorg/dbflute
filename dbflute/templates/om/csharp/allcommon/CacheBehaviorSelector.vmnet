@@ -12,7 +12,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommon} {
 
-    public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
+    public class ${glCacheBehaviorSelector} : ${glBehaviorSelector} {
 
         // ===============================================================================
         //                                                                      Definition
@@ -36,7 +36,7 @@ namespace ${glPackageBaseCommon} {
                 _log.Info("/= = = = = = = = = = = = = = = = = InitializeConditionBeanMetaData()");
             }
             foreach (${glDBMeta} dbmeta in dbmetas) {
-                ${glDaoReadableInterfaceName} dao = DaoSelector.ByName(dbmeta.TableDbName);
+                ${glDaoReadable} dao = DaoSelector.ByName(dbmeta.TableDbName);
                 MethodInfo method = dao.GetType().GetMethod("InitializeDaoMetaData");
                 if (method == null) {
                     continue;
@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                  Implementation
         //                                                                  ==============
-        public virtual BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadableInterfaceName} {
+        public virtual BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadable} {
             Type behaviorType = typeof(BEHAVIOR);
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
             BEHAVIOR bhv = (BEHAVIOR)component.GetComponentObject(behaviorType);
@@ -64,13 +64,13 @@ namespace ${glPackageBaseCommon} {
             return bhv;
         }
 
-        public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {
+        public virtual ${glBehaviorReadable} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
-            return InternalSelect<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
+            return InternalSelect<${glBehaviorReadable}>(GetBehaviorType(dbmeta));
         }
 
-        protected virtual BEHAVIOR InternalSelect<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadableInterfaceName} {
+        protected virtual BEHAVIOR InternalSelect<BEHAVIOR>(Type behaviorType) where BEHAVIOR : ${glBehaviorReadable} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
             BEHAVIOR bhv = (BEHAVIOR)component.GetComponentObject(behaviorType);
             if (bhv.IsInitialized) {

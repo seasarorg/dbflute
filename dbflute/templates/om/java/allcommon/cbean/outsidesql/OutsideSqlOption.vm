@@ -6,7 +6,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * The option of outside-SQL. It contains various information about execution.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlOptionName} {
+public class ${glOutsideSqlOption} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,8 +55,8 @@ public class ${glOutsideSqlOptionName} {
     // ===================================================================================
     //                                                                                Copy
     //                                                                                ====
-    public ${glOutsideSqlOptionName} copyOptionWithoutPaging() {
-        final ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+    public ${glOutsideSqlOption} copyOptionWithoutPaging() {
+        final ${glOutsideSqlOption} copyOption = new ${glOutsideSqlOption}();
         copyOption.setPagingSourceRequestType(_pagingRequestType);
         if (isDynamicBinding()) {
             copyOption.dynamicBinding();

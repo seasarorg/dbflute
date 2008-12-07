@@ -15,7 +15,7 @@ import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.impl.AbstractPropertyTypeFactory;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
@@ -70,7 +70,7 @@ public class ${glPropertyTypeFactoryBuilderExtension} implements PropertyTypeFac
         }
 
         protected boolean isEntity() {
-            return ${glEntityInterfaceName}.class.isAssignableFrom(beanClass);
+            return ${glEntity}.class.isAssignableFrom(beanClass);
         }
 
         protected boolean hasDBMeta() {
@@ -79,7 +79,7 @@ public class ${glPropertyTypeFactoryBuilderExtension} implements PropertyTypeFac
 
         protected ${glDBMeta} findDBMeta() {
             try {
-                final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) beanClass.newInstance();
+                final ${glEntity} entity = (${glEntity}) beanClass.newInstance();
                 return entity.getDBMeta();
             } catch (Exception e) {
                 String msg = "beanClass.newInstance() threw the exception: beanClass=" + beanClass;

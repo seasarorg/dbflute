@@ -1,13 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvSetup};
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * The interface of Value-Label Setupper.
  * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
  * @author ${database.ClassAuthor}
  */
-public interface ${glValueLabelSetupperName}<ENTITY extends ${glEntityInterfaceName}> {
+public interface ${glValueLabelSetupperName}<ENTITY extends ${glEntity}> {
 
     /**
      * Set up value-label.

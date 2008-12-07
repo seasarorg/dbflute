@@ -185,12 +185,12 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                 Object Instance
         //                                                                 ===============
-        public override ${glEntityInterfaceName} NewEntity() { return NewMyEntity(); }
+        public override ${glEntity} NewEntity() { return NewMyEntity(); }
         public ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
 #if (${isExistConditionBean})
-        public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
+        public override ${glConditionBean} NewConditionBean() { return NewMyConditionBean(); }
 #else
-        public override ${glConditionBeanInterfaceName} NewConditionBean() {
+        public override ${glConditionBean} NewConditionBean() {
             String msg = "The entity does not have condition-bean. So this method is invalid.";
             throw new SystemException(msg + " dbmeta=" + ToString());
         }

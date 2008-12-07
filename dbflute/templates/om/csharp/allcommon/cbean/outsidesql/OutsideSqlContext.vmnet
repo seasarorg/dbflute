@@ -15,7 +15,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
-    public class ${glOutsideSqlContextName} {
+    public class ${glOutsideSqlContext} {
 
         // ===============================================================================
         //                                                                      Definition
@@ -28,11 +28,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                    ============
         private static readonly LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
 
-        public static ${glOutsideSqlContextName} GetOutsideSqlContextOnThread() {
-            return (${glOutsideSqlContextName})Thread.GetData(_slot);
+        public static ${glOutsideSqlContext} GetOutsideSqlContextOnThread() {
+            return (${glOutsideSqlContext})Thread.GetData(_slot);
         }
 
-        public static void SetOutsideSqlContextOnThread(${glOutsideSqlContextName} outsideSqlContext) {
+        public static void SetOutsideSqlContextOnThread(${glOutsideSqlContext} outsideSqlContext) {
             if (outsideSqlContext == null) {
                 String msg = "The argument[outsideSqlContext] must not be null.";
                 throw new SystemException(msg);
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                      Unique Key
         //                                                                      ==========
-        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
+        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Object resultTypeSpecification) {
             String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
             String resultKey = (resultTypeSpecification != null ? resultTypeSpecification.ToString() : "null");
             String tableDbName = option.TableDbName;

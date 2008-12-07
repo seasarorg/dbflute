@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glSqlClauseInterfaceName}PostgreSql")
+#set ($myClassName = "${glSqlClause}PostgreSql")
 
 /**
  * SqlClause for PostreSQL.
@@ -49,7 +49,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * 
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} lockForUpdate() {
+    public ${glSqlClause} lockForUpdate() {
         _lockSqlSuffix = " for update";
         return this;
     }

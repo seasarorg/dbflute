@@ -4,5 +4,5 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public delegate void ${glScalarQuery}<CB>(CB cb) where CB : ${glConditionBeanInterfaceName};
+    public delegate void ${glScalarQuery}<CB>(CB cb) where CB : ${glConditionBean};
 }

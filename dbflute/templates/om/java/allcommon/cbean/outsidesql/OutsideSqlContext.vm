@@ -20,30 +20,30 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The context of outside-SQL.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlContextName} {
+public class ${glOutsideSqlContext} {
 
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(${glOutsideSqlContextName}.class);
+    private static final Log _log = LogFactory.getLog(${glOutsideSqlContext}.class);
     
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<${glOutsideSqlContextName}> _threadLocal = new ThreadLocal<${glOutsideSqlContextName}>();
+    private static final ThreadLocal<${glOutsideSqlContext}> _threadLocal = new ThreadLocal<${glOutsideSqlContext}>();
 
     /**
      * Get outside-SQL context on thread.
      * @return The context of outside-SQL. (Nullable)
      */
-    public static ${glOutsideSqlContextName} getOutsideSqlContextOnThread() {
-        return (${glOutsideSqlContextName})_threadLocal.get();
+    public static ${glOutsideSqlContext} getOutsideSqlContextOnThread() {
+        return (${glOutsideSqlContext})_threadLocal.get();
     }
 
     /**
      * Set outside-SQL context on thread.
      * @param outsideSqlContext The context of outside-SQL. (NotNull)
      */
-    public static void setOutsideSqlContextOnThread(${glOutsideSqlContextName} outsideSqlContext) {
+    public static void setOutsideSqlContextOnThread(${glOutsideSqlContext} outsideSqlContext) {
         if (outsideSqlContext == null) {
             String msg = "The argument[outsideSqlContext] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -69,7 +69,7 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
-    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
+    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Object resultTypeSpecification) {
         final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
         final String resultKey;
         if (resultTypeSpecification != null) {

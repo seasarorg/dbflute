@@ -53,14 +53,14 @@ public class ${glXLog} {
 	
 	public static void lock() {
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Locking the config of dbflute!");
+		    _log.info("...Locking the log object for execute status!");
 		}
 	    _locked = true;
 	}
 	
 	public static void unlock() {
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Unlocking the config of dbflute!");
+		    _log.info("...Unlocking the log object for execute status!");
 		}
 	    _locked = false;
 	}

@@ -5,8 +5,8 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonBhvCoreExecution}.${glBasicSelectExecution};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
@@ -122,7 +122,7 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
+    public ${glConditionBean} getConditionBean() {
         return null;
     }
 
@@ -130,7 +130,7 @@ public class ${glSelectNextValCommand}<RESULT> extends ${glAbstractBehaviorComma
         return null;
     }
 
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
         return null;
     }
 

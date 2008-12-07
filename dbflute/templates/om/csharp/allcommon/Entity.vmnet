@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommon} {
     /// The interface of entity.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public interface ${glEntityInterfaceName} {
+    public interface ${glEntity} {
 
         // ===============================================================================
         //                                                                      Table Name

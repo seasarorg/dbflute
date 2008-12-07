@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace ${glPackageBaseCommon} {
 
-    public interface ${glEntityDefinedCommonColumnInterfaceName} : ${glEntityInterfaceName} {
+    public interface ${glEntityDefinedCommonColumn} : ${glEntity} {
 #foreach ($columnName in ${database.CommonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.CommonColumnMap})

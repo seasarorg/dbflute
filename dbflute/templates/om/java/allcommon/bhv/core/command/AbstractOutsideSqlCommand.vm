@@ -1,8 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
 /**
  * @author ${database.ClassAuthor}
@@ -23,7 +23,7 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
     protected Object _parameterBean;
 
     /** The option of outside-SQL. (Required) */
-    protected ${glOutsideSqlOptionName} _outsideSqlOption;
+    protected ${glOutsideSqlOption} _outsideSqlOption;
 
     /** The current database definition. (Required) */
     protected ${glDBDef} _currentDBDef;
@@ -46,7 +46,7 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
+    public ${glConditionBean} getConditionBean() {
         return null;
     }
 
@@ -54,7 +54,7 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
         return _outsideSqlPath;
     }
 
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
         return _outsideSqlOption;
     }
 
@@ -93,7 +93,7 @@ public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstrac
         _parameterBean = parameterBean;
     }
 
-    public void setOutsideSqlOption(${glOutsideSqlOptionName} outsideSqlOption) {
+    public void setOutsideSqlOption(${glOutsideSqlOption} outsideSqlOption) {
         _outsideSqlOption = outsideSqlOption;
     }
 

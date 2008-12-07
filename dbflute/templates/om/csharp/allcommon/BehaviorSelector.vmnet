@@ -6,10 +6,10 @@ using ${glPackageBaseCommonBhv};
 
 namespace ${glPackageBaseCommon} {
 
-    [Implementation(typeof(${glCacheBehaviorSelectorName}))]
-    public interface ${glBehaviorSelectorInterfaceName} {
+    [Implementation(typeof(${glCacheBehaviorSelector}))]
+    public interface ${glBehaviorSelector} {
         void InitializeConditionBeanMetaData();
-        BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadableInterfaceName};
-        ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName);
+        BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadable};
+        ${glBehaviorReadable} ByName(String tableFlexibleName);
     }
 }

@@ -12,7 +12,7 @@ import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -28,7 +28,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
     /** The option of outside-SQL. (NotNull) */
-    protected final ${glOutsideSqlOptionName} _outsideSqlOption;
+    protected final ${glOutsideSqlOption} _outsideSqlOption;
 
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
@@ -40,7 +40,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     //                                                                         Constructor
     //                                                                         ===========
     public ${glOutsideSqlPagingExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
-                                  , ${glOutsideSqlOptionName} outsideSqlOption
+                                  , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
                                   , ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
@@ -171,7 +171,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     }
 
     protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> createCountExecutor() {
-        final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
+        final ${glOutsideSqlOption} countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
     }
 

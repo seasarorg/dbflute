@@ -2,14 +2,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import java.util.Map;
 
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The interface of condition-bean.
  * @author ${database.ClassAuthor}
  */
-public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterfaceName} {
+public interface ${glConditionBean} extends ${glPagingBeanInterfaceName} {
 
     // ===================================================================================
     //                                                                          Table Name
@@ -33,7 +33,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * Get SQL-clause instance.
      * @return SQL-clause. (NotNull)
      */
-    public ${glSqlClauseName} getSqlClause();
+    public ${glSqlClause} getSqlClause();
 
     // ===================================================================================
     //                                                                      PrimaryKey Map
@@ -57,13 +57,13 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc();
+    public ${glConditionBean} addOrderBy_PK_Asc();
 
     /**
      * Add order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc();
+    public ${glConditionBean} addOrderBy_PK_Desc();
 
     // ===================================================================================
     //                                                                               Query
@@ -72,7 +72,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * Get the conditionQuery of the local table as interface.
      * @return The conditionQuery of the local table as interface. (NotNull)
      */
-    public ${glConditionQueryInterfaceName} localCQ();
+    public ${glConditionQuery} localCQ();
 
     // ===================================================================================
     //                                                                         Union Query
@@ -94,7 +94,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * </p>
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} lockForUpdate();
+    public ${glConditionBean} lockForUpdate();
 
     // =====================================================================================
     //                                                                          Select Count
@@ -104,14 +104,14 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * This method is for INTERNAL. Don't invoke this!
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope();
+    public ${glConditionBean} xsetupSelectCountIgnoreFetchScope();
 
     /**
      * Do after-care for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope();
+    public ${glConditionBean} xafterCareSelectCountIgnoreFetchScope();
 
     /**
      * Is set up various things for select-count-ignore-fetch-scope? {Internal}

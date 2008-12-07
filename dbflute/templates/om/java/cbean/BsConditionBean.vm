@@ -5,13 +5,13 @@ import java.util.Map;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionQuery};
 import ${glPackageBaseCommonCBean}.${glSubQuery};
 import ${glPackageBaseCommonCBean}.${glUnionQuery};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -35,7 +35,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                           SqlClause
     //                                                                           =========
     @Override
-    protected ${glSqlClauseName} createSqlClause() {
+    protected ${glSqlClause} createSqlClause() {
         return new ${glSqlClauseCreatorImpl}().createSqlClause(this);
     }
 
@@ -104,7 +104,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                     OrderBy Setting
     //                                                                     ===============
-    public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc() {
+    public ${glConditionBean} addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
         query().addOrderBy_${col.JavaName}_Asc();
@@ -116,7 +116,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #end
     }
 
-    public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc() {
+    public ${glConditionBean} addOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
         query().addOrderBy_${col.JavaName}_Desc();
@@ -146,7 +146,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * ${database.ImplementComment}
      * @return The conditionQuery of the local table as interface. (NotNull)
      */
-    public ${glConditionQueryInterfaceName} localCQ() {
+    public ${glConditionQuery} localCQ() {
         return getConditionQuery();
     }
 
@@ -202,11 +202,11 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     public void lockWithUR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithUR(); } }
 
     protected boolean helpIsSqlClauseDb2() {
-        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2;
+        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2;
     }
 
-    protected ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2 helpGettingSqlClauseDb2() {
-        return (${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName}Db2)getSqlClause();
+    protected ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2 helpGettingSqlClauseDb2() {
+        return (${glPackageBaseCommonSqlClause}.${glSqlClause}Db2)getSqlClause();
     }
 #end
 #end
@@ -230,7 +230,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _nss${tmpPropertyNameInitCap};
     }
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+        doSetupSelect(new SsCall() { public ${glConditionQuery} qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -247,7 +247,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _nss${tmpPropertyNameInitCap};
     }
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        doSetupSelect(new SsCall() { public ${glConditionQueryInterfaceName} qf() { return query().query${tmpPropertyNameInitCap}(); } });
+        doSetupSelect(new SsCall() { public ${glConditionQuery} qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -281,7 +281,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         protected ${tmpCBClassName}.Specification _${tmpPropertyName};
 #end
 #end
-        public Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
+        public Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
                            , boolean forDeriveReferrer, boolean forScalarSelect, boolean forScalarSubQuery
                            , ${glDBMetaProvider} dbmetaProvider)
         { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect, forScalarSubQuery, dbmetaProvider); _myQyCall = qyCall; }

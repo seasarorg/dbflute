@@ -47,8 +47,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                 Object Instance
         //                                                                 ===============
-        ${glEntityInterfaceName} NewEntity();
-        ${glConditionBeanInterfaceName} NewConditionBean();
+        ${glEntity} NewEntity();
+        ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                                     Column Info
@@ -112,7 +112,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         void SetupEntityProperty(String propertyName, Object entity, Object value);
     }
 
-    public interface EntityPropertySetupper<ENTITY> where ENTITY : ${glEntityInterfaceName} {
+    public interface EntityPropertySetupper<ENTITY> where ENTITY : ${glEntity} {
         void Setup(ENTITY entity, Object value);
     }
 

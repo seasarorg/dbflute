@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommon}.${glEntity};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
@@ -20,10 +20,10 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     //                                                                           Attribute
     //                                                                           =========
     /** The type of entity. (Required) */
-    protected Class<? extends ${glEntityInterfaceName}> _entityType;
+    protected Class<? extends ${glEntity}> _entityType;
 
     /** The instance of condition-bean. (Required) */
-    protected ${glEntityInterfaceName} _entity;
+    protected ${glEntity} _entity;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -90,7 +90,7 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
+    public ${glConditionBean} getConditionBean() {
         return null;
     }
 
@@ -98,7 +98,7 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
         return null;
     }
 
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
         return null;
     }
 
@@ -116,12 +116,12 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
         if (beanType == null) {
             return null;
         }
-        if (!${glEntityInterfaceName}.class.isAssignableFrom(beanType)) {
+        if (!${glEntity}.class.isAssignableFrom(beanType)) {
             return null;
         }
-        final ${glEntityInterfaceName} entity;
+        final ${glEntity} entity;
         try {
-            entity = (${glEntityInterfaceName})beanType.newInstance();
+            entity = (${glEntity})beanType.newInstance();
         } catch (InstantiationException e) {
             throw new IllegalStateException(e);
         } catch (IllegalAccessException e) {
@@ -158,11 +158,11 @@ public abstract class ${glAbstractEntityCommand} extends ${glAbstractBehaviorCom
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<? extends ${glEntityInterfaceName}> entityType) {
+    public void setEntityType(Class<? extends ${glEntity}> entityType) {
         _entityType = entityType;
     }
 
-    public void setEntity(${glEntityInterfaceName} entity) {
+    public void setEntity(${glEntity} entity) {
         _entity = entity;
     }
 }

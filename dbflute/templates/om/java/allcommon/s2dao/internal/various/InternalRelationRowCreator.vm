@@ -15,7 +15,7 @@ import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
@@ -237,7 +237,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     
     protected boolean isConditionBeanSelectedRelation(RelationRowCreationResource res) {
         if (hasConditionBean(res)) {
-            final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+            final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
             if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
                 return true;
             }
@@ -250,7 +250,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     }
     
     protected boolean hasSelectedForeignInfo(RelationRowCreationResource res) {
-        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
             return true;
         }

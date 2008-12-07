@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClause}${database.DaoGenDbName}")
 
 using System;
 
@@ -70,7 +70,7 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
     // ===================================================================================
     //                                                                       Lock Override
     //                                                                       =============
-    public override ${glSqlClauseInterfaceName} lockForUpdate() {
+    public override ${glSqlClause} lockForUpdate() {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableName);
         if (dbmeta.HasPrimaryKey) {
             String primaryKeyColumnName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;

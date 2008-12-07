@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glSqlClauseInterfaceName}MySql")
+#set ($myClassName = "${glSqlClause}MySql")
 
 /**
  * SqlClause for MySQL.
@@ -64,7 +64,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} lockForUpdate() {
+    public ${glSqlClause} lockForUpdate() {
         _lockSqlSuffix = " for update";
         return this;
     }

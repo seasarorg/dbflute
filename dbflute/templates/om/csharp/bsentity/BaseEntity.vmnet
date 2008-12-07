@@ -15,9 +15,9 @@ using ${myDBMetaPackageName};
 
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
-#set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
+#set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
 #else
-#set ($myEntityInterfaceName = ${glEntityInterfaceName})
+#set ($myEntityInterfaceName = ${glEntity})
 #end
 
 namespace ${myExtendedEntityPackageName} {

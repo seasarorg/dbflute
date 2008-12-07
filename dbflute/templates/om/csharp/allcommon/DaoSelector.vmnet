@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommon} {
 
     [Implementation(typeof(${glCacheDaoSelectorName}))]
     public interface ${glDaoSelectorInterfaceName} {
-        DAO Select<DAO>() where DAO : ${glDaoReadableInterfaceName};
-        ${glDaoReadableInterfaceName} ByName(String tableFlexibleName);
+        DAO Select<DAO>() where DAO : ${glDaoReadable};
+        ${glDaoReadable} ByName(String tableFlexibleName);
     }
 }

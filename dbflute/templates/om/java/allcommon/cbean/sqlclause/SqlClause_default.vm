@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glSqlClauseInterfaceName}Default")
+#set ($myClassName = "${glSqlClause}Default")
 
 /**
  * SqlClause for Default.
@@ -67,7 +67,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * 
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} lockForUpdate() {
+    public ${glSqlClause} lockForUpdate() {
         String msg = "LockForUpdate-SQL is unsupported in the database. Sorry...: " + toString();
         throw new UnsupportedOperationException(msg);
     }

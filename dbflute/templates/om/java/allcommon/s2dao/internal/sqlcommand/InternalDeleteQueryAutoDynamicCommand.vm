@@ -8,7 +8,7 @@ import org.seasar.dao.Node;
 import org.seasar.dao.SqlCommand;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalCommandContextHandler};
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
@@ -37,7 +37,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand, $
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
+        ${glConditionBean} cb = extractConditionBeanWithCheck(args);
         String[] argNames = new String[]{"dto"};
         Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
@@ -48,26 +48,26 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand, $
         return new Integer(rows);
     }
     
-    protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
+    protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
         if (args == null || args.length == 0) {
             String msg = "The arguments should have one argument! But:";
             msg = msg + " args=" + (args != null ? args.length : null);
             throw new IllegalArgumentException(msg);
         }
         Object fisrtArg = args[0];
-        if (!(fisrtArg instanceof ${glConditionBeanInterfaceName})) {
-            String msg = "The type of argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
+        if (!(fisrtArg instanceof ${glConditionBean})) {
+            String msg = "The type of argument should be " + ${glConditionBean}.class + "! But:";
             msg = msg + " type=" + fisrtArg.getClass();
             throw new IllegalArgumentException(msg);
         }
-        return (${glConditionBeanInterfaceName}) fisrtArg;
+        return (${glConditionBean}) fisrtArg;
     }
     
     protected ${glInternalCommandContextHandler} createCommandContextHandler(CommandContext context) {
         return new ${glInternalCommandContextHandler}(dataSource, statementFactory, context);
     }
 
-    protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
+    protected String buildQueryDeleteTwoWaySql(${glConditionBean} cb) {
         return cb.getSqlClause().getClauseQueryDelete();
     }
     

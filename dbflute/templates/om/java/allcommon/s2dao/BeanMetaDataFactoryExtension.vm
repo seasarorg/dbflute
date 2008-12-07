@@ -13,7 +13,7 @@ import org.seasar.dao.IdentifierGenerator;
 import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalIdentifierGeneratorFactory};
 
 /**
@@ -27,7 +27,7 @@ public class ${glBeanMetaDataFactoryExtension} extends BeanMetaDataFactoryImpl {
     //                                                                           Attribute
     //                                                                           =========
     /** The map of bean meta data for cache. */
-    protected Map<Class<? extends ${glEntityInterfaceName}>, BeanMetaData> _metaMap = newConcurrentHashMap();
+    protected Map<Class<? extends ${glEntity}>, BeanMetaData> _metaMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -175,7 +175,7 @@ public class ${glBeanMetaDataFactoryExtension} extends BeanMetaDataFactoryImpl {
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean isDBFluteEntity(Class beanClass) {
-        return ${glEntityInterfaceName}.class.isAssignableFrom(beanClass);
+        return ${glEntity}.class.isAssignableFrom(beanClass);
     }
     
     protected BeanMetaData getMetaFromCache(Class beanClass) {

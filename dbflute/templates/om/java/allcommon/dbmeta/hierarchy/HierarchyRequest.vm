@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 import java.util.ArrayList;
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumnName};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIteratorName};
@@ -17,7 +17,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * @author ${database.ClassAuthor}
  * @param <LOCAL_ENTITY> The type of local entity.
  */
-public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
+public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
 
     // ===================================================================================
     //                                                                           Attribute

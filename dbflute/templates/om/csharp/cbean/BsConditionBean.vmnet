@@ -30,7 +30,7 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                  Add OrderBy PK
         //                                                                  ==============
-        public override ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc() {
+        public override ${glConditionBean} AddOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
             Query().AddOrderBy_${col.JavaName}_Asc();
@@ -43,7 +43,7 @@ namespace ${glPackageBaseCB} {
         }
 
         /// <summary>${database.ImplementComment}</summary><returns>this. (NotNull)</returns>
-        public override ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc() {
+        public override ${glConditionBean} AddOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.PrimaryKey)
             Query().AddOrderBy_${col.JavaName}_Desc();
@@ -71,7 +71,7 @@ namespace ${glPackageBaseCB} {
             }
         }
 
-        public override ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName} ConditionQueryAsInterface {
+        public override ${glPackageBaseCommonCBean}.${glConditionQuery} ConditionQueryAsInterface {
             get { return this.ConditionQuery; }
         }
 
@@ -190,7 +190,7 @@ namespace ${glPackageBaseCB} {
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #end
-        public ${myConditionBeanClassName}Specification(${glConditionBeanInterfaceName} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDerivedReferrer, bool forScalarSelect)
+        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDerivedReferrer, bool forScalarSelect)
         : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect) { _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }

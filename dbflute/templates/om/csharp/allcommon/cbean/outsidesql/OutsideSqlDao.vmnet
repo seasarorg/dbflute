@@ -14,25 +14,25 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
     [Implementation]
 	[S2Dao(typeof(${glS2DaoSetting}))]
     [Bean(typeof(OutsideSqlDaoDummyEntity))]
-    public interface ${glOutsideSqlDaoName} : ${glDaoReadableInterfaceName} {
+    public interface ${glOutsideSqlDao} : ${glDaoReadable} {
 
         // ===================================================================================
         //                                                                              Select
         //                                                                              ======
-        System.Collections.IList SelectList(String path, Object pmb, ${glOutsideSqlOptionName} option, Type entityType);
+        System.Collections.IList SelectList(String path, Object pmb, ${glOutsideSqlOption} option, Type entityType);
 
-        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
+        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOption} option, ${glCursorHandlerName} handler);
 
-        int Execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
+        int Execute(String path, Object pmb, ${glOutsideSqlOption} option);
 
 		// Not implemented yet!
-        // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
+        // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOption} option);
 
         // [DBFlute-0.8.0]
         // ===================================================================================
         //                                                                                Call
         //                                                                                ====
-        void Call(String path, Object pmb, ${glOutsideSqlOptionName} option);
+        void Call(String path, Object pmb, ${glOutsideSqlOption} option);
     }
 
     public class OutsideSqlDaoDummyEntity {

@@ -13,7 +13,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+        protected ${glOutsideSqlDao} _outsideSqlDao;
         protected String _tableDbName;
         protected bool _dynamicBinding;
         protected ${glStatementConfig} _statementConfig;
@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
+        public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDao} outsideSqlDao, String tableDbName) {
             _outsideSqlDao = outsideSqlDao;
             _tableDbName = tableDbName;
         }
@@ -57,7 +57,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                  Procedure Call
         //                                                                  ==============
-        public void Call(${glProcedurePmbName} pmb) {
+        public void Call(${glProcedurePmb} pmb) {
             if (pmb == null) { throw new ArgumentNullException("The argument of call() 'pmb' should not be null!"); }
             _outsideSqlDao.Call(pmb.ProcedureName, pmb, CreateOutsideSqlOption());
         }
@@ -74,13 +74,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         }
 
         public ${glOutsideSqlPagingExecutorName} AutoPaging() {
-            ${glOutsideSqlOptionName} option = CreateOutsideSqlOption();
+            ${glOutsideSqlOption} option = CreateOutsideSqlOption();
             option.AutoPaging();
             return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
         }
 
         public ${glOutsideSqlPagingExecutorName} ManualPaging() {
-            ${glOutsideSqlOptionName} option = CreateOutsideSqlOption();
+            ${glOutsideSqlOption} option = CreateOutsideSqlOption();
             option.ManualPaging();
             return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
         }
@@ -98,8 +98,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // -------------------------------------------------
         //                                            Helper
         //                                            ------
-        protected ${glOutsideSqlOptionName} CreateOutsideSqlOption() {
-            ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+        protected ${glOutsideSqlOption} CreateOutsideSqlOption() {
+            ${glOutsideSqlOption} option = new ${glOutsideSqlOption}();
             option.StatementConfig = _statementConfig;
             if (_dynamicBinding) {
                 option.DynamicBinding();

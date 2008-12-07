@@ -6,7 +6,7 @@ using ${glPackageBaseCommonSqlClause};
 namespace ${glPackageBaseCommonCBean} {
 
 // JavaLike
-public interface ${glConditionQueryInterfaceName} {
+public interface ${glConditionQuery} {
 
     // ===================================================================================
     //                                                                          Table Name
@@ -17,14 +17,14 @@ public interface ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    ${glConditionQueryInterfaceName} getChildQuery();
-    ${glSqlClauseName} getSqlClause();
+    ${glConditionQuery} getChildQuery();
+    ${glSqlClause} getSqlClause();
     String getAliasName();
     String getRealAliasName();
     String getRealColumnName(String columnName);
     int getNestLevel();
     int getNextNestLevel();
-    bool isBaseQuery(${glConditionQueryInterfaceName} query);
+    bool isBaseQuery(${glConditionQuery} query);
 	int getSubQueryLevel();
 	String getForeignPropertyName();
     String getRelationPath();
@@ -35,7 +35,7 @@ public interface ${glConditionQueryInterfaceName} {
     ${glConditionValueName} invokeValue(String columnFlexibleName);
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
     void invokeOrderBy(String columnFlexibleName, bool isAsc);
-    ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName);
+    ${glConditionQuery} invokeForeignCQ(String foreignPropertyName);
 }
 
 }

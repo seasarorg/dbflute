@@ -2,7 +2,7 @@
 using System;
 
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
-    public interface ${glProcedurePmbName} {
+    public interface ${glProcedurePmb} {
         String ProcedureName { get; }
     }
 }

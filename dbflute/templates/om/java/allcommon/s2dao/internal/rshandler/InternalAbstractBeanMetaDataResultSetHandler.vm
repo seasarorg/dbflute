@@ -10,7 +10,7 @@ import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.RowCreator;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * @author ${database.ClassAuthor}
@@ -94,8 +94,8 @@ public abstract class ${glInternalAbstractBeanMetaDataResultSetHandler} extends 
      * @param row The row of result list. (NotNull)
      */
     protected void postCreateRow(final Object row) {
-        if (row instanceof ${glEntityInterfaceName}) { // DBFlute Target
-            ((${glEntityInterfaceName})row).clearModifiedPropertyNames();
+        if (row instanceof ${glEntity}) { // DBFlute Target
+            ((${glEntity})row).clearModifiedPropertyNames();
         } else { // Basically Unreachable
             final BeanMetaData bmd = getBeanMetaData();
             final Set names = bmd.getModifiedPropertyNames(row);

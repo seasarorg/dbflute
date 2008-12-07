@@ -7,7 +7,7 @@ import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
@@ -25,7 +25,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     protected final ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
     /** The option of outside-SQL. (NotNull) */
-    protected final ${glOutsideSqlOptionName} _outsideSqlOption;
+    protected final ${glOutsideSqlOption} _outsideSqlOption;
 
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
@@ -37,7 +37,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     //                                                                         Constructor
     //                                                                         ===========
     public ${glOutsideSqlEntityExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
-                                  , ${glOutsideSqlOptionName} outsideSqlOption
+                                  , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
                                   , ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;

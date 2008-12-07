@@ -7,7 +7,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalProcedureHandler};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
 
@@ -40,7 +40,7 @@ public class ${glInternalProcedureCommand} implements SqlCommand, ${glSqlExecuti
     //                                                                             =======
     public Object execute(final Object[] args) {
         final ${glInternalProcedureHandler} handler = newArgumentDtoProcedureHandler();
-        final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
         final Object pmb = outsideSqlContext.getParameterBean();
         // The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(...);

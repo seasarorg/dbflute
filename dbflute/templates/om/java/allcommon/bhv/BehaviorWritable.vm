@@ -2,13 +2,13 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * The interface of behavior-writable.
  * @author ${database.ClassAuthor}
  */
-public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadableInterfaceName} {
+public interface ${glBehaviorWritable} extends ${glBehaviorReadable} {
 
     // =====================================================================================
     //                                                                   Basic Entity Update
@@ -18,7 +18,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void create(${glPackageBaseCommon}.${glEntity} entity);
 
     /**
      * Modify.
@@ -28,7 +28,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void modify(${glPackageBaseCommon}.${glEntity} entity);
 
     /**
      * Modify non-strict.
@@ -37,7 +37,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void modifyNonstrict(${glEntityInterfaceName} entity);
+    public void modifyNonstrict(${glEntity} entity);
 
     /**
      * Create or modify. <br />
@@ -49,7 +49,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void createOrModify(${glPackageBaseCommon}.${glEntity} entity);
 
     /**
      * Create or modify non-strict. <br />
@@ -60,7 +60,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntity} entity);
 
     /**
      * Remove.
@@ -69,7 +69,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void remove(${glPackageBaseCommon}.${glEntity} entity);
 
     // =====================================================================================
     //                                                                    Basic Batch Update
@@ -79,7 +79,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entityList The list of entity. (NotNull and NotEmpty)
      * @return The array of created count.
      */
-    public int[] lumpCreate(List<${glEntityInterfaceName}> entityList);
+    public int[] lumpCreate(List<${glEntity}> entityList);
 
     /**
      * Lump modify the list.
@@ -88,7 +88,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public int[] lumpModify(List<${glEntityInterfaceName}> entityList);
+    public int[] lumpModify(List<${glEntity}> entityList);
 
     /**
      * Lump remove the list.
@@ -97,5 +97,5 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public int[] lumpRemove(List<${glEntityInterfaceName}> entityList);
+    public int[] lumpRemove(List<${glEntity}> entityList);
 }

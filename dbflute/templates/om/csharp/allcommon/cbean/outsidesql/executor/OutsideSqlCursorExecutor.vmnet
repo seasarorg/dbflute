@@ -11,14 +11,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+        protected ${glOutsideSqlDao} _outsideSqlDao;
 
-        protected ${glOutsideSqlOptionName} _outsideSqlOption;
+        protected ${glOutsideSqlOption} _outsideSqlOption;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+        public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption) {
             this._outsideSqlDao = outsideSqlDao;
             this._outsideSqlOption = outsideSqlOption;
         }

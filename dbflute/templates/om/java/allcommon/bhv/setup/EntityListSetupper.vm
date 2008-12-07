@@ -2,14 +2,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvSetup};
 
 import java.util.List;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * The interface of entity list setupper.
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityListSetupperName}<ENTITY extends ${glEntityInterfaceName}> {
+public interface ${glEntityListSetupperName}<ENTITY extends ${glEntity}> {
 
     /**
      * Set up the list of entity.

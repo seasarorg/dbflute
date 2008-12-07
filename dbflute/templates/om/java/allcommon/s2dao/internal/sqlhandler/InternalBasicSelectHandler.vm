@@ -12,7 +12,7 @@ import org.seasar.extension.jdbc.StatementFactory;
 
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetWrapper};
 
 /**
@@ -89,8 +89,8 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
             return resultSet;
         }
         final ${glFetchNarrowingResultSetWrapper} wrapper;
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
             wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
         } else {
             wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, false, false);
@@ -105,8 +105,8 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         if (!cb.isFetchNarrowingEffective()) {
             return false; // It is not necessary to control.
         }
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+        if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
             if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
                 return true;
             }

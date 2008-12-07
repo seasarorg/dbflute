@@ -67,10 +67,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected ${glStatementConfig} FindStatementConfigOnThread() {
             ${glStatementConfig} config = null;
             if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+                ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
                 config = cb.StatementConfig;
-            } else if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            } else if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext} context = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
                 config = context.StatementConfig;
             }
             return config;

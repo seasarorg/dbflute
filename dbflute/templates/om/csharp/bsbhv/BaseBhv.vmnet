@@ -19,9 +19,9 @@ using ${glPackageCB};
 
 #set ($myExtendClassName = "")
 #if ($table.isWritable())
-  #set ($myExtendClassName = "${glBehaviorWritableAbstractName}")
+  #set ($myExtendClassName = "${glAbstractBehaviorWritable}")
 #else
-  #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
+  #set ($myExtendClassName = "${glAbstractBehaviorReadable}")
 #end
 
 namespace ${glPackageExtendedBhv} {
@@ -98,8 +98,8 @@ namespace ${glPackageExtendedBhv} {
         //                                                                    New Instance
         //                                                                    ============
         #region New Instance
-        public override ${glEntityInterfaceName} NewEntity() { return NewMyEntity(); }
-        public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
+        public override ${glEntity} NewEntity() { return NewMyEntity(); }
+        public override ${glConditionBean} NewConditionBean() { return NewMyConditionBean(); }
         public virtual ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
         public virtual ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
         #endregion
@@ -172,7 +172,7 @@ namespace ${glPackageExtendedBhv} {
             return DelegateSelectNextVal();
         }
 #if ($table.hasOnlyOnePrimaryKey())
-        protected override void SetupNextValueToPrimaryKey(${glEntityInterfaceName} entity) {// Very Internal
+        protected override void SetupNextValueToPrimaryKey(${glEntity} entity) {// Very Internal
             ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
             myEntity.${table.primaryKeyJavaNameAsOne} = SelectNextVal();
         }
@@ -359,7 +359,7 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
-        protected override bool HasVersionNoValue(${glEntityInterfaceName} entity) {
+        protected override bool HasVersionNoValue(${glEntity} entity) {
 #if ($table.isUseVersionNo())
             return Downcast(entity).${table.versionNoJavaName} != null;
 #else
@@ -367,7 +367,7 @@ namespace ${glPackageExtendedBhv} {
 #end
         }
 
-        protected override bool HasUpdateDateValue(${glEntityInterfaceName} entity) {
+        protected override bool HasUpdateDateValue(${glEntity} entity) {
 #if ($table.isUseUpdateDate())
             return Downcast(entity).${table.updateDateJavaName} != null;
 #else
@@ -378,7 +378,7 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                          Helper
         //                                                                          ======
-        protected ${myExtendedObjectClassName} Downcast(${glEntityInterfaceName} entity) {
+        protected ${myExtendedObjectClassName} Downcast(${glEntity} entity) {
             return (${myExtendedObjectClassName})entity;
         }
 
@@ -387,9 +387,9 @@ namespace ${glPackageExtendedBhv} {
         //                                                                 ===============
         #region Delegate Method
         protected int DelegateSelectCount(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectCount(cb); }
-        protected override int DoCallReadCount(${glConditionBeanInterfaceName} cb) { return this.DelegateSelectCount((${myConditionBeanClassName})cb); }
+        protected override int DoCallReadCount(${glConditionBean} cb) { return this.DelegateSelectCount((${myConditionBeanClassName})cb); }
         protected IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectList(cb); }
-        protected override IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb) { return (IList<${glEntityInterfaceName}>)this.DelegateSelectList((${myConditionBeanClassName})cb); }
+        protected override IList<${glEntity}> DoCallReadList(${glConditionBean} cb) { return (IList<${glEntity}>)this.DelegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
         protected ${table.sequenceReturnType} DelegateSelectNextVal() { return this.Dao.SelectNextVal(); }
 #end
@@ -404,9 +404,9 @@ namespace ${glPackageExtendedBhv} {
 #if ($table.hasOptimisticLock())
         protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
 #end
-        protected override int DoCallCreate(${glEntityInterfaceName} e) { return this.DelegateInsert((${myExtendedObjectClassName})e); }
-        protected override int DoCallModify(${glEntityInterfaceName} e) { return this.DelegateUpdate((${myExtendedObjectClassName})e); }
-        protected override int DoCallRemove(${glEntityInterfaceName} e) { return this.DelegateDelete((${myExtendedObjectClassName})e); }
+        protected override int DoCallCreate(${glEntity} e) { return this.DelegateInsert((${myExtendedObjectClassName})e); }
+        protected override int DoCallModify(${glEntity} e) { return this.DelegateUpdate((${myExtendedObjectClassName})e); }
+        protected override int DoCallRemove(${glEntity} e) { return this.DelegateDelete((${myExtendedObjectClassName})e); }
 #end
         #endregion
 #if ($table.hasBehaviorFilterBeforeColumn())
@@ -416,7 +416,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                 ===============
         #region Filter Override
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
-        protected override void FilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+        protected override void FilterEntityOfInsert(${glEntity} targetEntity) {
             base.FilterEntityOfInsert(targetEntity);
             ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
@@ -425,7 +425,7 @@ namespace ${glPackageExtendedBhv} {
         }
 #end
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
-        protected override void FilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+        protected override void FilterEntityOfUpdate(${glEntity} targetEntity) {
             base.FilterEntityOfUpdate(targetEntity);
             ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)

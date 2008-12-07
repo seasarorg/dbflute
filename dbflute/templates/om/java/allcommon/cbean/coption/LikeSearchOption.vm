@@ -1,19 +1,19 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
-#set ($myClassName = "${glConditionOptionLikeSearchName}")
+#set ($myClassName = "${glLikeSearchOption}")
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommon}.${glDBCurrent};
 import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
+import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
 
 /**
  * The class of like-search-option.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
+public class ${myClassName} extends ${glSimpleStringOption} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -191,7 +191,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                            Japanese
     //                                                                            ========
-    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+    public ${glJapaneseOptionPartsAgent} localJapanese() {
         return doLocalJapanese();
     }
 
@@ -228,7 +228,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     }
 
     protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
-	    return ${glDBCurrent}.getInstance().isCurrentDBDef(currentDBDef);
+	    return ${glResourceContext}.isCurrentDBDef(currentDBDef);
     }
 
     // ===================================================================================
@@ -246,7 +246,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return deepCopy;
     }
 
-    protected ${glConditionOptionSimpleStringName} newDeepCopyInstance() {
+    protected ${glSimpleStringOption} newDeepCopyInstance() {
         return new ${myClassName}();
     }
 

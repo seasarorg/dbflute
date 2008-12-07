@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
@@ -554,7 +554,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
-    protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptPrimaryKeyMap(ENTITY entity
+    protected <ENTITY extends ${glEntity}> void doAcceptPrimaryKeyMap(ENTITY entity
             , Map<String, ? extends Object> columnValueMap
             , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
@@ -581,7 +581,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         }
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void doAcceptColumnValueMap(ENTITY entity
+    protected <ENTITY extends ${glEntity}> void doAcceptColumnValueMap(ENTITY entity
             , Map<String, ? extends Object> columnValueMap
             , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
@@ -608,7 +608,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         }
     }
 
-    protected String doExtractPrimaryKeyMapString(${glEntityInterfaceName} entity
+    protected String doExtractPrimaryKeyMapString(${glEntity} entity
                                                 , String startBrace
                                                 , String endBrace
                                                 , String delimiter
@@ -630,7 +630,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
 		return sb.toString();
 	}
 
-    protected String doExtractColumnValueMapString(${glEntityInterfaceName} entity
+    protected String doExtractColumnValueMapString(${glEntity} entity
                                                  , String startBrace
                                                  , String endBrace
                                                  , String delimiter
@@ -655,7 +655,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     // -----------------------------------------------------
     //                                               Convert
     //                                               -------
-    protected Map<String, Object> doConvertToColumnValueMap(${glEntityInterfaceName} entity) {
+    protected Map<String, Object> doConvertToColumnValueMap(${glEntity} entity) {
         Map<String, Object> valueMap = newLinkedHashMap();
 		try {
             List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
@@ -671,7 +671,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         return valueMap;
     }
 	
-    protected Map<String, String> doConvertToColumnStringValueMap(${glEntityInterfaceName} entity) {
+    protected Map<String, String> doConvertToColumnStringValueMap(${glEntity} entity) {
         Map<String, String> valueMap = newLinkedHashMap();
 		try {
             List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
@@ -691,7 +691,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     //                                                               Entity Property Setup
     //                                                               =====================
 	// It's very INTERNAL!
-    protected <ENTITY extends ${glEntityInterfaceName}> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
+    protected <ENTITY extends ${glEntity}> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
                                                            , Eps<ENTITY> setupper
                                                            , ${glColumnInfoName} columnInfo) {
         String columnName = columnInfo.getColumnDbName();
@@ -699,7 +699,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> void registerEntityPropertySetupper(
+    protected <ENTITY extends ${glEntity}> void registerEntityPropertySetupper(
 		                                          String columnName
 												, String propertyName
 	                                            , Eps<ENTITY> setupper
@@ -708,7 +708,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
 		entityPropertySetupperMap.put(columnName, setupper);
 	}
 
-    protected <ENTITY extends ${glEntityInterfaceName}> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap, String propertyName) {
+    protected <ENTITY extends ${glEntity}> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap, String propertyName) {
         Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
         if (setupper == null) {
             String msg = "The propertyName was Not Found in the map of setupper of entity property:";
@@ -726,7 +726,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      */
     protected static class MapStringUtil {
 
-        public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntityInterfaceName} entity) {
+        public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntity} entity) {
             if (primaryKeyMapString == null) {
                 String msg = "The argument[primaryKeyMapString] should not be null.";
                 throw new IllegalArgumentException(msg);
@@ -743,7 +743,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
         }
 
-        public static void acceptColumnValueMapString(String columnValueMapString, ${glEntityInterfaceName} entity) {
+        public static void acceptColumnValueMapString(String columnValueMapString, ${glEntity} entity) {
             if (columnValueMapString == null) {
                 String msg = "The argument[columnValueMapString] should not be null.";
                 throw new IllegalArgumentException(msg);
@@ -760,7 +760,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
         }
 
-        public static String extractPrimaryKeyMapString(${glEntityInterfaceName} entity) {
+        public static String extractPrimaryKeyMapString(${glEntity} entity) {
             final String startBrace = MAP_STRING_START_BRACE;
             final String endBrace = MAP_STRING_END_BRACE;
             final String delimiter = MAP_STRING_DELIMITER;
@@ -768,7 +768,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             return entity.getDBMeta().extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
         }
 
-        public static String extractColumnValueMapString(${glEntityInterfaceName} entity) {
+        public static String extractColumnValueMapString(${glEntity} entity) {
             final String startBrace = MAP_STRING_START_BRACE;
             final String endBrace = MAP_STRING_END_BRACE;
             final String delimiter = MAP_STRING_DELIMITER;
@@ -989,15 +989,15 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     //                                                                       Assist Helper
     //                                                                       =============
 	@SuppressWarnings("unchecked")
-	protected <ENTITY> ENTITY downcast(${glEntityInterfaceName} entity) {
+	protected <ENTITY> ENTITY downcast(${glEntity} entity) {
 		checkDowncast(entity);
 		return (ENTITY)entity;
 	}
 
-    protected void checkDowncast(${glEntityInterfaceName} entity) {
+    protected void checkDowncast(${glEntity} entity) {
         assertObjectNotNull("entity", entity);
-        Class<? extends ${glEntityInterfaceName}> entityType = getEntityType();
-        Class<? extends ${glEntityInterfaceName}> targetType = entity.getClass();
+        Class<? extends ${glEntity}> entityType = getEntityType();
+        Class<? extends ${glEntity}> targetType = entity.getClass();
         if (!entityType.isAssignableFrom(targetType)) {
             String name = entityType.getSimpleName();
             String msg = "The entity should be " + name + " but it was: " + targetType;

@@ -13,12 +13,12 @@ import java.lang.reflect.InvocationTargetException;
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionFromToName};
-import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -28,7 +28,7 @@ import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
  * The abstract class of condition-query.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glConditionQueryInterfaceName} {
+public abstract class ${myClassName} implements ${glConditionQuery} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -60,7 +60,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                           Attribute
     //                                                                           =========
     /** SQL clause. */
-    protected final ${glSqlClauseName} _sqlClause;
+    protected final ${glSqlClause} _sqlClause;
 
     /** My alias name. */
     protected final String _aliasName;
@@ -81,7 +81,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String _relationPath;
 
     /** The query of child. */
-    protected final ${glConditionQueryInterfaceName} _childQuery;
+    protected final ${glConditionQuery} _childQuery;
 
     // -----------------------------------------------------
     //                                                Inline
@@ -99,7 +99,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
      */
-    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
         _childQuery = childQuery;
         _sqlClause = sqlClause;
         _aliasName = aliasName;
@@ -126,7 +126,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * Get child query.
      * @return Child query. (Nullable)
      */
-    public ${glConditionQueryInterfaceName} getChildQuery() {
+    public ${glConditionQuery} getChildQuery() {
         return _childQuery;
     }
 
@@ -134,7 +134,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * Get sql clause.
      * @return Sql clause. (NotNull)
      */
-    public ${glSqlClauseName} getSqlClause() {
+    public ${glSqlClause} getSqlClause() {
         return _sqlClause;
     }
 
@@ -167,7 +167,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param query Condition query. (NotNull)
      * @return Determination.
      */
-    public boolean isBaseQuery(${glConditionQueryInterfaceName} query) {
+    public boolean isBaseQuery(${glConditionQuery} query) {
         return (query.getChildQuery() == null);
     }
 
@@ -251,7 +251,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getLocationBase() {
         final StringBuffer sb = new StringBuffer();
-        ${glConditionQueryInterfaceName} query = this;
+        ${glConditionQuery} query = this;
         while (true) {
             if (query.isBaseQuery(query)) {
                 sb.insert(0, CQ_PROPERTY + ".");
@@ -278,15 +278,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                         Union Query
     //                                                                         ===========
     /** The map of union query. */
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap;
+    protected Map<String, ${glConditionQuery}> _unionQueryMap;
 
     /**
      * Get the map of union query.
      * @return The map of union query. (NotNull)
      */
-    public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+    public Map<String, ${glConditionQuery}> getUnionQueryMap() {// for Internal
         if (_unionQueryMap == null) {
-            _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+            _unionQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
         }
         return _unionQueryMap;
     }
@@ -295,20 +295,20 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * Set union query. {Internal}
      * @param unionQuery Union query. (NotNull)
      */
-    public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
+    public void xsetUnionQuery(${glConditionQuery} unionQuery) {
         xsetupUnion(unionQuery, false, getUnionQueryMap());
     }
 
     /** The map of union all query. */
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap;
+    protected Map<String, ${glConditionQuery}> _unionAllQueryMap;
 
     /**
      * Get the map of union all query.
      * @return The map of union all query. (NotNull)
      */
-    public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+    public Map<String, ${glConditionQuery}> getUnionAllQueryMap() {// for Internal
         if (_unionAllQueryMap == null) {
-            _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+            _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
         }
         return _unionAllQueryMap;
     }
@@ -317,11 +317,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * Set union all query. {Internal}
      * @param unionAllQuery Union all query. (NotNull)
      */
-    public void xsetUnionAllQuery(${glConditionQueryInterfaceName} unionAllQuery) {
+    public void xsetUnionAllQuery(${glConditionQuery} unionAllQuery) {
         xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
     }
 
-    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
+    protected void xsetupUnion(${glConditionQuery} unionQuery, boolean unionAll, Map<String, ${glConditionQuery}> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -337,7 +337,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param baseQueryAsSuper Base query as super. (NotNull)
      * @param unionQueryAsSuper Union query as super. (NotNull)
      */
-    abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
+    abstract protected void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper);
 
     /**
      * Has union query or union all query?
@@ -351,18 +351,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * Get the list of union query.
      * @return The list of union query. (NotNull)
      */
-    public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
-        if (_unionQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
-        return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
+    public List<${glConditionQuery}> getUnionQueryList() {
+        if (_unionQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        return new ArrayList<${glConditionQuery}>(_unionQueryMap.values());
     }
 
     /**
      * Get the list of union all query.
      * @return The list of union all query. (NotNull)
      */
-    public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
-        if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
-        return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
+    public List<${glConditionQuery}> getUnionAllQueryList() {
+        if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        return new ArrayList<${glConditionQuery}>(_unionAllQueryMap.values());
     }
 
     // ===================================================================================
@@ -415,7 +415,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                         , String colName
                         , String capPropName
                         , String uncapPropName
-                        , ${glConditionOptionLikeSearchName} option) {
+                        , ${glLikeSearchOption} option) {
         registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 
@@ -426,7 +426,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                          , String colName
                                          , String capPropName
                                          , String uncapPropName
-                                         , ${glConditionOptionLikeSearchName} option) {
+                                         , ${glLikeSearchOption} option) {
         final String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
         if (!key.isValidRegistration(cvalue, value, validationMsg)) {
             return;
@@ -451,16 +451,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
                 
                 // Callback for LikeAsOr!
-                final List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
+                final List<${glLikeSearchOption}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
                 if (!callbackList.isEmpty()) {
                     getSqlClause().makeAdditionalConditionAsOrEffective();
-                    for (Iterator<${glConditionOptionLikeSearchName}.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext();) {
-                        final ${glConditionOptionLikeSearchName}.LikeAsOrCallback likeAsOrCallback = (${glConditionOptionLikeSearchName}.LikeAsOrCallback) ite.next();
+                    for (Iterator<${glLikeSearchOption}.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext();) {
+                        final ${glLikeSearchOption}.LikeAsOrCallback likeAsOrCallback = (${glLikeSearchOption}.LikeAsOrCallback) ite.next();
                         final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
                         final String filteredValue = likeAsOrCallback.filterValue(currentValue);
-                        final ${glConditionOptionLikeSearchName} optionDeepCopy = (${glConditionOptionLikeSearchName}) option.createDeepCopy();
+                        final ${glLikeSearchOption} optionDeepCopy = (${glLikeSearchOption}) option.createDeepCopy();
                         optionDeepCopy.clearLikeAsOrCallback();
-                        final ${glConditionOptionLikeSearchName} filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
+                        final ${glLikeSearchOption} filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
                         invokeSetterLikeSearch(additionalTargetPropertyName, filteredValue, filteredOption);
                     }
                     getSqlClause().ignoreAdditionalConditionAsOr();
@@ -479,7 +479,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             }
             
             // @jflute -- Callback for LikeAsOr!
-            // final List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
+            // final List<${glLikeSearchOption}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
             // ...
             
             getSqlClause().ignoreAdditionalConditionAsOr();
@@ -500,7 +500,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         throw new ${glRequiredOptionNotFoundException}(msg);
     }
         
-    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glConditionOptionLikeSearchName} option) {
+    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glLikeSearchOption} option) {
         if (value == null) {
             return;
         }
@@ -509,7 +509,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String methodName = "set" + columnCapPropName + "_LikeSearch";
         Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
+            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glLikeSearchOption}.class});
         } catch (NoSuchMethodException e) {
             String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
@@ -575,17 +575,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                       InScopeSubQuery
     //                                       ---------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected void registerNotInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerNotInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
@@ -607,7 +607,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getRealColumnName(columnName);
     }
 
-    protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected String getInScopeSubQuerySql(${glConditionQuery} subQuery
                                  , String relatedColumnName, String propertyName) {
         String tableAliasName = getSqlClause().getLocalTableAliasName();
         String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
@@ -620,17 +620,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                        ExistsSubQuery
     //                                        --------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected void registerNotExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerNotExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String existsOption) {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
@@ -656,7 +656,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getRealColumnName(columnName);
     }
 
-    protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected String getExistsSubQuerySql(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
@@ -670,7 +670,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                               DerivedReferrerSubQuery
     //                               -----------------------
-    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQuery} subQuery
                                                  , String columnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
         assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
@@ -693,7 +693,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getRealColumnName(columnName);
     }
 
-    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
                                                  , String realColumnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
@@ -789,7 +789,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+    protected void assertDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         final ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
@@ -830,7 +830,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                        ScalarSubQuery
     //                                        --------------
-    protected void registerScalarSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+    protected void registerScalarSubQuery(String function, ${glConditionQuery} subQuery
                                         , String propertyName, String operand) {
         assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
         
@@ -862,7 +862,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getRealColumnName(columnName);
     }
 
-    protected String getScalarSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+    protected String getScalarSubQuerySql(String function, ${glConditionQuery} subQuery
                                         , String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
@@ -951,7 +951,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    protected void assertScalarSubQueryColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+    protected void assertScalarSubQueryColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         final ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
@@ -987,7 +987,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    public static class SSQFunction<CB extends ${glConditionBeanInterfaceName}> {
+    public static class SSQFunction<CB extends ${glConditionBean}> {
         protected SSQSetupper<CB> _setupper;
         public SSQFunction(SSQSetupper<CB> setupper) {
             _setupper = setupper;
@@ -1006,14 +1006,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    protected static interface SSQSetupper<CB extends ${glConditionBeanInterfaceName}> {
+    protected static interface SSQSetupper<CB extends ${glConditionBean}> {
         public void setup(String function, ${glSubQuery}<CB> subQuery);
     }
 
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
-    protected String buildPlainSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
+    protected String buildPlainSubQueryFromWhereClause(${glConditionQuery} subQuery
                                                      , String relatedColumnName
                                                      , String propertyName
                                                      , String selectClause
@@ -1038,7 +1038,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return fromWhereClause;
     }
 
-    protected String buildCorrelationSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
+    protected String buildCorrelationSubQueryFromWhereClause(${glConditionQuery} subQuery
                                                            , String relatedColumnName
                                                            , String propertyName
                                                            , String selectClause
@@ -1064,7 +1064,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return fromWhereClause;
     }
 
-    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
+    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQuery} subQuery) { // Very Internal
         int subQueryLevel = subQuery.getSubQueryLevel();
         if (_subQueryLevel <= subQueryLevel) {
             _subQueryLevel = subQueryLevel + 1;
@@ -1123,14 +1123,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                           Union Query
     //                                           -----------
-    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
+    public void registerUnionQuery(${glConditionQuery} unionQuery, boolean unionAll, String unionQueryPropertyName) {
         final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
         
         // At the future, building SQL will be moved to sqlClause.
         getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
-    protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
+    protected String getUnionQuerySql(${glConditionQuery} unionQuery, String unionQueryPropertyName) {
         final String fromClause = unionQuery.getSqlClause().getFromClause();
         final String whereClause = unionQuery.getSqlClause().getWhereClause();
         final String unionQueryClause;
@@ -1299,7 +1299,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         final String propertyName = container.getPropertyName();
-        final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        final ${glConditionQuery} cq = container.getConditionQuery();
         final ${glDBMeta} dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
@@ -1316,7 +1316,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         final String propertyName = container.getPropertyName();
-        final ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        final ${glConditionQuery} cq = container.getConditionQuery();
         final String ascDesc = isAsc ? "Asc" : "Desc";
         final ${glDBMeta} dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
@@ -1330,18 +1330,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty)
      * @return The conditionQuery of foreign as interface. (NotNull)
      */
-    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
+    public ${glConditionQuery} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
         final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
-        return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
+        return (${glConditionQuery})helpInvokingCQMethod(this, method, new Object[]{});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
         final String[] strings = name.split("\\.");
         final int length = strings.length;
         String propertyName = null;
-        ${glConditionQueryInterfaceName} cq = this;
+        ${glConditionQuery} cq = this;
         int index = 0;
         for (String element : strings) {
             if (length == (index+1)) {// at last loop!
@@ -1356,20 +1356,20 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     private static class PropertyNameCQContainer {
         protected String _propertyName;
-        protected ${glConditionQueryInterfaceName} _cq;
-        public PropertyNameCQContainer(String propertyName, ${glConditionQueryInterfaceName} cq) {
+        protected ${glConditionQuery} _cq;
+        public PropertyNameCQContainer(String propertyName, ${glConditionQuery} cq) {
             this._propertyName = propertyName;
             this._cq = cq;
         }
         public String getPropertyName() {
             return _propertyName;
         }
-        public ${glConditionQueryInterfaceName} getConditionQuery() {
+        public ${glConditionQuery} getConditionQuery() {
             return _cq;
         }
     }
 
-    private Method helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Class<?>[] argTypes, String property) {
+    private Method helpGettingCQMethod(${glConditionQuery} cq, String methodName, Class<?>[] argTypes, String property) {
         try {
             return cq.getClass().getMethod(methodName, argTypes);
         } catch (NoSuchMethodException e) {
@@ -1382,7 +1382,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, Method method, Object[] args) {
+    private Object helpInvokingCQMethod(${glConditionQuery} cq, Method method, Object[] args) {
         try {
             return method.invoke(cq, args);
         } catch (IllegalAccessException e) {
@@ -1463,10 +1463,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
     
     public static interface NssCall { // Very Internal
-        public ${glConditionQueryInterfaceName} qf();
+        public ${glConditionQuery} qf();
     }
 
-    protected void registerOuterJoin(${glConditionQueryInterfaceName} cq, Map<String, String> joinOnMap) {
+    protected void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
     }
 

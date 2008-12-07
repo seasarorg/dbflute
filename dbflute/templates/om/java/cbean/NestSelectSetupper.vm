@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageNss};
 #set ($myClassName = "${myNestSelectSetupperClassName}")
 
 #if ($table.hasForeignKeyOrReferrerAsOne())
-import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionQuery};
 #end
 import ${glPackageCQ}.${myConditionQueryClassName};
 
@@ -29,7 +29,7 @@ public class ${myClassName} {
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
     public ${fk.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQuery} qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
 		return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
     }
 #end
@@ -42,7 +42,7 @@ public class ${myClassName} {
 #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
-        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQueryInterfaceName} qf() { return _query.query${tmpPropertyNameInitCap}(); }});
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ${glConditionQuery} qf() { return _query.query${tmpPropertyNameInitCap}(); }});
 		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
     }
 #end

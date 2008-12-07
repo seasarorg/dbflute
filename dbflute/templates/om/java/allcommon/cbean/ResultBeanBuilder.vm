@@ -43,7 +43,7 @@ public class ${glResultBeanBuilderName}<ENTITY> {
      * @param selectedList Selected list. (NotNull)
      * @return The result bean of list. (NotNull)
      */
-    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glConditionBeanInterfaceName} cb, List<ENTITY> selectedList) {
+    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glConditionBean} cb, List<ENTITY> selectedList) {
         ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(selectedList.size());

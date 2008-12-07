@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOptionPartsLocal};
 
-#set ($myClassName = "${glConditionOptionPartsAgentJapaneseName}")
+#set ($myClassName = "${glJapaneseOptionPartsAgent}")
 
 import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacterName};
 import ${glPackageBaseCommonHelperCharacterImpl}.${glJapaneseCharacterImplName};

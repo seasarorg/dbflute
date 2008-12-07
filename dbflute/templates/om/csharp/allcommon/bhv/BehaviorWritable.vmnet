@@ -6,13 +6,13 @@ using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    public interface ${glBehaviorWritableInterfaceName} : ${glBehaviorReadableInterfaceName} {
+    public interface ${glBehaviorWritable} : ${glBehaviorReadable} {
 
         /// <summary>
         /// Create entity.
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
-        void Create(${glEntityInterfaceName} entity);
+        void Create(${glEntity} entity);
 
         /// <summary>
         /// Modify entity.
@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        void Modify(${glEntityInterfaceName} entity);
+        void Modify(${glEntity} entity);
 
         /// <summary>
         /// Remove entity.
@@ -30,6 +30,6 @@ namespace ${glPackageBaseCommonBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        void Remove(${glEntityInterfaceName} entity);
+        void Remove(${glEntity} entity);
     }
 }

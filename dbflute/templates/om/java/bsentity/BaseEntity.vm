@@ -7,9 +7,9 @@ import java.util.*;
 import ${glPackageBaseCommon}.${glCDef};
 #end
 #if (${table.hasAllCommonColumn()})
-import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #else
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 #end
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 #if (!$isSql2Entity)
@@ -20,9 +20,9 @@ import ${myExtendedEntityPackageName}.*;
 #end
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
-  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
 #else
-  #set ($myEntityInterfaceName = ${glEntityInterfaceName})
+  #set ($myEntityInterfaceName = ${glEntity})
 #end
 
 /**

@@ -5,10 +5,10 @@ import java.util.List;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.dao.BeanMetaData;
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 
@@ -16,7 +16,7 @@ import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
  * @author ${database.ClassAuthor}
  * @param <ENTITY> The type of entity.
  */
-public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> extends ${glAbstractSelectCBCommand}<List<ENTITY>> {
+public class ${glSelectListCBCommand}<ENTITY extends ${glEntity}> extends ${glAbstractSelectCBCommand}<List<ENTITY>> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -47,7 +47,7 @@ public class ${glSelectListCBCommand}<ENTITY extends ${glEntityInterfaceName}> e
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
     }

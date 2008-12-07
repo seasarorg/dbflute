@@ -1,4 +1,4 @@
-#set ($myClassName = "${glBehaviorReadableAbstractName}")
+#set ($myClassName = "${glAbstractBehaviorReadable}")
 
 using System;
 using System.Collections.Generic;
@@ -14,13 +14,13 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    public abstract class $myClassName : ${glBehaviorReadableInterfaceName} {
+    public abstract class $myClassName : ${glBehaviorReadable} {
 
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
         protected ${glDaoSelectorInterfaceName} _daoSelector;
-        protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
+        protected ${glBehaviorSelector} _behaviorSelector;
 
         // ===============================================================================
         //                                                                Initialized Mark
@@ -40,8 +40,8 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                    New Instance
         //                                                                    ============
-        public abstract ${glEntityInterfaceName} NewEntity();
-        public abstract ${glConditionBeanInterfaceName} NewConditionBean();
+        public abstract ${glEntity} NewEntity();
+        public abstract ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                                   Basic Get All
@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                      Count Read
         //                                                                      ==========
-        public virtual int ReadCount(${glConditionBeanInterfaceName} cb) {
+        public virtual int ReadCount(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
             return this.CallReadCount(cb);
         }
@@ -61,66 +61,66 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                     Entity Read
         //                                                                     ===========
-        public virtual ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb) {
+        public virtual ${glEntity} ReadEntity(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
+            IList<${glEntity}> ls = this.CallReadList(cb);
             if (ls.Count == 0) {
                 return null;
             }
             AssertEntitySelectedAsOne(ls, cb);
-            return (${glEntityInterfaceName})ls[0];
+            return (${glEntity})ls[0];
         }
 
-        public virtual ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+        public virtual ${glEntity} ReadEntityWithDeletedCheck(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
+            IList<${glEntity}> ls = this.CallReadList(cb);
             AssertEntityNotDeleted(ls, cb);
             AssertEntitySelectedAsOne(ls, cb);
-            return (${glEntityInterfaceName})ls[0];
+            return (${glEntity})ls[0];
         }
 
         // ===============================================================================
         //                                                                       List Read
         //                                                                       =========
-        public virtual ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb) {
+        public virtual ${glListResultBeanName}<${glEntity}> ReadList(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ${glResultBeanBuilderName}<${glEntityInterfaceName}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
+            return new ${glResultBeanBuilderName}<${glEntity}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
-        public virtual ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb) {
+        public virtual ${glPagingResultBeanName}<${glEntity}> ReadPage(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            ${glPagingInvokerName}<${glEntityInterfaceName}> invoker = new ${glPagingInvokerName}<${glEntityInterfaceName}>(TableDbName);
+            ${glPagingInvokerName}<${glEntity}> invoker = new ${glPagingInvokerName}<${glEntity}>(TableDbName);
             return invoker.InvokePaging(new InternalReadPagingHandler(this, cb));
         }
 
-        private class InternalReadPagingHandler : ${glPagingHandlerName}<${glEntityInterfaceName}> {
-            protected ${glBehaviorReadableInterfaceName} _bhv;
-            protected ${glConditionBeanInterfaceName} _cb;
-            public InternalReadPagingHandler(${glBehaviorReadableInterfaceName} bhv, ${glConditionBeanInterfaceName} cb) {
+        private class InternalReadPagingHandler : ${glPagingHandlerName}<${glEntity}> {
+            protected ${glBehaviorReadable} _bhv;
+            protected ${glConditionBean} _cb;
+            public InternalReadPagingHandler(${glBehaviorReadable} bhv, ${glConditionBean} cb) {
                 _bhv = bhv;
                 _cb = cb;
             }
             public ${glPagingBeanInterfaceName} PagingBean { get { return _cb; } }
             public int Count() { return _bhv.ReadCount(_cb); }
-            public IList<${glEntityInterfaceName}> Paging() { return _bhv.ReadList(_cb); }
+            public IList<${glEntity}> Paging() { return _bhv.ReadList(_cb); }
         }
 
         // -------------------------------------------------
         //                                     Assert Result
         //                                     -------------
-        protected void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
+        protected void AssertEntityNotDeleted(${glEntity} entity, Object searchKey4Log) {
             if (entity == null) {
                 ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
                 ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
 				${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
@@ -134,7 +134,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                  ==============
         public virtual ${glOutsideSqlBasicExecutorName} OutsideSql() {
             AssertDaoSelectorNotNull("OutsideSql");
-            ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDaoName}>();
+            ${glOutsideSqlDao} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDao}>();
             return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao, this.TableDbName);
         }
 
@@ -174,9 +174,9 @@ namespace ${glPackageBaseCommonBhv} {
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
-                     where LOCAL_ENTITY : ${glEntityInterfaceName}
-                     where REFERRER_CB : ${glConditionBeanInterfaceName}
-                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
+                     where LOCAL_ENTITY : ${glEntity}
+                     where REFERRER_CB : ${glConditionBean}
+                     where REFERRER_ENTITY : ${glEntity} {
             DoHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
         }
 
@@ -195,9 +195,9 @@ namespace ${glPackageBaseCommonBhv} {
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
-                     where LOCAL_ENTITY : ${glEntityInterfaceName}
-                     where REFERRER_CB : ${glConditionBeanInterfaceName}
-                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
+                     where LOCAL_ENTITY : ${glEntity}
+                     where REFERRER_CB : ${glConditionBean}
+                     where REFERRER_ENTITY : ${glEntity} {
 
             // - - - - - - - - - - -
             // Assert pre-condition
@@ -299,9 +299,9 @@ namespace ${glPackageBaseCommonBhv} {
          * @param <REFERRER_ENTITY> The type of referrer entity.
          */
         protected interface InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>
-                     where LOCAL_ENTITY : ${glEntityInterfaceName}
-                     where REFERRER_CB : ${glConditionBeanInterfaceName}
-                     where REFERRER_ENTITY : ${glEntityInterfaceName} {
+                     where LOCAL_ENTITY : ${glEntity}
+                     where REFERRER_CB : ${glConditionBean}
+                     where REFERRER_ENTITY : ${glEntity} {
             // For Base
             PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
             void callbackBase_setReferrerList(LOCAL_ENTITY entity, IList<REFERRER_ENTITY> referrerList);
@@ -315,7 +315,7 @@ namespace ${glPackageBaseCommonBhv} {
             void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
         }
 
-        protected ${glBehaviorSelectorInterfaceName} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
+        protected ${glBehaviorSelector} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
             AssertBehaviorSelectorNotNull("loadReferrer");
             return this.BehaviorSelector;
         }
@@ -342,7 +342,7 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                         Pullout Internal Helper
         //                                                         =======================
         protected IList<FOREIGN_ENTITY> HelpPulloutInternally<LOCAL_ENTITY, FOREIGN_ENTITY>(IList<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback)
-                where LOCAL_ENTITY : ${glEntityInterfaceName} where FOREIGN_ENTITY : ${glEntityInterfaceName} {
+                where LOCAL_ENTITY : ${glEntity} where FOREIGN_ENTITY : ${glEntity} {
             AssertObjectNotNull("localEntityList", localEntityList);
             IList<FOREIGN_ENTITY> foreignList = new List<FOREIGN_ENTITY>();
             foreach (LOCAL_ENTITY entity in localEntityList) {
@@ -355,23 +355,23 @@ namespace ${glPackageBaseCommonBhv} {
             return foreignList;
         }
 
-        protected interface InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> where LOCAL_ENTITY : ${glEntityInterfaceName} where FOREIGN_ENTITY : ${glEntityInterfaceName} {
+        protected interface InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> where LOCAL_ENTITY : ${glEntity} where FOREIGN_ENTITY : ${glEntity} {
             FOREIGN_ENTITY callbackGetForeignEntity(LOCAL_ENTITY entity);
         }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
-        protected abstract bool HasVersionNoValue(${glEntityInterfaceName} entity);
-        protected abstract bool HasUpdateDateValue(${glEntityInterfaceName} entity);
+        protected abstract bool HasVersionNoValue(${glEntity} entity);
+        protected abstract bool HasUpdateDateValue(${glEntity} entity);
 
         // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
-        protected int CallReadCount(${glConditionBeanInterfaceName} cb) { return DoCallReadCount(cb); }
-        protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
-        protected IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) { return DoCallReadList(cb); }
-        protected abstract IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
+        protected int CallReadCount(${glConditionBean} cb) { return DoCallReadCount(cb); }
+        protected abstract int DoCallReadCount(${glConditionBean} cb);
+        protected IList<${glEntity}> CallReadList(${glConditionBean} cb) { return DoCallReadList(cb); }
+        protected abstract IList<${glEntity}> DoCallReadList(${glConditionBean} cb);
 
         // ===============================================================================
         //                                                                  General Helper
@@ -402,15 +402,15 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected virtual void AssertEntityNotNull(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityNotNull(${glEntity} entity) {
             AssertObjectNotNull("entity", entity);
         }
 
-        protected virtual void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+        protected virtual void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBean} cb) {
             AssertObjectNotNull("cb", cb);
         }
 
-        protected virtual void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntity} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 String msg = "The entity should have primary-key: entity=" + entity;
@@ -479,7 +479,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         ///  The property of behavior selector.
         /// </summary>
-        public ${glBehaviorSelectorInterfaceName} BehaviorSelector {
+        public ${glBehaviorSelector} BehaviorSelector {
             get { return _behaviorSelector; }
             set { _behaviorSelector = value; }
         }

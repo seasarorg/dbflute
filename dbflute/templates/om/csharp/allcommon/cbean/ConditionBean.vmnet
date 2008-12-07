@@ -6,7 +6,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public interface ${glConditionBeanInterfaceName} : ${glPagingBeanInterfaceName} {
+    public interface ${glConditionBean} : ${glPagingBeanInterfaceName} {
 
         // ===============================================================================
         //                                                                      Table Name
@@ -17,19 +17,19 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                       SqlClause
         //                                                                       =========
-        ${glSqlClauseName} SqlClause { get; }
+        ${glSqlClause} SqlClause { get; }
         String GetClause();
 
         // ===============================================================================
         //                                                                 OrderBy Setting
         //                                                                 ===============
-        ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
-        ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
+        ${glConditionBean} AddOrderBy_PK_Asc();
+        ${glConditionBean} AddOrderBy_PK_Desc();
 		
         // ===============================================================================
         //                                                                           Query
         //                                                                           =====
-        ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
+        ${glConditionQuery} ConditionQueryAsInterface { get; }
 
         // ===============================================================================
         //                                                                     Union Query
@@ -39,13 +39,13 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                    Lock Setting
         //                                                                    ============
-        $glConditionBeanInterfaceName LockForUpdate();
+        $glConditionBean LockForUpdate();
 
         // ===============================================================================
         //                                                                    Select Count
         //                                                                    ============
-        ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope();
-        ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope();
+        ${glConditionBean} XSetupSelectCountIgnoreFetchScope();
+        ${glConditionBean} XAfterCareSelectCountIgnoreFetchScope();
         bool IsSelectCountIgnoreFetchScope();
 		
         // ===============================================================================

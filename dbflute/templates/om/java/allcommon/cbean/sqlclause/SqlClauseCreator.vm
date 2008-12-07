@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 
 /**
  * The creator of SQL clause.
@@ -13,12 +13,12 @@ public interface ${glSqlClauseCreator} {
 	 * @param cb Condition-bean. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb);
+    public ${glSqlClause} createSqlClause(${glConditionBean} cb);
 
 	/**
 	 * Create SQL clause.
 	 * @param tableDbName The DB name of table. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClauseName} createSqlClause(String tableDbName);
+    public ${glSqlClause} createSqlClause(String tableDbName);
 }

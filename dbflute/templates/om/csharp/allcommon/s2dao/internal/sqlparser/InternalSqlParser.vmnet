@@ -578,7 +578,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             Type type = valueAndType.TargetType;
 
             // LikeSearchOption handling here is for OutsideSql.
-            ${glConditionOptionLikeSearchName} likeSearchOption = null;
+            ${glLikeSearchOption} likeSearchOption = null;
             String rearOption = null;
 
             for (int pos = 1; pos < _names.Length; ++pos) {
@@ -639,7 +639,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected bool IsLastLoop4LikeSearch(int pos, ${glConditionOptionLikeSearchName} likeSearchOption) {
+        protected bool IsLastLoop4LikeSearch(int pos, ${glLikeSearchOption} likeSearchOption) {
             return _names.Length == (pos + 1) && likeSearchOption != null;
         }
 
@@ -653,9 +653,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected ${glConditionOptionLikeSearchName} GetLikeSearchOption(Type type, String currentName, Object resourceBean) {
+        protected ${glLikeSearchOption} GetLikeSearchOption(Type type, String currentName, Object resourceBean) {
             PropertyInfo pi = type.GetProperty(currentName + "InternalLikeSearchOption");
-            ${glConditionOptionLikeSearchName} option = (${glConditionOptionLikeSearchName})pi.GetValue(resourceBean, null);
+            ${glLikeSearchOption} option = (${glLikeSearchOption})pi.GetValue(resourceBean, null);
 			if (option == null) {
 			    ThrowLikeSearchOptionNotFoundException(resourceBean, currentName);
 			}
@@ -682,7 +682,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         // for OutsideSql
-        protected void ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(${glConditionOptionLikeSearchName} option, Object resourceBean, String currentName) {
+        protected void ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(${glLikeSearchOption} option, Object resourceBean, String currentName) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
             msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + GetLineSeparator();

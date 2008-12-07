@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
 #set ($myClassName = "${glHierarchyBasicRequestName}")
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 
@@ -13,7 +13,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
  * @param <LOCAL_ENTITY> The type of local entity.
  * @param <LOCAL_RELATION_TRACE> The type of local relation trace.
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}, LOCAL_RELATION_TRACE extends ${glDBMeta}.RelationTrace> extends ${glHierarchyRequestName}<LOCAL_ENTITY> {
+public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}, LOCAL_RELATION_TRACE extends ${glDBMeta}.RelationTrace> extends ${glHierarchyRequestName}<LOCAL_ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute

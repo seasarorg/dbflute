@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
-#set ($myClassName = "${glBehaviorReadableAbstractName}")
+#set ($myClassName = "${glAbstractBehaviorReadable}")
 
 import java.util.List;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
 import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glBehaviorSelector};
+import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
@@ -29,14 +29,14 @@ import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonCBean}.${glScalarQuery};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
@@ -49,7 +49,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The abstract class of readable behavior.
  * @author ${database.ClassAuthor}
  */
-public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
+public abstract class $myClassName implements ${glBehaviorReadable} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -58,7 +58,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
 
     /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
-    protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
+    protected ${glBehaviorSelector} _behaviorSelector;
 
     // ===================================================================================
     //                                                                       Current DBDef
@@ -84,7 +84,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int readCount(${glConditionBeanInterfaceName} cb) {
+    public int readCount(${glConditionBean} cb) {
         assertCBNotNull(cb);
         return callReadCount(cb);
     }
@@ -98,14 +98,14 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Read entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
+    public ${glEntity} readEntity(${glConditionBean} cb) {
         assertCBNotNull(cb);
-        final List<${glEntityInterfaceName}> ls = readList(cb);
+        final List<${glEntity}> ls = readList(cb);
         if (ls.isEmpty()) {
             return null;
         }
         assertEntitySelectedAsOne(ls, cb);
-        return (${glEntityInterfaceName})ls.get(0);
+        return (${glEntity})ls.get(0);
     }
 
     /**
@@ -116,18 +116,18 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
-    public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+    public ${glEntity} readEntityWithDeletedCheck(${glConditionBean} cb) {
         assertCBNotNull(cb);
-        final List<${glEntityInterfaceName}> ls = readList(cb);
+        final List<${glEntity}> ls = readList(cb);
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
-        return (${glEntityInterfaceName})ls.get(0);
+        return (${glEntity})ls.get(0);
     }
 
     // ===================================================================================
     //                                                         Entity Read Internal Helper
     //                                                         ===========================
-    protected <ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}>
+    protected <ENTITY extends ${glEntity}, CB extends ${glConditionBean}>
             ENTITY helpSelectEntityInternally(CB cb, InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
         cb.checkSafetyResult(1);
@@ -144,11 +144,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (ENTITY)ls.get(0);
     }
 
-    protected static interface InternalSelectEntityCallback<ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}> {
+    protected static interface InternalSelectEntityCallback<ENTITY extends ${glEntity}, CB extends ${glConditionBean}> {
         public List<ENTITY> callbackSelectList(CB cb);
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}>
+    protected <ENTITY extends ${glEntity}, CB extends ${glConditionBean}>
             ENTITY helpSelectEntityWithDeletedCheckInternally(CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
         cb.checkSafetyResult(1);
@@ -163,7 +163,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (ENTITY)ls.get(0);
     }
 
-    protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends ${glEntityInterfaceName}, CB extends ${glConditionBeanInterfaceName}> {
+    protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends ${glEntity}, CB extends ${glConditionBean}> {
         public List<ENTITY> callbackSelectList(CB cb);
     }
 
@@ -175,9 +175,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}<${glEntityInterfaceName}> readList(${glConditionBeanInterfaceName} cb) {
+    public ${glListResultBeanName}<${glEntity}> readList(${glConditionBean} cb) {
         assertCBNotNull(cb);
-        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${glEntityInterfaceName}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
+        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${glEntity}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
     }
 
     /**
@@ -185,13 +185,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb) {
+    public ${glPagingResultBeanName}<${glEntity}> readPage(final ${glConditionBean} cb) {
         assertCBNotNull(cb);
-        final ${glPagingInvokerName}<${glEntityInterfaceName}> invoker = new ${glPagingInvokerName}<${glEntityInterfaceName}>(getTableDbName());
-        final ${glPagingHandlerName}<${glEntityInterfaceName}> handler = new ${glPagingHandlerName}<${glEntityInterfaceName}>() {
+        final ${glPagingInvokerName}<${glEntity}> invoker = new ${glPagingInvokerName}<${glEntity}>(getTableDbName());
+        final ${glPagingHandlerName}<${glEntity}> handler = new ${glPagingHandlerName}<${glEntity}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int count() { return readCount(cb); }
-            public List<${glEntityInterfaceName}> paging() { return readList(cb); }
+            public List<${glEntity}> paging() { return readList(cb); }
         };
         return invoker.invokePaging(handler);
     }
@@ -202,7 +202,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      */
-    protected void assertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(${glEntity} entity, Object searchKey4Log) {
         if (entity == null) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -214,7 +214,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param searchKey4Log Search-key for Logging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
-    protected void assertEntityNotDeleted(List<? extends ${glEntityInterfaceName}> ls, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(List<? extends ${glEntity}> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -227,7 +227,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    protected void assertEntitySelectedAsOne(List<? extends ${glEntityInterfaceName}> ls, Object searchKey4Log) {
+    protected void assertEntitySelectedAsOne(List<? extends ${glEntity}> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -253,7 +253,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param <CB> The type of condition-bean.
      * @param <RESULT> The type of result.
      */
-    public class SLFunction<CB extends ${glConditionBeanInterfaceName}, RESULT> { // SL: ScaLar
+    public class SLFunction<CB extends ${glConditionBean}, RESULT> { // SL: ScaLar
 
         /** The condition-bean for scalar select. (NotNull) */
         protected CB _conditionBean;
@@ -283,7 +283,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          */
         public RESULT max(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MAX);
+            return exec(scalarQuery, ${glSqlClause}.SelectClauseType.MAX);
         }
 
         /**
@@ -299,7 +299,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          */
         public RESULT min(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.MIN);
+            return exec(scalarQuery, ${glSqlClause}.SelectClauseType.MIN);
         }
 
         /**
@@ -315,7 +315,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          */
         public RESULT sum(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.SUM);
+            return exec(scalarQuery, ${glSqlClause}.SelectClauseType.SUM);
         }
 
         /**
@@ -331,10 +331,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          */
         public RESULT avg(${glScalarQuery}<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, ${glSqlClauseName}.SelectClauseType.AVG);
+            return exec(scalarQuery, ${glSqlClause}.SelectClauseType.AVG);
         }
 
-        protected RESULT exec(${glScalarQuery}<CB> scalarQuery, ${glSqlClauseName}.SelectClauseType selectClauseType) {
+        protected RESULT exec(${glScalarQuery}<CB> scalarQuery, ${glSqlClause}.SelectClauseType selectClauseType) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             assertObjectNotNull("selectClauseType", selectClauseType);
             assertObjectNotNull("conditionBean", _conditionBean);
@@ -449,7 +449,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
      */
-    public <ENTITY extends ${glEntityInterfaceName}> List<Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
+    public <ENTITY extends ${glEntity}> List<Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
         final List<Map<String, Object>> valueLabelList = new ArrayList<Map<String, Object>>();
         final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
         for (ENTITY entity : entityList) {
@@ -518,10 +518,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      */
-    protected <LOCAL_ENTITY extends ${glEntityInterfaceName}
+    protected <LOCAL_ENTITY extends ${glEntity}
              , PK
-             , REFERRER_CB extends ${glConditionBeanInterfaceName}
-             , REFERRER_ENTITY extends ${glEntityInterfaceName}>
+             , REFERRER_CB extends ${glConditionBean}
+             , REFERRER_ENTITY extends ${glEntity}>
             void helpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
                                          , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                          , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
@@ -539,10 +539,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      */
-    protected <LOCAL_ENTITY extends ${glEntityInterfaceName}
+    protected <LOCAL_ENTITY extends ${glEntity}
              , PK
-             , REFERRER_CB extends ${glConditionBeanInterfaceName}
-             , REFERRER_ENTITY extends ${glEntityInterfaceName}>
+             , REFERRER_CB extends ${glConditionBean}
+             , REFERRER_ENTITY extends ${glEntity}>
             void doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
                                          , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                          , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
@@ -645,10 +645,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param <REFERRER_CB> The type of referrer conditionBean.
      * @param <REFERRER_ENTITY> The type of referrer entity.
      */
-    protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends ${glEntityInterfaceName}
+    protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends ${glEntity}
                                                           , PK
-                                                          , REFERRER_CB extends ${glConditionBeanInterfaceName}
-                                                          , REFERRER_ENTITY extends ${glEntityInterfaceName}> {
+                                                          , REFERRER_CB extends ${glConditionBean}
+                                                          , REFERRER_ENTITY extends ${glEntity}> {
         // For Base
         public PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
         public void callbackBase_setReferrerList(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList);
@@ -662,7 +662,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
     }
 
-    protected ${glBehaviorSelectorInterfaceName} xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
+    protected ${glBehaviorSelector} xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
         assertBehaviorSelectorNotNull("loadReferrer");
         return getBehaviorSelector();
     }
@@ -688,7 +688,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                             Pullout Internal Helper
     //                                                             =======================
-    protected <LOCAL_ENTITY extends ${glEntityInterfaceName}, FOREIGN_ENTITY extends ${glEntityInterfaceName}>
+    protected <LOCAL_ENTITY extends ${glEntity}, FOREIGN_ENTITY extends ${glEntity}>
             List<FOREIGN_ENTITY> helpPulloutInternally(List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
         assertObjectNotNull("localEntityList", localEntityList);
         final Set<FOREIGN_ENTITY> foreignSet = new LinkedHashSet<FOREIGN_ENTITY>();
@@ -702,7 +702,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return new ArrayList<FOREIGN_ENTITY>(foreignSet);
     }
 
-    protected static interface InternalPulloutCallback<LOCAL_ENTITY extends ${glEntityInterfaceName}, FOREIGN_ENTITY extends ${glEntityInterfaceName}> {
+    protected static interface InternalPulloutCallback<LOCAL_ENTITY extends ${glEntity}, FOREIGN_ENTITY extends ${glEntity}> {
         public FOREIGN_ENTITY callbackGetForeignEntity(LOCAL_ENTITY entity);
     }
 
@@ -723,15 +723,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
          * @throws java.io.FileNotFoundException
          * @throws java.io.IOException
          */
-        public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+        public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBean} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertCBNotNull(cb);
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
 
-            final List<${glEntityInterfaceName}> ls = readList(cb);
+            final List<${glEntity}> ls = readList(cb);
             List<List<String>> rowList = new ArrayList<List<String>>();
-            for (java.util.Iterator<${glEntityInterfaceName}> ite = ls.iterator(); ite.hasNext(); ) {
-                final ${glEntityInterfaceName} entity = ite.next();
+            for (java.util.Iterator<${glEntity}> ite = ls.iterator(); ite.hasNext(); ) {
+                final ${glEntity} entity = ite.next();
                 final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
                 rowList.add(valueList);
             }
@@ -767,7 +767,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * ${database.ImplementComment}
      * @return All list. (NotNull)
      */
-    protected List<${glEntityInterfaceName}> callGetListAll() {
+    protected List<${glEntity}> callGetListAll() {
         return callReadList(newConditionBean());
     }
 
@@ -776,22 +776,22 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
-    protected int callReadCount(${glConditionBeanInterfaceName} cb) {
+    protected int callReadCount(${glConditionBean} cb) {
         assertCBNotNull(cb);
         return doCallReadCount(cb);
     }
-    protected abstract int doCallReadCount(${glConditionBeanInterfaceName} cb);
+    protected abstract int doCallReadCount(${glConditionBean} cb);
 
     /**
      * ${database.ImplementComment}
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
-    protected List<${glEntityInterfaceName}> callReadList(${glConditionBeanInterfaceName} cb) {
+    protected List<${glEntity}> callReadList(${glConditionBean} cb) {
         assertCBNotNull(cb);
         return doCallReadList(cb);
     }
-    protected abstract List<${glEntityInterfaceName}> doCallReadList(${glConditionBeanInterfaceName} cb);
+    protected abstract List<${glEntity}> doCallReadList(${glConditionBean} cb);
 
     // ===================================================================================
     //                                                                    Behavior Command
@@ -802,13 +802,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             cmd.setInitializeOnly(true); invoke(cmd);
         }
         {
-            ${glSelectListCBCommand}<? extends ${glEntityInterfaceName}> cmd
+            ${glSelectListCBCommand}<? extends ${glEntity}> cmd
                     = createSelectListCBCommand(newConditionBean(), getDBMeta().getEntityType());
             cmd.setInitializeOnly(true); invoke(cmd);
         }
     }
 
-    protected ${glSelectCountCBCommand} createSelectCountCBCommand(${glConditionBeanInterfaceName} cb) {
+    protected ${glSelectCountCBCommand} createSelectCountCBCommand(${glConditionBean} cb) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final ${glSelectCountCBCommand} command = xsetupSelectCommand(new ${glSelectCountCBCommand}());
         command.setConditionBeanType(cb.getClass());
@@ -816,7 +816,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return command;
     }
 
-    protected <ENTITY extends ${glEntityInterfaceName}> ${glSelectListCBCommand}<ENTITY> createSelectListCBCommand(${glConditionBeanInterfaceName} cb, Class<ENTITY> entityType) {
+    protected <ENTITY extends ${glEntity}> ${glSelectListCBCommand}<ENTITY> createSelectListCBCommand(${glConditionBean} cb, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
         final ${glSelectListCBCommand}<ENTITY> command = xsetupSelectCommand(new ${glSelectListCBCommand}<ENTITY>());
         command.setConditionBeanType(cb.getClass());
@@ -833,9 +833,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return command;
     }
 
-    protected <RESULT> ${glSelectScalarCBCommand}<RESULT> createSelectScalarCBCommand(${glConditionBeanInterfaceName} cb
+    protected <RESULT> ${glSelectScalarCBCommand}<RESULT> createSelectScalarCBCommand(${glConditionBean} cb
                                                                               , Class<RESULT> resultType
-                                                                              , ${glSqlClauseName}.SelectClauseType selectClauseType) {
+                                                                              , ${glSqlClause}.SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
         final ${glSelectScalarCBCommand}<RESULT> command = xsetupSelectCommand(new ${glSelectScalarCBCommand}<RESULT>());
         command.setConditionBeanType(cb.getClass());
@@ -882,8 +882,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================
-    protected abstract boolean hasVersionNoValue(${glEntityInterfaceName} entity);
-    protected abstract boolean hasUpdateDateValue(${glEntityInterfaceName} entity);
+    protected abstract boolean hasVersionNoValue(${glEntity} entity);
+    protected abstract boolean hasUpdateDateValue(${glEntity} entity);
 
     // ===================================================================================
     //                                                                      General Helper
@@ -909,7 +909,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     @SuppressWarnings("unchecked")
-    protected <ENTITY extends ${glEntityInterfaceName}> ENTITY helpDowncastInternally(${glEntityInterfaceName} entity, Class<ENTITY> clazz) {
+    protected <ENTITY extends ${glEntity}> ENTITY helpDowncastInternally(${glEntity} entity, Class<ENTITY> clazz) {
         assertObjectNotNull("entity", entity);
         assertObjectNotNull("clazz", clazz);
         try {
@@ -944,7 +944,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the entity is not null.
      * @param entity Entity. (NotNull)
      */
-    protected void assertEntityNotNull(${glEntityInterfaceName} entity) {
+    protected void assertEntityNotNull(${glEntity} entity) {
         assertObjectNotNull("entity", entity);
     }
 
@@ -952,7 +952,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the condition-bean is not null.
      * @param cb Condition-bean. (NotNull)
      */
-    protected void assertConditionBeanNotNull(${glConditionBeanInterfaceName} cb) {
+    protected void assertConditionBeanNotNull(${glConditionBean} cb) {
         assertCBNotNull(cb);
     }
 
@@ -960,7 +960,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the condition-bean is not null.
      * @param cb Condition-bean. (NotNull)
      */
-    protected void assertCBNotNull(${glConditionBeanInterfaceName} cb) {
+    protected void assertCBNotNull(${glConditionBean} cb) {
         assertObjectNotNull("cb", cb);
     }
 
@@ -968,7 +968,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that the entity has primary-key value.
      * @param entity Entity. (NotNull)
      */
-    protected void assertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+    protected void assertEntityNotNullAndHasPrimaryKeyValue(${glEntity} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             String msg = "The entity must should primary-key: entity=" + entity;
@@ -1055,7 +1055,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Get the selector of behavior.
      * @return The select of behavior. (Nullable: But normally NotNull)
      */
-    protected ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
+    protected ${glBehaviorSelector} getBehaviorSelector() {
         return _behaviorSelector;
     }
 
@@ -1063,7 +1063,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Set the selector of behavior.
      * @param behaviorSelector The selector of behavior. (NotNull)
      */
-    public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} behaviorSelector) {
+    public void setBehaviorSelector(${glBehaviorSelector} behaviorSelector) {
         this._behaviorSelector = behaviorSelector;
     }
 }

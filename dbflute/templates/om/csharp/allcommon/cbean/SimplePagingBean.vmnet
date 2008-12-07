@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected readonly ${glSqlClauseName} _sqlClause;
+        protected readonly ${glSqlClause} _sqlClause;
         protected int _safetyMaxResultSize;
         protected bool _paging = true;
         protected bool _countLater;
@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${glSimplePagingBeanName}() {
-            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}("Dummy");
+            _sqlClause = new ${glSqlClause}${database.DaoGenDbName}("Dummy");
         }
 
         // ===============================================================================
@@ -157,7 +157,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        protected ${glSqlClauseName} SqlClause {
+        protected ${glSqlClause} SqlClause {
             get { return _sqlClause; }
         }
     }

@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glListResultBeanName}")
-#set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
+#set ($selectedListArgumentGenericDefinition = "${glEntity}")
 
 import java.io.Serializable;
 import java.util.Collection;

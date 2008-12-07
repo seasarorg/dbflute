@@ -338,10 +338,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected static ${glDBMeta} FindDBMetaByClass(Type beanClass) {
             Object instance = NewInstance(beanClass);
-            if (!(instance is ${glEntityInterfaceName})) {
+            if (!(instance is ${glEntity})) {
                 return null;
             }
-            return ((${glEntityInterfaceName})instance).DBMeta;
+            return ((${glEntity})instance).DBMeta;
         }
 
         protected static Object NewInstance(Type clazz) {
@@ -389,10 +389,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
 		
 		public static ${glDBMeta} FindDBMeta(Object row) {
-		    if (!(row is ${glEntityInterfaceName})) {
+		    if (!(row is ${glEntity})) {
 			    return null;
 			}
-			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
+			${glEntity} entity = (${glEntity})row;
             ${glDBMeta} dbmeta = FindCachedDBMeta(entity.GetType());
 			if (dbmeta != null) {
 			    return dbmeta;
@@ -420,7 +420,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             System.Collections.Generic.IDictionary<Type, ${glDBMeta}> dbmetaCache = FindDBMetaCache();
             if (dbmetaCache == null) {
                 dbmetaCache = new System.Collections.Generic.Dictionary<Type, ${glDBMeta}>();
-                ${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
+                ${glInternalMapContext}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
             }
             if (dbmetaCache.ContainsKey(rowType)) {
                 return dbmetaCache[rowType];
@@ -428,7 +428,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return null;
         }
         
-        protected static void CacheDBMeta(${glEntityInterfaceName} entity, ${glDBMeta} dbmeta) {
+        protected static void CacheDBMeta(${glEntity} entity, ${glDBMeta} dbmeta) {
             CacheDBMeta(entity.GetType(), dbmeta);
         }
         
@@ -438,7 +438,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         
         protected static System.Collections.Generic.IDictionary<Type, ${glDBMeta}> FindDBMetaCache() {
-            return (System.Collections.Generic.IDictionary<Type, ${glDBMeta}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
+            return (System.Collections.Generic.IDictionary<Type, ${glDBMeta}>)${glInternalMapContext}.GetObject(DBMETA_CACHE_KEY);
         }
 	}
 	
@@ -597,7 +597,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected bool HasSelectedForeignInfo(RelationRowCreationResource res) {
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.SqlClause.hasSelectedForeignInfo(res.RelationNoSuffix)) {
                 return true;
             }

@@ -86,8 +86,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 // - - - - - - - - - -
                 // Execute outsideSql.
                 // - - - - - - - - - -
-                if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-                    ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                    ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
                     if (outsideSqlContext.IsDynamicBinding) {
                         return ExecuteOutsideSqlAsDynamic(args, outsideSqlContext);
                     } else {
@@ -108,7 +108,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
             IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
 
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             String finalClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
         
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
@@ -146,7 +146,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                OutsideSql Execute
         //                                ------------------
-        protected Object ExecuteOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected Object ExecuteOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContext} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - -
             // Find specified resultSetHandler.
             // - - - - - - - - - - - - - - - - -
@@ -170,7 +170,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return selectHandler.Execute(bindVariableArray, ctx.BindVariableTypes);
         }
 
-        protected Object ExecuteOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        protected Object ExecuteOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContext} outsideSqlContext) {
             Object firstArg = args[0];
             PropertyInfo[] properties = firstArg.GetType().GetProperties();
             String filteredSql = this.Sql;
@@ -273,7 +273,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                      Setup Clause
         //                                      ------------
         protected String SetupRealClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             String realClause = null;
             {
                 ${glSelectDynamicCommand} dynamicCommand = CreateMySelectDynamicCommand();

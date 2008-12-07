@@ -31,7 +31,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
     //                                                                             Execute
     //                                                                             =======
     public Object Execute(Object[] args) {
-        ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
+        ${glConditionBean} cb = extractConditionBeanWithCheck(args);
         String[] argNames = new String[]{"dto"};
         Type[] argTypes = new Type[]{cb.GetType()};
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
@@ -42,26 +42,26 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         return rows;
     }
     
-    protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
+    protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
         if (args == null || args.Length == 0) {
             String msg = "The arguments should have one argument! But:";
             msg = msg + " args=" + (args != null ? "" + args.Length : "null");
             throw new IllegalArgumentException(msg);
         }
         Object fisrtArg = args[0];
-        if (!(fisrtArg is ${glConditionBeanInterfaceName})) {
-            String msg = "The type of argument should be " + typeof(${glConditionBeanInterfaceName}) + "! But:";
+        if (!(fisrtArg is ${glConditionBean})) {
+            String msg = "The type of argument should be " + typeof(${glConditionBean}) + "! But:";
             msg = msg + " type=" + fisrtArg.GetType();
             throw new IllegalArgumentException(msg);
         }
-        return (${glConditionBeanInterfaceName}) fisrtArg;
+        return (${glConditionBean}) fisrtArg;
     }
     
     protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
         return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
     }
 
-    protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
+    protected String buildQueryDeleteTwoWaySql(${glConditionBean} cb) {
         return cb.SqlClause.getClauseQueryDelete();
     }
     

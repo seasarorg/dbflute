@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 
-import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glEntity};
 
 /**
  * @author ${database.ClassAuthor}
@@ -21,7 +21,7 @@ public class ${glTokenFileReflectionFailureName} {
     /** The line number. */
     protected int _lineNumber;
 
-    protected ${glEntityInterfaceName} _entity;
+    protected ${glEntity} _entity;
     protected Exception _exception;
 
     // =====================================================================================
@@ -67,11 +67,11 @@ public class ${glTokenFileReflectionFailureName} {
         _lineNumber = lineNumber;
     }
 
-    public ${glEntityInterfaceName} getEntity() {
+    public ${glEntity} getEntity() {
         return _entity;
     }
 
-    public void setEntity(${glEntityInterfaceName} value) {
+    public void setEntity(${glEntity} value) {
         _entity = value;
     }
 

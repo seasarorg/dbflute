@@ -40,7 +40,7 @@ public class ${glInternalProcedureCommand} : ISqlCommand {
         //                                                                         =======
         public Object Execute(Object[] args) {
             ${glInternalProcedureHandler} handler = NewArgumentDtoProcedureHandler();
-            ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+            ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
             Object pmb = outsideSqlContext.ParameterBean;
             // The logging message SQL of procedure is unnecessary.
             // handler.LoggingMessageSqlArgs = ...;

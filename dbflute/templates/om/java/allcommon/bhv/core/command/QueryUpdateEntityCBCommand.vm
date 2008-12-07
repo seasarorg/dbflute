@@ -2,10 +2,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 
 /**
@@ -17,10 +17,10 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
     //                                                                           Attribute
     //                                                                           =========
     /** The type of condition-bean. (Derived from conditionBean) */
-    protected Class<? extends ${glConditionBeanInterfaceName}> _conditionBeanType;
+    protected Class<? extends ${glConditionBean}> _conditionBeanType;
 
     /** The instance of condition-bean. (Required) */
-    protected ${glConditionBeanInterfaceName} _conditionBean;
+    protected ${glConditionBean} _conditionBean;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -43,7 +43,7 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
     @Override
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final ${glConditionBeanInterfaceName} cb = _conditionBean;
+        final ${glConditionBean} cb = _conditionBean;
         ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
     }
@@ -65,7 +65,7 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
         };
     }
 
-    protected ${glSqlExecution} createQueryUpdateEntityCBExecution(Class<? extends ${glConditionBeanInterfaceName}> cbType) {
+    protected ${glSqlExecution} createQueryUpdateEntityCBExecution(Class<? extends ${glConditionBean}> cbType) {
         return new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _statementFactory);
     }
 
@@ -77,7 +77,7 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ${glConditionBeanInterfaceName} getConditionBean() {
+    public ${glConditionBean} getConditionBean() {
         return _conditionBean;
     }
 
@@ -85,7 +85,7 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
         return null;
     }
 
-    public ${glOutsideSqlOptionName} getOutsideSqlOption() {
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
         return null;
     }
 
@@ -113,11 +113,11 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setConditionBeanType(Class<? extends ${glConditionBeanInterfaceName}> conditionBeanType) {
+    public void setConditionBeanType(Class<? extends ${glConditionBean}> conditionBeanType) {
         _conditionBeanType = conditionBeanType;
     }
 
-    public void setConditionBean(${glConditionBeanInterfaceName} conditionBean) {
+    public void setConditionBean(${glConditionBean} conditionBean) {
         _conditionBean = conditionBean;
     }
 }

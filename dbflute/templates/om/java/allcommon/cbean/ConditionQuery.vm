@@ -1,13 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 
 /**
  * The condition-query as interface.
  * @author ${database.ClassAuthor}
  */
-public interface ${glConditionQueryInterfaceName} {
+public interface ${glConditionQuery} {
 
     // ===================================================================================
     //                                                                  Important Accessor
@@ -41,13 +41,13 @@ public interface ${glConditionQueryInterfaceName} {
      * Get child query.
      * @return Child query. (Nullable)
      */
-    public ${glConditionQueryInterfaceName} getChildQuery();
+    public ${glConditionQuery} getChildQuery();
 
     /**
      * Get sql clause.
      * @return Sql clause. (NotNull)
      */
-    public ${glSqlClauseName} getSqlClause();
+    public ${glSqlClause} getSqlClause();
 
     /**
      * Get alias name.
@@ -72,7 +72,7 @@ public interface ${glConditionQueryInterfaceName} {
      * @param query Condition query. (NotNull)
      * @return Determination.
      */
-    public boolean isBaseQuery(${glConditionQueryInterfaceName} query);
+    public boolean isBaseQuery(${glConditionQuery} query);
 
 	/**
 	 * Get the level of subQuery.
@@ -122,5 +122,5 @@ public interface ${glConditionQueryInterfaceName} {
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      */
-    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName);
+    public ${glConditionQuery} invokeForeignCQ(String foreignPropertyName);
 }

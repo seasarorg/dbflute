@@ -16,7 +16,7 @@ namespace ${glPackageBaseCommonCBean} {
 
 // JavaLike
 [System.Serializable]
-public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
+public abstract class ${myClassName} : ${glConditionQuery} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,7 +42,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected readonly ${glSqlClauseName} _sqlClause;
+    protected readonly ${glSqlClause} _sqlClause;
     protected readonly String _aliasName;
     protected readonly int _nestLevel;
 	protected int _subQueryLevel;
@@ -52,7 +52,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected String _foreignPropertyName;
     protected String _relationPath;
-    protected readonly ${glConditionQueryInterfaceName} _childQuery;
+    protected readonly ${glConditionQuery} _childQuery;
 
     // -----------------------------------------------------
     //                                                Inline
@@ -62,7 +62,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
         _childQuery = childQuery;
         _sqlClause = sqlClause;
         _aliasName = aliasName;
@@ -78,11 +78,11 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    public ${glConditionQueryInterfaceName} getChildQuery() {
+    public ${glConditionQuery} getChildQuery() {
         return _childQuery;
     }
 
-    public ${glSqlClauseName} getSqlClause() {
+    public ${glSqlClause} getSqlClause() {
         return _sqlClause;
     }
 
@@ -98,7 +98,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return _nestLevel+1;
     }
 
-    public bool isBaseQuery(${glConditionQueryInterfaceName} query) {
+    public bool isBaseQuery(${glConditionQuery} query) {
         return (query.getChildQuery() == null);
     }
 
@@ -157,7 +157,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected String getLocationBase() {
         StringBuilder sb = new StringBuilder();
-        ${glConditionQueryInterfaceName} query = this;
+        ${glConditionQuery} query = this;
         while (true) {
             if (query.isBaseQuery(query)) {
                 sb.insert(0, CQ_PROPERTY + ".");
@@ -183,41 +183,41 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap;
+    protected Map<String, ${glConditionQuery}> _unionQueryMap;
 
-    public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+    public Map<String, ${glConditionQuery}> getUnionQueryMap() {// for Internal
 		if (_unionQueryMap == null) {
-		    _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		    _unionQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
 		}
         return _unionQueryMap;
     }
 
-	public Map<String, ${glConditionQueryInterfaceName}> UnionQueryMap {// for SQL-Comment
+	public Map<String, ${glConditionQuery}> UnionQueryMap {// for SQL-Comment
         get { return getUnionQueryMap(); }
     }
 
-    public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
+    public void xsetUnionQuery(${glConditionQuery} unionQuery) {
         xsetupUnion(unionQuery, false, getUnionQueryMap());
     }
 
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap;
+    protected Map<String, ${glConditionQuery}> _unionAllQueryMap;
 
-    public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+    public Map<String, ${glConditionQuery}> getUnionAllQueryMap() {// for Internal
 		if (_unionAllQueryMap == null) {
-		    _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		    _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
 		}
         return _unionAllQueryMap;
     }
 
-	public Map<String, ${glConditionQueryInterfaceName}> UnionAllQueryMap {// for SQL-Comment
+	public Map<String, ${glConditionQuery}> UnionAllQueryMap {// for SQL-Comment
         get { return getUnionAllQueryMap(); }
     }
 
-    public void xsetUnionAllQuery(${glConditionQueryInterfaceName} unionAllQuery) {
+    public void xsetUnionAllQuery(${glConditionQuery} unionAllQuery) {
         xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
     }
 
-    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, bool unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
+    protected void xsetupUnion(${glConditionQuery} unionQuery, bool unionAll, Map<String, ${glConditionQuery}> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -228,20 +228,20 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);// If CSharp, The property of 'Union' should be 'InitCap'.
     }
 	
-    abstract public void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
+    abstract public void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper);
 
     public bool hasUnionQueryOrUnionAllQuery() {
         return (_unionQueryMap != null && !_unionQueryMap.isEmpty()) || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
     }
 
-    public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
-		if (_unionQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
-        return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
+    public List<${glConditionQuery}> getUnionQueryList() {
+		if (_unionQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        return new ArrayList<${glConditionQuery}>(_unionQueryMap.values());
     }
 
-    public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
-		if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
-        return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
+    public List<${glConditionQuery}> getUnionAllQueryList() {
+		if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        return new ArrayList<${glConditionQuery}>(_unionAllQueryMap.values());
     }
 
     // ===================================================================================
@@ -294,7 +294,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                         , String colName
                         , String capPropName
                         , String uncapPropName
-                        , ${glConditionOptionLikeSearchName} option) {
+                        , ${glLikeSearchOption} option) {
         registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 
@@ -304,7 +304,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                          , String colName
                                          , String capPropName
                                          , String uncapPropName
-                                         , ${glConditionOptionLikeSearchName} option) {
+                                         , ${glLikeSearchOption} option) {
         String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
         if (!key.isValidRegistration(cvalue, value, validationMsg)) {
             return;
@@ -372,17 +372,17 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                       InScopeSubQuery
     //                                       ---------------
-    protected virtual void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected virtual void registerNotInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerNotInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected virtual void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerInScopeSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
@@ -404,7 +404,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return getRealColumnName(columnName);
     }
 
-    protected virtual String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected virtual String getInScopeSubQuerySql(${glConditionQuery} subQuery
                                  , String relatedColumnName, String propertyName) {
         String tableAliasName = getSqlClause().getLocalTableAliasName();
         String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
@@ -416,17 +416,17 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                        ExistsSubQuery
     //                                        --------------
-    protected virtual void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected virtual void registerNotExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerNotExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected virtual void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerExistsSubQuery(${glConditionQuery} subQuery
                                  , String columnName, String relatedColumnName, String propertyName
                                  , String existsOption) {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
@@ -452,7 +452,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return getRealColumnName(columnName);
     }
 
-    protected virtual String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected virtual String getExistsSubQuerySql(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
 		int subQueryLevel = subQuery.getSubQueryLevel();
 		String tableAliasName = "dfsublocal_" + subQueryLevel;
@@ -466,7 +466,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                               DerivedReferrerSubQuery
     //                               -----------------------
-    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQueryInterfaceName} subQuery
+    protected void registerDerivedReferrerSubQuery(String function, ${glConditionQuery} subQuery
                                                  , String columnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
         assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
@@ -489,7 +489,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return getRealColumnName(columnName);
     }
 
-    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQueryInterfaceName} subQuery
+    protected String getDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
                                                  , String realColumnName, String relatedColumnName
                                                  , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
@@ -583,7 +583,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
     
-    protected void assertDerivedReferrerColumnType(String function, ${glConditionQueryInterfaceName} subQuery, String deriveColumnName) {
+    protected void assertDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
@@ -621,7 +621,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
-    protected String buildPlainSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
+    protected String buildPlainSubQueryFromWhereClause(${glConditionQuery} subQuery
                                                      , String relatedColumnName
                                                      , String propertyName
                                                      , String selectClause
@@ -646,7 +646,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 		return fromWhereClause;
     }
 
-    protected String buildCorrelationSubQueryFromWhereClause(${glConditionQueryInterfaceName} subQuery
+    protected String buildCorrelationSubQueryFromWhereClause(${glConditionQuery} subQuery
                                                            , String relatedColumnName
                                                            , String propertyName
                                                            , String selectClause
@@ -672,7 +672,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return fromWhereClause;
     }
 
-    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQueryInterfaceName} subQuery) { // Very Internal
+    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQuery} subQuery) { // Very Internal
         int subQueryLevel = subQuery.getSubQueryLevel();
         if (_subQueryLevel <= subQueryLevel) {
             _subQueryLevel = subQueryLevel + 1;
@@ -731,14 +731,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                           Union Query
     //                                           -----------
-    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, bool unionAll, String unionQueryPropertyName) {
+    public void registerUnionQuery(${glConditionQuery} unionQuery, bool unionAll, String unionQueryPropertyName) {
         String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
 		
 		// At the future, building SQL will be moved to sqlClause.
         getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
-    protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
+    protected String getUnionQuerySql(${glConditionQuery} unionQuery, String unionQueryPropertyName) {
 	    String fromClause = unionQuery.getSqlClause().getFromClause();
 		String whereClause = unionQuery.getSqlClause().getWhereClause();
 		String unionQueryClause;
@@ -887,7 +887,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
         PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         String propertyName = container.getPropertyName();
-        ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        ${glConditionQuery} cq = container.getConditionQuery();
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "Set" + columnCapPropName + "_" + initCap(conditionKeyName);
@@ -899,7 +899,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
         String propertyName = container.getPropertyName();
-        ${glConditionQueryInterfaceName} cq = container.getConditionQuery();
+        ${glConditionQuery} cq = container.getConditionQuery();
         String ascDesc = isAsc ? "Asc" : "Desc";
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
@@ -908,18 +908,18 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         helpInvokingCQMethod(cq, method, new Object[]{});
     }
 
-    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
+    public ${glConditionQuery} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         String methodName = "Query" + initCap(foreignPropertyName);
         MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
-        return (${glConditionQueryInterfaceName})helpInvokingCQMethod(this, method, new Object[]{});
+        return (${glConditionQuery})helpInvokingCQMethod(this, method, new Object[]{});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
         String[] strings = name.Split('.');
         int length = strings.Length;
         String propertyName = null;
-        ${glConditionQueryInterfaceName} cq = this;
+        ${glConditionQuery} cq = this;
         int index = 0;
         foreach (String element in strings) {
             if (length == (index+1)) {// at last loop!
@@ -934,20 +934,20 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     private class PropertyNameCQContainer {
         protected String _propertyName;
-        protected ${glConditionQueryInterfaceName} _cq;
-        public PropertyNameCQContainer(String propertyName, ${glConditionQueryInterfaceName} cq) {
+        protected ${glConditionQuery} _cq;
+        public PropertyNameCQContainer(String propertyName, ${glConditionQuery} cq) {
             this._propertyName = propertyName;
             this._cq = cq;
         }
         public String getPropertyName() {
             return _propertyName;
         }
-        public ${glConditionQueryInterfaceName} getConditionQuery() {
+        public ${glConditionQuery} getConditionQuery() {
             return _cq;
         }
     }
 
-    private PropertyInfo helpGettingCQProperty(${glConditionQueryInterfaceName} cq, String propertyName) {
+    private PropertyInfo helpGettingCQProperty(${glConditionQuery} cq, String propertyName) {
         PropertyInfo property = cq.GetType().GetProperty(propertyName);
         if (property == null) {
             String msg = "The property is not existing:";
@@ -958,11 +958,11 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return property;
     }
 
-    private Object helpInvokingCQProperty(${glConditionQueryInterfaceName} cq, PropertyInfo property) {
+    private Object helpInvokingCQProperty(${glConditionQuery} cq, PropertyInfo property) {
         return property.GetValue(cq, null);
     }
 
-    private MethodInfo helpGettingCQMethod(${glConditionQueryInterfaceName} cq, String methodName, Type[] argTypes, String property) {
+    private MethodInfo helpGettingCQMethod(${glConditionQuery} cq, String methodName, Type[] argTypes, String property) {
         MethodInfo method = cq.GetType().GetMethod(methodName, argTypes);
         if (method == null) {
             String msg = "The method is not existing:";
@@ -975,7 +975,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return method;
     }
 
-    private Object helpInvokingCQMethod(${glConditionQueryInterfaceName} cq, MethodInfo method, Object[] args) {
+    private Object helpInvokingCQMethod(${glConditionQuery} cq, MethodInfo method, Object[] args) {
         return method.Invoke(cq, args);
     }
 
