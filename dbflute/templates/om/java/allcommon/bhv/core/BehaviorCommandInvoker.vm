@@ -22,7 +22,7 @@ import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
 import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
-import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
+import ${glPackageBaseCommonUtil}.${glTraceViewUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 
@@ -257,7 +257,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                                                      Log SqlCommand
     //                                                                      ==============
     protected <RESULT> void logSqlExecution(${glBehaviorCommand}<RESULT> behaviorCommand, ${glSqlExecution} execution, long beforeCmd, long afterCmd) {
-        log("SqlExecution Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
+        log("SqlExecution Initialization Cost: [" + ${glTraceViewUtil}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     // ===================================================================================
@@ -543,7 +543,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                                                          ==========
     protected <RESULT> void logReturn(${glBehaviorCommand}<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
         try {
-            final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";
+            final String daoResultPrefix = "===========/ [" + ${glTraceViewUtil}.convertToPerformanceView(after - before) + " - ";
             if (List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(daoResultPrefix + "Selected list: null]");

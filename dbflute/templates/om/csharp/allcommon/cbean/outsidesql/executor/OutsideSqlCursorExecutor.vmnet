@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Select
         //                                                                          ======
-        public Object SelectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+        public Object SelectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandler} handler) {
             return _outsideSqlDao.SelectCursor(path, pmb, _outsideSqlOption, handler);
         }
 

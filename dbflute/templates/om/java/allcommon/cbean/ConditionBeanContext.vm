@@ -101,7 +101,7 @@ public class ${glConditionBeanContext} {
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
             clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
             clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
-            clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
+            clazz = ${glPackageBaseCommonJdbc}.${glCursorHandler}.class;
             if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
         }
         if (debugEnabled) { 

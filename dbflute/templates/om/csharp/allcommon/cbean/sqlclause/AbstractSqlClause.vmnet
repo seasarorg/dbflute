@@ -1510,7 +1510,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected String toStringView(Object obj) {
-        return ${glTraceViewUtilName}.ToStringView(obj);
+        return ${glTraceViewUtil}.ToStringView(obj);
     }
     
     // -----------------------------------------------------

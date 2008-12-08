@@ -588,7 +588,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                  Log SqlCommand
         //                                                                  ==============
         protected void LogSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
-            Log("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
+            Log("SqlCommand Initialization Cost: [" + ${glTraceViewUtil}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
         }
 
         // ===============================================================================
@@ -597,7 +597,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void LogReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
             MethodBase method = invocation.Method;
             try {
-                String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + " - ";
+                String daoResultPrefix = "===========/ [" + ${glTraceViewUtil}.ConvertToPerformanceView(before, after) + " - ";
                 if (typeof(System.Collections.IList).IsAssignableFrom(retType) || (ret != null && ret is System.Collections.IList)) {
                     if (ret == null) {
                         Log(daoResultPrefix + "Selected list: null]");

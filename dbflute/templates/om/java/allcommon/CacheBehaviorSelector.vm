@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import ${glPackageBaseCommonBhv}.${glBehaviorReadable};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
-import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
+import ${glPackageBaseCommonUtil}.${glTraceViewUtil};
 
 /**
  * The implementation of behavior-selector.
@@ -49,7 +49,7 @@ public class ${glCacheBehaviorSelector} extends ${glCacheAbstractSelector} imple
 	    if (_log.isInfoEnabled()) {
 		    long after = System.currentTimeMillis();
 		    _log.info("Initialized Count: " + dbmetas.size());
-		    _log.info("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
+		    _log.info("= = = = = = = = = =/ [" + ${glTraceViewUtil}.convertToPerformanceView(after - before) + "]");
 		}
 	}
 	

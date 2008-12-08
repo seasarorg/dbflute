@@ -6,8 +6,8 @@ import java.util.Map;
 import java.lang.reflect.Method;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
+import ${glPackageBaseCommonHelper}.${glMapListString};
+import ${glPackageBaseCommonHelper}.${glMapListStringImpl};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
@@ -122,7 +122,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
         if (!primaryKeyMapString.trim().endsWith(suffix)) {
             primaryKeyMapString = primaryKeyMapString + suffix;
         }
-        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        ${glMapListString} mapListString = new ${glMapListStringImpl}();
         mapListString.setMapMark(MAP_STRING_MAP_MARK);
         mapListString.setListMark(MAP_STRING_LIST_MARK);
         mapListString.setDelimiter(MAP_STRING_DELIMITER);

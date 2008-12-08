@@ -68,17 +68,17 @@ targetdatabase = $targetDatabase
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
     ## [Helper]
-    #set ($glMapListStringName = "${glProjectPrefix}MapListString")
-    #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
-    #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
-    #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
+    #set ($glMapListString = "${glProjectPrefix}MapListString")
+    #set ($glMapListStringImpl = "${glProjectPrefix}MapListStringImpl")
+    #set ($glMapStringBuilder = "${glProjectPrefix}MapStringBuilder")
+    #set ($glMapStringBuilderImpl = "${glProjectPrefix}MapStringBuilderImpl")
     #set ($glStringKeyMap = "${glProjectPrefix}StringKeyMap")
     #set ($glStringSet = "${glProjectPrefix}StringSet")
 
     ## [Allcommon-JDBC]
-    #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
-    #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
-    #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
+    #set ($glCursorHandler = "${glProjectPrefix}CursorHandler")
+    #set ($glCursorFetcher = "${glProjectPrefix}CursorFetcher")
+    #set ($glLatestSqlProvider = "${glProjectPrefix}LatestSqlProvider")
 
     ## [ClassificationDefinition]
     #set ($glCDef = "${glProjectPrefix}CDef")
@@ -90,8 +90,8 @@ targetdatabase = $targetDatabase
     #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
     #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
     #set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
-    #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
-    #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
+    #set ($glValueLabelUtil = "${glProjectPrefix}ValueLabelUtil")
+    #set ($glTraceViewUtil = "${glProjectPrefix}TraceViewUtil")
 
     ## [Package]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")

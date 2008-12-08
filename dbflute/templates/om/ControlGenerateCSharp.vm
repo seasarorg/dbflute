@@ -274,10 +274,10 @@ targetdatabase = $targetDatabase
     #set ($glSQLFailureException = "${glProjectPrefix}SQLFailureException")
 
     ## [Allcommon-Helper]
-    #set ($glMapListStringName = "${glProjectPrefix}MapListString")
-    #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
-    #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
-    #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
+    #set ($glMapListString = "${glProjectPrefix}MapListString")
+    #set ($glMapListStringImpl = "${glProjectPrefix}MapListStringImpl")
+    #set ($glMapStringBuilder = "${glProjectPrefix}MapStringBuilder")
+    #set ($glMapStringBuilderImpl = "${glProjectPrefix}MapStringBuilderImpl")
     #set ($glStringKeyMap = "${glProjectPrefix}StringKeyMap")
     #set ($glStringSet = "${glProjectPrefix}StringSet")
 
@@ -324,10 +324,10 @@ targetdatabase = $targetDatabase
     #set ($glJavaReflection = "${glProjectPrefix}JavaReflection")
 
     ## [Allcommon-JDBC]
-    #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
-    #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
-    #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
-    #set ($glSqlLogHandlerName = "${glProjectPrefix}SqlLogHandler")
+    #set ($glCursorHandler = "${glProjectPrefix}CursorHandler")
+    #set ($glCursorFetcher = "${glProjectPrefix}CursorFetcher")
+    #set ($glLatestSqlProvider = "${glProjectPrefix}LatestSqlProvider")
+    #set ($glSqlLogHandler = "${glProjectPrefix}SqlLogHandler")
     #set ($glStatementConfig = "${glProjectPrefix}StatementConfig")
 
     ## [Allcommon-S2Container]
@@ -419,8 +419,8 @@ targetdatabase = $targetDatabase
     #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
     #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
     #set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
-    #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
-    #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
+    #set ($glValueLabelUtil = "${glProjectPrefix}ValueLabelUtil")
+    #set ($glTraceViewUtil = "${glProjectPrefix}TraceViewUtil")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -1547,19 +1547,19 @@ targetdatabase = $targetDatabase
     $database.info("public void parseHelperClass() {")
 
     $database.info("    parseMapListString();")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapListStringName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapListString}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapListString.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parseMapListStringImpl();")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapListStringImplName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapListStringImpl}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapListStringImpl.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('MapStringBuilder');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilder}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilder.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('MapStringBuilderImpl');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderImplName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderImpl}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilderImpl.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageJava())
@@ -1923,15 +1923,15 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.info("    parse('CursorHandler');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandlerName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandler}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/CursorHandler.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('LatestSqlProvider');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProviderName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProvider}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/LatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('SqlLogHandler');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glSqlLogHandlerName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJdbc})}${glSqlLogHandler}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/SqlLogHandler.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("    parse('StatementConfig');")
@@ -2380,11 +2380,11 @@ targetdatabase = $targetDatabase
     #end
 
     #if ($database.isTargetLanguageJava())
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtil}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
     #end
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glTraceViewUtilName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glTraceViewUtil}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/util/TraceViewUtil.${glTemplateFileExtension}",$path,"", "")
 
     ## -----------------------------------------------------------------------------------------------------

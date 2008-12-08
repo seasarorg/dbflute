@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glValueLabelUtilName} {
+public class ${glValueLabelUtil} {
 
     /**
      * Find the label by the value from the list of value label.

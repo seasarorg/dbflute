@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
  * The handler of SQL log.
  * @author ${database.ClassAuthor}
  */
-public interface ${glSqlLogHandlerName} {
+public interface ${glSqlLogHandler} {
 
     /**
      * @param executedSql The executed SQL. (NotNull)

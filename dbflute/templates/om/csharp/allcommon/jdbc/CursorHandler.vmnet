@@ -8,7 +8,7 @@ namespace ${glPackageBaseCommonJdbc} {
     /// The handler of cursor.
     /// Author : ${database.ClassAuthor}
     /// </summary>
-    public interface ${glCursorHandlerName} {
+    public interface ${glCursorHandler} {
 
         /// <summary>
         /// Handle dataReader.
@@ -24,5 +24,5 @@ namespace ${glPackageBaseCommonJdbc} {
     /// <typeparam name="CURSOR">The type of cursor.</typeparam>
     /// <param name="cursor">The cursor of fetch target. (NotNull)</param>
     /// <returns>the result of fetching. (Nullable)</returns>
-    public delegate Object ${glCursorFetcherName}<CURSOR>(CURSOR cursor);
+    public delegate Object ${glCursorFetcher}<CURSOR>(CURSOR cursor);
 }

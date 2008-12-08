@@ -1043,7 +1043,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-	    return ${glTraceViewUtilName}.ConvertObjectArrayToStringView(objArray);
+	    return ${glTraceViewUtil}.ConvertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------

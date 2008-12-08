@@ -234,7 +234,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return args;
             }
             object[] filteredArgs;
-            if (args[args.Length - 1] is ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
+            if (args[args.Length - 1] is ${glPackageBaseCommonJdbc}.${glCursorHandler}) {
                 filteredArgs = new object[args.Length - 1];
                 for (int i=0; i < args.Length - 1; i++) {
                     filteredArgs[i] = args[i];
@@ -249,8 +249,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (args == null || args.Length == 0) {
                 return this.dataReaderHandler;
             }
-            if (args[args.Length-1] is ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
-                ${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler = (${glPackageBaseCommonJdbc}.${glCursorHandlerName})args[args.Length-1];
+            if (args[args.Length-1] is ${glPackageBaseCommonJdbc}.${glCursorHandler}) {
+                ${glPackageBaseCommonJdbc}.${glCursorHandler} cursorHandler = (${glPackageBaseCommonJdbc}.${glCursorHandler})args[args.Length-1];
                 return new DataReaderCursol(cursorHandler);
             }
             if (ArgTypes.Length+1 == args.Length && args[args.Length-1] == null) {
@@ -332,8 +332,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         
         protected class DataReaderCursol : IDataReaderHandler {
-            protected ${glPackageBaseCommonJdbc}.${glCursorHandlerName} _cursorHandler;
-            public DataReaderCursol(${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler) {
+            protected ${glPackageBaseCommonJdbc}.${glCursorHandler} _cursorHandler;
+            public DataReaderCursol(${glPackageBaseCommonJdbc}.${glCursorHandler} cursorHandler) {
                 this._cursorHandler = cursorHandler;
             }
             public object Handle(System.Data.IDataReader dr) {

@@ -78,7 +78,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                       SQL Logging
         //                                       -----------
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
-            ${glSqlLogHandlerName} sqlLogHandler = GetSqlLogHander();
+            ${glSqlLogHandler} sqlLogHandler = GetSqlLogHander();
             bool existsSqlLogHandler = sqlLogHandler != null;
             ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
             bool existsSqlLogRegistry = sqlLogRegistry != null;
@@ -108,7 +108,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return ${glInternalBindVariableUtil}.GetCompleteSql(_sql, args);
         }
 
-        protected virtual ${glSqlLogHandlerName} GetSqlLogHander() {
+        protected virtual ${glSqlLogHandler} GetSqlLogHander() {
             if (!${glCallbackContext}.IsExistCallbackContextOnThread()) {
                 return null;
             }

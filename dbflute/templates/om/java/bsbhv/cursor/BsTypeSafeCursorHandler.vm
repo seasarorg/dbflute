@@ -3,14 +3,14 @@ ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandler};
 import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**
  * The cursor handler of ${table.name}.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glCursorHandlerName} {
+public abstract class ${myClassName} implements ${glCursorHandler} {
 
     /**
      * Handle.

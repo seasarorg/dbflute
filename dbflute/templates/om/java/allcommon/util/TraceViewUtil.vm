@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTraceViewUtilName} {
+public class ${glTraceViewUtil} {
 
     /**
      * Convert to performance view.

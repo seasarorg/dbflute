@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
 import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
-import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
-import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
+import ${glPackageBaseCommonHelper}.${glMapListString};
+import ${glPackageBaseCommonHelper}.${glMapListStringImpl};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilder};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderImpl};
 import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
@@ -519,7 +519,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * ${database.ImplementComment}
      * @return Map list string that is prepared. (NotNull)
      */
-    public ${glMapListStringName} createMapListString() {
+    public ${glMapListString} createMapListString() {
         return MapStringUtil.createMapListString();
     }
 
@@ -527,7 +527,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * ${database.ImplementComment}
      * @return Map string builder that is prepared. (NotNull)
      */
-    public ${glMapStringBuilderName} createMapStringBuilder() {
+    public ${glMapStringBuilder} createMapStringBuilder() {
         final List${database.filterGenericsString('String')} columnDbNameList = new ArrayList${database.filterGenericsString('String')}();
         for (final Iterator<${glColumnInfoName}> ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
             final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
@@ -739,7 +739,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             if (!primaryKeyMapString.trim().endsWith(suffix)) {
                 primaryKeyMapString = primaryKeyMapString + suffix;
             }
-            ${glMapListStringName} mapListString = createMapListString();
+            ${glMapListString} mapListString = createMapListString();
             entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
         }
 
@@ -756,7 +756,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             if (!columnValueMapString.trim().endsWith(suffix)) {
                 columnValueMapString = columnValueMapString + suffix;
             }
-            ${glMapListStringName} mapListString = createMapListString();
+            ${glMapListString} mapListString = createMapListString();
             entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
         }
 
@@ -827,8 +827,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         }
 
-        public static ${glMapListStringName} createMapListString() {
-            final ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        public static ${glMapListString} createMapListString() {
+            final ${glMapListString} mapListString = new ${glMapListStringImpl}();
             mapListString.setMapMark(MAP_STRING_MAP_MARK);
             mapListString.setListMark(MAP_STRING_LIST_MARK);
             mapListString.setStartBrace(MAP_STRING_START_BRACE);
@@ -838,8 +838,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             return mapListString;
         }
 
-        public static ${glMapStringBuilderName} createMapStringBuilder(List${database.filterGenericsString('String')} columnNameList) {
-            ${glMapStringBuilderName} mapStringBuilder = new ${glMapStringBuilderImplName}();
+        public static ${glMapStringBuilder} createMapStringBuilder(List${database.filterGenericsString('String')} columnNameList) {
+            ${glMapStringBuilder} mapStringBuilder = new ${glMapStringBuilderImpl}();
             mapStringBuilder.setMsMapMark(MAP_STRING_MAP_MARK);
             mapStringBuilder.setMsStartBrace(MAP_STRING_START_BRACE);
             mapStringBuilder.setMsEndBrace(MAP_STRING_END_BRACE);

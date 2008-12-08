@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
  * The provider of latest SQL.
  * @author ${database.ClassAuthor}
  */
-public interface ${glLatestSqlProviderName} {
+public interface ${glLatestSqlProvider} {
 
     /**
      * Get display SQL.

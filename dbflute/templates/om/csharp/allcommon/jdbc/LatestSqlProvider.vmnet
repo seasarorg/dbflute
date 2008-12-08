@@ -9,7 +9,7 @@ using ${glPackageBaseCommonS2Dao};
 namespace ${glPackageBaseCommonJdbc} {
 
     [Implementation(typeof(${glSqlLogRegistryLatestSqlProvider}))]
-    public interface ${glLatestSqlProviderName} {
+    public interface ${glLatestSqlProvider} {
         String GetDisplaySql();
         IList<String> ExtractDisplaySqlList();
 	    void ClearSqlCache();

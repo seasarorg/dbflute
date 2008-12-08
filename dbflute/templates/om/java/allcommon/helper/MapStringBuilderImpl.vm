@@ -11,7 +11,7 @@ import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
  * The implementation of map-string builder.
  * @author ${database.ClassAuthor}
  */
-public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} {
+public class ${glMapStringBuilderImpl} implements ${glMapStringBuilder} {
 
     protected List<String> _columnNameList;
 

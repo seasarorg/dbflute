@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelper};
  *
  * @author ${database.ClassAuthor}
  */
-public interface ${glMapStringBuilderName} {
+public interface ${glMapStringBuilder} {
 
     // =====================================================================================
     //                                                                                Setter

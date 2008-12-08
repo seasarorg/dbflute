@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace ${glPackageBaseCommonUtil} {
 
-    public class ${glTraceViewUtilName} {
+    public class ${glTraceViewUtil} {
 
         /// <summary>
         /// Convert to performance view.

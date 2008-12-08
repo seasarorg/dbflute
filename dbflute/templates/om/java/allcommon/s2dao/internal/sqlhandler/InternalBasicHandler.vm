@@ -24,7 +24,7 @@ import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
 import ${glPackageBaseCommonException}.${glSQLFailureException};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
-import ${glPackageBaseCommonJdbc}.${glSqlLogHandlerName};
+import ${glPackageBaseCommonJdbc}.${glSqlLogHandler};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -105,7 +105,7 @@ public class ${glInternalBasicHandler} {
     //                                           SQL Logging
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
-        final ${glSqlLogHandlerName} sqlLogHandler = getSqlLogHander();
+        final ${glSqlLogHandler} sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
         final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
@@ -137,7 +137,7 @@ public class ${glInternalBasicHandler} {
         return ${glInternalBindVariableUtil}.getCompleteSql(sql, args, logDateFormat, logTimestampFormat);
     }
 
-    protected ${glSqlLogHandlerName} getSqlLogHander() {
+    protected ${glSqlLogHandler} getSqlLogHander() {
         if (!${glCallbackContext}.isExistCallbackContextOnThread()) {
             return null;
         }

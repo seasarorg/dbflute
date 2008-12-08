@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                              ======
         System.Collections.IList SelectList(String path, Object pmb, ${glOutsideSqlOption} option, Type entityType);
 
-        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOption} option, ${glCursorHandlerName} handler);
+        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOption} option, ${glCursorHandler} handler);
 
         int Execute(String path, Object pmb, ${glOutsideSqlOption} option);
 

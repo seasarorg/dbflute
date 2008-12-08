@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonHelper} {
     /// The implementation of map-string-builder.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public class ${glMapStringBuilderImplName} : ${glMapStringBuilderName} {
+    public class ${glMapStringBuilderImpl} : ${glMapStringBuilder} {
 
         /// <summary>The instance of regular-expressions.</summary>
         protected Regex _regDelimiter;

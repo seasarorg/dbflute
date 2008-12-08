@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author ${database.ClassAuthor}
  */
-public interface ${glMapListStringName} {
+public interface ${glMapListString} {
 
     /** Default of map-mark. */
     public static final String DEFAULT_MAP_MARK = "map:";

@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
+import ${glPackageBaseCommonHelper}.${glMapListString};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilder};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
@@ -443,13 +443,13 @@ public interface ${myClassName} {
      * Create map list string that is prepared. (for INTERNAL)
      * @return Map list string that is prepared. (NotNull)
      */
-    public ${glMapListStringName} createMapListString();
+    public ${glMapListString} createMapListString();
 
     /**
      * Create map string builder that is prepared. (for INTERNAL)
      * @return Map string builder that is prepared. (NotNull)
      */
-    public ${glMapStringBuilderName} createMapStringBuilder();
+    public ${glMapStringBuilder} createMapStringBuilder();
     
     // ===================================================================================
     //                                                               Entity Property Setup

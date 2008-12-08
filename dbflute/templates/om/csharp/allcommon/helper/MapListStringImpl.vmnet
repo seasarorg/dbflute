@@ -20,7 +20,7 @@ namespace ${glPackageBaseCommonHelper}
         }
     }
 
-    public class ${glMapListStringImplName} : ${glMapListStringName}
+    public class ${glMapListStringImpl} : ${glMapListString}
     {
         public  string NEW_LINE
         {
@@ -99,7 +99,7 @@ namespace ${glPackageBaseCommonHelper}
         /** Remainder string. */
         protected String _remainderString;
 
-        public ${glMapListStringImplName}()
+        public ${glMapListStringImpl}()
         {
             _mapMark = DEFAULT_MAP_MARK;
             _listMark = DEFAULT_LIST_MARK;
@@ -895,9 +895,9 @@ namespace ${glPackageBaseCommonHelper}
         /**
          * Get count that target string exist in the base string.
          * 
-         * @param targetString ‘ÎÛ•¶š—ñ
-         * @param delimiter ƒfƒŠƒ~ƒ^
-         * @return c‚è‚Ì•¶š—ñ‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚éƒfƒŠƒ~ƒ^‚Ì”
+         * @param targetString ï¿½ÎÛ•ï¿½ï¿½ï¿½ï¿½ï¿½
+         * @param delimiter ï¿½fï¿½ï¿½ï¿½~ï¿½^
+         * @return ï¿½cï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ÉŠÜ‚Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½Ìï¿½
          */
         protected int getDelimiterCount(string targetString, string delimiter)
         {

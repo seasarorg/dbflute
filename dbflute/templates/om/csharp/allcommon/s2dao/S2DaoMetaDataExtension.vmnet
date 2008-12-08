@@ -305,7 +305,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             string[] filteredParameterNames = null;
             Type[] filteredParameterTypes = null;
             if (parameterTypes != null && parameterTypes.Length > 0
-                    && typeof(${glCursorHandlerName}).IsAssignableFrom(parameterTypes[parameterTypes.Length - 1])) {
+                    && typeof(${glCursorHandler}).IsAssignableFrom(parameterTypes[parameterTypes.Length - 1])) {
                 filteredParameterNames = new string[parameterTypes.Length - 1];
                 filteredParameterTypes = new Type[parameterTypes.Length - 1];
                 for (int i = 0; i < parameterTypes.Length - 1; i++) {
@@ -371,7 +371,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 } else {
                     throw new NotSupportedException("The return type of method is unsupported: method.ReturnType=" + method.ReturnType);
                 }
-            } else if (typeof(${glCursorHandlerName}).IsAssignableFrom(lastestArguementType)) {
+            } else if (typeof(${glCursorHandler}).IsAssignableFrom(lastestArguementType)) {
                 // - - - - - - - -
                 // CursorHandling
                 // - - - - - - - -

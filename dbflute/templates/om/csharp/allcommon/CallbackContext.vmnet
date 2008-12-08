@@ -30,8 +30,8 @@ namespace ${glPackageBaseCommon} {
             return (Thread.GetData(_slot) != null);
         }
 
-		protected ${glSqlLogHandlerName} _sqlLogHandler;
-		public ${glSqlLogHandlerName} SqlLogHandler {
+		protected ${glSqlLogHandler} _sqlLogHandler;
+		public ${glSqlLogHandler} SqlLogHandler {
 		    get { return _sqlLogHandler; }
 			set { _sqlLogHandler = value; }
 		}

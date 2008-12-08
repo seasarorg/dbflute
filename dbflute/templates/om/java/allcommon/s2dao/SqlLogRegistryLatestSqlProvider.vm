@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
+import ${glPackageBaseCommonJdbc}.${glLatestSqlProvider};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
@@ -8,7 +8,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
  * This instance should be singleton.
  * @author ${database.ClassAuthor}
  */
-public class ${glSqlLogRegistryLatestSqlProvider} implements ${glLatestSqlProviderName} {
+public class ${glSqlLogRegistryLatestSqlProvider} implements ${glLatestSqlProvider} {
 
     public String getDisplaySql() {
         return ${glInternalSqlLogRegistry}.peekCompleteSql();

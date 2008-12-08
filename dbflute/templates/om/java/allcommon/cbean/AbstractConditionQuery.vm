@@ -22,7 +22,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
-import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
+import ${glPackageBaseCommonUtil}.${glTraceViewUtil};
 
 /**
  * The abstract class of condition-query.
@@ -1486,7 +1486,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-        return ${glTraceViewUtilName}.convertObjectArrayToStringView(objArray);
+        return ${glTraceViewUtil}.convertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------

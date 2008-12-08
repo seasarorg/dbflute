@@ -5,7 +5,7 @@ import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectCursorCommand};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
-import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
@@ -54,18 +54,18 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
      * @return The result object that the cursor handler returns. (Nullable)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
-    public Object selectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+    public Object selectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandler} handler) {
         return invoke(createSelectCursorCommand(path, pmb, handler));
     }
 
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected ${glBehaviorCommand}<Object> createSelectCursorCommand(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+    protected ${glBehaviorCommand}<Object> createSelectCursorCommand(String path, PARAMETER_BEAN pmb, ${glCursorHandler} handler) {
         return xsetupCommand(new ${glOutsideSqlSelectCursorCommand}(), path, pmb, handler);
     }
 
-    private ${glOutsideSqlSelectCursorCommand} xsetupCommand(${glOutsideSqlSelectCursorCommand} command, String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+    private ${glOutsideSqlSelectCursorCommand} xsetupCommand(${glOutsideSqlSelectCursorCommand} command, String path, PARAMETER_BEAN pmb, ${glCursorHandler} handler) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);

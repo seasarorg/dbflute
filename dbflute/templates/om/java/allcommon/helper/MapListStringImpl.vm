@@ -10,7 +10,7 @@ import java.util.Map;
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glMapListStringImplName} implements ${glMapListStringName} {
+public class ${glMapListStringImpl} implements ${glMapListString} {
 
     /** Line separator. */
     public static final String NEW_LINE = System.getProperty("line.separator");
@@ -42,7 +42,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
     /**
      * Constructor.
      */
-    public ${glMapListStringImplName}() {
+    public ${glMapListStringImpl}() {
         _mapMark = DEFAULT_MAP_MARK;
         _listMark = DEFAULT_LIST_MARK;
         _startBrace = DEFAULT_START_BRACE;

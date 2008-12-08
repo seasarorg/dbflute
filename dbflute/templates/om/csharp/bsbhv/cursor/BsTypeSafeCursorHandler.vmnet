@@ -7,11 +7,11 @@ using ${glPackageBaseCommonJdbc};
 namespace ${myExtendedDaoCursorPackageName} {
 
     [System.Serializable]
-    public partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandlerName} {
+    public partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandler} {
 
-        protected ${glCursorFetcherName}<${myExtendedTypeSafeCursorClassName}> _cursorFetcher;
+        protected ${glCursorFetcher}<${myExtendedTypeSafeCursorClassName}> _cursorFetcher;
 
-        public ${myClassName}(${glCursorFetcherName}<${myExtendedTypeSafeCursorClassName}> cursorFetcher) {
+        public ${myClassName}(${glCursorFetcher}<${myExtendedTypeSafeCursorClassName}> cursorFetcher) {
             _cursorFetcher = cursorFetcher;
         }
 

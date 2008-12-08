@@ -7,7 +7,7 @@ using ${glPackageBaseCommonS2DaoInternalSqlLog};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
-    public class ${glSqlLogRegistryLatestSqlProvider} : ${glLatestSqlProviderName} {
+    public class ${glSqlLogRegistryLatestSqlProvider} : ${glLatestSqlProvider} {
 
         public String GetDisplaySql() {
             return GetLastCompleteSql();

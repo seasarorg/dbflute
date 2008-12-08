@@ -8,7 +8,7 @@ namespace ${glPackageBaseCommonHelper} {
     /// The interface of map-string-builder.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public interface ${glMapStringBuilderName} {// Thank you koyak!
+    public interface ${glMapStringBuilder} {// Thank you koyak!
 
         /// <summary>
         /// The property of column-name array.

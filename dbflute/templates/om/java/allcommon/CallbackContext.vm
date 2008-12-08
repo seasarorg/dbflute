@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommonJdbc}.${glSqlLogHandlerName};
+import ${glPackageBaseCommonJdbc}.${glSqlLogHandler};
 
 /**
  * The context of callback.
@@ -52,16 +52,16 @@ public class ${glCallbackContext} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glSqlLogHandlerName} _sqlLogHandler;
+    protected ${glSqlLogHandler} _sqlLogHandler;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glSqlLogHandlerName} getSqlLogHandler() {
+    public ${glSqlLogHandler} getSqlLogHandler() {
         return _sqlLogHandler;
     }
 
-    public void setSqlLogHandler(${glSqlLogHandlerName} sqlLogHandler) {
+    public void setSqlLogHandler(${glSqlLogHandler} sqlLogHandler) {
         this._sqlLogHandler = sqlLogHandler;
     }
 }

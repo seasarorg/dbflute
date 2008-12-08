@@ -23,8 +23,8 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glQueryDeleteCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glQueryUpdateEntityCBCommand};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
-import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilder};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderImpl};
 
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionOptionName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionResultName};
@@ -488,7 +488,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
         }
 
         protected ${glEntity} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
-            final ${glMapStringBuilderName} builder = new ${glMapStringBuilderImplName}();
+            final ${glMapStringBuilder} builder = new ${glMapStringBuilderImpl}();
             builder.setMsMapMark(MAP_STRING_MAP_MARK);
             builder.setMsStartBrace(MAP_STRING_START_BRACE);
             builder.setMsEndBrace(MAP_STRING_END_BRACE);
