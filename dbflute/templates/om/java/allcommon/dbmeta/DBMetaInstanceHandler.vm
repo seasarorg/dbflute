@@ -11,7 +11,7 @@ import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 
 /**
- * The instance handler of DB meta.
+ * The handler of the instance of DB meta.
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements ${glDBMetaProvider} {
@@ -29,46 +29,22 @@ public class ${myClassName} implements ${glDBMetaProvider} {
     protected static final Map<String, ${glDBMeta}> _tableDbNameInstanceMap = newConcurrentHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
-    protected static final Map<String, String> _tableDbNameClassNameMap = newConcurrentHashMap();
-    
+    protected static final Map<String, String> _tableDbNameClassNameMap;
+    static {
+        final Map<String, String> tmpMap = newConcurrentHashMap();
+#foreach ($table in $database.tables)
+        tmpMap.put("${table.name}", "${table.DBMetaFullClassName}");
+#end
+        _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
+    }
+
     /** The flexible map of table DB name. This is for conversion at finding. */
     protected static final Map<String, String> _tableDbNameFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
-    
-    /** The count of setting up resources of DB meta for internal information. */
-    protected static int setupCount = 0; 
-
-    /**
-     * Set up the resource of DBMeta. Lock this class.
-     * @param tableDbNameClassNameMap The map of table DB name and class name. (NotNull)
-     */
-    public static synchronized void setupDBMetaResource(Map<String, String> tableDbNameClassNameMap) {
-        if (tableDbNameClassNameMap == null) {
-            String msg = "The argument 'tableDbNameClassNameMap' should not be null";
-            msg = msg + " at ${myClassName}.setupDBMetaResource()";
-            throw new IllegalArgumentException(msg);
-        }
-        if (tableDbNameClassNameMap.isEmpty()) {
-            String msg = "The argument 'tableDbNameClassNameMap' should not be empty";
-            msg = msg + " at ${myClassName}.setupDBMetaResource()";
-            throw new IllegalArgumentException(msg);
-        }
-        final String firstMsg = "...Setting up resources of DB meta";
-        final int tableCount = tableDbNameClassNameMap.size();
-        if (setupCount == 0) {
-            _log.info(firstMsg + ": tables=" + tableCount); // basically here
-        } else {
-            _log.info(firstMsg + " AGAIN(" + (setupCount + 1) + " times): tables=" + tableCount);
-        }
-        _tableDbNameInstanceMap.clear();
-        _tableDbNameClassNameMap.clear();
-        _tableDbNameFlexibleMap.clear();
-        final Set<String> tableDbNameSet = tableDbNameClassNameMap.keySet();
+    static {
+        final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
         for (String tableDbName : tableDbNameSet) {
-            final String className = tableDbNameClassNameMap.get(tableDbName);
-            _tableDbNameClassNameMap.put(tableDbName, className);
             _tableDbNameFlexibleMap.put(tableDbName, tableDbName);
         }
-        ++setupCount;
     }
 
     /**
@@ -78,7 +54,10 @@ public class ${myClassName} implements ${glDBMetaProvider} {
         initializeDBMetaMap();
         return _tableDbNameInstanceMap;
     }
-    
+
+    /**
+     * Initialize the map of DB meta.
+     */
     protected static void initializeDBMetaMap() {
         if (isInitialized()) {
             return;
