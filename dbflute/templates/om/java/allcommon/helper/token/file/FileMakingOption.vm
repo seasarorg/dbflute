@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileMakingOptionName} {
+public class ${glFileMakingOption} {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -21,42 +21,42 @@ public class ${glFileMakingOptionName} {
     protected boolean _goodByeDoubleQuotation;
 
     /** File-making header information. (NotRequired) */
-    protected ${glFileMakingHeaderInfoName} _fileMakingHeaderInfo;
+    protected ${glFileMakingHeaderInfo} _fileMakingHeaderInfo;
 
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public ${glFileMakingOptionName} delimitateByComma() {
+    public ${glFileMakingOption} delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public ${glFileMakingOptionName} delimitateByTab() {
+    public ${glFileMakingOption} delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
-    public ${glFileMakingOptionName} encodeAsUTF8() {
+    public ${glFileMakingOption} encodeAsUTF8() {
         _encoding = "UTF-8";
         return this;
     }
 
-    public ${glFileMakingOptionName} encodeAsWindows31J() {
+    public ${glFileMakingOption} encodeAsWindows31J() {
         _encoding = "Windows-31J";
         return this;
     }
 
-    public ${glFileMakingOptionName} separateCrLf() {
+    public ${glFileMakingOption} separateCrLf() {
         _lineSeparator = "\r\n";
         return this;
     }
 
-    public ${glFileMakingOptionName} separateLf() {
+    public ${glFileMakingOption} separateLf() {
         _lineSeparator = "\n";
         return this;
     }
 
-    public ${glFileMakingOptionName} goodByeDoubleQuotation() {
+    public ${glFileMakingOption} goodByeDoubleQuotation() {
         _goodByeDoubleQuotation = true;
         return this;
     }
@@ -92,11 +92,11 @@ public class ${glFileMakingOptionName} {
         return _goodByeDoubleQuotation;
     }
 
-    public ${glFileMakingHeaderInfoName} getFileMakingHeaderInfo() {
+    public ${glFileMakingHeaderInfo} getFileMakingHeaderInfo() {
         return _fileMakingHeaderInfo;
     }
 
-    public void setFileMakingHeaderInfo(${glFileMakingHeaderInfoName} fileMakingHeaderInfo) {
+    public void setFileMakingHeaderInfo(${glFileMakingHeaderInfo} fileMakingHeaderInfo) {
         _fileMakingHeaderInfo = fileMakingHeaderInfo;
     }
 

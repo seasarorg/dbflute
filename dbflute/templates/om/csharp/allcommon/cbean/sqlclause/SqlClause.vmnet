@@ -153,7 +153,7 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
-    // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter);
+    // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilter} whereClauseSimpleFilter);
 	
     // =====================================================================================
     //                                                                 Selected Foreign Info

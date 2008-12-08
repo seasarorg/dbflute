@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileTokenizingHeaderInfoName} {
+public class ${glFileTokenizingHeaderInfo} {
 
     // =====================================================================================
     //                                                                             Attribute

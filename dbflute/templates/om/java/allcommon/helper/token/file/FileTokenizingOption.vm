@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileTokenizingOptionName} {
+public class ${glFileTokenizingOption} {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -19,32 +19,32 @@ public class ${glFileTokenizingOptionName} {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public ${glFileTokenizingOptionName} delimitateByComma() {
+    public ${glFileTokenizingOption} delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public ${glFileTokenizingOptionName} delimitateByTab() {
+    public ${glFileTokenizingOption} delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
-    public ${glFileTokenizingOptionName} encodeAsUTF8() {
+    public ${glFileTokenizingOption} encodeAsUTF8() {
         _encoding = "UTF-8";
         return this;
     }
 
-    public ${glFileTokenizingOptionName} encodeAsWindows31J() {
+    public ${glFileTokenizingOption} encodeAsWindows31J() {
         _encoding = "Windows-31J";
         return this;
     }
 
-    public ${glFileTokenizingOptionName} beginFirstLine() {
+    public ${glFileTokenizingOption} beginFirstLine() {
         _beginFirstLine = true;
         return this;
     }
 
-    public ${glFileTokenizingOptionName} handleEmptyAsNull() {
+    public ${glFileTokenizingOption} handleEmptyAsNull() {
         _handleEmptyAsNull = true;
         return this;
     }

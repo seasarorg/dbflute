@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public interface ${glFileMakingCallbackName} {
+public interface ${glFileMakingCallback} {
 
     /**
      * Get file-making header information.
@@ -13,5 +13,5 @@ public interface ${glFileMakingCallbackName} {
      * </pre>
      * @return File-making header information. (Nullable)
      */
-    public ${glFileMakingRowResourceName} getRowResource();
+    public ${glFileMakingRowResource} getRowResource();
 }

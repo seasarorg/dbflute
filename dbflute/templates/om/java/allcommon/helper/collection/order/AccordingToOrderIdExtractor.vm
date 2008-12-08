@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperCollectionOrder}
  * @param <ELEMENT_TYPE> The type of element.
  * @param <ID_TYPE> The type of ID.
  */
-public interface ${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> {
+public interface ${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> {
 
     /**
      * Extract ID from the element instance.

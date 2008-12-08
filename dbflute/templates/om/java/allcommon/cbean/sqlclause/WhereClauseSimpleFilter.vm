@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glWhereClauseSimpleFilterInterface}")
+#set ($myClassName = "${glWhereClauseSimpleFilter}")
 
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 

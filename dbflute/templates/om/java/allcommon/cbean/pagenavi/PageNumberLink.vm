@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenavi};
-#set ($myClassName = "${glPageNumberLinkName}")
+#set ($myClassName = "${glPageNumberLink}")
 
 /**
  * The class of page number link.

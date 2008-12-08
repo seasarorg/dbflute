@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCOptionPartsLocal};
 
 #set ($myClassName = "${glJapaneseOptionPartsAgent}")
 
-import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacterName};
-import ${glPackageBaseCommonHelperCharacterImpl}.${glJapaneseCharacterImplName};
+import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacter};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glJapaneseCharacterImpl};
 
 /**
  * The class of condition-option-parts-agent.
@@ -16,7 +16,7 @@ public class ${myClassName} {
     //                                                                             =========
     protected boolean _toDoubleByteKatakana;
     protected boolean _removeLastLongVowel;
-    private ${glJapaneseCharacterName} _japaneseCharacter;
+    private ${glJapaneseCharacter} _japaneseCharacter;
 
     // =====================================================================================
     //                                                                                  Main
@@ -61,9 +61,9 @@ public class ${myClassName} {
     // =====================================================================================
     //                                                                                Helper
     //                                                                                ======
-    protected ${glJapaneseCharacterName} getJapaneseCharacter() {
+    protected ${glJapaneseCharacter} getJapaneseCharacter() {
         if (_japaneseCharacter == null) {
-            _japaneseCharacter = new ${glJapaneseCharacterImplName}();
+            _japaneseCharacter = new ${glJapaneseCharacterImpl}();
         }
         return _japaneseCharacter;
     }

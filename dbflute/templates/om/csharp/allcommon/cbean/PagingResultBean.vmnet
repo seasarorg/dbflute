@@ -24,10 +24,10 @@ namespace ${glPackageBaseCommonCBean} {
 
         protected int _pageSize;
         protected int _currentPageNumber;
-        protected ${glPageGroupBeanName} _pageGroupBean;
-        protected ${glPageGroupOptionName} _pageGroupOption;
-        protected ${glPageRangeBeanName} _pageRangeBean;
-        protected ${glPageRangeOptionName} _pageRangeOption;
+        protected ${glPageGroupBean} _pageGroupBean;
+        protected ${glPageGroupOption} _pageGroupOption;
+        protected ${glPageRangeBean} _pageRangeBean;
+        protected ${glPageRangeOption} _pageRangeOption;
 
         #endregion
 
@@ -68,11 +68,11 @@ namespace ${glPackageBaseCommonCBean} {
             get { return CalculateCurrentEndRecordNumber(_currentPageNumber, _pageSize); }
         }
 
-        public ${glPageRangeOptionName} PageRangeOption {
+        public ${glPageRangeOption} PageRangeOption {
             set { _pageRangeOption = value; }
         }
 
-        public ${glPageGroupOptionName} PageGroupOption {
+        public ${glPageGroupOption} PageGroupOption {
             set { _pageGroupOption = value; }
         }
 
@@ -84,10 +84,10 @@ namespace ${glPackageBaseCommonCBean} {
         // -------------------------------------------------
         //                                        Page Group
         //                                        ----------
-        public ${glPageGroupBeanName} PageGroup() {
+        public ${glPageGroupBean} PageGroup() {
             AssertPageGroupValid();
             if (_pageGroupBean == null) {
-                _pageGroupBean = new ${glPageGroupBeanName}();
+                _pageGroupBean = new ${glPageGroupBean}();
             }
             _pageGroupBean.PageGroupOption = _pageGroupOption;
             _pageGroupBean.CurrentPageNumber = CurrentPageNumber;
@@ -115,10 +115,10 @@ namespace ${glPackageBaseCommonCBean} {
         // -------------------------------------------------
         //                                        Page Range
         //                                        ----------
-        public ${glPageRangeBeanName} PageRange() {
+        public ${glPageRangeBean} PageRange() {
             AssertPageRangeValid();
             if (_pageRangeBean == null) {
-                _pageRangeBean = new ${glPageRangeBeanName}();
+                _pageRangeBean = new ${glPageRangeBean}();
             }
             _pageRangeBean.PageRangeOption = _pageRangeOption;
             _pageRangeBean.CurrentPageNumber = CurrentPageNumber;

@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
-#set ($myClassName = "${glHierarchySourceColumnName}")
+#set ($myClassName = "${glHierarchySourceColumn}")
 
 /**
  * @author ${database.ClassAuthor}

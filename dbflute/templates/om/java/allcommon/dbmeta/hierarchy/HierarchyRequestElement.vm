@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
-#set ($myClassName = "${glHierarchyRequestElementName}")
+#set ($myClassName = "${glHierarchyRequestElement}")
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
     /** The column of source. */
-    protected ${glHierarchySourceColumnName} sourceColumn;
+    protected ${glHierarchySourceColumn} sourceColumn;
 
     /** The dbmeta of destination. */
     protected ${glDBMeta} destinationDBMeta;
@@ -52,7 +52,7 @@ public class ${myClassName} {
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
+    public void mapping(${glHierarchySourceColumn} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
         this.sourceColumn = sourceColumn;
         this.destinationColumnInfo = destinationColumnInfo;
     }
@@ -90,11 +90,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glHierarchySourceColumnName} getSourceColumnInfo() {
+    public ${glHierarchySourceColumn} getSourceColumnInfo() {
         return sourceColumn;
     }
 
-    public void setSourceColumnInfo(${glHierarchySourceColumnName} sourceColumn) {
+    public void setSourceColumnInfo(${glHierarchySourceColumn} sourceColumn) {
         this.sourceColumn = sourceColumn;
     }
 

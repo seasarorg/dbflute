@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOption};
 
 /**
  * @author ${database.ClassAuthor}
@@ -10,7 +10,7 @@ public class ${glTokenFileOutputOption} {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected ${glFileMakingOptionName} _fileMakingOption = new ${glFileMakingOptionName}();
+    protected ${glFileMakingOption} _fileMakingOption = new ${glFileMakingOption}();
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -81,7 +81,7 @@ public class ${glTokenFileOutputOption} {
         return _fileMakingOption.isGoodByeDoubleQuotation();
     }
 
-    public ${glFileMakingOptionName} getFileMakingOption() {
+    public ${glFileMakingOption} getFileMakingOption() {
         return _fileMakingOption;
     }
 }

@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviRange};
-#set ($myClassName = "${glPageRangeOptionName}")
+#set ($myClassName = "${glPageRangeOption}")
 
 /**
  * The option of page range.

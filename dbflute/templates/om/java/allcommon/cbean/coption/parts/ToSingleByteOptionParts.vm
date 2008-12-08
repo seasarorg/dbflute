@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
 
 #set ($myClassName = "${glToSingleByteOptionParts}")
 
-import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
-import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImplName};
+import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacter};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImpl};
 
 /**
  * The interface of condition-option.
@@ -19,7 +19,7 @@ public class ${myClassName} {
     protected boolean _toSingleByteAlphabetNumber;
     protected boolean _toSingleByteAlphabetNumberMark;
 
-    private ${glGeneralCharacterName} _generalCharacter;
+    private ${glGeneralCharacter} _generalCharacter;
 
     // =====================================================================================
     //                                                                                  Main
@@ -62,9 +62,9 @@ public class ${myClassName} {
     // =====================================================================================
     //                                                                                Helper
     //                                                                                ======
-    protected ${glGeneralCharacterName} getGeneralCharacter() {
+    protected ${glGeneralCharacter} getGeneralCharacter() {
         if (_generalCharacter == null) {
-            _generalCharacter = new ${glGeneralCharacterImplName}();
+            _generalCharacter = new ${glGeneralCharacterImpl}();
         }
         return _generalCharacter;
     }

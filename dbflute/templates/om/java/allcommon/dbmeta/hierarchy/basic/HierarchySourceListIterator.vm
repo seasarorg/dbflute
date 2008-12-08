@@ -1,23 +1,23 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
 
-#set ($myClassName = "${glHierarchySourceListIteratorName}")
+#set ($myClassName = "${glHierarchySourceListIterator}")
 
 /**
  * @author ${database.ClassAuthor}
  * @param <SOURCE_ROW> The type of source.
  */
-public class ${myClassName}<SOURCE_ROW> implements ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceIteratorName} {
+public class ${myClassName}<SOURCE_ROW> implements ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceIterator} {
 
     protected java.util.List<? extends Object> sourceRowList;
 
-    protected ${glHierarchySourceRowSetupperName}<SOURCE_ROW> sourceRowSetupper;
+    protected ${glHierarchySourceRowSetupper}<SOURCE_ROW> sourceRowSetupper;
 
     protected java.util.Iterator<SOURCE_ROW> sourceBeanListIterator;
 
-    protected ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} currentSourceEntity;
+    protected ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} currentSourceEntity;
 
     public ${myClassName}(java.util.List<SOURCE_ROW> sourceRowList,
-            ${glHierarchySourceRowSetupperName}<SOURCE_ROW> sourceRowSetupper) {
+            ${glHierarchySourceRowSetupper}<SOURCE_ROW> sourceRowSetupper) {
         this.sourceRowList = sourceRowList;
         this.sourceRowSetupper = sourceRowSetupper;
         this.sourceBeanListIterator = sourceRowList.iterator();
@@ -27,12 +27,12 @@ public class ${myClassName}<SOURCE_ROW> implements ${glPackageBaseCommonDBMetaHi
         return this.sourceBeanListIterator.hasNext();
     }
 
-    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} next() {
+    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} next() {
         this.currentSourceEntity = this.sourceRowSetupper.setup(this.sourceBeanListIterator.next());
         return this.currentSourceEntity;
     }
 
-    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} current() {
+    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} current() {
         return this.currentSourceEntity;
     }
 }

@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTrace};
 /**
  * @author ${database.ClassAuthor}
  */
-public interface ${glInvokeNameExtractingResourceName} {
+public interface ${glInvokeNameExtractingResource} {
 
     public boolean isTargetElement(String className, String methodName);
     public String filterSimpleClassName(String simpleClassName);

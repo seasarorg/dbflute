@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviGroup};
-#set ($myClassName = "${glPageGroupBeanName}")
+#set ($myClassName = "${glPageGroupBean}")
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName};
-import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName};
+import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLink};
+import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupper};
 
 /**
  * The bean of page group.
@@ -25,7 +25,7 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                           =========
     protected int _currentPageNumber;
     protected int _allPageCount;
-    protected ${glPageGroupOptionName} _pageGroupOption;
+    protected ${glPageGroupOption} _pageGroupOption;
 
     // ===================================================================================
     //                                                                                Main
@@ -36,7 +36,7 @@ public class ${myClassName} implements java.io.Serializable {
      * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends ${glPageNumberLinkName}> List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) {
+    public <LINK extends ${glPageNumberLink}> List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupper}<LINK> pageNumberLinkSetupper) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber: pageNumberList) {
@@ -187,7 +187,7 @@ public class ${myClassName} implements java.io.Serializable {
     public void setAllPageCount(int allPageCount) {
         this._allPageCount = allPageCount;
     }
-    public void setPageGroupOption(${glPageGroupOptionName} pageGroupOption) {
+    public void setPageGroupOption(${glPageGroupOption} pageGroupOption) {
         this._pageGroupOption = pageGroupOption;
     }
 }

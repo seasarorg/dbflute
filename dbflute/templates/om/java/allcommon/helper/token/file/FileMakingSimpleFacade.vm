@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public interface ${glFileMakingSimpleFacadeName} {
+public interface ${glFileMakingSimpleFacade} {
 
     /**
      * Make token-file from row-list.
@@ -14,7 +14,7 @@ public interface ${glFileMakingSimpleFacadeName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void makeFromRowList(final String filename, final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void makeFromRowList(final String filename, final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Make bytes from row-list.
@@ -25,5 +25,5 @@ public interface ${glFileMakingSimpleFacadeName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public byte[] makeFromRowList(final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public byte[] makeFromRowList(final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 }

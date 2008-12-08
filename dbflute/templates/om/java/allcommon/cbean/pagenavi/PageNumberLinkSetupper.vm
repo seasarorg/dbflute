@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenavi};
-#set ($myClassName = "${glPageNumberLinkSetupperName}")
+#set ($myClassName = "${glPageNumberLinkSetupper}")
 
 /**
  * The setupper of page number link.
  * @param <LINK> The type of link.
  * @author ${database.ClassAuthor}
  */
-public interface ${myClassName}<LINK extends ${glPageNumberLinkName}> {
+public interface ${myClassName}<LINK extends ${glPageNumberLink}> {
 
     /**
      * Set up page number link.

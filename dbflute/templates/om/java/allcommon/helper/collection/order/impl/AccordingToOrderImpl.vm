@@ -6,14 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrderName};
-import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrderIdExtractorName};
-import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrderOptionName};
+import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrder};
+import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrderIdExtractor};
+import ${glPackageBaseCommonHelperCollectionOrder}.${glAccordingToOrderOption};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glAccordingToOrderImplName} implements ${glAccordingToOrderName} {
+public class ${glAccordingToOrderImpl} implements ${glAccordingToOrder} {
 
     // ===================================================================================
     //                                                                                Main
@@ -26,7 +26,7 @@ public class ${glAccordingToOrderImplName} implements ${glAccordingToOrderName} 
      * @param <ELEMENT_TYPE> The type of element.
      * @param <ID_TYPE> The type of ID.
      */
-    public <ELEMENT_TYPE, ID_TYPE> void order(final List<ELEMENT_TYPE> unorderedList, final ${glAccordingToOrderOptionName}<ELEMENT_TYPE, ID_TYPE> option) {
+    public <ELEMENT_TYPE, ID_TYPE> void order(final List<ELEMENT_TYPE> unorderedList, final ${glAccordingToOrderOption}<ELEMENT_TYPE, ID_TYPE> option) {
         assertObjectNotNull("unorderedList", unorderedList);
         if (unorderedList.isEmpty()) {
             return;
@@ -37,7 +37,7 @@ public class ${glAccordingToOrderImplName} implements ${glAccordingToOrderName} 
         if (orderedUniqueIdList.isEmpty()) {
             return;
         }
-        final ${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> idExtractor = option.getIdExtractor();
+        final ${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> idExtractor = option.getIdExtractor();
         assertObjectNotNull("option.getIdExtractor()", idExtractor);
 
         final Map<ID_TYPE, Integer> idIndexMap = new LinkedHashMap<ID_TYPE, Integer>();

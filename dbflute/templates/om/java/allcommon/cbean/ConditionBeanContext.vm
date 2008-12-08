@@ -99,8 +99,8 @@ public class ${glConditionBeanContext} {
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminer}.class;
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResource}.class;
             clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupper}.class;
-            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
-            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
+            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLink}.class;
+            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupper}.class;
             clazz = ${glPackageBaseCommonJdbc}.${glCursorHandler}.class;
             if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
         }

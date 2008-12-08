@@ -30,12 +30,12 @@ import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionOption};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionResult};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionFailure};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallbackName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResourceName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfoName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileToken};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallback};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResource};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfo};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOption};
+import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImpl};
 
 /**
  * The abstract class of writable behavior.
@@ -391,9 +391,9 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
             final ${glTokenFileReflectionResult} result = buildTokenFileReflectionResult();
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
-            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+            final ${glFileTokenizingCallback} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final ${glFileTokenizingOption} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+            final ${glFileToken} fileToken = new ${glFileTokenImpl}();
             fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
             return result;
         }
@@ -411,9 +411,9 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
             final ${glTokenFileReflectionResult} result = buildTokenFileReflectionResult();
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
-            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+            final ${glFileTokenizingCallback} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final ${glFileTokenizingOption} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+            final ${glFileToken} fileToken = new ${glFileTokenImpl}();
             fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
             return result;
         }
@@ -434,7 +434,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             return result;
         }
 
-        protected ${glFileTokenizingCallbackName} buildFileTokenReflectionFileTokenizingCallback(${glTokenFileReflectionOption} tokenFileReflectionOption, final ${glTokenFileReflectionResult} result) throws java.io.FileNotFoundException, java.io.IOException {
+        protected ${glFileTokenizingCallback} buildFileTokenReflectionFileTokenizingCallback(${glTokenFileReflectionOption} tokenFileReflectionOption, final ${glTokenFileReflectionResult} result) throws java.io.FileNotFoundException, java.io.IOException {
             assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
             final String encoding = tokenFileReflectionOption.getEncoding();
@@ -445,9 +445,9 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} failureList = result.getFailureList();
             assertObjectNotNull("failureList", failureList);
 
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = new ${glFileTokenizingCallbackName}() {
-                public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource) {
-                    final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
+            final ${glFileTokenizingCallback} fileTokenizingCallback = new ${glFileTokenizingCallback}() {
+                public void handleRowResource(${glFileTokenizingRowResource} fileTokenizingRowResource) {
+                    final ${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
                     final java.util.List${database.filterGenericsString('String')} columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
                     final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingRowResource.getValueList();
 
@@ -502,7 +502,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             return entity;
         }
 
-        protected ${glFileTokenizingOptionName} buildFileTokenReflectionFileTokenizingOption(${glTokenFileReflectionOption} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        protected ${glFileTokenizingOption} buildFileTokenReflectionFileTokenizingOption(${glTokenFileReflectionOption} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
             final String encoding = tokenFileReflectionOption.getEncoding();
@@ -510,7 +510,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
             assertObjectNotNull("delimiter", delimiter);
 
-            final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
+            final ${glFileTokenizingOption} fileTokenizingOption = new ${glFileTokenizingOption}();
             fileTokenizingOption.setEncoding(encoding);
             fileTokenizingOption.setDelimiter(delimiter);
             if (tokenFileReflectionOption.isHandleEmptyAsNull()) {

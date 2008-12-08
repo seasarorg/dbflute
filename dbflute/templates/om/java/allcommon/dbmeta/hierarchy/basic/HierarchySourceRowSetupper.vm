@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
 
-#set ($myClassName = "${glHierarchySourceRowSetupperName}")
+#set ($myClassName = "${glHierarchySourceRowSetupper}")
 
 /**
  * @author ${database.ClassAuthor}
@@ -8,5 +8,5 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
  */
 public interface ${myClassName}<SOURCE_ROW> {
 
-    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} setup(SOURCE_ROW source);
+    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} setup(SOURCE_ROW source);
 }

@@ -1,4 +1,4 @@
-#set ($myClassName = "${glPageGroupOptionName}")
+#set ($myClassName = "${glPageGroupOption}")
 
 using System;
 using ${glPackageBaseCommonJavaLike};

@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLine};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glLineMakingOptionName} {
+public class ${glLineMakingOption} {
 
     protected String _delimiter;
 
@@ -11,12 +11,12 @@ public class ${glLineMakingOptionName} {
 
     protected boolean _trimSpace;
 
-    public ${glLineMakingOptionName} delimitateByComma() {
+    public ${glLineMakingOption} delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public ${glLineMakingOptionName} delimitateByTab() {
+    public ${glLineMakingOption} delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
@@ -29,7 +29,7 @@ public class ${glLineMakingOptionName} {
         _delimiter = delimiter;
     }
 
-    public ${glLineMakingOptionName} quoteByDoubleQuotation() {
+    public ${glLineMakingOption} quoteByDoubleQuotation() {
         _quoteByDoubleQuotation = true;
         return this;
     }
@@ -38,7 +38,7 @@ public class ${glLineMakingOptionName} {
         return _quoteByDoubleQuotation;
     }
 
-    public ${glLineMakingOptionName} trimSpace() {
+    public ${glLineMakingOption} trimSpace() {
         _trimSpace = true;
         return this;
     }

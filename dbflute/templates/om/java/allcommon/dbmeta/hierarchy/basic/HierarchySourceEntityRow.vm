@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
 
-#set ($myClassName = "${glHierarchySourceEntityRowName}")
+#set ($myClassName = "${glHierarchySourceEntityRow}")
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} implements ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} {
+public class ${myClassName} implements ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} {
 
     protected Object sourceBean;
 
@@ -13,12 +13,12 @@ public class ${myClassName} implements ${glPackageBaseCommonDBMetaHierarchy}.${g
         this.sourceBean = sourceBean;
     }
 
-    public Object extractColumnValue(${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceColumnName} columnInfo) {
-        if (!(columnInfo instanceof ${glHierarchySourceEntityColumnName})) {
-            String msg = "The column info should be ${glHierarchySourceEntityColumnName}! but: " + columnInfo;
+    public Object extractColumnValue(${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceColumn} columnInfo) {
+        if (!(columnInfo instanceof ${glHierarchySourceEntityColumn})) {
+            String msg = "The column info should be ${glHierarchySourceEntityColumn}! but: " + columnInfo;
             throw new IllegalStateException(msg);
         }
-        final ${glHierarchySourceEntityColumnName} sourceEntityColumn = (${glHierarchySourceEntityColumnName}) columnInfo;
+        final ${glHierarchySourceEntityColumn} sourceEntityColumn = (${glHierarchySourceEntityColumn}) columnInfo;
         return invoke(sourceEntityColumn.findGetter(), sourceBean, new Object[] {});
     }
 

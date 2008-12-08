@@ -113,7 +113,7 @@ public abstract class ${myClassName} implements ${glSqlClause} {
     //                               WhereClauseSimpleFilter
     //                               -----------------------
     /** The filter for where clause. */
-    protected List<${glWhereClauseSimpleFilterInterface}> _whereClauseSimpleFilterList;
+    protected List<${glWhereClauseSimpleFilter}> _whereClauseSimpleFilterList;
 
     // -----------------------------------------------------
     //                                 Selected Foreign Info
@@ -1191,9 +1191,9 @@ public abstract class ${myClassName} implements ${glSqlClause} {
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter) {
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilter} whereClauseSimpleFilter) {
         if (_whereClauseSimpleFilterList == null) {
-            _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterface}>();
+            _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilter}>();
         }
         _whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
     }
@@ -1202,8 +1202,8 @@ public abstract class ${myClassName} implements ${glSqlClause} {
         if (_whereClauseSimpleFilterList == null || _whereClauseSimpleFilterList.isEmpty()) {
             return clauseElement;
         }
-        for (final Iterator<${glWhereClauseSimpleFilterInterface}> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
-            final ${glWhereClauseSimpleFilterInterface} filter = ite.next();
+        for (final Iterator<${glWhereClauseSimpleFilter}> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
+            final ${glWhereClauseSimpleFilter} filter = ite.next();
             if (filter == null) {
                 String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
                 throw new IllegalStateException(msg);

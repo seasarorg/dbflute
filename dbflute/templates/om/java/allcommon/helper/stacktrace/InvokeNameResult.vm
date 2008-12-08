@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTrace};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInvokeNameResultName} {
+public class ${glInvokeNameResult} {
 
     // ==========================================================================================
     //                                                                                  Attribute

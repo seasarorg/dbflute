@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLine};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glLineTokenizingOptionName} {
+public class ${glLineTokenizingOption} {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -17,22 +17,22 @@ public class ${glLineTokenizingOptionName} {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public ${glLineTokenizingOptionName} delimitateByComma() {
+    public ${glLineTokenizingOption} delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public ${glLineTokenizingOptionName} delimitateByTab() {
+    public ${glLineTokenizingOption} delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
-    public ${glLineTokenizingOptionName} trimDoubleQuotation() {
+    public ${glLineTokenizingOption} trimDoubleQuotation() {
         _trimDoubleQuotation = true;
         return this;
     }
 
-    public ${glLineTokenizingOptionName} handleEmtpyAsNull() {
+    public ${glLineTokenizingOption} handleEmtpyAsNull() {
         _handleEmtpyAsNull = true;
         return this;
     }

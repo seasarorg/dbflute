@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author ${database.ClassAuthor}
  */
-public interface ${glAccordingToOrderName} {
+public interface ${glAccordingToOrder} {
 
     /**
      * Order the unordered list.
@@ -15,5 +15,5 @@ public interface ${glAccordingToOrderName} {
      * @param <ELEMENT_TYPE> The type of element.
      * @param <ID_TYPE> The type of ID.
      */
-    <ELEMENT_TYPE, ID_TYPE> void order(List<ELEMENT_TYPE> unorderedList, ${glAccordingToOrderOptionName}<ELEMENT_TYPE, ID_TYPE> option);
+    <ELEMENT_TYPE, ID_TYPE> void order(List<ELEMENT_TYPE> unorderedList, ${glAccordingToOrderOption}<ELEMENT_TYPE, ID_TYPE> option);
 }

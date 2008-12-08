@@ -10,7 +10,7 @@ import ${glPackageBaseCommonHelper}.${glMapListString};
 import ${glPackageBaseCommonHelper}.${glMapListStringImpl};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterface};
+import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilter};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
@@ -98,7 +98,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     // ===================================================================================
     //                                                                 Where Clause Filter
     //                                                                 ===================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter) {
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilter} whereClauseSimpleFilter) {
         this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 

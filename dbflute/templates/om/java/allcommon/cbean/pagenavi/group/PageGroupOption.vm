@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviGroup};
-#set ($myClassName = "${glPageGroupOptionName}")
+#set ($myClassName = "${glPageGroupOption}")
 
 /**
  * The option of page group.

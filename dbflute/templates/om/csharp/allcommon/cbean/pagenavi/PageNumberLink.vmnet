@@ -1,4 +1,4 @@
-#set ($myClassName = "${glPageNumberLinkName}")
+#set ($myClassName = "${glPageNumberLink}")
 
 using System;
 using ${glPackageBaseCommonJavaLike};

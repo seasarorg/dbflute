@@ -2,10 +2,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glPagingResultBean}")
 
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapper};
-import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupBeanName};
-import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName};
-import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeBeanName};
-import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
+import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupBean};
+import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOption};
+import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeBean};
+import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOption};
 
 /**
  * The result bean of paging.
@@ -36,19 +36,19 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
     //                                            Page Group
     //                                            ----------
     /** The value of page-group bean. */
-    protected ${glPageGroupBeanName} _pageGroupBean;
+    protected ${glPageGroupBean} _pageGroupBean;
 
     /** The value of page-group option. */
-    protected ${glPageGroupOptionName} _pageGroupOption;
+    protected ${glPageGroupOption} _pageGroupOption;
 
     // -----------------------------------------------------
     //                                            Page Range
     //                                            ----------
     /** The value of page-range bean. */
-    protected ${glPageRangeBeanName} _pageRangeBean;
+    protected ${glPageRangeBean} _pageRangeBean;
 
     /** The value of page-range option. */
-    protected ${glPageRangeOptionName} _pageRangeOption;
+    protected ${glPageRangeOption} _pageRangeOption;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -105,7 +105,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * @param pageGroupSize The value of pageGroupSize.
      */
     public void setPageGroupSize(int pageGroupSize) {
-        final ${glPageGroupOptionName} option = new ${glPageGroupOptionName}();
+        final ${glPageGroupOption} option = new ${glPageGroupOption}();
         option.setPageGroupSize(pageGroupSize);
         setPageGroupOption(option);
     }
@@ -114,7 +114,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * Set the value of pageGroupOption.
      * @param pageGroupOption The value of pageGroupOption. (Nullable)
      */
-    public void setPageGroupOption(${glPageGroupOptionName} pageGroupOption) {
+    public void setPageGroupOption(${glPageGroupOption} pageGroupOption) {
         _pageGroupOption = pageGroupOption;
     }
 
@@ -122,10 +122,10 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * Get the value of pageGroupBean.
      * @return The value of pageGroupBean. (NotNull)
      */
-    public ${glPageGroupBeanName} pageGroup() {
+    public ${glPageGroupBean} pageGroup() {
         assertPageGroupValid();
         if (_pageGroupBean == null) {
-            _pageGroupBean = new ${glPageGroupBeanName}();
+            _pageGroupBean = new ${glPageGroupBean}();
         }
         _pageGroupBean.setPageGroupOption(_pageGroupOption);
         _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
@@ -166,7 +166,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * @param pageRangeSize The value of pageRangeSize.
      */
     public void setPageRangeSize(int pageRangeSize) {
-        final ${glPageRangeOptionName} option = new ${glPageRangeOptionName}();
+        final ${glPageRangeOption} option = new ${glPageRangeOption}();
         option.setPageRangeSize(pageRangeSize);
         setPageRangeOption(option);
     }
@@ -175,7 +175,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * Set the value of pageRangeOption.
      * @param pageRangeOption The value of pageRangeOption. (Nullable)
      */
-    public void setPageRangeOption(${glPageRangeOptionName} pageRangeOption) {
+    public void setPageRangeOption(${glPageRangeOption} pageRangeOption) {
         this._pageRangeOption = pageRangeOption;
     }
 
@@ -183,10 +183,10 @@ public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
      * Get the value of pageRangeBean.
      * @return The value of pageRangeBean. (NotNull)
      */
-    public ${glPageRangeBeanName} pageRange() {
+    public ${glPageRangeBean} pageRange() {
         assertPageRangeValid();
         if (_pageRangeBean == null) {
-            _pageRangeBean = new ${glPageRangeBeanName}();
+            _pageRangeBean = new ${glPageRangeBean}();
         }
         _pageRangeBean.setPageRangeOption(_pageRangeOption);
         _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());

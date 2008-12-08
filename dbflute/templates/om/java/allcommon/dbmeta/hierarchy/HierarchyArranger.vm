@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
-#set ($myClassName = "${glHierarchyArrangerName}")
+#set ($myClassName = "${glHierarchyArranger}")
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -234,16 +234,16 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param request Hierarchy request. (NotNull)
      * @return The list of local entity. (NotNull)
      */
-    public List<LOCAL_ENTITY> arrangeHierarchy(${glHierarchyRequestName}<LOCAL_ENTITY> request) {
+    public List<LOCAL_ENTITY> arrangeHierarchy(${glHierarchyRequest}<LOCAL_ENTITY> request) {
         final List<LOCAL_ENTITY> localTableList = new ArrayList<LOCAL_ENTITY>();
         final Map<String, ${glEntity}> alreadyRegisteredEntityMap = new HashMap<String, ${glEntity}>();
 
         // ============
         // Record Loop!
         // ============
-        final ${glHierarchySourceIteratorName} sourceIterator = request.getSourceIterator();
+        final ${glHierarchySourceIterator} sourceIterator = request.getSourceIterator();
         while (sourceIterator.hasNext()) {
-            final ${glHierarchySourceRowName} sourceRow = sourceIterator.next();
+            final ${glHierarchySourceRow} sourceRow = sourceIterator.next();
             final TopInfo<LOCAL_ENTITY> topInfo = new TopInfo<LOCAL_ENTITY>();
             topInfo.setHierarchyRequest(request);
             topInfo.setSourceRow(sourceRow);
@@ -285,7 +285,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @return Top already-registered key. (NotNull)
      */
     protected String buildTopAlreadyRegisteredKey(Map<String, Object> primaryKeyMap) {
-        return ${glHierarchyRequestElementName}.TOP_KEY + ":" + primaryKeyMap;
+        return ${glHierarchyRequestElement}.TOP_KEY + ":" + primaryKeyMap;
     }
 
     /**
@@ -294,20 +294,20 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param topInfo The information object of top that has generics of the type of local entity. (NotNull)
      */
     protected void doColumnLoop(TopInfo<LOCAL_ENTITY> topInfo) {
-        final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
+        final ${glHierarchyRequest}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final ${glEntity} localEntity = topInfo.getLocalEntity();
-        final List<${glHierarchyRequestElementName}> requestElementList = request.getRequestElementList();
+        final List<${glHierarchyRequestElement}> requestElementList = request.getRequestElementList();
 
         // ============
         // Column Loop!
         // ============
-        for (${glHierarchyRequestElementName} requestElement : requestElementList) {
+        for (${glHierarchyRequestElement} requestElement : requestElementList) {
             final List<String> relationPropertyNameList = requestElement.getRelationPropertyNameList();
 
             // If the column belongs to local entity, inject the value to entity and continue loop.
             if (relationPropertyNameList == null || relationPropertyNameList.isEmpty()) {
-                final ${glHierarchySourceColumnName} sourceColumn = requestElement.getSourceColumnInfo();
-                final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
+                final ${glHierarchySourceColumn} sourceColumn = requestElement.getSourceColumnInfo();
+                final ${glHierarchySourceRow} sourceRow = topInfo.getSourceRow();
                 final Object sourceColumnValue = extractColumnValueFromSource(sourceRow, sourceColumn);
                 final ${glColumnInfo} destinationColumnInfo = requestElement.getDestinationColumnInfo();
                 injectColumnValueToDestinationIfNotNull(localEntity, destinationColumnInfo, sourceColumnValue);
@@ -328,14 +328,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param requestElement The element of request. This is relation loop resource. (NotNull)
      * @param relationPropNameList The list of relation property name that has generics of string. (NotNull)
      */
-    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement, java.util.List<String> relationPropNameList) {
-        final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
+    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElement} requestElement, java.util.List<String> relationPropNameList) {
+        final ${glHierarchyRequest}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, ${glEntity}> alreadyRegisteredEntityMap = topInfo.getAlreadyRegisteredEntityMap();
 
         // Temporary variables for local
         ${glEntity} localEntity = topInfo.getLocalEntity();// as Default
         ${glDBMeta} localDBMeta = request.getDestinationDBMeta();// as Default
-        String localRelationPath = ${glHierarchyRequestElementName}.TOP_KEY;// as Default
+        String localRelationPath = ${glHierarchyRequestElement}.TOP_KEY;// as Default
 
         // ==============
         // Relation Loop!
@@ -489,12 +489,12 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param localEntity The interface of local entity. (NotNull)
      * @param primaryKeyMap The map of primary key. (NotNull)
      */
-    protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement,
+    protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElement} requestElement,
                                        ${glEntity} localEntity, Map<String, Object> primaryKeyMap) {
         final ${glColumnInfo} destinationColumnInfo = requestElement.getDestinationColumnInfo();
         if (!primaryKeyMap.containsKey(destinationColumnInfo.getColumnDbName())) {// The column is primary key!
-            final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
-            final ${glHierarchySourceColumnName} sourceColumnInfo = requestElement.getSourceColumnInfo();
+            final ${glHierarchySourceRow} sourceRow = topInfo.getSourceRow();
+            final ${glHierarchySourceColumn} sourceColumnInfo = requestElement.getSourceColumnInfo();
             final Object sourceColumnValue = extractColumnValueFromSource(sourceRow, sourceColumnInfo);
             if (sourceColumnValue != null) {
                 injectColumnValueToDestinationIfNotNull(localEntity, destinationColumnInfo, sourceColumnValue);
@@ -506,24 +506,24 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     //                                                                       Extract Logic
     //                                                                       =============
     protected Map<String, Object> extractTopPrimaryKeyMapFromSource(TopInfo<LOCAL_ENTITY> topInfo) {
-        return extractPrimaryKeyMapFromSource(topInfo, ${glHierarchyRequestElementName}.TOP_KEY);
+        return extractPrimaryKeyMapFromSource(topInfo, ${glHierarchyRequestElement}.TOP_KEY);
     }
 
     protected Map<String, Object> extractPrimaryKeyMapFromSource(TopInfo<LOCAL_ENTITY> topInfo, String relationPath) {
-        final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
-        final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
-        final java.util.List<${glHierarchyRequestElementName}> primaryKeyElement = request.findPrimaryKeyElement(relationPath);
+        final ${glHierarchyRequest}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
+        final ${glHierarchySourceRow} sourceRow = topInfo.getSourceRow();
+        final java.util.List<${glHierarchyRequestElement}> primaryKeyElement = request.findPrimaryKeyElement(relationPath);
         final java.util.Map<String, Object> primaryKeyMap = new java.util.LinkedHashMap<String, Object>();
-        for (${glHierarchyRequestElementName} element : primaryKeyElement) {
-            final ${glHierarchySourceColumnName} sourcePrimaryKey = element.getSourceColumnInfo();
+        for (${glHierarchyRequestElement} element : primaryKeyElement) {
+            final ${glHierarchySourceColumn} sourcePrimaryKey = element.getSourceColumnInfo();
             final Object sourcePrimaryKeyValue = extractColumnValueFromSource(sourceRow, sourcePrimaryKey);
             primaryKeyMap.put(element.getDestinationColumnInfo().getColumnDbName(), sourcePrimaryKeyValue);
         }
         return primaryKeyMap;
     }
 
-    protected Object extractColumnValueFromSource(${glHierarchySourceRowName} sourceRow,
-            ${glHierarchySourceColumnName} sourceColumn) {
+    protected Object extractColumnValueFromSource(${glHierarchySourceRow} sourceRow,
+            ${glHierarchySourceColumn} sourceColumn) {
         return sourceRow.extractColumnValue(sourceColumn);
     }
 
@@ -582,11 +582,11 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     }
 
     protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntity} localEntity, ${glForeignInfo} foreignInfo, String foreignRelationPath) {
-        final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
+        final ${glHierarchyRequest}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> foreignPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, foreignRelationPath);
-        final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(foreignRelationPath);
+        final List<${glHierarchyRequestElement}> primaryKeyElementList = request.findPrimaryKeyElement(foreignRelationPath);
         final Map<String, Object> localForeignKeyMap = new HashMap<String, Object>();
-        for (${glHierarchyRequestElementName} foreignElement : primaryKeyElementList) {
+        for (${glHierarchyRequestElement} foreignElement : primaryKeyElementList) {
             final String foreignPrimaryKeyColumnName = foreignElement.getDestinationColumnInfo().getColumnDbName();
             final ${glColumnInfo} localForeignKeyInfo = foreignInfo.findLocalByForeign(foreignPrimaryKeyColumnName);
             final Object localForeignKeyValue = foreignPrimaryKeyMap.get(foreignPrimaryKeyColumnName);
@@ -597,11 +597,11 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
 
     protected void injectReferrerForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntity} referrerEntity,
             ${glReferrerInfo} referrerInfo, String localRelationPath) {
-        final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
+        final ${glHierarchyRequest}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> localPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, localRelationPath);
-        final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(localRelationPath);
+        final List<${glHierarchyRequestElement}> primaryKeyElementList = request.findPrimaryKeyElement(localRelationPath);
         final Map<String, Object> referrerForeignKeyMap = new HashMap<String, Object>();
-        for (${glHierarchyRequestElementName} localElement : primaryKeyElementList) {
+        for (${glHierarchyRequestElement} localElement : primaryKeyElementList) {
             final String localPrimaryKeyName = localElement.getDestinationColumnInfo().getColumnDbName();
             final ${glColumnInfo} referrerForeignKeyInfo = referrerInfo.findReferrerByLocal(localPrimaryKeyName);
             final Object referrerForeignKeyValue = localPrimaryKeyMap.get(localPrimaryKeyName);
@@ -722,19 +722,19 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     //                                                                          Info Class
     //                                                                          ==========
     protected static class TopInfo<LOCAL_ENTITY extends ${glEntity}> {
-        private ${glHierarchyRequestName}<LOCAL_ENTITY> hierarchyRequest;
+        private ${glHierarchyRequest}<LOCAL_ENTITY> hierarchyRequest;
 
-        private ${glHierarchySourceRowName} sourceRow;
+        private ${glHierarchySourceRow} sourceRow;
 
         private ${glEntity} localEntity;
 
         private Map<String, ${glEntity}> alreadyRegisteredEntityMap;
 
-        public ${glHierarchySourceRowName} getSourceRow() {
+        public ${glHierarchySourceRow} getSourceRow() {
             return sourceRow;
         }
 
-        public void setSourceRow(${glHierarchySourceRowName} sourceRow) {
+        public void setSourceRow(${glHierarchySourceRow} sourceRow) {
             this.sourceRow = sourceRow;
         }
 
@@ -754,11 +754,11 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
             this.alreadyRegisteredEntityMap = alreadyRegisteredEntityMap;
         }
 
-        public ${glHierarchyRequestName}<LOCAL_ENTITY> getHierarchyRequest() {
+        public ${glHierarchyRequest}<LOCAL_ENTITY> getHierarchyRequest() {
             return hierarchyRequest;
         }
 
-        public void setHierarchyRequest(${glHierarchyRequestName}<LOCAL_ENTITY> hierarchyRequest) {
+        public void setHierarchyRequest(${glHierarchyRequest}<LOCAL_ENTITY> hierarchyRequest) {
             this.hierarchyRequest = hierarchyRequest;
         }
     }

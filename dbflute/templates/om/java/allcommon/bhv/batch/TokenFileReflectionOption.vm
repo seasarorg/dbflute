@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOption};
 
 /**
  * @author ${database.ClassAuthor}
@@ -12,7 +12,7 @@ public class ${glTokenFileReflectionOption} {
     //                                                                             =========
     protected boolean _interruptIfError;
 
-    protected ${glFileTokenizingOptionName} _fileTokenizingOption = new ${glFileTokenizingOptionName}();
+    protected ${glFileTokenizingOption} _fileTokenizingOption = new ${glFileTokenizingOption}();
 
     // =====================================================================================
     //                                                                           Easy-to-Use

@@ -1,20 +1,20 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFileImpl};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileToken};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallbackName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResourceName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallback};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOption};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResource};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacade};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileMakingSimpleFacadeImplName} implements ${glFileMakingSimpleFacadeName} {
+public class ${glFileMakingSimpleFacadeImpl} implements ${glFileMakingSimpleFacade} {
 
-    protected ${glFileTokenName} _fileToken = new ${glFileTokenImplName}();
+    protected ${glFileToken} _fileToken = new ${glFileTokenImpl}();
 
-    public void setFileToken(${glFileTokenName} fileToken) {
+    public void setFileToken(${glFileToken} fileToken) {
         this._fileToken = fileToken;
     }
 
@@ -27,16 +27,16 @@ public class ${glFileMakingSimpleFacadeImplName} implements ${glFileMakingSimple
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void makeFromRowList(final String filename, final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
-        final ${glFileMakingCallbackName} fileMakingCallback = new ${glFileMakingCallbackName}() {
+    public void makeFromRowList(final String filename, final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        final ${glFileMakingCallback} fileMakingCallback = new ${glFileMakingCallback}() {
             protected int rowCount = 0;
-            public ${glFileMakingRowResourceName} getRowResource() {
+            public ${glFileMakingRowResource} getRowResource() {
                 ++rowCount;
                 if (rowList.size() < rowCount) {
                     return null;// The End!
                 }
                 final java.util.List${database.filterGenericsString('String')} valueList = (java.util.List${database.filterGenericsString('String')})rowList.get(rowCount - 1);
-                final ${glFileMakingRowResourceName} fileMakingRowResource = new ${glFileMakingRowResourceName}();
+                final ${glFileMakingRowResource} fileMakingRowResource = new ${glFileMakingRowResource}();
                 fileMakingRowResource.setValueList(valueList);
                 return fileMakingRowResource;
             }
@@ -53,16 +53,16 @@ public class ${glFileMakingSimpleFacadeImplName} implements ${glFileMakingSimple
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public byte[] makeFromRowList(final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
-        final ${glFileMakingCallbackName} fileMakingCallback = new ${glFileMakingCallbackName}() {
+    public byte[] makeFromRowList(final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        final ${glFileMakingCallback} fileMakingCallback = new ${glFileMakingCallback}() {
             protected int rowCount = 0;
-            public ${glFileMakingRowResourceName} getRowResource() {
+            public ${glFileMakingRowResource} getRowResource() {
                 ++rowCount;
                 if (rowList.size() < rowCount) {
                     return null;// The End!
                 }
                 final java.util.List${database.filterGenericsString('String')} valueList = (java.util.List${database.filterGenericsString('String')})rowList.get(rowCount - 1);
-                final ${glFileMakingRowResourceName} fileMakingRowResource = new ${glFileMakingRowResourceName}();
+                final ${glFileMakingRowResource} fileMakingRowResource = new ${glFileMakingRowResource}();
                 fileMakingRowResource.setValueList(valueList);
                 return fileMakingRowResource;
             }

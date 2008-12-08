@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacter};
  *
  * @author ${database.ClassAuthor}
  */
-public interface ${glJapaneseCharacterName} {
+public interface ${glJapaneseCharacter} {
 
     public String toDoubleByteKatakana(String target);
 }

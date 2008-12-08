@@ -3,9 +3,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelper};
 import java.util.Arrays;
 import java.util.List;
 
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineToken};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOption};
+import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImpl};
 
 /**
  * The implementation of map-string builder.
@@ -104,8 +104,8 @@ public class ${glMapStringBuilderImpl} implements ${glMapStringBuilder} {
     }
 
     protected List<String> tokenize(String value, String delimiter) {
-        final ${glLineTokenName} lineToken = new ${glLineTokenImplName}();
-        final ${glLineTokenizingOptionName} lineTokenizingOption = new ${glLineTokenizingOptionName}();
+        final ${glLineToken} lineToken = new ${glLineTokenImpl}();
+        final ${glLineTokenizingOption} lineTokenizingOption = new ${glLineTokenizingOption}();
         lineTokenizingOption.setDelimiter(delimiter);
         if (_trimDoubleQuotation) {
             lineTokenizingOption.trimDoubleQuotation();

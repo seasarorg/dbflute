@@ -14,9 +14,9 @@ import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupper};
 #end
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupper};
 #if ($database.isMakeFlatExpansion())
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArranger};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequest};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequest};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glListResultBean};
@@ -807,8 +807,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param <SOURCE> The type of source.
      * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      */
-    public <SOURCE> ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(List<SOURCE> sourceList) {
-        final ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
+    public <SOURCE> ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(List<SOURCE> sourceList) {
+        final ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
         request.registerSourceList(sourceList);
         return request;
     }
@@ -818,8 +818,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      * @return The list of ${myExtendedObjectClassName}. (NotNull)
      */
-    public List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
-        return new ${glHierarchyArrangerName}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
+    public List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequest}<${myExtendedObjectClassName}> request) {
+        return new ${glHierarchyArranger}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
     }
 #end
 

@@ -1,13 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacterImpl};
 
-import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacterName};
+import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacter};
 
 /**
  * The implementation of Japanese character.
  *
  * @author ${database.ClassAuthor}
  */
-public class ${glJapaneseCharacterImplName} implements ${glJapaneseCharacterName} {
+public class ${glJapaneseCharacterImpl} implements ${glJapaneseCharacter} {
 
     // Double-byte Katakana
     protected static final String TABLE_ZENKANA = 

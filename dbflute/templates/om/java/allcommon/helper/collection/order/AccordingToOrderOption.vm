@@ -7,19 +7,19 @@ import java.util.List;
  * @param <ELEMENT_TYPE> The type of element.
  * @param <ID_TYPE> The type of ID.
  */
-public class ${glAccordingToOrderOptionName}<ELEMENT_TYPE, ID_TYPE> {
+public class ${glAccordingToOrderOption}<ELEMENT_TYPE, ID_TYPE> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected List<ID_TYPE> _orderedUniqueIdList;
 
-    protected ${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> _idExtractor;
+    protected ${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> _idExtractor;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void setupOrderedResource(List<ID_TYPE> orderedUniqueIdList, ${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> idExtractor) {
+    public void setupOrderedResource(List<ID_TYPE> orderedUniqueIdList, ${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> idExtractor) {
         setOrderedUniqueIdList(orderedUniqueIdList);
         setIdExtractor(idExtractor);
     }
@@ -35,11 +35,11 @@ public class ${glAccordingToOrderOptionName}<ELEMENT_TYPE, ID_TYPE> {
         this._orderedUniqueIdList = orderedUniqueIdList;
     }
 
-    public ${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> getIdExtractor() {
+    public ${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> getIdExtractor() {
         return _idExtractor;
     }
 
-    public void setIdExtractor(${glAccordingToOrderIdExtractorName}<ELEMENT_TYPE, ID_TYPE> idExtractor) {
+    public void setIdExtractor(${glAccordingToOrderIdExtractor}<ELEMENT_TYPE, ID_TYPE> idExtractor) {
         _idExtractor = idExtractor;
     }
 }

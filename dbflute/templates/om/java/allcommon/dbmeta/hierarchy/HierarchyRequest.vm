@@ -1,14 +1,14 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
-#set ($myClassName = "${glHierarchyRequestName}")
+#set ($myClassName = "${glHierarchyRequest}")
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumnName};
-import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIteratorName};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumn};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIterator};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
 
@@ -26,10 +26,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     protected ${glDBMeta} destinationDBMeta;
 
     /** The iterator of hierarychy source. */
-    protected ${glHierarchySourceIteratorName} sourceIterator;
+    protected ${glHierarchySourceIterator} sourceIterator;
 
     /** The list of request element. */
-    protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
+    protected List<${glHierarchyRequestElement}> requestElementList = new ArrayList<${glHierarchyRequestElement}>();
 
     /** The set of already registered source column info for check. */
     protected java.util.Set<${glColumnInfo}> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<${glColumnInfo}>();
@@ -84,7 +84,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumn The column of source. (NotNull)
      * @param relationTrace The relation trace of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glDBMeta}.RelationTrace relationTrace) {
+    public void mapping(${glHierarchySourceColumn} sourceColumn, ${glDBMeta}.RelationTrace relationTrace) {
         setupElement(sourceColumn, relationTrace.getTraceColumn());
         addRelationToLastElement(relationTrace.getTraceRelation());
     }
@@ -109,9 +109,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    protected void setupElement(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
+    protected void setupElement(${glHierarchySourceColumn} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
-        final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
+        final ${glHierarchyRequestElement} element = new ${glHierarchyRequestElement}();
         requestElementList.add(element);
         element.mapping(sourceColumn, destinationColumnInfo);
         element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
@@ -138,9 +138,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
         alreadyRegisteredSourceColumnInfoSet4Check.add(sourceColumnInfo);
         assertSameSourceDBMeta(sourceColumnInfo);
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
-        final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
+        final ${glHierarchyRequestElement} element = new ${glHierarchyRequestElement}();
         requestElementList.add(element);
-        final ${glHierarchySourceColumnName} sourceColumn = createDefaultSourceColumn(sourceColumnInfo);
+        final ${glHierarchySourceColumn} sourceColumn = createDefaultSourceColumn(sourceColumnInfo);
         element.mapping(sourceColumn, destinationColumnInfo);
         element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
     }
@@ -157,7 +157,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
         }
         for (${glRelationInfo} relationInfo : relationInfoList) {
             final int lastIndex = requestElementList.size() - 1;
-            final ${glHierarchyRequestElementName} element = (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
+            final ${glHierarchyRequestElement} element = (${glHierarchyRequestElement}) requestElementList.get(lastIndex);
             element.relation(relationInfo);
         }
     }
@@ -193,7 +193,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      */
     protected void assertSameLocalDestinationDBMeta(${glColumnInfo} destinationColumnInfo) {
         if (!requestElementList.isEmpty()) {
-            final ${glHierarchyRequestElementName} currentElement = currentElement();
+            final ${glHierarchyRequestElement} currentElement = currentElement();
             final List<${glRelationInfo}> relationInfoList = currentElement.getRelationInfoList();
             if (relationInfoList.isEmpty()) {
                 final ${glDBMeta} actualDBMeta = currentElement().getDestinationDBMeta();
@@ -218,16 +218,16 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param <SOURCE> The type of source. (NotNull)
      * @return Default source iterator. (NotNull)
      */
-    protected <SOURCE> ${glHierarchySourceIteratorName} createDefaultSourceIterator(java.util.List<SOURCE> sourceList) {
-        return new ${glHierarchySourceEntityListIteratorName}<SOURCE>(sourceList);
+    protected <SOURCE> ${glHierarchySourceIterator} createDefaultSourceIterator(java.util.List<SOURCE> sourceList) {
+        return new ${glHierarchySourceEntityListIterator}<SOURCE>(sourceList);
     }
 
     /**
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @return Default source column. (NotNull)
      */
-    protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfo} sourceColumnInfo) {
-        return new ${glHierarchySourceEntityColumnName}(sourceColumnInfo);
+    protected ${glHierarchySourceColumn} createDefaultSourceColumn(${glColumnInfo} sourceColumnInfo) {
+        return new ${glHierarchySourceEntityColumn}(sourceColumnInfo);
     }
 
     /**
@@ -235,9 +235,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * 
      * @return Current element. (NotNull)
      */
-    protected ${glHierarchyRequestElementName} currentElement() {
+    protected ${glHierarchyRequestElement} currentElement() {
         final int lastIndex = requestElementList.size() - 1;
-        return (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
+        return (${glHierarchyRequestElement}) requestElementList.get(lastIndex);
     }
 
     // -----------------------------------------------------
@@ -247,9 +247,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param relationPropertyKey Relation Property key. (NotNull)
      * @return The list of request element. (NotNull)
      */
-    public List<${glHierarchyRequestElementName}> findPrimaryKeyElement(String relationPropertyKey) {
-        final List<${glHierarchyRequestElementName}> resultList = new ArrayList<${glHierarchyRequestElementName}>();
-        for (${glHierarchyRequestElementName} element : requestElementList) {
+    public List<${glHierarchyRequestElement}> findPrimaryKeyElement(String relationPropertyKey) {
+        final List<${glHierarchyRequestElement}> resultList = new ArrayList<${glHierarchyRequestElement}>();
+        for (${glHierarchyRequestElement} element : requestElementList) {
             if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
                 continue;
             }
@@ -278,19 +278,19 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
         this.destinationDBMeta = destinationDBMeta;
     }
 
-    public List<${glHierarchyRequestElementName}> getRequestElementList() {
+    public List<${glHierarchyRequestElement}> getRequestElementList() {
         return requestElementList;
     }
 
-    public void addRequestElementList(${glHierarchyRequestElementName} element) {
+    public void addRequestElementList(${glHierarchyRequestElement} element) {
         this.requestElementList.add(element);
     }
 
-    public ${glHierarchySourceIteratorName} getSourceIterator() {
+    public ${glHierarchySourceIterator} getSourceIterator() {
         return sourceIterator;
     }
 
-    public void setSourceIterator(${glHierarchySourceIteratorName} sourceIterator) {
+    public void setSourceIterator(${glHierarchySourceIterator} sourceIterator) {
         this.sourceIterator = sourceIterator;
     }
 

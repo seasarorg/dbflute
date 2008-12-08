@@ -3,6 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public interface ${glFileTokenizingCallbackName} {
-    public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource);
+public interface ${glFileTokenizingCallback} {
+    public void handleRowResource(${glFileTokenizingRowResource} fileTokenizingRowResource);
 }

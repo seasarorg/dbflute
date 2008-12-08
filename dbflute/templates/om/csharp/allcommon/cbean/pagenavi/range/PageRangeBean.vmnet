@@ -1,4 +1,4 @@
-#set ($myClassName = "${glPageRangeBeanName}")
+#set ($myClassName = "${glPageRangeBean}")
 
 using System;
 
@@ -17,13 +17,13 @@ public class ${myClassName} {
     public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
     protected int _allPageCount;
     public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
-    protected ${glPageRangeOptionName} _pageRangeOption;
-    public ${glPageRangeOptionName} PageRangeOption { get { return _pageRangeOption; } set { _pageRangeOption = value; } }
+    protected ${glPageRangeOption} _pageRangeOption;
+    public ${glPageRangeOption} PageRangeOption { get { return _pageRangeOption; } set { _pageRangeOption = value; } }
 
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public System.Collections.Generic.IList<LINK> BuildPageNumberLinkList<LINK>(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLinkName} {
+    public System.Collections.Generic.IList<LINK> BuildPageNumberLinkList<LINK>(${glPageNumberLinkSetupper}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLink} {
         System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
         System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
         foreach (int pageNumber in pageNumberList) {

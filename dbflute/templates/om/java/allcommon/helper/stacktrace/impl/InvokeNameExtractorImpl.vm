@@ -1,13 +1,13 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperStackTraceImpl};
 
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractorName};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResult};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResource};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractor};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInvokeNameExtractorImplName} implements ${glInvokeNameExtractorName} {
+public class ${glInvokeNameExtractorImpl} implements ${glInvokeNameExtractor} {
 
     // ==========================================================================================
     //                                                                                  Attribute
@@ -21,7 +21,7 @@ public class ${glInvokeNameExtractorImplName} implements ${glInvokeNameExtractor
      * @param resource the call-back resource for invoke-name-extracting. (NotNull)
      * @return Invoke name. (NotNull: If not found, returns empty string.)
      */
-    public ${glInvokeNameResultName} extractInvokeName(${glInvokeNameExtractingResourceName} resource) {
+    public ${glInvokeNameResult} extractInvokeName(${glInvokeNameExtractingResource} resource) {
         if (_stackTrace == null) {
             String msg = "The attribute 'stackTrace' should not be null: resource=" + resource;
             throw new IllegalStateException(msg);
@@ -65,7 +65,7 @@ public class ${glInvokeNameExtractorImplName} implements ${glInvokeNameExtractor
                 break;
             }
         }
-        final ${glInvokeNameResultName} result = new ${glInvokeNameResultName}();
+        final ${glInvokeNameResult} result = new ${glInvokeNameResult}();
         if (targetSimpleClassName == null) {
             result.beEmptyResult(); // Not Found! It sets empty result.
             return result;

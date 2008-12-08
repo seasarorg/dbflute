@@ -380,7 +380,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                          Where Clause Simple Filter
     //                                                          ==========================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter);
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilter} whereClauseSimpleFilter);
     
     // ===================================================================================
     //                                                               Selected Foreign Info

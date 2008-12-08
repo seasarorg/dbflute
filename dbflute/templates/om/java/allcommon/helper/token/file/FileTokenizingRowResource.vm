@@ -3,12 +3,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileTokenizingRowResourceName} {
+public class ${glFileTokenizingRowResource} {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo;
+    protected ${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo;
 
     protected java.util.List${database.filterGenericsString('String')} valueList;
 
@@ -23,11 +23,11 @@ public class ${glFileTokenizingRowResourceName} {
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public ${glFileTokenizingHeaderInfoName} getFileTokenizingHeaderInfo() {
+    public ${glFileTokenizingHeaderInfo} getFileTokenizingHeaderInfo() {
         return fileTokenizingHeaderInfo;
     }
 
-    public void setFirstLineInfo(${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo) {
+    public void setFirstLineInfo(${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo) {
         this.fileTokenizingHeaderInfo = fileTokenizingHeaderInfo;
     }
 

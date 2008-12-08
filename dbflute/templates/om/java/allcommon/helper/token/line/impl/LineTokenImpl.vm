@@ -4,19 +4,19 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineToken};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOption};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOption};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glLineTokenImplName} implements ${glLineTokenName} {
+public class ${glLineTokenImpl} implements ${glLineToken} {
 
     // ===================================================================================
     //                                                                       Tokenize Line
     //                                                                       =============
-    public List<String> tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption) {
+    public List<String> tokenize(String lineString, ${glLineTokenizingOption} lineTokenizingOption) {
         final String delimiter = lineTokenizingOption.getDelimiter();
         final List<String> list = new ArrayList<String>();
         int i = 0;
@@ -41,7 +41,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return list;
     }
 
-    protected String filterHandlingEmptyAsNull(String target, ${glLineTokenizingOptionName} lineTokenizingOption) {
+    protected String filterHandlingEmptyAsNull(String target, ${glLineTokenizingOption} lineTokenizingOption) {
         if (target == null) {
             return null;
         }
@@ -54,7 +54,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
     // ===================================================================================
     //                                                                           Make Line
     //                                                                           =========
-    public String make(java.util.List<String> valueList, ${glLineMakingOptionName} lineMakingOption) {
+    public String make(java.util.List<String> valueList, ${glLineMakingOption} lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();

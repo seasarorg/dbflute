@@ -17,9 +17,9 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
-import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResultName};
-import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImplName};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResource};
+import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameResult};
+import ${glPackageBaseCommonHelperStackTraceImpl}.${glInvokeNameExtractorImpl};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalStatementFactory};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtil};
@@ -265,7 +265,7 @@ public class ${glBehaviorCommandInvoker} {
     //                                                                      ==============
     protected <RESULT> void logInvocation(${glBehaviorCommand}<RESULT> behaviorCommand) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final ${glInvokeNameResultName} behaviorResult = extractBehaviorInvokeName(stackTrace);
+        final ${glInvokeNameResult} behaviorResult = extractBehaviorInvokeName(stackTrace);
         filterBehaviorResult(behaviorCommand, behaviorResult);
 
         final String invokeClassName;
@@ -300,7 +300,7 @@ public class ${glBehaviorCommandInvoker} {
         }
     }
 
-    protected <RESULT> void filterBehaviorResult(${glBehaviorCommand}<RESULT> behaviorCommand, ${glInvokeNameResultName} behaviorResult) {
+    protected <RESULT> void filterBehaviorResult(${glBehaviorCommand}<RESULT> behaviorCommand, ${glInvokeNameResult} behaviorResult) {
         final String simpleClassName = behaviorResult.getSimpleClassName();
         if (simpleClassName == null) {
             return;
@@ -312,11 +312,11 @@ public class ${glBehaviorCommandInvoker} {
         }
     }
 
-    protected <RESULT> void logPath(${glBehaviorCommand}<RESULT> behaviorCommand, StackTraceElement[] stackTrace, ${glInvokeNameResultName} behaviorResult) {
+    protected <RESULT> void logPath(${glBehaviorCommand}<RESULT> behaviorCommand, StackTraceElement[] stackTrace, ${glInvokeNameResult} behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
-        final ${glInvokeNameResultName} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
+        final ${glInvokeNameResult} clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final ${glInvokeNameResultName} byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+        final ${glInvokeNameResult} byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
 
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
@@ -403,9 +403,9 @@ public class ${glBehaviorCommandInvoker} {
         return sb.toString();
     }
 
-    protected ${glInvokeNameResultName} extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
+    protected ${glInvokeNameResult} extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
         final List<String> suffixList = Arrays.asList(new String[]{"Page", "Action"});
-        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
+        final ${glInvokeNameExtractingResource} resource = new ${glInvokeNameExtractingResource}() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
@@ -425,9 +425,9 @@ public class ${glBehaviorCommandInvoker} {
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected ${glInvokeNameResultName} extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
+    protected ${glInvokeNameResult} extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
         final List<String> suffixList = Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"});
-        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
+        final ${glInvokeNameExtractingResource} resource = new ${glInvokeNameExtractingResource}() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
@@ -447,13 +447,13 @@ public class ${glBehaviorCommandInvoker} {
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected ${glInvokeNameResultName} extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
+    protected ${glInvokeNameResult} extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable" , "PagingInvoker"});
         final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
         final List<String> ousideSql1List = Arrays.asList(new String[]{"OutsideSql"});
         final List<String> ousideSql2List = Arrays.asList(new String[]{"Executor"});
         final List<String> ousideSql3List = Arrays.asList(new String[]{"Executor$"});
-        final ${glInvokeNameExtractingResourceName} resource = new ${glInvokeNameExtractingResourceName}() {
+        final ${glInvokeNameExtractingResource} resource = new ${glInvokeNameExtractingResource}() {
             public boolean isTargetElement(String className, String methodName) {
                 if (isClassNameEndsWith(className, suffixList)) {
                     return true;
@@ -507,8 +507,8 @@ public class ${glBehaviorCommandInvoker} {
      * @param stackTrace Stack log. (NotNull)
      * @return The result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    protected ${glInvokeNameResultName} extractInvokeName(${glInvokeNameExtractingResourceName} resource, StackTraceElement[] stackTrace) {
-        final ${glInvokeNameExtractorImplName} extractor = new ${glInvokeNameExtractorImplName}();
+    protected ${glInvokeNameResult} extractInvokeName(${glInvokeNameExtractingResource} resource, StackTraceElement[] stackTrace) {
+        final ${glInvokeNameExtractorImpl} extractor = new ${glInvokeNameExtractorImpl}();
         extractor.setStackTrace(stackTrace);
         return extractor.extractInvokeName(resource);
     }

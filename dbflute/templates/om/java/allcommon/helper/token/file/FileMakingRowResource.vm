@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileMakingRowResourceName} {
+public class ${glFileMakingRowResource} {
 
     // =====================================================================================
     //                                                                             Attribute

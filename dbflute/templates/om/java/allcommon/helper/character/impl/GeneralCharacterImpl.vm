@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacterImpl};
 
-import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
+import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacter};
 
 /**
  * The implementation of general character.
  * @author ${database.ClassAuthor}
  */
-public class ${glGeneralCharacterImplName} implements ${glGeneralCharacterName} {
+public class ${glGeneralCharacterImpl} implements ${glGeneralCharacter} {
 
     public String toSingleByteAlphabet(String target) {
         if (target == null) {

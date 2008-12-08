@@ -4,33 +4,33 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileToken};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallbackName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResourceName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfoName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallback};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOption};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResource};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfo};
 
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallbackName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResourceName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallback};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOption};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResource};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfo};
 
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
-import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
-import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineToken};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOption};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOption};
+import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImpl};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glFileTokenImplName} implements ${glFileTokenName} {
+public class ${glFileTokenImpl} implements ${glFileToken} {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
     /** Line-token for help. */
-    protected final ${glLineTokenName} _lineToken = new ${glLineTokenImplName}();
+    protected final ${glLineToken} _lineToken = new ${glLineTokenImpl}();
 
     // =====================================================================================
     //                                                                                  Main
@@ -44,7 +44,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(String filename, ${glFileTokenizingCallbackName} fileTokenizingCallback, ${glFileTokenizingOptionName} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void tokenize(String filename, ${glFileTokenizingCallback} fileTokenizingCallback, ${glFileTokenizingOption} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
         java.io.FileInputStream fis = null;
@@ -78,7 +78,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(java.io.InputStream inputStream, ${glFileTokenizingCallbackName} fileTokenizingCallback, ${glFileTokenizingOptionName} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void tokenize(java.io.InputStream inputStream, ${glFileTokenizingCallback} fileTokenizingCallback, ${glFileTokenizingOption} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertObjectNotNull("inputStream", inputStream);
         assertObjectNotNull("fileTokenizingCallback", fileTokenizingCallback);
         assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
@@ -99,7 +99,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
             ir = new java.io.InputStreamReader(inputStream, encoding);
             br = new java.io.BufferedReader(ir);
 
-            ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = null;
+            ${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo = null;
             int count = -1;
             int rowNumber = 1;
             int lineNumber = 0;
@@ -115,7 +115,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 }
                 if (count == 0) {
                     if (fileTokenizingOption.isBeginFirstLine()) {
-                        fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();// As empty
+                        fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfo}();// As empty
                     } else {
                         fileTokenizingHeaderInfo = analyzeHeaderInfo(delimiter, lineString);
                         continue;
@@ -138,7 +138,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 temporaryValueList.addAll(ls);
 
                 try {
-                    final ${glFileTokenizingRowResourceName} fileTokenizingRowResource = new ${glFileTokenizingRowResourceName}();
+                    final ${glFileTokenizingRowResource} fileTokenizingRowResource = new ${glFileTokenizingRowResource}();
                     fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
 
                     if (fileTokenizingOption.isHandleEmptyAsNull()) {
@@ -188,7 +188,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
 
         // Don't use split!
         //        final String[] values = lineString.split(delimiter);
-        final ${glLineTokenizingOptionName} tokenizingOption = new ${glLineTokenizingOptionName}();
+        final ${glLineTokenizingOption} tokenizingOption = new ${glLineTokenizingOption}();
         tokenizingOption.setDelimiter(delimiter);
         final List${database.filterGenericsString('String')} list = _lineToken.tokenize(lineString, tokenizingOption);
         final String[] values = (String[])list.toArray(new String[list.size()]);
@@ -313,7 +313,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
         return value;
     }
 
-    protected ${glFileTokenizingHeaderInfoName} analyzeHeaderInfo(String delimiter, final String lineString) {
+    protected ${glFileTokenizingHeaderInfo} analyzeHeaderInfo(String delimiter, final String lineString) {
         final java.util.List<String> columnNameList = new ArrayList<String>();
         final String[] values = lineString.split(delimiter);
         for (int i=0; i < values.length; i++) {
@@ -324,7 +324,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 columnNameList.add(value);
             }
         }
-        final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();
+        final ${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfo}();
         fileTokenizingHeaderInfo.setColumnNameList(columnNameList);
         fileTokenizingHeaderInfo.setColumnNameRowString(lineString);
         return fileTokenizingHeaderInfo;
@@ -361,7 +361,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(String filename, ${glFileMakingCallbackName} fileMakingCallback, ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void make(String filename, ${glFileMakingCallback} fileMakingCallback, ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
         java.io.FileOutputStream fos = null;
@@ -391,7 +391,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(java.io.OutputStream outputStream, ${glFileMakingCallbackName} fileMakingCallback, ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void make(java.io.OutputStream outputStream, ${glFileMakingCallback} fileMakingCallback, ${glFileMakingOption} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertObjectNotNull("outputStream", outputStream);
         assertObjectNotNull("fileMakingCallback", fileMakingCallback);
         assertObjectNotNull("fileMakingOption", fileMakingOption);
@@ -415,11 +415,11 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
             boolean headerDone = false;
 
             // Make header.
-            final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = fileMakingOption.getFileMakingHeaderInfo();
+            final ${glFileMakingHeaderInfo} fileMakingHeaderInfo = fileMakingOption.getFileMakingHeaderInfo();
             if (fileMakingHeaderInfo != null) {
                 final List<String> columnNameList = fileMakingHeaderInfo.getColumnNameList();
                 if (columnNameList != null && !columnNameList.isEmpty()) {
-                    final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                    final ${glLineMakingOption} lineMakingOption = new ${glLineMakingOption}();
                     lineMakingOption.setDelimiter(delimiter);
                     lineMakingOption.trimSpace();// Trimming is Header Only!
                     final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
@@ -429,7 +429,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
             }
 
             // Make row.
-            ${glFileMakingRowResourceName} rowResource = null;
+            ${glFileMakingRowResource} rowResource = null;
             while (true) {
                 rowResource = fileMakingCallback.getRowResource();
                 if (rowResource == null) {
@@ -442,7 +442,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                     final java.util.LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
                     if (!headerDone) {
                         final java.util.List<String> columnNameList = new java.util.ArrayList<String>(nameValueMap.keySet());
-                        final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                        final ${glLineMakingOption} lineMakingOption = new ${glLineMakingOption}();
                         lineMakingOption.setDelimiter(delimiter);
                         lineMakingOption.trimSpace();// Trimming is Header Only!
                         final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
@@ -451,7 +451,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                     }
                     valueList = new ArrayList<String>(nameValueMap.values());
                 }
-                final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                final ${glLineMakingOption} lineMakingOption = new ${glLineMakingOption}();
                 lineMakingOption.setDelimiter(delimiter);
                 if (!fileMakingOption.isGoodByeDoubleQuotation()) {
                     lineMakingOption.quoteByDoubleQuotation();

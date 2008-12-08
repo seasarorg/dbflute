@@ -39,10 +39,10 @@ import ${glPackageBaseCommonCBean}.${glScalarQuery};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutor};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
-import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
-import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOption};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfo};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacade};
+import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImpl};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -735,9 +735,9 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
                 final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
                 rowList.add(valueList);
             }
-            final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
-            final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
-            final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
+            final ${glFileMakingSimpleFacade} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImpl}();
+            final ${glFileMakingOption} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
+            final ${glFileMakingHeaderInfo} fileMakingHeaderInfo = new ${glFileMakingHeaderInfo}();
             final List<String> columnDbNameList = new ArrayList<String>();
             for (final java.util.Iterator<${glColumnInfo}> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
                 final ${glColumnInfo} columnInfo = ite.next();
