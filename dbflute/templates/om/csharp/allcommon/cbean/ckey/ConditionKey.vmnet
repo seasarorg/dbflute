@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionKeyName}")
+#set ($myClassName = "${glConditionKey}")
 
 using System;
 
@@ -79,9 +79,9 @@ public abstract class ${myClassName} {
         return _operand;
     }
 
-    abstract public bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName);
+    abstract public bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName);
 
-    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -90,7 +90,7 @@ public abstract class ${myClassName} {
         return this;
     }
 
-    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -99,10 +99,10 @@ public abstract class ${myClassName} {
         return this;
     }
 	
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value);
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
 
-    public ${glConditionValueName} setupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
         if (conditionValue == null) {
             String msg = "Argument[conditionValue] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -111,7 +111,7 @@ public abstract class ${myClassName} {
         return conditionValue;
     }
 
-    public ${glConditionValueName} setupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         if (conditionValue == null) {
             String msg = "Argument[conditionValue] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -120,8 +120,8 @@ public abstract class ${myClassName} {
         return conditionValue;
     }
 	
-    abstract protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location);
-    abstract protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location);
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
 
     protected String buildBindClause(String columnName, String location) {
         return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";

@@ -68,13 +68,13 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read list. (NotNull)</returns>
-        ${glListResultBeanName}<${glEntity}> ReadList(${glConditionBean} cb);
+        ${glListResultBean}<${glEntity}> ReadList(${glConditionBean} cb);
 
         /// <summary>
         /// Read page.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName}<${glEntity}> ReadPage(${glConditionBean} cb);
+        ${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb);
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
+import ${glPackageBaseCommonDBMeta}.${glAbstractDBMeta};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 import ${glPackageBaseCommonDBMetaInfo}.*;
 import ${glPackageBaseCommonHelper}.${glStringKeyMap};
@@ -14,7 +14,7 @@ import ${glPackageBaseCommonHelper}.${glStringKeyMap};
  * The DB meta of ${table.Name}. (Singleton)
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glDBMetaAbstractName} {
+public class ${myClassName} extends ${glAbstractDBMeta} {
 
     private static final ${myClassName} _instance = new ${myClassName}();
     private ${myClassName}() {}

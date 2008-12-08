@@ -47,19 +47,19 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
-    void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value);
+    void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
     void registerWhereClause(String clause);
     void exchangeFirstWhereClauseForLastOne();
 
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value);
+    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
     void registerBaseTableInlineWhereClause(String value);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, bool onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, bool onClauseInline);
     void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline);
 
     // ===================================================================================

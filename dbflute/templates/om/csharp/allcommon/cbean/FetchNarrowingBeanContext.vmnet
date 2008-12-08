@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonCBean} {
  * 
  * @author ${database.ClassAuthor}
  */
-    public static class ${glFetchNarrowingBeanContextName} {
+    public static class ${glFetchNarrowingBeanContext} {
 
         /** The thread-local for this. */
         private static LocalDataStoreSlot _fetchNarrowingBeanSlot = Thread.AllocateDataSlot();
@@ -22,8 +22,8 @@ namespace ${glPackageBaseCommonCBean} {
          * 
          * @return FetchNarrowing-bean. (Nullable)
          */
-        public static ${glFetchNarrowingBeanInterfaceName} GetFetchNarrowingBeanOnThread() {
-            return (${glFetchNarrowingBeanInterfaceName})Thread.GetData(_fetchNarrowingBeanSlot);
+        public static ${glFetchNarrowingBean} GetFetchNarrowingBeanOnThread() {
+            return (${glFetchNarrowingBean})Thread.GetData(_fetchNarrowingBeanSlot);
         }
 
         /**
@@ -31,7 +31,7 @@ namespace ${glPackageBaseCommonCBean} {
          * 
          * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
          */
-        public static void SetFetchNarrowingBeanOnThread(${glFetchNarrowingBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        public static void SetFetchNarrowingBeanOnThread(${glFetchNarrowingBean} ${glAttachedCBArgsVariableName}) {
             if (${glAttachedCBArgsVariableName} == null) {
                 String msg = "The argument[${glAttachedCBArgsVariableName}] must not be null.";
                 throw new ArgumentNullException(msg);
@@ -62,7 +62,7 @@ namespace ${glPackageBaseCommonCBean} {
          * @return Determination.
          */
         public static bool IsTheArgumentFetchNarrowingBean(Object dtoInstance) {
-            if (dtoInstance is ${glFetchNarrowingBeanInterfaceName}) {
+            if (dtoInstance is ${glFetchNarrowingBean}) {
                 return true;
             } else {
                 return false;
@@ -76,7 +76,7 @@ namespace ${glPackageBaseCommonCBean} {
          * @return Determination.
          */
         public static bool IsTheTypeFetchNarrowingBean(Type dtoType) {
-            if (typeof(${glFetchNarrowingBeanInterfaceName}).IsAssignableFrom(dtoType)) {
+            if (typeof(${glFetchNarrowingBean}).IsAssignableFrom(dtoType)) {
                 return true;
             } else {
                 return false;

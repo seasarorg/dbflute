@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                       Attribute
         //                                                                       =========
         protected System.Data.IDataReader _dataReader;
-        protected ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
+        protected ${glFetchNarrowingBean} _fetchNarrowingBean;
         protected long _fetchCounter;
         protected long _requestCounter;
         protected bool _offsetByCursorForcedly;
@@ -29,7 +29,7 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @param dataReader Original data-reader. (NotNull)
          * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
          */
-        public ${glFetchNarrowingResultSetWrapper}(System.Data.IDataReader dataReader, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean
+        public ${glFetchNarrowingResultSetWrapper}(System.Data.IDataReader dataReader, ${glFetchNarrowingBean} fetchNarrowingBean
                                                  , bool offsetByCursorForcedly, bool limitByCursorForcedly) {
             _dataReader = dataReader;
             _fetchNarrowingBean = fetchNarrowingBean;
@@ -160,7 +160,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        public ${glFetchNarrowingBeanInterfaceName} FetchNarrowingBean {
+        public ${glFetchNarrowingBean} FetchNarrowingBean {
             get { return _fetchNarrowingBean; }
         }
 

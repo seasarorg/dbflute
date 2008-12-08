@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// The bean of fetch narrowing.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public interface ${glFetchNarrowingBeanInterfaceName} {
+    public interface ${glFetchNarrowingBean} {
 
         int FetchNarrowingSkipStartIndex { get; }
         int FetchNarrowingLoopCount { get; }

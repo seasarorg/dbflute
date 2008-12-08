@@ -9,7 +9,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
  * SqlClause for Oracle.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glSqlClauseAbstractName} {
+public class ${myClassName} extends ${glAbstractSqlClause} {
 
     // ===================================================================================
     //                                                                           Attribute

@@ -734,14 +734,14 @@ namespace ${glPackageBaseCommonS2Dao} {
     	}
 	
         protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {
-            if (pmb == null || !${glFetchNarrowingBeanContextName}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
+            if (pmb == null || !${glFetchNarrowingBeanContext}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
                 return;
             }
-            ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
+            ${glFetchNarrowingBean} fetchNarrowingBean = (${glFetchNarrowingBean})pmb;
             if (option.IsManualPaging) {
                 fetchNarrowingBean.IgnoreFetchNarrowing();
             }
-            ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(fetchNarrowingBean);
+            ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread(fetchNarrowingBean);
         }
 
         // -------------------------------------------------
@@ -764,10 +764,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                     return null;
                 }
 
-                if (!${glConditionBeanContextName}.IsTheArgumentConditionBean(arg0)) {// The argument is not condition-bean...
-                    if (${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(arg0) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                if (!${glConditionBeanContext}.IsTheArgumentConditionBean(arg0)) {// The argument is not condition-bean...
+                    if (${glFetchNarrowingBeanContext}.IsTheArgumentFetchNarrowingBean(arg0) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
                         // Fetch-narrowing-bean and Not select count!
-                        ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
+                        ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBean})arg0);
                     }
                     return null;
                 }
@@ -778,10 +778,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
                 cb.XSetupSelectCountIgnoreFetchScope();
             } else {
-                ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(cb);
+                ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread(cb);
             }
 
-            ${glConditionBeanContextName}.SetConditionBeanOnThread(cb);
+            ${glConditionBeanContext}.SetConditionBeanOnThread(cb);
             return cb;
         }
 
@@ -801,16 +801,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
                 ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
             }
-            if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
+            if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                ${glFetchNarrowingBeanContextName}.GetFetchNarrowingBeanOnThread().RestoreIgnoredFetchNarrowing();
+                ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread().RestoreIgnoredFetchNarrowing();
 
-                ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
+                ${glFetchNarrowingBeanContext}.ClearFetchNarrowingBeanOnThread();
             }
-            if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                ${glConditionBeanContextName}.ClearConditionBeanOnThread();
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                ${glConditionBeanContext}.ClearConditionBeanOnThread();
             }
             if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
                 ${glInternalMapContext}.ClearInternalMapOnThread();

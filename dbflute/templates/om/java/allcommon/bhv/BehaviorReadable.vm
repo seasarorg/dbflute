@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glListResultBean};
+import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
@@ -96,14 +96,14 @@ public interface ${glBehaviorReadable} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntity})} readList(${glConditionBean} ${glAttachedCBArgsVariableName});
+    public ${glListResultBean}${database.filterGenericsString(${glEntity})} readList(${glConditionBean} ${glAttachedCBArgsVariableName});
 
     /**
      * Read page as result-bean.
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntity})} readPage(final ${glConditionBean} ${glAttachedCBArgsVariableName});
+    public ${glPagingResultBean}${database.filterGenericsString(${glEntity})} readPage(final ${glConditionBean} ${glAttachedCBArgsVariableName});
 
     // ===================================================================================
     //                                                                            Sequence

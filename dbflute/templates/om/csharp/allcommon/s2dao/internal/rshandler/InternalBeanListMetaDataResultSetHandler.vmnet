@@ -145,14 +145,14 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         //                                                                       Assist Helper
         //                                                                       =============
         protected bool HasConditionBean() {
-            return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+            return ${glConditionBeanContext}.IsExistConditionBeanOnThread();
         }
 
         protected bool IsSelectedForeignInfoEmpty() {
             if (!HasConditionBean()) {
                 return true;
             }
-            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             if (cb.SqlClause.isSelectedForeignInfoEmpty()) {
                 return true;
             }
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         // You should call HasConditionBean() before calling this!
         protected bool HasSelectedForeignInfo(String relationNoSuffix) {
-            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             if (cb.SqlClause.hasSelectedForeignInfo(relationNoSuffix)) {
                 return true;
             }

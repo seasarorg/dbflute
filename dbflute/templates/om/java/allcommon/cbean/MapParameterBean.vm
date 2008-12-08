@@ -6,7 +6,7 @@ import java.util.Map;
  * The bean of map parameter.
  * @author ${database.ClassAuthor}
  */
-public interface ${glMapParameterBeanInterfaceName} {
+public interface ${glMapParameterBean} {
 
     /**
      * Get the map of parameter.

@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 import java.util.Map;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
+import ${glPackageBaseCommonCBean}.${glAbstractConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionQuery};
 import ${glPackageBaseCommonCBean}.${glSubQuery};
@@ -23,7 +23,7 @@ import ${glPackageNss}.*;
  * The base condition-bean of ${table.name}.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glConditionBeanAbstractName} {
+public class ${myClassName} extends ${glAbstractConditionBean} {
 
     // ===================================================================================
     //                                                                           Attribute

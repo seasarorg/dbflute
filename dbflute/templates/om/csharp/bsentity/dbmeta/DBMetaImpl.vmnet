@@ -23,7 +23,7 @@ namespace ${myDBMetaPackageName} {
     /// The DB meta of ${table.name}.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public class ${myClassName} : ${glDBMetaAbstractName} {
+    public class ${myClassName} : ${glAbstractDBMeta} {
 
         public static readonly Type ENTITY_TYPE = typeof(${myExtendedObjectClassName});
 

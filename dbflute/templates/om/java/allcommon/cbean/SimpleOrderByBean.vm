@@ -6,7 +6,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 /**
  * @deprecated
  */
-public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName} {
+public class ${glSimpleOrderByBeanName} implements ${glOrderByBean} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -14,7 +14,7 @@ public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName}
     /** SQL clause instance. */
     protected final ${glSqlClause} _sqlClause;
     {
-        _sqlClause = ${glConditionBeanContextName}.createSqlClause("Dummy");
+        _sqlClause = ${glConditionBeanContext}.createSqlClause("Dummy");
     }
 
     // ===================================================================================
@@ -76,7 +76,7 @@ public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName}
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+    public ${glOrderByBean} clearOrderBy() {
         getSqlClause().clearOrderBy();
         return this;
     }
@@ -86,7 +86,7 @@ public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName}
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+    public ${glOrderByBean} ignoreOrderBy() {
         getSqlClause().ignoreOrderBy();
         return this;
     }
@@ -96,7 +96,7 @@ public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName}
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+    public ${glOrderByBean} makeOrderByEffective() {
         getSqlClause().makeOrderByEffective();
         return this;
     }

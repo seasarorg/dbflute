@@ -16,7 +16,7 @@ import org.seasar.dao.impl.RelationRowCreationResource;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
 
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
@@ -237,7 +237,7 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     
     protected boolean isConditionBeanSelectedRelation(RelationRowCreationResource res) {
         if (hasConditionBean(res)) {
-            final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+            final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
             if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
                 return true;
             }
@@ -246,11 +246,11 @@ public class ${glInternalRelationRowCreator} extends RelationRowCreatorImpl {
     }
     
     protected boolean hasConditionBean(RelationRowCreationResource res) {
-        return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
+        return ${glConditionBeanContext}.isExistConditionBeanOnThread();
     }
     
     protected boolean hasSelectedForeignInfo(RelationRowCreationResource res) {
-        final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
             return true;
         }

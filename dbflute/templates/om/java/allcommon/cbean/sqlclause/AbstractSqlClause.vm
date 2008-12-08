@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
-#set ($myClassName = "${glSqlClauseAbstractName}")
+#set ($myClassName = "${glAbstractSqlClause}")
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
@@ -663,13 +663,13 @@ public abstract class ${myClassName} implements ${glSqlClause} {
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
@@ -694,13 +694,13 @@ public abstract class ${myClassName} implements ${glSqlClause} {
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value);
         arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
     }
 
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
@@ -711,7 +711,7 @@ public abstract class ${myClassName} implements ${glSqlClause} {
         _baseTableInlineWhereList.add(value);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
@@ -723,7 +723,7 @@ public abstract class ${myClassName} implements ${glSqlClause} {
         arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);

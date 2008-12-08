@@ -40,12 +40,12 @@ namespace ${glPackageCIQ} {
             throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
         }
     
-        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                                  , String colName, String capPropName, String uncapPropName) {
             registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
         }
     
-        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
             registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
@@ -70,7 +70,7 @@ namespace ${glPackageCIQ} {
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-        protected override ${glConditionValueName} getCValue${tmpJavaName}() {
+        protected override ${glConditionValue} getCValue${tmpJavaName}() {
             return _myCQ.${tmpJavaName};
         }
 

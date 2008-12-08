@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public class ${glPagingInvokerName}<ENTITY> {
+    public class ${glPagingInvoker}<ENTITY> {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -15,16 +15,16 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glPagingInvokerName}(String tableDbName) {
+        public ${glPagingInvoker}(String tableDbName) {
             this._tableDbName = tableDbName;
         }
 
         // ===============================================================================
         //                                                                          Invoke
         //                                                                          ======
-        public ${glPagingResultBeanName}<ENTITY> InvokePaging(${glPagingHandlerName}<ENTITY> handler) {
+        public ${glPagingResultBean}<ENTITY> InvokePaging(${glPagingHandler}<ENTITY> handler) {
             AssertObjectNotNull("handler", handler);
-            ${glPagingBeanInterfaceName} pagingBean = handler.PagingBean;
+            ${glPagingBean} pagingBean = handler.PagingBean;
             AssertObjectNotNull("handler.getPagingBean()", pagingBean);
             if (!pagingBean.IsFetchScopeEffective) {
                 String msg = "The paging bean is not effective about fetch-scope!";
@@ -41,25 +41,25 @@ namespace ${glPackageBaseCommonCBean} {
                 allRecordCount = handler.Count();
                 selectedList = handler.Paging();
             }
-            ${glPagingResultBeanName}<ENTITY> rb = new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, allRecordCount, selectedList);
+            ${glPagingResultBean}<ENTITY> rb = new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, allRecordCount, selectedList);
             if (IsNecessaryToReadPageAgain(rb)) {
                 pagingBean.FetchPage(rb.AllPageCount);
                 int reAllRecordCount = handler.Count();
                 IList<ENTITY> reSelectedList = handler.Paging();
-                return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
+                return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
             } else {
                 return rb;
             }
         }
 
-        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
+        protected bool IsNecessaryToReadPageAgain(${glPagingResultBean}<ENTITY> rb) {
             return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
         }
 
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glPagingInvokerName}<ENTITY> CountLater() {
+        public ${glPagingInvoker}<ENTITY> CountLater() {
             _countLater = true; return this;
         }
 

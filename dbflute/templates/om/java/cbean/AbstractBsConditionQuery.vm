@@ -10,7 +10,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -19,7 +19,7 @@ import ${glPackageCQ}.*;
  * The abstract condition-query of ${table.name}.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
+public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -691,13 +691,13 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
 #end
 
-    protected void reg${tmpJavaName}(${glConditionKeyName} key, Object value) {
+    protected void reg${tmpJavaName}(${glConditionKey} key, Object value) {
         registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
     }
-    protected void registerInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
+    protected void registerInline${tmpJavaName}(${glConditionKey} key, Object value) {
         registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
     }
-    abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
+    abstract protected ${glConditionValue} getCValue${tmpJavaName}();
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 

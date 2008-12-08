@@ -13,7 +13,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBean};
  * ${database.filterGenericsParamOutput('<REFERRER_ENTITY>', 'The type of referrer entity.')}
  * @author ${database.ClassAuthor}
  */
-public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glConditionBean}, REFERRER_ENTITY extends ${glEntity}> {
+public class ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN extends ${glConditionBean}, REFERRER_ENTITY extends ${glEntity}> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -31,19 +31,19 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glLoadReferrerOptionName}() {
+    public ${glLoadReferrerOption}() {
     }
 
-    public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
+    public ${glLoadReferrerOption}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
     }
 
-    public ${glLoadReferrerOptionName}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
+    public ${glLoadReferrerOption}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
         this._entityListSetupper = entityListSetupper;
     }
 
-    public ${glLoadReferrerOptionName}(${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> option) {
+    public ${glLoadReferrerOption}(${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> option) {
         this._conditionBeanSetupper = option._conditionBeanSetupper;
         this._entityListSetupper = option._entityListSetupper;
         this._referrerConditionBean = option._referrerConditionBean;
@@ -59,7 +59,7 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
      * This method is valid only after you use reffererConditionBean and add your original condition to it.
      * @return this. (NotNull)
      */
-    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondition() {
+    public ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondition() {
         _toLastKeyCondition = true;
         return this;
     }
@@ -69,7 +69,7 @@ public class ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN extends ${glCon
      * This method is valid only after you use reffererConditionBean and add your original order-by to it.
      * @return this. (NotNull)
      */
-    public ${glLoadReferrerOptionName}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> stopOrderByKey() {
+    public ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> stopOrderByKey() {
         _stopOrderByKey = true;
         return this;
     }

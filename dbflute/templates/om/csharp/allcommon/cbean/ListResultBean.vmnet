@@ -1,4 +1,4 @@
-#set ($myClassName = "${glListResultBeanName}")
+#set ($myClassName = "${glListResultBean}")
 
 using System;
 using System.Text;
@@ -99,7 +99,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                         Mapping
         //                                                                         =======
         #region Mapping
-        public ${myClassName}<DTO> MappingList<DTO>(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+        public ${myClassName}<DTO> MappingList<DTO>(${glEntityDtoMapper}<ENTITY, DTO> entityDtoMapper) {
             ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
             foreach (ENTITY entity in _selectedList) {
                 mappingList.Add(entityDtoMapper.Invoke(entity));

@@ -139,9 +139,9 @@ namespace ${glPackageExtendedBhv} {
         //                                                                     List Select
         //                                                                     ===========
         #region List Select
-        public virtual ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
+        public virtual ${glListResultBean}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ${glResultBeanBuilderName}<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
+            return new ${glResultBeanBuilder}<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
         #endregion
 
@@ -149,16 +149,16 @@ namespace ${glPackageExtendedBhv} {
         //                                                                     Page Select
         //                                                                     ===========
         #region Page Select
-        public virtual ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
+        public virtual ${glPagingResultBean}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            ${glPagingInvokerName}<${myExtendedObjectClassName}> invoker = new ${glPagingInvokerName}<${myExtendedObjectClassName}>(TableDbName);
+            ${glPagingInvoker}<${myExtendedObjectClassName}> invoker = new ${glPagingInvoker}<${myExtendedObjectClassName}>(TableDbName);
             return invoker.InvokePaging(new InternalSelectPagingHandler(this, cb));
         }
 
-        private class InternalSelectPagingHandler : ${glPagingHandlerName}<${myExtendedObjectClassName}> {
+        private class InternalSelectPagingHandler : ${glPagingHandler}<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv; protected ${myConditionBeanClassName} _cb;
             public InternalSelectPagingHandler(${myClassName} bhv, ${myConditionBeanClassName} cb) { _bhv = bhv; _cb = cb; }
-            public ${glPagingBeanInterfaceName} PagingBean { get { return _cb; } }
+            public ${glPagingBean} PagingBean { get { return _cb; } }
             public int Count() { return _bhv.SelectCount(_cb); }
             public IList<${myExtendedObjectClassName}> Paging() { return _bhv.SelectList(_cb); }
         }
@@ -199,9 +199,9 @@ namespace ${glPackageExtendedBhv} {
         public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (${myEntityListVariableName}.Count == 0) { return; }
-            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
         }
-        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
             if (${myEntityListVariableName}.Count == 0) { return; }
             ${referrerBhvClassName} referrerBhv = xgetBSFLR().Select<${referrerBhvClassName}>();

@@ -66,8 +66,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected ${glStatementConfig} FindStatementConfigOnThread() {
             ${glStatementConfig} config = null;
-            if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
                 config = cb.StatementConfig;
             } else if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
                 ${glOutsideSqlContext} context = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();

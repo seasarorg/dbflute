@@ -7,7 +7,7 @@ using ${glPackageBaseCommonJavaLike};
 namespace ${glPackageBaseCommonSqlClause} {
 
 [System.Serializable]
-public class ${myClassName} : ${glSqlClauseAbstractName} {
+public class ${myClassName} : ${glAbstractSqlClause} {
 
     public ${myClassName}(String tableName)
         : base(tableName) {}

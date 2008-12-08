@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
  * The bean of paging.
  * @author ${database.ClassAuthor}
  */
-public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInterfaceName}, ${glOrderByBeanInterfaceName} {
+public interface ${glPagingBean} extends ${glFetchNarrowingBean}, ${glOrderByBean} {
 
     // ===================================================================================
     //                                                                Paging Determination
@@ -52,7 +52,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize);
+    public ${glPagingBean} fetchFirst(int fetchSize);
 
     /**
      * Fetch scope. <br />
@@ -61,7 +61,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize);
+    public ${glPagingBean} fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
      * Fetch page. <br />
@@ -71,7 +71,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber);
+    public ${glPagingBean} fetchPage(int fetchPageNumber);
 
     // ===================================================================================
     //                                                                      Fetch Property

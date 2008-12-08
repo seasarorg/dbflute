@@ -11,7 +11,7 @@ import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
@@ -49,7 +49,7 @@ public class ${glBehaviorInitializer} {
     //                                                                        Cool Classes
     //                                                                        ============
     protected void loadCoolClasses() { // for S2Container basically 
-        ${glConditionBeanContextName}.loadCoolClasses(); // Against the ClassLoader Headache!
+        ${glConditionBeanContext}.loadCoolClasses(); // Against the ClassLoader Headache!
     }
 
     // ===================================================================================

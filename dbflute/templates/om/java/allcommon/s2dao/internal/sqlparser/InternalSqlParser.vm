@@ -21,7 +21,7 @@ import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.OgnlUtil;
 
-import ${glPackageBaseCommonCBean}.${glMapParameterBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glMapParameterBean};
 import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
 import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyException};
 import ${glPackageBaseCommonException}.${glBindVariableParameterNullValueException};
@@ -610,8 +610,8 @@ public class ${glInternalSqlParser} {
                     clazz = method.getReturnType();
                     continue;
                 }
-                if (pos == 1 && ${glMapParameterBeanInterfaceName}.class.isAssignableFrom(clazz)) {
-                    final ${glMapParameterBeanInterfaceName} pmb = (${glMapParameterBeanInterfaceName})value;
+                if (pos == 1 && ${glMapParameterBean}.class.isAssignableFrom(clazz)) {
+                    final ${glMapParameterBean} pmb = (${glMapParameterBean})value;
                     final Map<String, Object> map = pmb.getParameterMap();
                     final Object elementValue = (map != null ? map.get(_names[pos]) : null);
                     if (elementValue != null) {

@@ -7,7 +7,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glSqlClauseAbstractName} {
+public class ${myClassName} extends ${glAbstractSqlClause} {
 
     /** String of fetch-scope as select-hint. */
     protected String _fetchScopeSelectHint = "";

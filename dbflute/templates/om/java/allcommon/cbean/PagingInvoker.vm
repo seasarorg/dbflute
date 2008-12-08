@@ -7,7 +7,7 @@ import java.util.List;
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public class ${glPagingInvokerName}<ENTITY> {
+public class ${glPagingInvoker}<ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -18,7 +18,7 @@ public class ${glPagingInvokerName}<ENTITY> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glPagingInvokerName}(String tableDbName) {
+    public ${glPagingInvoker}(String tableDbName) {
         _tableDbName = tableDbName;
     }
 
@@ -30,9 +30,9 @@ public class ${glPagingInvokerName}<ENTITY> {
      * @param handler The handler of paging. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
-    public ${glPagingResultBeanName}<ENTITY> invokePaging(${glPagingHandlerName}<ENTITY> handler) {
+    public ${glPagingResultBean}<ENTITY> invokePaging(${glPagingHandler}<ENTITY> handler) {
         assertObjectNotNull("handler", handler);
-        final ${glPagingBeanInterfaceName} pagingBean = handler.getPagingBean();
+        final ${glPagingBean} pagingBean = handler.getPagingBean();
         assertObjectNotNull("handler.getPagingBean()", pagingBean);
         if (!pagingBean.isFetchScopeEffective()) {
             String msg = "The paging bean is not effective about fetch-scope!";
@@ -49,12 +49,12 @@ public class ${glPagingInvokerName}<ENTITY> {
             allRecordCount = handler.count();
             selectedList = handler.paging();
         }
-        final ${glPagingResultBeanName}<ENTITY> rb = new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
+        final ${glPagingResultBean}<ENTITY> rb = new ${glResultBeanBuilder}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
         if (isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
             final int reAllRecordCount = handler.count();
             final java.util.List<ENTITY> reSelectedList = handler.paging();
-            return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
+            return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
         } else {
             return rb;
         }
@@ -65,14 +65,14 @@ public class ${glPagingInvokerName}<ENTITY> {
      * @param rb The result bean of paging. (NotNull)
      * @return Determination.
      */
-    protected boolean isNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
+    protected boolean isNecessaryToReadPageAgain(${glPagingResultBean}<ENTITY> rb) {
         return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glPagingInvokerName}<ENTITY> countLater() {
+    public ${glPagingInvoker}<ENTITY> countLater() {
         _countLater = true; return this;
     }
 

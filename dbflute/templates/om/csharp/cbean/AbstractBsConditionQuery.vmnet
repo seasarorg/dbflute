@@ -13,7 +13,7 @@ using ${glPackageCB};
 namespace ${glPackageBaseCQ} {
 
     [System.Serializable]
-    public abstract class ${myClassName} : ${glConditionQueryAbstractName} {
+    public abstract class ${myClassName} : ${glAbstractConditionQuery} {
 
         // ===============================================================================
         //                                                                     Constructor
@@ -514,15 +514,15 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
 #end
   
-        protected void reg${tmpJavaName}(${glConditionKeyName} key, Object value) {
+        protected void reg${tmpJavaName}(${glConditionKey} key, Object value) {
             registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
 
-        protected void registerInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
+        protected void registerInline${tmpJavaName}(${glConditionKey} key, Object value) {
             registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
 
-        protected abstract ${glConditionValueName} getCValue${tmpJavaName}();
+        protected abstract ${glConditionValue} getCValue${tmpJavaName}();
 #end
 
         // ===============================================================================

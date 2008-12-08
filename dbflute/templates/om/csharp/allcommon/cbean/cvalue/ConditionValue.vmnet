@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionValueName}")
+#set ($myClassName = "${glConditionValue}")
 
 using System;
 using System.Text;

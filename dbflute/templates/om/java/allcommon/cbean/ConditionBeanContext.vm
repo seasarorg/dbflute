@@ -10,10 +10,10 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * The context of condition-bean.
  * @author ${database.ClassAuthor}
  */
-public class ${glConditionBeanContextName} {
+public class ${glConditionBeanContext} {
 
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(${glConditionBeanContextName}.class);
+    private static final Log _log = LogFactory.getLog(${glConditionBeanContext}.class);
 
     // ===================================================================================
     //                                                                        Thread Local
@@ -86,7 +86,7 @@ public class ${glConditionBeanContextName} {
         // Against the ClassLoader Headache!
         final StringBuilder sb = new StringBuilder();
         {
-            final Class<?> clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
+            final Class<?> clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBean}.class;
             if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
 		{

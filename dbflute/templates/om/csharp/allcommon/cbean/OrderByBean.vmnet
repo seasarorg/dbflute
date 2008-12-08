@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// The condition-bean as interface.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public interface ${glOrderByBeanInterfaceName} : ${glSelectResourceInterfaceName} {
+    public interface ${glOrderByBean} : ${glSelectResource} {
 
         /// <summary>
         /// The property of sql component of order-by clause.
@@ -21,21 +21,21 @@ namespace ${glPackageBaseCommonCBean} {
          * 
          * @return this. (NotNull)
          */
-        ${glOrderByBeanInterfaceName} ClearOrderBy();
+        ${glOrderByBean} ClearOrderBy();
 
 	    /**
 	     * Ignore order-by.
 	     * 
 	     * @return this. (NotNull)
 	     */
-        ${glOrderByBeanInterfaceName} IgnoreOrderBy();
+        ${glOrderByBean} IgnoreOrderBy();
 
 	    /**
 	     * Make order-by effective.
 	     * 
 	     * @return this. (NotNull)
 	     */
-        ${glOrderByBeanInterfaceName} MakeOrderByEffective();
+        ${glOrderByBean} MakeOrderByEffective();
 
 	    /**
 	     * Get order-by clause.

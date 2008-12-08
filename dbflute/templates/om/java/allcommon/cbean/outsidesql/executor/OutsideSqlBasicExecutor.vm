@@ -3,8 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glDBDef};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
+import ${glPackageBaseCommonCBean}.${glListResultBean};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilder};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractOutsideSqlCommand};
@@ -84,9 +84,9 @@ public class ${glOutsideSqlBasicExecutorName} {
      * @return The result bean of selected list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
-    public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
+    public <ENTITY> ${glListResultBean}<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
+        return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).buildListResultBean(resultList);
     }
 
     // ===================================================================================

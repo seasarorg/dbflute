@@ -17,7 +17,7 @@ import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glInternalMapContext};
 import ${glPackageBaseCommon}.${glQLog};
 import ${glPackageBaseCommonBhvCore}.${glResourceContext};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonException}.${glEntityAlreadyExistsException};
@@ -411,11 +411,11 @@ public class ${glInternalBasicHandler} {
         }
 
         protected boolean hasConditionBean() {
-            return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
+            return ${glConditionBeanContext}.isExistConditionBeanOnThread();
         }
 
         protected ${glConditionBean} getConditionBean() {
-            return ${glConditionBeanContextName}.getConditionBeanOnThread();
+            return ${glConditionBeanContext}.getConditionBeanOnThread();
         }
 
         protected boolean hasOutsideSqlContext() {

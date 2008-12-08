@@ -1,5 +1,5 @@
 
-#set ($myClassName = "${glDBMetaAbstractName}")
+#set ($myClassName = "${glAbstractDBMeta}")
 
 using System;
 using System.Reflection;

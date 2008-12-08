@@ -7,13 +7,13 @@ import java.util.List;
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glPagingHandlerName}<ENTITY> {
+public interface ${glPagingHandler}<ENTITY> {
 
     /**
      * Get the bean of paging.
      * @return The bean of paging. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} getPagingBean();
+    public ${glPagingBean} getPagingBean();
 
     /**
      * Execute SQL for count.

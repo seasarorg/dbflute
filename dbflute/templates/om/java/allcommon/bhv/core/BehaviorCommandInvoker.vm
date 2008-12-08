@@ -13,8 +13,8 @@ import org.seasar.dao.ValueTypeFactory;
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommon}.${glXLog};
 import ${glPackageBaseCommon}.${glInternalMapContext};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonHelperStackTrace}.${glInvokeNameExtractingResourceName};
@@ -637,16 +637,16 @@ public class ${glBehaviorCommandInvoker} {
         if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
             ${glOutsideSqlContext}.clearOutsideSqlContextOnThread();
         }
-        if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
+        if (${glFetchNarrowingBeanContext}.isExistFetchNarrowingBeanOnThread()) {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread().restoreIgnoredFetchNarrowing();
+            ${glFetchNarrowingBeanContext}.getFetchNarrowingBeanOnThread().restoreIgnoredFetchNarrowing();
 
-            ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
+            ${glFetchNarrowingBeanContext}.clearFetchNarrowingBeanOnThread();
         }
-        if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-            ${glConditionBeanContextName}.clearConditionBeanOnThread();
+        if (${glConditionBeanContext}.isExistConditionBeanOnThread()) {
+            ${glConditionBeanContext}.clearConditionBeanOnThread();
         }
         if (${glInternalMapContext}.isExistInternalMapContextOnThread()) {
             ${glInternalMapContext}.clearInternalMapContextOnThread();

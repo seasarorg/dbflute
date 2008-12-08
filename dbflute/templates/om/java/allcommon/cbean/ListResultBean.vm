@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
-#set ($myClassName = "${glListResultBeanName}")
+#set ($myClassName = "${glListResultBean}")
 #set ($selectedListArgumentGenericDefinition = "${glEntity}")
 
 import java.io.Serializable;
@@ -13,7 +13,7 @@ import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
-import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapper};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**
@@ -118,7 +118,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapper}<ENTITY, DTO> entityDtoMapper) {
         final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
         for (ENTITY entity : _selectedList) {
             mappingList.add(entityDtoMapper.map(entity));

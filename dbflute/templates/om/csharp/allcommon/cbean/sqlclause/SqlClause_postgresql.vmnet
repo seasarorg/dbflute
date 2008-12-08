@@ -5,7 +5,7 @@ using System;
 namespace ${glPackageBaseCommonSqlClause} {
 
 [System.Serializable]
-public class ${myClassName} : ${glSqlClauseAbstractName} {
+public class ${myClassName} : ${glAbstractSqlClause} {
 
     protected String _fetchScopeSqlSuffix = "";
     protected String _lockSqlSuffix = "";

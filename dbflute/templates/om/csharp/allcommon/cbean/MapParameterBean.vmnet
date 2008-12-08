@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public interface ${glMapParameterBeanInterfaceName} {
+    public interface ${glMapParameterBean} {
         IDictionary<String, Object> ParameterMap { get; }
     }
 }

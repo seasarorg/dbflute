@@ -14,7 +14,7 @@ using ${glPackageNss};
 namespace ${glPackageBaseCB} {
 
     [System.Serializable]
-    public class ${myClassName} : ${glConditionBeanAbstractName} {
+    public class ${myClassName} : ${glAbstractConditionBean} {
 
         // ===============================================================================
         //                                                                       Attribute

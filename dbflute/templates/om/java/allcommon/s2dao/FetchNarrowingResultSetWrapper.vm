@@ -8,7 +8,7 @@ import org.seasar.extension.jdbc.impl.ResultSetWrapper;
 
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonBhvCore}.${glResourceContext};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBean};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
 
 /**
@@ -24,7 +24,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     protected ResultSet _resultSet;
 
     /** The bean of fetch narrowing. (NotNull) */
-    protected ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
+    protected ${glFetchNarrowingBean} _fetchNarrowingBean;
 
     /** The counter of fetch. */
     protected long _fetchCounter;
@@ -57,7 +57,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean
+    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBean} fetchNarrowingBean
                                              , boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
         super(resultSet);
 

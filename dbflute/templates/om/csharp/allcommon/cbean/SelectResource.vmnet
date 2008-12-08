@@ -9,6 +9,6 @@ namespace ${glPackageBaseCommonCBean} {
     /// The select-resource as marker-interface.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public interface ${glSelectResourceInterfaceName} {
+    public interface ${glSelectResource} {
     }
 }

@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import org.seasar.extension.jdbc.StatementFactory;
 
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
@@ -75,8 +75,8 @@ public class ${glInternalStatementFactory} implements StatementFactory {
     }
     protected ${glStatementConfig} findStatementConfigOnThread() {
         final ${glStatementConfig} config;
-        if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-            final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        if (${glConditionBeanContext}.isExistConditionBeanOnThread()) {
+            final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
             config = cb.getStatementConfig();
         } else if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
             final ${glOutsideSqlContext} context = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();

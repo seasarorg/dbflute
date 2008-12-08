@@ -5,7 +5,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 
 /**
@@ -51,7 +51,7 @@ public class ${glSelectScalarCBCommand}<RESULT> extends ${glAbstractSelectCBComm
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ${glConditionBean} cb = _conditionBean;
-        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
+        ${glConditionBeanContext}.setConditionBeanOnThread(cb);
         cb.getSqlClause().classifySelectClauseType(_selectClauseType); // *Point!
     }
 

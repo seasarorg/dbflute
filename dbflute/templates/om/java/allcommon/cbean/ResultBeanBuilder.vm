@@ -7,7 +7,7 @@ import java.util.List;
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public class ${glResultBeanBuilderName}<ENTITY> {
+public class ${glResultBeanBuilder}<ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -17,7 +17,7 @@ public class ${glResultBeanBuilderName}<ENTITY> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glResultBeanBuilderName}(String tableDbName) {
+    public ${glResultBeanBuilder}(String tableDbName) {
         _tableDbName = tableDbName;
     }
 
@@ -29,8 +29,8 @@ public class ${glResultBeanBuilderName}<ENTITY> {
      * @param selectedList Selected list. (NotNull)
      * @return The result bean of list. (NotNull)
      */
-    public ${glListResultBeanName}<ENTITY> buildListResultBean(List<ENTITY> selectedList) {
-        ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+    public ${glListResultBean}<ENTITY> buildListResultBean(List<ENTITY> selectedList) {
+        ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(selectedList.size());
         rb.setSelectedList(selectedList);
@@ -43,8 +43,8 @@ public class ${glResultBeanBuilderName}<ENTITY> {
      * @param selectedList Selected list. (NotNull)
      * @return The result bean of list. (NotNull)
      */
-    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glConditionBean} cb, List<ENTITY> selectedList) {
-        ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+    public ${glListResultBean}<ENTITY> buildListResultBean(${glConditionBean} cb, List<ENTITY> selectedList) {
+        ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(selectedList.size());
         rb.setSelectedList(selectedList);
@@ -59,8 +59,8 @@ public class ${glResultBeanBuilderName}<ENTITY> {
      * @param selectedList The list of selected entity. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
-    public ${glPagingResultBeanName}<ENTITY> buildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, List<ENTITY> selectedList) {
-        ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
+    public ${glPagingResultBean}<ENTITY> buildPagingResultBean(${glPagingBean} pb, int allRecordCount, List<ENTITY> selectedList) {
+        ${glPagingResultBean}<ENTITY> rb = new ${glPagingResultBean}<ENTITY>();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(allRecordCount);
         rb.setSelectedList(selectedList);

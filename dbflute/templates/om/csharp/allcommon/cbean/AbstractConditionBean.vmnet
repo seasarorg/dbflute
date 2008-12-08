@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionBeanAbstractName}")
+#set ($myClassName = "${glAbstractConditionBean}")
 
 using System;
 using System.Reflection;
@@ -87,17 +87,17 @@ namespace ${glPackageBaseCommonCBean} {
         // -------------------------------------------------
         //                                     Fetch Setting
         //                                     -------------
-        public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
+        public ${glPagingBean} FetchFirst(int fetchSize) {
             this.SqlClause.fetchFirst(fetchSize);
             return this;
         }
 
-        public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
+        public ${glPagingBean} FetchScope(int fetchStartIndex, int fetchSize) {
             this.SqlClause.fetchScope(fetchStartIndex, fetchSize);
             return this;
         }
 
-        public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
+        public ${glPagingBean} FetchPage(int fetchPageNumber) {
             this.SqlClause.fetchPage(fetchPageNumber);
             return this;
         }
@@ -141,17 +141,17 @@ namespace ${glPackageBaseCommonCBean} {
             get { return this.SqlClause.getSqlComponentOfOrderByClause(); }
         }
 
-        public ${glOrderByBeanInterfaceName} ClearOrderBy() {
+        public ${glOrderByBean} ClearOrderBy() {
             this.SqlClause.clearOrderBy();
             return this;
         }
 
-        public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
+        public ${glOrderByBean} IgnoreOrderBy() {
             this.SqlClause.ignoreOrderBy();
             return this;
         }
 
-        public $glOrderByBeanInterfaceName MakeOrderByEffective() {
+        public $glOrderByBean MakeOrderByEffective() {
             this.SqlClause.makeOrderByEffective();
             return this;
         }
@@ -217,7 +217,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Display SQL
         //                                                                     ===========
         public virtual String ToDisplaySql() {
-            return ${glConditionBeanContextName}.ConvertConditionBean2DisplaySql(this);
+            return ${glConditionBeanContext}.ConvertConditionBean2DisplaySql(this);
         }
         
     

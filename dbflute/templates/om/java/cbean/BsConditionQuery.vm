@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.Map;
 
 import ${glPackageBaseCommonCBean}.*;
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageCIQ}.*;
 import ${glPackageCB}.*;
@@ -60,12 +60,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-    protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
-    public ${glConditionValueName} get${tmpJavaName}() {
-        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValueName}(); }
+    protected ${glConditionValue} _${tmpUncapitalisedJavaName};
+    public ${glConditionValue} get${tmpJavaName}() {
+        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValue}(); }
         return _${tmpUncapitalisedJavaName};
     }
-    protected ${glConditionValueName} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
+    protected ${glConditionValue} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
 #if (${col.isJavaNativeStringObject()})
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")

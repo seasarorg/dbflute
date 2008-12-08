@@ -3,5 +3,5 @@ using System;
 
 namespace ${glPackageBaseCommonCBeanMapping} {
 
-    public delegate DTO ${glEntityDtoMapperName}<ENTITY, DTO>(ENTITY entity);
+    public delegate DTO ${glEntityDtoMapper}<ENTITY, DTO>(ENTITY entity);
 }

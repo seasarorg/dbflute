@@ -6,7 +6,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public interface ${glConditionBean} : ${glPagingBeanInterfaceName} {
+    public interface ${glConditionBean} : ${glPagingBean} {
 
         // ===============================================================================
         //                                                                      Table Name

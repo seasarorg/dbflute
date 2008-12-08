@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
-#set ($myClassName = "${glPagingResultBeanName}")
+#set ($myClassName = "${glPagingResultBean}")
 
-import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapper};
 import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupBeanName};
 import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName};
 import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeBeanName};
@@ -12,7 +12,7 @@ import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
  * @param <ENTITY> The type of entity for the element of selected list.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
+public class ${myClassName}<ENTITY> extends ${glListResultBean}<ENTITY> {
 
     // ===================================================================================
     //                                                                          Definition
@@ -230,8 +230,8 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
-        final ${glListResultBeanName}<DTO> ls = super.mappingList(entityDtoMapper);
+    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapper}<ENTITY, DTO> entityDtoMapper) {
+        final ${glListResultBean}<DTO> ls = super.mappingList(entityDtoMapper);
         final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
         mappingList.setSelectedList(ls.getSelectedList());
         mappingList.setTableDbName(getTableDbName());

@@ -6,7 +6,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
  * SqlClause for DB2.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glSqlClauseAbstractName} {
+public class ${myClassName} extends ${glAbstractSqlClause} {
 
     // ===================================================================================
     //                                                                           Attribute

@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionKeyName}IsNotNull")
+#set ($myClassName = "${glConditionKey}IsNotNull")
 
 using System;
 
@@ -8,7 +8,7 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-public class ${myClassName} : ${glConditionKeyName} {
+public class ${myClassName} : ${glConditionKey} {
 
     private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -17,7 +17,7 @@ public class ${myClassName} : ${glConditionKeyName} {
         _operand = "is not null";
     }
 
-    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+    public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
         if (conditionValue.HasIsNotNull) {
             _log.Debug("The value has already registered at " + _conditionKey + ": " + value);
             return false;
@@ -25,23 +25,23 @@ public class ${myClassName} : ${glConditionKeyName} {
         return true;
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
         if (value.IsNotNull == null) {
             return;
         }
         conditionList.add(buildClauseWithoutValue(columnName));
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
         conditionValue.IsNotNull = DUMMY_OBJECT;
         conditionValue.setIsNotNullLocation(location);
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

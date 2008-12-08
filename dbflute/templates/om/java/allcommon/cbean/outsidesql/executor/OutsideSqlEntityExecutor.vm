@@ -6,7 +6,7 @@ import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -105,11 +105,11 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     //                                                Helper
     //                                                ------
     protected void throwEntityAlreadyDeletedException(Object searchKey4Log) {
-        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
+        ${glConditionBeanContext}.throwEntityAlreadyDeletedException(searchKey4Log);
     }
 
     protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+        ${glConditionBeanContext}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
     }
 
     // ===================================================================================

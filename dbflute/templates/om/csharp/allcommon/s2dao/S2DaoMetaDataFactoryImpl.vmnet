@@ -593,11 +593,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected bool HasConditionBean(RelationRowCreationResource res) {
-            return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+            return ${glConditionBeanContext}.IsExistConditionBeanOnThread();
         }
 
         protected bool HasSelectedForeignInfo(RelationRowCreationResource res) {
-            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             if (cb.SqlClause.hasSelectedForeignInfo(res.RelationNoSuffix)) {
                 return true;
             }

@@ -82,7 +82,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // This is top execution.
             // - - - - - - - - - - - -
 
-            if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+            if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
                 // - - - - - - - - - -
                 // Execute outsideSql.
                 // - - - - - - - - - -
@@ -108,7 +108,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
             IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
 
-            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             String finalClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
         
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
@@ -273,7 +273,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                      Setup Clause
         //                                      ------------
         protected String SetupRealClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-            ${glConditionBean} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             String realClause = null;
             {
                 ${glSelectDynamicCommand} dynamicCommand = CreateMySelectDynamicCommand();

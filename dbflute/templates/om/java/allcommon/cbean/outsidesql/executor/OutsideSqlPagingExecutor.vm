@@ -6,12 +6,12 @@ import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glOutsideSqlSelectListCommand};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
-import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
-import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
-import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glListResultBean};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilder};
+import ${glPackageBaseCommonCBean}.${glPagingBean};
+import ${glPackageBaseCommonCBean}.${glPagingHandler};
+import ${glPackageBaseCommonCBean}.${glPagingInvoker};
+import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
@@ -84,10 +84,10 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @return The result bean of paged list. (NotNull)
      * @exception com.example.dbflute.basic.dbflute.allcommon.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
-    public <ENTITY> ${glListResultBeanName}<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
+    public <ENTITY> ${glListResultBean}<ENTITY> selectList(String path, ${glPagingBean} pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
         List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).buildListResultBean(resultList);
+        return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).buildListResultBean(resultList);
     }
 
     /**
@@ -146,12 +146,12 @@ public class ${glOutsideSqlPagingExecutorName} {
      * @return The result bean of paging. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the outside-SQL is not found.
      */
-    public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
-                                                      , final ${glPagingBeanInterfaceName} pmb
+    public <ENTITY> ${glPagingResultBean}<ENTITY> selectPage(final String path
+                                                      , final ${glPagingBean} pmb
                                                       , final Class<ENTITY> entityType) {
-        final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = createCountExecutor();
-        final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
-            public ${glPagingBeanInterfaceName} getPagingBean() {
+        final ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor = createCountExecutor();
+        final ${glPagingHandler}<ENTITY> handler = new ${glPagingHandler}<ENTITY>() {
+            public ${glPagingBean} getPagingBean() {
                 return pmb;
             }
             public int count() {
@@ -163,16 +163,16 @@ public class ${glOutsideSqlPagingExecutorName} {
                 return selectList(path, pmb, entityType);
             }
         };
-        final ${glPagingInvokerName}<ENTITY> invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+        final ${glPagingInvoker}<ENTITY> invoker = new ${glPagingInvoker}<ENTITY>(_tableDbName);
         if (pmb.isCountLater()) {
             invoker.countLater();
         }
         return invoker.invokePaging(handler);
     }
 
-    protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> createCountExecutor() {
+    protected ${glOutsideSqlEntityExecutorName}<${glPagingBean}> createCountExecutor() {
         final ${glOutsideSqlOption} countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlEntityExecutorName}<${glPagingBean}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
     }
 
     protected void setupScrollableCursorIfNeeds() {

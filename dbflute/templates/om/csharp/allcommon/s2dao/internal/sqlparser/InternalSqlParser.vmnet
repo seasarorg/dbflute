@@ -621,8 +621,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     type = (value != null ? value.GetType() : pi.PropertyType);
                     continue;
                 }
-                if (pos == 1 && typeof(${glMapParameterBeanInterfaceName}).IsAssignableFrom(type)) {
-                    ${glMapParameterBeanInterfaceName} pmb = (${glMapParameterBeanInterfaceName})value;
+                if (pos == 1 && typeof(${glMapParameterBean}).IsAssignableFrom(type)) {
+                    ${glMapParameterBean} pmb = (${glMapParameterBean})value;
                     IDictionary<String, Object> map = pmb.ParameterMap;
                     Object elementValue = (map != null && map.ContainsKey(currentName) ? map[currentName] : null);
                     if (elementValue != null) {

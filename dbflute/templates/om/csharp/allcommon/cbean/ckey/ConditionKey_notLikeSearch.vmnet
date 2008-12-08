@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionKeyName}NotLikeSearch")
+#set ($myClassName = "${glConditionKey}NotLikeSearch")
 
 using System;
 
@@ -8,25 +8,25 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-public class ${myClassName} : ${glConditionKeyName} {
+public class ${myClassName} : ${glConditionKey} {
 
     public ${myClassName}() {
         _conditionKey = "notLikeSearch";
         _operand = "not like";
     }
 
-    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+    public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
         if (value == null) {
             return false;
         }
         return true;
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
         throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
@@ -39,11 +39,11 @@ public class ${myClassName} : ${glConditionKeyName} {
         conditionList.add(buildBindClauseWithRearOption(columnName, value.getNotLikeSearchLocation(), myOption.getRearOption()));
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
         throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         conditionValue.setNotLikeSearch((String)value, (${glLikeSearchOption})option).setNotLikeSearchLocation(location);
     }
 }

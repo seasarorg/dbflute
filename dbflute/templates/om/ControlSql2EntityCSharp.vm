@@ -57,7 +57,7 @@ targetdatabase = $targetDatabase
 
     ## [DBMeta]
     #set ($glDBMeta = "${glProjectPrefix}DBMeta")
-    #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glAbstractDBMeta = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaInfo]

@@ -69,25 +69,25 @@ public class ${myClassName} : ${glSimpleStringOption} {
         return toDate;
     }
 
-    public ${glConditionKeyName} getFromDateConditionKey() {
+    public ${glConditionKey} getFromDateConditionKey() {
         if (_compareAsDate) {
-            return ${glConditionKeyName}.CK_GREATER_EQUAL;
+            return ${glConditionKey}.CK_GREATER_EQUAL;
         }
         if (_fromDateGreaterThan) {
-            return ${glConditionKeyName}.CK_GREATER_THAN;// Default!
+            return ${glConditionKey}.CK_GREATER_THAN;// Default!
         } else {
-            return ${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+            return ${glConditionKey}.CK_GREATER_EQUAL;// Default!
         }
     }
 
-    public ${glConditionKeyName} getToDateConditionKey() {
+    public ${glConditionKey} getToDateConditionKey() {
         if (_compareAsDate) {
-            return _toDateMaxValue ? ${glConditionKeyName}.CK_LESS_EQUAL : ${glConditionKeyName}.CK_LESS_THAN;
+            return _toDateMaxValue ? ${glConditionKey}.CK_LESS_EQUAL : ${glConditionKey}.CK_LESS_THAN;
         }
         if (_toDateLessThan) {
-            return ${glConditionKeyName}.CK_LESS_THAN;// Default!
+            return ${glConditionKey}.CK_LESS_THAN;// Default!
         } else {
-            return ${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+            return ${glConditionKey}.CK_LESS_EQUAL;// Default!
         }
     }
 }

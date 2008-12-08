@@ -9,7 +9,7 @@ import ${glPackageBaseCommon}.*;
 import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 #end
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
-import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
+import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOption};
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 #end
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
@@ -19,12 +19,12 @@ import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
-import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
-import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
-import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glListResultBean};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilder};
+import ${glPackageBaseCommonCBean}.${glPagingHandler};
+import ${glPackageBaseCommonCBean}.${glPagingInvoker};
+import ${glPackageBaseCommonCBean}.${glPagingBean};
+import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
@@ -177,9 +177,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull)
      */
-    public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
+    public ${glListResultBean}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
-        return new ${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
+        return new ${glResultBeanBuilder}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     // ===================================================================================
@@ -190,11 +190,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected page. (NotNull)
      */
-    public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
+    public ${glPagingResultBean}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
-        final ${glPagingInvokerName}<${myExtendedObjectClassName}> invoker = new ${glPagingInvokerName}<${myExtendedObjectClassName}>(getTableDbName());
-        final ${glPagingHandlerName}<${myExtendedObjectClassName}> handler = new ${glPagingHandlerName}<${myExtendedObjectClassName}>() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
+        final ${glPagingInvoker}<${myExtendedObjectClassName}> invoker = new ${glPagingInvoker}<${myExtendedObjectClassName}>(getTableDbName());
+        final ${glPagingHandler}<${myExtendedObjectClassName}> handler = new ${glPagingHandler}<${myExtendedObjectClassName}>() {
+            public ${glPagingBean} getPagingBean() { return cb; }
             public int count() { return selectCount(cb); }
             public List<${myExtendedObjectClassName}> paging() { return selectList(cb); }
         };
@@ -278,14 +278,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${referrerCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
-    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadReferrerOption<${referrerEntityClassName}, ${referrerCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }

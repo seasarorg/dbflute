@@ -82,25 +82,25 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                       List Read
         //                                                                       =========
-        public virtual ${glListResultBeanName}<${glEntity}> ReadList(${glConditionBean} cb) {
+        public virtual ${glListResultBean}<${glEntity}> ReadList(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ${glResultBeanBuilderName}<${glEntity}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
+            return new ${glResultBeanBuilder}<${glEntity}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
-        public virtual ${glPagingResultBeanName}<${glEntity}> ReadPage(${glConditionBean} cb) {
+        public virtual ${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            ${glPagingInvokerName}<${glEntity}> invoker = new ${glPagingInvokerName}<${glEntity}>(TableDbName);
+            ${glPagingInvoker}<${glEntity}> invoker = new ${glPagingInvoker}<${glEntity}>(TableDbName);
             return invoker.InvokePaging(new InternalReadPagingHandler(this, cb));
         }
 
-        private class InternalReadPagingHandler : ${glPagingHandlerName}<${glEntity}> {
+        private class InternalReadPagingHandler : ${glPagingHandler}<${glEntity}> {
             protected ${glBehaviorReadable} _bhv;
             protected ${glConditionBean} _cb;
             public InternalReadPagingHandler(${glBehaviorReadable} bhv, ${glConditionBean} cb) {
                 _bhv = bhv;
                 _cb = cb;
             }
-            public ${glPagingBeanInterfaceName} PagingBean { get { return _cb; } }
+            public ${glPagingBean} PagingBean { get { return _cb; } }
             public int Count() { return _bhv.ReadCount(_cb); }
             public IList<${glEntity}> Paging() { return _bhv.ReadList(_cb); }
         }
@@ -110,22 +110,22 @@ namespace ${glPackageBaseCommonBhv} {
         //                                     -------------
         protected void AssertEntityNotDeleted(${glEntity} entity, Object searchKey4Log) {
             if (entity == null) {
-                ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+                ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
         protected void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
-                ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+                ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
         protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
-				${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+				${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
             if (ls.Count != 1) {
-			    ${glConditionBeanContextName}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null, TableDbName);
+			    ${glConditionBeanContext}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null, TableDbName);
             }
         }
 
@@ -172,7 +172,7 @@ namespace ${glPackageBaseCommonBhv} {
          */
         protected virtual void HelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
-                                             , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                             , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
                      where LOCAL_ENTITY : ${glEntity}
                      where REFERRER_CB : ${glConditionBean}
@@ -193,7 +193,7 @@ namespace ${glPackageBaseCommonBhv} {
          */
         protected virtual void DoHelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
-                                             , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                             , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                              , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
                      where LOCAL_ENTITY : ${glEntity}
                      where REFERRER_CB : ${glConditionBean}

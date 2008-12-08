@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glFetchNarrowingBeanInterfaceName} {
+public interface ${glFetchNarrowingBean} {
 
     /**
      * Get fetch start index.

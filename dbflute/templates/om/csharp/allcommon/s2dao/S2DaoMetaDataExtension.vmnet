@@ -215,7 +215,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected void AssertAutoQueryByDtoUnsupported(MethodInfo methodInfo, Type[] argTypes) {
             Type firstArgType = argTypes[0];
-            if (!${glConditionBeanContextName}.IsTheTypeConditionBean(firstArgType)) {
+            if (!${glConditionBeanContext}.IsTheTypeConditionBean(firstArgType)) {
                 String msg = "Sorry! The auto query by DTO of S2Dao is unsupported on DBFlute:";
                 msg = msg + " dto=" + firstArgType + " method=" + methodInfo;
                 throw new NotSupportedException(msg);

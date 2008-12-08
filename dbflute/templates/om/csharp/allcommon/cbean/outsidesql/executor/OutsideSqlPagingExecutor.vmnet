@@ -30,41 +30,41 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
-        public ${glListResultBeanName}<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
+        public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, ${glPagingBean} pmb) {
             IList<ENTITY> resultList = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
-            return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
+            return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
         }
 #else
-        public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
+        public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBean} pmb) {
             return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
         }
 #end
 
-        public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb) {
+        public ${glPagingResultBean}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBean} pmb) {
             ${glOutsideSqlOption} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
-            ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
+            ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBean}>(_outsideSqlDao, countOption);
             DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, typeof(ENTITY), countExecutor, this);
-            ${glPagingInvokerName}<ENTITY> invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+            ${glPagingInvoker}<ENTITY> invoker = new ${glPagingInvoker}<ENTITY>(_tableDbName);
             if (pmb.IsCountLater) {
                 invoker.CountLater();
             }
             return invoker.InvokePaging(handler);
         }
 
-        protected class DefaultPagingHandler<ENTITY> : ${glPagingHandlerName}<ENTITY> {
+        protected class DefaultPagingHandler<ENTITY> : ${glPagingHandler}<ENTITY> {
             protected String _path;
-            protected ${glPagingBeanInterfaceName} _pmb;
+            protected ${glPagingBean} _pmb;
             protected Type _entityType;
-            protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> _countExecutor;
+            protected ${glOutsideSqlEntityExecutorName}<${glPagingBean}> _countExecutor;
             protected ${glOutsideSqlPagingExecutorName} _pagingExecutor;
-            public DefaultPagingHandler(String path, ${glPagingBeanInterfaceName} pmb, Type entityType, ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor, ${glOutsideSqlPagingExecutorName} pagingExecutor) {
+            public DefaultPagingHandler(String path, ${glPagingBean} pmb, Type entityType, ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor, ${glOutsideSqlPagingExecutorName} pagingExecutor) {
                 this._path = path;
                 this._pmb = pmb;
                 this._entityType = entityType;
                 this._countExecutor = countExecutor;
                 this._pagingExecutor = pagingExecutor;
             }
-            public ${glPagingBeanInterfaceName} PagingBean {
+            public ${glPagingBean} PagingBean {
                 get { return _pmb; }
             }
             public int Count() {

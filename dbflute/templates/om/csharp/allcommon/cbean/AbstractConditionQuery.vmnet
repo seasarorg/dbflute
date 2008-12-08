@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionQueryAbstractName}")
+#set ($myClassName = "${glAbstractConditionQuery}")
 
 using System;
 using System.Reflection;
@@ -21,21 +21,21 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static readonly ${glConditionKeyName} CK_EQ = ${glConditionKeyName}.CK_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_NE = ${glConditionKeyName}.CK_NOT_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_GE = ${glConditionKeyName}.CK_GREATER_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_GT = ${glConditionKeyName}.CK_GREATER_THAN;
-    protected static readonly ${glConditionKeyName} CK_LE = ${glConditionKeyName}.CK_LESS_EQUAL;
-    protected static readonly ${glConditionKeyName} CK_LT = ${glConditionKeyName}.CK_LESS_THAN;
-    protected static readonly ${glConditionKeyName} CK_PS = ${glConditionKeyName}.CK_PREFIX_SEARCH;
-    protected static readonly ${glConditionKeyName} CK_INS = ${glConditionKeyName}.CK_IN_SCOPE;
-    protected static readonly ${glConditionKeyName} CK_NINS = ${glConditionKeyName}.CK_NOT_IN_SCOPE;
-    protected static readonly ${glConditionKeyName} CK_LS = ${glConditionKeyName}.CK_LIKE_SEARCH;
-    protected static readonly ${glConditionKeyName} CK_NLS = ${glConditionKeyName}.CK_NOT_LIKE_SEARCH;
-    protected static readonly ${glConditionKeyName} CK_ISN = ${glConditionKeyName}.CK_IS_NULL;
-    protected static readonly ${glConditionKeyName} CK_ISNN = ${glConditionKeyName}.CK_IS_NOT_NULL;
+    protected static readonly ${glConditionKey} CK_EQ = ${glConditionKey}.CK_EQUAL;
+    protected static readonly ${glConditionKey} CK_NE = ${glConditionKey}.CK_NOT_EQUAL;
+    protected static readonly ${glConditionKey} CK_GE = ${glConditionKey}.CK_GREATER_EQUAL;
+    protected static readonly ${glConditionKey} CK_GT = ${glConditionKey}.CK_GREATER_THAN;
+    protected static readonly ${glConditionKey} CK_LE = ${glConditionKey}.CK_LESS_EQUAL;
+    protected static readonly ${glConditionKey} CK_LT = ${glConditionKey}.CK_LESS_THAN;
+    protected static readonly ${glConditionKey} CK_PS = ${glConditionKey}.CK_PREFIX_SEARCH;
+    protected static readonly ${glConditionKey} CK_INS = ${glConditionKey}.CK_IN_SCOPE;
+    protected static readonly ${glConditionKey} CK_NINS = ${glConditionKey}.CK_NOT_IN_SCOPE;
+    protected static readonly ${glConditionKey} CK_LS = ${glConditionKey}.CK_LIKE_SEARCH;
+    protected static readonly ${glConditionKey} CK_NLS = ${glConditionKey}.CK_NOT_LIKE_SEARCH;
+    protected static readonly ${glConditionKey} CK_ISN = ${glConditionKey}.CK_IS_NULL;
+    protected static readonly ${glConditionKey} CK_ISNN = ${glConditionKey}.CK_IS_NOT_NULL;
 
-    protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
+    protected static readonly ${glConditionValue} DUMMY_CONDITION_VALUE = new ${glConditionValue}();
     protected static readonly Object DUMMY_OBJECT = new Object();
 	protected static readonly String CQ_PROPERTY = "ConditionQuery";
 	
@@ -151,7 +151,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                            Location
     //                                                                            ========
-    protected String getLocation(String columnPropertyName, ${glConditionKeyName} key) {
+    protected String getLocation(String columnPropertyName, ${glConditionKey} key) {
         return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
     }
 
@@ -250,14 +250,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Normal Query
     //                                          ------------
-    protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                          , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
         }
     }
 	
-	protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+	protected virtual void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                          , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
@@ -267,18 +267,18 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void registerFromToQuery(DateTime? fromDate, DateTime? toDate, ${glConditionValueName} cvalue
+    protected void registerFromToQuery(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue
                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
         {
             DateTime? filteredFromDate = option.filterFromDate(fromDate);
-            ${glConditionKeyName} fromKey = option.getFromDateConditionKey();
+            ${glConditionKey} fromKey = option.getFromDateConditionKey();
             if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName, capPropName, uncapPropName);
             }
         }
         {
             DateTime? filteredToDate = option.filterToDate(toDate);
-            ${glConditionKeyName} toKey = option.getToDateConditionKey();
+            ${glConditionKey} toKey = option.getToDateConditionKey();
             if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName, capPropName, uncapPropName);
             }
@@ -288,9 +288,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
-    protected void regLSQ(${glConditionKeyName} key
+    protected void regLSQ(${glConditionKey} key
                         , String value
-                        , ${glConditionValueName} cvalue
+                        , ${glConditionValue} cvalue
                         , String colName
                         , String capPropName
                         , String uncapPropName
@@ -298,9 +298,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 
-    protected void registerLikeSearchQuery(${glConditionKeyName} key
+    protected void registerLikeSearchQuery(${glConditionKey} key
                                          , String value
-                                         , ${glConditionValueName} cvalue
+                                         , ${glConditionValue} cvalue
                                          , String colName
                                          , String capPropName
                                          , String uncapPropName
@@ -345,7 +345,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
-    protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
@@ -357,7 +357,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                        , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
@@ -704,13 +704,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
-    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key)); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
-    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
@@ -870,13 +870,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
-    public ${glConditionValueName} invokeValue(String columnFlexibleName) {
+    public ${glConditionValue} invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(columnFlexibleName));
         String propertyName = columnCapPropName;
         PropertyInfo property = helpGettingCQProperty(this, propertyName);
-        return (${glConditionValueName})helpInvokingCQProperty(this, property);
+        return (${glConditionValue})helpInvokingCQProperty(this, property);
     }
 
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {

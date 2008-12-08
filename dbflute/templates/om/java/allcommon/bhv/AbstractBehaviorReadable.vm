@@ -27,14 +27,14 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glSelectNextValCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectScalarCBCommand};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
-import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOption};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
-import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
-import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glListResultBean};
+import ${glPackageBaseCommonCBean}.${glPagingHandler};
+import ${glPackageBaseCommonCBean}.${glPagingInvoker};
+import ${glPackageBaseCommonCBean}.${glPagingBean};
+import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonCBean}.${glScalarQuery};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
@@ -175,9 +175,9 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
      * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}<${glEntity}> readList(${glConditionBean} cb) {
+    public ${glListResultBean}<${glEntity}> readList(${glConditionBean} cb) {
         assertCBNotNull(cb);
-        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${glEntity}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
+        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilder}<${glEntity}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
     }
 
     /**
@@ -185,11 +185,11 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
      * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}<${glEntity}> readPage(final ${glConditionBean} cb) {
+    public ${glPagingResultBean}<${glEntity}> readPage(final ${glConditionBean} cb) {
         assertCBNotNull(cb);
-        final ${glPagingInvokerName}<${glEntity}> invoker = new ${glPagingInvokerName}<${glEntity}>(getTableDbName());
-        final ${glPagingHandlerName}<${glEntity}> handler = new ${glPagingHandlerName}<${glEntity}>() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
+        final ${glPagingInvoker}<${glEntity}> invoker = new ${glPagingInvoker}<${glEntity}>(getTableDbName());
+        final ${glPagingHandler}<${glEntity}> handler = new ${glPagingHandler}<${glEntity}>() {
+            public ${glPagingBean} getPagingBean() { return cb; }
             public int count() { return readCount(cb); }
             public List<${glEntity}> paging() { return readList(cb); }
         };
@@ -237,11 +237,11 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
     }
 
     private void throwEntityAlreadyDeletedException(Object searchKey4Log) {
-        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
+        ${glConditionBeanContext}.throwEntityAlreadyDeletedException(searchKey4Log);
     }
 
     private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+        ${glConditionBeanContext}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
     }
 
     // ===================================================================================
@@ -523,7 +523,7 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
              , REFERRER_CB extends ${glConditionBean}
              , REFERRER_ENTITY extends ${glEntity}>
             void helpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
-                                         , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                         , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                          , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
         doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
     }
@@ -544,7 +544,7 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
              , REFERRER_CB extends ${glConditionBean}
              , REFERRER_ENTITY extends ${glEntity}>
             void doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
-                                         , ${glLoadReferrerOptionName}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
+                                         , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
                                          , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
         // - - - - - - - - - - -

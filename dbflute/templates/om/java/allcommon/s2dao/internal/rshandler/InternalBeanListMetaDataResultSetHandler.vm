@@ -19,7 +19,7 @@ import org.seasar.dao.impl.RelationKey;
 import org.seasar.dao.impl.RelationRowCache;
 
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 
 /**
@@ -163,14 +163,14 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean hasConditionBean() {
-        return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
+        return ${glConditionBeanContext}.isExistConditionBeanOnThread();
     }
 
     protected boolean isSelectedForeignInfoEmpty() {
         if (!hasConditionBean()) {
             return true;
         }
-        ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
         if (cb.getSqlClause().isSelectedForeignInfoEmpty()) {
             return true;
         }
@@ -184,7 +184,7 @@ public class ${glInternalBeanListMetaDataResultSetHandler} extends ${glInternalA
      * @return Determination.
      */
     protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
-        final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
             return true;
         }

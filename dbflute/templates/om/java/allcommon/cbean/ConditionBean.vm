@@ -9,7 +9,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * The interface of condition-bean.
  * @author ${database.ClassAuthor}
  */
-public interface ${glConditionBean} extends ${glPagingBeanInterfaceName} {
+public interface ${glConditionBean} extends ${glPagingBean} {
 
     // ===================================================================================
     //                                                                          Table Name

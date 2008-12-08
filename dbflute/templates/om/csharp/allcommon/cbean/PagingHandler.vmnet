@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public interface ${glPagingHandlerName}<ENTITY> {
+    public interface ${glPagingHandler}<ENTITY> {
 
-        ${glPagingBeanInterfaceName} PagingBean { get; }
+        ${glPagingBean} PagingBean { get; }
         int Count();
         IList<ENTITY> Paging();
     }

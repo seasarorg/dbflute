@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glSelectResourceInterfaceName} {
+public interface ${glSelectResource} {
 
     /**
      * Check safety result.

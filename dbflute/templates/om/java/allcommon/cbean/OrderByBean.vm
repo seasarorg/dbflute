@@ -7,7 +7,7 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glOrderByBeanInterfaceName} extends ${glSelectResourceInterfaceName} {
+public interface ${glOrderByBean} extends ${glSelectResource} {
 
     /**
      * Get sql component of order-by clause.
@@ -28,19 +28,19 @@ public interface ${glOrderByBeanInterfaceName} extends ${glSelectResourceInterfa
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} clearOrderBy();
+    public ${glOrderByBean} clearOrderBy();
 
     /**
      * Ignore order-by.
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} ignoreOrderBy();
+    public ${glOrderByBean} ignoreOrderBy();
 
     /**
      * Make order-by effective.
      * 
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} makeOrderByEffective();
+    public ${glOrderByBean} makeOrderByEffective();
 }

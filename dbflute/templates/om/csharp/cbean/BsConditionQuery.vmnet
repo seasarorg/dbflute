@@ -50,11 +50,11 @@ namespace ${glPackageBaseCQ} {
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-        protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
-        public ${glConditionValueName} ${tmpJavaName} {
-            get { if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValueName}(); } return _${tmpUncapitalisedJavaName}; }
+        protected ${glConditionValue} _${tmpUncapitalisedJavaName};
+        public ${glConditionValue} ${tmpJavaName} {
+            get { if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValue}(); } return _${tmpUncapitalisedJavaName}; }
         }
-        protected override ${glConditionValueName} getCValue${tmpJavaName}() { return this.${tmpJavaName}; }
+        protected override ${glConditionValue} getCValue${tmpJavaName}() { return this.${tmpJavaName}; }
 
 #if (${col.isJavaNativeStringObject()})
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})

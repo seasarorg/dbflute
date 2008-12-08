@@ -65,11 +65,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                            Helper
         //                                            ------
         protected void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
-            ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log);
+            ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log);
         }
 
         protected void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
-            ${glConditionBeanContextName}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+            ${glConditionBeanContext}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
         }
 
         // ===============================================================================

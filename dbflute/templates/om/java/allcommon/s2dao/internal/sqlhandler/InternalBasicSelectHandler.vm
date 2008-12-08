@@ -10,8 +10,8 @@ import javax.sql.DataSource;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBean};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetWrapper};
 
@@ -81,10 +81,10 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
 
     protected ResultSet createResultSet(PreparedStatement ps) throws SQLException {
         final ResultSet resultSet = ps.executeQuery();
-        if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
+        if (!${glFetchNarrowingBeanContext}.isExistFetchNarrowingBeanOnThread()) {
             return resultSet;
         }
-        final ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
+        final ${glFetchNarrowingBean} cb = ${glFetchNarrowingBeanContext}.getFetchNarrowingBeanOnThread();
         if (!isUseFetchNarrowingResultSetWrapper(cb)) {
             return resultSet;
         }
@@ -98,7 +98,7 @@ public class ${glInternalBasicSelectHandler} extends ${glInternalBasicHandler} {
         return wrapper;
     }
 
-    protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
+    protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBean} cb) {
         if (cb.getSafetyMaxResultSize() > 0) {
             return true;
         }

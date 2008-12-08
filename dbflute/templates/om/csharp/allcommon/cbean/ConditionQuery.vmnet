@@ -32,7 +32,7 @@ public interface ${glConditionQuery} {
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
-    ${glConditionValueName} invokeValue(String columnFlexibleName);
+    ${glConditionValue} invokeValue(String columnFlexibleName);
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
     void invokeOrderBy(String columnFlexibleName, bool isAsc);
     ${glConditionQuery} invokeForeignCQ(String foreignPropertyName);

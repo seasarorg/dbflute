@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public class ${glResultBeanBuilderName}<ENTITY> {
+    public class ${glResultBeanBuilder}<ENTITY> {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -14,23 +14,23 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glResultBeanBuilderName}(String tableDbName) {
+        public ${glResultBeanBuilder}(String tableDbName) {
             _tableDbName = tableDbName;
         }
 
         // ===============================================================================
         //                                                                         Builder
         //                                                                         =======
-        public ${glListResultBeanName}<ENTITY> BuildListResultBean(IList<ENTITY> selectedList) {
-            ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+        public ${glListResultBean}<ENTITY> BuildListResultBean(IList<ENTITY> selectedList) {
+            ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
             rb.TableDbName = _tableDbName;
             rb.AllRecordCount = selectedList.Count;
             rb.SelectedList = selectedList;
             return rb;
         }
 
-        public ${glListResultBeanName}<ENTITY> BuildListResultBean(${glConditionBean} ob, IList<ENTITY> selectedList) {
-            ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+        public ${glListResultBean}<ENTITY> BuildListResultBean(${glConditionBean} ob, IList<ENTITY> selectedList) {
+            ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
             rb.TableDbName = _tableDbName;
             rb.AllRecordCount = selectedList.Count;
             rb.SelectedList = selectedList;
@@ -38,8 +38,8 @@ namespace ${glPackageBaseCommonCBean} {
             return rb;
         }
 
-        public ${glPagingResultBeanName}<ENTITY> BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, IList<ENTITY> selectedList) {
-            ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
+        public ${glPagingResultBean}<ENTITY> BuildPagingResultBean(${glPagingBean} pb, int allRecordCount, IList<ENTITY> selectedList) {
+            ${glPagingResultBean}<ENTITY> rb = new ${glPagingResultBean}<ENTITY>();
             rb.TableDbName = _tableDbName;
             rb.AllRecordCount = allRecordCount;
             rb.SelectedList = selectedList;

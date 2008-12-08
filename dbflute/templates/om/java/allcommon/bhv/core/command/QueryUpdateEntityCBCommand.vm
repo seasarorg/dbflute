@@ -3,8 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
 
@@ -44,8 +44,8 @@ public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} 
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ${glConditionBean} cb = _conditionBean;
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
-        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
+        ${glFetchNarrowingBeanContext}.setFetchNarrowingBeanOnThread(cb);
+        ${glConditionBeanContext}.setConditionBeanOnThread(cb);
     }
 
     // ===================================================================================

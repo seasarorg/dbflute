@@ -30,9 +30,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
-        public ${glListResultBeanName}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
+        public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
             IList<ENTITY> resultList = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
-            return new ${glResultBeanBuilderName}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
+            return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
             
         }
 #else

@@ -7,7 +7,7 @@ using ${glPackageBaseCommonDBMeta};
 namespace ${glPackageBaseCommonSqlClause} {
 
 [System.Serializable]
-public class ${myClassName} : ${glSqlClauseAbstractName} {
+public class ${myClassName} : ${glAbstractSqlClause} {
 
     // ===================================================================================
     //                                                                           Attribute

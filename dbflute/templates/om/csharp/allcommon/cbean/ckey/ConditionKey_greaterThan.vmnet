@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionKeyName}GreaterThan")
+#set ($myClassName = "${glConditionKey}GreaterThan")
 
 using System;
 
@@ -8,7 +8,7 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-public class ${myClassName} : ${glConditionKeyName} {
+public class ${myClassName} : ${glConditionKey} {
 
     private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -17,7 +17,7 @@ public class ${myClassName} : ${glConditionKeyName} {
         _operand = ">";
     }
 
-    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+    public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
         if (value == null) {
             return false;
         }
@@ -33,7 +33,7 @@ public class ${myClassName} : ${glConditionKeyName} {
         return true;
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
         if (value.GreaterThan == null) {
             return;
         }
@@ -41,16 +41,16 @@ public class ${myClassName} : ${glConditionKeyName} {
         conditionList.add(buildBindClause(columnName, value.getGreaterThanLocation()));
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
         conditionValue.GreaterThan = value;
         conditionValue.setGreaterThanLocation(location);
     }
 
-    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

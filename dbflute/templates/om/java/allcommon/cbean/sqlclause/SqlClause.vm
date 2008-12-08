@@ -3,9 +3,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 import java.util.Map;
 
-import ${glPackageBaseCommonCKey}.${glConditionKeyName};
+import ${glPackageBaseCommonCKey}.${glConditionKey};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 
 /**
  * The interface of SQL clause.
@@ -142,7 +142,7 @@ public interface ${myClassName} {
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value);
 
     /**
      * Register 'where' clause.
@@ -151,7 +151,7 @@ public interface ${myClassName} {
      * @param value Condition-value. (NotNull)
      * @param option Condition-option. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
 
     /**
      * Register 'where' clause.
@@ -167,11 +167,11 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value);
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
     public void registerBaseTableInlineWhereClause(String value);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, boolean onClauseInline);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================

@@ -293,7 +293,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         protected bool IsUniqueConstraintException(DbException e) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
-            // return ${glConditionBeanContextName}.IsUniqueConstraintException(ExtractSQLState(e), e.ErrorCode);
+            // return ${glConditionBeanContext}.IsUniqueConstraintException(ExtractSQLState(e), e.ErrorCode);
             return false;
         }
 
@@ -466,11 +466,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected bool HasConditionBean() {
-            return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+            return ${glConditionBeanContext}.IsExistConditionBeanOnThread();
         }
 
         protected ${glConditionBean} GetConditionBean() {
-            return ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            return ${glConditionBeanContext}.GetConditionBeanOnThread();
         }
 
         protected bool HasOutsideSqlContext() {

@@ -23,10 +23,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         public IDataReader CreateDataReader(IDataSource dataSource, IDbCommand cmd) {
             IDataReader dataReader = ExecuteReader(dataSource, cmd);
 
-            if (!${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
+            if (!${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
                 return dataReader;// If the first argument is not condition-bean...
             }
-            ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.GetFetchNarrowingBeanOnThread();
+            ${glFetchNarrowingBean} cb = ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread();
             if (!IsUseFetchNarrowingResultSetWrapper(cb)) {
                 return dataReader;
             }
@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return wrapper;
         }
 
-        protected bool IsUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
+        protected bool IsUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBean} cb) {
             if (cb.SafetyMaxResultSize > 0) {
                 return true;
             }

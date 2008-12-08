@@ -5,8 +5,8 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonBhvCoreExecution}.${glOutsideSqlSelectExecution};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
-import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBean};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
 
@@ -57,14 +57,14 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
     }
 
     protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {
-        if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
+        if (pmb == null || !${glFetchNarrowingBeanContext}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
             return;
         }
-        final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
+        final ${glFetchNarrowingBean} fetchNarrowingBean = (${glFetchNarrowingBean})pmb;
         if (option.isManualPaging()) {
             fetchNarrowingBean.ignoreFetchNarrowing();
         }
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
+        ${glFetchNarrowingBeanContext}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
     }
 
     public void afterExecuting() {

@@ -9,7 +9,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 
 import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -62,7 +62,7 @@ public class ${glSelectCBExecution} extends ${glInternalAbstractDynamicCommand} 
     //                                          Setup Clause
     //                                          ------------
     protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
-        final ${glConditionBean} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
         final String realClause;
         {
             final ${glSelectCBExecution} dynamicSqlFactory = createDynamicSqlFactory();

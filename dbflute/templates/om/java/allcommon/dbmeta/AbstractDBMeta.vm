@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
-#set ($myClassName = "${glDBMetaAbstractName}")
+#set ($myClassName = "${glAbstractDBMeta}")
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 import java.util.Calendar;
 import java.util.Date;
 
-import ${glPackageBaseCommonCKey}.${glConditionKeyName};
+import ${glPackageBaseCommonCKey}.${glConditionKey};
 
 /**
  * The option of from-to.
@@ -125,14 +125,14 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
      * Get the condition-key of the from-date. It requires this method is called after filterFromDate().
      * @return The condition-key of the from-date. (NotNull)
      */
-    public ${glConditionKeyName} getFromDateConditionKey() {
+    public ${glConditionKey} getFromDateConditionKey() {
         if (_compareAsDate) {
-            return ${glConditionKeyName}.CK_GREATER_EQUAL;
+            return ${glConditionKey}.CK_GREATER_EQUAL;
         }
         if (_fromDateGreaterThan) {
-            return ${glConditionKeyName}.CK_GREATER_THAN;// Default!
+            return ${glConditionKey}.CK_GREATER_THAN;// Default!
         } else {
-            return ${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+            return ${glConditionKey}.CK_GREATER_EQUAL;// Default!
         }
     }
 
@@ -140,14 +140,14 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
      * Get the condition-key of the to-date. It requires this method is called after filterToDate().
      * @return The condition-key of the to-date. (NotNull)
      */
-    public ${glConditionKeyName} getToDateConditionKey() {
+    public ${glConditionKey} getToDateConditionKey() {
         if (_compareAsDate) {
-            return ${glConditionKeyName}.CK_LESS_THAN;
+            return ${glConditionKey}.CK_LESS_THAN;
         }
         if (_toDateLessThan) {
-            return ${glConditionKeyName}.CK_LESS_THAN;// Default!
+            return ${glConditionKey}.CK_LESS_THAN;// Default!
         } else {
-            return ${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+            return ${glConditionKey}.CK_LESS_EQUAL;// Default!
         }
     }
 

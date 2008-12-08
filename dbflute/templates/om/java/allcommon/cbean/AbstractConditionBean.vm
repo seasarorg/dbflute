@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-#set ($myClassName = "${glConditionBeanAbstractName}")
+#set ($myClassName = "${glAbstractConditionBean}")
 import java.util.List;
 import java.util.Map;
 import java.lang.reflect.Method;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
@@ -225,7 +225,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNUll)
      */
-    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
+    public ${glPagingBean} fetchFirst(int fetchSize) {
         getSqlClause().fetchFirst(fetchSize);
         return this;
     }
@@ -236,7 +236,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNUll)
      */
-    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
+    public ${glPagingBean} fetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
@@ -246,7 +246,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
+    public ${glPagingBean} fetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
         return this;
     }
@@ -434,7 +434,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+    public ${glOrderByBean} clearOrderBy() {
         getSqlClause().clearOrderBy();
         return this;
     }
@@ -443,7 +443,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+    public ${glOrderByBean} ignoreOrderBy() {
         getSqlClause().ignoreOrderBy();
         return this;
     }
@@ -452,7 +452,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+    public ${glOrderByBean} makeOrderByEffective() {
         getSqlClause().makeOrderByEffective();
         return this;
     }
@@ -1018,7 +1018,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * @return SQL for display. (NotNull and NotEmpty)
      */
     public String toDisplaySql() {
-        return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
+        return ${glConditionBeanContext}.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
     }
     protected abstract String getLogDateFormat();
     protected abstract String getLogTimestampFormat();

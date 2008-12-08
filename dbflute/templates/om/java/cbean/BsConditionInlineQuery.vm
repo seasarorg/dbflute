@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageCIQ};
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageCB}.*;
 import ${glPackageBaseCQ}.*;
@@ -41,13 +41,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
@@ -77,7 +77,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
-    protected ${glConditionValueName} getCValue${tmpJavaName}() {
+    protected ${glConditionValue} getCValue${tmpJavaName}() {
         return _myCQ.get${tmpJavaName}();
     }
 #if (${col.isJavaNativeStringObject()})

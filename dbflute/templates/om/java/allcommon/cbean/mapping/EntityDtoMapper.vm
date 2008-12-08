@@ -6,7 +6,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanMapping};
  * @param <DTO> The type of dto.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityDtoMapperName}<ENTITY, DTO> {
+public interface ${glEntityDtoMapper}<ENTITY, DTO> {
 
     /**
      * Map entity to data transfer object.

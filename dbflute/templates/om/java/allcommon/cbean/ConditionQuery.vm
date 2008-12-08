@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 
 /**
@@ -100,7 +100,7 @@ public interface ${glConditionQuery} {
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
      */
-    public ${glConditionValueName} invokeValue(String columnFlexibleName);
+    public ${glConditionValue} invokeValue(String columnFlexibleName);
 
     /**
      * Invoke setting query. {ResolveRelation}

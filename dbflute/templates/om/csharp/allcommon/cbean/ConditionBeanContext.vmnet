@@ -10,7 +10,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    public static class ${glConditionBeanContextName} {
+    public static class ${glConditionBeanContext} {
 
         private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
 

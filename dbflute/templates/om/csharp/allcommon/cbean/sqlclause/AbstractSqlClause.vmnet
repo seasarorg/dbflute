@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClauseAbstractName}")
+#set ($myClassName = "${glAbstractSqlClause}")
 
 using System;
 using ${glPackageBaseCommon};
@@ -642,13 +642,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
@@ -673,13 +673,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value);
         arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
     }
 
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
@@ -690,7 +690,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         _baseTableInlineWhereList.add(value);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
@@ -702,7 +702,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);

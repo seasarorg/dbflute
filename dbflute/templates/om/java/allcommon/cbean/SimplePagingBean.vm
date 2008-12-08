@@ -12,7 +12,7 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, ${glMapParameterBeanInterfaceName} {
+public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterBean} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -103,7 +103,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
+    public ${glPagingBean} fetchFirst(int fetchSize) {
         getSqlClause().fetchFirst(fetchSize);
         return this;
     }
@@ -114,7 +114,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
+    public ${glPagingBean} fetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
@@ -124,7 +124,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
+    public ${glPagingBean} fetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
         return this;
     }
@@ -303,7 +303,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+    public ${glOrderByBean} clearOrderBy() {
         getSqlClause().clearOrderBy();
         return this;
     }
@@ -312,7 +312,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+    public ${glOrderByBean} ignoreOrderBy() {
         getSqlClause().ignoreOrderBy();
         return this;
     }
@@ -321,7 +321,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * ${database.ImplementComment}
      * @return this. (NotNull)
      */
-    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+    public ${glOrderByBean} makeOrderByEffective() {
         getSqlClause().makeOrderByEffective();
         return this;
     }
