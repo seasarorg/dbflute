@@ -1,8 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.XADataSource;
 #if ($database.isTargetContainerSeasar())
 
@@ -10,7 +7,6 @@ import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 #end
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};

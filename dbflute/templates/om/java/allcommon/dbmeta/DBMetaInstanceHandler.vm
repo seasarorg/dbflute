@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInstanceHandler}")
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,12 +16,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements ${glDBMetaProvider} {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
 
     // ===================================================================================
     //                                                                        Resource Map
