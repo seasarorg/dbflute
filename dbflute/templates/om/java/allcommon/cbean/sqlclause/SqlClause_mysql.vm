@@ -32,7 +32,7 @@ public class ${myClassName} extends ${glAbstractSqlClause} {
     //                                                                    OrderBy Override
     //                                                                    ================
 	@Override
-    protected ${glOrderByClauseName}.OrderByNullsSetupper createOrderByNullsSetupper() {
+    protected ${glOrderByClause}.OrderByNullsSetupper createOrderByNullsSetupper() {
 	    return createOrderByNullsSetupperByCaseWhen();
 	}
 

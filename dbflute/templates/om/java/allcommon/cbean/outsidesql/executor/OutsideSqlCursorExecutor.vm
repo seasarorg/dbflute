@@ -13,7 +13,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
+public class ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,7 +33,7 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlCursorExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+    public ${glOutsideSqlCursorExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
                                   , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
                                   , ${glDBDef} currentDBDef) {
@@ -89,12 +89,12 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> dynamicBinding() {
+    public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }
 
-    public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> configure(${glStatementConfig} statementConfig) {
+    public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> configure(${glStatementConfig} statementConfig) {
 		_outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

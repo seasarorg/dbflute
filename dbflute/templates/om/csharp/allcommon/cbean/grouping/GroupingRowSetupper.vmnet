@@ -3,5 +3,5 @@ using System;
 
 namespace ${glPackageBaseCommonCBeanGrouping} {
 
-    public delegate ROW ${glGroupingRowSetupperName}<ROW, ENTITY>(${glGroupingRowResourceName}<ENTITY> groupingRowResource);
+    public delegate ROW ${glGroupingRowSetupper}<ROW, ENTITY>(${glGroupingRowResource}<ENTITY> groupingRowResource);
 }

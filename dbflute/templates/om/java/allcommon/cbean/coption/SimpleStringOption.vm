@@ -2,9 +2,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
 #set ($myClassName = "${glSimpleStringOption}")
 
-import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsSplitName};
-import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToUpperLowerCaseName};
-import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToSingleByteName};
+import ${glPackageBaseCommonCOptionParts}.${glSplitOptionParts};
+import ${glPackageBaseCommonCOptionParts}.${glToUpperLowerCaseOptionParts};
+import ${glPackageBaseCommonCOptionParts}.${glToSingleByteOptionParts};
 import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 
@@ -13,11 +13,11 @@ import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} implements ${glConditionOptionInterfaceName} {
+public class ${myClassName} implements ${glConditionOption} {
 
-    protected ${glConditionOptionPartsSplitName} _splitOptionParts;
-    protected ${glConditionOptionPartsToUpperLowerCaseName} _toUpperLowerCaseOptionParts;
-    protected ${glConditionOptionPartsToSingleByteName} _toSingleByteCaseOptionParts;
+    protected ${glSplitOptionParts} _splitOptionParts;
+    protected ${glToUpperLowerCaseOptionParts} _toUpperLowerCaseOptionParts;
+    protected ${glToSingleByteOptionParts} _toSingleByteCaseOptionParts;
     protected ${glJapaneseOptionPartsAgent} _japaneseOptionPartsAgent;
 
     // =====================================================================================
@@ -60,9 +60,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return this;
     }
 
-    protected ${glConditionOptionPartsSplitName} getSplitOptionParts() {
+    protected ${glSplitOptionParts} getSplitOptionParts() {
         if (_splitOptionParts == null) {
-            _splitOptionParts = new ${glConditionOptionPartsSplitName}();
+            _splitOptionParts = new ${glSplitOptionParts}();
         }
         return _splitOptionParts;
     }
@@ -88,9 +88,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return this;
     }
 
-    protected ${glConditionOptionPartsToUpperLowerCaseName} getToUpperLowerCaseOptionParts() {
+    protected ${glToUpperLowerCaseOptionParts} getToUpperLowerCaseOptionParts() {
         if (_toUpperLowerCaseOptionParts == null) {
-            _toUpperLowerCaseOptionParts = new ${glConditionOptionPartsToUpperLowerCaseName}();
+            _toUpperLowerCaseOptionParts = new ${glToUpperLowerCaseOptionParts}();
         }
         return _toUpperLowerCaseOptionParts;
     }
@@ -113,9 +113,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return this;
     }
 
-    protected ${glConditionOptionPartsToSingleByteName} getToSingleByteOptionParts() {
+    protected ${glToSingleByteOptionParts} getToSingleByteOptionParts() {
         if (_toSingleByteCaseOptionParts == null) {
-            _toSingleByteCaseOptionParts = new ${glConditionOptionPartsToSingleByteName}();
+            _toSingleByteCaseOptionParts = new ${glToSingleByteOptionParts}();
         }
         return _toSingleByteCaseOptionParts;
     }
@@ -160,9 +160,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     //                                                                              ========
     public Object createDeepCopy() {
         final ${myClassName} deepCopy = newDeepCopyInstance();
-        deepCopy._splitOptionParts = _splitOptionParts != null ? (${glConditionOptionPartsSplitName})_splitOptionParts.createDeepCopy() : null;
-        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (${glConditionOptionPartsToUpperLowerCaseName})_toUpperLowerCaseOptionParts.createDeepCopy() : null;
-        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (${glConditionOptionPartsToSingleByteName})_toSingleByteCaseOptionParts.createDeepCopy() : null;
+        deepCopy._splitOptionParts = _splitOptionParts != null ? (${glSplitOptionParts})_splitOptionParts.createDeepCopy() : null;
+        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (${glToUpperLowerCaseOptionParts})_toUpperLowerCaseOptionParts.createDeepCopy() : null;
+        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (${glToSingleByteOptionParts})_toSingleByteCaseOptionParts.createDeepCopy() : null;
         deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (${glJapaneseOptionPartsAgent})_japaneseOptionPartsAgent.createDeepCopy() : null;
         return deepCopy;
     }

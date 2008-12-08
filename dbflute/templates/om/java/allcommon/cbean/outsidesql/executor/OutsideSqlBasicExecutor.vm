@@ -42,7 +42,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlBasicExecutorName} {
+public class ${glOutsideSqlBasicExecutor} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -65,7 +65,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlBasicExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+    public ${glOutsideSqlBasicExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
                                  , String tableDbName, ${glDBDef} currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._tableDbName = tableDbName;
@@ -169,8 +169,8 @@ public class ${glOutsideSqlBasicExecutorName} {
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
-    public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
+    public ${glOutsideSqlCursorExecutor}<Object> cursorHandling() {
+        return new ${glOutsideSqlCursorExecutor}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
     }
 
     /**
@@ -183,8 +183,8 @@ public class ${glOutsideSqlBasicExecutorName} {
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
-    public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
-        return new ${glOutsideSqlEntityExecutorName}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
+    public ${glOutsideSqlEntityExecutor}<Object> entityHandling() {
+        return new ${glOutsideSqlEntityExecutor}<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
     }
 
     // -----------------------------------------------------
@@ -205,10 +205,10 @@ public class ${glOutsideSqlBasicExecutorName} {
      * </pre>
      * @return The executor of paging that the paging mode is auto. (NotNull)
      */
-    public ${glOutsideSqlPagingExecutorName} autoPaging() {
+    public ${glOutsideSqlPagingExecutor} autoPaging() {
         final ${glOutsideSqlOption} option = createOutsideSqlOption();
         option.autoPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     /**
@@ -226,16 +226,16 @@ public class ${glOutsideSqlBasicExecutorName} {
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
-    public ${glOutsideSqlPagingExecutorName} manualPaging() {
+    public ${glOutsideSqlPagingExecutor} manualPaging() {
         final ${glOutsideSqlOption} option = createOutsideSqlOption();
         option.manualPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     // -----------------------------------------------------
     //                                       Dynamic Binding
     //                                       ---------------
-    public ${glOutsideSqlBasicExecutorName} dynamicBinding() {
+    public ${glOutsideSqlBasicExecutor} dynamicBinding() {
         _dynamicBinding = true;
         return this;
     }
@@ -243,7 +243,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     // -----------------------------------------------------
     //                                      Statement Config
     //                                      ----------------
-    public ${glOutsideSqlBasicExecutorName} configure(${glStatementConfig} statementConfig) {
+    public ${glOutsideSqlBasicExecutor} configure(${glStatementConfig} statementConfig) {
         _statementConfig = statementConfig;
         return this;
     }

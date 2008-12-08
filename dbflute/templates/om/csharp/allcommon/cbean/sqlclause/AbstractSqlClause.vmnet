@@ -65,7 +65,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected List<String> _baseTableInlineWhereList = new ArrayList<String>();
 
     /** The clause of order-by. (NotNull) */
-    protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+    protected ${glOrderByClause} _orderByClause = new ${glOrderByClause}();
 
     /** The list of union clause. (Nullable: This is lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
@@ -98,7 +98,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                               WhereClauseSimpleFilter
     //                               -----------------------
     // /** The filter for where clause. */
-    // protected List<${glWhereClauseSimpleFilterInterfaceName}> _whereClauseSimpleFilterList;
+    // protected List<${glWhereClauseSimpleFilterInterface}> _whereClauseSimpleFilterList;
 
     // -----------------------------------------------------
     //                                 Selected Foreign Info
@@ -222,13 +222,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
         // - - - - - - - - - -/
         StringBuilder sb = new StringBuilder();
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableName);
-        List<${glColumnInfoName}> columnInfoList = dbmeta.ColumnInfoList;
+        List<${glColumnInfo}> columnInfoList = dbmeta.ColumnInfoList;
 
         // [DBFlute-0.7.4]
         Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         
-        foreach (${glColumnInfoName} columnInfo in columnInfoList) {
+        foreach (${glColumnInfo} columnInfo in columnInfoList) {
             String columnName = columnInfo.ColumnDbName;
             
             // [DBFlute-0.7.4]
@@ -517,7 +517,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                                                                                  , String foreignPropertyName
                                                                                  , String localRelationPath) {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
-        ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
+        ${glForeignInfo} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         int relationNo = foreignInfo.RelationNo;
         String nextRelationPath = "_" + relationNo;
         if (localRelationPath != null) {
@@ -525,7 +525,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
         ${glDBMeta} foreignDBMeta = foreignInfo.ForeignDBMeta;
-        foreach (${glColumnInfoName} columnInfo in foreignDBMeta.ColumnInfoList) {
+        foreach (${glColumnInfo} columnInfo in foreignDBMeta.ColumnInfoList) {
             String columnDbName = columnInfo.ColumnDbName;
             SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
@@ -648,7 +648,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
@@ -679,7 +679,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
     }
 
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
@@ -702,7 +702,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
@@ -765,7 +765,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+    public ${glOrderByClause} getSqlComponentOfOrderByClause() {
         return _orderByClause;
     }
 
@@ -845,7 +845,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                     registeredColumnName = registeredOrderBy.Substring(registeredOrderBy.LastIndexOf(".") + 1);
                 }
 
-                ${glOrderByElementName} element = new ${glOrderByElementName}();
+                ${glOrderByElement} element = new ${glOrderByElement}();
                 element.setAliasName(aliasName);
                 element.setColumnName(columnName);
                 element.setRegisteredAliasName(registeredAliasName);
@@ -1126,7 +1126,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
          ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
-         ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
+         ${glForeignInfo} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         return foreignInfo.RelationNo;
     }
 
@@ -1167,9 +1167,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
 //    // =====================================================================================
 //    //                                                            Where Clause Simple Filter
 //    //                                                            ==========================
-//    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
+//    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter) {
 //        if (_whereClauseSimpleFilterList == null) {
-//            _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterfaceName}>();
+//            _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterface}>();
 //        }
 //        _whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
 //    }
@@ -1178,8 +1178,8 @@ public abstract class ${myClassName} : ${glSqlClause} {
 //        if (_whereClauseSimpleFilterList == null || _whereClauseSimpleFilterList.isEmpty()) {
 //            return clauseElement;
 //        }
-//        for (Iterator<${glWhereClauseSimpleFilterInterfaceName}> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
-//             ${glWhereClauseSimpleFilterInterfaceName} filter = ite.next();
+//        for (Iterator<${glWhereClauseSimpleFilterInterface}> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
+//             ${glWhereClauseSimpleFilterInterface} filter = ite.next();
 //            if (filter == null) {
 //                String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
 //                throw new IllegalStateException(msg);

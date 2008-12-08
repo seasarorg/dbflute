@@ -5,14 +5,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
  * @param  <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public class ${glGroupingOptionName}<ENTITY> {
+public class ${glGroupingOption}<ENTITY> {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
     protected int _elementCount;
 
-    protected ${glGroupingRowEndDeterminerName}<ENTITY> _groupingRowEndDeterminer;
+    protected ${glGroupingRowEndDeterminer}<ENTITY> _groupingRowEndDeterminer;
 
     // =====================================================================================
     //                                                                           Constructor
@@ -20,14 +20,14 @@ public class ${glGroupingOptionName}<ENTITY> {
     /**
      * Constructor. You should set the determiner of grouping row end after you create the instance.
      */
-    public ${glGroupingOptionName}() {
+    public ${glGroupingOption}() {
     }
 
     /**
      * Constructor.
      * @param elementCount The count of row element in a group.
      */
-    public ${glGroupingOptionName}(int elementCount) {
+    public ${glGroupingOption}(int elementCount) {
         _elementCount = elementCount;
     }
 
@@ -38,11 +38,11 @@ public class ${glGroupingOptionName}<ENTITY> {
         return this._elementCount;
     }
 
-    public ${glGroupingRowEndDeterminerName}<ENTITY> getGroupingRowEndDeterminer() {
+    public ${glGroupingRowEndDeterminer}<ENTITY> getGroupingRowEndDeterminer() {
         return this._groupingRowEndDeterminer;
     }
 
-    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminerName}<ENTITY> groupingRowEndDeterminer) {
+    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminer}<ENTITY> groupingRowEndDeterminer) {
         this._groupingRowEndDeterminer = groupingRowEndDeterminer;
     }
 }

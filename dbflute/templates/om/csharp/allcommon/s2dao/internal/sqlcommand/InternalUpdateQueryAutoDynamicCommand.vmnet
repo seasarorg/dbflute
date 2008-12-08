@@ -99,7 +99,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         try {
             foreach (String propertyName in modifiedPropertyNames.Keys) {
                 currentPropertyName = propertyName;
-                ${glColumnInfoName} columnInfo = dbmeta.FindColumnInfo(propertyName);
+                ${glColumnInfo} columnInfo = dbmeta.FindColumnInfo(propertyName);
                 String columnName = columnInfo.ColumnDbName;
                 PropertyInfo getter = columnInfo.FindProperty();
                 Object value = getter.GetValue(entity, null);
@@ -110,12 +110,12 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
                 }
             }
             if (dbmeta.HasVersionNo) {
-                ${glColumnInfoName} columnInfo = dbmeta.VersionNoColumnInfo;
+                ${glColumnInfo} columnInfo = dbmeta.VersionNoColumnInfo;
                 String columnName = columnInfo.ColumnDbName;
                 columnParameterMap.put(columnName, columnName + " + 1");
             }
             if (dbmeta.HasUpdateDate) {
-                ${glColumnInfoName} columnInfo = dbmeta.UpdateDateColumnInfo;
+                ${glColumnInfo} columnInfo = dbmeta.UpdateDateColumnInfo;
                 PropertyInfo setter = columnInfo.FindProperty();
                 setter.SetValue(entity, DateTime.Now, null);
                 String columnName = columnInfo.ColumnDbName;

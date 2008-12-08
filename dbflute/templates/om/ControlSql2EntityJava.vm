@@ -61,11 +61,11 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Allcommon-DBMetaInfo]
-    #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
+    #set ($glForeignInfo = "${glProjectPrefix}ForeignInfo")
     #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
-    #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
-    #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
-    #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
+    #set ($glRelationInfo = "${glProjectPrefix}RelationInfo")
+    #set ($glUniqueInfo = "${glProjectPrefix}UniqueInfo")
+    #set ($glColumnInfo = "${glProjectPrefix}ColumnInfo")
 
     ## [Helper]
     #set ($glMapListString = "${glProjectPrefix}MapListString")

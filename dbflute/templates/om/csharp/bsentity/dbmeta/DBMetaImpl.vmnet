@@ -50,11 +50,11 @@ namespace ${myDBMetaPackageName} {
         //                                                                     Column Info
         //                                                                     ===========
 #foreach ($col in $table.columns)
-        protected ${glColumnInfoName} _column${col.javaName};
+        protected ${glColumnInfo} _column${col.javaName};
 #end
 
 #foreach ($col in $table.columns)
-        public ${glColumnInfoName} Column${col.javaName} { get { return _column${col.javaName}; } }
+        public ${glColumnInfo} Column${col.javaName} { get { return _column${col.javaName}; } }
 #end
 
         protected void InitializeColumnInfo() {
@@ -70,7 +70,7 @@ namespace ${myDBMetaPackageName} {
         }
 
         protected void InitializeColumnInfoList() {
-            _columnInfoList = new ArrayList<${glColumnInfoName}>();
+            _columnInfoList = new ArrayList<${glColumnInfo}>();
 #foreach ($col in $table.columns)
             _columnInfoList.add(Column${col.javaName});
 #end
@@ -202,13 +202,13 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        public override ${glUniqueInfoName} PrimaryUniqueInfo {
+        public override ${glUniqueInfo} PrimaryUniqueInfo {
             get {
 #if ($table.hasPrimaryKey())
-                ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+                ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
                 uniqueInfo.DBMeta = this;
 #foreach ($col in $table.primaryKey)
-                uniqueInfo.AddUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}));
+                uniqueInfo.AddUniqueColumnList(new ${glColumnInfo}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}));
 #end
                 uniqueInfo.IsPrimary = true;
                 return uniqueInfo;
@@ -231,8 +231,8 @@ namespace ${myDBMetaPackageName} {
         //                                   Foreign Element
         //                                   ---------------
 #foreach ($foreignKeys in $table.foreignKeys)
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-        public ${glForeignInfoName} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+        public ${glForeignInfo} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
@@ -242,9 +242,9 @@ namespace ${myDBMetaPackageName} {
 #end
 
 #foreach ($referrer in $table.referrers)
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
 #if (${referrer.isOneToOne()})
-        public ${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
+        public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
@@ -259,9 +259,9 @@ namespace ${myDBMetaPackageName} {
         //                                  ----------------
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
 #set ($referrerTable = $referrer.table)
-        public ${glReferrerInfoName} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
+        public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
@@ -280,11 +280,11 @@ namespace ${myDBMetaPackageName} {
 #end
 #if ($table.isUseVersionNo())
         public override bool HasVersionNo { get { return true; } }
-        public override ${glColumnInfoName} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
+        public override ${glColumnInfo} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
 #end
 #if ($table.isUseUpdateDate())
         public override bool HasUpdateDate { get { return true; } }
-        public override ${glColumnInfoName} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
+        public override ${glColumnInfo} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
 #end
         public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
 

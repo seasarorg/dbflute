@@ -8,7 +8,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
-    public class ${glOutsideSqlBasicExecutorName} {
+    public class ${glOutsideSqlBasicExecutor} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDao} outsideSqlDao, String tableDbName) {
+        public ${glOutsideSqlBasicExecutor}(${glOutsideSqlDao} outsideSqlDao, String tableDbName) {
             _outsideSqlDao = outsideSqlDao;
             _tableDbName = tableDbName;
         }
@@ -65,32 +65,32 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glOutsideSqlCursorExecutorName}<Object> CursorHandling() {
-            return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        public ${glOutsideSqlCursorExecutor}<Object> CursorHandling() {
+            return new ${glOutsideSqlCursorExecutor}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
         }
 
-        public ${glOutsideSqlEntityExecutorName}<Object> EntityHandling() {
-            return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        public ${glOutsideSqlEntityExecutor}<Object> EntityHandling() {
+            return new ${glOutsideSqlEntityExecutor}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
         }
 
-        public ${glOutsideSqlPagingExecutorName} AutoPaging() {
+        public ${glOutsideSqlPagingExecutor} AutoPaging() {
             ${glOutsideSqlOption} option = CreateOutsideSqlOption();
             option.AutoPaging();
-            return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+            return new ${glOutsideSqlPagingExecutor}(_outsideSqlDao, option, _tableDbName);
         }
 
-        public ${glOutsideSqlPagingExecutorName} ManualPaging() {
+        public ${glOutsideSqlPagingExecutor} ManualPaging() {
             ${glOutsideSqlOption} option = CreateOutsideSqlOption();
             option.ManualPaging();
-            return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+            return new ${glOutsideSqlPagingExecutor}(_outsideSqlDao, option, _tableDbName);
         }
 
-        public ${glOutsideSqlBasicExecutorName} DynamicBinding() {
+        public ${glOutsideSqlBasicExecutor} DynamicBinding() {
             _dynamicBinding = true;
             return this;
         }
 
-        public ${glOutsideSqlBasicExecutorName} Configure(${glStatementConfig} statementConfig) {
+        public ${glOutsideSqlBasicExecutor} Configure(${glStatementConfig} statementConfig) {
             _statementConfig = statementConfig;
             return this;
         }

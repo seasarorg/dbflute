@@ -258,7 +258,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 	
 	protected virtual void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                         , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                                         , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
@@ -268,7 +268,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          FromTo Query
     //                                          ------------
     protected void registerFromToQuery(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue
-                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
+                                 , String colName, String capPropName, String uncapPropName, ${glFromToOption} option) {
         {
             DateTime? filteredFromDate = option.filterFromDate(fromDate);
             ${glConditionKey} fromKey = option.getFromDateConditionKey();
@@ -358,7 +358,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected virtual void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                       , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                       , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
@@ -711,7 +711,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }

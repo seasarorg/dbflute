@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
-import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
+import ${glPackageBaseCommonCOption}.${glInScopeOption};
 import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
 
 /**
@@ -527,7 +527,7 @@ public class ${myClassName} {
     /** The value of inScope. */
     protected List<?> _inScope;
 
-    protected ${glConditionOptionInScopeName} _inScopeOption;
+    protected ${glInScopeOption} _inScopeOption;
 
     /**
      * Get the value of inScope.
@@ -551,7 +551,7 @@ public class ${myClassName} {
         return this;
     }
 
-    public ${myClassName} setInScope(List<?> value, ${glConditionOptionInScopeName} option) {
+    public ${myClassName} setInScope(List<?> value, ${glInScopeOption} option) {
         _inScope = value;
         _inScopeOption = option;
         return this;

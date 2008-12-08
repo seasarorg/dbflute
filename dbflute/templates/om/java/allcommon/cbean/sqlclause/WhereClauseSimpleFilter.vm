@@ -1,8 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glWhereClauseSimpleFilterInterfaceName}")
+#set ($myClassName = "${glWhereClauseSimpleFilterInterface}")
 
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 
 /**
  * The interface of simple filter for where clause.
@@ -34,14 +34,14 @@ public interface ${myClassName} {
      */
     public static class WhereClauseToEmbeddedSimpleFilter implements ${myClassName} {
 
-        protected java.util.Set<${glColumnInfoName}> _filterTargetColumnInfoSet;
+        protected java.util.Set<${glColumnInfo}> _filterTargetColumnInfoSet;
 
-        public WhereClauseToEmbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
-            this._filterTargetColumnInfoSet = new java.util.HashSet<${glColumnInfoName}>();
+        public WhereClauseToEmbeddedSimpleFilter(${glColumnInfo} filterTargetColumnInfo) {
+            this._filterTargetColumnInfoSet = new java.util.HashSet<${glColumnInfo}>();
             this._filterTargetColumnInfoSet.add(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedSimpleFilter(java.util.Set<${glColumnInfoName}> filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedSimpleFilter(java.util.Set<${glColumnInfo}> filterTargetColumnInfoSet) {
             this._filterTargetColumnInfoSet = filterTargetColumnInfoSet;
         }
 
@@ -54,8 +54,8 @@ public interface ${myClassName} {
             if (_filterTargetColumnInfoSet == null || _filterTargetColumnInfoSet.isEmpty()) {
                 return toEmbedded(clauseElement);
             }
-            for (final java.util.Iterator<${glColumnInfoName}> ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
-                final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            for (final java.util.Iterator<${glColumnInfo}> ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
+                final ${glColumnInfo} columnInfo = (${glColumnInfo})ite.next();
                 if (isTargetClause(clauseElement, columnInfo.getColumnDbName())) {
                     return toEmbedded(clauseElement);
                 }
@@ -106,11 +106,11 @@ public interface ${myClassName} {
      */
     public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
 
-        public WhereClauseToEmbeddedQuotedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
+        public WhereClauseToEmbeddedQuotedSimpleFilter(${glColumnInfo} filterTargetColumnInfo) {
             super(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedQuotedSimpleFilter(java.util.Set<${glColumnInfoName}> filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedQuotedSimpleFilter(java.util.Set<${glColumnInfo}> filterTargetColumnInfoSet) {
             super(filterTargetColumnInfoSet);
         }
 

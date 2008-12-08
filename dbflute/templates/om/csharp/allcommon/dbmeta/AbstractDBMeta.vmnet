@@ -17,7 +17,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected List<${glColumnInfoName}> _columnInfoList;
+        protected List<${glColumnInfo}> _columnInfoList;
 
         // ===============================================================================
         //                                                                      Table Info
@@ -37,7 +37,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return HasProperty("Column" + InitCap(propertyName));
         }
 
-        public ${glColumnInfoName} FindColumnInfo(String columnFlexibleName) {
+        public ${glColumnInfo} FindColumnInfo(String columnFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
             if (!HasColumn(columnFlexibleName)) {
                 String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
@@ -46,20 +46,20 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             String propertyName = "Column" + InitCap(FindPropertyName(columnFlexibleName));
             PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
-            return (${glColumnInfoName})propertyInfo.GetValue(this, null);
+            return (${glColumnInfo})propertyInfo.GetValue(this, null);
         }
 
         // createColumnInfo()
-        protected ${glColumnInfoName} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
-            return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+        protected ${glColumnInfo} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
+            return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
         }
 
         // createColumnInfo()
-        protected ${glColumnInfoName} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
-            return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
+        protected ${glColumnInfo} cci(String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
+            return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
         }
 
-        public List<${glColumnInfoName}> ColumnInfoList { get { return _columnInfoList; } }
+        public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }
 
         // ===============================================================================
         //                                                                   Name Handling
@@ -133,16 +133,16 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        public abstract ${glUniqueInfoName} PrimaryUniqueInfo { get; }
+        public abstract ${glUniqueInfo} PrimaryUniqueInfo { get; }
         public abstract bool HasPrimaryKey { get; }
         public abstract bool HasTwoOrMorePrimaryKeys { get; }
 
         // ===============================================================================
         //                                                                   Relation Info
         //                                                                   =============
-        public ${glRelationInfoName} FindRelationInfo(String relationPropertyName) {
+        public ${glRelationInfo} FindRelationInfo(String relationPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-            return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindReferrerInfo(relationPropertyName);
+            return HasForeign(relationPropertyName) ? (${glRelationInfo})FindForeignInfo(relationPropertyName) : (${glRelationInfo})FindReferrerInfo(relationPropertyName);
         }
 
         // -------------------------------------------------
@@ -158,7 +158,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return FindForeignInfo(foreignPropertyName).ForeignDBMeta;
         }
 
-        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} FindForeignInfo(String foreignPropertyName) {
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo} FindForeignInfo(String foreignPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
             String propertyName = BuildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
             PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
@@ -166,14 +166,14 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String msg = "The property '" + propertyName + "' was Not Found on " + GetType().Name;
                 throw new SystemException(msg);
             }
-            return (${glForeignInfoName})propertyInfo.GetValue(this, null);
+            return (${glForeignInfo})propertyInfo.GetValue(this, null);
         }
     
-        protected ${glForeignInfoName} cfi(String propName
+        protected ${glForeignInfo} cfi(String propName
                                 , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
-                                , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+                                , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
                                 , int relNo, bool oneToOne) {// createForeignInfo()
-            ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
+            ${glForeignInfo} foreignInfo = new ${glForeignInfo}();
             foreignInfo.ForeignPropertyName = propName;
             foreignInfo.LocalDBMeta = localDbm;
             foreignInfo.ForeignDBMeta = foreignDbm;
@@ -197,7 +197,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             return FindReferrerInfo(referrerPropertyName).ReferrerDBMeta;
         }
 
-        public ${glReferrerInfoName} FindReferrerInfo(String referrerPropertyName) {
+        public ${glReferrerInfo} FindReferrerInfo(String referrerPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
             String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referrer", referrerPropertyName);
             PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
@@ -205,14 +205,14 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String msg = "The property '" + propertyName + "' was Not Found on " + GetType().Name;
                 throw new SystemException(msg);
             }
-            return (${glReferrerInfoName})propertyInfo.GetValue(this, null);
+            return (${glReferrerInfo})propertyInfo.GetValue(this, null);
         }
 
-        protected ${glReferrerInfoName} cri(String propName
+        protected ${glReferrerInfo} cri(String propName
                                  , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
-                                 , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                                 , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
                                  , bool oneToOne) {// createReferrerInfo()
-            ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
+            ${glReferrerInfo} referrerInfo = new ${glReferrerInfo}();
             referrerInfo.ReferrerPropertyName = propName;
             referrerInfo.LocalDBMeta = localDbm;
             referrerInfo.ReferrerDBMeta = referrerDbm;
@@ -238,9 +238,9 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                            Optimistic Lock Info
         //                                                            ====================
         public virtual bool HasVersionNo { get { return false; } }
-        public virtual ${glColumnInfoName} VersionNoColumnInfo { get { return null; } }
+        public virtual ${glColumnInfo} VersionNoColumnInfo { get { return null; } }
         public virtual bool HasUpdateDate { get { return false; } }
-        public virtual ${glColumnInfoName} UpdateDateColumnInfo { get { return null; } }
+        public virtual ${glColumnInfo} UpdateDateColumnInfo { get { return null; } }
 
         // ===============================================================================
         //                                                              Common Column Info

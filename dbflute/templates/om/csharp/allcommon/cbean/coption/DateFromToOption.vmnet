@@ -1,10 +1,10 @@
-#set ($myClassName = "${glConditionOptionDateFromToName}")
+#set ($myClassName = "${glDateFromToOption}")
 
 using System;
 
 namespace ${glPackageBaseCommonCOption} {
 
-public class ${myClassName} : ${glConditionOptionFromToName} {
+public class ${myClassName} : ${glFromToOption} {
 
     // ===================================================================================
     //                                                                         Constructor

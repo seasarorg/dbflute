@@ -3,14 +3,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTokenFileReflectionResultName} {
+public class ${glTokenFileReflectionResult} {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
     protected java.util.List${database.filterGenericsString('String')} _columnNameList;
     protected int _successCount;
-    protected java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} _failureList;
+    protected java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} _failureList;
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -38,11 +38,11 @@ public class ${glTokenFileReflectionResultName} {
         _successCount = successCount;
     }
 
-    public java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} getFailureList() {
+    public java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} getFailureList() {
         return _failureList;
     }
 
-    public void setFailureList(java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList) {
+    public void setFailureList(java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} failureList) {
         this._failureList = failureList;
     }
 }

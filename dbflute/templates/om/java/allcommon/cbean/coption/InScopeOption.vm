@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
-#set ($myClassName = "${glConditionOptionInScopeName}")
+#set ($myClassName = "${glInScopeOption}")
 
 import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
 

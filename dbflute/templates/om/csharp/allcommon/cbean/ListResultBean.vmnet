@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected String _tableDbName;
         protected int _allRecordCount;
         protected System.Collections.Generic.IList<ENTITY> _selectedList = new System.Collections.Generic.List<ENTITY>();
-        protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+        protected ${glOrderByClause} _orderByClause = new ${glOrderByClause}();
         protected bool _isSetterInvokedSelectedList;
         #endregion
 
@@ -44,15 +44,15 @@ namespace ${glPackageBaseCommonCBean} {
          * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
          * @return The grouped list. (NotNull)
          */
-        public System.Collections.Generic.IList<ROW> GroupingList<ROW>(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
+        public System.Collections.Generic.IList<ROW> GroupingList<ROW>(${glGroupingRowSetupper}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOption}<ENTITY> groupingOption) {
             System.Collections.Generic.IList<ROW> groupingList = new System.Collections.Generic.List<ROW>();
-            ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.GroupingRowEndDeterminer;
+            ${glGroupingRowEndDeterminer}<ENTITY> rowEndDeterminer = groupingOption.GroupingRowEndDeterminer;
             if (rowEndDeterminer == null) {
-                rowEndDeterminer = delegate(${glGroupingRowResourceName}<ENTITY> currentRowResource, ENTITY nextEntity) {
+                rowEndDeterminer = delegate(${glGroupingRowResource}<ENTITY> currentRowResource, ENTITY nextEntity) {
                     return currentRowResource.IsSizeUpBreakCount;
                 }; // as Default
             }
-            ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+            ${glGroupingRowResource}<ENTITY> rowResource = new ${glGroupingRowResource}<ENTITY>();
             int breakCount = groupingOption.ElementCount;
             int rowElementIndex = 0;
             int allElementIndex = 0;
@@ -83,7 +83,7 @@ namespace ${glPackageBaseCommonCBean} {
                     groupingList.Add(groupingRowObject);
 
                     // Initialize!
-                    rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+                    rowResource = new ${glGroupingRowResource}<ENTITY>();
                     rowElementIndex = 0;
                     ++allElementIndex;
                     continue;
@@ -274,7 +274,7 @@ namespace ${glPackageBaseCommonCBean} {
             set { if (value == null) { return; } _selectedList = value; }
         }
 
-        public ${glOrderByClauseName} OrderByClause {
+        public ${glOrderByClause} OrderByClause {
             get { return _orderByClause; }
             set { if (value == null) { return; } _orderByClause = value; }
         }

@@ -11,10 +11,10 @@ import java.util.Set;
 
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
 
 /**
  * The arranger of hierarchy.
@@ -309,7 +309,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
                 final ${glHierarchySourceColumnName} sourceColumn = requestElement.getSourceColumnInfo();
                 final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
                 final Object sourceColumnValue = extractColumnValueFromSource(sourceRow, sourceColumn);
-                final ${glColumnInfoName} destinationColumnInfo = requestElement.getDestinationColumnInfo();
+                final ${glColumnInfo} destinationColumnInfo = requestElement.getDestinationColumnInfo();
                 injectColumnValueToDestinationIfNotNull(localEntity, destinationColumnInfo, sourceColumnValue);
                 continue;
             }
@@ -348,7 +348,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
             }
             relationPropKeyStringBuilder.append(relationPropName);
             final String targetRelationPath = relationPropKeyStringBuilder.toString();
-            final ${glRelationInfoName} relationInfo = localDBMeta.findRelationInfo(relationPropName);
+            final ${glRelationInfo} relationInfo = localDBMeta.findRelationInfo(relationPropName);
 
             final Map<String, Object> targetPrimaryKeyMap;
             final String alreadyRegisteredEntityKey;
@@ -356,7 +356,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
                 // =======
                 // Foreign
                 // =======
-                final ${glForeignInfoName} foreignInfo = localDBMeta.findForeignInfo(relationPropName);
+                final ${glForeignInfo} foreignInfo = localDBMeta.findForeignInfo(relationPropName);
                 final String foreignPropName = foreignInfo.getForeignPropertyName();
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -400,7 +400,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
                 // =======
                 // Referrer
                 // =======
-                final ${glReferrerInfoName} referrerInfo = localDBMeta.findReferrerInfo(relationPropName);
+                final ${glReferrerInfo} referrerInfo = localDBMeta.findReferrerInfo(relationPropName);
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // Extract referrer list from current local entity and initialize it if needs.
@@ -491,7 +491,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      */
     protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement,
                                        ${glEntity} localEntity, Map<String, Object> primaryKeyMap) {
-        final ${glColumnInfoName} destinationColumnInfo = requestElement.getDestinationColumnInfo();
+        final ${glColumnInfo} destinationColumnInfo = requestElement.getDestinationColumnInfo();
         if (!primaryKeyMap.containsKey(destinationColumnInfo.getColumnDbName())) {// The column is primary key!
             final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
             final ${glHierarchySourceColumnName} sourceColumnInfo = requestElement.getSourceColumnInfo();
@@ -528,7 +528,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     }
 
     @SuppressWarnings("unchecked")
-    protected java.util.List<${glEntity}> extractReferrerList(${glEntity} entity, ${glReferrerInfoName} referrerInfo) {
+    protected java.util.List<${glEntity}> extractReferrerList(${glEntity} entity, ${glReferrerInfo} referrerInfo) {
         return (java.util.List<${glEntity}>) invoke(referrerInfo.findGetter(), entity, new Object[] {});
     }
 
@@ -540,7 +540,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param columnInfo Column info. (NotNull)
      * @param columnValue Column value. (NotNull)
      */
-    protected void injectColumnValueToDestinationIfNotNull(${glEntity} entity, ${glColumnInfoName} columnInfo, final Object columnValue) {
+    protected void injectColumnValueToDestinationIfNotNull(${glEntity} entity, ${glColumnInfo} columnInfo, final Object columnValue) {
         if (columnValue != null) {
             injectColumnValueToDestination(entity, columnInfo.getColumnDbName(), columnValue);
         }
@@ -569,7 +569,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
-    protected void injectReferrerList(${glEntity} entity, ${glReferrerInfoName} referrerInfo, java.util.List<${glEntity}> referrerList) {
+    protected void injectReferrerList(${glEntity} entity, ${glReferrerInfo} referrerInfo, java.util.List<${glEntity}> referrerList) {
         invoke(referrerInfo.findSetter(), entity, new Object[] { referrerList });
     }
 
@@ -581,14 +581,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
         injectColumnValueMapToDestination(referrerEntity, referrerPrimaryKeyMap);
     }
 
-    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntity} localEntity, ${glForeignInfoName} foreignInfo, String foreignRelationPath) {
+    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntity} localEntity, ${glForeignInfo} foreignInfo, String foreignRelationPath) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> foreignPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, foreignRelationPath);
         final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(foreignRelationPath);
         final Map<String, Object> localForeignKeyMap = new HashMap<String, Object>();
         for (${glHierarchyRequestElementName} foreignElement : primaryKeyElementList) {
             final String foreignPrimaryKeyColumnName = foreignElement.getDestinationColumnInfo().getColumnDbName();
-            final ${glColumnInfoName} localForeignKeyInfo = foreignInfo.findLocalByForeign(foreignPrimaryKeyColumnName);
+            final ${glColumnInfo} localForeignKeyInfo = foreignInfo.findLocalByForeign(foreignPrimaryKeyColumnName);
             final Object localForeignKeyValue = foreignPrimaryKeyMap.get(foreignPrimaryKeyColumnName);
             localForeignKeyMap.put(localForeignKeyInfo.getColumnDbName(), localForeignKeyValue);
         }
@@ -596,14 +596,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     }
 
     protected void injectReferrerForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntity} referrerEntity,
-            ${glReferrerInfoName} referrerInfo, String localRelationPath) {
+            ${glReferrerInfo} referrerInfo, String localRelationPath) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> localPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, localRelationPath);
         final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(localRelationPath);
         final Map<String, Object> referrerForeignKeyMap = new HashMap<String, Object>();
         for (${glHierarchyRequestElementName} localElement : primaryKeyElementList) {
             final String localPrimaryKeyName = localElement.getDestinationColumnInfo().getColumnDbName();
-            final ${glColumnInfoName} referrerForeignKeyInfo = referrerInfo.findReferrerByLocal(localPrimaryKeyName);
+            final ${glColumnInfo} referrerForeignKeyInfo = referrerInfo.findReferrerByLocal(localPrimaryKeyName);
             final Object referrerForeignKeyValue = localPrimaryKeyMap.get(localPrimaryKeyName);
             referrerForeignKeyMap.put(referrerForeignKeyInfo.getColumnDbName(), referrerForeignKeyValue);
         }

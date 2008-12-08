@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 
 /**
  * The basic request of hierarchy.
@@ -18,7 +18,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}, LOCAL_RELATION_TRA
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glColumnInfoName} _currentSourceColumnInfo;
+    protected ${glColumnInfo} _currentSourceColumnInfo;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -44,7 +44,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}, LOCAL_RELATION_TRA
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @return Destination relation trace. (NotNull)
      */
-    public DestinationRelationTrace<LOCAL_RELATION_TRACE> src(${glColumnInfoName} sourceColumnInfo) {
+    public DestinationRelationTrace<LOCAL_RELATION_TRACE> src(${glColumnInfo} sourceColumnInfo) {
         this._currentSourceColumnInfo = sourceColumnInfo;
         final ${myClassName}<LOCAL_ENTITY, LOCAL_RELATION_TRACE> outer = this;
         return new DestinationRelationTrace<LOCAL_RELATION_TRACE>() {

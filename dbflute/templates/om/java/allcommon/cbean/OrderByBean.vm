@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
  * The order-by-bean as interface.
@@ -14,7 +14,7 @@ public interface ${glOrderByBean} extends ${glSelectResource} {
      * 
      * @return Sql component of order-by clause. (NotNull)
      */
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause();
+    public ${glOrderByClause} getSqlComponentOfOrderByClause();
 
     /**
      * Get order-by clause.

@@ -16,7 +16,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
+public class ${glOutsideSqlEntityExecutor}<PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,7 +36,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlEntityExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+    public ${glOutsideSqlEntityExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
                                   , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
                                   , ${glDBDef} currentDBDef) {
@@ -143,12 +143,12 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> configure(${glStatementConfig} statementConfig) {
+    public ${glOutsideSqlEntityExecutor}<PARAMETER_BEAN> configure(${glStatementConfig} statementConfig) {
 		_outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 	
-    public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> dynamicBinding() {
+    public ${glOutsideSqlEntityExecutor}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }

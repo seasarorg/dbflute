@@ -9,7 +9,7 @@ import ${glPackageBaseCommon}.${glEntity};
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityListSetupperName}<ENTITY extends ${glEntity}> {
+public interface ${glEntityListSetupper}<ENTITY extends ${glEntity}> {
 
     /**
      * Set up the list of entity.

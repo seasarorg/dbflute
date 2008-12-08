@@ -109,7 +109,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                   Implementation of OrderByBean
         //                                                   =============================
-        public ${glOrderByClauseName} SqlComponentOfOrderByClause {
+        public ${glOrderByClause} SqlComponentOfOrderByClause {
             get { return this.SqlClause.getSqlComponentOfOrderByClause(); }
         }
 

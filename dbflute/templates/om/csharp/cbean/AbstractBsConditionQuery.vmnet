@@ -481,11 +481,11 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
-        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
+        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glPackageBaseCommonCOption}.${glFromToOption} fromToOption) {
             registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
         }
         public void Set${tmpJavaName}_DateFromTo(DateTime? fromDate, DateTime? toDate) {
-            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glConditionOptionDateFromToName}());
+            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glDateFromToOption}());
         }
 #end
 #end

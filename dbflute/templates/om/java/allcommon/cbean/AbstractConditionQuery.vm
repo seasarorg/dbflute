@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 import ${glPackageBaseCommonCKey}.${glConditionKey};
-import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
-import ${glPackageBaseCommonCOption}.${glConditionOptionFromToName};
+import ${glPackageBaseCommonCOption}.${glConditionOption};
+import ${glPackageBaseCommonCOption}.${glFromToOption};
 import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
-import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
+import ${glPackageBaseCommonCOption}.${glInScopeOption};
 import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
@@ -379,7 +379,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     }
 
     protected void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                 , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
@@ -389,7 +389,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     //                                          FromTo Query
     //                                          ------------
     protected void registerFromToQuery(java.util.Date fromDate, java.util.Date toDate, ${glConditionValue} cvalue
-                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
+                                 , String colName, String capPropName, String uncapPropName, ${glFromToOption} option) {
         {
             final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
             final ${glConditionKey} fromKey = option.getFromDateConditionKey();
@@ -528,7 +528,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     //                                         InScope Query
     //                                         -------------
     protected void registerInScopeQuery(${glConditionKey} key, String value, ${glConditionValue} cvalue
-                                     , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
+                                     , String colName, String capPropName, String uncapPropName, ${glInScopeOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
@@ -560,7 +560,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     }
 
     protected void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                       , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                       , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
             if (isBaseQuery(this)) {
@@ -1103,7 +1103,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
     }
 
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }

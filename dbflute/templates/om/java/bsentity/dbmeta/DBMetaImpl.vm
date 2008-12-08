@@ -32,16 +32,16 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                                                         ===========
 #foreach ($col in $table.columns)
 #if ($col.isVersionNo())
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
 #elseif ($col.isUpdateDate())
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
 #else
-    protected ${glColumnInfoName} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
 #end
 #end
 
 #foreach ($col in $table.columns)
-    public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
+    public ${glColumnInfo} column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
 #end
 
     // ===================================================================================
@@ -88,10 +88,10 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                       ---------------
 #if ($table.hasPrimaryKey())
 #if ($table.hasOnlyOnePrimaryKey())
-    public ${glUniqueInfoName} getPrimaryUniqueInfo() { return createPrimaryUniqueInfo(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
+    public ${glUniqueInfo} getPrimaryUniqueInfo() { return createPrimaryUniqueInfo(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
 #else
-    public ${glUniqueInfoName} getPrimaryUniqueInfo() {
-        ${glUniqueInfoName} uniqueInfo = createPrimaryUniqueInfo();
+    public ${glUniqueInfo} getPrimaryUniqueInfo() {
+        ${glUniqueInfo} uniqueInfo = createPrimaryUniqueInfo();
 #foreach ($col in $table.primaryKey)
         uniqueInfo.addUniqueColumnList(column${col.javaBeansRulePropertyNameInitCap}());
 #end
@@ -99,7 +99,7 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     }
 #end
 #else
-    public ${glUniqueInfoName} getPrimaryUniqueInfo() {
+    public ${glUniqueInfo} getPrimaryUniqueInfo() {
         throw new UnsupportedOperationException("The table doen not have primary key: " + getTableDbName());
     }
 #end
@@ -113,13 +113,13 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                      Foreign Property
     //                                      ----------------
 #foreach ($foreignKeys in $table.foreignKeys)
-    public ${glForeignInfoName} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${glForeignInfo} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
 #if ($foreignKeys.isSimpleKeyFK())
 #set ($column = $foreignKeys.localColumnAsOne)
 #set ($yourColumn = ${foreignKeys.getForeignColumnByLocalColumn(${column})})
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #else
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap();
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap();
 #foreach ($column in $foreignKeys.localColumnList)
 #set ($yourColumn = ${foreignKeys.getForeignColumnByLocalColumn(${column})})
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
@@ -129,15 +129,15 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     }
 #end
 #foreach ($referrer in $table.referrers)
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
 #if (${referrer.isOneToOne()})
-    public ${glForeignInfoName} foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+    public ${glForeignInfo} foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($column = $referrer.foreignColumnAsOne)
 #set ($yourColumn = ${referrer.getLocalColumnByForeignColumn(${column})})
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #else
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap();
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap();
 #foreach ($column in $referrer.foreignColumnList)
 #set ($yourColumn = ${referrer.getLocalColumnByForeignColumn(${column})})
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
@@ -153,12 +153,12 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                     -----------------
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
-    public ${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+    public ${glReferrerInfo} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($column = $referrer.foreignColumnAsOne)
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #else
-        Map<${glColumnInfoName}, ${glColumnInfoName}> map = newLinkedHashMap();
+        Map<${glColumnInfo}, ${glColumnInfo}> map = newLinkedHashMap();
 #foreach ($column in $referrer.foreignColumnList)
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
@@ -176,7 +176,7 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
         return new ${table.relationTraceClassName}RelationTrace(relationTraceFixHandler);
     }
 
-    public ${table.relationTraceClassName}RelationTrace createRelationTrace(List<${glRelationInfoName}> relationList, List<AbstractRelationTrace> relationTraceList) {
+    public ${table.relationTraceClassName}RelationTrace createRelationTrace(List<${glRelationInfo}> relationList, List<AbstractRelationTrace> relationTraceList) {
         return new ${table.relationTraceClassName}RelationTrace(relationList, relationTraceList);
     }
 
@@ -195,7 +195,7 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
-        public ${table.relationTraceClassName}RelationTrace(List<${glRelationInfoName}> relationList, List<AbstractRelationTrace> relationTraceList) {
+        public ${table.relationTraceClassName}RelationTrace(List<${glRelationInfo}> relationList, List<AbstractRelationTrace> relationTraceList) {
             super(relationList, relationTraceList);
         }
 
@@ -237,11 +237,11 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
 #end
 #if ($table.isUseVersionNo())
     public boolean hasVersionNo() { return true; }
-    public ${glColumnInfoName} getVersionNoColumnInfo() { return _column${table.versionNoJavaName}; }
+    public ${glColumnInfo} getVersionNoColumnInfo() { return _column${table.versionNoJavaName}; }
 #end
 #if ($table.isUseUpdateDate())
     public boolean hasUpdateDate() { return true; }
-    public ${glColumnInfoName} getUpdateDateColumnInfo() { return _column${table.updateDateJavaName}; }
+    public ${glColumnInfo} getUpdateDateColumnInfo() { return _column${table.updateDateJavaName}; }
 #end
 #if ($table.hasAllCommonColumn())
     public boolean hasCommonColumn() { return true; }

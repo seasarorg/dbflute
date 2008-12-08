@@ -19,7 +19,7 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  * The paging executor of outside-SQL.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlPagingExecutorName} {
+public class ${glOutsideSqlPagingExecutor} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -39,7 +39,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlPagingExecutorName}(${glBehaviorCommandInvoker} behaviorCommandInvoker
+    public ${glOutsideSqlPagingExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
                                   , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
                                   , ${glDBDef} currentDBDef) {
@@ -149,7 +149,7 @@ public class ${glOutsideSqlPagingExecutorName} {
     public <ENTITY> ${glPagingResultBean}<ENTITY> selectPage(final String path
                                                       , final ${glPagingBean} pmb
                                                       , final Class<ENTITY> entityType) {
-        final ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor = createCountExecutor();
+        final ${glOutsideSqlEntityExecutor}<${glPagingBean}> countExecutor = createCountExecutor();
         final ${glPagingHandler}<ENTITY> handler = new ${glPagingHandler}<ENTITY>() {
             public ${glPagingBean} getPagingBean() {
                 return pmb;
@@ -170,9 +170,9 @@ public class ${glOutsideSqlPagingExecutorName} {
         return invoker.invokePaging(handler);
     }
 
-    protected ${glOutsideSqlEntityExecutorName}<${glPagingBean}> createCountExecutor() {
+    protected ${glOutsideSqlEntityExecutor}<${glPagingBean}> createCountExecutor() {
         final ${glOutsideSqlOption} countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new ${glOutsideSqlEntityExecutorName}<${glPagingBean}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlEntityExecutor}<${glPagingBean}>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
     }
 
     protected void setupScrollableCursorIfNeeds() {
@@ -221,12 +221,12 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlPagingExecutorName} configure(${glStatementConfig} statementConfig) {
+    public ${glOutsideSqlPagingExecutor} configure(${glStatementConfig} statementConfig) {
 		_outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 
-    public ${glOutsideSqlPagingExecutorName} dynamicBinding() {
+    public ${glOutsideSqlPagingExecutor} dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }

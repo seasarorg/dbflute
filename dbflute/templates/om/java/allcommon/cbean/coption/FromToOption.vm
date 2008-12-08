@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
-#set ($myClassName = "${glConditionOptionFromToName}")
+#set ($myClassName = "${glFromToOption}")
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,7 +31,7 @@ import ${glPackageBaseCommonCKey}.${glConditionKey};
  * </pre>
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} implements ${glConditionOptionInterfaceName} {
+public class ${myClassName} implements ${glConditionOption} {
 
     // ===================================================================================
     //                                                                           Attribute

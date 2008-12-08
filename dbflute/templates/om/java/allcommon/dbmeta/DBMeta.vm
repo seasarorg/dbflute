@@ -7,11 +7,11 @@ import java.util.List;
 import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonHelper}.${glMapListString};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilder};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfo};
 
 /**
  * The interface of DB meta.
@@ -136,7 +136,7 @@ public interface ${myClassName} {
     /**
      * @return The list of DB name of column. (NotNull and NotEmpty)
      */
-    public List<${glColumnInfoName}> getColumnInfoList();
+    public List<${glColumnInfo}> getColumnInfoList();
 
     /**
      * Has column?
@@ -155,7 +155,7 @@ public interface ${myClassName} {
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return The information of the column. (NotNull)
      */ 
-    public ${glColumnInfoName} findColumnInfo(String columnFlexibleName);
+    public ${glColumnInfo} findColumnInfo(String columnFlexibleName);
 
     // ===================================================================================
     //                                                                         Unique Info
@@ -164,7 +164,7 @@ public interface ${myClassName} {
      * Get primary unique info.
      * @return Primary unique info. (NotNull)
      */
-    public ${glUniqueInfoName} getPrimaryUniqueInfo();
+    public ${glUniqueInfo} getPrimaryUniqueInfo();
 
     /**
      * Has primary-key?
@@ -189,7 +189,7 @@ public interface ${myClassName} {
      * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
      * @return Relation info. (NotNull)
      */ 
-    public ${glRelationInfoName} findRelationInfo(String relationPropertyName);
+    public ${glRelationInfo} findRelationInfo(String relationPropertyName);
 
     // -----------------------------------------------------
     //                                       Foreign Element
@@ -213,7 +213,7 @@ public interface ${myClassName} {
      * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign info. (NotNull)
      */ 
-    public ${glForeignInfoName} findForeignInfo(String foreignPropName);
+    public ${glForeignInfo} findForeignInfo(String foreignPropName);
 
     // -----------------------------------------------------
     //                                      Referrer Element
@@ -237,7 +237,7 @@ public interface ${myClassName} {
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer information. (NotNull)
      */ 
-    public ${glReferrerInfoName} findReferrerInfo(String referrerPropertyName);
+    public ${glReferrerInfo} findReferrerInfo(String referrerPropertyName);
 
     // -----------------------------------------------------
     //                                        Relation Trace
@@ -251,13 +251,13 @@ public interface ${myClassName} {
          * Get the trace of relation.
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public List${database.filterGenericsString($glRelationInfoName)} getTraceRelation();
+        public List${database.filterGenericsString($glRelationInfo)} getTraceRelation();
 
         /**
          * Get the trace of column.
          * @return The trace of column as column info. (Nullable)
          */
-        public ${glColumnInfoName} getTraceColumn();
+        public ${glColumnInfo} getTraceColumn();
     }
 
     public static interface RelationTraceFixHandler {
@@ -293,7 +293,7 @@ public interface ${myClassName} {
      * Get the column information of version no.
      * @return The column information of version no. (Nullable: If it doesn't have the column, return null.)
      */
-    public ${glColumnInfoName} getVersionNoColumnInfo();
+    public ${glColumnInfo} getVersionNoColumnInfo();
 
     /**
      * Has update date?
@@ -305,7 +305,7 @@ public interface ${myClassName} {
      * Get the column information of update date.
      * @return The column information of update date. (Nullable: If it doesn't have the column, return null.)
      */
-    public ${glColumnInfoName} getUpdateDateColumnInfo();
+    public ${glColumnInfo} getUpdateDateColumnInfo();
 
     // ===================================================================================
     //                                                                  Common Column Info

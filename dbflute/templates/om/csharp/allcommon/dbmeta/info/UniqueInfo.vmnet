@@ -1,4 +1,4 @@
-#set ($myClassName = "${glUniqueInfoName}")
+#set ($myClassName = "${glUniqueInfo}")
 
 using System;
 
@@ -13,14 +13,14 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                       Attribute
         //                                                                       =========
         protected ${glDBMeta} dbmeta;
-        protected List<${glColumnInfoName}> uniqueColumnList = new ArrayList<${glColumnInfoName}>();
+        protected List<${glColumnInfo}> uniqueColumnList = new ArrayList<${glColumnInfo}>();
         protected bool primary;
 
         // ===============================================================================
         //                                                                     Easy-to-Use
         //                                                                     ===========
         public bool ContainsColumn(String columnName) {
-            foreach (${glColumnInfoName} columnInfo in uniqueColumnList) {
+            foreach (${glColumnInfo} columnInfo in uniqueColumnList) {
                 if (columnInfo.ColumnDbName.Equals(columnName)) {
                     return true;
                 }
@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             return false;
         }
 
-        public bool ContainsColumn(${glColumnInfoName} column) {
+        public bool ContainsColumn(${glColumnInfo} column) {
             return ContainsColumn(column.ColumnDbName);
         }
 
@@ -40,16 +40,16 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
            set { this.dbmeta = value; }
        }
 
-        public List<${glColumnInfoName}> UniqueColumnList {
+        public List<${glColumnInfo}> UniqueColumnList {
             get { return uniqueColumnList; }
         }
 
-        public void AddUniqueColumnList(${glColumnInfoName} uniqueColumn) {
+        public void AddUniqueColumnList(${glColumnInfo} uniqueColumn) {
             this.uniqueColumnList.add(uniqueColumn);
         }
 
-        public ${glColumnInfoName} FirstColumn {
-            get { return (${glColumnInfoName})this.uniqueColumnList.get(0); }
+        public ${glColumnInfo} FirstColumn {
+            get { return (${glColumnInfo})this.uniqueColumnList.get(0); }
         }
 
         public bool IsTwoOrMore {

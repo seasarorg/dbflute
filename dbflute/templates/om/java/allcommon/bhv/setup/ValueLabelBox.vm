@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvSetup};
  * The class of Value-Label Box.
  * @author ${database.ClassAuthor}
  */
-public class ${glValueLabelBoxName} {
+public class ${glValueLabelBox} {
 
     protected Object _value;
 

@@ -3,16 +3,16 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
 #set ($myClassName = "${glHierarchySourceEntityColumnName}")
 
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceColumnName};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 
 /**
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements ${glHierarchySourceColumnName} {
 
-    protected ${glColumnInfoName} columnInfo;
+    protected ${glColumnInfo} columnInfo;
 
-    public ${myClassName}(${glColumnInfoName} columnInfo) {
+    public ${myClassName}(${glColumnInfo} columnInfo) {
         this.columnInfo = columnInfo;
     }
 

@@ -5,7 +5,7 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTokenFileReflectionOptionName} {
+public class ${glTokenFileReflectionOption} {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -17,32 +17,32 @@ public class ${glTokenFileReflectionOptionName} {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public ${glTokenFileReflectionOptionName} delimitateByComma() {
+    public ${glTokenFileReflectionOption} delimitateByComma() {
         _fileTokenizingOption.delimitateByComma();
         return this;
     }
 
-    public ${glTokenFileReflectionOptionName} delimitateByTab() {
+    public ${glTokenFileReflectionOption} delimitateByTab() {
         _fileTokenizingOption.delimitateByTab();
         return this;
     }
 
-    public ${glTokenFileReflectionOptionName} encodeAsUTF8() {
+    public ${glTokenFileReflectionOption} encodeAsUTF8() {
         _fileTokenizingOption.encodeAsUTF8();
         return this;
     }
 
-    public ${glTokenFileReflectionOptionName} encodeAsWindows31J() {
+    public ${glTokenFileReflectionOption} encodeAsWindows31J() {
         _fileTokenizingOption.encodeAsWindows31J();
         return this;
     }
 
-    public ${glTokenFileReflectionOptionName} handleEmptyAsNull() {
+    public ${glTokenFileReflectionOption} handleEmptyAsNull() {
         _fileTokenizingOption.handleEmptyAsNull();
         return this;
     }
 
-    public ${glTokenFileReflectionOptionName} interruptIfError() {
+    public ${glTokenFileReflectionOption} interruptIfError() {
         _interruptIfError = true;
         return this;
     }

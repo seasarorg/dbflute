@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
-#set ($myClassName = "${glColumnInfoName}")
+#set ($myClassName = "${glColumnInfo}")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta}.OptimisticLockType;

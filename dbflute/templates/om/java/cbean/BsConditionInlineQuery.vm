@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageCIQ};
 #set ($myCQClassName = "${myBaseConditionQueryClassName}")
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
-import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOption};
 import ${glPackageBaseCommonCValue}.${glConditionValue};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageCB}.*;
@@ -48,7 +48,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     @Override
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 

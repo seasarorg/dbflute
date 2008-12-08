@@ -5,7 +5,7 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTokenFileOutputOptionName} {
+public class ${glTokenFileOutputOption} {
 
     // =====================================================================================
     //                                                                             Attribute
@@ -15,37 +15,37 @@ public class ${glTokenFileOutputOptionName} {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
-    public ${glTokenFileOutputOptionName} delimitateByComma() {
+    public ${glTokenFileOutputOption} delimitateByComma() {
         _fileMakingOption.delimitateByComma();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} delimitateByTab() {
+    public ${glTokenFileOutputOption} delimitateByTab() {
         _fileMakingOption.delimitateByTab();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} encodeAsUTF8() {
+    public ${glTokenFileOutputOption} encodeAsUTF8() {
         _fileMakingOption.encodeAsUTF8();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} encodeAsWindows31J() {
+    public ${glTokenFileOutputOption} encodeAsWindows31J() {
         _fileMakingOption.encodeAsWindows31J();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} separateCrLf() {
+    public ${glTokenFileOutputOption} separateCrLf() {
         _fileMakingOption.separateCrLf();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} separateLf() {
+    public ${glTokenFileOutputOption} separateLf() {
         _fileMakingOption.separateLf();
         return this;
     }
 
-    public ${glTokenFileOutputOptionName} goodByeDoubleQuotation() {
+    public ${glTokenFileOutputOption} goodByeDoubleQuotation() {
         _fileMakingOption.goodByeDoubleQuotation();
         return this;
     }

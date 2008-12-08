@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glOrderByElementName}")
+#set ($myClassName = "${glOrderByElement}")
 import java.io.Serializable;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class ${myClassName} implements Serializable {
     protected String _ascDesc = "asc";
 	
 	/** The setupper of order-by nulls. */
-	protected ${glOrderByClauseName}.OrderByNullsSetupper _orderByNullsSetupper;
+	protected ${glOrderByClause}.OrderByNullsSetupper _orderByNullsSetupper;
 	
 	/** Is nulls ordered first? */
 	protected boolean _nullsFirst;
@@ -227,7 +227,7 @@ public class ${myClassName} implements Serializable {
     public void setAscDesc(String value) {
         _ascDesc = value;
     }
-    public void setOrderByNullsSetupper(${glOrderByClauseName}.OrderByNullsSetupper value, boolean nullsFirst) {
+    public void setOrderByNullsSetupper(${glOrderByClause}.OrderByNullsSetupper value, boolean nullsFirst) {
         _orderByNullsSetupper = value;
 		_nullsFirst = nullsFirst;
     }

@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of sql component of order-by clause.
         /// </summary>
-        ${glOrderByClauseName} SqlComponentOfOrderByClause { get; }
+        ${glOrderByClause} SqlComponentOfOrderByClause { get; }
 
         /**
          * Clear order-by.

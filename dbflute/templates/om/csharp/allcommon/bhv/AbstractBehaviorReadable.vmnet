@@ -132,10 +132,10 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                  Various Select
         //                                                                  ==============
-        public virtual ${glOutsideSqlBasicExecutorName} OutsideSql() {
+        public virtual ${glOutsideSqlBasicExecutor} OutsideSql() {
             AssertDaoSelectorNotNull("OutsideSql");
             ${glOutsideSqlDao} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDao}>();
-            return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao, this.TableDbName);
+            return new ${glOutsideSqlBasicExecutor}(outsideSqlDao, this.TableDbName);
         }
 
         private void AssertDaoSelectorNotNull(String methodName) {

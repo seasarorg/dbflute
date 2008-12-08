@@ -1,4 +1,4 @@
-#set ($myClassName = "${glForeignInfoName}")
+#set ($myClassName = "${glForeignInfo}")
 
 using System;
 using System.Reflection;
@@ -9,7 +9,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
 
-    public class ${myClassName} : ${glRelationInfoName} {
+    public class ${myClassName} : ${glRelationInfo} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -17,17 +17,17 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected String foreignPropertyName;
         protected ${glDBMeta} localDBMeta;
         protected ${glDBMeta} foreignDBMeta;
-        protected Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap;
-        protected Map<${glColumnInfoName}, ${glColumnInfoName}> foreignLocalColumnInfoMap;
+        protected Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap;
+        protected Map<${glColumnInfo}, ${glColumnInfo}> foreignLocalColumnInfoMap;
         protected int relationNo;
         protected bool oneToOne;
 
         // ===============================================================================
         //                                                                          Finder
         //                                                                          ======
-        public ${glColumnInfoName} FindLocalByForeign(String foreignColumnDbName) {
-            ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(foreignDBMeta, foreignColumnDbName);
-            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})foreignLocalColumnInfoMap.get(keyColumnInfo);
+        public ${glColumnInfo} FindLocalByForeign(String foreignColumnDbName) {
+            ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(foreignDBMeta, foreignColumnDbName);
+            ${glColumnInfo} resultColumnInfo = (${glColumnInfo})foreignLocalColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
                 msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
@@ -58,7 +58,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             get { return ForeignDBMeta; }
         }
 
-        public Map<${glColumnInfoName}, ${glColumnInfoName}> LocalTargetColumnInfoMap {
+        public Map<${glColumnInfo}, ${glColumnInfo}> LocalTargetColumnInfoMap {
             get { return LocalForeignColumnInfoMap; }
         }
 
@@ -84,19 +84,19 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { this.foreignDBMeta = value; }
         }
 
-        public Map<${glColumnInfoName}, ${glColumnInfoName}> LocalForeignColumnInfoMap {
+        public Map<${glColumnInfo}, ${glColumnInfo}> LocalForeignColumnInfoMap {
             get { return localForeignColumnInfoMap; }
             set {
                 this.localForeignColumnInfoMap = value;
-                foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfoName}, ${glColumnInfoName}>();
-                foreach (${glColumnInfoName} key in localForeignColumnInfoMap.keySet()) {
-                    ${glColumnInfoName} val = (${glColumnInfoName})localForeignColumnInfoMap.get(key);
+                foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
+                foreach (${glColumnInfo} key in localForeignColumnInfoMap.keySet()) {
+                    ${glColumnInfo} val = (${glColumnInfo})localForeignColumnInfoMap.get(key);
                     foreignLocalColumnInfoMap.put(val, key);
                 }
             }
         }
 
-        public Map<${glColumnInfoName}, ${glColumnInfoName}> ForeignLocalColumnInfoMap {
+        public Map<${glColumnInfo}, ${glColumnInfo}> ForeignLocalColumnInfoMap {
             get { return foreignLocalColumnInfoMap; }
         }
 

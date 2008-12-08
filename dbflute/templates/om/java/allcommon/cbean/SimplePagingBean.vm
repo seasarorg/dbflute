@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
-import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
  * The simple pagingBean.
@@ -287,7 +287,7 @@ public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterB
      * ${database.ImplementComment}
      * @return Sql component of order-by clause. (NotNull)
      */
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+    public ${glOrderByClause} getSqlComponentOfOrderByClause() {
         return getSqlClause().getSqlComponentOfOrderByClause();
     }
 

@@ -1,5 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-#set ($myClassName = "${glRelationInfoName}")
+#set ($myClassName = "${glRelationInfo}")
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public interface ${myClassName} {
 
     public ${glDBMeta} getTargetDBMeta();
 
-    public Map<${glColumnInfoName}, ${glColumnInfoName}> getLocalTargetColumnInfoMap();
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalTargetColumnInfoMap();
 
     public boolean isOneToOne();
 

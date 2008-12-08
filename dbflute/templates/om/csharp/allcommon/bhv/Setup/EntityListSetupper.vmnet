@@ -6,5 +6,5 @@ using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonBhvSetup} {
 
-    public delegate void ${glEntityListSetupperName}<ENTITY>(IList<ENTITY> entityList) where ENTITY : ${glEntity};
+    public delegate void ${glEntityListSetupper}<ENTITY>(IList<ENTITY> entityList) where ENTITY : ${glEntity};
 }

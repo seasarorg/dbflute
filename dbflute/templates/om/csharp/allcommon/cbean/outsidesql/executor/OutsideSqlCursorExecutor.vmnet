@@ -6,7 +6,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
-    public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
+    public class ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption) {
+        public ${glOutsideSqlCursorExecutor}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption) {
             this._outsideSqlDao = outsideSqlDao;
             this._outsideSqlOption = outsideSqlOption;
         }
@@ -33,12 +33,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
+        public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
             _outsideSqlOption.StatementConfig = statementConfig;
             return this;
         }
 
-        public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> DynamicBinding() {
+        public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> DynamicBinding() {
             _outsideSqlOption.DynamicBinding();
             return this;
         }

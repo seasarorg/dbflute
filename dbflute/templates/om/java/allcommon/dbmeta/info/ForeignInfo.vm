@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
-#set ($myClassName = "${glForeignInfoName}")
+#set ($myClassName = "${glForeignInfo}")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
@@ -9,9 +9,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${myClassName} implements ${glRelationInfoName} {
+public class ${myClassName} implements ${glRelationInfo} {
 
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -26,9 +26,9 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-    public ${glColumnInfoName} findLocalByForeign(String foreignColumnDbName) {
-        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(foreignDBMeta, foreignColumnDbName);
-        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})foreignLocalColumnInfoMap.get(keyColumnInfo);
+    public ${glColumnInfo} findLocalByForeign(String foreignColumnDbName) {
+        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(foreignDBMeta, foreignColumnDbName);
+        final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})foreignLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
             msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
@@ -110,8 +110,8 @@ public class ${myClassName} implements ${glRelationInfoName} {
         final java.util.Set keySet = localForeignColumnInfoMap.keySet();
         foreignLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
         for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfoName} key = (${glColumnInfoName})ite.next();
-            final ${glColumnInfoName} value = (${glColumnInfoName})localForeignColumnInfoMap.get(key);
+            final ${glColumnInfo} key = (${glColumnInfo})ite.next();
+            final ${glColumnInfo} value = (${glColumnInfo})localForeignColumnInfoMap.get(key);
             foreignLocalColumnInfoMap.put(value, key);
         }
     }

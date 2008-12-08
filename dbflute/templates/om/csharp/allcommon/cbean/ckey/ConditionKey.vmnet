@@ -90,7 +90,7 @@ public abstract class ${myClassName} {
         return this;
     }
 
-    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -100,7 +100,7 @@ public abstract class ${myClassName} {
     }
 	
     abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value);
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option);
 
     public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
         if (conditionValue == null) {
@@ -111,7 +111,7 @@ public abstract class ${myClassName} {
         return conditionValue;
     }
 
-    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         if (conditionValue == null) {
             String msg = "Argument[conditionValue] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
@@ -121,7 +121,7 @@ public abstract class ${myClassName} {
     }
 	
     abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location);
-    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option);
 
     protected String buildBindClause(String columnName, String location) {
         return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";

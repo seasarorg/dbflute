@@ -6,12 +6,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glGroupingRowSetupperName}<ROW, ENTITY> {
+public interface ${glGroupingRowSetupper}<ROW, ENTITY> {
 
     /**
      * Set up the instance of grouping row.
      * @param groupingRowResource Grouping row resource. (NotNull)
      * @return The instance of grouping row. (NotNull)
      */
-    public ROW setup(${glGroupingRowResourceName}<ENTITY> groupingRowResource);
+    public ROW setup(${glGroupingRowResource}<ENTITY> groupingRowResource);
 }

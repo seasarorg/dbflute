@@ -8,7 +8,7 @@ using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
-    public class ${glOutsideSqlPagingExecutorName} {
+    public class ${glOutsideSqlPagingExecutor} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -20,7 +20,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption, String tableDbName) {
+        public ${glOutsideSqlPagingExecutor}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption, String tableDbName) {
             this._outsideSqlDao = outsideSqlDao;
             this._outsideSqlOption = outsideSqlOption;
             this._tableDbName = tableDbName;
@@ -42,7 +42,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
         public ${glPagingResultBean}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBean} pmb) {
             ${glOutsideSqlOption} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
-            ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBean}>(_outsideSqlDao, countOption);
+            ${glOutsideSqlEntityExecutor}<${glPagingBean}> countExecutor = new ${glOutsideSqlEntityExecutor}<${glPagingBean}>(_outsideSqlDao, countOption);
             DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, typeof(ENTITY), countExecutor, this);
             ${glPagingInvoker}<ENTITY> invoker = new ${glPagingInvoker}<ENTITY>(_tableDbName);
             if (pmb.IsCountLater) {
@@ -55,9 +55,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             protected String _path;
             protected ${glPagingBean} _pmb;
             protected Type _entityType;
-            protected ${glOutsideSqlEntityExecutorName}<${glPagingBean}> _countExecutor;
-            protected ${glOutsideSqlPagingExecutorName} _pagingExecutor;
-            public DefaultPagingHandler(String path, ${glPagingBean} pmb, Type entityType, ${glOutsideSqlEntityExecutorName}<${glPagingBean}> countExecutor, ${glOutsideSqlPagingExecutorName} pagingExecutor) {
+            protected ${glOutsideSqlEntityExecutor}<${glPagingBean}> _countExecutor;
+            protected ${glOutsideSqlPagingExecutor} _pagingExecutor;
+            public DefaultPagingHandler(String path, ${glPagingBean} pmb, Type entityType, ${glOutsideSqlEntityExecutor}<${glPagingBean}> countExecutor, ${glOutsideSqlPagingExecutor} pagingExecutor) {
                 this._path = path;
                 this._pmb = pmb;
                 this._entityType = entityType;
@@ -80,12 +80,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         // ===============================================================================
         //                                                                          Option
         //                                                                          ======
-        public ${glOutsideSqlPagingExecutorName} Configure(${glStatementConfig} statementConfig) {
+        public ${glOutsideSqlPagingExecutor} Configure(${glStatementConfig} statementConfig) {
             _outsideSqlOption.StatementConfig = statementConfig;
             return this;
         }
 
-        public ${glOutsideSqlPagingExecutorName} DynamicBinding() {
+        public ${glOutsideSqlPagingExecutor} DynamicBinding() {
             _outsideSqlOption.DynamicBinding();
             return this;
         }

@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCKey};
 #set ($myClassName = "${glConditionKey}")
 import java.util.List;
 
-import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOption};
 import ${glPackageBaseCommonCValue}.${glConditionValue};
 
 /**
@@ -108,7 +108,7 @@ public abstract class ${myClassName} {
      * @param option Condition option. (NotNull)
      * @return this.
      */
-    public ${myClassName} addWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    public ${myClassName} addWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
@@ -132,7 +132,7 @@ public abstract class ${myClassName} {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -161,7 +161,7 @@ public abstract class ${myClassName} {
      * @param option Condition option. (NotNull)
      * @return Condition value. (The same as argument[conditionValue]) (NotNull)
      */
-    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         if (conditionValue == null) {
             String msg = "Argument[conditionValue] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
@@ -185,7 +185,7 @@ public abstract class ${myClassName} {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option);
 
     // ===================================================================================
     //                                                                         Bind Clause

@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCKey};
 #set ($myClassName = "${glConditionKey}NotLikeSearch")
 import java.util.List;
 
-import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOption};
 import ${glPackageBaseCommonCOption}.${glLikeSearchOption};
 import ${glPackageBaseCommonCValue}.${glConditionValue};
 
@@ -52,7 +52,7 @@ public class ${myClassName} extends ${glConditionKey} {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
@@ -82,7 +82,7 @@ public class ${myClassName} extends ${glConditionKey} {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         conditionValue.setNotLikeSearch((String)value, (${glLikeSearchOption})option).setNotLikeSearchLocation(location);
     }
 }

@@ -5,8 +5,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
 import java.util.List;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
 
 /**
  * @author ${database.ClassAuthor}
@@ -29,10 +29,10 @@ public class ${myClassName} {
     protected ${glDBMeta} destinationDBMeta;
 
     /** The column info of destination. */
-    protected ${glColumnInfoName} destinationColumnInfo;
+    protected ${glColumnInfo} destinationColumnInfo;
 
     /** The list of relation info. */
-    protected java.util.List<${glRelationInfoName}> relationInfoList = new java.util.ArrayList<${glRelationInfoName}>();
+    protected java.util.List<${glRelationInfo}> relationInfoList = new java.util.ArrayList<${glRelationInfo}>();
 
     /** the list of relation property name. */
     protected java.util.List<String> relationPropertyNameList = new java.util.ArrayList<String>();
@@ -52,7 +52,7 @@ public class ${myClassName} {
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
+    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
         this.sourceColumn = sourceColumn;
         this.destinationColumnInfo = destinationColumnInfo;
     }
@@ -62,11 +62,11 @@ public class ${myClassName} {
      * 
      * @param relationInfo Relation info. (NotNull)
      */
-    public void relation(${glRelationInfoName} relationInfo) {
+    public void relation(${glRelationInfo} relationInfo) {
         addRelationInfoList(relationInfo);
     }
 
-    protected void addRelationInfoList(${glRelationInfoName} relationInfo) {
+    protected void addRelationInfoList(${glRelationInfo} relationInfo) {
         relationInfoList.add(relationInfo);
         addRelationPropertyNameList(relationInfo.getRelationPropertyName());
     }
@@ -106,11 +106,11 @@ public class ${myClassName} {
         return destinationDBMeta;
     }
 
-    public ${glColumnInfoName} getDestinationColumnInfo() {
+    public ${glColumnInfo} getDestinationColumnInfo() {
         return destinationColumnInfo;
     }
 
-    public java.util.List<${glRelationInfoName}> getRelationInfoList() {
+    public java.util.List<${glRelationInfo}> getRelationInfoList() {
         return relationInfoList;
     }
 

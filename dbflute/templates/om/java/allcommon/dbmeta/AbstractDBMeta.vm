@@ -18,11 +18,11 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImpl};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilder};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImpl};
 import ${glPackageBaseCommonHelper}.${glStringKeyMap};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfo};
 import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -47,8 +47,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     // Initialized at its getter.
     private ${glStringKeyMap}<String> _tableDbNameFlexibleMap;
     private ${glStringKeyMap}<String> _tablePropertyNameFlexibleMap;
-    private List<${glColumnInfoName}> _columnInfoList;
-    private ${glStringKeyMap}<${glColumnInfoName}> _columnInfoFlexibleMap;
+    private List<${glColumnInfo}> _columnInfoList;
+    private ${glStringKeyMap}<${glColumnInfo}> _columnInfoFlexibleMap;
 
     // Initialized at hasMethod().
     private Map<String, Object> _methodNameMap = newConcurrentHashMap();
@@ -110,9 +110,9 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return The information of the column. (NotNull)
      */ 
-    public ${glColumnInfoName} findColumnInfo(String columnFlexibleName) {
+    public ${glColumnInfo} findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final ${glColumnInfoName} columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
+        final ${glColumnInfo} columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
         if (columnInfo == null) {
             String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName();
@@ -121,23 +121,23 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         return columnInfo;
     }
 
-    protected ${glColumnInfoName} cci(String columnDbName, String propertyName
+    protected ${glColumnInfo} cci(String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary
                            , Integer columnSize, Integer columnDecimalDigits) {// createColumnInfo()
-        return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+        return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
     }
 
-    protected ${glColumnInfoName} cci(String columnDbName, String propertyName
+    protected ${glColumnInfo} cci(String columnDbName, String propertyName
                            , Class<?> propertyType, boolean primary
                            , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {// createColumnInfo()
-        return new ${glColumnInfoName}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
+        return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
     }
 
     /**
 	 * ${database.ImplementComment}
      * @return The list of columns. (NotNull, NotEmpty)
      */
-    public List<${glColumnInfoName}> getColumnInfoList() {
+    public List<${glColumnInfo}> getColumnInfoList() {
         if (_columnInfoList != null) {
             return _columnInfoList;
         }
@@ -148,12 +148,12 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             Method[] methods = this.getClass().getMethods();
             _columnInfoList = newArrayList();
             String prefix = "column";
-            Class<${glColumnInfoName}> returnType = ${glColumnInfoName}.class;
+            Class<${glColumnInfo}> returnType = ${glColumnInfo}.class;
             Object[] args = new Object[]{};
             try {
                 for (Method method : methods) {
                     if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _columnInfoList.add((${glColumnInfoName})method.invoke(this, args));
+                        _columnInfoList.add((${glColumnInfo})method.invoke(this, args));
                     }
                 }
             } catch (Exception e) {
@@ -167,17 +167,17 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * Get the flexible map of column information.
      * @return The flexible map of column information. (NotNull, NotEmpty)
      */
-    protected Map<String, ${glColumnInfoName}> getColumnInfoFlexibleMap() {
+    protected Map<String, ${glColumnInfo}> getColumnInfoFlexibleMap() {
         if (_columnInfoFlexibleMap != null) {
             return _columnInfoFlexibleMap;
         }
-        final List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+        final List<${glColumnInfo}> columnInfoList = getColumnInfoList();
         synchronized (this) {
             if (_columnInfoFlexibleMap != null) {
                 return _columnInfoFlexibleMap;
             }
             _columnInfoFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
-            for (${glColumnInfoName} columnInfo : columnInfoList) {
+            for (${glColumnInfo} columnInfo : columnInfoList) {
                 _columnInfoFlexibleMap.put(columnInfo.getColumnDbName(), columnInfo);
             }
             return _columnInfoFlexibleMap;
@@ -228,7 +228,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      */
     public String findDbName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ${glColumnInfoName} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
         if (columnInfoMap != null) {
             return columnInfoMap.getColumnDbName();
         }
@@ -247,7 +247,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      */
     public String findPropertyName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ${glColumnInfoName} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
         if (columnInfoMap != null) {
             return columnInfoMap.getPropertyName();
         }
@@ -262,15 +262,15 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
-    protected ${glUniqueInfoName} createPrimaryUniqueInfo() {
-        ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+    protected ${glUniqueInfo} createPrimaryUniqueInfo() {
+        ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
         uniqueInfo.setDBMeta(this);
         uniqueInfo.setPrimary(true);
         return uniqueInfo;
     }
 
-    protected ${glUniqueInfoName} createPrimaryUniqueInfo(${glColumnInfoName} uniqueColumnInfo) {
-        ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+    protected ${glUniqueInfo} createPrimaryUniqueInfo(${glColumnInfo} uniqueColumnInfo) {
+        ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
         uniqueInfo.setDBMeta(this);
         uniqueInfo.setPrimary(true);
 		uniqueInfo.addUniqueColumnList(uniqueColumnInfo);
@@ -284,9 +284,9 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
      * @return The information of relation. (NotNull)
      */ 
-    public ${glRelationInfoName} findRelationInfo(String relationPropertyName) {
+    public ${glRelationInfo} findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? (${glRelationInfoName})findForeignInfo(relationPropertyName) : (${glRelationInfoName})findReferrerInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? (${glRelationInfo})findForeignInfo(relationPropertyName) : (${glRelationInfo})findReferrerInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
@@ -314,7 +314,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign information. (NotNull)
      */ 
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} findForeignInfo(String foreignPropertyName) {
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo} findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
         java.lang.reflect.Method method = null;
@@ -326,7 +326,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glForeignInfoName})method.invoke(this, new Object[]{});
+            return (${glForeignInfo})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -334,11 +334,11 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         }
     }
     
-    protected ${glForeignInfoName} cfi(String propName
+    protected ${glForeignInfo} cfi(String propName
                             , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
-                            , Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap
+                            , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
                             , int relNo, boolean oneToOne) {// createForeignInfo()
-        final ${glForeignInfoName} foreignInfo = new ${glForeignInfoName}();
+        final ${glForeignInfo} foreignInfo = new ${glForeignInfo}();
         foreignInfo.setForeignPropertyName(propName);
         foreignInfo.setLocalDBMeta(localDbm);
         foreignInfo.setForeignDBMeta(foreignDbm);
@@ -374,7 +374,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Referrer information. (NotNull)
      */ 
-    public ${glReferrerInfoName} findReferrerInfo(String referrerPropertyName) {
+    public ${glReferrerInfo} findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
         java.lang.reflect.Method method = null;
@@ -386,7 +386,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glReferrerInfoName})method.invoke(this, new Object[]{});
+            return (${glReferrerInfo})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -394,11 +394,11 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         }
     }
 
-    protected ${glReferrerInfoName} cri(String propName
+    protected ${glReferrerInfo} cri(String propName
                              , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
-                             , Map<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap
+                             , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
                              , boolean oneToOne) {// createReferrerInfo()
-        final ${glReferrerInfoName} referrerInfo = new ${glReferrerInfoName}();
+        final ${glReferrerInfo} referrerInfo = new ${glReferrerInfo}();
         referrerInfo.setReferrerPropertyName(propName);
         referrerInfo.setLocalDBMeta(localDbm);
         referrerInfo.setReferrerDBMeta(referrerDbm);
@@ -423,16 +423,16 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     protected static abstract class AbstractRelationTrace implements RelationTrace {
 
         /** The list of relation. */
-        protected List<${glRelationInfoName}> _relationList;
+        protected List<${glRelationInfo}> _relationList;
 
         /** The list of relation trace. */
         protected List<AbstractRelationTrace> _relationTraceList;
 
         /** The list of relation info as trace. */
-        protected List<${glRelationInfoName}> _traceRelationInfoList;
+        protected List<${glRelationInfo}> _traceRelationInfoList;
 
         /** The column info as trace. */
-        protected ${glColumnInfoName} _traceColumnInfo;
+        protected ${glColumnInfo} _traceColumnInfo;
 
         /** The handler of fixed relation trace. */
         protected RelationTraceFixHandler _relationTraceFixHandler;
@@ -442,7 +442,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
          */
         public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-            this(new ArrayList<${glRelationInfoName}>(), new ArrayList<AbstractRelationTrace>());
+            this(new ArrayList<${glRelationInfo}>(), new ArrayList<AbstractRelationTrace>());
             this._relationTraceFixHandler = relationTraceFixHandler;
         }
 
@@ -451,7 +451,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
-        public AbstractRelationTrace(List<${glRelationInfoName}> relationList, List<AbstractRelationTrace> relationTraceList) {
+        public AbstractRelationTrace(List<${glRelationInfo}> relationList, List<AbstractRelationTrace> relationTraceList) {
             this._relationList = relationList;
             this._relationTraceList = relationTraceList;
             this._relationTraceList.add(this);
@@ -461,7 +461,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * ${database.ImplementComment}
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public List<${glRelationInfoName}> getTraceRelation() {
+        public List<${glRelationInfo}> getTraceRelation() {
             return _traceRelationInfoList;
         }
 
@@ -469,7 +469,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * ${database.ImplementComment}
          * @return The trace of column as column info. (Nullable)
          */
-        public ${glColumnInfoName} getTraceColumn() {
+        public ${glColumnInfo} getTraceColumn() {
             return _traceColumnInfo;
         }
 
@@ -479,7 +479,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * @param traceColumnInfo The trace of column as column info. (Nullable)
          * @return Relation trace(result). (NotNull)
          */
-        protected RelationTrace fixTrace(List<${glRelationInfoName}> traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
+        protected RelationTrace fixTrace(List<${glRelationInfo}> traceRelationInfoList, ${glColumnInfo} traceColumnInfo) {
             final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace)_relationTraceList.get(0);
             localRelationTrace.setTraceRelation(traceRelationInfoList);
             localRelationTrace.setTraceColumn(traceColumnInfo);
@@ -488,11 +488,11 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             return localRelationTrace;
         }
 
-        protected void setTraceRelation(List<${glRelationInfoName}> traceRelationInfoList) {
+        protected void setTraceRelation(List<${glRelationInfo}> traceRelationInfoList) {
             this._traceRelationInfoList = traceRelationInfoList;
         }
 
-        protected void setTraceColumn(${glColumnInfoName} traceColumn) {
+        protected void setTraceColumn(${glColumnInfo} traceColumn) {
             this._traceColumnInfo = traceColumn;
         }
 
@@ -500,7 +500,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
          * ${database.ImplementComment}
          */
         protected void recycle() {
-            this._relationList = new ArrayList<${glRelationInfoName}>();
+            this._relationList = new ArrayList<${glRelationInfo}>();
             this._relationTraceList = new ArrayList<AbstractRelationTrace>();
             this._relationTraceList.add(this);
         }
@@ -529,8 +529,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
      */
     public ${glMapStringBuilder} createMapStringBuilder() {
         final List${database.filterGenericsString('String')} columnDbNameList = new ArrayList${database.filterGenericsString('String')}();
-        for (final Iterator<${glColumnInfoName}> ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
-            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+        for (final Iterator<${glColumnInfo}> ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
+            final ${glColumnInfo} columnInfo = (${glColumnInfo})ite.next();
             columnDbNameList.add(columnInfo.getColumnDbName());
         }
         return MapStringUtil.createMapStringBuilder(columnDbNameList);
@@ -543,9 +543,9 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     public boolean hasSequence() { return false; }
     public String getSequenceNextValSql() { return null; }
     public boolean hasVersionNo() { return false; }
-    public ${glColumnInfoName} getVersionNoColumnInfo() { return null; }
+    public ${glColumnInfo} getVersionNoColumnInfo() { return null; }
     public boolean hasUpdateDate() { return false; }
-    public ${glColumnInfoName} getUpdateDateColumnInfo() { return null; }
+    public ${glColumnInfo} getUpdateDateColumnInfo() { return null; }
     public boolean hasCommonColumn() { return false; }
 
     // ===================================================================================
@@ -559,8 +559,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
-        List<${glColumnInfoName}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
-        for (${glColumnInfoName} columnInfo : columnInfoList) {
+        List<${glColumnInfo}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        for (${glColumnInfo} columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
             String propertyName = columnInfo.getPropertyName();
             String uncapPropName = initUncap(propertyName);
@@ -586,8 +586,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
-        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
-        for (${glColumnInfoName} columnInfo : columnInfoList) {
+        List<${glColumnInfo}> columnInfoList = getColumnInfoList();
+        for (${glColumnInfo} columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
             String propertyName = columnInfo.getPropertyName();
             String uncapPropName = initUncap(propertyName);
@@ -615,9 +615,9 @@ public abstract class ${myClassName} implements ${glDBMeta} {
                                                 , String equal) {
         String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         StringBuilder sb = new StringBuilder();
-        List<${glColumnInfoName}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        List<${glColumnInfo}> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
 		try {
-            for (${glColumnInfoName} columnInfo : columnInfoList) {
+            for (${glColumnInfo} columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
 				Object value = getterMethod.invoke(entity, (Object[])null);
@@ -637,9 +637,9 @@ public abstract class ${myClassName} implements ${glDBMeta} {
                                                  , String equal) {
         String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         StringBuilder sb = new StringBuilder();
-        List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
+        List<${glColumnInfo}> columnInfoList = getColumnInfoList();
 		try {
-            for (${glColumnInfoName} columnInfo : columnInfoList) {
+            for (${glColumnInfo} columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
 				Object value = getterMethod.invoke(entity, (Object[])null);
@@ -658,8 +658,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     protected Map<String, Object> doConvertToColumnValueMap(${glEntity} entity) {
         Map<String, Object> valueMap = newLinkedHashMap();
 		try {
-            List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
-            for (${glColumnInfoName} columnInfo : columnInfoList) {
+            List<${glColumnInfo}> columnInfoList = getColumnInfoList();
+            for (${glColumnInfo} columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
                 Object value = getterMethod.invoke(entity, (Object[])null);
@@ -674,8 +674,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     protected Map<String, String> doConvertToColumnStringValueMap(${glEntity} entity) {
         Map<String, String> valueMap = newLinkedHashMap();
 		try {
-            List<${glColumnInfoName}> columnInfoList = getColumnInfoList();
-            for (${glColumnInfoName} columnInfo : columnInfoList) {
+            List<${glColumnInfo}> columnInfoList = getColumnInfoList();
+            for (${glColumnInfo} columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
                 Object value = getterMethod.invoke(entity, (Object[])null);
@@ -693,7 +693,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
 	// It's very INTERNAL!
     protected <ENTITY extends ${glEntity}> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
                                                            , Eps<ENTITY> setupper
-                                                           , ${glColumnInfoName} columnInfo) {
+                                                           , ${glColumnInfo} columnInfo) {
         String columnName = columnInfo.getColumnDbName();
         String propertyName = columnInfo.getPropertyName();
         registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
@@ -1043,7 +1043,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
                 if (!name.startsWith(columnInfoMethodPrefix)) {
                     continue;
                 }
-                ${glColumnInfoName} columnInfo = (${glColumnInfoName})method.invoke(this);
+                ${glColumnInfo} columnInfo = (${glColumnInfo})method.invoke(this);
                 String dbName = columnInfo.getColumnDbName();
                 String propertyName = columnInfo.getPropertyName();
                 if (dbNameKey) {

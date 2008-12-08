@@ -16,8 +16,8 @@ import java.lang.reflect.Constructor;
 import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommon}.${glBehaviorSelector};
 import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOption};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResult};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommand};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
 import ${glPackageBaseCommonBhvCoreCommand}.${glAbstractBehaviorCommand};
@@ -25,8 +25,8 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glSelectCountCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectListCBCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectNextValCommand};
 import ${glPackageBaseCommonBhvCoreCommand}.${glSelectScalarCBCommand};
-import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
-import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupper};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelBox};
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOption};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
@@ -37,8 +37,8 @@ import ${glPackageBaseCommonCBean}.${glPagingBean};
 import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonCBean}.${glScalarQuery};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutor};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
@@ -434,9 +434,9 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
      * </pre>
      * @return The basic executor of outside-SQL. (NotNull) 
      */
-    public ${glOutsideSqlBasicExecutorName} outsideSql() {
+    public ${glOutsideSqlBasicExecutor} outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return new ${glOutsideSqlBasicExecutorName}(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef());
+        return new ${glOutsideSqlBasicExecutor}(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef());
     }
 
     // ===================================================================================
@@ -449,9 +449,9 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
      */
-    public <ENTITY extends ${glEntity}> List<Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
+    public <ENTITY extends ${glEntity}> List<Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupper}<ENTITY> valueLabelSetupper) {
         final List<Map<String, Object>> valueLabelList = new ArrayList<Map<String, Object>>();
-        final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
+        final ${glValueLabelBox} box = new ${glValueLabelBox}();
         for (ENTITY entity : entityList) {
             final Map<String, Object> valueLabel = new HashMap<String, Object>();
             valueLabelSetupper.setup(box, entity);
@@ -723,7 +723,7 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
          * @throws java.io.FileNotFoundException
          * @throws java.io.IOException
          */
-        public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBean} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+        public ${glTokenFileOutputResult} outputTokenFile(${glConditionBean} cb, String filename, ${glTokenFileOutputOption} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertCBNotNull(cb);
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
@@ -739,14 +739,14 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
             final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
             final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
             final List<String> columnDbNameList = new ArrayList<String>();
-            for (final java.util.Iterator<${glColumnInfoName}> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
-                final ${glColumnInfoName} columnInfo = ite.next();
+            for (final java.util.Iterator<${glColumnInfo}> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
+                final ${glColumnInfo} columnInfo = ite.next();
                 columnDbNameList.add(columnInfo.getColumnDbName());
             }
             fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
             fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
             fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
-            final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
+            final ${glTokenFileOutputResult} tokeFileOutputResult = new ${glTokenFileOutputResult}();
             tokeFileOutputResult.setSelectedList(ls);
             return tokeFileOutputResult;
         }

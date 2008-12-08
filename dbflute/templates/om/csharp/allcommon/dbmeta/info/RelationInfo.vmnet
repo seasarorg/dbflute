@@ -1,4 +1,4 @@
-#set ($myClassName = "${glRelationInfoName}")
+#set ($myClassName = "${glRelationInfo}")
 
 using System;
 using ${glPackageBaseCommonDBMeta};
@@ -11,7 +11,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         String RelationPropertyName { get; }
         ${glDBMeta} LocalDBMeta { get; }
         ${glDBMeta} TargetDBMeta { get; }
-        Map<${glColumnInfoName},${glColumnInfoName}> LocalTargetColumnInfoMap { get; }
+        Map<${glColumnInfo},${glColumnInfo}> LocalTargetColumnInfoMap { get; }
         bool IsOneToOne { get; }
         bool IsReferrer { get; }
     }

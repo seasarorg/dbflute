@@ -8,11 +8,11 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCOption} {
 
-public class ${myClassName} : ${glConditionOptionInterfaceName} {
+public class ${myClassName} : ${glConditionOption} {
 
-    // protected ${glConditionOptionPartsSplitName} _splitOptionParts;
-    // protected ${glConditionOptionPartsToUpperLowerCaseName} _toUpperLowerCaseOptionParts;
-    // protected ${glConditionOptionPartsToSingleByteName} _toSingleByteCaseOptionParts;
+    // protected ${glSplitOptionParts} _splitOptionParts;
+    // protected ${glToUpperLowerCaseOptionParts} _toUpperLowerCaseOptionParts;
+    // protected ${glToSingleByteOptionParts} _toSingleByteCaseOptionParts;
     // protected ${glJapaneseOptionPartsAgent} _japaneseOptionPartsAgent;
 
     // =====================================================================================

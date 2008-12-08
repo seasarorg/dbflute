@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
 
-#set ($myClassName = "${glConditionOptionPartsToUpperLowerCaseName}")
+#set ($myClassName = "${glToUpperLowerCaseOptionParts}")
 
 /**
  * The class of condition-option-parts about toUpperCase/toLowerCase.

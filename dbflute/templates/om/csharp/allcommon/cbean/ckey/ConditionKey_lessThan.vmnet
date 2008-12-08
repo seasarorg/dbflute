@@ -41,7 +41,7 @@ public class ${myClassName} : ${glConditionKey} {
         conditionList.add(buildBindClause(columnName, value.getLessThanLocation()));
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
     }
 
@@ -50,7 +50,7 @@ public class ${myClassName} : ${glConditionKey} {
         conditionValue.setLessThanLocation(location);
     }
 
-    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

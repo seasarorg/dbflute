@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
 
-#set ($myClassName = "${glConditionOptionPartsSplitName}")
+#set ($myClassName = "${glSplitOptionParts}")
 
 /**
  * The interface of condition-option.

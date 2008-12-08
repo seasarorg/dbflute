@@ -10,9 +10,9 @@ import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
 #end
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOption};
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupper};
 #end
-import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupper};
 #if ($database.isMakeFlatExpansion())
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
@@ -232,7 +232,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
      */
-    public List<Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
+    public List<Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupper}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
 #if ($table.isUseSequence())
@@ -274,7 +274,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
-    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${referrerCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }

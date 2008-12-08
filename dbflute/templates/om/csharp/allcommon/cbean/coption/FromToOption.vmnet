@@ -1,4 +1,4 @@
-#set ($myClassName = "${glConditionOptionFromToName}")
+#set ($myClassName = "${glFromToOption}")
 
 using System;
 

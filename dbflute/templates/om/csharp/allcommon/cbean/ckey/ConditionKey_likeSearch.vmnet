@@ -26,7 +26,7 @@ public class ${myClassName} : ${glConditionKey} {
         throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
     }
 
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOptionInterfaceName} option) {
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
@@ -43,7 +43,7 @@ public class ${myClassName} : ${glConditionKey} {
         throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
     }
 
-    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         conditionValue.setLikeSearch((String)value, (${glLikeSearchOption})option).setLikeSearchLocation(location);
     }
 }

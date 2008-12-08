@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
-#set ($myClassName = "${glReferrerInfoName}")
+#set ($myClassName = "${glReferrerInfo}")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
@@ -9,9 +9,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${myClassName} implements ${glRelationInfoName} {
+public class ${myClassName} implements ${glRelationInfo} {
 
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -25,9 +25,9 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-    public ${glColumnInfoName} findLocalByReferrer(String referrerColumnDbName) {
-        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(referrerDBMeta, referrerColumnDbName);
-        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})referrerLocalColumnInfoMap.get(keyColumnInfo);
+    public ${glColumnInfo} findLocalByReferrer(String referrerColumnDbName) {
+        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(referrerDBMeta, referrerColumnDbName);
+        final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})referrerLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
             msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap=" + referrerLocalColumnInfoMap;
@@ -36,9 +36,9 @@ public class ${myClassName} implements ${glRelationInfoName} {
         return resultColumnInfo;
     }
 
-    public ${glColumnInfoName} findReferrerByLocal(String localColumnDbName) {
-        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(localDBMeta, localColumnDbName);
-        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localReferrerColumnInfoMap.get(keyColumnInfo);
+    public ${glColumnInfo} findReferrerByLocal(String localColumnDbName) {
+        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(localDBMeta, localColumnDbName);
+        final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})localReferrerColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
             msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap=" + localReferrerColumnInfoMap;
@@ -120,8 +120,8 @@ public class ${myClassName} implements ${glRelationInfoName} {
         final java.util.Set keySet = localReferrerColumnInfoMap.keySet();
         referrerLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
         for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfoName} key = (${glColumnInfoName})ite.next();
-            final ${glColumnInfoName} value = (${glColumnInfoName})localReferrerColumnInfoMap.get(key);
+            final ${glColumnInfo} key = (${glColumnInfo})ite.next();
+            final ${glColumnInfo} value = (${glColumnInfo})localReferrerColumnInfoMap.get(key);
             referrerLocalColumnInfoMap.put(value, key);
         }
     }

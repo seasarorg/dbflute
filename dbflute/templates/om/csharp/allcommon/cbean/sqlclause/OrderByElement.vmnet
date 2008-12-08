@@ -1,5 +1,5 @@
 
-#set ($myClassName = "${glOrderByElementName}")
+#set ($myClassName = "${glOrderByElement}")
 using System;
 
 using ${glPackageBaseCommonJavaLike};

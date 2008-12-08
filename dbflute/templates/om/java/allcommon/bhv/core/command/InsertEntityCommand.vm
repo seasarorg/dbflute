@@ -5,7 +5,7 @@ import java.util.List;
 import org.seasar.dao.BeanMetaData;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
 import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
@@ -62,14 +62,14 @@ public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
         if (dbmeta.hasPrimaryKey()) {
             return null;
         }
-        final List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
+        final List<${glColumnInfo}> columnInfoList = dbmeta.getColumnInfoList();
         final StringBuilder columnDefSb = new StringBuilder();
-        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfo} columnInfo : columnInfoList) {
             columnDefSb.append(", ").append(columnInfo.getColumnDbName());
         }
         columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final StringBuilder columnValuesSb = new StringBuilder();
-        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName} columnInfo : columnInfoList) {
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfo} columnInfo : columnInfoList) {
             columnValuesSb.append(", /*dto.").append(columnInfo.getPropertyName()).append("*/null");
         }
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");

@@ -53,14 +53,14 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        List<${glColumnInfoName}> ColumnInfoList { get; }
+        List<${glColumnInfo}> ColumnInfoList { get; }
         bool HasColumn(String columnFlexibleName);
-        ${glColumnInfoName} FindColumnInfo(String columnFlexibleName);
+        ${glColumnInfo} FindColumnInfo(String columnFlexibleName);
 
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        ${glUniqueInfoName} PrimaryUniqueInfo { get; }
+        ${glUniqueInfo} PrimaryUniqueInfo { get; }
         bool HasPrimaryKey { get; }
         bool HasTwoOrMorePrimaryKeys { get; }
 
@@ -70,21 +70,21 @@ namespace ${glPackageBaseCommonDBMeta} {
         // -------------------------------------------------
         //                                  Relation Element
         //                                  ----------------
-        ${glRelationInfoName} FindRelationInfo(String relationPropertyName);
+        ${glRelationInfo} FindRelationInfo(String relationPropertyName);
 
         // -------------------------------------------------
         //                                   Foreign Element
         //                                   ---------------
         bool HasForeign(String foreignPropName);
         ${myClassName} FindForeignDBMeta(String foreignPropName);
-        ${glForeignInfoName} FindForeignInfo(String foreignPropName);
+        ${glForeignInfo} FindForeignInfo(String foreignPropName);
 
         // -------------------------------------------------
         //                                  Referrer Element
         //                                  ----------------
         bool HasReferrer(String referrerPropertyName);
         ${myClassName} FindReferrerDBMeta(String referrerPropertyName);
-        ${glReferrerInfoName} FindReferrerInfo(String referrerPropertyName);
+        ${glReferrerInfo} FindReferrerInfo(String referrerPropertyName);
 
         // ===============================================================================
         //                                                                   Sequence Info
@@ -96,9 +96,9 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                            Optimistic Lock Info
         //                                                            ====================
         bool HasVersionNo { get; }
-        ${glColumnInfoName} VersionNoColumnInfo { get; }
+        ${glColumnInfo} VersionNoColumnInfo { get; }
         bool HasUpdateDate { get; }
-        ${glColumnInfoName} UpdateDateColumnInfo { get; }
+        ${glColumnInfo} UpdateDateColumnInfo { get; }
 
         // ===============================================================================
         //                                                              Common Column Info

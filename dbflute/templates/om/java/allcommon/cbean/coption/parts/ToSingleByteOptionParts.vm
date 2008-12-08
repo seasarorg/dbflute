@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
 
-#set ($myClassName = "${glConditionOptionPartsToSingleByteName}")
+#set ($myClassName = "${glToSingleByteOptionParts}")
 
 import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
 import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImplName};

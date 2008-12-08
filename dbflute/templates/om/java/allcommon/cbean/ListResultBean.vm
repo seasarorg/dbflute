@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
-import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
-import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
-import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOption};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminer};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResource};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupper};
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapper};
-import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
  * The result bean for list.
@@ -42,7 +42,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
     protected List<ENTITY> _selectedList = new ArrayList<ENTITY>();
 
     /** The clause of order-by. (NotNull) */
-    protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+    protected ${glOrderByClause} _orderByClause = new ${glOrderByClause}();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -63,17 +63,17 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
      * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
      * @return The grouped list. (NotNull)
      */
-    public <ROW> List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
+    public <ROW> List<ROW> groupingList(${glGroupingRowSetupper}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOption}<ENTITY> groupingOption) {
         final List<ROW> groupingList = new ArrayList<ROW>();
-        ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
+        ${glGroupingRowEndDeterminer}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
         if (rowEndDeterminer == null) {
-            rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<ENTITY>() {
-                public boolean determine(${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
+            rowEndDeterminer = new ${glGroupingRowEndDeterminer}<ENTITY>() {
+                public boolean determine(${glGroupingRowResource}<ENTITY> rowResource, ENTITY nextEntity) {
                     return rowResource.isSizeUpBreakCount();
                 }
             }; // as Default
         }
-        ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+        ${glGroupingRowResource}<ENTITY> rowResource = new ${glGroupingRowResource}<ENTITY>();
         int breakCount = groupingOption.getElementCount();
         int rowElementIndex = 0;
         int allElementIndex = 0;
@@ -104,7 +104,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
                 groupingList.add(groupingRowObject);
 
                 // Initialize!
-                rowResource = new ${glGroupingRowResourceName}<ENTITY>();
+                rowResource = new ${glGroupingRowResource}<ENTITY>();
                 rowElementIndex = 0;
                 ++allElementIndex;
                 continue;
@@ -335,7 +335,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
      * Get the value of orderByClause.
      * @return The value of orderByClause. (NotNull)
      */
-    public ${glOrderByClauseName} getOrderByClause() {
+    public ${glOrderByClause} getOrderByClause() {
         return _orderByClause;
     }
 
@@ -343,7 +343,7 @@ public class ${myClassName}<ENTITY> implements List<ENTITY>, Serializable {
      * Set the value of orderByClause.
      * @param orderByClause The value of orderByClause. (NotNull: If you set null, it ignores it.)
      */
-    public void setOrderByClause(${glOrderByClauseName} orderByClause) {
+    public void setOrderByClause(${glOrderByClause} orderByClause) {
         if (orderByClause == null) { return; } // Not allowed to set null value to the selected list
         _orderByClause = orderByClause;
     }

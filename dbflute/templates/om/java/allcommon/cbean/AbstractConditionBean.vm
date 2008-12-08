@@ -8,12 +8,12 @@ import java.lang.reflect.Method;
 import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonHelper}.${glMapListString};
 import ${glPackageBaseCommonHelper}.${glMapListStringImpl};
-import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
+import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterface};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -98,7 +98,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     // ===================================================================================
     //                                                                 Where Clause Filter
     //                                                                 ===================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter) {
         this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 
@@ -418,7 +418,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
      * ${database.ImplementComment}
      * @return Sql component of order-by clause. (NotNull)
      */
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+    public ${glOrderByClause} getSqlComponentOfOrderByClause() {
         return getSqlClause().getSqlComponentOfOrderByClause();
     }
 
@@ -954,8 +954,8 @@ public abstract class ${myClassName} implements ${glConditionBean} {
             throw new IllegalArgumentException(msg);
         }
         ${glDBMeta} dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        List<${glColumnInfoName}> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
-        for (${glColumnInfoName} columnInfo : columnInfoList) {
+        List<${glColumnInfo}> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+        for (${glColumnInfo} columnInfo : columnInfoList) {
             String columnDbName = columnInfo.getColumnDbName();
             if (!primaryKeyMap.containsKey(columnDbName)) {
                 String msg = "The primaryKeyMap must have the value of " + columnDbName;

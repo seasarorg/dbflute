@@ -5,7 +5,7 @@ import ${glPackageBaseCommon}.${glEntity};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTokenFileOutputResultName} {
+public class ${glTokenFileOutputResult} {
 
     // =====================================================================================
     //                                                                             Attribute

@@ -9,8 +9,8 @@ import ${glPackageBaseCommon}.${glEntity};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumnName};
 import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIteratorName};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
 
 /**
  * The request of hierarchy.
@@ -32,10 +32,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
     protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
 
     /** The set of already registered source column info for check. */
-    protected java.util.Set<${glColumnInfoName}> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<${glColumnInfoName}>();
+    protected java.util.Set<${glColumnInfo}> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<${glColumnInfo}>();
 
     /** First source column info for check. */
-    protected ${glColumnInfoName} firstSourceColumnInfo4Check;
+    protected ${glColumnInfo} firstSourceColumnInfo4Check;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -95,7 +95,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @param relationTrace The relation trace of destination. (NotNull)
      */
-    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glDBMeta}.RelationTrace relationTrace) {
+    public void mapping(${glColumnInfo} sourceColumnInfo, ${glDBMeta}.RelationTrace relationTrace) {
         setupElement(sourceColumnInfo, relationTrace.getTraceColumn());
         addRelationToLastElement(relationTrace.getTraceRelation());
     }
@@ -109,7 +109,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    protected void setupElement(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
+    protected void setupElement(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
         requestElementList.add(element);
@@ -124,7 +124,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    protected void setupElement(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
+    protected void setupElement(${glColumnInfo} sourceColumnInfo, ${glColumnInfo} destinationColumnInfo) {
         if (alreadyRegisteredSourceColumnInfoSet4Check.contains(sourceColumnInfo)) {
             String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -150,12 +150,12 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * 
      * @param relationInfoList The list of relation info. (NotNull)
      */
-    protected void addRelationToLastElement(List<${glRelationInfoName}> relationInfoList) {
+    protected void addRelationToLastElement(List<${glRelationInfo}> relationInfoList) {
         if (requestElementList.isEmpty()) {
             String msg = "You shuold invoke mapping() before invoking relation()!";
             throw new IllegalStateException(msg);
         }
-        for (${glRelationInfoName} relationInfo : relationInfoList) {
+        for (${glRelationInfo} relationInfo : relationInfoList) {
             final int lastIndex = requestElementList.size() - 1;
             final ${glHierarchyRequestElementName} element = (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
             element.relation(relationInfo);
@@ -167,7 +167,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * 
      * @param sourceColumnInfo The column info of source. (NotNull)
      */
-    protected void assertSameSourceDBMeta(${glColumnInfoName} sourceColumnInfo) {
+    protected void assertSameSourceDBMeta(${glColumnInfo} sourceColumnInfo) {
         if (firstSourceColumnInfo4Check == null) {
             firstSourceColumnInfo4Check = sourceColumnInfo;
             return;
@@ -191,10 +191,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * Assert same source dbmeta.
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    protected void assertSameLocalDestinationDBMeta(${glColumnInfoName} destinationColumnInfo) {
+    protected void assertSameLocalDestinationDBMeta(${glColumnInfo} destinationColumnInfo) {
         if (!requestElementList.isEmpty()) {
             final ${glHierarchyRequestElementName} currentElement = currentElement();
-            final List<${glRelationInfoName}> relationInfoList = currentElement.getRelationInfoList();
+            final List<${glRelationInfo}> relationInfoList = currentElement.getRelationInfoList();
             if (relationInfoList.isEmpty()) {
                 final ${glDBMeta} actualDBMeta = currentElement().getDestinationDBMeta();
                 final ${glDBMeta} expectedDBMeta = destinationDBMeta;
@@ -226,7 +226,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @return Default source column. (NotNull)
      */
-    protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfoName} sourceColumnInfo) {
+    protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfo} sourceColumnInfo) {
         return new ${glHierarchySourceEntityColumnName}(sourceColumnInfo);
     }
 
@@ -253,7 +253,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
             if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
                 continue;
             }
-            final ${glColumnInfoName} destinationColumnInfo = element.getDestinationColumnInfo();
+            final ${glColumnInfo} destinationColumnInfo = element.getDestinationColumnInfo();
             if (!destinationColumnInfo.isPrimary()) {
                 continue;
             }

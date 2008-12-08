@@ -7,12 +7,12 @@ import ${glPackageBaseCommon}.${glEntity};
  * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
  * @author ${database.ClassAuthor}
  */
-public interface ${glValueLabelSetupperName}<ENTITY extends ${glEntity}> {
+public interface ${glValueLabelSetupper}<ENTITY extends ${glEntity}> {
 
     /**
      * Set up value-label.
      * @param box Value-label box. (NotNull)
      * @param entity Entity. (NotNull)
      */
-    public void setup(${glValueLabelBoxName} box, ENTITY entity);
+    public void setup(${glValueLabelBox} box, ENTITY entity);
 }

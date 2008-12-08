@@ -1,5 +1,5 @@
 
-#set ($myClassName = "${glOrderByClauseName}")
+#set ($myClassName = "${glOrderByClause}")
 
 using System;
 
@@ -13,25 +13,25 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<${glOrderByElementName}> _orderByList = new ArrayList<${glOrderByElementName}>();
+    protected List<${glOrderByElement}> _orderByList = new ArrayList<${glOrderByElement}>();
 
     // ===================================================================================
     //                                                                         Main Method
     //                                                                         ===========
-    public void addOrderByElement(${glOrderByElementName} value) {
+    public void addOrderByElement(${glOrderByElement} value) {
         _orderByList.add(value);
     }
 
     public void reverseAll() {
-        foreach (${glOrderByElementName} element in _orderByList) {
+        foreach (${glOrderByElement} element in _orderByList) {
             element.reverse();
         }
     }
 
     public void exchangeFirstOrderByElementForLastOne() {
         if (_orderByList.size() > 1) {
-            ${glOrderByElementName} first = _orderByList.get(0);
-            ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+            ${glOrderByElement} first = _orderByList.get(0);
+            ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
             _orderByList.set(0, last);
             _orderByList.set(_orderByList.size() - 1, first);
         }
@@ -41,7 +41,7 @@ public class ${myClassName} {
 	    if (_orderByList.isEmpty()) {
 		    return;
 		}
-		${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
 		last.setOrderByNullsSetupper(filter, true);
 	}
 	
@@ -49,11 +49,11 @@ public class ${myClassName} {
 	    if (_orderByList.isEmpty()) {
 		    return;
 		}
-		${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
 		last.setOrderByNullsSetupper(filter, false);
 	}
 
-    public List<${glOrderByElementName}> getOrderByList() {
+    public List<${glOrderByElement}> getOrderByList() {
         return _orderByList;
     }
 
@@ -67,8 +67,8 @@ public class ${myClassName} {
         }
         StringBuilder sb = new StringBuilder();
         String delimiter = ", ";
-        for (Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
-            ${glOrderByElementName} element = ite.next();
+        for (Iterator<${glOrderByElement}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            ${glOrderByElement} element = ite.next();
             sb.append(delimiter);
 			if (selectClauseRealColumnAliasMap != null) {
 			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
@@ -85,7 +85,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         return element.getColumnFullName();
     }
 
@@ -94,7 +94,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         return element.getRegisteredColumnFullName();
     }
 
@@ -105,7 +105,7 @@ public class ${myClassName} {
         }
         int count = 0;
         foreach (String columnFullNameElement in columnFullNameArray) {
-            ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(count);
+            ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(count);
             if (!element.getColumnFullName().ToLower().Equals(columnFullNameElement.ToLower())) {
                 return false;
             }
@@ -119,7 +119,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         return element.isAsc();
     }
 
@@ -132,7 +132,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualAliasName = element.getAliasName();
         if (actualAliasName != null && expectedAliasName != null) {
             return actualAliasName.Equals(expectedAliasName);
@@ -146,7 +146,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualColumnName = element.getColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.Equals(expectedColumnName);
@@ -160,7 +160,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualRegisteredAliasName = element.getRegisteredAliasName();
         if (actualRegisteredAliasName != null && expectedRegisteredAliasName != null) {
             return actualRegisteredAliasName.Equals(expectedRegisteredAliasName);
@@ -174,7 +174,7 @@ public class ${myClassName} {
             String msg = "This order-by clause is empty: " + ToString();
             throw new IllegalStateException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualRegisteredColumnName = element.getRegisteredColumnName();
         if (actualRegisteredColumnName != null && expectedRegisteredColumnName != null) {
             return actualRegisteredColumnName.Equals(expectedRegisteredColumnName);

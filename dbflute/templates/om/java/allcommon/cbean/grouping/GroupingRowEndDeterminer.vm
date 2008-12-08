@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
  * @param <ENTITY> The type of entity.
  * @author ${database.ClassAuthor}
  */
-public interface ${glGroupingRowEndDeterminerName}<ENTITY> {
+public interface ${glGroupingRowEndDeterminer}<ENTITY> {
 
     /**
      * Determine whether the grouping row is end.
@@ -13,5 +13,5 @@ public interface ${glGroupingRowEndDeterminerName}<ENTITY> {
      * @param nextEntity The entity of next element. (NotNull and the rowResource does not contain yet)
      * @return Whether the grouping row is end. (If the value is true, break grouping row and the nextEntity is registered to next row)
      */
-    public boolean determine(${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity);
+    public boolean determine(${glGroupingRowResource}<ENTITY> rowResource, ENTITY nextEntity);
 }

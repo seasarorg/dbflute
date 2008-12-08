@@ -196,7 +196,7 @@ namespace ${glPackageExtendedBhv} {
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${referrerEntityClassName}>")
 #if (!${referrer.isOneToOne()})
-        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (${myEntityListVariableName}.Count == 0) { return; }
             Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));

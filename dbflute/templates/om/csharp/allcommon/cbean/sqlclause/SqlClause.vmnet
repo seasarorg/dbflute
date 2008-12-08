@@ -48,7 +48,7 @@ public interface ${myClassName} {
     //                                                                               Where
     //                                                                               =====
     void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value);
-    void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
     void registerWhereClause(String clause);
     void exchangeFirstWhereClauseForLastOne();
 
@@ -56,10 +56,10 @@ public interface ${myClassName} {
     //                                                                         InlineWhere
     //                                                                         ===========
     void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value);
-    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
     void registerBaseTableInlineWhereClause(String value);
     void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline);
     void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline);
 
     // ===================================================================================
@@ -71,7 +71,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    ${glOrderByClauseName} getSqlComponentOfOrderByClause();
+    ${glOrderByClause} getSqlComponentOfOrderByClause();
     ${myClassName} clearOrderBy();
     ${myClassName} ignoreOrderBy();
     ${myClassName} makeOrderByEffective();
@@ -153,7 +153,7 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
-    // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
+    // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter);
 	
     // =====================================================================================
     //                                                                 Selected Foreign Info

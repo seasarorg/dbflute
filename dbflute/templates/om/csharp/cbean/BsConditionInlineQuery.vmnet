@@ -46,7 +46,7 @@ namespace ${glPackageCIQ} {
         }
     
         protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+                                                                 , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
             registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
     

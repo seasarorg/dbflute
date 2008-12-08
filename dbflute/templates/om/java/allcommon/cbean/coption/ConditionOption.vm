@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
-#set ($myClassName = "${glConditionOptionInterfaceName}")
+#set ($myClassName = "${glConditionOption}")
 
 /**
  * The interface of condition-option.

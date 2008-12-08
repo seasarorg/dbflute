@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 import java.util.Map;
 
 import ${glPackageBaseCommonCKey}.${glConditionKey};
-import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOption};
 import ${glPackageBaseCommonCValue}.${glConditionValue};
 
 /**
@@ -151,7 +151,7 @@ public interface ${myClassName} {
      * @param value Condition-value. (NotNull)
      * @param option Condition-option. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
 
     /**
      * Register 'where' clause.
@@ -168,10 +168,10 @@ public interface ${myClassName} {
     //                                                                         InlineWhere
     //                                                                         ===========
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value);
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option);
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
     public void registerBaseTableInlineWhereClause(String value);
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, boolean onClauseInline);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, boolean onClauseInline);
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================
@@ -183,7 +183,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause();
+    public ${glOrderByClause} getSqlComponentOfOrderByClause();
     public ${myClassName} clearOrderBy();
     public ${myClassName} ignoreOrderBy();
     public ${myClassName} makeOrderByEffective();
@@ -380,7 +380,7 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                          Where Clause Simple Filter
     //                                                          ==========================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterface} whereClauseSimpleFilter);
     
     // ===================================================================================
     //                                                               Selected Foreign Info

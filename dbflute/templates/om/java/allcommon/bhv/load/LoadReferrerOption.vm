@@ -3,8 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhvLoad};
 import java.util.List;
 
 import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
-import ${glPackageBaseCommonBhvSetup}.${glEntityListSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupper};
+import ${glPackageBaseCommonBhvSetup}.${glEntityListSetupper};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 
 /**
@@ -18,9 +18,9 @@ public class ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN extends ${glConditi
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> _conditionBeanSetupper;
+    protected ${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> _conditionBeanSetupper;
 
-    protected ${glEntityListSetupperName}<REFERRER_ENTITY> _entityListSetupper;
+    protected ${glEntityListSetupper}<REFERRER_ENTITY> _entityListSetupper;
 
     protected REFERRER_CONDITION_BEAN _referrerConditionBean;
 
@@ -34,11 +34,11 @@ public class ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN extends ${glConditi
     public ${glLoadReferrerOption}() {
     }
 
-    public ${glLoadReferrerOption}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
+    public ${glLoadReferrerOption}(${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
     }
 
-    public ${glLoadReferrerOption}(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
+    public ${glLoadReferrerOption}(${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupper}<REFERRER_ENTITY> entityListSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
         this._entityListSetupper = entityListSetupper;
     }
@@ -95,19 +95,19 @@ public class ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN extends ${glConditi
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> getConditionBeanSetupper() {
+    public ${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> getConditionBeanSetupper() {
         return _conditionBeanSetupper;
     }
 
-    public void setConditionBeanSetupper(${glConditionBeanSetupperName}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
+    public void setConditionBeanSetupper(${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
     }
 
-    public ${glEntityListSetupperName}<REFERRER_ENTITY> getEntityListSetupper() {
+    public ${glEntityListSetupper}<REFERRER_ENTITY> getEntityListSetupper() {
         return _entityListSetupper;
     }
 
-    public void setEntityListSetupper(${glEntityListSetupperName}<REFERRER_ENTITY> entityListSetupper) {
+    public void setEntityListSetupper(${glEntityListSetupper}<REFERRER_ENTITY> entityListSetupper) {
         this._entityListSetupper = entityListSetupper;
     }
 

@@ -1,4 +1,4 @@
-#set ($myClassName = "${glColumnInfoName}")
+#set ($myClassName = "${glColumnInfo}")
 
 using System;
 using System.Reflection;

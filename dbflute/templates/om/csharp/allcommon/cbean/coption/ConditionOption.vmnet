@@ -1,5 +1,5 @@
 
-#set ($myClassName = "${glConditionOptionInterfaceName}")
+#set ($myClassName = "${glConditionOption}")
 using System;
 
 namespace ${glPackageBaseCommonCOption} {

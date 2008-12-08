@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 #set ($myClassName = "${glSqlClause}Oracle")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 
 /**
  * SqlClause for Oracle.
@@ -102,7 +102,7 @@ public class ${myClassName} extends ${glAbstractSqlClause} {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;
         } else {
-            final String randomColumnName = ((${glColumnInfoName})dbmeta.getColumnInfoList().get(0)).getColumnDbName();
+            final String randomColumnName = ((${glColumnInfo})dbmeta.getColumnInfoList().get(0)).getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + randomColumnName;
         }
         return this;

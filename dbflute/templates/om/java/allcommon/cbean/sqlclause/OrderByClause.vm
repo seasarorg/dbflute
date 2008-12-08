@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glOrderByClauseName}")
+#set ($myClassName = "${glOrderByClause}")
 import java.io.Serializable;
 import java.util.Map;
 import java.util.List;
@@ -19,7 +19,7 @@ public class ${myClassName} implements Serializable {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected List<${glOrderByElementName}> _orderByList = new ArrayList<${glOrderByElementName}>();
+    protected List<${glOrderByElement}> _orderByList = new ArrayList<${glOrderByElement}>();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -37,7 +37,7 @@ public class ${myClassName} implements Serializable {
      * Add order-by element.
      * @param orderByElement Order-by element. (NotNull)
      */
-    public void addOrderByElement(${glOrderByElementName} orderByElement) {
+    public void addOrderByElement(${glOrderByElement} orderByElement) {
         _orderByList.add(orderByElement);
     }
 
@@ -45,20 +45,20 @@ public class ${myClassName} implements Serializable {
      * Insert first order-by element .
      * @param orderByElement Order-by element. (NotNull)
      */
-    public void insertFirstOrderByElement(${glOrderByElementName} orderByElement) {
+    public void insertFirstOrderByElement(${glOrderByElement} orderByElement) {
         _orderByList.add(0, orderByElement);
     }
 
     public void reverseAll() {
-        for (Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+        for (Iterator<${glOrderByElement}> ite = _orderByList.iterator(); ite.hasNext(); ) {
             ite.next().reverse();
         }
     }
 
     public void exchangeFirstOrderByElementForLastOne() {
         if (_orderByList.size() > 1) {
-            final ${glOrderByElementName} first = _orderByList.get(0);
-            final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+            final ${glOrderByElement} first = _orderByList.get(0);
+            final ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
             _orderByList.set(0, last);
             _orderByList.set(_orderByList.size() - 1, first);
         }
@@ -68,7 +68,7 @@ public class ${myClassName} implements Serializable {
 	    if (_orderByList.isEmpty()) {
 		    return;
 		}
-		final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		final ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
 		last.setOrderByNullsSetupper(filter, true);
 	}
 	
@@ -76,7 +76,7 @@ public class ${myClassName} implements Serializable {
 	    if (_orderByList.isEmpty()) {
 		    return;
 		}
-		final ${glOrderByElementName} last = _orderByList.get(_orderByList.size() - 1);
+		final ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
 		last.setOrderByNullsSetupper(filter, false);
 	}
 	
@@ -87,7 +87,7 @@ public class ${myClassName} implements Serializable {
     // =====================================================================================
     //                                                                   Order-By Expression
     //                                                                   ===================
-    public List<${glOrderByElementName}> getOrderByList() {
+    public List<${glOrderByElement}> getOrderByList() {
         return _orderByList;
     }
 
@@ -101,8 +101,8 @@ public class ${myClassName} implements Serializable {
         }
         final StringBuffer sb = new StringBuffer();
         final String delimiter = ", ";
-        for (final Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
-            final ${glOrderByElementName} element = ite.next();
+        for (final Iterator<${glOrderByElement}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            final ${glOrderByElement} element = ite.next();
             sb.append(delimiter);
 			if (selectClauseRealColumnAliasMap != null) {
 			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
@@ -128,7 +128,7 @@ public class ${myClassName} implements Serializable {
         int count = 0;
         for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext(); ) {
             final String columnFullName = ite.next();
-            final ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(count);
+            final ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(count);
             if (!element.getColumnFullName().equals(columnFullName)) {
                 return false;
             }
@@ -145,7 +145,7 @@ public class ${myClassName} implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new IllegalStateException(msg);
         }
-        final ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        final ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         return element.isAsc();
     }
 
@@ -158,7 +158,7 @@ public class ${myClassName} implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualAliasName = element.getAliasName();
         if (actualAliasName != null && expectedAliasName != null) {
             return actualAliasName.equalsIgnoreCase(expectedAliasName);
@@ -176,7 +176,7 @@ public class ${myClassName} implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualColumnName = element.getColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.equalsIgnoreCase(expectedColumnName);
@@ -194,7 +194,7 @@ public class ${myClassName} implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualAliasName = element.getRegisteredAliasName();
         if (actualAliasName != null && expectedAliasName != null) {
             return actualAliasName.equalsIgnoreCase(expectedAliasName);
@@ -212,7 +212,7 @@ public class ${myClassName} implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
+        ${glOrderByElement} element = (${glOrderByElement})_orderByList.get(0);
         String actualColumnName = element.getRegisteredColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.equalsIgnoreCase(expectedColumnName);
@@ -236,7 +236,7 @@ public class ${myClassName} implements Serializable {
      * Get iterator of order-by list.
      * @return Determination.
      */
-    public Iterator<${glOrderByElementName}> iterator() {
+    public Iterator<${glOrderByElement}> iterator() {
         return _orderByList.iterator();
     }
 

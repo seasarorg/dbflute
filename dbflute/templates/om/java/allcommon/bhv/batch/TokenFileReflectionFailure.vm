@@ -5,7 +5,7 @@ import ${glPackageBaseCommon}.${glEntity};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glTokenFileReflectionFailureName} {
+public class ${glTokenFileReflectionFailure} {
 
     // =====================================================================================
     //                                                                             Attribute
