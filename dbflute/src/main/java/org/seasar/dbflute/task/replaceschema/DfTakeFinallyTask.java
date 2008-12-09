@@ -45,8 +45,12 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
-        takeFinally(runInfo);
-        showCreateSchemaResult();
+        final String takeFinallyResult = takeFinally(runInfo);
+        try {
+            showFinalInformation(takeFinallyResult);
+        } catch (Throwable ignored) {
+            _log.info("Failed to show final information!", ignored);
+        }
     }
 
     @Override
@@ -100,7 +104,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // --------------------------------------------
     //                                 Take Finally
     //                                 ------------
-    protected void takeFinally(DfRunnerInformation runInfo) {
+    protected String takeFinally(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * **");
         _log.info("*              *");
@@ -108,8 +112,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("*              *");
         _log.info("* * * * * * * **");
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
-        _log.info("");
+        return fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
@@ -275,7 +278,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         return "\n";
     }
     
-    protected void showCreateSchemaResult() {
+    protected void showFinalInformation(String takeFinallyResult) {
         final File file = new File("./log/create-schema.log");
         if (!file.exists()) {
             return;
@@ -286,13 +289,18 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             final String line = br.readLine();
             if (line != null) {
-                _log.info("");
-                _log.info("/* * * * * * * * * * * * * * * * * * ");
-                _log.info("[Create-Schema Result]");
-                _log.info("");
-                _log.info(line);
-                _log.info("* * * * * * * * * */");
-                _log.info("");
+                final StringBuilder sb = new StringBuilder();
+                final String ln = getLineSeparator();
+                sb.append(ln).append("/* * * * * * * * * * * * * * * * * * *");
+                sb.append(ln).append("[Final Information]");
+                sb.append(ln).append("");
+                sb.append(ln).append("  <Create-Schema>");
+                sb.append(ln).append("  ").append(line);
+                sb.append(ln).append("  ");
+                sb.append(ln).append("  <Take-Finally>");
+                sb.append(ln).append("  ").append(takeFinallyResult);
+                sb.append(ln).append("* * * * * * * * * */");
+                _log.info(sb.toString());
             }
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);

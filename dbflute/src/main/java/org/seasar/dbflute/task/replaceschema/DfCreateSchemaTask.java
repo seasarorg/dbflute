@@ -141,7 +141,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         final String result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
-        dumpExecuteResult(result);
+        try {
+            dumpExecuteResult(result);
+        } catch (Throwable ignored) {
+            _log.info("Failed to dump create-schema result: " + result, ignored);
+        }
         if (_log.isInfoEnabled()) {
             _log.info("");
         }

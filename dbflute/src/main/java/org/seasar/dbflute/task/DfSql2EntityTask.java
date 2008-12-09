@@ -504,7 +504,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.warn(" ");
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.warn("SQL for sql2entity was Not Found!");
-            _log.warn("- - - - - - - - - -");
+            _log.warn("");
             _log.warn("SQL Files: " + sqlFileList.size());
             int index = 0;
             for (File file : sqlFileList) {
