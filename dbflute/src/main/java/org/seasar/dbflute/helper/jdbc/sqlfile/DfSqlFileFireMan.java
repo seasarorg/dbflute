@@ -31,9 +31,11 @@ public class DfSqlFileFireMan {
     private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
 
     /**
-     * Load the sql file and then execute it.
+     * Load the SQL files and then execute them.
+     * @return The error result information. (Nullable: If it's null, it means no error)
      */
-    public void execute(DfSqlFileRunner runner, List<File> fileList) {
+    public String execute(DfSqlFileRunner runner, List<File> fileList) {
+        final StringBuilder sb = new StringBuilder();
         try {
             int goodSqlCount = 0;
             int totalSqlCount = 0;
@@ -55,6 +57,7 @@ public class DfSqlFileFireMan {
             String msg = "[Fired SQL] success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
             msg = msg + " (in " + fileList.size() + " files)";
             _log.info(msg);
+            sb.append(msg);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -62,5 +65,6 @@ public class DfSqlFileFireMan {
                 throw new RuntimeException(e);
             }
         }
+        return sb.toString();
     }
 }

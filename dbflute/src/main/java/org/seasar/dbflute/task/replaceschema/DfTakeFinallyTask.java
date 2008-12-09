@@ -2,10 +2,13 @@ package org.seasar.dbflute.task.replaceschema;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +46,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
         beforeTakeFinally();
         takeFinally(runInfo);
+        showCreateSchemaResult();
     }
 
     @Override
@@ -269,6 +273,44 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
     protected String getLineSeparator() {
         return "\n";
+    }
+    
+    protected void showCreateSchemaResult() {
+        final File file = new File("./log/create-schema.log");
+        if (!file.exists()) {
+            return;
+        }
+        BufferedReader br = null;
+        try {
+            final FileInputStream fis = new FileInputStream(file);
+            br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            final String line = br.readLine();
+            if (line != null) {
+                _log.info("");
+                _log.info("/* * * * * * * * * * * * * * * * * * ");
+                _log.info("[Create-Schema Result]");
+                _log.info("");
+                _log.info(line);
+                _log.info("* * * * * * * * * */");
+                _log.info("");
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+        if (file.exists()) {
+            file.delete();
+        }
     }
 
     // ===================================================================================

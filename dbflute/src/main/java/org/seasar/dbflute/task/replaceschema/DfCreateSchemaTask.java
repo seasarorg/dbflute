@@ -1,7 +1,13 @@
 package org.seasar.dbflute.task.replaceschema;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -134,9 +140,39 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             _log.info("* * * * * * * * *");
         }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
+        final String result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
+        dumpExecuteResult(result);
         if (_log.isInfoEnabled()) {
             _log.info("");
+        }
+    }
+
+    protected void dumpExecuteResult(String result) {
+        final File file = new File("./log/create-schema.log");
+        if (file.exists()) {
+            file.delete();
+        }
+        if (result == null || result.trim().length() == 0) {
+            return; // nothing to dump!
+        }
+        BufferedWriter bw = null;
+        try {
+            final FileOutputStream fos = new FileOutputStream(file);
+            bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+            bw.write(result);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
@@ -154,7 +190,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
             }
-            
+
             @Override
             protected boolean isHandlingCommentOnLineSeparator() {
                 return true;
