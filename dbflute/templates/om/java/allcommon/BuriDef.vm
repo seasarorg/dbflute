@@ -10,6 +10,7 @@ public class ${glBuriDef} {
 #set ($processList = $database.getBuriProcessList($packageName))
 #foreach ($processName in $processList)
 #set ($statusList = $database.getBuriStatusList($packageName, $processName))
+
     public enum ${packageName}_${processName}_Status {
 #set ($count = 0)
 #foreach ($statusName in $statusList)
@@ -37,7 +38,8 @@ public class ${glBuriDef} {
     }
 #end
 #foreach ($processName in $processList)
-#set ($actionList = $database.getBuriStatusList($packageName, $processName))
+#set ($actionList = $database.getBuriActionList($packageName, $processName))
+
     public enum ${packageName}_${processName}_Action {
 #set ($count = 0)
 #foreach ($actionName in $actionList)
