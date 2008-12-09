@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
 
 /**
- * The interface of simple filter for where clause.
+ * The simple filter for where clause.
  * @author ${database.ClassAuthor}
  */
 public interface ${myClassName} {
@@ -28,7 +28,7 @@ public interface ${myClassName} {
 
     /**
      * The simple filter for where clause to embedded. <br />
-     * *Attension -- Target column is not perfect. This class determines by column name only!
+     * *Attention -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
      * @author ${database.ClassAuthor}
      */
@@ -100,7 +100,7 @@ public interface ${myClassName} {
 
     /**
      * The simple filter for where clause to embedded and quoted. <br />
-     * *Attension -- Target column is not perfect. This class determines by column name only!
+     * *Attention -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
      * @author ${database.ClassAuthor}
      */
