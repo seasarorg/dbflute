@@ -32,10 +32,10 @@ public class DfSqlFileFireMan {
 
     /**
      * Load the SQL files and then execute them.
-     * @return The error result information. (Nullable: If it's null, it means no error)
+     * @return The result about firing SQL. (NotNull)
      */
-    public String execute(DfSqlFileRunner runner, List<File> fileList) {
-        final StringBuilder sb = new StringBuilder();
+    public FireResult execute(DfSqlFileRunner runner, List<File> fileList) {
+        final FireResult fireResult = new FireResult();
         try {
             int goodSqlCount = 0;
             int totalSqlCount = 0;
@@ -57,7 +57,8 @@ public class DfSqlFileFireMan {
             String msg = "[Fired SQL] success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
             msg = msg + " (in " + fileList.size() + " files)";
             _log.info(msg);
-            sb.append(msg);
+            fireResult.setResultMessage(msg);
+            fireResult.setExistsError(totalSqlCount > goodSqlCount);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -65,6 +66,27 @@ public class DfSqlFileFireMan {
                 throw new RuntimeException(e);
             }
         }
-        return sb.toString();
+        return fireResult;
+    }
+
+    public static class FireResult {
+        protected String resultMessage;
+        protected boolean existsError;
+
+        public String getResultMessage() {
+            return resultMessage;
+        }
+
+        public void setResultMessage(String resultMessage) {
+            this.resultMessage = resultMessage;
+        }
+
+        public boolean isExistsError() {
+            return existsError;
+        }
+
+        public void setExistsError(boolean existsError) {
+            this.existsError = existsError;
+        }
     }
 }

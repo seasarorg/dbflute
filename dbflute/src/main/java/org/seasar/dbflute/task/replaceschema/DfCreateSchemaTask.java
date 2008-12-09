@@ -21,6 +21,7 @@ import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
@@ -32,7 +33,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfCreateSchemaTask.class);
-    
+
     protected static final String LOG_PATH = "./log/create-schema.log";
 
     // ===================================================================================
@@ -142,9 +143,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             _log.info("* * * * * * * * *");
         }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        final String result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
+        final FireResult result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
         try {
-            dumpExecuteResult(result);
+            dumpFireResult(result);
         } catch (Throwable ignored) {
             _log.info("Failed to dump create-schema result: " + result, ignored);
         }
@@ -153,19 +154,20 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected void dumpExecuteResult(String result) {
+    protected void dumpFireResult(FireResult result) {
         final File file = new File(LOG_PATH);
         if (file.exists()) {
             file.delete();
         }
-        if (result == null || result.trim().length() == 0) {
+        final String resultMessage = result.getResultMessage();
+        if (resultMessage == null || resultMessage.trim().length() == 0) {
             return; // nothing to dump!
         }
         BufferedWriter bw = null;
         try {
             final FileOutputStream fos = new FileOutputStream(file);
             bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-            bw.write(result);
+            bw.write(resultMessage + getLineSeparator() + result.isExistsError());
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {

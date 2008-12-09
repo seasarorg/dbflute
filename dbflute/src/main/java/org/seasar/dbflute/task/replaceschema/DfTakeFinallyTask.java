@@ -22,6 +22,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
 public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
@@ -45,7 +46,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
-        final String takeFinallyResult = takeFinally(runInfo);
+        final FireResult takeFinallyResult = takeFinally(runInfo);
         try {
             showFinalInformation(takeFinallyResult);
         } catch (Throwable ignored) {
@@ -104,7 +105,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // --------------------------------------------
     //                                 Take Finally
     //                                 ------------
-    protected String takeFinally(DfRunnerInformation runInfo) {
+    protected FireResult takeFinally(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * **");
         _log.info("*              *");
@@ -129,7 +130,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             protected boolean isSqlTrimAndRemoveLineSeparator() {
                 return true;
             }
-            
+
             @Override
             protected boolean isHandlingCommentOnLineSeparator() {
                 return true;
@@ -277,8 +278,8 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     protected String getLineSeparator() {
         return "\n";
     }
-    
-    protected void showFinalInformation(String takeFinallyResult) {
+
+    protected void showFinalInformation(FireResult takeFinallyResult) {
         final File file = new File(DfCreateSchemaTask.LOG_PATH);
         if (!file.exists()) {
             return;
@@ -289,16 +290,18 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             final String line = br.readLine();
             if (line != null) {
+                final String line2 = br.readLine();
+                final boolean existsError = isLine2True(line2) || takeFinallyResult.isExistsError();
                 final StringBuilder sb = new StringBuilder();
                 final String ln = getLineSeparator();
                 sb.append(ln).append("/* * * * * * * * * * * * * * * * * * *");
-                sb.append(ln).append("[Final Information]");
+                sb.append(ln).append("[Final Information]" + (existsError ? " *Error" : ""));
                 sb.append(ln).append("");
                 sb.append(ln).append("  {Create Schema}");
                 sb.append(ln).append("  ").append(line);
                 sb.append(ln).append("  ");
                 sb.append(ln).append("  {Take Finally}");
-                sb.append(ln).append("  ").append(takeFinallyResult);
+                sb.append(ln).append("  ").append(takeFinallyResult.getResultMessage());
                 sb.append(ln).append("* * * * * * * * * */");
                 _log.info(sb.toString());
             }
@@ -319,6 +322,10 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         if (file.exists()) {
             file.delete();
         }
+    }
+
+    protected boolean isLine2True(String line2) {
+        return line2 != null && line2.trim().equalsIgnoreCase("true");
     }
 
     // ===================================================================================
