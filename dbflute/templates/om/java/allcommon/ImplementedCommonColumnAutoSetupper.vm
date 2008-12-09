@@ -9,7 +9,7 @@ import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
  * The basic implementation of the auto set-upper of common column.
  * @author ${database.ClassAuthor}
  */
-public class ${glCommonColumnBasicAutoSetupper} implements ${glCommonColumnAutoSetupper} {
+public class ${glImplementedCommonColumnAutoSetupper} implements ${glCommonColumnAutoSetupper} {
 #if ($database.isExistCommonColumnSetupElement())
 
     // =====================================================================================

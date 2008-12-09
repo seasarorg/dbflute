@@ -71,7 +71,7 @@ targetdatabase = $targetDatabase
     #set ($glEntity = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
-    #set ($glCommonColumnBasicAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
+    #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
     #set ($glCacheAbstractSelector = "${glProjectPrefix}CacheAbstractSelector")
     #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
     #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
@@ -699,7 +699,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
 
       $database.info("    parse('CommonColumnBasicAutoSetupper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnBasicAutoSetupper}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnBasicAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
     #end
     $database.info("}")

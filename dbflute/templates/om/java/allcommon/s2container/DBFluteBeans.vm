@@ -15,7 +15,7 @@
         <property name="valueTypeFactory" ref="valueTypeFactory"></property>
 	</bean>
     <bean id="invokerAssistant" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType"/>
-    <bean id="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}" autowire="byType"/>
+    <bean id="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
 	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelector}" autowire="byType" destroy-method="destroy"/>
 
     <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryExtension}" autowire="byType"/>

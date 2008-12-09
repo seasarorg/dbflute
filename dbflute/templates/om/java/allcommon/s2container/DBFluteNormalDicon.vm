@@ -18,7 +18,7 @@
     <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
     <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
     <component name="invokerAssistant" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}"/>
-    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}"/>
+    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelector}">
         <destroyMethod name="destroy"/>
     </component>

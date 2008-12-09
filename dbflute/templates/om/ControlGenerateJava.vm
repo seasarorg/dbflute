@@ -71,7 +71,6 @@ targetdatabase = $targetDatabase
     #set ($glCacheBehaviorSelector = "${glProjectPrefix}CacheBehaviorSelector")
     #set ($glCDef = "${glProjectPrefix}CDef")
     #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
-    #set ($glCommonColumnBasicAutoSetupper = "${glProjectPrefix}CommonColumnBasicAutoSetupper")
     #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
     #set ($glDBDef = "${glProjectPrefix}DBDef")
     #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
@@ -79,6 +78,7 @@ targetdatabase = $targetDatabase
     #set ($glEntity = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glBehaviorSelector = "${glProjectPrefix}BehaviorSelector")
+    #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
     #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
     #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glInternalMapContext = "${glProjectPrefix}InternalMapContext")
@@ -786,7 +786,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
 
       $database.info("    parse('CommonColumnBasicAutoSetupper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnBasicAutoSetupper}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnBasicAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
     #end
     $database.info("}")
