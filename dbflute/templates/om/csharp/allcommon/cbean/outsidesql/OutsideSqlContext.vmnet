@@ -173,9 +173,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return text;
             }
 
-            if (_resultTypeSpecification != null) {
+            if (_resultTypeSpecification != null && _resultTypeSpecification is Type) {
                 // In customize entity assembly!
-                Assembly asmResultType = _resultTypeSpecification.GetType().Assembly;
+                Assembly asmResultType = ((Type)_resultTypeSpecification).Assembly;
                 if (asmResultType != null && asmResultType != asm) {
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asmResultType);
                     if (text != null) {
