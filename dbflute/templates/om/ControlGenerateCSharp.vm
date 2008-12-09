@@ -102,7 +102,6 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorCommand = "${glProjectPrefix}BehaviorCommand")
     #set ($glBehaviorCommandComponentSetup = "${glProjectPrefix}BehaviorCommandComponentSetup")
     #set ($glBehaviorCommandInvoker = "${glProjectPrefix}BehaviorCommandInvoker")
-    #set ($glBehaviorInitializer = "${glProjectPrefix}BehaviorInitializer")
     #set ($glResourceContext = "${glProjectPrefix}ResourceContext")
     #set ($glSqlExecution = "${glProjectPrefix}SqlExecution")
     #set ($glSqlExecutionCreator = "${glProjectPrefix}SqlExecutionCreator")
@@ -218,7 +217,7 @@ targetdatabase = $targetDatabase
     #set ($glSqlClause = "${glProjectPrefix}SqlClause")
     #set ($glAbstractSqlClause = "${glProjectPrefix}AbstractSqlClause")
     #set ($glSqlClauseCreator = "${glProjectPrefix}SqlClauseCreator")
-    #set ($glSqlClauseCreatorImpl = "${glProjectPrefix}SqlClauseCreatorImpl")
+    #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}SqlClauseCreatorImpl")
     #set ($glOrderByClause = "${glProjectPrefix}OrderByClause")
     #set ($glOrderByElement = "${glProjectPrefix}OrderByElement")
     #set ($glWhereClauseSimpleFilter = "${glProjectPrefix}WhereClauseSimpleFilter")
@@ -636,228 +635,23 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhv})}${glAbstractBehaviorWritable}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/bhv/AbstractBehaviorWritable.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvBatch}))
-      $database.makeDirectory($path)
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
+    $database.makeDirectory($path)
 
-      $database.info("    parseTokenFileReflectionOption()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionOption}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileReflectionOption.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parse('LoadReferrerOption')")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReferrerOption}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/bhv/load/LoadReferrerOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parseTokenFileReflectionResult()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionResult}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileReflectionResult.${glTemplateFileExtension}",$path ,"", "")
+    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
+    $database.makeDirectory($path)
 
-      $database.info("    parseTokenFileReflectionFailure()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionFailure}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileReflectionFailure.${glTemplateFileExtension}",$path ,"", "")
+    $database.info("    parseConditionBeanSetupper()")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupper}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.info("    parseTokenFileOutputOption()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileOutputOption}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileOutputOption.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parseTokenFileOutputResult()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileOutputResult}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/batch/TokenFileOutputResult.${glTemplateFileExtension}",$path ,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCore}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('BehaviorCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BehaviorCommandComponentSetup');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommandComponentSetup}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommandComponentSetup.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BehaviorCommandInvoker');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorCommandInvoker}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorCommandInvoker.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BehaviorInitializer');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glBehaviorInitializer}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/BehaviorInitializer.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('ResourceContext');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glResourceContext}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/ResourceContext.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SqlExecution');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecution}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/SqlExecution.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SqlExecutionCreator');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glSqlExecutionCreator}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/SqlExecutionCreator.${glTemplateFileExtension}",$path,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('AbstractBehaviorCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractBehaviorCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractBehaviorCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('AbstractEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('AbstractListEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractListEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractListEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('AbstractOutsideSqlCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('AbstractOutsideSqlSelectCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractOutsideSqlSelectCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractOutsideSqlSelectCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('AbstractSelectCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glAbstractSelectCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/AbstractSelectCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BatchDeleteEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchDeleteEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchDeleteEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BatchDeleteNonstrictEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchDeleteNonstrictEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchDeleteNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BatchInsertEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchInsertEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchInsertEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BatchUpdateEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchUpdateEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchUpdateEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('BatchUpdateNonstrictEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glBatchUpdateNonstrictEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/BatchUpdateNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('DeleteEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glDeleteEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/DeleteEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('DeleteNonstrictEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glDeleteNonstrictEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/DeleteNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('InsertEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glInsertEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/InsertEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('OutsideSqlSelectListCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlSelectListCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlSelectListCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('OutsideSqlCallCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlCallCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlCallCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('OutsideSqlExecuteCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlExecuteCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlExecuteCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('OutsideSqlSelectCursorCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glOutsideSqlSelectCursorCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/OutsideSqlSelectCursorCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('QueryDeleteCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glQueryDeleteCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/QueryDeleteCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('QueryUpdateEntityCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glQueryUpdateEntityCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/QueryUpdateEntityCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SelectCountCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectCountCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectCountCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SelectListCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectListCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectListCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SelectNextValCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectNextValCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectNextValCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SelectScalarCBCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glSelectScalarCBCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/SelectScalarCBCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('UpdateEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('UpdateNonstrictEntityCommand');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreCommand})}${glUpdateNonstrictEntityCommand}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/command/UpdateNonstrictEntityCommand.${glTemplateFileExtension}",$path,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('BasicSelectExecution');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glBasicSelectExecution}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/BasicSelectExecution.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('OutsideSqlSelectExecution');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glOutsideSqlSelectExecution}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/OutsideSqlSelectExecution.${glTemplateFileExtension}",$path,"", "")
-
-      $database.info("    parse('SelectCBExecution');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCoreExecution})}${glSelectCBExecution}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/core/execution/SelectCBExecution.${glTemplateFileExtension}",$path,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('LoadReferrerOption')")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReferrerOption}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/load/LoadReferrerOption.${glTemplateFileExtension}",$path ,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
-      $database.makeDirectory($path)
-
-      $database.info("    parseConditionBeanSetupper()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parseEntityListSetupper()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glEntityListSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/EntityListSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parseValueLabelSetupper()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glValueLabelSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ValueLabelSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parseValueLabelBox()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glValueLabelBox}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ValueLabelBox.${glTemplateFileExtension}",$path ,"", "")
-    #end
-    #if ($database.isTargetLanguageCSharp())
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('LoadReferrerOption')")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReferrerOption}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/load/LoadReferrerOption.${glTemplateFileExtension}",$path ,"", "")
-
-      #set ($path = $database.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
-      $database.makeDirectory($path)
-
-      $database.info("    parseConditionBeanSetupper()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parseEntityListSetupper()")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glEntityListSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/EntityListSetupper.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parseEntityListSetupper()")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glEntityListSetupper}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/bhv/Setup/EntityListSetupper.${glTemplateFileExtension}",$path ,"", "")
     $database.info("}")
 
     ## ===================================================================================
@@ -1257,7 +1051,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("parse('SqlClauseCreatorImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseCreatorImpl}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreatorImpl.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 

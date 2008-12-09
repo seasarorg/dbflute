@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import javax.sql.XADataSource;
 #if ($database.isTargetContainerSeasar())
@@ -6,7 +6,6 @@ import javax.sql.XADataSource;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 #end
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
@@ -14,22 +13,22 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glBehaviorInitializer} {
+public class ${glDBFluteInitializer} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glBehaviorInitializer}.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDBFluteInitializer}.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor. And initialize various components related behavior.
+     * Constructor. And initialize various components.
      * @param xaDataSource The data source of XA. (Nullable)
      */
-    public ${glBehaviorInitializer}(XADataSource xaDataSource) {
+    public ${glDBFluteInitializer}(XADataSource xaDataSource) {
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         ${glDBFluteConfig}.getInstance().unlock();
         handleSqlLogRegistry();

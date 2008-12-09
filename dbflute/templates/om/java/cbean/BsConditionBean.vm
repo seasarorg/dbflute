@@ -12,7 +12,7 @@ import ${glPackageBaseCommonCBean}.${glUnionQuery};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
+import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 #if ($table.hasForeignKeyOrReferrerAsOne())
@@ -36,7 +36,7 @@ public class ${myClassName} extends ${glAbstractConditionBean} {
     //                                                                           =========
     @Override
     protected ${glSqlClause} createSqlClause() {
-        return new ${glSqlClauseCreatorImpl}().createSqlClause(this);
+        return new ${glImplementedSqlClauseCreator}().createSqlClause(this);
     }
     
     // ===================================================================================

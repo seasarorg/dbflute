@@ -4,7 +4,7 @@
     "http://www.springframework.org/dtd/spring-beans.dtd"
 >
 <beans>
-    <bean id="behaviorInitializer" class="${glPackageBaseCommonBhvCore}.${glBehaviorInitializer}">
+    <bean id="dbfluteInitializer" class="${glPackageBaseCommon}.${glDBFluteInitializer}">
         <constructor-arg index="0">
             <ref bean="xaDataSource"/>
         </constructor-arg>
@@ -14,7 +14,7 @@
         <property name="beanMetaDataFactory" ref="beanMetaDataFactory"></property>
         <property name="valueTypeFactory" ref="valueTypeFactory"></property>
 	</bean>
-    <bean id="invokerAssistant" class="${glPackageBaseCommonBhvCore}.${glInvokerAssistantImpl}" autowire="byType"/>
+    <bean id="invokerAssistant" class="${glPackageBaseCommonBhvCore}.${glImplementedInvokerAssistant}" autowire="byType"/>
     <bean id="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glCommonColumnBasicAutoSetupper}" autowire="byType"/>
 	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelector}" autowire="byType" destroy-method="destroy"/>
 

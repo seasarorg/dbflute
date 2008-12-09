@@ -10,12 +10,12 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
+import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInvokerAssistantImpl} implements ${glInvokerAssistant}, Disposable {
+public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, Disposable {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -29,7 +29,7 @@ public class ${glInvokerAssistantImpl} implements ${glInvokerAssistant}, Disposa
     //                                                                            Creation
     //                                                                            ========
     protected ${glSqlClauseCreator} createSqlClauseCreator() {
-        return new ${glSqlClauseCreatorImpl}();
+        return new ${glImplementedSqlClauseCreator}();
     }
 
     protected ${glDBMetaProvider} createDBMetaProvider() {

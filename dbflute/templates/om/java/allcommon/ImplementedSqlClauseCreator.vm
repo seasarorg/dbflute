@@ -10,7 +10,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBean};
  * The creator of SQL clause.
  * @author ${database.ClassAuthor}
  */
-public class ${glSqlClauseCreatorImpl} implements ${glSqlClauseCreator} {
+public class ${glImplementedSqlClauseCreator} implements ${glSqlClauseCreator} {
 
 	/**
 	 * Create SQL clause. {for condition-bean}

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreatorImpl};
+import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
@@ -20,7 +20,7 @@ public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterB
     /** SQL clause instance. */
     protected final ${glSqlClause} _sqlClause;
     {
-        _sqlClause = new ${glSqlClauseCreatorImpl}().createSqlClause("Dummy");
+        _sqlClause = new ${glImplementedSqlClauseCreator}().createSqlClause("Dummy");
     }
 
     /** The map of parameter. (Nullable) */
