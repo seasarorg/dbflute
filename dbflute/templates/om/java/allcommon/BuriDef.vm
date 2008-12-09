@@ -16,12 +16,23 @@ public class ${glBuriDef} {
 #if ($count != 0)
         ,
 #end
-        $database.initCap(${statusName})
+        $database.initCap(${statusName})("${statusName}")
 #set ($count = $count + 1)
 #end
         ;
+        private String _code;
+        private ${packageName}_${processName}_Status(String code) {
+            _code = code;
+        }
+        public String code() {
+            return _code;
+        }
         public static String path() {
             return "${packageName}.${processName}";
+        }
+        @Override
+        public String toString() {
+            return path() + "." + _code;
         }
     }
 #end
@@ -33,10 +44,24 @@ public class ${glBuriDef} {
 #if ($count != 0)
         ,
 #end
-        $database.initCap(${actionName})
+        $database.initCap(${actionName})("${actionName}")
 #set ($count = $count + 1)
 #end
         ;
+        private String _code;
+        private ${packageName}_${processName}_Action(String code) {
+            _code = code;
+        }
+        public String code() {
+            return _code;
+        }
+        private static String path() {
+            return "${packageName}.${processName}";
+        }
+        @Override
+        public String toString() {
+            return path() + "." + _code;
+        }
     }
 #end
 #end
