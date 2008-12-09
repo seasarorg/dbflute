@@ -217,7 +217,6 @@ targetdatabase = $targetDatabase
     #set ($glSqlClause = "${glProjectPrefix}SqlClause")
     #set ($glAbstractSqlClause = "${glProjectPrefix}AbstractSqlClause")
     #set ($glSqlClauseCreator = "${glProjectPrefix}SqlClauseCreator")
-    #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}SqlClauseCreatorImpl")
     #set ($glOrderByClause = "${glProjectPrefix}OrderByClause")
     #set ($glOrderByElement = "${glProjectPrefix}OrderByElement")
     #set ($glWhereClauseSimpleFilter = "${glProjectPrefix}WhereClauseSimpleFilter")
@@ -1044,16 +1043,6 @@ targetdatabase = $targetDatabase
     $database.info("    parseAbstractSqlClause")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glAbstractSqlClause}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
-
-    #if ($database.isTargetLanguageJava())
-      $database.info("parse('SqlClauseCreator');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseCreator}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
-
-      $database.info("parse('SqlClauseCreatorImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseCreatorImpl.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
 
     #if ($database.isTargetLanguageJava())
       $database.info("    parse('WhereClauseSimpleFilter');")

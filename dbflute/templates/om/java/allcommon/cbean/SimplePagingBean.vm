@@ -3,8 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 import java.util.Map;
 import java.util.LinkedHashMap;
 
+import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**

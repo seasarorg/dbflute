@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 import java.util.Map;
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommonCBean}.${glAbstractConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
 import ${glPackageBaseCommonCBean}.${glConditionQuery};
@@ -12,7 +13,6 @@ import ${glPackageBaseCommonCBean}.${glUnionQuery};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
-import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 #if ($table.hasForeignKeyOrReferrerAsOne())

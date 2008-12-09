@@ -9,7 +9,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
-import ${glPackageBaseCommonSqlClause}.${glImplementedSqlClauseCreator};
 
 /**
  * @author ${database.ClassAuthor}
