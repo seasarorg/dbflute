@@ -136,11 +136,11 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                 Activity Definition
     //                                                                 ===================
-    protected Map<String, Map<String, List<String>>> _activityDefinitionMap;
+    protected Map<String, Map<String, Map<String, List<String>>>> _activityDefinitionMap;
 
-    public Map<String, Map<String, List<String>>> getActivityDefinitionMap() {
+    public Map<String, Map<String, Map<String, List<String>>>> getActivityDefinitionMap() {
         if (_activityDefinitionMap == null) {
-            _activityDefinitionMap = new LinkedHashMap<String, Map<String, List<String>>>();
+            _activityDefinitionMap = new LinkedHashMap<String, Map<String, Map<String, List<String>>>>();
             final Map<String, Object> activityDefinitionMap = getBuriPropertyAsMap("activityDefinitionMap");
             if (activityDefinitionMap != null) {
                 final Set<String> packageNameSet = activityDefinitionMap.keySet();
@@ -149,14 +149,14 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
                     assertPackageValueIsMap(packageValue);
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> processMap = (Map<String, Object>) packageValue;
-                    final Map<String, List<String>> processResultMap = new LinkedHashMap<String, List<String>>();
+                    final Map<String, Map<String, List<String>>> processResultMap = newLinkedHashMap();
                     final Set<String> processNameSet = processMap.keySet();
                     for (String processName : processNameSet) {
                         final Object processValue = processMap.get(processName);
-                        assertProcessValueIsList(processValue);
+                        assertProcessValueIsMap(processValue);
                         @SuppressWarnings("unchecked")
-                        final List<String> activityList = (List<String>) processValue;
-                        processResultMap.put(processName, activityList);
+                        final Map<String, List<String>> activityMap = (Map<String, List<String>>) processValue;
+                        processResultMap.put(processName, activityMap);
                     }
                     _activityDefinitionMap.put(packageName, processResultMap);
                 }
@@ -172,33 +172,48 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected void assertProcessValueIsList(Object processValue) {
-        if (!(processValue instanceof List)) {
-            String msg = "The type of process value should be List: " + processValue;
+    protected void assertProcessValueIsMap(Object processValue) {
+        if (!(processValue instanceof Map)) {
+            String msg = "The type of process value should be Map: " + processValue;
             throw new IllegalStateException(msg);
         }
     }
 
-    public Map<String, List<String>> getProcessMap(String packageName) {
-        final Map<String, List<String>> map = getActivityDefinitionMap().get(packageName);
-        return map != null ? map : new HashMap<String, List<String>>();
-    }
-
-    public List<String> getActivityList(String packageName, String processName) {
-        final Map<String, List<String>> processMap = getProcessMap(packageName);
-        return processMap != null ? processMap.get(processName) : new ArrayList<String>();
+    public Map<String, Map<String, List<String>>> getProcessMap(String packageName) {
+        final Map<String, Map<String, List<String>>> map = getActivityDefinitionMap().get(packageName);
+        return map != null ? map : new HashMap<String, Map<String, List<String>>>();
     }
 
     public List<String> getPackageProcessPathList() {
         final List<String> packageProcessPathList = new ArrayList<String>();
-        final Map<String, Map<String, List<String>>> activityDefinitionMap = getActivityDefinitionMap();
+        final Map<String, Map<String, Map<String, List<String>>>> activityDefinitionMap = getActivityDefinitionMap();
         final Set<String> packageNameSet = activityDefinitionMap.keySet();
         for (String packageName : packageNameSet) {
-            final Map<String, List<String>> processMap = activityDefinitionMap.get(packageName);
+            final Map<String, Map<String, List<String>>> processMap = activityDefinitionMap.get(packageName);
             final Set<String> processName = processMap.keySet();
             packageProcessPathList.add(packageName + "." + processName);
         }
         return packageProcessPathList;
+    }
+
+    public List<String> getStatusList(String packageName, String processName) {
+        final Map<String, Map<String, List<String>>> processMap = getProcessMap(packageName);
+        if (processMap == null) {
+            return new ArrayList<String>();
+        }
+        Map<String, List<String>> map = processMap.get(processName);
+        List<String> statusList = map.get("status");
+        return statusList != null ? statusList : new ArrayList<String>();
+    }
+    
+    public List<String> getActionList(String packageName, String processName) {
+        final Map<String, Map<String, List<String>>> processMap = getProcessMap(packageName);
+        if (processMap == null) {
+            return new ArrayList<String>();
+        }
+        Map<String, List<String>> map = processMap.get(processName);
+        List<String> actionList = map.get("action");
+        return actionList != null ? actionList : new ArrayList<String>();
     }
 
     // ===================================================================================

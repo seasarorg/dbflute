@@ -409,6 +409,10 @@ public abstract class DfAbstractHelperProperties {
     protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
         return new DfFlexibleMap<KEY, VALUE>(map);
     }
+    
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
+    }
 
     protected String filterDoubleQuotation(String str) {
         return DfPropertyUtil.convertAll(str, "\"", "'");

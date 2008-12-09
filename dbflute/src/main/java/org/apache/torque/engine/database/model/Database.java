@@ -1319,8 +1319,12 @@ public class Database {
         return new ArrayList<String>(getProperties().getBuriProperties().getProcessMap(packageName).keySet());
     }
 
-    public List<String> getBuriActivityList(String packageName, String processName) {
-        return getProperties().getBuriProperties().getActivityList(packageName, processName);
+    public List<String> getBuriStatusList(String packageName, String processName) {
+        return getProperties().getBuriProperties().getStatusList(packageName, processName);
+    }
+    
+    public List<String> getBuriActionList(String packageName, String processName) {
+        return getProperties().getBuriProperties().getActionList(packageName, processName);
     }
 
     // ===================================================================================

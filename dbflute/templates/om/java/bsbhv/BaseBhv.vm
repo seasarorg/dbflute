@@ -665,13 +665,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
-    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}.path(), ${myEntityVariableName});
+    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${processName}_Action action) {
+        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.path(), ${myEntityVariableName}, action);
     }
-    public void toNextStatusAction_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, String action) {
-        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}.path(), ${myEntityVariableName}, action);
-    }
-    public void getEntities(${glBuriDef}.${processName} activity) { // Making...
+    public void getEntities(${glBuriDef}.${processName}_Status status) { // Making...
     }
 #end
 #end
