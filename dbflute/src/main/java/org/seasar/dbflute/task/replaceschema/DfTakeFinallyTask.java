@@ -279,7 +279,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
     
     protected void showFinalInformation(String takeFinallyResult) {
-        final File file = new File("./log/create-schema.log");
+        final File file = new File(DfCreateSchemaTask.LOG_PATH);
         if (!file.exists()) {
             return;
         }
@@ -294,10 +294,10 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 sb.append(ln).append("/* * * * * * * * * * * * * * * * * * *");
                 sb.append(ln).append("[Final Information]");
                 sb.append(ln).append("");
-                sb.append(ln).append("  <Create-Schema>");
+                sb.append(ln).append("  {Create Schema}");
                 sb.append(ln).append("  ").append(line);
                 sb.append(ln).append("  ");
-                sb.append(ln).append("  <Take-Finally>");
+                sb.append(ln).append("  {Take Finally}");
                 sb.append(ln).append("  ").append(takeFinallyResult);
                 sb.append(ln).append("* * * * * * * * * */");
                 _log.info(sb.toString());

@@ -32,6 +32,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfCreateSchemaTask.class);
+    
+    protected static final String LOG_PATH = "./log/create-schema.log";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -152,7 +154,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void dumpExecuteResult(String result) {
-        final File file = new File("./log/create-schema.log");
+        final File file = new File(LOG_PATH);
         if (file.exists()) {
             file.delete();
         }

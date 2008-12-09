@@ -111,28 +111,4 @@ public interface ${glPagingBean} extends ${glFetchNarrowingBean}, ${glOrderByBea
      * @return Determination.
      */
     public boolean isFetchScopeEffective();
-
-    // ===================================================================================
-    //                                                                       Hint Property
-    //                                                                       =============
-    // * * * * * * * *
-    // For SQL Comment
-    // * * * * * * * *
-    /**
-     * Get select-hint. {select [select-hint] * from table...}
-     * @return Select-hint. (NotNull)
-     */
-    public String getSelectHint();
-
-    /**
-     * Get from-hint. {select * from table [from-hint] where ...}
-     * @return From-hint. (NotNull)
-     */
-    public String getFromHint();
-
-    /**
-     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * @return Sql-suffix. (NotNull)
-     */
-    public String getSqlSuffix();
 }

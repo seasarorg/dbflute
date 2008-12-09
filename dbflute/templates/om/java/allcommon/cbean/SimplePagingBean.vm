@@ -3,12 +3,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause}Default;
 import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
- * The simple bean of paging.
+ * The simple paging-bean.
  * @author ${database.ClassAuthor}
  */
 public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterBean} {
@@ -19,7 +19,7 @@ public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterB
     /** SQL clause instance. */
     protected final ${glSqlClause} _sqlClause;
     {
-        _sqlClause = new ${glImplementedSqlClauseCreator}().createSqlClause("Dummy");
+        _sqlClause = new ${glSqlClause}Default("Dummy");
     }
 
     /** The map of parameter. (Nullable) */
@@ -177,41 +177,6 @@ public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterB
      */
     public boolean isFetchScopeEffective() {
         return getSqlClause().isFetchScopeEffective();
-    }
-
-    // -----------------------------------------------------
-    //                                         Hint Property
-    //                                         -------------
-    /**
-     * Get select-hint. {select [select-hint] * from table...}
-     * @return Select-hint. (NotNull)
-     */
-    public String getSelectHint() {
-        return getSqlClause().getSelectHint();
-    }
-
-    /**
-     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
-     * @return from-base-table-hint. (NotNull)
-     */
-    public String getFromBaseTableHint() {
-        return getSqlClause().getFromBaseTableHint();
-    }
-
-    /**
-     * Get from-hint. {select * from table [from-hint] where ...}
-     * @return From-hint. (NotNull)
-     */
-    public String getFromHint() {
-        return getSqlClause().getFromHint();
-    }
-
-    /**
-     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * @return Sql-suffix. (NotNull)
-     */
-    public String getSqlSuffix() {
-        return getSqlClause().getSqlSuffix();
     }
 
     // ===================================================================================
