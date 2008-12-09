@@ -54,7 +54,6 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,7 +83,6 @@ import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
@@ -549,9 +547,6 @@ public class Database {
         }
         final DfOldClassHandler handler = createOldClassHandler();
         handler.deleteOldTableClass();
-        
-        // [Temporary Migration]: for 0.8.7 to 0.8.8
-        deleteBehaviorInitializer();
     }
 
     public void deleteOldCustomizeClass() {
@@ -568,19 +563,6 @@ public class Database {
                 .getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(), getTableList());
     }
     
-    protected void deleteBehaviorInitializer() { // [Temporary Migration]: for 0.8.7 to 0.8.8
-        final DfGeneratedClassPackageProperties prop = getProperties().getGeneratedClassPackageProperties();
-        final String commonPackage = prop.getBaseCommonPackage();
-        final String pathBase = getGeneratorInstance().getOutputPath() + "/" + getPackageAsPath(commonPackage);
-        final String className = getProjectPrefix() + "BehaviorInitializer";
-        final String targetPath = pathBase + "/" + className + ".java";
-        final File file = new File(targetPath);
-        if (file.exists()) {
-            _log.info("...Deleting old class: " + className);
-            file.delete();
-        }
-    }
-
     // ===================================================================================
     //                                                                    Output Directory
     //                                                                    ================

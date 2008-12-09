@@ -780,15 +780,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava())
-      $database.info("    parse('CommonColumnAutoSetupper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-      $database.info("    parse('CommonColumnBasicAutoSetupper');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnBasicAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.info("    parse('CommonColumnAutoSetupper');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
     $database.info("}")
 
     ## -----------------------------------------------------
@@ -1615,6 +1609,10 @@ targetdatabase = $targetDatabase
     ##                                   ---------------------
     #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
+
+    $database.info("    parse('ImplementedCommonColumnAutoSetupper');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedCommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
 
     $database.info("    parse('ImplementedInvokerAssistant');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedInvokerAssistant}.${glClassFileExtension}" )
