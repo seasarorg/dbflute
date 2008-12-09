@@ -61,6 +61,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
@@ -87,12 +88,23 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void setupControlTemplate() {
+        final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        if (littleProp.isAlternateGenerateControlValid()) {
+            _log.info("* * * * * * * * * * * * * * *");
+            _log.info("* Process Alternate Control *");
+            _log.info("* * * * * * * * * * * * * * *");
+            final String control = littleProp.getAlternateGenerateControl();
+            _log.info("...Using alternate control: " + control);
+            setControlTemplate(control);
+        }
         final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
         if (jdbcProperties.hasS2jdbcDefinition()) {
             _log.info("* * * * * * * * * *");
             _log.info("* Process S2JDBC  *");
             _log.info("* * * * * * * * * *");
-            setControlTemplate("om/java/other/s2jdbc/s2jdbc-Control.vm");
+            final String control = "om/java/other/s2jdbc/s2jdbc-Control.vm";
+            _log.info("...Using s2jdbc control: " + control);
+            setControlTemplate(control);
             return;
         }
         if (getBasicProperties().isTargetLanguageMain()) {
@@ -106,15 +118,19 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 throw new IllegalStateException(msg);
             }
             _log.info("* * * * * * * * * * *");
-            _log.info("* Process " + language + "     *");
+            _log.info("* Process " + language + "      *");
             _log.info("* * * * * * * * * * *");
-            setControlTemplate("om/ControlGenerate" + language + ".vm");
+            final String control = "om/ControlGenerate" + language + ".vm";
+            _log.info("...Using " + language + " control: " + control);
+            setControlTemplate(control);
         } else {
             final String language = getBasicProperties().getTargetLanguage();
             _log.info("* * * * * * * * * *");
-            _log.info("* Process " + language + "     *");
+            _log.info("* Process " + language + "    *");
             _log.info("* * * * * * * * * *");
-            setControlTemplate("om/" + language + "/Control-" + language + ".vm");
+            final String control = "om/" + language + "/Control-" + language + ".vm";
+            _log.info("...Using " + language + " control: " + control);
+            setControlTemplate(control);
         }
     }
 

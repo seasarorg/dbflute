@@ -182,12 +182,21 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                         return text;
                     }
                 }
+
+                // Re-try after resolving path for the assembly of result type. 
+                String resolvedStandardPath = ResolvePathForResultTypeAssembly(standardPath, asm, asmResultType);
+                String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, asmResultType);
+                text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, asmResultType);
+                if (text != null) {
+                    return text;
+                }
             }
 
             text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
             if (text != null) {
                 return text;
             }
+            
             ThrowOutsideSqlNotFoundException(standardPath);
             return null;// Unreachable!
         }
@@ -218,6 +227,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return dbmsPath;
         }
 
+        protected void ResolvePathForResultTypeAssembly(String path, Assembly asmDbflute, Assembly asmResultType) {
+            String asmDbfluteRootName = System.IO.Path.GetFileNameWithoutExtension(asmDbflute.Location);
+            String asmResultTypeRootName = System.IO.Path.GetFileNameWithoutExtension(asmResultType.Location);
+            return path.Replace(asmDbfluteRootName, asmResultTypeRootName);
+        }
+  
         // ===============================================================================
         //                                                                     Set up Path
         //                                                                     ===========

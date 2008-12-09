@@ -53,7 +53,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableDatabaseDependency() {
         return booleanProp("torque.isAvailableDatabaseDependency", false);
     }
-    
+
     // ===================================================================================
     //                                              ToLower in Generator Underscore Method
     //                                              ======================================
@@ -62,13 +62,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                              Flat Directory Package
-    //                                                              ======================
+    //                                                         Flat/Omit Directory Package
+    //                                                         ===========================
+    // CSharp Only
     public boolean isFlatDirectoryPackageValid() {
         final String str = getFlatDirectoryPackage();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
-    
+
     /**
      * Get the package for flat directory. Normally, this property is only for C#.
      * @return The package for flat directory. (Nullable)
@@ -103,7 +104,29 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             throw new IllegalStateException(msg);
         }
     }
-    
+
+    // ===================================================================================
+    //                                                                   Alternate Control
+    //                                                                   =================
+    // Very Internal
+    public boolean isAlternateGenerateControlValid() {
+        final String str = getAlternateGenerateControl();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
+    public String getAlternateGenerateControl() {
+        return stringProp("torque.alternateGenerateControl", null);
+    }
+
+    public boolean isAlternateSql2EntityControlValid() {
+        final String str = getAlternateSql2EntityControl();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
+    public String getAlternateSql2EntityControl() {
+        return stringProp("torque.alternateSql2EntityControl", null);
+    }
+
     // ===================================================================================
     //                                                                 MultipleFK Property
     //                                                                 ===================
