@@ -1,10 +1,9 @@
-${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommon}.${glDBCurrent};
-import ${glPackageBaseCommon}.${glDBDef};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonSqlClause}.*;
 
 /**
  * The creator of SQL clause.
