@@ -8,8 +8,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClause};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
 
 /**
- * The simple pagingBean.
- * 
+ * The simple bean of paging.
  * @author ${database.ClassAuthor}
  */
 public class ${glSimplePagingBean} implements ${glPagingBean}, ${glMapParameterBean} {

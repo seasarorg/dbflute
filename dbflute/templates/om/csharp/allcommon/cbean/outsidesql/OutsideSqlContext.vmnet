@@ -227,7 +227,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return dbmsPath;
         }
 
-        protected void ResolvePathForResultTypeAssembly(String path, Assembly asmDbflute, Assembly asmResultType) {
+        protected String ResolvePathForResultTypeAssembly(String path, Assembly asmDbflute, Assembly asmResultType) {
             String asmDbfluteRootName = System.IO.Path.GetFileNameWithoutExtension(asmDbflute.Location);
             String asmResultTypeRootName = System.IO.Path.GetFileNameWithoutExtension(asmResultType.Location);
             return path.Replace(asmDbfluteRootName, asmResultTypeRootName);
