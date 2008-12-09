@@ -96,6 +96,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             final String control = littleProp.getAlternateGenerateControl();
             _log.info("...Using alternate control: " + control);
             setControlTemplate(control);
+            return;
         }
         final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
         if (jdbcProperties.hasS2jdbcDefinition()) {

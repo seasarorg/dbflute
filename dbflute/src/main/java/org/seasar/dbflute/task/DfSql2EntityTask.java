@@ -140,6 +140,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String control = littleProp.getAlternateSql2EntityControl();
             _log.info("...Using alternate control: " + control);
             setControlTemplate(control);
+            return;
         }
         final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
         if (jdbcProperties.hasS2jdbcDefinition()) {
