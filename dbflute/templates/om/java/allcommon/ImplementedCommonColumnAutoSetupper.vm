@@ -16,7 +16,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements ${glCommonColum
     //                                                                            Definition
     //                                                                            ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glCommonColumnAutoSetupper}.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glImplementedCommonColumnAutoSetupper}.class);
 
     // =====================================================================================
     //                                                                             Attribute
