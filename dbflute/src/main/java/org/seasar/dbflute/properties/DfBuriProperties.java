@@ -41,7 +41,10 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //     ; outputDirectory = ./../
     //     ; activityDefinitionMap = map:{
     //         ; [package] = map:{
-    //             ; [process] = list:{ [activity1], [activity2] }
+    //             ; [process] = map:{
+    //                 status = list:{ st1; st2; st3 }
+    //                 action = list:{ ac1; ac2; ac3 }
+    //             }
     //         }
     //     }
     // }
