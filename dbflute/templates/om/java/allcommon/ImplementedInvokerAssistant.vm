@@ -3,8 +3,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
-import ${glPackageBaseCommonBhvCore}.${glResourceParameter};
 import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCore}.${glInvokerAssistant};
+import ${glPackageBaseCommonBhvCore}.${glResourceParameter};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};

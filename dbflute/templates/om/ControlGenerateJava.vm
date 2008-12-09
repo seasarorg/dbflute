@@ -79,8 +79,8 @@ targetdatabase = $targetDatabase
     #set ($glEntity = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
     #set ($glBehaviorSelector = "${glProjectPrefix}BehaviorSelector")
-    #set ($glImplementedInvokerAssistant = "${glProjectPrefix}InvokerAssistantImpl")
-    #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}SqlClauseCreatorImpl")
+    #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
+    #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glInternalMapContext = "${glProjectPrefix}InternalMapContext")
     #set ($glQLog = "${glProjectPrefix}QLog")
     #set ($glXLog = "${glProjectPrefix}XLog")
@@ -1194,7 +1194,7 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplateFileExtension}",$path ,"" ,"")
 
     $database.info("    parse('DBFluteInitializer');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glDBFluteInitializer}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteInitializer}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteInitializer.${glTemplateFileExtension}",$path,"", "")
     $database.info("}")
 
@@ -1617,12 +1617,12 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.info("    parse('ImplementedInvokerAssistant');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonBhvCore})}${glImplementedInvokerAssistant}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedInvokerAssistant}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedInvokerAssistant.${glTemplateFileExtension}",$path,"", "")
 
     $database.info("parse('ImplementedSqlClauseCreator');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/ImplementedSqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
     ## -------------------------------------------------------
     ##                                       allcommon BuriDef
