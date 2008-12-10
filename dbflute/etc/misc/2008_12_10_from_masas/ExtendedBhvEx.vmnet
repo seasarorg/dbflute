@@ -1,0 +1,10 @@
+#set ($myClassName = "${myExtendedBhvInterfaceName}")
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageExtendedBhv} {
+
+    partial class ${myClassName}Ex {
+    }
+}
