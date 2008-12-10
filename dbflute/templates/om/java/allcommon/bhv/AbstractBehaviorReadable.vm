@@ -43,6 +43,7 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOption};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfo};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacade};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImpl};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -64,6 +65,11 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
     //                                                                       Current DBDef
     //                                                                       =============
     protected abstract ${glDBDef} getCurrentDBDef();
+
+    // ===================================================================================
+    //                                                             Default StatementConfig
+    //                                                             =======================
+    protected abstract ${glStatementConfig} getDefaultStatementConfig();
 
     // ===================================================================================
     //                                                                       Basic Get All
@@ -436,7 +442,8 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
      */
     public ${glOutsideSqlBasicExecutor} outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return new ${glOutsideSqlBasicExecutor}(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef());
+        return new ${glOutsideSqlBasicExecutor}(_behaviorCommandInvoker, getTableDbName()
+                                         , getCurrentDBDef(), getDefaultStatementConfig());
     }
 
     // ===================================================================================

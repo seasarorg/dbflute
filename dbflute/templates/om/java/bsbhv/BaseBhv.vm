@@ -26,6 +26,7 @@ import ${glPackageBaseCommonCBean}.${glPagingInvoker};
 import ${glPackageBaseCommonCBean}.${glPagingBean};
 import ${glPackageBaseCommonCBean}.${glPagingResultBean};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end
@@ -113,6 +114,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
+    // ===================================================================================
+    //                                                             Default StatementConfig
+    //                                                             =======================
+    @Override
+    protected ${glStatementConfig} getDefaultStatementConfig() {
+        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+    }
+    
     // ===================================================================================
     //                                                                        Count Select
     //                                                                        ============

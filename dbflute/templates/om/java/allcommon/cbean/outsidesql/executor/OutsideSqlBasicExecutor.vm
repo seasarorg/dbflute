@@ -54,22 +54,28 @@ public class ${glOutsideSqlBasicExecutor} {
     protected final String _tableDbName;
 
 	/** The current database definition. (NotNull) */
-    protected ${glDBDef} _currentDBDef;
+    protected final ${glDBDef} _currentDBDef;
+	
+	/** The default configuration of statement. (Nullable) */
+	protected final ${glStatementConfig} _defaultStatementConfig;
 
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 	
-	/** The config of statement. (Nullable) */
+	/** The configuration of statement. (Nullable) */
 	protected ${glStatementConfig} _statementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glOutsideSqlBasicExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
-                                 , String tableDbName, ${glDBDef} currentDBDef) {
+                                 , String tableDbName
+                                 , ${glDBDef} currentDBDef
+                                 , ${glStatementConfig} defaultStatementConfig) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
+        this._defaultStatementConfig = defaultStatementConfig;
     }
 
     // ===================================================================================
@@ -208,7 +214,8 @@ public class ${glOutsideSqlBasicExecutor} {
     public ${glOutsideSqlPagingExecutor} autoPaging() {
         final ${glOutsideSqlOption} option = createOutsideSqlOption();
         option.autoPaging();
-        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName
+                                          , _currentDBDef, _defaultStatementConfig);
     }
 
     /**
@@ -229,7 +236,8 @@ public class ${glOutsideSqlBasicExecutor} {
     public ${glOutsideSqlPagingExecutor} manualPaging() {
         final ${glOutsideSqlOption} option = createOutsideSqlOption();
         option.manualPaging();
-        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+        return new ${glOutsideSqlPagingExecutor}(_behaviorCommandInvoker, option, _tableDbName
+                                          , _currentDBDef, _defaultStatementConfig);
     }
 
     // -----------------------------------------------------

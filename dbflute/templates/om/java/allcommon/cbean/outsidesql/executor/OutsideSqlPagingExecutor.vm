@@ -34,7 +34,10 @@ public class ${glOutsideSqlPagingExecutor} {
     protected final String _tableDbName;
 
 	/** The current database definition. (NotNull) */
-    protected ${glDBDef} _currentDBDef;
+    protected final ${glDBDef} _currentDBDef;
+	
+	/** The default configuration of statement. (Nullable) */
+	protected final ${glStatementConfig} _defaultStatementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -42,11 +45,13 @@ public class ${glOutsideSqlPagingExecutor} {
     public ${glOutsideSqlPagingExecutor}(${glBehaviorCommandInvoker} behaviorCommandInvoker
                                   , ${glOutsideSqlOption} outsideSqlOption
                                   , String tableDbName
-                                  , ${glDBDef} currentDBDef) {
+                                  , ${glDBDef} currentDBDef
+                                  , ${glStatementConfig} defaultStatementConfig) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
+        this._defaultStatementConfig = defaultStatementConfig;
     }
 
     // ===================================================================================
@@ -180,7 +185,10 @@ public class ${glOutsideSqlPagingExecutor} {
             return;
         }
         ${glStatementConfig} statementConfig = _outsideSqlOption.getStatementConfig();
-        if (statementConfig != null && statementConfig.getResultSetType() != null) {
+        if (statementConfig != null && statementConfig.hasResultSetType()) {
+            return;
+        }
+        if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
             return;
         }
         if (statementConfig == null) {
