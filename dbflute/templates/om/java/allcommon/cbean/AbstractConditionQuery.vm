@@ -685,7 +685,7 @@ public abstract class ${myClassName} implements ${glConditionQuery} {
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln;
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String clause = "(" + beginMark + subQueryClause + ln + endIndent + ") " + aliasName + endMark;
+        String clause = "(" + beginMark + subQueryClause + ln + endIndent + ") as " + aliasName + endMark;
         getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
