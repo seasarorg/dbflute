@@ -223,9 +223,11 @@
     <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
+  	<!-- Freeze
     <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
+    -->
     <copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
