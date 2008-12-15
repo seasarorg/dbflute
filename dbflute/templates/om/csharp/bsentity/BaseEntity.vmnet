@@ -106,8 +106,21 @@ namespace ${myExtendedEntityPackageName} {
         //                                                      Classification Classifying
         //                                                      ==========================
         #region Classify Method
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
 #if (${col.hasClassification()})
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+        public void Classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+#if (${col.isJavaNativeStringObject()})
+            set${col.javaName}(cls != null ? cls.Code : null);
+#else
+            set${col.javaName}(cls != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(cls.Code) : null);
+#end
+        }
+
 #foreach ($classificationMap in $col.classificationMapList)
         /// <summary>
         /// Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}.
@@ -116,14 +129,8 @@ namespace ${myExtendedEntityPackageName} {
         /// ]]>
         /// </summary>
         public void Classify${col.javaName}${classificationMap.get('name')}() {
-            String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
-#if (${col.isJavaNativeStringObject()})
-            ${col.javaName} = code;
+            Classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
-#else
-            ${col.javaName} = ${col.javaNativeRemovedCSharpNullable}.Parse(code);
-        }
-#end
 
 #end
 #end
@@ -137,6 +144,15 @@ namespace ${myExtendedEntityPackageName} {
         #region Classification Determination
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+        public ${glCDef}.${col.classificationName} ${col.javaName}As${col.classificationName} { get {
+            return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        }}
+
  #foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
         /// Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -148,7 +164,7 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         public bool Is${col.javaName}${classificationMap.get('name')} {
             get {
-                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
                 return cls != null ? cls.Equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
             }
         }
@@ -168,7 +184,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (${col.hasClassificationName()})
         public String ${col.javaName}Name {
             get {
-                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
                 return cls != null ? cls.Name : null;
             }
         }
@@ -176,7 +192,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (${col.hasClassificationAlias()})
         public String ${col.javaName}Alias {
             get {
-                ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.CodeOf(_${col.UncapitalisedJavaName});
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
                 return cls != null ? cls.Alias : null;
             }
         }
