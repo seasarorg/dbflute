@@ -208,7 +208,7 @@ namespace ${myDBMetaPackageName} {
                 ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
                 uniqueInfo.DBMeta = this;
 #foreach ($col in $table.primaryKey)
-                uniqueInfo.AddUniqueColumnList(new ${glColumnInfo}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}));
+                uniqueInfo.AddUniqueColumnList(Column${col.javaName});
 #end
                 uniqueInfo.IsPrimary = true;
                 return uniqueInfo;
