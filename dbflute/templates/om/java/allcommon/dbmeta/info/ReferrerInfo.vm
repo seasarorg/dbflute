@@ -1,32 +1,56 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-
 #set ($myClassName = "${glReferrerInfo}")
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
- * The class of referrer information.
- * 
+ * The information of referrer relation.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${myClassName} implements ${glRelationInfo} {
+ */
+public class ${glReferrerInfo} implements ${glRelationInfo} {
 
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String referrerPropertyName;
-    protected ${glDBMeta} localDBMeta;
-    protected ${glDBMeta} referrerDBMeta;
-    protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localReferrerColumnInfoMap;
-    protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} referrerLocalColumnInfoMap;
-    protected boolean oneToOne;
+    protected final String referrerPropertyName;
+    protected final ${glDBMeta} localDBMeta;
+    protected final ${glDBMeta} referrerDBMeta;
+    protected final Map<${genericsColumnInfoMap}> localReferrerColumnInfoMap;
+    protected final Map<${genericsColumnInfoMap}> referrerLocalColumnInfoMap;
+    protected final boolean oneToOne;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glReferrerInfo}(String referrerPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} referrerDBMeta
+                      , Map<${genericsColumnInfoMap}> localReferrerColumnInfoMap
+                      , boolean oneToOne) {
+        this.referrerPropertyName = referrerPropertyName;
+        this.localDBMeta = localDBMeta;
+        this.referrerDBMeta = referrerDBMeta;
+        this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
+        final Set<${glColumnInfo}> keySet = localReferrerColumnInfoMap.keySet();
+        referrerLocalColumnInfoMap = new LinkedHashMap<${genericsColumnInfoMap}>();
+        for (final Iterator<${glColumnInfo}> ite = keySet.iterator(); ite.hasNext(); ) {
+            final ${glColumnInfo} key = ite.next();
+            final ${glColumnInfo} value = localReferrerColumnInfoMap.get(key);
+            referrerLocalColumnInfoMap.put(value, key);
+        }
+        this.oneToOne = oneToOne;
+    }
+    
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public ${glColumnInfo} findLocalByReferrer(String referrerColumnDbName) {
-        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(referrerDBMeta, referrerColumnDbName);
+        final ${glColumnInfo} keyColumnInfo = referrerDBMeta.findColumnInfo(referrerColumnDbName);
         final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})referrerLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
@@ -37,7 +61,7 @@ public class ${myClassName} implements ${glRelationInfo} {
     }
 
     public ${glColumnInfo} findReferrerByLocal(String localColumnDbName) {
-        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(localDBMeta, localColumnDbName);
+        final ${glColumnInfo} keyColumnInfo = localDBMeta.findColumnInfo(localColumnDbName);
         final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})localReferrerColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
@@ -76,7 +100,7 @@ public class ${myClassName} implements ${glRelationInfo} {
         return getReferrerDBMeta();
     }
 
-    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getLocalTargetColumnInfoMap() {
         return getLocalReferrerColumnInfoMap();
     }
 
@@ -91,51 +115,24 @@ public class ${myClassName} implements ${glRelationInfo} {
         return referrerPropertyName;
     }
 
-    public void setReferrerPropertyName(String referrerPropertyName) {
-        this.referrerPropertyName = referrerPropertyName;
-    }
-
     public ${glDBMeta} getLocalDBMeta() {
         return localDBMeta;
-    }
-
-    public void setLocalDBMeta(${glDBMeta} localDBMeta) {
-        this.localDBMeta = localDBMeta;
     }
 
     public ${glDBMeta} getReferrerDBMeta() {
         return referrerDBMeta;
     }
 
-    public void setReferrerDBMeta(${glDBMeta} referrerDBMeta) {
-        this.referrerDBMeta = referrerDBMeta;
-    }
-
-    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalReferrerColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getLocalReferrerColumnInfoMap() {
         return localReferrerColumnInfoMap;
     }
 
-    public void setLocalReferrerColumnInfoMap(java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localReferrerColumnInfoMap) {
-        this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
-        final java.util.Set keySet = localReferrerColumnInfoMap.keySet();
-        referrerLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
-        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfo} key = (${glColumnInfo})ite.next();
-            final ${glColumnInfo} value = (${glColumnInfo})localReferrerColumnInfoMap.get(key);
-            referrerLocalColumnInfoMap.put(value, key);
-        }
-    }
-
-    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getReferrerLocalColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getReferrerLocalColumnInfoMap() {
         return referrerLocalColumnInfoMap;
     }
 
     public boolean isOneToOne() {
         return oneToOne;
-    }
-
-    public void setOneToOne(boolean oneToOne) {
-        this.oneToOne = oneToOne;
     }
 
     // ===================================================================================
@@ -145,11 +142,11 @@ public class ${myClassName} implements ${glRelationInfo} {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    protected java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
+    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         try {
             return clazz.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            String msg = "class=" + clazz + " method=" + methodName + "-" + Arrays.asList(argTypes);
             throw new RuntimeException(msg, ex);
         }
     }

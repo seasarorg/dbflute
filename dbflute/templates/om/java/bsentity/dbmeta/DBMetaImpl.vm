@@ -32,11 +32,11 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                                                         ===========
 #foreach ($col in $table.columns)
 #if ($col.isVersionNo())
-    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
 #elseif ($col.isUpdateDate())
-    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
 #else
-    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
+    protected ${glColumnInfo} _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
 #end
 #end
 
@@ -88,14 +88,14 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     //                                       ---------------
 #if ($table.hasPrimaryKey())
 #if ($table.hasOnlyOnePrimaryKey())
-    public ${glUniqueInfo} getPrimaryUniqueInfo() { return createPrimaryUniqueInfo(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
+    public ${glUniqueInfo} getPrimaryUniqueInfo() { return cpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
 #else
     public ${glUniqueInfo} getPrimaryUniqueInfo() {
-        ${glUniqueInfo} uniqueInfo = createPrimaryUniqueInfo();
+        List<${glColumnInfo}> ls = newArrayList();
 #foreach ($col in $table.primaryKey)
-        uniqueInfo.addUniqueColumnList(column${col.javaBeansRulePropertyNameInitCap}());
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
 #end
-        return uniqueInfo;
+        return cpui(ls);
     }
 #end
 #else

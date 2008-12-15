@@ -295,6 +295,14 @@ public class Column {
         return "(" + alias + ")";
     }
 
+    public String getAliasSettingExpression() {
+        final String alias = getAlias();
+        if (alias == null || alias.trim().length() == 0) {
+            return "null";
+        }
+        return "\"" + alias + "\"";
+    }
+
     // -----------------------------------------------------
     //                                           Description
     //                                           -----------

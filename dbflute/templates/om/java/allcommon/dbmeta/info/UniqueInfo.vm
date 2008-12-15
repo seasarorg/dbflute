@@ -1,28 +1,38 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-
 #set ($myClassName = "${glUniqueInfo}")
+
+import java.util.List;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
- * The class of unique info.
- * 
+ * The information of unique.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBMeta} dbmeta;
-    protected java.util.List${database.filterGenericsString(${glColumnInfo})} uniqueColumnList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfo})}();
-    protected boolean primary;
+    protected final ${glDBMeta} dbmeta;
+    protected final List<${glColumnInfo}> uniqueColumnList;
+    protected final boolean primary;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}(${glDBMeta} dbmeta, List<${glColumnInfo}> uniqueColumnList, boolean primary) {
+        this.dbmeta = dbmeta;
+        this.uniqueColumnList = uniqueColumnList;
+        this.primary = primary;
+    }
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
     public boolean containsColumn(String columnName) {
-        for (final java.util.Iterator ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<${glColumnInfo}> ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
             final ${glColumnInfo} columnInfo = (${glColumnInfo})ite.next();
             if (columnInfo.getColumnDbName().equals(columnName)) {
                 return true;
@@ -42,16 +52,8 @@ public class ${myClassName} {
         return dbmeta;
     }
 
-    public void setDBMeta(${glDBMeta} dbmeta) {
-        this.dbmeta = dbmeta;
-    }
-
-    public java.util.List${database.filterGenericsString(${glColumnInfo})} getUniqueColumnList() {
+    public List<${glColumnInfo}> getUniqueColumnList() {
         return uniqueColumnList;
-    }
-
-    public void addUniqueColumnList(${glColumnInfo} uniqueColumn) {
-        this.uniqueColumnList.add(uniqueColumn);
     }
 
     public ${glColumnInfo} getFirstColumn() {
@@ -64,9 +66,5 @@ public class ${myClassName} {
 
     public boolean isPrimary() {
         return this.primary;
-    }
-
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
     }
 }

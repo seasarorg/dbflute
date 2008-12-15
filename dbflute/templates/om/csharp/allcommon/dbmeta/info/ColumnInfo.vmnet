@@ -19,21 +19,25 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected bool primary;
         protected int? columnSize;
         protected int? columnDecimalDigits;
+        protected String columnAlias;
         protected OptimisticLockType optimisticLockType;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName) : this (dbmeta, columnDbName, null, null, false, null, null) {
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
+                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
+            : this (dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary
+                  , columnSize, columnDecimalDigits
+                  , OptimisticLockType.NONE) {
         }
 
-        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
-            : this (dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE) {
-        }
-
-        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, OptimisticLockType optimisticLockType) {
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
+                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits
+                       , OptimisticLockType optimisticLockType) {
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
+            this.columnAlias = columnAlias;
             this.propertyName = propertyName;
             this.propertyType = propertyType;
             this.primary = primary;
@@ -107,37 +111,34 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                        ========
         public ${glDBMeta} DBMeta {
             get { return dbmeta; }
-            set { dbmeta = value; }
         }
 
         public String ColumnDbName {
             get { return columnDbName; }
-            set { columnDbName = value; }
+        }
+
+        public String ColumnAlias {
+            get { return columnAlias; }
         }
 
         public String PropertyName {
             get { return propertyName; }
-            set { propertyName = value; }
         }
 
         public Type PropertyType {
             get { return propertyType; }
-            set { propertyType = value; }
         }
 
         public bool IsPrimary {
             get { return primary; }
-            set { primary = value; }
         }
 
         public int? ColumnSize {
             get { return columnSize; }
-            set { columnSize = value; }
         }
 
         public int? ColumnDecimalDigits {
             get { return columnDecimalDigits; }
-            set { columnDecimalDigits = value; }
         }
     }
 }

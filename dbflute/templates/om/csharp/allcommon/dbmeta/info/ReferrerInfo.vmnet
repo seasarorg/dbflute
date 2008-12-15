@@ -25,7 +25,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                          Finder
         //                                                                          ======
         public ${glColumnInfo} FindLocalByReferrer(String referrerColumnDbName) {
-            ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(referrerDBMeta, referrerColumnDbName);
+            ${glColumnInfo} keyColumnInfo = referrerDBMeta.FindColumnInfo(referrerColumnDbName);
             ${glColumnInfo} resultColumnInfo = (${glColumnInfo})referrerLocalColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
@@ -36,7 +36,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         public ${glColumnInfo} FindReferrerByLocal(String localColumnDbName) {
-            ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(localDBMeta, localColumnDbName);
+            ${glColumnInfo} keyColumnInfo = localDBMeta.FindColumnInfo(localColumnDbName);
             ${glColumnInfo} resultColumnInfo = (${glColumnInfo})localReferrerColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";

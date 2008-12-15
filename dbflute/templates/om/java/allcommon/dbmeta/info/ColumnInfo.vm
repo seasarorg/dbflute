@@ -1,7 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
-#set ($myClassName = "${glColumnInfo}")
-
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMeta}.OptimisticLockType;
 
@@ -9,42 +7,37 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta}.OptimisticLockType;
  * The information of column.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${glColumnInfo} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBMeta} dbmeta;
-    protected String columnDbName;
-    protected String propertyName;
-    protected Class<?> propertyType;
-    protected boolean primary;
-    protected Integer columnSize;
-    protected Integer columnDecimalDigits;
-    protected OptimisticLockType optimisticLockType;
+    protected final ${glDBMeta} dbmeta;
+    protected final String columnDbName;
+    protected final String columnAlias;
+    protected final String propertyName;
+    protected final Class<?> propertyType;
+    protected final boolean primary;
+    protected final Integer columnSize;
+    protected final Integer columnDecimalDigits;
+    protected final OptimisticLockType optimisticLockType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName) {
-        this(dbmeta, columnDbName, null, null, false, null, null);
+    public ${glColumnInfo}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
+                    , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
+        this(dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary
+           , columnSize, columnDecimalDigits
+           , OptimisticLockType.NONE);
     }
 
-    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
-                           , Class<?> propertyType, boolean primary, Integer columnSize) {
-        this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, null);
-    }
-
-    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
-                           , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
-        this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, OptimisticLockType.NONE);
-    }
-
-    public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String propertyName
-                           , Class<?> propertyType, boolean primary, Integer columnSize
-                           , Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
+    public ${glColumnInfo}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
+                    , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits
+                    , OptimisticLockType optimisticLockType) {
         this.dbmeta = dbmeta;
         this.columnDbName = columnDbName;
+        this.columnAlias = columnAlias;
         this.propertyName = propertyName;
         this.propertyType = propertyType;
         this.primary = primary;
@@ -110,10 +103,10 @@ public class ${myClassName} {
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof ${myClassName})) {
+        if (!(obj instanceof ${glColumnInfo})) {
             return false;
         }
-        final ${myClassName} target = (${myClassName})obj;
+        final ${glColumnInfo} target = (${glColumnInfo})obj;
         if (this.dbmeta == null || target.getDBMeta() == null) {
             return false;
         }
@@ -140,55 +133,59 @@ public class ${myClassName} {
         return dbmeta;
     }
 
-    public void setDBMeta(${glDBMeta} dbmeta) {
-        this.dbmeta = dbmeta;
-    }
-
+    /**
+     * Get the DB name of the column.
+     * @return The DB name of the column. (NotNull)
+     */
     public String getColumnDbName() {
         return this.columnDbName;
     }
 
-    public void setColumnDbName(String columnDbName) {
-        this.columnDbName = columnDbName;
+    /**
+     * Get the alias of the column.
+     * @return The alias of the column. (Nullable: If the definition about aliases, it returns null.)
+     */
+    public String getColumnAlias() {
+        return this.columnAlias;
     }
 
+    /**
+     * Get the name of property for the column. (JavaBeansRule)
+     * @return The name of property for the column. (NotNull)
+     */
     public String getPropertyName() {
         return this.propertyName;
     }
 
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
-    }
-	
+    /**
+     * Get the type of property for the column.
+     * @return The type of property for the column. (NotNull)
+     */
 	public Class<?> getPropertyType() {
         return this.propertyType;
     }
 
-    public void setPropertyType(Class<?> propertyType) {
-        this.propertyType = propertyType;
-    }
-
+    /**
+     * Is the column is a part of primary keys?
+     * @return Determination.
+     */
     public boolean isPrimary() {
         return this.primary;
     }
 
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
-    }
-
+    /**
+     * Get the size of the column.
+     * @return The size of the column. (Nullable: If the type does not have size, it returns null.)
+     */
     public Integer getColumnSize() {
         return this.columnSize;
     }
 
-    public void setColumnSize(Integer columnSize) {
-        this.columnSize = columnSize;
-    }
-
+    /**
+     * Get the decimal digits of the column.
+     * @return The decimal digits of the column. (Nullable: If the type does not have disits, it returns null.)
+     */
     public Integer getColumnDecimalDigits() {
         return this.columnDecimalDigits;
-    }
-
-    public void setColumnDecimalDigits(Integer columnDecimalDigits) {
-        this.columnDecimalDigits = columnDecimalDigits;
     }
 }

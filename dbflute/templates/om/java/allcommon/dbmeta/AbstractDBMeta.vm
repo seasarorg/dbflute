@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glAbstractDBMeta}")
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -121,16 +122,16 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         return columnInfo;
     }
 
-    protected ${glColumnInfo} cci(String columnDbName, String propertyName
+    protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName
                            , Class<?> propertyType, boolean primary
                            , Integer columnSize, Integer columnDecimalDigits) {// createColumnInfo()
-        return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+        return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
     }
 
-    protected ${glColumnInfo} cci(String columnDbName, String propertyName
+    protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName
                            , Class<?> propertyType, boolean primary
                            , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {// createColumnInfo()
-        return new ${glColumnInfo}(this, columnDbName, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
+        return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
     }
 
     /**
@@ -262,18 +263,12 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
-    protected ${glUniqueInfo} createPrimaryUniqueInfo() {
-        ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
-        uniqueInfo.setDBMeta(this);
-        uniqueInfo.setPrimary(true);
-        return uniqueInfo;
+    protected ${glUniqueInfo} cpui(${glColumnInfo} uniqueColumnInfo) { // createPrimaryUniqueInfo()
+        return cpui(Arrays.asList(uniqueColumnInfo));
     }
 
-    protected ${glUniqueInfo} createPrimaryUniqueInfo(${glColumnInfo} uniqueColumnInfo) {
-        ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
-        uniqueInfo.setDBMeta(this);
-        uniqueInfo.setPrimary(true);
-		uniqueInfo.addUniqueColumnList(uniqueColumnInfo);
+    protected ${glUniqueInfo} cpui(List<${glColumnInfo}> uniqueColumnInfoList) { // createPrimaryUniqueInfo()
+        ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}(this, uniqueColumnInfoList, true);
         return uniqueInfo;
     }
 
@@ -337,17 +332,10 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     protected ${glForeignInfo} cfi(String propName
                             , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
                             , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
-                            , int relNo, boolean oneToOne) {// createForeignInfo()
-        final ${glForeignInfo} foreignInfo = new ${glForeignInfo}();
-        foreignInfo.setForeignPropertyName(propName);
-        foreignInfo.setLocalDBMeta(localDbm);
-        foreignInfo.setForeignDBMeta(foreignDbm);
-        foreignInfo.setLocalForeignColumnInfoMap(localForeignColumnInfoMap);
-        foreignInfo.setRelationNo(relNo);
-        foreignInfo.setOneToOne(oneToOne);
-        return foreignInfo;
+                            , int relNo, boolean oneToOne) { // createForeignInfo()
+        return new ${glForeignInfo}(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne);
     }
-	
+
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
@@ -397,14 +385,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     protected ${glReferrerInfo} cri(String propName
                              , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
                              , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
-                             , boolean oneToOne) {// createReferrerInfo()
-        final ${glReferrerInfo} referrerInfo = new ${glReferrerInfo}();
-        referrerInfo.setReferrerPropertyName(propName);
-        referrerInfo.setLocalDBMeta(localDbm);
-        referrerInfo.setReferrerDBMeta(referrerDbm);
-        referrerInfo.setLocalReferrerColumnInfoMap(localReferrerColumnInfoMap);
-        referrerInfo.setOneToOne(oneToOne);
-        return referrerInfo;
+                             , boolean oneToOne) { // createReferrerInfo()
+        return new ${glReferrerInfo}(propName, localDbm, referrerDbm, localReferrerColumnInfoMap, oneToOne);
     }
 
     // -----------------------------------------------------

@@ -1,33 +1,58 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-
 #set ($myClassName = "${glForeignInfo}")
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
- * The class of foreign information.
- * 
+ * The information of foreign relation.
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} implements ${glRelationInfo} {
 
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String foreignPropertyName;
-    protected ${glDBMeta} localDBMeta;
-    protected ${glDBMeta} foreignDBMeta;
-    protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap;
-    protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} foreignLocalColumnInfoMap;
-    protected int relationNo;
-    protected boolean oneToOne;
+    protected final String foreignPropertyName;
+    protected final ${glDBMeta} localDBMeta;
+    protected final ${glDBMeta} foreignDBMeta;
+    protected final Map<${genericsColumnInfoMap}> localForeignColumnInfoMap;
+    protected final Map<${genericsColumnInfoMap}> foreignLocalColumnInfoMap;
+    protected final int relationNo;
+    protected final boolean oneToOne;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
+                        , Map<${genericsColumnInfoMap}> localForeignColumnInfoMap
+                        , int relationNo, boolean oneToOne) {
+        this.foreignPropertyName = foreignPropertyName;
+        this.localDBMeta = localDBMeta;
+        this.foreignDBMeta = foreignDBMeta;
+        this.localForeignColumnInfoMap = localForeignColumnInfoMap;
+        final Set<${glColumnInfo}> keySet = localForeignColumnInfoMap.keySet();
+        foreignLocalColumnInfoMap = new LinkedHashMap<${genericsColumnInfoMap}>();
+        for (final Iterator<${glColumnInfo}> ite = keySet.iterator(); ite.hasNext(); ) {
+            final ${glColumnInfo} key = ite.next();
+            final ${glColumnInfo} value = localForeignColumnInfoMap.get(key);
+            foreignLocalColumnInfoMap.put(value, key);
+        }
+        this.relationNo = relationNo;
+        this.oneToOne = oneToOne;
+    }
 
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public ${glColumnInfo} findLocalByForeign(String foreignColumnDbName) {
-        final ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(foreignDBMeta, foreignColumnDbName);
+        final ${glColumnInfo} keyColumnInfo = foreignDBMeta.findColumnInfo(foreignColumnDbName);
         final ${glColumnInfo} resultColumnInfo = (${glColumnInfo})foreignLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
@@ -66,7 +91,7 @@ public class ${myClassName} implements ${glRelationInfo} {
         return getForeignDBMeta();
     }
 
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getLocalTargetColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getLocalTargetColumnInfoMap() {
         return getLocalForeignColumnInfoMap();
     }
 
@@ -81,42 +106,19 @@ public class ${myClassName} implements ${glRelationInfo} {
         return foreignPropertyName;
     }
 
-    public void setForeignPropertyName(String foreignPropertyName) {
-        this.foreignPropertyName = foreignPropertyName;
-    }
-
     public ${glDBMeta} getLocalDBMeta() {
         return localDBMeta;
-    }
-
-    public void setLocalDBMeta(${glDBMeta} localDBMeta) {
-        this.localDBMeta = localDBMeta;
     }
 
     public ${glDBMeta} getForeignDBMeta() {
         return foreignDBMeta;
     }
 
-    public void setForeignDBMeta(${glDBMeta} foreignDBMeta) {
-        this.foreignDBMeta = foreignDBMeta;
-    }
-
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getLocalForeignColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getLocalForeignColumnInfoMap() {
         return localForeignColumnInfoMap;
     }
 
-    public void setLocalForeignColumnInfoMap(java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap) {
-        this.localForeignColumnInfoMap = localForeignColumnInfoMap;
-        final java.util.Set keySet = localForeignColumnInfoMap.keySet();
-        foreignLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
-        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfo} key = (${glColumnInfo})ite.next();
-            final ${glColumnInfo} value = (${glColumnInfo})localForeignColumnInfoMap.get(key);
-            foreignLocalColumnInfoMap.put(value, key);
-        }
-    }
-
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getForeignLocalColumnInfoMap() {
+    public Map<${genericsColumnInfoMap}> getForeignLocalColumnInfoMap() {
         return foreignLocalColumnInfoMap;
     }
 
@@ -124,26 +126,18 @@ public class ${myClassName} implements ${glRelationInfo} {
         return relationNo;
     }
 
-    public void setRelationNo(int relationNo) {
-        this.relationNo = relationNo;
-    }
-
     public boolean isOneToOne() {
         return oneToOne;
-    }
-
-    public void setOneToOne(boolean oneToOne) {
-        this.oneToOne = oneToOne;
     }
 
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
+    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         try {
             return clazz.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            String msg = "class=" + clazz + " method=" + methodName + "-" + Arrays.asList(argTypes);
             throw new RuntimeException(msg, ex);
         }
     }

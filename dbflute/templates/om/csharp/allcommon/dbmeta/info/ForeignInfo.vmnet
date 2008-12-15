@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                          Finder
         //                                                                          ======
         public ${glColumnInfo} FindLocalByForeign(String foreignColumnDbName) {
-            ${glColumnInfo} keyColumnInfo = new ${glColumnInfo}(foreignDBMeta, foreignColumnDbName);
+            ${glColumnInfo} keyColumnInfo = foreignDBMeta.FindColumnInfo(foreignColumnDbName);
             ${glColumnInfo} resultColumnInfo = (${glColumnInfo})foreignLocalColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
