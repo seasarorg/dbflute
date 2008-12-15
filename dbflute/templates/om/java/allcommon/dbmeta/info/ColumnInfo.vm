@@ -52,13 +52,6 @@ public class ${glColumnInfo} {
     }
 
     // ===================================================================================
-    //                                                                             Builder
-    //                                                                             =======
-    public String buildInitCapPropertyName() {
-        return initCap(this.propertyName);
-    }
-
-    // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
@@ -67,6 +60,10 @@ public class ${glColumnInfo} {
 
     public java.lang.reflect.Method findGetter() {
         return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
+    }
+
+    protected String buildInitCapPropertyName() {
+        return initCap(this.propertyName);
     }
 
     // ===================================================================================

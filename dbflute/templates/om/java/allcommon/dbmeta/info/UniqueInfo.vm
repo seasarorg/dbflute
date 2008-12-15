@@ -7,7 +7,7 @@ import java.util.Iterator;
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 
 /**
- * The information of unique.
+ * The information of unique constraint.
  * @author ${database.ClassAuthor}
  */
 public class ${glUniqueInfo} {
@@ -33,18 +33,18 @@ public class ${glUniqueInfo} {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public boolean containsColumn(String columnName) {
+    public boolean containsColumn(${glColumnInfo} columnInfo) {
+        return containsColumn(columnInfo.getColumnDbName());
+    }
+
+    protected boolean containsColumn(String columnName) {
         for (final Iterator<${glColumnInfo}> ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfo} columnInfo = (${glColumnInfo})ite.next();
+            final ${glColumnInfo} columnInfo = ite.next();
             if (columnInfo.getColumnDbName().equals(columnName)) {
                 return true;
             }
         }
         return false;
-    }
-
-    public boolean containsColumn(${glColumnInfo} column) {
-        return containsColumn(column.getColumnDbName());
     }
 
     // ===================================================================================

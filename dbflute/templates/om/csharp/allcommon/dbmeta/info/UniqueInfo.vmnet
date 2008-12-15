@@ -19,17 +19,17 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                     Easy-to-Use
         //                                                                     ===========
-        public bool ContainsColumn(String columnName) {
+        public bool ContainsColumn(${glColumnInfo} columnInfo) {
+            return ContainsColumn(columnInfo.ColumnDbName);
+        }
+
+        protected bool ContainsColumn(String columnName) {
             foreach (${glColumnInfo} columnInfo in uniqueColumnList) {
                 if (columnInfo.ColumnDbName.Equals(columnName)) {
                     return true;
                 }
             }
             return false;
-        }
-
-        public bool ContainsColumn(${glColumnInfo} column) {
-            return ContainsColumn(column.ColumnDbName);
         }
 
         // ===============================================================================

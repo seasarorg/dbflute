@@ -66,13 +66,6 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
     }
 
     // ===================================================================================
-    //                                                                             Builder
-    //                                                                             =======
-    public String buildInitCapPropertyName() {
-        return initCap(this.foreignPropertyName);
-    }
-
-    // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
@@ -81,6 +74,10 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
 
     public java.lang.reflect.Method findGetter() {
         return findMethod(localDBMeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
+    }
+
+    protected String buildInitCapPropertyName() {
+        return initCap(this.foreignPropertyName);
     }
 
     // ===================================================================================

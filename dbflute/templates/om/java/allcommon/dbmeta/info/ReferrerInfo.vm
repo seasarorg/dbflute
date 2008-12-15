@@ -75,13 +75,6 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
     }
 
     // ===================================================================================
-    //                                                                             Builder
-    //                                                                             =======
-    public String buildInitCapPropertyName() {
-        return initCap(this.referrerPropertyName);
-    }
-
-    // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
@@ -90,6 +83,10 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
 
     public java.lang.reflect.Method findGetter() {
         return findMethod(localDBMeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
+    }
+
+    protected String buildInitCapPropertyName() {
+        return initCap(this.referrerPropertyName);
     }
 
     // ===================================================================================
@@ -169,7 +166,7 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
     }
 
     public String toString() {
-        return localDBMeta.getTableDbName() + "." + referrerPropertyName + "->" + referrerDBMeta.getTableDbName();
+        return localDBMeta.getTableDbName() + "." + referrerPropertyName + "<-" + referrerDBMeta.getTableDbName();
     }
 
     // ===================================================================================
