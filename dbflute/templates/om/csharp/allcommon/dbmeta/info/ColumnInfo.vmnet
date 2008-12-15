@@ -83,17 +83,11 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         public override bool Equals(Object obj) {
-            if (!(obj is ${myClassName})) {
+            if (obj == null || !(obj is ${myClassName})) {
                 return false;
             }
             ${myClassName} target = (${myClassName})obj;
-            if (dbmeta == null || target.DBMeta == null) {
-                return false;
-            }
             if (!dbmeta.Equals(target.DBMeta)) {
-                return false;
-            }
-            if (columnDbName == null || target.ColumnDbName == null) {
                 return false;
             }
             if (!columnDbName.Equals(target.ColumnDbName)) {

@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-#set ($myClassName = "${glUniqueInfo}")
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
@@ -10,7 +10,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  * The information of unique.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${glUniqueInfo} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -22,7 +22,9 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glDBMeta} dbmeta, List<${glColumnInfo}> uniqueColumnList, boolean primary) {
+    public ${glUniqueInfo}(${glDBMeta} dbmeta, List<${glColumnInfo}> uniqueColumnList, boolean primary) {
+        assertObjectNotNull("dbmeta", dbmeta);
+        assertObjectNotNull("uniqueColumnList", uniqueColumnList);
         this.dbmeta = dbmeta;
         this.uniqueColumnList = uniqueColumnList;
         this.primary = primary;
@@ -46,18 +48,71 @@ public class ${myClassName} {
     }
 
     // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    /**
+     * Assert that the object is not null.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public int hashCode() {
+        return dbmeta.hashCode() + uniqueColumnList.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ${glUniqueInfo})) {
+            return false;
+        }
+        final ${glUniqueInfo} target = (${glUniqueInfo})obj;
+        if (!this.dbmeta.equals(target.getDBMeta())) {
+            return false;
+        }
+        if (!this.uniqueColumnList.equals(target.getUniqueColumnList())) {
+            return false;
+        }
+        return true;
+    }
+
+    public String toString() {
+        return dbmeta.getTableDbName() + "." + uniqueColumnList;
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public ${glDBMeta} getDBMeta() {
         return dbmeta;
     }
 
+    /**
+     * Get the list of unique column.
+     * @return The list of unique column. (NotNull)
+     */
     public List<${glColumnInfo}> getUniqueColumnList() {
-        return uniqueColumnList;
+        return new ArrayList<${glColumnInfo}>(uniqueColumnList); // as snapshot
     }
 
+    /**
+     * Get the column information of the first in primary columns.
+     * @return The column information of the first in primary columns. (NotNull)
+     */
     public ${glColumnInfo} getFirstColumn() {
-        return (${glColumnInfo})this.uniqueColumnList.get(0);
+        return this.uniqueColumnList.get(0);
     }
 
     public boolean isTwoOrMore() {

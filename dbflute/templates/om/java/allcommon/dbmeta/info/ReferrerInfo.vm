@@ -1,5 +1,4 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-#set ($myClassName = "${glReferrerInfo}")
 
 import java.util.Arrays;
 import java.util.Set;
@@ -32,6 +31,10 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
     public ${glReferrerInfo}(String referrerPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} referrerDBMeta
                       , Map<${genericsColumnInfoMap}> localReferrerColumnInfoMap
                       , boolean oneToOne) {
+        assertObjectNotNull("referrerPropertyName", referrerPropertyName);
+        assertObjectNotNull("localDBMeta", localDBMeta);
+        assertObjectNotNull("referrerDBMeta", referrerDBMeta);
+        assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
         this.referrerPropertyName = referrerPropertyName;
         this.localDBMeta = localDBMeta;
         this.referrerDBMeta = referrerDBMeta;
@@ -109,6 +112,67 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
     }
 
     // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String initCap(final String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        try {
+            return clazz.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException ex) {
+            String msg = "class=" + clazz + " method=" + methodName + "-" + Arrays.asList(argTypes);
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    /**
+     * Assert that the object is not null.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public int hashCode() {
+        return referrerPropertyName.hashCode() + localDBMeta.hashCode() + referrerDBMeta.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ${glReferrerInfo})) {
+            return false;
+        }
+        final ${glReferrerInfo} target = (${glReferrerInfo})obj;
+        if (!this.referrerPropertyName.equals(target.getReferrerPropertyName())) {
+            return false;
+        }
+        if (!this.localDBMeta.equals(target.getLocalDBMeta())) {
+            return false;
+        }
+        if (!this.referrerDBMeta.equals(target.getReferrerDBMeta())) {
+            return false;
+        }
+        return true;
+    }
+
+    public String toString() {
+        return localDBMeta.getTableDbName() + "." + referrerPropertyName + "->" + referrerDBMeta.getTableDbName();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getReferrerPropertyName() {
@@ -124,30 +188,14 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
     }
 
     public Map<${genericsColumnInfoMap}> getLocalReferrerColumnInfoMap() {
-        return localReferrerColumnInfoMap;
+        return new LinkedHashMap<${genericsColumnInfoMap}>(localReferrerColumnInfoMap); // as snapshot
     }
 
     public Map<${genericsColumnInfoMap}> getReferrerLocalColumnInfoMap() {
-        return referrerLocalColumnInfoMap;
+        return new LinkedHashMap<${genericsColumnInfoMap}>(referrerLocalColumnInfoMap); // as snapshot
     }
 
     public boolean isOneToOne() {
         return oneToOne;
-    }
-
-    // ===================================================================================
-    //                                                                     Internal Helper
-    //                                                                     ===============
-    protected String initCap(final String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
-
-    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        try {
-            return clazz.getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + Arrays.asList(argTypes);
-            throw new RuntimeException(msg, ex);
-        }
     }
 }
