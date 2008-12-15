@@ -152,6 +152,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                          ==========================
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+    /**
+     * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NotNull)
+     */
+    public void classify${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
+        set${col.javaName}(new ${col.javaNative}(cls.code()));
+    }
+
 #foreach ($classificationMap in $col.classificationMapList)
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
@@ -169,6 +185,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                        ============================
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     */
+    public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
+        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+    }
+
 #foreach ($classificationMap in $col.classificationMapList)
     /**
      * Is the value of the column '${col.uncapitalisedJavaName}' '${classificationMap.get('name')}'? <br />

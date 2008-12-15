@@ -14,8 +14,6 @@ namespace ${glPackageBaseCommon} {
 #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
   #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
   #set ($existTop = true)
-#else
-  #set ($existTop = false)
 #end
 #if ($database.isInitNumber($classificationName))
         // The classification name that its initial character is number is unsupported!
