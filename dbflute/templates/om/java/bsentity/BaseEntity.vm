@@ -164,7 +164,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
-    public void classify${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
+    public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
         set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
     }
 
@@ -174,7 +174,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void classify${col.javaName}${classificationMap.get('name')}() {
-        classify${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+        classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
     }
 
 #end
