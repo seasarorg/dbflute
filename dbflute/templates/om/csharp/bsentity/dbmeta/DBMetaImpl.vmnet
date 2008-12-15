@@ -274,6 +274,9 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                    Various Info
         //                                                                    ============
+#if ($table.isUseIdentity())
+        public override bool HasIdentity { get { return true; } }
+#end
 #if ($table.isUseSequence())
         public override bool HasSequence { get { return true; } }
         public override String SequenceNextValSql { get { return "${table.SequenceNextSql}"; } }

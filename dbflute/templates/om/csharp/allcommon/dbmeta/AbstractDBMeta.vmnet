@@ -229,22 +229,15 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // ===============================================================================
-        //                                                                   Sequence Info
-        //                                                                   =============
+        //                                                                    Various Info
+        //                                                                    ============
+        public virtual bool HasIdentity { get { return false; } }
         public virtual bool HasSequence { get { return false; } }
         public virtual String SequenceNextValSql { get { return null; } }
-
-        // ===============================================================================
-        //                                                            Optimistic Lock Info
-        //                                                            ====================
         public virtual bool HasVersionNo { get { return false; } }
         public virtual ${glColumnInfo} VersionNoColumnInfo { get { return null; } }
         public virtual bool HasUpdateDate { get { return false; } }
         public virtual ${glColumnInfo} UpdateDateColumnInfo { get { return null; } }
-
-        // ===============================================================================
-        //                                                              Common Column Info
-        //                                                              ==================
         public abstract bool HasCommonColumn { get; }
 
         // ===============================================================================

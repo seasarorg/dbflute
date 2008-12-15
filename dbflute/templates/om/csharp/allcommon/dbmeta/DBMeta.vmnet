@@ -87,6 +87,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         ${glReferrerInfo} FindReferrerInfo(String referrerPropertyName);
 
         // ===============================================================================
+        //                                                                   Identity Info
+        //                                                                   =============
+        bool HasIdentity { get; }
+
+        // ===============================================================================
         //                                                                   Sequence Info
         //                                                                   =============
         bool HasSequence { get; }

@@ -162,10 +162,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NotNull)
+     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
     public void classify${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
-        set${col.javaName}(new ${col.javaNative}(cls.code()));
+        set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
     }
 
 #foreach ($classificationMap in $col.classificationMapList)
@@ -174,7 +174,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void classify${col.javaName}${classificationMap.get('name')}() {
-        set${col.javaName}(new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+        classify${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
     }
 
 #end
@@ -212,7 +212,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
         return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
     }
 
@@ -231,7 +231,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
         return cls != null ? cls.name() : null;
     }
 
@@ -242,7 +242,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of the column '${col.uncapitalisedJavaName}' as classification alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        ${glCDef}.${col.classificationName} cls = ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
         return cls != null ? cls.alias() : null;
     }
 

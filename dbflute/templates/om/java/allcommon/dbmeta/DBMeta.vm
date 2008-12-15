@@ -264,6 +264,14 @@ public interface ${myClassName} {
         public void handleFixedTrace(RelationTrace relationTrace);
     }
 
+    // ===================================================================================
+    //                                                                       Identity Info
+    //                                                                       =============
+    /**
+     * Has identity?
+     * @return Determination.
+     */
+    public boolean hasIdentity();
 
     // ===================================================================================
     //                                                                       Sequence Info

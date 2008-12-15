@@ -231,6 +231,9 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
     // ===================================================================================
     //                                                                        Various Info
     //                                                                        ============
+#if ($table.isUseIdentity())
+    public boolean hasIdentity() { return true; }
+#end
 #if ($table.isUseSequence())
     public boolean hasSequence() { return true; }
     public String getSequenceNextValSql() { return "${table.sequenceNextSql}"; }
