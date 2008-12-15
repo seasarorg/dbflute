@@ -117,7 +117,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (${col.isJavaNativeStringObject()})
             ${col.javaName} = cls != null ? cls.Code : null;
 #else
-            ${col.javaName} = cls != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(cls.Code) : null;
+            ${col.javaName} = cls != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(cls.Code) : (${col.javaNative})null;
 #end
         }
 
