@@ -115,9 +115,9 @@ namespace ${myExtendedEntityPackageName} {
 #end
         public void Classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
 #if (${col.isJavaNativeStringObject()})
-            set${col.javaName}(cls != null ? cls.Code : null);
+            ${col.javaName} = cls != null ? cls.Code : null;
 #else
-            set${col.javaName}(cls != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(cls.Code) : null);
+            ${col.javaName} = cls != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(cls.Code) : null;
 #end
         }
 
@@ -129,7 +129,7 @@ namespace ${myExtendedEntityPackageName} {
         /// ]]>
         /// </summary>
         public void Classify${col.javaName}${classificationMap.get('name')}() {
-            Classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
+            Classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
         }
 
 #end
@@ -150,7 +150,7 @@ namespace ${myExtendedEntityPackageName} {
   #set ($existTop = true)
 #end
         public ${glCDef}.${col.classificationName} ${col.javaName}As${col.classificationName} { get {
-            return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+            return ${glCDef}.${col.classificationName}.CodeOf(_${col.uncapitalisedJavaName});
         }}
 
  #foreach ($classificationMap in $col.ClassificationMapList)

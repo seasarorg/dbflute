@@ -31,7 +31,7 @@ namespace ${glPackageBaseCommon} {
             /** $database.buildClassificationApplicationComment($classificationMap) */
             public static readonly ${classificationName} ${classificationMap.get('name')} = new ${classificationName}($database.buildClassificationCodeNameAliasVariables($classificationMap));
 #end
-            private static readonly Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+            private static readonly Map<String, ${classificationName}> _codeValueMap = new LinkedHashMap<String, ${classificationName}>();
             static ${classificationName}() {
 #foreach ($classificationMap in $classificationMapList)
                 _codeValueMap.put(${classificationMap.get('name')}.Code.ToLower(), ${classificationMap.get('name')});
@@ -47,6 +47,15 @@ namespace ${glPackageBaseCommon} {
             public static ${classificationName} CodeOf(Object code) {
                 if (code == null) { return null; } return _codeValueMap.get(code.ToString().ToLower());
             }
+            public static ${classificationName}[] Values { get {
+                ${classificationName}[] values = new ${classificationName}[_codeValueMap.size()];
+                int index = 0;
+                foreach (${classificationName} flg in _codeValueMap.values()) {
+                    values[index] = flg;
+                    ++index;
+                }
+                return values;
+            }}
             public override int GetHashCode() {
                 return 7 + _code.GetHashCode();
             }
