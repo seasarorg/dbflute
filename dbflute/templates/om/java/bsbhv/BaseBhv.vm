@@ -675,9 +675,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
-        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.path(), ${myEntityVariableName}, action.code());
+        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
     }
-    public void getEntities(${glBuriDef}.${processName}_Status status) { // Making...
+    public List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
+        assertObjectNotNull("statuses", statuses);
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.setupSelect_BuriPathData();
+        java.util.List<String> pathNameList = new java.util.ArrayList<String>();
+        for (${glBuriDef}.${processName}_Status status : statuses) {
+            pathNameList.add(status.fullPath());
+        }
+        cb.query().queryBuriPathData().setPathName_InScope(pathNameList);
+        return selectList(cb);
     }
 #end
 #end
