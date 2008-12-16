@@ -1,7 +1,6 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -14,6 +13,16 @@ import org.seasar.dbflute.util.basic.DfStringUtil;
  * @author jflute
  */
 public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
+    
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String KEY_LOCAL_TABLE_NAME = "localTableName";
+    public static final String KEY_FOREIGN_TABLE_NAME = "foreignTableName";
+    public static final String KEY_LOCAL_COLUMN_NAME = "localColumnName";
+    public static final String KEY_FOREIGN_COLUMN_NAME = "foreignColumnName";
+    public static final String KEY_FIXED_CONDITION = "fixedCondition";
+    public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -34,7 +43,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
         if (_additionalForeignKeyMap == null) {
-            _additionalForeignKeyMap = new LinkedHashMap<String, Map<String, String>>();
+            _additionalForeignKeyMap = newLinkedHashMap();
             final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
             final Set<String> fisrtKeySet = generatedMap.keySet();
             for (Object foreignName : fisrtKeySet) {// FK Loop!
@@ -46,7 +55,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
                 }
                 final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
                 final Set<?> secondKeySet = foreignDefinitionMap.keySet();
-                final Map<String, String> genericForeignDefinitiontMap = new LinkedHashMap<String, String>();
+                final Map<String, String> genericForeignDefinitiontMap = newLinkedHashMap();
                 for (Object componentName : secondKeySet) {// FK Component Loop!
                     final Object secondValue = foreignDefinitionMap.get(componentName);
                     if (secondValue == null) {
@@ -77,22 +86,27 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     //                                                                      ==============
     public String findLocalTableName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("localTableName");
+        return componentMap.get(KEY_LOCAL_TABLE_NAME);
     }
 
     public String findForeignTableName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("foreignTableName");
+        return componentMap.get(KEY_FOREIGN_TABLE_NAME);
     }
 
     protected String findLocalColumnName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("localColumnName");
+        return componentMap.get(KEY_LOCAL_COLUMN_NAME);
+    }
+
+    protected String findForeignColumnName(String foreignName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+        return componentMap.get(KEY_FOREIGN_COLUMN_NAME);
     }
 
     public String findFixedCondition(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        String fixedCondition = componentMap.get("fixedCondition");
+        String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             fixedCondition = DfStringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
             fixedCondition = DfStringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
@@ -103,7 +117,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     public String findFixedSuffix(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("fixedSuffix");
+        return componentMap.get(KEY_FIXED_SUFFIX);
     }
     
     public List<String> findLocalColumnNameList(String foreignName) {
@@ -117,11 +131,6 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             localColumnNameList.add(st.nextToken());
         }
         return localColumnNameList;
-    }
-
-    protected String findForeignColumnName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("foreignColumnName");
     }
 
     public List<String> findForeignColumnNameList(String foreignName) {

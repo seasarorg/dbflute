@@ -380,6 +380,10 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
 
+    protected DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
+        return DfPropertiesHandler.getInstance().getAdditionalForeignKeyProperties(getProperties());
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return DfPropertiesHandler.getInstance().getLittleAdjustmentProperties(getProperties());
     }
@@ -409,7 +413,7 @@ public abstract class DfAbstractHelperProperties {
     protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
         return new DfFlexibleMap<KEY, VALUE>(map);
     }
-    
+
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }

@@ -57,8 +57,8 @@ public class DfAdditionalForeignKeyInitializer {
     //                                                                AdditionalForeignKey
     //                                                                ====================
     public void initializeAdditionalForeignKey() {
-        _log.info("/======================================");
-        _log.info("...Initializing additional foreign key.");
+        _log.info("/=======================================");
+        _log.info("...Initializing additional foreign keys.");
 
         final Map<String, Map<String, String>> additionalForeignKeyMap = getAdditionalForeignKeyMap();
         final Set<String> foreignKeyNameKeySet = additionalForeignKeyMap.keySet();
@@ -91,7 +91,7 @@ public class DfAdditionalForeignKeyInitializer {
                 showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
             }
         }
-        _log.info("========/");
+        _log.info("==========/");
     }
 
     protected void processAllTableFK(String foreignKeyName, String foreignTableName,

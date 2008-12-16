@@ -618,9 +618,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
+        ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         return delegateInsert(currentEntity);
     }
 #end
@@ -679,7 +679,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
     public List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
         assertObjectNotNull("statuses", statuses);
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.setupSelect_BuriPathData();
         java.util.List<String> pathNameList = new java.util.ArrayList<String>();
         for (${glBuriDef}.${processName}_Status status : statuses) {

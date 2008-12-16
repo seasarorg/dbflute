@@ -56,8 +56,8 @@ public class DfAdditionalPrimaryKeyInitializer {
     //                                                                AdditionalPrimaryKey
     //                                                                ====================
     public void initializeAdditionalPrimaryKey() {
-        _log.info("/======================================");
-        _log.info("...Initializing additional primary key.");
+        _log.info("/=======================================");
+        _log.info("...Initializing additional primary keys.");
 
         final Map<String, Map<String, String>> additionalPrimaryKeyMap = getAdditionalPrimaryKeyMap();
         final Set<String> primaryNameKeySet = additionalPrimaryKeyMap.keySet();
@@ -80,7 +80,7 @@ public class DfAdditionalPrimaryKeyInitializer {
             }
             showResult(primaryKeyName, table, columnNameList);
         }
-        _log.info("========/");
+        _log.info("==========/");
     }
 
     protected void showResult(String primaryKeyName, Table table, List<String> columnNameList) {

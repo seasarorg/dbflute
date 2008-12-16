@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.collection.DfStringKeyMap;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
@@ -15,6 +18,12 @@ import org.seasar.dbflute.util.basic.DfStringUtil;
  * @author jflute
  */
 public final class DfBuriProperties extends DfAbstractHelperProperties {
+
+    // ===============================================================================
+    //                                                                      Definition
+    //                                                                      ==========
+    /** Log-instance */
+    private static final Log _log = LogFactory.getLog(DfBuriProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -205,7 +214,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         List<String> statusList = map.get("status");
         return statusList != null ? statusList : new ArrayList<String>();
     }
-    
+
     public List<String> getActionList(String packageName, String processName) {
         final Map<String, Map<String, List<String>>> processMap = getProcessMap(packageName);
         if (processMap == null) {
@@ -302,6 +311,55 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         }
         final String key = javaName.trim().toLowerCase();
         return _columnJavaNameCaseInsensitiveMap.get(key);
+    }
+
+    // ===================================================================================
+    //                                                                AdditionalForeignKey
+    //                                                                ====================
+    public void setupImplicitAdditionalForeignKey(TableFinder finder) {
+        if (!isUseBuri()) {
+            return;
+        }
+        _log.info("/===========================================");
+        _log.info("...Setting up implicit foreign key for Buri.");
+        final DfAdditionalForeignKeyProperties fkprop = getAdditionalForeignKeyProperties();
+        final Map<String, Map<String, String>> additionalForeignKeyMap = fkprop.getAdditionalForeignKeyMap();
+        final DfGeneratedClassPackageProperties pkgprop = getGeneratedClassPackageProperties();
+        final String entityPackage = pkgprop.getExtendedEntityPackage();
+        final Map<String, List<String>> targetProcessMap = getTargetProcessMap();
+        final Set<String> tableNameSet = targetProcessMap.keySet();
+        for (String current : tableNameSet) {
+            final String tableName = current.toUpperCase();
+            final String foreignName = "FK_" + tableName + "_BURIPATHDATA";
+            if (additionalForeignKeyMap.containsKey(foreignName)) {
+                continue;
+            }
+            final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
+            final Table table = finder.findTable(tableName);
+            if (table == null) {
+                String msg = "The table was not found: " + tableName;
+                throw new IllegalStateException(msg);
+            }
+            if (table.hasTwoOrMorePrimaryKeys()) {
+                String msg = "The table should have the only one primary key: " + tableName;
+                throw new IllegalStateException(msg);
+            }
+            elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
+            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURIPATHDATA");
+            final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
+            elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
+            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEYNUM");
+            final String entityName = table.getExtendedEntityClassName();
+            final String fixedCondition = "$$foreignAlias$$.DATATYPE = '" + entityPackage + "." + entityName + "'";
+            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, fixedCondition);
+            additionalForeignKeyMap.put(foreignName, elementMap);
+            _log.info(foreignName);
+        }
+        _log.info("==========/");
+    }
+
+    public static interface TableFinder {
+        public Table findTable(String tableName);
     }
 
     // ===================================================================================

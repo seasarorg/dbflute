@@ -82,6 +82,7 @@ import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
@@ -496,7 +497,23 @@ public class Database {
     // -----------------------------------------------------
     //                                  AdditionalForeignKey
     //                                  --------------------
+    /**
+     * Initialize additional foreign key. <br />
+     * This is for Generate task. (Not Sql2Entity)
+     */
     public void initializeAdditionalForeignKey() {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Set up implicit foreign key for Buri before initializing
+        // - - - - - - - - - -/
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        buriProperties.setupImplicitAdditionalForeignKey(new DfBuriProperties.TableFinder() {
+            public Table findTable(String tableName) {
+                return getTable(tableName);
+            }
+        });
+        // /- - - - - - - - - - - - - - - - -
+        // Initialize additional foreign key
+        // - - - - - - - - - -/
         final DfAdditionalForeignKeyInitializer initializer = new DfAdditionalForeignKeyInitializer(this);
         initializer.initializeAdditionalForeignKey();
     }
@@ -562,7 +579,7 @@ public class Database {
         return new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(), getProperties()
                 .getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(), getTableList());
     }
-    
+
     // ===================================================================================
     //                                                                    Output Directory
     //                                                                    ================
@@ -1322,7 +1339,7 @@ public class Database {
     public List<String> getBuriStatusList(String packageName, String processName) {
         return getProperties().getBuriProperties().getStatusList(packageName, processName);
     }
-    
+
     public List<String> getBuriActionList(String packageName, String processName) {
         return getProperties().getBuriProperties().getActionList(packageName, processName);
     }
