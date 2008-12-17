@@ -59,6 +59,34 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     private Map<String, Object> _methodNameMap = newConcurrentHashMap();
 
     // ===================================================================================
+    //                                                             Resource Initialization
+    //                                                             =======================
+    protected void initializeInformationResource() { // for instance initializer of subclass.
+        // Initialize the flexible map of table DB name.
+        getTableDbNameFlexibleMap();
+
+        // Initialize the flexible map of table property name.
+        getTablePropertyNameFlexibleMap();
+
+        // Initialize the list of column information.
+        getColumnInfoList();
+
+        // Initialize the flexible map of column information. 
+        getColumnInfoFlexibleMap();
+
+        // These should not be initialized here!
+        // because the problem 'cyclic reference' occurred! 
+        // So these are initialized as lazy.
+        // getForeignInfoList();
+        // getForeignInfoFlexibleMap();
+        // getReferrerInfoList();
+        // getReferrerInfoFlexibleMap();
+
+        // Initialize the map of (public)method name. 
+        hasMethod("dummy");
+    }
+
+    // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
     /**
@@ -386,7 +414,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             }
             Method[] methods = this.getClass().getMethods();
             _referrerInfoList = newArrayList();
-            String prefix = "foreign";
+            String prefix = "referrer";
             Class<${glReferrerInfo}> returnType = ${glReferrerInfo}.class;
             Object[] args = new Object[]{};
             try {
@@ -410,13 +438,13 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         if (_referrerInfoFlexibleMap != null) {
             return _referrerInfoFlexibleMap;
         }
-        final List<${glReferrerInfo}> referrerInfoList = getForeignInfoList();
+        final List<${glReferrerInfo}> referrerInfoList = getReferrerInfoList();
         synchronized (this) {
             if (_referrerInfoFlexibleMap != null) {
                 return _referrerInfoFlexibleMap;
             }
             _referrerInfoFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
-            for (${glForeignInfo} referrerInfo : referrerInfoList) {
+            for (${glReferrerInfo} referrerInfo : referrerInfoList) {
                 _referrerInfoFlexibleMap.put(referrerInfo.getReferrerPropertyName(), referrerInfo);
             }
             return _referrerInfoFlexibleMap;
@@ -564,26 +592,6 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     public boolean hasUpdateDate() { return false; }
     public ${glColumnInfo} getUpdateDateColumnInfo() { return null; }
     public boolean hasCommonColumn() { return false; }
-
-    // ===================================================================================
-    //                                                             Resource Initialization
-    //                                                             =======================
-    protected void initializeInformationResource() { // for instance initializer of subclass.
-        // Initialize the flexible map of table DB name.
-        getTableDbNameFlexibleMap();
-
-        // Initialize the flexible map of table property name.
-        getTablePropertyNameFlexibleMap();
-
-        // Initialize the list of column information.
-        getColumnInfoList();
-
-        // Initialize the flexible map of column information. 
-        getColumnInfoFlexibleMap();
-
-        // Initialize the map of (public)method name. 
-        hasMethod("dummy");
-    }
 
     // ===================================================================================
     //                                                                       Name Handling
