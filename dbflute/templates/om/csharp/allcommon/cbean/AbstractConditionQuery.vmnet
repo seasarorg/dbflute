@@ -860,10 +860,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============
-    protected String prepareFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "dto." + getLocationBase());
         return fixedCondition;
     }
 

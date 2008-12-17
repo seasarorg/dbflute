@@ -153,21 +153,24 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             return;
         }
         if (getBasicProperties().isTargetLanguageMain()) {
-            final String language;
             if (getBasicProperties().isTargetLanguageJava()) {
-                language = "Java";
+                _log.info("* * * * * * * * *");
+                _log.info("* Process Java  *");
+                _log.info("* * * * * * * * *");
+                final String control = "om/ControlSql2EntityJava.vm";
+                _log.info("...Using Java control: " + control);
+                setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                language = "CSharp";
+                _log.info("* * * * * * * * * *");
+                _log.info("* Process CSharp  *");
+                _log.info("* * * * * * * * * *");
+                final String control = "om/ControlSql2EntityCSharp.vm";
+                _log.info("...Using CSharp control: " + control);
+                setControlTemplate(control);
             } else {
                 String msg = "Unknown Main Language: " + getBasicProperties().getTargetLanguage();
                 throw new IllegalStateException(msg);
             }
-            _log.info("* * * * * * * * * * *");
-            _log.info("* Process " + language + "      *");
-            _log.info("* * * * * * * * * * *");
-            final String control = "om/ControlSql2Entity" + language + ".vm";
-            _log.info("...Using " + language + " control: " + control);
-            setControlTemplate(control);
         } else {
             final String language = getBasicProperties().getTargetLanguage();
             _log.info("* * * * * * * * * *");

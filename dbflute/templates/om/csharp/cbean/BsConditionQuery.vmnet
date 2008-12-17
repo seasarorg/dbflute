@@ -342,7 +342,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($fk in $table.foreignKeys)
             if (baseQuery.hasConditionQuery${fk.foreignPropertyNameInitCap}()) {
 #if ($fk.hasDynamicFixedCondition())
-                unionQuery.xsetParameterMap${fk.foreignPropertyNameInitCap}(baseQuery.ParameterMap${fk.foreignPropertyNameInitCap});
+                unionQuery.xsetParameterMap${fk.foreignPropertyNameInitCap}(baseQuery.parameterMap${fk.foreignPropertyNameInitCap});
                 unionQuery.ConditionQuery${fk.foreignPropertyNameInitCap}.reflectRelationOnUnionQuery(baseQuery.ConditionQuery${fk.foreignPropertyNameInitCap}, unionQuery.ConditionQuery${fk.foreignPropertyNameInitCap});
 #else
                 unionQuery.Query${fk.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.Query${fk.foreignPropertyNameInitCap}(), unionQuery.Query${fk.foreignPropertyNameInitCap}());
@@ -371,7 +371,7 @@ namespace ${glPackageBaseCQ} {
         protected ${foreignCQClassName} _conditionQuery${fk.ForeignPropertyNameInitCap};
         public ${foreignCQClassName} Query${fk.ForeignPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
 #if ($fk.hasDynamicFixedCondition())
-            Map<String, Object> parameterMap = ParameterMap${fk.foreignPropertyNameInitCap};
+            Map<String, Object> parameterMap = parameterMap${fk.foreignPropertyNameInitCap};
             ${fk.dynamicFixedConditionParameterMapSetup}
 #end
             return this.ConditionQuery${fk.ForeignPropertyNameInitCap};
@@ -387,7 +387,7 @@ namespace ${glPackageBaseCQ} {
         }
 #if ($fk.hasDynamicFixedCondition())
         protected Map<String, Object> _parameterMap${fk.foreignPropertyNameInitCap};
-        public Map<String, Object> ParameterMap${fk.foreignPropertyNameInitCap} { get {
+        public Map<String, Object> parameterMap${fk.foreignPropertyNameInitCap} { get {
             if (_parameterMap${fk.foreignPropertyNameInitCap} == null) {
                 _parameterMap${fk.foreignPropertyNameInitCap} = new LinkedHashMap<String, Object>();
             }
@@ -413,7 +413,7 @@ namespace ${glPackageBaseCQ} {
             joinOnMap.put(getRealColumnName("${localColumn.name}"), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealColumnName("${foreignColumnName}"));
 #end
 #if ($fk.hasFixedCondition())
-            joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${fk.fixedCondition}", getRealAliasName(), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealAliasName()));
+            joinOnMap.put("$$fixedCondition$$", ppFxCd("${fk.fixedCondition}", getRealAliasName(), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealAliasName()));
 #end
             getSqlClause().registerOuterJoin(ConditionQuery${fk.foreignPropertyNameInitCap}.getTableSqlName(), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealAliasName(), joinOnMap);
         }
@@ -461,7 +461,7 @@ namespace ${glPackageBaseCQ} {
             joinOnMap.put(getRealColumnName("${foreignColumn.name}"), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealColumnName("${refererColumnName}"));
 #end
 #if ($referrer.hasFixedCondition())
-            joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referrer.fixedCondition}", getRealAliasName(), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealAliasName()));
+            joinOnMap.put("$$fixedCondition$$", ppFxCd("${referrer.fixedCondition}", getRealAliasName(), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealAliasName()));
 #end
             getSqlClause().registerOuterJoin(ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getTableSqlName(), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealAliasName(), joinOnMap);
         }
