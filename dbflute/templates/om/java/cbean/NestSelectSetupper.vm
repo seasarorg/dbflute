@@ -25,7 +25,7 @@ public class ${myClassName} {
 #set ($dynamicFixedConditionArgs = "")
 #set ($dynamicFixedConditionVariables = "")
 #if ($fk.hasDynamicFixedCondition())
-#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
     public ${fk.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {

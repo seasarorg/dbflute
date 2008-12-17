@@ -1068,6 +1068,14 @@ public class ForeignKey {
     }
 
     public String getDynamicFixedConditionArgs() {
+        return buildDynamicFixedConditionArgs(false);
+    }
+
+    public String getDynamicFixedConditionFinalArgs() {
+        return buildDynamicFixedConditionArgs(true);
+    }
+
+    protected String buildDynamicFixedConditionArgs(boolean finalArg) {
         final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
         final StringBuilder sb = new StringBuilder();
         for (String parameterName : parameterNameSet) {
@@ -1075,7 +1083,10 @@ public class ForeignKey {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append("final ").append(paramterType).append(" ").append(parameterName);
+            if (finalArg) {
+                sb.append("final ");
+            }
+            sb.append(paramterType).append(" ").append(parameterName);
         }
         return sb.toString();
     }

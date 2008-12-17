@@ -221,7 +221,7 @@ public class ${myClassName} extends ${glAbstractConditionBean} {
 #set ($dynamicFixedConditionArgs = "")
 #set ($dynamicFixedConditionVariables = "")
 #if ($fk.hasDynamicFixedCondition())
-#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
     protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
