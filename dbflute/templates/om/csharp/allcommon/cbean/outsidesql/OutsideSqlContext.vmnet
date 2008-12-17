@@ -164,31 +164,31 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
     
         public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-            String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
+            String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
 
-            Assembly asm = GetType().Assembly;// In same assembly!
+            Assembly asm = GetType().Assembly; // In same assembly!
             String text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
                 return text;
             }
 
-            if (_resultTypeSpecification != null && _resultTypeSpecification is Type) {
-                // In customize entity assembly!
-                Assembly asmResultType = ((Type)_resultTypeSpecification).Assembly;
-                if (asmResultType != null && asmResultType != asm) {
-                    text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asmResultType);
+            ${glDBFluteConfig}.AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
+            if (additionalAssemblyProvider != null) {
+                Assembly additionalAssembly = additionalAssemblyProvider.Invoke;
+                if (additionalAssembly != null && additionalAssembly != asm) {
+                    text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, additionalAssembly);
                     if (text != null) {
                         return text;
                     }
-                }
 
-                // Re-try after resolving path for the assembly of result type. 
-                String resolvedStandardPath = ResolvePathForResultTypeAssembly(standardPath, asm, asmResultType);
-                String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, asmResultType);
-                text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, asmResultType);
-                if (text != null) {
-                    return text;
+                    // Re-try after resolving path for the assembly of result type. 
+                    String resolvedStandardPath = ResolvePathForResultTypeAssembly(standardPath, asm, additionalAssembly);
+                    String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, additionalAssembly);
+                    text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, additionalAssembly);
+                    if (text != null) {
+                        return text;
+                    }
                 }
             }
 

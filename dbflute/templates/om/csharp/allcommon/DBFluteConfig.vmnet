@@ -56,6 +56,7 @@ public class ${myClassName} {
 #else
     protected String _omitFileSystemPathPackage;
 #end
+    protected AdditionalAssembly _additionalAssemblyProvider;
 	protected bool _internalDebug;
 	protected bool _locked = true;
 
@@ -235,6 +236,24 @@ public class ${myClassName} {
 	        _omitFileSystemPathPackage = value;
 		}
 	}
+
+    // ===================================================================================
+    //                                                      Additional OutsideSql Assembly
+    //                                                      ==============================
+	public AdditionalAssembly AdditionalAssemblyProvider { // CSharp only
+	    get {
+	        return _additionalAssemblyProvider;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting additionalAssemblyProvider: " + value);
+		    }
+	        _additionalAssemblyProvider = value;
+		}
+	}
+	
+	public delegate Assembly AdditionalAssembly();
 	
     // ===================================================================================
     //                                                                      Internal Debug
