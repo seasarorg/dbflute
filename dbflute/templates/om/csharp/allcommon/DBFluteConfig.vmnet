@@ -1,5 +1,6 @@
 
 using System;
+using System.Reflection;
 
 using ${glPackageBaseCommonJdbc};
 
@@ -238,8 +239,8 @@ public class ${myClassName} {
 	}
 
     // ===================================================================================
-    //                                                      Additional OutsideSql Assembly
-    //                                                      ==============================
+    //                                                        Additional Assembly Provider
+    //                                                        ============================
 	public AdditionalAssembly AdditionalAssemblyProvider { // CSharp only
 	    get {
 	        return _additionalAssemblyProvider;

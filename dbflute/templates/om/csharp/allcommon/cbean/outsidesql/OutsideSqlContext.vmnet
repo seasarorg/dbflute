@@ -175,7 +175,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
             ${glDBFluteConfig}.AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
             if (additionalAssemblyProvider != null) {
-                Assembly additionalAssembly = additionalAssemblyProvider.Invoke;
+                Assembly additionalAssembly = additionalAssemblyProvider.Invoke();
                 if (additionalAssembly != null && additionalAssembly != asm) {
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, additionalAssembly);
                     if (text != null) {

@@ -22,16 +22,22 @@ namespace ${glPackageNss} {
         // ===============================================================================
         //                                                                    Setup Select
         //                                                                    ============
-#foreach ($foreignKeys in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKeys.foreignPropertyNameInitCap}")
-#set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-        public ${foreignKeys.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+        public ${fk.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
             AssertConditionQuery();
-            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
+            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRealAliasName();
             String localRelationPath = _query.getRelationPath();
             _query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-            return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
+            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRelationPath(), "${tmpPropertyName}");
+            return new ${fk.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
         }
 
 #end

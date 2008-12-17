@@ -333,10 +333,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
         }
 #end
-#foreach ($refferer in $table.referrers)
-#if (${refferer.isOneToOne()})
-        if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
-            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}());
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+        if (baseQuery.hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}()) {
+            unionQuery.query${referrer.referrerPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${referrer.referrerPropertyNameInitCapAsOne}(), unionQuery.query${referrer.referrerPropertyNameInitCapAsOne}());
         }
 #end
 #end
@@ -374,8 +374,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         }
         return _parameterMap${fk.foreignPropertyNameInitCap};
     }
-    public void xsetParameterMap${fk.foreignPropertyNameInitCap}(Map<String, Object> parameterMap) { // for UnionQuery
-        _parameterMap${fk.foreignPropertyNameInitCap} = parameterMap;
+    public void xsetParameterMap${fk.foreignPropertyNameInitCap}(Map<String, Object> parameterMap) {
+        _parameterMap${fk.foreignPropertyNameInitCap} = parameterMap; // for UnionQuery
     }
 #end
     protected ${foreignCQClassName} xcreateQuery${fk.foreignPropertyNameInitCap}() {
