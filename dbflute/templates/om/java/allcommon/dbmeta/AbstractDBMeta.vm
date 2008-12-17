@@ -50,6 +50,10 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     private ${glStringKeyMap}<String> _tablePropertyNameFlexibleMap;
     private List<${glColumnInfo}> _columnInfoList;
     private ${glStringKeyMap}<${glColumnInfo}> _columnInfoFlexibleMap;
+    private List<${glForeignInfo}> _foreignInfoList;
+    private ${glStringKeyMap}<${glForeignInfo}> _foreignInfoFlexibleMap;
+    private List<${glReferrerInfo}> _referrerInfoList;
+    private ${glStringKeyMap}<${glReferrerInfo}> _referrerInfoFlexibleMap;
 
     // Initialized at hasMethod().
     private Map<String, Object> _methodNameMap = newConcurrentHashMap();
@@ -186,81 +190,6 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     }
 
     // ===================================================================================
-    //                                                             Resource Initialization
-    //                                                             =======================
-    protected void initializeInformationResource() { // for instance initializer of subclass.
-        // Initialize the flexible map of table DB name.
-        getTableDbNameFlexibleMap();
-
-        // Initialize the flexible map of table property name.
-        getTablePropertyNameFlexibleMap();
-
-        // Initialize the list of column information.
-        getColumnInfoList();
-
-        // Initialize the flexible map of column information. 
-        getColumnInfoFlexibleMap();
-
-        // Initialize the map of (public)method name. 
-        hasMethod("dummy");
-    }
-
-    // ===================================================================================
-    //                                                                       Name Handling
-    //                                                                       =============
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return Determination.
-     */
-    public boolean hasFlexibleName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-
-        // It uses column before table because column is used much more than table.
-        // This is the same consideration at other methods.
-        return getColumnInfoFlexibleMap().containsKey(flexibleName)
-               || getTableDbNameFlexibleMap().containsKey(flexibleName);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return DB name. (NotNull, NotEmpty)
-     */
-    public String findDbName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
-        if (columnInfoMap != null) {
-            return columnInfoMap.getColumnDbName();
-        }
-        final String tableDbName = getTableDbNameFlexibleMap().get(flexibleName);
-        if (tableDbName != null) {
-            return tableDbName;
-        }
-        String msg = "Not found DB name by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalArgumentException(msg);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return DB name. (NotNull, NotEmpty)
-     */
-    public String findPropertyName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
-        if (columnInfoMap != null) {
-            return columnInfoMap.getPropertyName();
-        }
-        final String tablePropertyName = getTablePropertyNameFlexibleMap().get(flexibleName);
-        if (tablePropertyName != null) {
-            return tablePropertyName;
-        }
-        String msg = "Not found property name by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalArgumentException(msg);
-    }
-
-    // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
     protected ${glUniqueInfo} cpui(${glColumnInfo} uniqueColumnInfo) { // createPrimaryUniqueInfo()
@@ -276,7 +205,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     //                                                                       Relation Info
     //                                                                       =============
     /**
-     * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
+     * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return The information of relation. (NotNull)
      */ 
     public ${glRelationInfo} findRelationInfo(String relationPropertyName) {
@@ -288,7 +217,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     //                                       Foreign Element
     //                                       ---------------
     /**
-     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * ${database.ImplementComment}
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Determination. (NotNull)
      */ 
     public boolean hasForeign(String foreignPropertyName) {
@@ -298,7 +228,8 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     }
 
     /**
-     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * ${database.ImplementComment}
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
     public ${glDBMeta} findForeignDBMeta(String foreignPropertyName) {
@@ -306,13 +237,14 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     }
 
     /**
-     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * ${database.ImplementComment}
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign information. (NotNull)
      */ 
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfo} findForeignInfo(String foreignPropertyName) {
+    public ${glForeignInfo} findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
-        java.lang.reflect.Method method = null;
+        Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
@@ -336,11 +268,62 @@ public abstract class ${myClassName} implements ${glDBMeta} {
         return new ${glForeignInfo}(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne);
     }
 
+    /**
+     * ${database.ImplementComment}
+     * @return The list of foreign information. (NotNull)
+     */
+    public List<${glForeignInfo}> getForeignInfoList() {
+        if (_foreignInfoList != null) {
+            return _foreignInfoList;
+        }
+        synchronized (this) {
+            if (_foreignInfoList != null) {
+                return _foreignInfoList;
+            }
+            Method[] methods = this.getClass().getMethods();
+            _foreignInfoList = newArrayList();
+            String prefix = "foreign";
+            Class<${glForeignInfo}> returnType = ${glForeignInfo}.class;
+            Object[] args = new Object[]{};
+            try {
+                for (Method method : methods) {
+                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                        _foreignInfoList.add((${glForeignInfo})method.invoke(this, args));
+                    }
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            return _foreignInfoList;
+        }
+    }
+
+    /**
+     * Get the flexible map of foreign information.
+     * @return The flexible map of foreign information. (NotNull, NotEmpty)
+     */
+    protected Map<String, ${glForeignInfo}> getForeignInfoFlexibleMap() {
+        if (_foreignInfoFlexibleMap != null) {
+            return _foreignInfoFlexibleMap;
+        }
+        final List<${glForeignInfo}> foreignInfoList = getForeignInfoList();
+        synchronized (this) {
+            if (_foreignInfoFlexibleMap != null) {
+                return _foreignInfoFlexibleMap;
+            }
+            _foreignInfoFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+            for (${glForeignInfo} foreignInfo : foreignInfoList) {
+                _foreignInfoFlexibleMap.put(foreignInfo.getForeignPropertyName(), foreignInfo);
+            }
+            return _foreignInfoFlexibleMap;
+        }
+    }
+
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
     /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Determination. (NotNull)
      */ 
     public boolean hasReferrer(String referrerPropertyName) {
@@ -350,7 +333,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     }
 
     /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */ 
     public ${glDBMeta} findReferrerDBMeta(String referrerPropertyName) {
@@ -359,7 +342,7 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     }
 
     /**
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer information. (NotNull)
      */ 
     public ${glReferrerInfo} findReferrerInfo(String referrerPropertyName) {
@@ -387,6 +370,57 @@ public abstract class ${myClassName} implements ${glDBMeta} {
                              , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
                              , boolean oneToOne) { // createReferrerInfo()
         return new ${glReferrerInfo}(propName, localDbm, referrerDbm, localReferrerColumnInfoMap, oneToOne);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return The list of referrer information. (NotNull)
+     */
+    public List<${glReferrerInfo}> getReferrerInfoList() {
+        if (_referrerInfoList != null) {
+            return _referrerInfoList;
+        }
+        synchronized (this) {
+            if (_referrerInfoList != null) {
+                return _referrerInfoList;
+            }
+            Method[] methods = this.getClass().getMethods();
+            _referrerInfoList = newArrayList();
+            String prefix = "foreign";
+            Class<${glReferrerInfo}> returnType = ${glReferrerInfo}.class;
+            Object[] args = new Object[]{};
+            try {
+                for (Method method : methods) {
+                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                        _referrerInfoList.add((${glReferrerInfo})method.invoke(this, args));
+                    }
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            return _referrerInfoList;
+        }
+    }
+
+    /**
+     * Get the flexible map of referrer information.
+     * @return The flexible map of referrer information. (NotNull, NotEmpty)
+     */
+    protected Map<String, ${glReferrerInfo}> getReferrerInfoFlexibleMap() {
+        if (_referrerInfoFlexibleMap != null) {
+            return _referrerInfoFlexibleMap;
+        }
+        final List<${glReferrerInfo}> referrerInfoList = getForeignInfoList();
+        synchronized (this) {
+            if (_referrerInfoFlexibleMap != null) {
+                return _referrerInfoFlexibleMap;
+            }
+            _referrerInfoFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+            for (${glForeignInfo} referrerInfo : referrerInfoList) {
+                _referrerInfoFlexibleMap.put(referrerInfo.getReferrerPropertyName(), referrerInfo);
+            }
+            return _referrerInfoFlexibleMap;
+        }
     }
 
     // -----------------------------------------------------
@@ -530,6 +564,81 @@ public abstract class ${myClassName} implements ${glDBMeta} {
     public boolean hasUpdateDate() { return false; }
     public ${glColumnInfo} getUpdateDateColumnInfo() { return null; }
     public boolean hasCommonColumn() { return false; }
+
+    // ===================================================================================
+    //                                                             Resource Initialization
+    //                                                             =======================
+    protected void initializeInformationResource() { // for instance initializer of subclass.
+        // Initialize the flexible map of table DB name.
+        getTableDbNameFlexibleMap();
+
+        // Initialize the flexible map of table property name.
+        getTablePropertyNameFlexibleMap();
+
+        // Initialize the list of column information.
+        getColumnInfoList();
+
+        // Initialize the flexible map of column information. 
+        getColumnInfoFlexibleMap();
+
+        // Initialize the map of (public)method name. 
+        hasMethod("dummy");
+    }
+
+    // ===================================================================================
+    //                                                                       Name Handling
+    //                                                                       =============
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
+     * @return Determination.
+     */
+    public boolean hasFlexibleName(String flexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+
+        // It uses column before table because column is used much more than table.
+        // This is the same consideration at other methods.
+        return getColumnInfoFlexibleMap().containsKey(flexibleName)
+               || getTableDbNameFlexibleMap().containsKey(flexibleName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
+     * @return DB name. (NotNull, NotEmpty)
+     */
+    public String findDbName(String flexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        if (columnInfoMap != null) {
+            return columnInfoMap.getColumnDbName();
+        }
+        final String tableDbName = getTableDbNameFlexibleMap().get(flexibleName);
+        if (tableDbName != null) {
+            return tableDbName;
+        }
+        String msg = "Not found DB name by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalArgumentException(msg);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
+     * @return DB name. (NotNull, NotEmpty)
+     */
+    public String findPropertyName(String flexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
+        final ${glColumnInfo} columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
+        if (columnInfoMap != null) {
+            return columnInfoMap.getPropertyName();
+        }
+        final String tablePropertyName = getTablePropertyNameFlexibleMap().get(flexibleName);
+        if (tablePropertyName != null) {
+            return tablePropertyName;
+        }
+        String msg = "Not found property name by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalArgumentException(msg);
+    }
 
     // ===================================================================================
     //                                                                     Entity Handling

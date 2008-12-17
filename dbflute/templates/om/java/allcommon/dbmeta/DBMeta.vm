@@ -62,82 +62,8 @@ public interface ${myClassName} {
     public String getTableSqlName();
 
     // ===================================================================================
-    //                                                                       Name Handling
-    //                                                                       =============
-    /**
-     * Has object of flexible name? {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return Determination.
-     */
-    public boolean hasFlexibleName(String flexibleName);
-
-    /**
-     * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return The DB name of anything. (NotNull and NotEmpty)
-     */
-    public String findDbName(String flexibleName);
-
-    /**
-     * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return The DB name of anything. (NotNull and NotEmpty)
-     */
-    public String findPropertyName(String flexibleName);
-
-    // ===================================================================================
-    //                                                                           Type Name
-    //                                                                           =========
-    /**
-     * Get the type name of entity.
-     * @return The type name of entity. (NotNull)
-     */ 
-    public String getEntityTypeName();
-
-    /**
-     * Get the type name of condition-bean.
-     * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
-     */ 
-    public String getConditionBeanTypeName();
-
-    /**
-     * Get the type name of DAO.
-     * @return The type name of DAO. (Nullable: If the DAO does not exist)
-     */ 
-    public String getDaoTypeName();
-
-    /**
-     * Get the type name of behavior.
-     * @return The type name of behavior. (Nullable: If the behavior does not exist)
-     */ 
-    public String getBehaviorTypeName();
-
-    // ===================================================================================
-    //                                                                         Object Type
-    //                                                                         ===========
-    /**
-     * Get the type of entity.
-     * @return The type of entity. (NotNull)
-     */ 
-    public Class<? extends ${glEntity}> getEntityType();
-
-    // ===================================================================================
-    //                                                                     Object Instance
-    //                                                                     ===============
-    /**
-     * New the instance of entity.
-     * @return The instance of entity. (NotNull)
-     */ 
-    public ${glEntity} newEntity();
-
-    // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    /**
-     * @return The list of DB name of column. (NotNull and NotEmpty)
-     */
-    public List<${glColumnInfo}> getColumnInfoList();
-
     /**
      * Has column?
      * @param columnFlexibleName The flexible name of the column. (NotNull)
@@ -156,6 +82,12 @@ public interface ${myClassName} {
      * @return The information of the column. (NotNull)
      */ 
     public ${glColumnInfo} findColumnInfo(String columnFlexibleName);
+
+    /**
+     * Get the list of column information.
+     * @return The list of column information. (NotNull and NotEmpty)
+     */
+    public List<${glColumnInfo}> getColumnInfoList();
 
     // ===================================================================================
     //                                                                         Unique Info
@@ -186,7 +118,7 @@ public interface ${myClassName} {
     //                                      ----------------
     /**
      * Find relation info.
-     * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
+     * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return Relation info. (NotNull)
      */ 
     public ${glRelationInfo} findRelationInfo(String relationPropertyName);
@@ -196,48 +128,60 @@ public interface ${myClassName} {
     //                                       ---------------
     /**
      * Has foreign?
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Determination. (NotNull)
-     */ 
+     */
     public boolean hasForeign(String foreignPropName);
 
     /**
-     * Find foreign dbmeta.
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * Find foreign DB meta.
+     * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Foreign DBMeta. (NotNull)
-     */ 
+     */
     public ${myClassName} findForeignDBMeta(String foreignPropName);
 
     /**
      * Find foreign info.
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Foreign info. (NotNull)
-     */ 
+     */
     public ${glForeignInfo} findForeignInfo(String foreignPropName);
+
+    /**
+     * Get the list of foreign information.
+     * @return The list of foreign information. (NotNull)
+     */
+    public List<${glForeignInfo}> getForeignInfoList();
 
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
     /**
      * Has referrer?
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Determination. (NotNull)
      */ 
     public boolean hasReferrer(String referrerPropertyName);
 
     /**
-     * Find referrer dbmeta.
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * Find referrer DB meta.
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */ 
     public ${myClassName} findReferrerDBMeta(String referrerPropertyName);
 
     /**
      * Find referrer information.
-     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer information. (NotNull)
      */ 
     public ${glReferrerInfo} findReferrerInfo(String referrerPropertyName);
+
+    /**
+     * Get the list of referrer information.
+     * @return The list of referrer information. (NotNull)
+     */
+    public List<${glReferrerInfo}> getReferrerInfoList();
 
     // -----------------------------------------------------
     //                                        Relation Trace
@@ -323,6 +267,75 @@ public interface ${myClassName} {
      * @return Determination.
      */
     public boolean hasCommonColumn();
+
+    // ===================================================================================
+    //                                                                       Name Handling
+    //                                                                       =============
+    /**
+     * Has object of flexible name? {Target objects are TABLE and COLUMN}
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
+     * @return Determination.
+     */
+    public boolean hasFlexibleName(String flexibleName);
+
+    /**
+     * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
+     * @return The DB name of anything. (NotNull and NotEmpty)
+     */
+    public String findDbName(String flexibleName);
+
+    /**
+     * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
+     * @return The DB name of anything. (NotNull and NotEmpty)
+     */
+    public String findPropertyName(String flexibleName);
+
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
+    /**
+     * Get the type name of entity.
+     * @return The type name of entity. (NotNull)
+     */ 
+    public String getEntityTypeName();
+
+    /**
+     * Get the type name of condition-bean.
+     * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
+     */ 
+    public String getConditionBeanTypeName();
+
+    /**
+     * Get the type name of DAO.
+     * @return The type name of DAO. (Nullable: If the DAO does not exist)
+     */ 
+    public String getDaoTypeName();
+
+    /**
+     * Get the type name of behavior.
+     * @return The type name of behavior. (Nullable: If the behavior does not exist)
+     */ 
+    public String getBehaviorTypeName();
+
+    // ===================================================================================
+    //                                                                         Object Type
+    //                                                                         ===========
+    /**
+     * Get the type of entity.
+     * @return The type of entity. (NotNull)
+     */ 
+    public Class<? extends ${glEntity}> getEntityType();
+
+    // ===================================================================================
+    //                                                                     Object Instance
+    //                                                                     ===============
+    /**
+     * New the instance of entity.
+     * @return The instance of entity. (NotNull)
+     */ 
+    public ${glEntity} newEntity();
 
     // ===================================================================================
     //                                                                     Entity Handling
