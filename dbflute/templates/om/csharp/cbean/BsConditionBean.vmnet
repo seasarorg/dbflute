@@ -222,7 +222,7 @@ namespace ${glPackageBaseCB} {
 		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
 		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 #if ($fk.hasDynamicFixedCondition())
-			public ${tmpCQClassName} qy() { return _myQyCall.qy().ConditionQuery${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _myQyCall.qy().ConditionQuery${tmpPropertyNameInitCap}; }
 #else
 			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
 #end
