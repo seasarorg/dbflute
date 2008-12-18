@@ -69,7 +69,7 @@ public class ${glBuriDef} {
 #end
         ;
         private static final Map<String, ${packageName}_${processName}_Action> _codeValueMap = new HashMap<String, ${packageName}_${processName}_Action>();
-        static { for (${packageName}_${processName}_Status value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        static { for (${packageName}_${processName}_Action value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
         private String _code;
         private ${packageName}_${processName}_Action(String code) {
             _code = code;
