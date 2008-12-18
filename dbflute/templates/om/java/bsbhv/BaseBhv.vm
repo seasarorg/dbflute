@@ -678,6 +678,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
         ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
         BuriPathDataCB cb = bhv.newMyConditionBean();
+        cb.specify().columnPathName();
         cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
         cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
         String pathName = bhv.selectEntityWithDeletedCheck(cb).getPathName();
