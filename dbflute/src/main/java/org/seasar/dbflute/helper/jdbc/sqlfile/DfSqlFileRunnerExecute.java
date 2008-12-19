@@ -204,6 +204,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Result Count]" + getLineSeparator() + resultCount + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[Result List]" + getLineSeparator();
         for (Map<String, String> recordMap : resultList) {
             msg = msg + recordMap + getLineSeparator();
