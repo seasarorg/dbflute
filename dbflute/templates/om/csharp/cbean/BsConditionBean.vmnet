@@ -119,8 +119,8 @@ namespace ${glPackageBaseCB} {
 #end
 #foreach ($referrer in $table.referrers)
   #if (${referrer.isOneToOne()})
-    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameInitCapAsOne}")
-    #set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
+    #set ($tmpPropertyName = "${referrer.referrerPropertyNameInitCapAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
     #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
         protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
@@ -129,7 +129,7 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(); });
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
             { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}()); }
             return _nss${tmpPropertyNameInitCap};

@@ -80,7 +80,7 @@ namespace ${myDBMetaPackageName} {
         public override ${glUniqueInfo} PrimaryUniqueInfo { get {
 #if ($table.hasPrimaryKey())
 #if ($table.hasOnlyOnePrimaryKey())
-            return cpui(Column${table.primaryKeyAsOne.javaName}());
+            return cpui(Column${table.primaryKeyAsOne.javaName});
 #else
             List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
 #foreach ($col in $table.primaryKey)
