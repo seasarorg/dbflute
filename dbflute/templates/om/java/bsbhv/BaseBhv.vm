@@ -677,13 +677,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if (!$table.isRequiresAction())
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName});
-        return xgetCurrentStatus(${myEntityVariableName});
     }
 
 #end
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
         _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
-        return xgetCurrentStatus(${myEntityVariableName});
     }
 
     public java.util.List<${glBuriDef}.${processName}_Status> getStatuses_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
