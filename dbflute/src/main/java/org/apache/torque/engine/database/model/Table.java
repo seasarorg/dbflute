@@ -2353,9 +2353,9 @@ public class Table {
         return buriProperties.getTableProcessForMethodNameList(getName());
     }
 
-    public boolean isRequiredAction() {
+    public boolean isRequiresAction() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isRequiredAction();
+        return buriProperties.isRequiresAction();
     }
 
     // ===================================================================================

@@ -291,7 +291,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + getLineSeparator();
             msg = msg + "[SetupSelect Method]" + getLineSeparator() + methodName + getLineSeparator();
             msg = msg + getLineSeparator();
-            msg = msg + "[ConditionBean SQL]" + getLineSeparator() + toDisplaySql() + getLineSeparator();
+            msg = msg + "[ConditionBean SQL]" + getLineSeparator() + ToDisplaySql() + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }

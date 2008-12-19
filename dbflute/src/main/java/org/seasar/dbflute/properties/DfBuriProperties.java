@@ -55,7 +55,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     ; tableProcessMap = list:{ [package].[process] }
-    //     ; requiredAction = false
+    //     ; requiresAction = false
     // }
 
     // ===================================================================================
@@ -205,10 +205,10 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Required Action
+    //                                                                     Requires Action
     //                                                                     ===============
-    public boolean isRequiredAction() {
-        return isBuriProperty("requiredAction");
+    public boolean isRequiresAction() {
+        return isBuriProperty("requiresAction");
     }
 
     // ===================================================================================

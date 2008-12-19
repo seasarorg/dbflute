@@ -404,7 +404,7 @@ namespace ${glPackageBaseCQ} {
             cq.xsetForeignPropertyName("${fk.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${fk.ForeignPropertyNameInitCap}() {
-            ${foreignCQClassName} cq = ConditionQuery${fk.foreignPropertyNameInitCap}();
+            ${foreignCQClassName} cq = ConditionQuery${fk.foreignPropertyNameInitCap};
             Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
 #foreach ($columnName in $fk.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
@@ -446,7 +446,7 @@ namespace ${glPackageBaseCQ} {
             cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${referrer.ReffererPropertyNameInitCapAsOne}() {
-            ${relatedCQClassName} cq = ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
+            ${relatedCQClassName} cq = ConditionQuery${referrer.referrerPropertyNameInitCapAsOne};
             Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))

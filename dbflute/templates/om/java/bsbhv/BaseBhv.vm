@@ -674,7 +674,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
-#if (!$table.isRequiredAction())
+#if (!$table.isRequiresAction())
     public ${glBuriDef}.${processName}_Status toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName});
         return xgetCurrentStatus(${myEntityVariableName});

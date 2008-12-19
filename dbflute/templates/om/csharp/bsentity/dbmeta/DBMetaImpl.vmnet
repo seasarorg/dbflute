@@ -77,23 +77,21 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        public override ${glUniqueInfo} PrimaryUniqueInfo {
-            get {
+        public override ${glUniqueInfo} PrimaryUniqueInfo { get {
 #if ($table.hasPrimaryKey())
 #if ($table.hasOnlyOnePrimaryKey())
-                return cpui(column${table.primaryKeyAsOne.javaName}());
+            return cpui(Column${table.primaryKeyAsOne.javaName}());
 #else
-                List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
+            List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
 #foreach ($col in $table.primaryKey)
-                ls.add(Column${col.javaName});
+            ls.add(Column${col.javaName});
 #end
-                return cpui(ls);
+            return cpui(ls);
 #end
 #else
-                throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
+            throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
 #end
-            }
-        }
+        }}
 
         // -------------------------------------------------
         //                                   Primary Element
