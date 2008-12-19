@@ -675,18 +675,29 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
 #if (!$table.isRequiresAction())
-    public ${glBuriDef}.${processName}_Status toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName});
         return xgetCurrentStatus(${myEntityVariableName});
     }
 
 #end
-    public ${glBuriDef}.${processName}_Status toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
+    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
         _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
         return xgetCurrentStatus(${myEntityVariableName});
     }
 
-    public List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
+    public java.util.List<${glBuriDef}.${processName}_Status> getStatuses_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName});
+        java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
+        if (buriPathDataList.isEmpty()) { return statusList; }
+        for (BuriPathData buriPathData : buriPathDataList) {
+            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
+            if (status != null) { statusList.add(status); }
+        }
+        return statusList;
+    }
+
+    public java.util.List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
         assertObjectNotNull("statuses", statuses);
         ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.setupSelect_BuriPathData();
@@ -699,15 +710,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-    private ${glBuriDef}.${processName}_Status xgetCurrentStatus(${myExtendedObjectClassName} ${myEntityVariableName}) {
+    private List<BuriPathData> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}) {
         ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
         BuriPathDataCB cb = bhv.newMyConditionBean();
         cb.specify().columnPathName();
         cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
         cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
-        BuriPathData buriPathData = bhv.selectEntity(cb);
-        if (buriPathData == null) { return null; }
-        return ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
+        return bhv.selectList(cb);
     }
 
     private ${glPackageExtendedBhv}.BuriPathDataBhv xgetBuriPathDataBhv() {
