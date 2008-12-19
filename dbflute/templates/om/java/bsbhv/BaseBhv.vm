@@ -674,16 +674,16 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
+#if (!$table.isRequiredAction())
+    public ${glBuriDef}.${processName}_Status toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName});
+        return xgetCurrentStatus(${myEntityVariableName});
+    }
+
+#end
     public ${glBuriDef}.${processName}_Status toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
         _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
-        ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
-        BuriPathDataCB cb = bhv.newMyConditionBean();
-        cb.specify().columnPathName();
-        cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
-        cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
-        BuriPathData buriPathData = bhv.selectEntity(cb);
-        if (buriPathData == null) { return null; }
-        return ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
+        return xgetCurrentStatus(${myEntityVariableName});
     }
 
     public List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
@@ -698,6 +698,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return selectList(cb);
     }
 #end
+
+    private ${glBuriDef}.${processName}_Status xgetCurrentStatus(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
+        BuriPathDataCB cb = bhv.newMyConditionBean();
+        cb.specify().columnPathName();
+        cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
+        cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
+        BuriPathData buriPathData = bhv.selectEntity(cb);
+        if (buriPathData == null) { return null; }
+        return ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
+    }
 
     private ${glPackageExtendedBhv}.BuriPathDataBhv xgetBuriPathDataBhv() {
         return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriPathDataBhv.class);

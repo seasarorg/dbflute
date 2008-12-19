@@ -2353,6 +2353,11 @@ public class Table {
         return buriProperties.getTableProcessForMethodNameList(getName());
     }
 
+    public boolean isRequiredAction() {
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        return buriProperties.isRequiredAction();
+    }
+
     // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============

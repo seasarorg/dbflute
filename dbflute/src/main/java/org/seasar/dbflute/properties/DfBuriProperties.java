@@ -55,6 +55,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     ; tableProcessMap = list:{ [package].[process] }
+    //     ; requiredAction = false
     // }
 
     // ===================================================================================
@@ -73,51 +74,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             return false;
         }
         return getTargetProcessMap().containsKey(tableName);
-    }
-
-    // ===================================================================================
-    //                                                                   Table Process Map
-    //                                                                   =================
-    protected Map<String, List<String>> _tableProcessMap;
-
-    protected Map<String, List<String>> getTargetProcessMap() {
-        if (_tableProcessMap == null) {
-            _tableProcessMap = DfStringKeyMap.createAsFlexible();
-            final Map<String, Object> buriPropertyAsMap = getBuriPropertyAsMap("tableProcessMap");
-            if (buriPropertyAsMap != null) {
-                final Set<String> tableNameSet = buriPropertyAsMap.keySet();
-                for (String tableName : tableNameSet) {
-                    final Object processMappingValue = buriPropertyAsMap.get(tableName);
-                    if (processMappingValue == null) {
-                        continue;
-                    }
-                    assertProcessMappingValueIsList(processMappingValue);
-                    @SuppressWarnings("unchecked")
-                    List<String> processList = (List<String>) processMappingValue;
-                    _tableProcessMap.put(tableName, processList);
-                }
-            }
-        }
-        return _tableProcessMap;
-    }
-
-    public List<String> getTableProcessForMethodNameList(String tableName) {
-        final List<String> processList = getTargetProcessMap().get(tableName);
-        if (processList == null) {
-            return new ArrayList<String>();
-        }
-        final ArrayList<String> resultList = new ArrayList<String>();
-        for (String process : processList) {
-            resultList.add(DfStringUtil.replace(process, ".", "_"));
-        }
-        return resultList;
-    }
-
-    protected void assertProcessMappingValueIsList(Object processMappingValue) {
-        if (!(processMappingValue instanceof List)) {
-            String msg = "The type of process mapping value should be List: " + processMappingValue;
-            throw new IllegalStateException(msg);
-        }
     }
 
     // ===================================================================================
@@ -201,6 +157,58 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         Map<String, List<String>> map = processMap.get(processName);
         List<String> actionList = map.get("action");
         return actionList != null ? actionList : new ArrayList<String>();
+    }
+
+    // ===================================================================================
+    //                                                                   Table Process Map
+    //                                                                   =================
+    protected Map<String, List<String>> _tableProcessMap;
+
+    protected Map<String, List<String>> getTargetProcessMap() {
+        if (_tableProcessMap == null) {
+            _tableProcessMap = DfStringKeyMap.createAsFlexible();
+            final Map<String, Object> buriPropertyAsMap = getBuriPropertyAsMap("tableProcessMap");
+            if (buriPropertyAsMap != null) {
+                final Set<String> tableNameSet = buriPropertyAsMap.keySet();
+                for (String tableName : tableNameSet) {
+                    final Object processMappingValue = buriPropertyAsMap.get(tableName);
+                    if (processMappingValue == null) {
+                        continue;
+                    }
+                    assertProcessMappingValueIsList(processMappingValue);
+                    @SuppressWarnings("unchecked")
+                    List<String> processList = (List<String>) processMappingValue;
+                    _tableProcessMap.put(tableName, processList);
+                }
+            }
+        }
+        return _tableProcessMap;
+    }
+
+    public List<String> getTableProcessForMethodNameList(String tableName) {
+        final List<String> processList = getTargetProcessMap().get(tableName);
+        if (processList == null) {
+            return new ArrayList<String>();
+        }
+        final ArrayList<String> resultList = new ArrayList<String>();
+        for (String process : processList) {
+            resultList.add(DfStringUtil.replace(process, ".", "_"));
+        }
+        return resultList;
+    }
+
+    protected void assertProcessMappingValueIsList(Object processMappingValue) {
+        if (!(processMappingValue instanceof List)) {
+            String msg = "The type of process mapping value should be List: " + processMappingValue;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     Required Action
+    //                                                                     ===============
+    public boolean isRequiredAction() {
+        return isBuriProperty("requiredAction");
     }
 
     // ===================================================================================
