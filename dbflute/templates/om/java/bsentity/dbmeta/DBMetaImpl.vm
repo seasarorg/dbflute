@@ -69,7 +69,7 @@ public class ${myClassName} extends ${glAbstractDBMeta} {
 #end
 #else
     public ${glUniqueInfo} getPrimaryUniqueInfo() {
-        throw new UnsupportedOperationException("The table doen not have primary key: " + getTableDbName());
+        throw new UnsupportedOperationException("The table does not have primary key: " + getTableDbName());
     }
 #end
     public boolean hasPrimaryKey() { return ${table.hasPrimaryKey()}; }

@@ -89,7 +89,7 @@ namespace ${myDBMetaPackageName} {
             return cpui(ls);
 #end
 #else
-            throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
+            throw new NotSupportedException("The table does not have primary key: " + TableDbName);
 #end
         }}
 
