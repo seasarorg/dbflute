@@ -214,26 +214,11 @@ namespace ${glPackageBaseCommonCBean} {
         }}
 
         // ===============================================================================
-        //                                                                   Assist Helper
-        //                                                                   =============
-        protected void DoSetupSelect(SsCall callback) {
-            String foreignPropertyName = callback.Invoke().getForeignPropertyName();
-            assertSetupSelectBeforeUnion(foreignPropertyName);
-            String foreignTableAliasName = callback.Invoke().getRealAliasName();
-            String localRelationPath = LocalCQ.getRelationPath();
-            SqlClause.registerSelectedSelectColumn(foreignTableAliasName, TableDbName, foreignPropertyName, localRelationPath);
-            SqlClause.registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
-        }
-
-        protected delegate ${glConditionQuery} SsCall();
-
-        // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
         public virtual String ToDisplaySql() {
             return ${glConditionBeanContext}.ConvertConditionBean2DisplaySql(this);
         }
-        
     
         // [DBFlute-0.7.4]
         // ===============================================================================
@@ -258,7 +243,70 @@ namespace ${glPackageBaseCommonCBean} {
         public void XSetupForInScopeSubQuery() {
             _forInScopeSubQuery = true;
         }
+
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
+        protected void doSetupSelect(SsCall callback) {
+            String foreignPropertyName = callback.Invoke().getForeignPropertyName();
+            assertSetupSelectBeforeUnion(foreignPropertyName);
+            String foreignTableAliasName = callback.Invoke().getRealAliasName();
+            String localRelationPath = LocalCQ.getRelationPath();
+            SqlClause.registerSelectedSelectColumn(foreignTableAliasName, TableDbName, foreignPropertyName, localRelationPath);
+            SqlClause.registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+        }
+
+        protected delegate ${glConditionQuery} SsCall();
+
+        // ===============================================================================
+        //                                                                   Assert Helper
+        //                                                                   =============
+        protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
+            if (HasUnionQueryOrUnionAllQuery()) {
+                throwSetupSelectAfterUnionException(this.GetType().Name, foreignPropertyName);
+            }
+        }
+
+        protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
+            String methodName = "setupSelect_" + initCap(foreignPropertyName) + "()";
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "You should NOT call " + methodName + " after calling union()!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + methodName + " should be called before calling union()." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
+            msg = msg + "    " + className + " cb = new " + className + "();" + getLineSeparator();
+            msg = msg + "    cb." + methodName + "; // You should call here!" + getLineSeparator();
+            msg = msg + "    cb.query().setXxx...;" + getLineSeparator();
+            msg = msg + "    cb.union(new UnionQuery<" + className + ">() {" + getLineSeparator();
+            msg = msg + "        public void query(" + className + " unionCB) {" + getLineSeparator();
+            msg = msg + "            unionCB.query().setXxx...;" + getLineSeparator();
+            msg = msg + "        }" + getLineSeparator();
+            msg = msg + "    });" + getLineSeparator();
+            msg = msg + "    // You should not call setupSelect after calling union()!" + getLineSeparator();
+            msg = msg + "    // cb." + methodName + ";" + getLineSeparator();
+            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SetupSelect Method]" + getLineSeparator() + methodName + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[ConditionBean SQL]" + getLineSeparator() + toDisplaySql() + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
     
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected String initCap(String str) {
+            return ${glSimpleStringUtil}.InitCap(str);
+        }
+    
+        protected String getLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============

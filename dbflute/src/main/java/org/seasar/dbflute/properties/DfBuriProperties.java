@@ -46,8 +46,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
 
     // [Buri Definition]
     // map:{
-    //     ; targetTableList = list:{ DOCUMENT }
-    //     ; outputDirectory = ./../
     //     ; activityDefinitionMap = map:{
     //         ; [package] = map:{
     //             ; [process] = map:{
@@ -56,20 +54,14 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //             }
     //         }
     //     }
+    //     ; tableProcessMap = list:{ [package].[process] }
     // }
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean isUseBuri() {
-        if (hasBuriDefinitionMap()) {
-            return true;
-        }
-        boolean isUseBuri = booleanProp("torque.isUseBuri", false);
-        if (isUseBuri) {
-            return true;
-        }
-        return booleanProp("torque.isUseS2Buri", false);
+        return hasBuriDefinitionMap();
     }
 
     protected boolean hasBuriDefinitionMap() {
@@ -126,20 +118,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             String msg = "The type of process mapping value should be List: " + processMappingValue;
             throw new IllegalStateException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                    Output Directory
-    //                                                                    ================
-    /**
-     * @return The directory for output. (NotNull)
-     */
-    public String getOutputDirectory() { // not required
-        final String value = (String) getBuriDefinitionMap().get("outputDirectory");
-        if (value == null) {
-            return getBasicProperties().getOutputDirectory();
-        }
-        return getBasicProperties().getOutputDirectory() + "/" + value;
     }
 
     // ===================================================================================

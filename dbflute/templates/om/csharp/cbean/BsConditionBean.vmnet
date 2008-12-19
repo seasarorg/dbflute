@@ -111,7 +111,7 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-            DoSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
             { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
             return _nss${tmpPropertyNameInitCap};
@@ -129,7 +129,7 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            DoSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
             { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}()); }
             return _nss${tmpPropertyNameInitCap};

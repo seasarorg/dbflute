@@ -12,43 +12,11 @@ namespace ${glPackageBaseCommonDBMeta} {
     public interface ${myClassName} {
 
         // ===============================================================================
-        //                                                                      Table Name
+        //                                                                      Table Info
         //                                                                      ==========
         String TableDbName { get; }
         String TablePropertyName { get; }
         String TableSqlName { get; }
-
-        // ===============================================================================
-        //                                                                   Name Handling
-        //                                                                   =============
-        bool HasFlexibleName(String flexibleName);
-        String FindDbName(String flexibleName);
-        String FindPropertyName(String flexibleName);
-
-        // ===============================================================================
-        //                                                                        Name Map
-        //                                                                        ========
-        Map<String, String> DbNamePropertyNameKeyToLowerMap { get; }
-        Map<String, String> PropertyNameDbNameKeyToLowerMap { get; }
-
-        // ===============================================================================
-        //                                                                       Type Name
-        //                                                                       =========
-        String EntityTypeName { get; }
-        String DaoTypeName { get; }
-        String ConditionBeanTypeName { get; }
-        String BehaviorTypeName { get; }
-
-        // ===============================================================================
-        //                                                                     Object Type
-        //                                                                     ===========
-        Type EntityType { get; }
-
-        // ===============================================================================
-        //                                                                 Object Instance
-        //                                                                 ===============
-        ${glEntity} NewEntity();
-        ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                                     Column Info
@@ -109,6 +77,38 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                              Common Column Info
         //                                                              ==================
         bool HasCommonColumn { get; }
+
+        // ===============================================================================
+        //                                                                   Name Handling
+        //                                                                   =============
+        bool HasFlexibleName(String flexibleName);
+        String FindDbName(String flexibleName);
+        String FindPropertyName(String flexibleName);
+
+        // ===============================================================================
+        //                                                                        Name Map
+        //                                                                        ========
+        Map<String, String> DbNamePropertyNameKeyToLowerMap { get; }
+        Map<String, String> PropertyNameDbNameKeyToLowerMap { get; }
+
+        // ===============================================================================
+        //                                                                       Type Name
+        //                                                                       =========
+        String EntityTypeName { get; }
+        String DaoTypeName { get; }
+        String ConditionBeanTypeName { get; }
+        String BehaviorTypeName { get; }
+
+        // ===============================================================================
+        //                                                                     Object Type
+        //                                                                     ===========
+        Type EntityType { get; }
+
+        // ===============================================================================
+        //                                                                 Object Instance
+        //                                                                 ===============
+        ${glEntity} NewEntity();
+        ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
         //                                                           Entity Property Setup

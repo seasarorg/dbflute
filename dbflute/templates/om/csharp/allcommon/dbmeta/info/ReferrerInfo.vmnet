@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.localDBMeta = localDBMeta;
             this.referrerDBMeta = referrerDBMeta;
             this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
-            final Set<${glColumnInfo}> keySet = localReferrerColumnInfoMap.keySet();
+            Set<${glColumnInfo}> keySet = localReferrerColumnInfoMap.keySet();
             referrerLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
             foreach (${glColumnInfo} key in localReferrerColumnInfoMap.keySet()) {
                 ${glColumnInfo} value = localReferrerColumnInfoMap.get(key);

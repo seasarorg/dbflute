@@ -40,11 +40,9 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                      Table Info
         //                                                                      ==========
-        #region Table Name
         public override String TableDbName { get { return "$table.name"; } }
         public override String TablePropertyName { get { return "$table.javaName"; } }
         public override String TableSqlName { get { return "$table.tableSqlName"; } }
-        #endregion
 
         // ===============================================================================
         //                                                                     Column Info
@@ -75,6 +73,100 @@ namespace ${myDBMetaPackageName} {
             _columnInfoList.add(Column${col.javaName});
 #end
         }
+
+        // ===============================================================================
+        //                                                                     Unique Info
+        //                                                                     ===========
+        public override ${glUniqueInfo} PrimaryUniqueInfo {
+            get {
+#if ($table.hasPrimaryKey())
+#if ($table.hasOnlyOnePrimaryKey())
+                return cpui(column${table.primaryKeyAsOne.javaName}());
+#else
+                List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
+#foreach ($col in $table.primaryKey)
+                ls.add(Column${col.javaName});
+#end
+                return cpui(ls);
+#end
+#else
+                throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
+#end
+            }
+        }
+
+        // -------------------------------------------------
+        //                                   Primary Element
+        //                                   ---------------
+        public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
+        public override bool HasTwoOrMorePrimaryKeys { get { return ${table.hasTwoOrMorePrimaryKeys()}; } }
+
+        // ===============================================================================
+        //                                                                   Relation Info
+        //                                                                   =============
+        // -------------------------------------------------
+        //                                   Foreign Element
+        //                                   ---------------
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+        public ${glForeignInfo} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($column in $foreignKeys.localColumnList)
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
+#end
+            return cfi("${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}", this, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
+        }}
+#end
+
+#foreach ($referrer in $table.referrers)
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+#if (${referrer.isOneToOne()})
+        public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($column in $referrer.foreignColumnList)
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+#end
+            return cfi("${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+        }}
+#end
+#end
+
+        // -------------------------------------------------
+        //                                  Referrer Element
+        //                                  ----------------
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+#set ($referrerTable = $referrer.table)
+        public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($column in $referrer.foreignColumnList)
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+#end
+            return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
+        }}
+#end
+#end
+
+        // ===============================================================================
+        //                                                                    Various Info
+        //                                                                    ============
+#if ($table.isUseIdentity())
+        public override bool HasIdentity { get { return true; } }
+#end
+#if ($table.isUseSequence())
+        public override bool HasSequence { get { return true; } }
+        public override String SequenceNextValSql { get { return "${table.SequenceNextSql}"; } }
+#end
+#if ($table.isUseVersionNo())
+        public override bool HasVersionNo { get { return true; } }
+        public override ${glColumnInfo} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
+#end
+#if ($table.isUseUpdateDate())
+        public override bool HasUpdateDate { get { return true; } }
+        public override ${glColumnInfo} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
+#end
+        public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
 
         // ===============================================================================
         //                                                                 Name Definition
@@ -198,100 +290,6 @@ namespace ${myDBMetaPackageName} {
 #if (${isExistConditionBean})
         public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
 #end
-
-        // ===============================================================================
-        //                                                                     Unique Info
-        //                                                                     ===========
-        public override ${glUniqueInfo} PrimaryUniqueInfo {
-            get {
-#if ($table.hasPrimaryKey())
-#if ($table.hasOnlyOnePrimaryKey())
-                return cpui(column${table.primaryKeyAsOne.javaName}());
-#else
-                List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
-#foreach ($col in $table.primaryKey)
-                ls.add(Column${col.javaName});
-#end
-                return cpui(ls);
-#end
-#else
-                throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
-#end
-            }
-        }
-
-        // -------------------------------------------------
-        //                                   Primary Element
-        //                                   ---------------
-        public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
-        public override bool HasTwoOrMorePrimaryKeys { get { return ${table.hasTwoOrMorePrimaryKeys()}; } }
-
-        // ===============================================================================
-        //                                                                   Relation Info
-        //                                                                   =============
-        // -------------------------------------------------
-        //                                   Foreign Element
-        //                                   ---------------
-#foreach ($foreignKeys in $table.foreignKeys)
-#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
-        public ${glForeignInfo} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
-            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $foreignKeys.localColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
-#end
-            return cfi("${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}", this, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
-        }}
-#end
-
-#foreach ($referrer in $table.referrers)
-#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
-#if (${referrer.isOneToOne()})
-        public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
-            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $referrer.foreignColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
-#end
-            return cfi("${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
-        }}
-#end
-#end
-
-        // -------------------------------------------------
-        //                                  Referrer Element
-        //                                  ----------------
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
-#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
-#set ($referrerTable = $referrer.table)
-        public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
-            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $referrer.foreignColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
-#end
-            return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
-        }}
-#end
-#end
-
-        // ===============================================================================
-        //                                                                    Various Info
-        //                                                                    ============
-#if ($table.isUseIdentity())
-        public override bool HasIdentity { get { return true; } }
-#end
-#if ($table.isUseSequence())
-        public override bool HasSequence { get { return true; } }
-        public override String SequenceNextValSql { get { return "${table.SequenceNextSql}"; } }
-#end
-#if ($table.isUseVersionNo())
-        public override bool HasVersionNo { get { return true; } }
-        public override ${glColumnInfo} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
-#end
-#if ($table.isUseUpdateDate())
-        public override bool HasUpdateDate { get { return true; } }
-        public override ${glColumnInfo} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
-#end
-        public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
 
         // ===============================================================================
         //                                                           Entity Property Setup

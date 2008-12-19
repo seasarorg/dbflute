@@ -926,6 +926,47 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     }
 
     // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+    /**
+     * Convert this conditionBean to SQL for display.
+     * @return SQL for display. (NotNull and NotEmpty)
+     */
+    public String toDisplaySql() {
+        return ${glConditionBeanContext}.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
+    }
+    protected abstract String getLogDateFormat();
+    protected abstract String getLogTimestampFormat();
+    
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    public void xsetupForDerivedReferrer() { // Very Internal
+        _forDerivedReferrer = true;
+    }
+
+    public void xsetupForScalarSelect() { // Very Internal
+        _forScalarSelect = true;
+    }
+
+    public void xsetupForScalarSubQuery() { // Very Internal
+        _forScalarSubQuery = true;
+    }
+
+    public void xsetupForUnion() { // Very Internal
+        _forUnion = true;
+    }
+
+    public void xsetupForExistsSubQuery() { // Very Internal
+        _forExistsSubQuery = true;
+    }
+
+    public void xsetupForInScopeSubQuery() { // Very Internal
+        _forInScopeSubQuery = true;
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected void doSetupSelect(SsCall callback) {
@@ -981,7 +1022,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
         msg = msg + "  For example:" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    " + className + " cb = new " + className + "();" + getLineSeparator();
-        msg = msg + "    cb." + methodName + "; // You shuold call here!" + getLineSeparator();
+        msg = msg + "    cb." + methodName + "; // You should call here!" + getLineSeparator();
         msg = msg + "    cb.query().setXxx...;" + getLineSeparator();
         msg = msg + "    cb.union(new UnionQuery<" + className + ">() {" + getLineSeparator();
         msg = msg + "        public void query(" + className + " unionCB) {" + getLineSeparator();
@@ -1008,47 +1049,6 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     
     protected String getLineSeparator() {
         return ${glSimpleSystemUtil}.getLineSeparator();
-    }
-
-    // ===================================================================================
-    //                                                                         Display SQL
-    //                                                                         ===========
-    /**
-     * Convert this conditionBean to SQL for display.
-     * @return SQL for display. (NotNull and NotEmpty)
-     */
-    public String toDisplaySql() {
-        return ${glConditionBeanContext}.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
-    }
-    protected abstract String getLogDateFormat();
-    protected abstract String getLogTimestampFormat();
-    
-    // [DBFlute-0.7.4]
-    // ===================================================================================
-    //                                                                        Purpose Type
-    //                                                                        ============
-    public void xsetupForDerivedReferrer() { // Very Internal
-        _forDerivedReferrer = true;
-    }
-
-    public void xsetupForScalarSelect() { // Very Internal
-        _forScalarSelect = true;
-    }
-
-    public void xsetupForScalarSubQuery() { // Very Internal
-        _forScalarSubQuery = true;
-    }
-
-    public void xsetupForUnion() { // Very Internal
-        _forUnion = true;
-    }
-
-    public void xsetupForExistsSubQuery() { // Very Internal
-        _forExistsSubQuery = true;
-    }
-
-    public void xsetupForInScopeSubQuery() { // Very Internal
-        _forInScopeSubQuery = true;
     }
 
     // ===================================================================================

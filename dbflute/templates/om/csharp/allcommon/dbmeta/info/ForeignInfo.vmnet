@@ -25,7 +25,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
-                         , Map<${glColumnInfo}, ${glColumnInfo} localForeignColumnInfoMap
+                         , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
                          , int relationNo, bool oneToOne) {
             AssertObjectNotNull("foreignPropertyName", foreignPropertyName);
             AssertObjectNotNull("localDBMeta", localDBMeta);
