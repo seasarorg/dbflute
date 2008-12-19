@@ -1,4 +1,3 @@
-#set ($myClassName = "${glForeignInfo}")
 
 using System;
 using System.Reflection;
@@ -9,7 +8,7 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
 
-    public class ${myClassName} : ${glRelationInfo} {
+    public class ${glForeignInfo} : ${glRelationInfo} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -23,11 +22,35 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected bool oneToOne;
 
         // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
+                         , Map<${glColumnInfo}, ${glColumnInfo} localForeignColumnInfoMap
+                         , int relationNo, bool oneToOne) {
+            AssertObjectNotNull("foreignPropertyName", foreignPropertyName);
+            AssertObjectNotNull("localDBMeta", localDBMeta);
+            AssertObjectNotNull("foreignDBMeta", foreignDBMeta);
+            AssertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+            this.foreignPropertyName = foreignPropertyName;
+            this.localDBMeta = localDBMeta;
+            this.foreignDBMeta = foreignDBMeta;
+            this.localForeignColumnInfoMap = localForeignColumnInfoMap;
+            Set<${glColumnInfo}> keySet = localForeignColumnInfoMap.keySet();
+            foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
+            foreach (${glColumnInfo} key in localForeignColumnInfoMap.keySet()) {
+                ${glColumnInfo} value = localForeignColumnInfoMap.get(key);
+                foreignLocalColumnInfoMap.put(value, key);
+            }
+            this.relationNo = relationNo;
+            this.oneToOne = oneToOne;
+        }
+        
+        // ===============================================================================
         //                                                                          Finder
         //                                                                          ======
         public ${glColumnInfo} FindLocalByForeign(String foreignColumnDbName) {
             ${glColumnInfo} keyColumnInfo = foreignDBMeta.FindColumnInfo(foreignColumnDbName);
-            ${glColumnInfo} resultColumnInfo = (${glColumnInfo})foreignLocalColumnInfoMap.get(keyColumnInfo);
+            ${glColumnInfo} resultColumnInfo = foreignLocalColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
                 msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
@@ -45,6 +68,28 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                         =======
         public String BuildInitCapPropertyName() {
             return InitCap(this.foreignPropertyName);
+        }
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected static String InitCap(String str) {
+            return ${glSimpleStringUtil}.InitCap(str);
+        }
+
+        protected static PropertyInfo FindProperty(Type clazz, String propertyName, Type[] argTypes) {
+            return clazz.GetProperty(propertyName, argTypes);
+        }
+        
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new ArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new ArgumentException(msg);
+            }
         }
 
         // ===============================================================================
@@ -71,29 +116,18 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                        ========
         public String ForeignPropertyName {
             get { return foreignPropertyName; }
-            set {this.foreignPropertyName = value; }
         }
 
         public ${glDBMeta} LocalDBMeta {
             get { return localDBMeta; }
-            set { this.localDBMeta = value; }
         }
 
         public ${glDBMeta} ForeignDBMeta {
             get { return foreignDBMeta; }
-            set { this.foreignDBMeta = value; }
         }
 
         public Map<${glColumnInfo}, ${glColumnInfo}> LocalForeignColumnInfoMap {
             get { return localForeignColumnInfoMap; }
-            set {
-                this.localForeignColumnInfoMap = value;
-                foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
-                foreach (${glColumnInfo} key in localForeignColumnInfoMap.keySet()) {
-                    ${glColumnInfo} val = (${glColumnInfo})localForeignColumnInfoMap.get(key);
-                    foreignLocalColumnInfoMap.put(val, key);
-                }
-            }
         }
 
         public Map<${glColumnInfo}, ${glColumnInfo}> ForeignLocalColumnInfoMap {
@@ -102,29 +136,10 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public int RelationNo {
             get { return relationNo; }
-            set { this.relationNo = value; }
         }
 
         public bool IsOneToOne {
             get { return oneToOne; }
-            set { this.oneToOne = value; }
-        }
-
-        // ===============================================================================
-        //                                                                  General Helper
-        //                                                                  ==============
-        // -------------------------------------------------
-        //                               Reflection Handling
-        //                               -------------------
-        protected static PropertyInfo FindProperty(Type clazz, String propertyName, Type[] argTypes) {
-            return clazz.GetProperty(propertyName, argTypes);
-        }
-		
-        // -------------------------------------------------
-        //                                   String Handling
-        //                                   ---------------
-        protected static String InitCap(String str) {
-            return ${glSimpleStringUtil}.InitCap(str);
         }
     }
 }

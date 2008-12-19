@@ -1035,7 +1035,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         getSqlClause().registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
     }
     
-    public delegate NssCall(); // Very Internal
+    public delegate ${glConditionQuery} NssCall(); // Very Internal
 
     protected void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);

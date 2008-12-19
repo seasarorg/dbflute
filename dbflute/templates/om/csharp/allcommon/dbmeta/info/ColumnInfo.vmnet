@@ -35,6 +35,11 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
                        , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits
                        , OptimisticLockType optimisticLockType) {
+            AssertObjectNotNull("dbmeta", dbmeta);
+            AssertObjectNotNull("columnDbName", columnDbName);
+            AssertObjectNotNull("propertyName", propertyName);
+            AssertObjectNotNull("propertyType", propertyType);
+            AssertObjectNotNull("optimisticLockType", optimisticLockType);
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
             this.columnAlias = columnAlias;
@@ -74,6 +79,20 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public bool IsUpdateDate { get {
             return OptimisticLockType.UPDATE_DATE == optimisticLockType;
         }}
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new ArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new ArgumentException(msg);
+            }
+        }
 
         // ===============================================================================
         //                                                                  Basic Override

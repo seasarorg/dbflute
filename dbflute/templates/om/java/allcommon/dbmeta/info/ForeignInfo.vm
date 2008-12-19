@@ -14,15 +14,14 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  */
 public class ${glForeignInfo} implements ${glRelationInfo} {
 
-#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final String foreignPropertyName;
     protected final ${glDBMeta} localDBMeta;
     protected final ${glDBMeta} foreignDBMeta;
-    protected final Map<${genericsColumnInfoMap}> localForeignColumnInfoMap;
-    protected final Map<${genericsColumnInfoMap}> foreignLocalColumnInfoMap;
+    protected final Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap;
+    protected final Map<${glColumnInfo}, ${glColumnInfo}> foreignLocalColumnInfoMap;
     protected final int relationNo;
     protected final boolean oneToOne;
 
@@ -30,7 +29,7 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
     //                                                                         Constructor
     //                                                                         ===========
     public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
-                     , Map<${genericsColumnInfoMap}> localForeignColumnInfoMap
+                     , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
                      , int relationNo, boolean oneToOne) {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
@@ -41,7 +40,7 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
         this.foreignDBMeta = foreignDBMeta;
         this.localForeignColumnInfoMap = localForeignColumnInfoMap;
         final Set<${glColumnInfo}> keySet = localForeignColumnInfoMap.keySet();
-        foreignLocalColumnInfoMap = new LinkedHashMap<${genericsColumnInfoMap}>();
+        foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
         for (final Iterator<${glColumnInfo}> ite = keySet.iterator(); ite.hasNext(); ) {
             final ${glColumnInfo} key = ite.next();
             final ${glColumnInfo} value = localForeignColumnInfoMap.get(key);
@@ -91,7 +90,7 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
         return getForeignDBMeta();
     }
 
-    public Map<${genericsColumnInfoMap}> getLocalTargetColumnInfoMap() {
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalTargetColumnInfoMap() {
         return getLocalForeignColumnInfoMap();
     }
 
@@ -175,12 +174,12 @@ public class ${glForeignInfo} implements ${glRelationInfo} {
         return foreignDBMeta;
     }
 
-    public Map<${genericsColumnInfoMap}> getLocalForeignColumnInfoMap() {
-        return new LinkedHashMap<${genericsColumnInfoMap}>(localForeignColumnInfoMap); // as snapshot
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalForeignColumnInfoMap() {
+        return new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>(localForeignColumnInfoMap); // as snapshot
     }
 
-    public Map<${genericsColumnInfoMap}> getForeignLocalColumnInfoMap() {
-        return new LinkedHashMap<${genericsColumnInfoMap}>(foreignLocalColumnInfoMap); // as snapshot
+    public Map<${glColumnInfo}, ${glColumnInfo}> getForeignLocalColumnInfoMap() {
+        return new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>(foreignLocalColumnInfoMap); // as snapshot
     }
 
     public int getRelationNo() {

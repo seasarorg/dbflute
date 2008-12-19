@@ -205,13 +205,15 @@ namespace ${myDBMetaPackageName} {
         public override ${glUniqueInfo} PrimaryUniqueInfo {
             get {
 #if ($table.hasPrimaryKey())
-                ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}();
-                uniqueInfo.DBMeta = this;
+#if ($table.hasOnlyOnePrimaryKey())
+                return cpui(column${table.primaryKeyAsOne.javaName}());
+#else
+                List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
 #foreach ($col in $table.primaryKey)
-                uniqueInfo.AddUniqueColumnList(Column${col.javaName});
+                ls.add(Column${col.javaName});
 #end
-                uniqueInfo.IsPrimary = true;
-                return uniqueInfo;
+                return cpui(ls);
+#end
 #else
                 throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
 #end

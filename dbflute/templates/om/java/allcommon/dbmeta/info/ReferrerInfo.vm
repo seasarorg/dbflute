@@ -14,22 +14,21 @@ import ${glPackageBaseCommonDBMeta}.${glDBMeta};
  */
 public class ${glReferrerInfo} implements ${glRelationInfo} {
 
-#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final String referrerPropertyName;
     protected final ${glDBMeta} localDBMeta;
     protected final ${glDBMeta} referrerDBMeta;
-    protected final Map<${genericsColumnInfoMap}> localReferrerColumnInfoMap;
-    protected final Map<${genericsColumnInfoMap}> referrerLocalColumnInfoMap;
+    protected final Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap;
+    protected final Map<${glColumnInfo}, ${glColumnInfo}> referrerLocalColumnInfoMap;
     protected final boolean oneToOne;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glReferrerInfo}(String referrerPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} referrerDBMeta
-                      , Map<${genericsColumnInfoMap}> localReferrerColumnInfoMap
+                      , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
                       , boolean oneToOne) {
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
@@ -40,7 +39,7 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
         this.referrerDBMeta = referrerDBMeta;
         this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
         final Set<${glColumnInfo}> keySet = localReferrerColumnInfoMap.keySet();
-        referrerLocalColumnInfoMap = new LinkedHashMap<${genericsColumnInfoMap}>();
+        referrerLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
         for (final Iterator<${glColumnInfo}> ite = keySet.iterator(); ite.hasNext(); ) {
             final ${glColumnInfo} key = ite.next();
             final ${glColumnInfo} value = localReferrerColumnInfoMap.get(key);
@@ -100,7 +99,7 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
         return getReferrerDBMeta();
     }
 
-    public Map<${genericsColumnInfoMap}> getLocalTargetColumnInfoMap() {
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalTargetColumnInfoMap() {
         return getLocalReferrerColumnInfoMap();
     }
 
@@ -184,12 +183,12 @@ public class ${glReferrerInfo} implements ${glRelationInfo} {
         return referrerDBMeta;
     }
 
-    public Map<${genericsColumnInfoMap}> getLocalReferrerColumnInfoMap() {
-        return new LinkedHashMap<${genericsColumnInfoMap}>(localReferrerColumnInfoMap); // as snapshot
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalReferrerColumnInfoMap() {
+        return new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>(localReferrerColumnInfoMap); // as snapshot
     }
 
-    public Map<${genericsColumnInfoMap}> getReferrerLocalColumnInfoMap() {
-        return new LinkedHashMap<${genericsColumnInfoMap}>(referrerLocalColumnInfoMap); // as snapshot
+    public Map<${glColumnInfo}, ${glColumnInfo}> getReferrerLocalColumnInfoMap() {
+        return new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>(referrerLocalColumnInfoMap); // as snapshot
     }
 
     public boolean isOneToOne() {

@@ -1,4 +1,3 @@
-#set ($myClassName = "${glUniqueInfo}")
 
 using System;
 
@@ -7,14 +6,25 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
 
-    public class ${myClassName} {
+    public class ${glUniqueInfo} {
 
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
         protected ${glDBMeta} dbmeta;
-        protected List<${glColumnInfo}> uniqueColumnList = new ArrayList<${glColumnInfo}>();
+        protected List<${glColumnInfo}> uniqueColumnList;
         protected bool primary;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glUniqueInfo}(${glDBMeta} dbmeta, List<${glColumnInfo}> uniqueColumnList, bool primary) {
+            AssertObjectNotNull("dbmeta", dbmeta);
+            AssertObjectNotNull("uniqueColumnList", uniqueColumnList);
+            this.dbmeta = dbmeta;
+            this.uniqueColumnList = uniqueColumnList;
+            this.primary = primary;
+        }
 
         // ===============================================================================
         //                                                                     Easy-to-Use
@@ -33,19 +43,28 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new ArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new ArgumentException(msg);
+            }
+        }
+
+        // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
        public ${glDBMeta} DBMeta {
            get { return dbmeta; }
-           set { this.dbmeta = value; }
        }
 
         public List<${glColumnInfo}> UniqueColumnList {
             get { return uniqueColumnList; }
-        }
-
-        public void AddUniqueColumnList(${glColumnInfo} uniqueColumn) {
-            this.uniqueColumnList.add(uniqueColumn);
         }
 
         public ${glColumnInfo} FirstColumn {
@@ -58,7 +77,6 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public bool IsPrimary {
             get { return this.primary; }
-            set { this.primary = value; }
         }
     }
 }

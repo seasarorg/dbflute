@@ -137,6 +137,17 @@ namespace ${glPackageBaseCommonDBMeta} {
         public abstract bool HasPrimaryKey { get; }
         public abstract bool HasTwoOrMorePrimaryKeys { get; }
 
+        protected ${glUniqueInfo} cpui(${glColumnInfo} uniqueColumnInfo) { // createPrimaryUniqueInfo()
+            List<${glColumnInfo}> uniqueColumnInfoList = new ArrayList<${glColumnInfo}>();
+            uniqueColumnInfoList.add(uniqueColumnInfo);
+            return cpui(uniqueColumnInfoList);
+        }
+    
+        protected ${glUniqueInfo} cpui(List<${glColumnInfo}> uniqueColumnInfoList) { // createPrimaryUniqueInfo()
+            ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}(this, uniqueColumnInfoList, true);
+            return uniqueInfo;
+        }
+    
         // ===============================================================================
         //                                                                   Relation Info
         //                                                                   =============
@@ -168,19 +179,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             return (${glForeignInfo})propertyInfo.GetValue(this, null);
         }
-    
+
         protected ${glForeignInfo} cfi(String propName
                                 , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
                                 , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
-                                , int relNo, bool oneToOne) {// createForeignInfo()
-            ${glForeignInfo} foreignInfo = new ${glForeignInfo}();
-            foreignInfo.ForeignPropertyName = propName;
-            foreignInfo.LocalDBMeta = localDbm;
-            foreignInfo.ForeignDBMeta = foreignDbm;
-            foreignInfo.LocalForeignColumnInfoMap = localForeignColumnInfoMap;
-            foreignInfo.RelationNo = relNo;
-            foreignInfo.IsOneToOne = oneToOne;
-            return foreignInfo;
+                                , int relNo, bool oneToOne) { // createForeignInfo()
+            return new ${glForeignInfo}(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne);
         }
 
         // -------------------------------------------------
@@ -211,14 +215,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected ${glReferrerInfo} cri(String propName
                                  , ${glDBMeta} localDbm, ${glDBMeta} referrerDbm
                                  , Map<${glColumnInfo}, ${glColumnInfo}> localReferrerColumnInfoMap
-                                 , bool oneToOne) {// createReferrerInfo()
-            ${glReferrerInfo} referrerInfo = new ${glReferrerInfo}();
-            referrerInfo.ReferrerPropertyName = propName;
-            referrerInfo.LocalDBMeta = localDbm;
-            referrerInfo.ReferrerDBMeta = referrerDbm;
-            referrerInfo.LocalReferrerColumnInfoMap = localReferrerColumnInfoMap;
-            referrerInfo.IsOneToOne = oneToOne;
-            return referrerInfo;
+                                 , bool oneToOne) { // createReferrerInfo()
+            return new ${glReferrerInfo}(propName, localDbm, referrerDbm, localReferrerColumnInfoMap, oneToOne);
         }
 
         // -------------------------------------------------
@@ -243,21 +241,21 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                           Entity Property Setup
         //                                                           =====================
-		public abstract bool HasEntityPropertySetupper(String propertyName);
+        public abstract bool HasEntityPropertySetupper(String propertyName);
         public abstract void SetupEntityProperty(String propertyName, Object entity, Object value);
 
-    	protected void RegisterEntityPropertySetupper<ENTITY>(
-			                                          String columnName
-													, String propertyName
-    	                                            , EntityPropertySetupper<ENTITY> setupper
-    											    , Map<String, EntityPropertySetupper<ENTITY>> _entityPropertySetupperMap
-													) where ENTITY : ${glEntity} {
-		    _entityPropertySetupperMap.put(columnName, setupper);
-		    _entityPropertySetupperMap.put(propertyName, setupper);
-		    _entityPropertySetupperMap.put(columnName.ToLower(), setupper);
-		    _entityPropertySetupperMap.put(propertyName.ToLower(), setupper);
-    	}
-		
+        protected void RegisterEntityPropertySetupper<ENTITY>(
+                                                      String columnName
+                                                    , String propertyName
+                                                    , EntityPropertySetupper<ENTITY> setupper
+                                                    , Map<String, EntityPropertySetupper<ENTITY>> _entityPropertySetupperMap
+                                                    ) where ENTITY : ${glEntity} {
+            _entityPropertySetupperMap.put(columnName, setupper);
+            _entityPropertySetupperMap.put(propertyName, setupper);
+            _entityPropertySetupperMap.put(columnName.ToLower(), setupper);
+            _entityPropertySetupperMap.put(propertyName.ToLower(), setupper);
+        }
+        
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
@@ -297,14 +295,14 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                   String Handling
         //                                   ---------------
         protected static String InitCap(String str) {
-		    return ${glSimpleStringUtil}.InitCap(str);
+            return ${glSimpleStringUtil}.InitCap(str);
         }
 
         // -------------------------------------------------
         //                                     Assert Object
         //                                     -------------
         protected static void AssertObjectNotNull(String variableName, Object value) {
-		    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
+            ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
         }
 
         // -------------------------------------------------
