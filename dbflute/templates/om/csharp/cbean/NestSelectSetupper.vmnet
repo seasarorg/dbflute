@@ -24,7 +24,7 @@ namespace ${glPackageNss} {
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
         public ${fk.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
             return new ${fk.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
         }
 
@@ -38,7 +38,7 @@ namespace ${glPackageNss} {
 #set ($tmpPropertyName = "${referrer.ReffererPropertyNameInitCapAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
-            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(); });
             return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
