@@ -7,21 +7,13 @@ namespace ${glPackageNss} {
 
     public class ${myClassName} {
 
-        // ===============================================================================
-        //                                                                       Attribute
-        //                                                                       =========
         protected ${myConditionQueryClassName} _query;
+        public ${myClassName}(${myConditionQueryClassName} query) { _query = query; }
+        public bool HasConditionQuery { get { return _query != null; } }
 
         // ===============================================================================
-        //                                                                     Constructor
-        //                                                                     ===========
-        public ${myClassName}(${myConditionQueryClassName} query) {
-            _query = query;
-        }
-
-        // ===============================================================================
-        //                                                                    Setup Select
-        //                                                                    ============
+        //                                                       With Nested Foreign Table
+        //                                                       =========================
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyNameInitCap}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
@@ -32,42 +24,25 @@ namespace ${glPackageNss} {
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
         public ${fk.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-            AssertConditionQuery();
-            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRealAliasName();
-            String localRelationPath = _query.getRelationPath();
-            _query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRelationPath(), "${tmpPropertyName}");
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
             return new ${fk.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
         }
 
 #end
+
+        // ===============================================================================
+        //                                                      With Nested Referrer Table
+        //                                                      ==========================
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.ReffererPropertyNameInitCapAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
-            AssertConditionQuery();
-            String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
-            String localRelationPath = _query.getRelationPath();
-            _query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-            _query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
             return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end
 #end
-        // ===============================================================================
-        //                                                                          Helper
-        //                                                                          ======
-        protected void AssertConditionQuery() {
-            if (!this.HasConditionQuery) { String msg = "The query should not be null."; throw new SystemException(msg); }
-        }
-
-        // ===============================================================================
-        //                                                                        Accessor
-        //                                                                        ========
-        public bool HasConditionQuery {
-            get { return _query != null; }
-        }
     }
 }

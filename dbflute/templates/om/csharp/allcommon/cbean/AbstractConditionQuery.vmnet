@@ -1027,6 +1027,19 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected System.Collections.IList fRESL(System.Collections.IList ls) {
         return filterRemoveEmptyStringFromList(ls);
     }
+    
+    public void doNss(NssCall callback) { // Very Internal
+        String foreignPropertyName = callback.Invoke().getForeignPropertyName();
+        String foreignTableAliasName = callback.Invoke().getRealAliasName();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
+        getSqlClause().registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+    }
+    
+    public delegate NssCall(); // Very Internal
+
+    protected void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
+        getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
+    }
 
     // ===================================================================================
     //                                                                      General Helper

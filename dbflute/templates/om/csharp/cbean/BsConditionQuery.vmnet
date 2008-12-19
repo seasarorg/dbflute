@@ -398,24 +398,23 @@ namespace ${glPackageBaseCQ} {
         }
 #end
         protected ${foreignCQClassName} xcreateQuery${fk.ForeignPropertyNameInitCap}() {
-            String nextRelationPath = resolveNextRelationPath${fk.foreignPropertyNameInitCap}();
-            String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-            ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-            cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
-            cq.xsetRelationPath(nextRelationPath);
-            return cq;
+            String nrp = resolveNextRelationPath${fk.foreignPropertyNameInitCap}();
+            String jan = resolveJoinAliasName(nrp, getNextNestLevel());
+            ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+            cq.xsetForeignPropertyName("${fk.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${fk.ForeignPropertyNameInitCap}() {
+            ${foreignCQClassName} cq = ConditionQuery${fk.foreignPropertyNameInitCap}();
             Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
 #foreach ($columnName in $fk.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
-            joinOnMap.put(getRealColumnName("${localColumn.name}"), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealColumnName("${foreignColumnName}"));
+            joinOnMap.put(getRealColumnName("${localColumn.name}"), cq.getRealColumnName("${foreignColumnName}"));
 #end
 #if ($fk.hasFixedCondition())
-            joinOnMap.put("$$fixedCondition$$", ppFxCd("${fk.fixedCondition}", getRealAliasName(), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealAliasName()));
+            joinOnMap.put("$$fixedCondition$$", ppFxCd("${fk.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
 #end
-            getSqlClause().registerOuterJoin(ConditionQuery${fk.foreignPropertyNameInitCap}.getTableSqlName(), ConditionQuery${fk.foreignPropertyNameInitCap}.getRealAliasName(), joinOnMap);
+            registerOuterJoin(cq, joinOnMap);
         }
         protected String resolveNextRelationPath${fk.foreignPropertyNameInitCap}() {
             return resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
@@ -425,45 +424,39 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 
-  #foreach ($referrer in $table.Referrers)
+  #foreach ($referrer in $table.referrers)
     #set ($relatedCQClassName = "${glProjectPrefix}${referrer.table.javaName}${glConditionQueryInitialName}")
     #if (${referrer.isOneToOne()})
-
-        // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   ReferrerTable    = [${referrer.table.name}]
-        //   ReferrerProperty = [${referrer.referrerPropertyNameInitCapAsOne}]
-        // * * * * * * * * */
 
         protected ${relatedCQClassName} _conditionQuery${referrer.ReffererPropertyNameInitCapAsOne};
         public ${relatedCQClassName} ConditionQuery${referrer.ReffererPropertyNameInitCapAsOne} {
             get {
-                if (_conditionQuery${referrer.ReffererPropertyNameInitCapAsOne} == null) {
-                    _conditionQuery${referrer.ReffererPropertyNameInitCapAsOne} = createQuery${referrer.ReffererPropertyNameInitCapAsOne}();
-                    xsetupOuterJoin_${referrer.ReffererPropertyNameInitCapAsOne}();
+                if (_conditionQuery${referrer.referrerPropertyNameInitCapAsOne} == null) {
+                    _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} = createQuery${referrer.referrerPropertyNameInitCapAsOne}();
+                    xsetupOuterJoin_${referrer.referrerPropertyNameInitCapAsOne}();
                 }
                 return _conditionQuery${referrer.ReffererPropertyNameInitCapAsOne};
             }
         }
-        public ${relatedCQClassName} Query${referrer.referrerPropertyNameInitCapAsOne}() { return this.ConditionQuery${referrer.ReffererPropertyNameInitCapAsOne}; }
-        protected ${relatedCQClassName} createQuery${referrer.ReffererPropertyNameInitCapAsOne}() {
-            String nextRelationPath = resolveNextRelationPath${referrer.ReffererPropertyNameInitCapAsOne}();
-            String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
-            ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-            cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
-            cq.xsetRelationPath(nextRelationPath);
-            return cq;
+        public ${relatedCQClassName} Query${referrer.referrerPropertyNameInitCapAsOne}() { return this.ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}; }
+        protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
+            String nrp = resolveNextRelationPath${referrer.ReferrerPropertyNameInitCapAsOne}();
+            String jan = resolveJoinAliasName(nrp, getNextNestLevel());
+            ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+            cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${referrer.ReffererPropertyNameInitCapAsOne}() {
+            ${relatedCQClassName} cq = ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
             Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($refererColumnName = $referrer.getForeignLocalMapping().get($columnName))
-            joinOnMap.put(getRealColumnName("${foreignColumn.name}"), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealColumnName("${refererColumnName}"));
+            joinOnMap.put(getRealColumnName("${foreignColumn.name}"), cq.getRealColumnName("${refererColumnName}"));
 #end
 #if ($referrer.hasFixedCondition())
-            joinOnMap.put("$$fixedCondition$$", ppFxCd("${referrer.fixedCondition}", getRealAliasName(), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealAliasName()));
+            joinOnMap.put("$$fixedCondition$$", ppFxCd("${referrer.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
 #end
-            getSqlClause().registerOuterJoin(ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getTableSqlName(), ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}.getRealAliasName(), joinOnMap);
+            registerOuterJoin(cq, joinOnMap);
         }
         protected String resolveNextRelationPath${referrer.ReffererPropertyNameInitCapAsOne}() {
             return resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");

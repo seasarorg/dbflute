@@ -7,7 +7,7 @@ import ${glPackageBaseCommonCBean}.${glConditionQuery};
 import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
- * The nest-select-setupper of ${table.name}.
+ * The nest select set-upper of ${table.name}.
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} {

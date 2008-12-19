@@ -231,7 +231,8 @@ public class ${myClassName} extends ${glAbstractConditionBean} {
     }
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         doSetupSelect(new SsCall() { public ${glConditionQuery} qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
-        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
+        { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end

@@ -50,7 +50,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                           Query
         //                                                                           =====
-        public abstract ${glConditionQuery} ConditionQueryAsInterface { get; }
+        public abstract ${glConditionQuery} LocalCQ { get; }
 
         // ===============================================================================
         //                                                                     Union Query
@@ -212,6 +212,20 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glStatementConfig} StatementConfig { get {
             return _statementConfig;
         }}
+
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
+        protected void DoSetupSelect(SsCall callback) {
+            String foreignPropertyName = callback.Invoke().getForeignPropertyName();
+            assertSetupSelectBeforeUnion(foreignPropertyName);
+            String foreignTableAliasName = callback.Invoke().getRealAliasName();
+            String localRelationPath = LocalCQ.getRelationPath();
+            SqlClause.registerSelectedSelectColumn(foreignTableAliasName, TableDbName, foreignPropertyName, localRelationPath);
+            SqlClause.registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+        }
+
+        protected delegate ${glConditionQuery} SsCall();
 
         // ===============================================================================
         //                                                                     Display SQL

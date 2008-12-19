@@ -71,7 +71,7 @@ namespace ${glPackageBaseCB} {
             }
         }
 
-        public override ${glPackageBaseCommonCBean}.${glConditionQuery} ConditionQueryAsInterface {
+        public override ${glPackageBaseCommonCBean}.${glConditionQuery} LocalCQ {
             get { return this.ConditionQuery; }
         }
 
@@ -106,22 +106,14 @@ namespace ${glPackageBaseCB} {
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
         protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
-            get {
-                if (_nss${tmpPropertyNameInitCap} == null) {
-                    _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
-                }
-                return _nss${tmpPropertyNameInitCap};
-            }
-        }
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} { get {
+            if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+            return _nss${tmpPropertyNameInitCap};
+        }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-            String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRealAliasName();
-            String localRelationPath = Query().getRelationPath();
-            this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-            this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}).getRelationPath(), "${tmpPropertyName}");
-            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
-                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
-            }
+            DoSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
+            { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
             return _nss${tmpPropertyNameInitCap};
         }
 #end
@@ -132,22 +124,14 @@ namespace ${glPackageBaseCB} {
     #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
         protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
-            get {
-                if (_nss${tmpPropertyNameInitCap} == null) {
-                    _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
-                }
-                return _nss${tmpPropertyNameInitCap};
-            }
-        }
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} { get {
+            if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+            return _nss${tmpPropertyNameInitCap};
+        }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}().getRealAliasName();
-            String localRelationPath = Query().getRelationPath();
-            this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-            this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
-                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
-            }
+            DoSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
+            { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}()); }
             return _nss${tmpPropertyNameInitCap};
         }
   #end
