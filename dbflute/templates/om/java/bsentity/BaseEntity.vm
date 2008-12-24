@@ -3,6 +3,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 
 import java.util.*;
 
+#if ($table.isBuriTarget())
+import ${glPackageBaseCommon}.${glBuriDef};
+#end
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -424,9 +427,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                      Buri Interface
     //                                                                      ==============
 #foreach ($processName in $table.tableProcessForMethodNameList)
-    public ${glPackageBaseCommon}.${glBuriDef}.${processName}_Status getBuriStatus_${processName}() {
+    public ${glBuriDef}.${processName}_Status getStatus_${processName}() {
         if (getBuriPathData() == null) { return null; }
-        return ${glPackageBaseCommon}.${glBuriDef}.${processName}_Status.codeOf(getBuriPathData().getPathName());
+        return ${glBuriDef}.${processName}_Status.codeOf(getBuriPathData().getPathName());
     }
 #end
 #end
