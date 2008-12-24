@@ -690,7 +690,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             String msg = "This method does not support duplicate status: " + statusList;
             throw new IllegalStateException(msg);
         }
-        return statusList.isEmpty() ? statusList.get(0) : null;
+        return !statusList.isEmpty() ? statusList.get(0) : null;
     }
 
     public java.util.List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {

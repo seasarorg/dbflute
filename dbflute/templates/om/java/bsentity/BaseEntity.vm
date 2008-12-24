@@ -426,7 +426,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($processName in $table.tableProcessForMethodNameList)
     public ${glPackageBaseCommon}.${glBuriDef}.${processName}_Status getBuriStatus_${processName}() {
         if (getBuriPathData() == null) { return null; }
-        return ${glBuriDef}.${processName}_Status.codeOf(getBuriPathData().getPathName());
+        return ${glPackageBaseCommon}.${glBuriDef}.${processName}_Status.codeOf(getBuriPathData().getPathName());
     }
 #end
 #end
