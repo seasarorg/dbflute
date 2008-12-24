@@ -55,7 +55,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     ; tableProcessMap = list:{ [package].[process] }
-    //     ; requiresAction = false
     // }
 
     // ===================================================================================
@@ -202,13 +201,6 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             String msg = "The type of process mapping value should be List: " + processMappingValue;
             throw new IllegalStateException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                     Requires Action
-    //                                                                     ===============
-    public boolean isRequiresAction() {
-        return isBuriProperty("requiresAction");
     }
 
     // ===================================================================================

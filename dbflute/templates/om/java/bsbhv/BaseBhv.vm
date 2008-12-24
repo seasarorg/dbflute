@@ -674,25 +674,23 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
-#if (!$table.isRequiresAction())
-    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        _simpleBuriProcessor.toNextStatus(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName});
-    }
-
-#end
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
         _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
     }
 
-    public java.util.List<${glBuriDef}.${processName}_Status> getStatuses_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+    public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName});
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
-        if (buriPathDataList.isEmpty()) { return statusList; }
+        if (buriPathDataList.isEmpty()) { return null; }
         for (BuriPathData buriPathData : buriPathDataList) {
             ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
             if (status != null) { statusList.add(status); }
         }
-        return statusList;
+        if (statusList.size() > 1) {
+            String msg = "This method does not support duplicate status: " + statusList;
+            throw new IllegalStateException(msg);
+        }
+        return statusList.isEmpty() ? statusList.get(0) : null;
     }
 
     public java.util.List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses) {
