@@ -995,6 +995,10 @@ public class Database {
     public String getConditionBeanPackage() {
         return getProperties().getGeneratedClassPackageProperties().getConditionBeanPackage();
     }
+    
+    public String getExtendedConditionBeanPackage() {
+        return getProperties().getGeneratedClassPackageProperties().getExtendedConditionBeanPackage();
+    }
 
     public String getExtendedBehaviorPackage() {
         return getProperties().getGeneratedClassPackageProperties().getExtendedBehaviorPackage();
