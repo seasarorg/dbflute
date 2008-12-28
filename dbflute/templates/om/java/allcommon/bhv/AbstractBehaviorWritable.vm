@@ -372,19 +372,27 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
     // =====================================================================================
     //                                                                            Token File
     //                                                                            ==========
+    /**
+     * Get the executor of token file reflection.
+     * @return The executor of token file output. (NotNull)
+     */
     public TokenFileReflectionExecutor tokenFileReflection() {
         return new TokenFileReflectionExecutor();
     }
 
+    /**
+     * The executor of token file reflection.
+     */
     public class TokenFileReflectionExecutor {
 
         /**
-         * Reflect(insert or update) token-file to this table.
-         * @param filename Name of the file. (NotNull and NotEmpty)
+         * Reflect(insert or update) token file to this table. <br />
+         * The supported column types are String, Number and Date.
+         * @param filename The name of the file. (NotNull and NotEmpty)
          * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return Token-file-reflection-result. (NotNull)
-         * @throws java.io.FileNotFoundException
-         * @throws java.io.IOException
+         * @return The result of token file reflection. (NotNull)
+         * @throws java.io.FileNotFoundException The file is not found.
+         * @throws java.io.IOException The IO exception occurred.
          */
         public ${glTokenFileReflectionResult} reflectTokenFile(String filename, ${glTokenFileReflectionOption} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
@@ -399,12 +407,13 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
         }
 
         /**
-         * Reflect(insert or update) token-file to this table.
-         * @param inputStream Input stream. (NotNull and NotClosed)
+         * Reflect(insert or update) token file to this table. <br />
+         * The supported column types are String, Number and Date.
+         * @param inputStream The input stream. (NotNull and NotClosed)
          * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return Token-file-reflection-result. (NotNull)
-         * @throws java.io.FileNotFoundException
-         * @throws java.io.IOException
+         * @return The result of token file reflection. (NotNull)
+         * @throws java.io.FileNotFoundException The file is not found.
+         * @throws java.io.IOException The IO exception occurred.
          */
         public ${glTokenFileReflectionResult} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOption} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertObjectNotNull("inputStream", inputStream);
@@ -429,7 +438,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
 
         protected ${glTokenFileReflectionResult} buildTokenFileReflectionResult() {
             final ${glTokenFileReflectionResult} result = new ${glTokenFileReflectionResult}();
-            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} failureList = new java.util.ArrayList${database.filterGenericsString(${glTokenFileReflectionFailure})}();
+            final java.util.List<${glTokenFileReflectionFailure}> failureList = new java.util.ArrayList<${glTokenFileReflectionFailure}>();
             result.setFailureList(failureList);
             return result;
         }
@@ -442,14 +451,14 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
             assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
             assertObjectNotNull("delimiter", delimiter);
-            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailure})} failureList = result.getFailureList();
+            final java.util.List<${glTokenFileReflectionFailure}> failureList = result.getFailureList();
             assertObjectNotNull("failureList", failureList);
 
             final ${glFileTokenizingCallback} fileTokenizingCallback = new ${glFileTokenizingCallback}() {
                 public void handleRowResource(${glFileTokenizingRowResource} fileTokenizingRowResource) {
                     final ${glFileTokenizingHeaderInfo} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
-                    final java.util.List${database.filterGenericsString('String')} columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
-                    final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingRowResource.getValueList();
+                    final java.util.List<String> columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
+                    final java.util.List<String> valueList = fileTokenizingRowResource.getValueList();
 
                     // Set up columnNameList of result object.
                     if (result.getColumnNameList() == null) {
@@ -487,7 +496,7 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             return fileTokenizingCallback;
         }
 
-        protected ${glEntity} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
+        protected ${glEntity} createEntityByStringValueList(java.util.List<String> columnNameList, java.util.List<String> valueList) {
             final ${glMapStringBuilder} builder = new ${glMapStringBuilderImpl}();
             builder.setMsMapMark(MAP_STRING_MAP_MARK);
             builder.setMsStartBrace(MAP_STRING_START_BRACE);
@@ -519,7 +528,6 @@ public abstract class ${myClassName} extends ${glAbstractBehaviorReadable} imple
             return fileTokenizingOption;
         }
     }
-
 
     // =====================================================================================
     //                                                                       Delegate Method

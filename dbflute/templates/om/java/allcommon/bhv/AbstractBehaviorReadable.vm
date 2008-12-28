@@ -716,19 +716,29 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
     // ===================================================================================
     //                                                                          Token File
     //                                                                          ==========
-    public TokenFileOutputExecutor tokenFileOutput() throws java.io.FileNotFoundException, java.io.IOException {
+    /**
+     * Get the executor of token file output.
+     * @return The executor of token file output. (NotNull)
+     */
+    public TokenFileOutputExecutor tokenFileOutput() {
         return new TokenFileOutputExecutor();
     }
 
+    /**
+     * The executor of token file output.
+     */
     public class TokenFileOutputExecutor {
+
         /**
-         * Output token-file from this table records.
-         * @param cb Condition-bean. (NotNull)
-         * @param filename Name of the file. (NotNull and NotEmpty)
-         * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
-         * @return Token-file-output-result. (NotNull)
-         * @throws java.io.FileNotFoundException
-         * @throws java.io.IOException
+         * Output token file from the table records. <br />
+         * The supported column types are String, Number and Date. <br />
+         * The search result is on memory temporarily so don't use this method if you have enormous records.
+         * @param cb The condition-bean. (NotNull: The setupSelect_Xxx() is ignored.)
+         * @param filename The name of the file. (NotNull and NotEmpty)
+         * @param tokenFileOutputOption The option of token file output. (NotNull and Required{delimiter and encoding})
+         * @return The result of token file output. (NotNull)
+         * @throws java.io.FileNotFoundException The file is not found.
+         * @throws java.io.IOException The IO exception occurred.
          */
         public ${glTokenFileOutputResult} outputTokenFile(${glConditionBean} cb, String filename, ${glTokenFileOutputOption} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertCBNotNull(cb);
