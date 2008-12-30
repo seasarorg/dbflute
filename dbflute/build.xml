@@ -7,10 +7,11 @@
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
+  <property name="dbflute.dist" value="dist"/>
   <property name="dbflute.jar.file" value="dbflute.jar"/>
-  <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
+  <property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
-  <property name="dbflute.zip.dirfile" value="dist/${dbflute.zip.file}"/>
+  <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
   <property name="dbflute.ncsharp.dir" value="${workspace.base}/dfncsharp"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
@@ -79,15 +80,34 @@
     <echo message="+------------------------------------------+"/>
 
     <mkdir dir="dist"/>
+
     <delete file="${dbflute.jar.dirfile}"/>
     <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
     <delete file="${dbflute.zip.dirfile}"/>
+  	
+    <delete file="etc/client_directory-template/fullProperties.zip"/>
+    <zip zipfile="etc/client_directory-template/fullProperties.zip">
+        <zipfileset prefix="fullProperties" dir="etc/client_directory-template/fullProperties"/>
+    </zip>
+  	
+    <delete file="etc/client_directory-template/minimumProperties.zip"/>
+    <zip zipfile="etc/client_directory-template/minimumProperties.zip">
+        <zipfileset prefix="minimumProperties" dir="etc/client_directory-template/minimumProperties"/>
+    </zip>
+
+    <delete file="etc/client_directory-template/minimumProperties4cs.zip"/>
+    <zip zipfile="etc/client_directory-template/minimumProperties4cs.zip">
+        <zipfileset prefix="minimumProperties4cs" dir="etc/client_directory-template/minimumProperties4cs"/>
+    </zip>
+
     <zip zipfile="${dbflute.zip.dirfile}">
         <zipfileset prefix="etc/cmd" dir="etc/cmd">
             <include name="*.cmd"/>
             <include name="*.sh"/>
         </zipfileset>
-        <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template"/>
+        <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template">
+            <include name="*.zip"/>
+        </zipfileset>
         <zipfileset prefix="lib/forExecute" dir="dist">
             <include name="${dbflute.jar.file}"/>
         </zipfileset>
