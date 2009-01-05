@@ -123,6 +123,9 @@
         <zipfileset prefix="" dir="">
             <include name="build-torque.xml"/>
         </zipfileset>
+        <zipfileset prefix="" dir="etc/mark">
+            <include name="product-is-dbflute"/>
+        </zipfileset>
     </zip>
   </target>
 
