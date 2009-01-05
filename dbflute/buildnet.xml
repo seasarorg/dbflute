@@ -1,0 +1,145 @@
+<project name="DBFlute" default="dist" basedir=".">
+
+  <!-- ================================================================ -->
+  <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
+  <!-- ================================================================ -->
+  <property name="version" value="0.8.8.1"/>
+  <property name="deploy.base" value="../../dbflute.net"/>
+  <property name="workspace.base" value=".."/>
+
+  <property name="dbflute.dist" value="dist/net"/>
+  <property name="dbflute.jar.file" value="dbflute.net.jar"/>
+  <property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
+  <property name="dbflute.zip.file" value="dbflute.net-${version}.zip"/>
+  <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
+  <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+  <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
+  <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
+
+  <target name="clean">
+    <delete dir="target/classes"/>
+    <mkdir dir="target/classes"/>
+  </target>
+  
+  <target name="copy-resources">
+    <copy todir="target/classes">
+      <fileset dir="src/main/java">
+        <exclude name="**/*.java"/>
+      </fileset>
+      <fileset dir="src/main/resources">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" depends="clean, copy-resources" description="==> compiles sources">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Compiling sources!                       |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+  	<javac destdir="target/classes" encoding="UTF-8" debug="true">
+      <src path="src/main/java" />
+  	  <src path="src/main/resources" />
+      <classpath>
+        <fileset dir="lib/forCompile">
+          <include name="**/*.jar" />
+        </fileset>
+      </classpath>
+  	  <include name="**/*"/>
+  	  <compilerarg value="-Xlint:deprecation" />
+  	  <compilerarg value="-Xlint:unchecked" />
+  	</javac>
+  </target>
+
+  <target name="dist" depends="compile" description="==> generates distribution">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating dist for YOUR datamodel!      |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <mkdir dir="${dbflute.dist}"/>
+
+    <delete file="${dbflute.jar.dirfile}"/>
+    <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
+    <delete file="${dbflute.zip.dirfile}"/>
+  	
+    <delete file="etc/client_directory-template/minimumProperties4cs.zip"/>
+    <zip zipfile="etc/client_directory-template/minimumProperties4cs.zip">
+        <zipfileset prefix="minimumProperties4cs" dir="etc/client_directory-template/minimumProperties4cs"/>
+    </zip>
+
+    <zip zipfile="${dbflute.zip.dirfile}">
+        <zipfileset prefix="etc/cmd" dir="etc/cmd">
+            <include name="*.cmd"/>
+            <include name="*.sh"/>
+        </zipfileset>
+        <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template">
+            <include name="minimumProperties4cs.zip"/>
+        </zipfileset>
+        <zipfileset prefix="lib/forExecute" dir="dist">
+            <include name="${dbflute.jar.file}"/>
+        </zipfileset>
+        <zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+            <include name="*.jar"/>
+            <include name="*.zip"/>
+        </zipfileset>
+        <zipfileset prefix="log" dir="log">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="output/doc" dir="output/doc">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="schema" dir="schema">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="templates/doc" dir="templates/doc">
+            <exclude name="**/*---.txt"/>
+        </zipfileset>
+        <zipfileset prefix="templates/om" dir="templates/om">
+            <include name="ControlGenerateCSharp.vm"/>
+            <include name="ControlSql2EntityCSharp.vm"/>
+        </zipfileset>
+        <zipfileset prefix="templates/om/csharp" dir="templates/om/csharp">
+            <exclude name="**/*---.txt"/>
+        </zipfileset>
+        <zipfileset prefix="ant" dir="ant"/>
+        <zipfileset prefix="" dir="">
+            <include name="build-torque.xml"/>
+        </zipfileset>
+    </zip>
+  </target>
+
+  <target name="expand-dist">
+    <delete dir="${dbflute.deploy.dir}"/>
+    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
+    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<!-- Freeze
+    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    -->
+  </target>
+
+  <target name="reflect-win-limit-nbasic" depends="expand-dist" description="==> reflect to nbasic example">
+    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+
+  <target name="reflect-win-limit-noracle" depends="expand-dist" description="==> reflect to noracle example">
+    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+</project>
