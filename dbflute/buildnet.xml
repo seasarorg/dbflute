@@ -8,7 +8,7 @@
   <property name="workspace.base" value=".."/>
 
   <property name="dbflute.dist" value="dist/net"/>
-  <property name="dbflute.jar.file" value="dbflute.net.jar"/>
+  <property name="dbflute.jar.file" value="dbflute.jar"/>
   <property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute.net-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
@@ -87,6 +87,8 @@
         <zipfileset prefix="lib/forExecute" dir="lib/forExecute">
             <include name="*.jar"/>
             <include name="*.zip"/>
+            <exclude name="derby-*.jar"/>
+            <exclude name="h2-*.jar"/>
         </zipfileset>
         <zipfileset prefix="log" dir="log">
             <include name="readme.txt"/>
