@@ -1,0 +1,8 @@
+
+[Eclipse Update Site]
+http://quick-junit.sourceforge.jp/updates/3.2
+http://eclipse.seasar.org/updates/3.3/
+http://www.skirnir.net/eclipse/updates/3.2/
+
+http://download.eclipse.org/technology/subversive/0.7/update-site/
+http://www.polarion.org/projects/subversive/download/eclipse/2.0/update-site/
