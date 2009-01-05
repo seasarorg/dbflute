@@ -245,6 +245,22 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        throw new UnsupportedOperationException("ScalarReferrer at inline() is unsupported! Sorry!");
+    }
+    public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
+        throw new UnsupportedOperationException("ScalarReferrer at inline() is unsupported! Sorry!");
+    }
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {

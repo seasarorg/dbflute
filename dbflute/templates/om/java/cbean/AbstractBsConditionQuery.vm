@@ -557,6 +557,36 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+
+    public SRSQFunction<${relatedCBClassName}> scalar${referrer.referrerPropertyNameInitCap}() {
+        return xcreateSRSQFunction${referrer.referrerPropertyNameInitCap}();
+    }
+    protected SRSQFunction<${relatedCBClassName}> xcreateSRSQFunction${referrer.referrerPropertyNameInitCap}() {
+        return new SRSQFunction<${relatedCBClassName}>(new SRSQSetupper<${relatedCBClassName}>() {
+            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xscalar${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            }
+        });
+    }
+    public void xscalar${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForScalarSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
+        registerScalarReferrerSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 

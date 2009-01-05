@@ -586,7 +586,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected void assertDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
-        if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
+        if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower()) || function.ToLower().StartsWith("count")) {
             if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
                 throwDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
