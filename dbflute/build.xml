@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.8.8.1"/>
+  <property name="version" value="0.8.8"/>
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
@@ -13,7 +13,6 @@
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
-  <property name="dbflute.ncsharp.dir" value="${workspace.base}/dfncsharp"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
   <property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
   <property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
@@ -29,9 +28,6 @@
   <property name="dbflute.s2jdbc.example.dir" value="${workspace.base}/dbflute-s2jdbc-example"/>
   <property name="dbflute.flexserver.example.dir" value="${workspace.base}/dbflute-flexserver-example"/>
   <property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
-  <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
-  <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
-  <property name="dbflute.pbasic.example.dir" value="${workspace.base}/dbflute-pbasic-example"/>
 
   <target name="clean">
     <delete dir="target/classes"/>
@@ -79,7 +75,7 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <mkdir dir="dist"/>
+    <mkdir dir="${dbflute.dist}"/>
 
     <delete file="${dbflute.jar.dirfile}"/>
     <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
@@ -95,18 +91,14 @@
         <zipfileset prefix="minimumProperties" dir="etc/client_directory-template/minimumProperties"/>
     </zip>
 
-    <delete file="etc/client_directory-template/minimumProperties4cs.zip"/>
-    <zip zipfile="etc/client_directory-template/minimumProperties4cs.zip">
-        <zipfileset prefix="minimumProperties4cs" dir="etc/client_directory-template/minimumProperties4cs"/>
-    </zip>
-
     <zip zipfile="${dbflute.zip.dirfile}">
         <zipfileset prefix="etc/cmd" dir="etc/cmd">
             <include name="*.cmd"/>
             <include name="*.sh"/>
         </zipfileset>
         <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template">
-            <include name="*.zip"/>
+            <include name="fullProperties.zip"/>
+            <include name="minimumProperties.zip"/>
         </zipfileset>
         <zipfileset prefix="lib/forExecute" dir="dist">
             <include name="${dbflute.jar.file}"/>
@@ -217,17 +209,7 @@
   	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-pbasic" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.pbasic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-
   <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
     <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -243,11 +225,6 @@
     <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
-  	<!-- Freeze
-    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    -->
     <copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -255,18 +232,6 @@
 
   <target name="reflect-win-limit-basic" depends="expand-dist" description="==> reflect to test application">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-limit-nbasic" depends="expand-dist" description="==> reflect to nbasic example">
-    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-limit-noracle" depends="expand-dist" description="==> reflect to noracle example">
-    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
