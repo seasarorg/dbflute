@@ -173,8 +173,8 @@ namespace ${glPackageBaseCQ} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
         protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
@@ -305,8 +305,8 @@ namespace ${glPackageBaseCQ} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
         protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;

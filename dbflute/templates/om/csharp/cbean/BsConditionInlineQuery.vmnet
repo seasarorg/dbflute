@@ -168,10 +168,10 @@ namespace ${glPackageCIQ} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
+            throw new UnsupportedOperationException("SpecifyDerivedReferrer at inline() is unsupported! Sorry!");
         }
 #end
 #end
@@ -271,10 +271,10 @@ namespace ${glPackageCIQ} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
+            throw new UnsupportedOperationException("SpecifyDerivedReferrer at inline() is unsupported! Sorry!");
         }
 #end
 #end

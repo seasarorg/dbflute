@@ -238,7 +238,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> Derived${tmpPropertyNameInitCap}() {
-            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
         }
 #end
 #end
