@@ -321,16 +321,46 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerDerivedReferrerSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+        return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
+    }
+    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            }
+        });
+    }
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
 #end
 #end
 #end
@@ -557,28 +587,16 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public SRSQFunction<${relatedCBClassName}> scalar${referrer.referrerPropertyNameInitCap}() {
-        return xcreateSRSQFunction${referrer.referrerPropertyNameInitCap}();
-    }
-    protected SRSQFunction<${relatedCBClassName}> xcreateSRSQFunction${referrer.referrerPropertyNameInitCap}() {
-        return new SRSQFunction<${relatedCBClassName}>(new SRSQSetupper<${relatedCBClassName}>() {
-            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
-                xscalar${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
-            }
-        });
-    }
-    public void xscalar${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForScalarSubQuery(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
-        registerScalarReferrerSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
 #end
 #end
 #end
@@ -587,16 +605,28 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
+    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+        return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
+    }
+    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            }
+        });
+    }
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerDerivedReferrerSubQuery(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
 #end
 #end
 #end
@@ -731,6 +761,9 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 
+    // ===================================================================================
+    //                                                                     Scalar SubQuery
+    //                                                                     ===============
     public SSQFunction<${myConditionBeanClassName}> scalar_Equal() {
         return xcreateSSQFunction("=");
     }
@@ -768,6 +801,9 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 #end
 
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
     // Very Internal (for Suppressing Warn about 'Not Use Import')
     protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }

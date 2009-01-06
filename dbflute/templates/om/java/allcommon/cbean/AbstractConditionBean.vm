@@ -615,7 +615,7 @@ public abstract class ${myClassName} implements ${glConditionBean} {
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "You should specified a local table column at condition-bean for derived-referrer." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "  For example(for SpecifyDerivedReferrer):" + getLineSeparator();
             msg = msg + "    " + getLineSeparator();
             msg = msg + "    [Wrong]" + getLineSeparator();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
@@ -762,26 +762,109 @@ public abstract class ${myClassName} implements ${glConditionBean} {
             _dbmetaProvider = dbmetaProvider;
         }
 
+        /**
+         * Set up the sub query of referrer for the scalar 'count'.
+         * <pre>
+         * cb.specify().derivePurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchaseDatetime(); // *Point! (Basically PK)
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"LATEST_PURCHASE_DATETIME\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void count(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
         }
+
+        /**
+         * Set up the sub query of referrer for the scalar 'count(with distinct)'.
+         * <pre>
+         * cb.specify().derivePurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchaseDatetime(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"LATEST_PURCHASE_DATETIME\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void countDistinct(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("count(distinct", subQuery, _localCQ, aliasName.trim());
         }
+
+        /**
+         * Set up the sub query of referrer for the scalar 'max'.
+         * <pre>
+         * cb.specify().derivePurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchaseDatetime(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"LATEST_PURCHASE_DATETIME\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void max(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
         }
+
+        /**
+         * Set up the sub query of referrer for the scalar 'min'.
+         * <pre>
+         * cb.specify().derivePurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchaseDatetime(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"LATEST_PURCHASE_DATETIME\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void min(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
         }
+        
+        /**
+         * Set up the sub query of referrer for the scalar 'sum'.
+         * <pre>
+         * cb.specify().derivePurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"SUMMARY_PURCHASE_PRICE\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void sum(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
         }
+        
+        /**
+         * Set up the sub query of referrer for the scalar 'avg'.
+         * <pre>
+         * cb.specify().derivePurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * }, \"AVERAGE_PURCHASE_PRICE\");
+         * </pre> 
+         * @param subQuery The sub query of referrer. (NotNull)
+         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+         */
         public void avg(${glSubQuery}<REFERRER_CB> subQuery, String aliasName) {
             assertAliasName(aliasName);
             _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());

@@ -158,10 +158,26 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
+        throw new UnsupportedOperationException("(Specify)DerivedReferrer at inline() is unsupported! Sorry!");
+    }
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
+    }
+    public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
+        throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
     }
 #end
 #end
@@ -245,13 +261,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ScalarReferrerSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("ScalarReferrer at inline() is unsupported! Sorry!");
-    }
-    public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
-        throw new UnsupportedOperationException("ScalarReferrer at inline() is unsupported! Sorry!");
+        throw new UnsupportedOperationException("(Specify)DerivedReferrer at inline() is unsupported! Sorry!");
     }
 #end
 #end
@@ -261,10 +274,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (!${referrer.isOneToOne()})
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_DerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        throw new UnsupportedOperationException("DerivedReferrer at inline() is unsupported! Sorry!");
+        throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
+    }
+    public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
+        throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
     }
 #end
 #end
@@ -274,8 +290,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($table.hasOnlyOnePrimaryKey())
 
     // ===================================================================================
-    //                                                                       Derived Query
-    //                                                                       =============
+    //                                                                     Scalar SubQuery
+    //                                                                     ===============
     public String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
         throw new UnsupportedOperationException("ScalarSubQuery at inline() is unsupported! Sorry!");
     }
