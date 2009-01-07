@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
+import org.seasar.dbflute.properties.DfAllClassCopyrightProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -138,8 +139,8 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                Additional Primary Key
-    //                                ----------------------
+    //                                      Additional Table
+    //                                      ----------------
     protected DfAdditionalTableProperties _additionalTableProperties;
 
     public DfAdditionalTableProperties getAdditionalTableProperties(Properties prop) {
@@ -171,6 +172,18 @@ public final class DfPropertiesHandler {
             _additionalForeignKeyProperties = new DfAdditionalForeignKeyProperties(prop);
         }
         return _additionalForeignKeyProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                   All Class Copyright
+    //                                   -------------------
+    protected DfAllClassCopyrightProperties _allClassCopyrightProperties;
+    
+    public DfAllClassCopyrightProperties getAllClassCopyrightProperties(Properties prop) {
+        if (_allClassCopyrightProperties == null) {
+            _allClassCopyrightProperties = new DfAllClassCopyrightProperties(prop);
+        }
+        return _allClassCopyrightProperties;
     }
 
     // -----------------------------------------------------

@@ -342,15 +342,15 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                              Prefix
     //                                                                              ======
     public String getProjectPrefix() {
-        return stringProp("torque.projectPrefix", "");
+        return getProperty("projectPrefix", "");
     }
 
     public String getBasePrefix() {
         return "Bs";
     }
 
-    public boolean isAppendProjectSuffixToComponentName() {
-        return booleanProp("torque.isAppendProjectSuffixToComponentName", true);
+    public boolean isAppendProjectSuffixToComponentName() { // It's closet!
+        return isProperty("isAppendProjectSuffixToComponentName", true);
     }
 
     // ===================================================================================
@@ -358,13 +358,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           =========
     public boolean isAvailableHotDeploy() {
         return booleanProp("torque.isAvailableHotDeploy", false);
-    }
-
-    // ===================================================================================
-    //                                                                           Copyright
-    //                                                                           =========
-    public String getAllClassCopyright() {
-        return stringProp("torque.allClassCopyright", "");
     }
 
     // ===================================================================================

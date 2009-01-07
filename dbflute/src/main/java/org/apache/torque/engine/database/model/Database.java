@@ -807,7 +807,7 @@ public class Database {
     //                                             Copyright
     //                                             ---------
     public String getAllClassCopyright() {
-        return getBasicProperties().getAllClassCopyright();
+        return getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
     }
 
     // -----------------------------------------------------
