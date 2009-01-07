@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.junit.Test;
 import org.seasar.dbflute.unit.DfDBFluteTestCase;
 
-public class DfGeneratedClassPackagePropertiesTest extends DfDBFluteTestCase {
+public class DfBasicPropertiesTest extends DfDBFluteTestCase {
 
     @Test
     public void test_conditionBeanPackage() {
