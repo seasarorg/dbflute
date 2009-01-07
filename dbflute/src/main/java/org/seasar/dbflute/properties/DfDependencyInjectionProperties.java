@@ -8,6 +8,10 @@ import java.util.Properties;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 
+/**
+ * @author jflute
+ * @since 0.8.8.1 (2009/01/07 Wednesday)
+ */
 public final class DfDependencyInjectionProperties extends DfAbstractHelperProperties {
 
     public DfDependencyInjectionProperties(Properties prop) {
@@ -93,8 +97,8 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     }
 
     public List<String> getDBFluteDiconPackageNameList() { // Java Only
-        final String prop = getProperty("dbfluteDiconPackageName", getDefaultDBFluteDicon()
-                .getDBFluteDiconPackageName());
+        final String defaultPackageName = getDefaultDBFluteDicon().getDBFluteDiconPackageName();
+        final String prop = getProperty("dbfluteDiconPackageName", defaultPackageName);
         final String[] array = prop.split(";");
         final List<String> ls = new ArrayList<String>();
         for (String string : array) {
@@ -107,28 +111,16 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return getProperty("dbfluteDiconFileName", getDefaultDBFluteDicon().getDBFluteDiconFileName());
     }
 
-    public String getDBFluteCreatorDiconFileName() { // Java Only
+    public String getDBFluteCreatorDiconFileName() { // It's closet! Java Only
         return getProperty("dbfluteCreatorDiconFileName", "dbflute-creator.dicon");
     }
 
-    public String getDBFluteCustomizerDiconFileName() { // Java Only
+    public String getDBFluteCustomizerDiconFileName() { // It's closet! Java Only
         return getProperty("dbfluteCustomizerDiconFileName", "dbflute-customizer.dicon");
     }
 
     public String getJ2eeDiconResourceName() { // Java Only
         return getProperty("j2eeDiconResourceName", getDefaultDBFluteDicon().getJ2eeDiconResourceName());
-    }
-
-    public String getRequiredTxComponentName() { // Java Only
-        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
-        final String defaultValue = diconDefault.getRequiredTxComponentName();
-        return getProperty("requiredTxComponentName", defaultValue);
-    }
-
-    public String getRequiresNewTxComponentName() { // Java Only
-        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
-        final String defaultValue = diconDefault.getRequiresNewTxComponentName();
-        return getProperty("requiresNewTxComponentName", defaultValue);
     }
 
     protected DfLanguageDependencyInfo getLanguageDependencyInfo() {
@@ -174,8 +166,19 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     // ===================================================================================
     //                                                                DBFluteBeans(Spring)
     //                                                                ====================
-    public String getDBFluteBeansFileName() {
+    public String getDBFluteBeansFileName() { // Java Only
         return getProperty("dbfluteBeansFileName", "dbfluteBeans.xml");
+    }
+
+    public List<String> getDBFluteBeansPackageNameList() { // Java Only
+        final String defaultPackageName = getDefaultDBFluteDicon().getDBFluteDiconPackageName();
+        final String prop = getProperty("dbfluteBeansPackageName", defaultPackageName);
+        final String[] array = prop.split(";");
+        final List<String> ls = new ArrayList<String>();
+        for (String string : array) {
+            ls.add(string.trim());
+        }
+        return ls;
     }
 
     // ===================================================================================
@@ -186,7 +189,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return name != null && name.trim().length() > 0 && !name.trim().equalsIgnoreCase("null");
     }
 
-    public String getQuillDataSourceName() {
+    public String getQuillDataSourceName() { // CSharp Only
         return getProperty("quillDataSourceName", null);
     }
 }

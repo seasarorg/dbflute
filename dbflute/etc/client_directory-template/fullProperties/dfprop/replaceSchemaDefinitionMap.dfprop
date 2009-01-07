@@ -3,32 +3,49 @@
 #
 # The various settings about replace-schema.
 # 
+# o dataLoadingType (NotRequired - Default 'ut')
+# o loggingInsertSql (NotRequired - Default 'true')
+# o skipSheet (NotRequired - Default '')
+# o filterVariablesMap (NotRequired - Default 'map:{}')
+# 
 # Example:
 # map:{
 #     ; dataLoadingType = ut
 #     ; loggingInsertSql = true
-#     # /- - - - - - - - - - - - - - - - - - - - - - - - - -
-#     # You can specify the skip sheet by regular expression
-#     # - - - - - - - - - -/
-#     #; skipSheet = P.+
-#     # /- - - - - - - - - - - - - - - - - - - - - - - - - -
-#     # You can specify the filter variables for DDL.
-#     # - - - - - - - - - -/
-#     #; filterVariablesMap = map:{abc=AAA}
+#     ; skipSheet = P.+
+#     ; filterVariablesMap = map:{abc=AAA}
 # }
 #
 # *The line that starts with '#' means comment-out.
 #
 map:{
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	# o dataLoadingType (NotRequired - Default 'ut')
+	#  The type of data loading.
+	#  If the value is 'ut', the target is './playsql/data/ut/...'.
+	#
     ; dataLoadingType = ut
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	# o loggingInsertSql (NotRequired - Default 'true')
+	#  Does it show insert values on log?
+	#
     ; loggingInsertSql = true
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - -
-    # You can specify the skip sheet by regular expression
     # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	# o skipSheet (NotRequired - Default '')
+	#  You can specify the skip sheet by regular expression
+	#
     #; skipSheet = P.+
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - -
-    # You can specify the filter variables for DDL.
     # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	# o filterVariablesMap (NotRequired - Default 'map:{}')
+    # You can specify the filter variables for DDL.
+    # 
     #; filterVariablesMap = map:{abc=AAA}
+    # - - - - - - - - - -/
 }
 # ----------------/

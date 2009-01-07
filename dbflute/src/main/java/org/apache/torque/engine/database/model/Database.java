@@ -960,14 +960,6 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getJ2eeDiconResourceName();
     }
 
-    public String getRequiredTxComponentName() {
-        return getProperties().getDependencyInjectionProperties().getRequiredTxComponentName();
-    }
-
-    public String getRequiresNewTxComponentName() {
-        return getProperties().getDependencyInjectionProperties().getRequiresNewTxComponentName();
-    }
-
     public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
     }
@@ -979,6 +971,10 @@ public class Database {
     // Spring
     public String getDBFluteBeansFileName() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
+    }
+
+    public List<String> getDBFluteBeansackageNameList() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansPackageNameList();
     }
 
     // Quill
