@@ -18,7 +18,7 @@ import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlDefinitionProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
@@ -226,11 +226,11 @@ public final class DfPropertiesHandler {
     // -----------------------------------------------------
     //                                            OutsideSql
     //                                            ----------
-    protected DfOutsideSqlDefinitionProperties _outsideSqlProperties;
+    protected DfOutsideSqlProperties _outsideSqlProperties;
 
-    public DfOutsideSqlDefinitionProperties getOutsideSqlProperties(Properties prop) {
+    public DfOutsideSqlProperties getOutsideSqlProperties(Properties prop) {
         if (_outsideSqlProperties == null) {
-            _outsideSqlProperties = new DfOutsideSqlDefinitionProperties(prop);
+            _outsideSqlProperties = new DfOutsideSqlProperties(prop);
         }
         return _outsideSqlProperties;
     }
