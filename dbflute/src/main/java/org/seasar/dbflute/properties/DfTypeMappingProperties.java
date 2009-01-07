@@ -22,6 +22,19 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                    Type Mapping Map
+    //                                                                    ================
+    public static final String KEY_typeMappingMap = "typeMappingMap";
+    protected Map<String, Object> _typeMappingMap;
+
+    public Map<String, Object> getTypeMappingMap() {
+        if (_typeMappingMap == null) {
+            _typeMappingMap = mapProp("torque." + KEY_typeMappingMap, DEFAULT_EMPTY_MAP);
+        }
+        return _typeMappingMap;
+    }
+
+    // ===================================================================================
     //                                                                 JDBC to Java Native
     //                                                                 ===================
     protected Map<String, Object> _jdbcToJavaNativeMap;
@@ -30,22 +43,37 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         if (_jdbcToJavaNativeMap != null) {
             return _jdbcToJavaNativeMap;
         }
+
         if (getBasicProperties().isTargetLanguageJava()) {
-            _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", getLanguageMetaData().getJdbcToJavaNativeMap());
+            // * * *
+            // Java
+            // * * *
+            Map<String, Object> typeMappingMap = getTypeMappingMap();
+            if (typeMappingMap.isEmpty()) {
+                Map<String, Object> defaultMap = getLanguageMetaData().getJdbcToJavaNativeMap(); // Actually Empty
+                _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", defaultMap);
+            } else {
+                _jdbcToJavaNativeMap = typeMappingMap;
+            }
             return _jdbcToJavaNativeMap;
         }
 
         // * * * * *
         // Not Java
         // * * * * *
-
         final Map<String, Object> metaMap = getLanguageMetaData().getJdbcToJavaNativeMap();
         if (metaMap.isEmpty()) {
             String msg = "The jdbcToJavaNamtiveMap should not be null: metaData=" + getLanguageMetaData();
             throw new IllegalStateException(msg);
         }
-        
-        _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP);
+
+        Map<String, Object> typeMappingMap = getTypeMappingMap();
+        if (typeMappingMap.isEmpty()) {
+            Map<String, Object> defaultMap = getLanguageMetaData().getJdbcToJavaNativeMap();
+            _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", defaultMap);
+        } else {
+            _jdbcToJavaNativeMap = typeMappingMap;
+        }
         if (_jdbcToJavaNativeMap.isEmpty()) {
             _jdbcToJavaNativeMap = metaMap;
             return _jdbcToJavaNativeMap;
@@ -62,49 +90,27 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         return _jdbcToJavaNativeMap;
     }
 
-    protected List<Object> _javaNativeStringList;
-
-    public List<Object> getJavaNativeStringList() {
-        if (_javaNativeStringList == null) {
-            _javaNativeStringList = listProp("torque.javaNativeStringList", getLanguageMetaData().getStringList());
-        }
-        return _javaNativeStringList;
+    // ===================================================================================
+    //                                                               Java Native Type List
+    //                                                               =====================
+    public List<Object> getJavaNativeStringList() { // It's not property!
+        return getLanguageMetaData().getStringList();
     }
 
-    protected List<Object> _javaNativeBooleanList;
-
-    public List<Object> getJavaNativeBooleanList() {
-        if (_javaNativeBooleanList == null) {
-            _javaNativeBooleanList = listProp("torque.javaNativeBooleanList", getLanguageMetaData().getBooleanList());
-        }
-        return _javaNativeBooleanList;
+    public List<Object> getJavaNativeBooleanList() { // It's not property!
+        return getLanguageMetaData().getBooleanList();
     }
 
-    protected List<Object> _javaNativeNumberList;
-
-    public List<Object> getJavaNativeNumberList() {
-        if (_javaNativeNumberList == null) {
-            _javaNativeNumberList = listProp("torque.javaNativeNumberList", getLanguageMetaData().getNumberList());
-        }
-        return _javaNativeNumberList;
+    public List<Object> getJavaNativeNumberList() { // It's not property!
+        return getLanguageMetaData().getNumberList();
     }
 
-    protected List<Object> _javaNativeDateList;
-
-    public List<Object> getJavaNativeDateList() {
-        if (_javaNativeDateList == null) {
-            _javaNativeDateList = listProp("torque.javaNativeDateList", getLanguageMetaData().getDateList());
-        }
-        return _javaNativeDateList;
+    public List<Object> getJavaNativeDateList() { // It's not property!
+        return getLanguageMetaData().getDateList();
     }
 
-    protected List<Object> _javaNativeBinaryList;
-
-    public List<Object> getJavaNativeBinaryList() {
-        if (_javaNativeBinaryList == null) {
-            _javaNativeBinaryList = listProp("torque.javaNativeBinaryList", getLanguageMetaData().getBinaryList());
-        }
-        return _javaNativeBinaryList;
+    public List<Object> getJavaNativeBinaryList() { // It's not property!
+        return getLanguageMetaData().getBinaryList();
 
     }
 
@@ -120,13 +126,5 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         _languageMetaData = languageDependencyInfo.createLanguageMetaData();
         return _languageMetaData;
-    }
-
-    // ===================================================================================
-    //                                                                               Other
-    //                                                                               =====
-    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
-        final String property = stringProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP_STRING);
-        return removeLineSeparator(property);
     }
 }

@@ -1369,10 +1369,6 @@ public class Database {
         return getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
     }
 
-    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
-        return getProperties().getTypeMappingProperties().getJdbcToJavaNativeAsStringRemovedLineSeparator();
-    }
-
     // ===================================================================================
     //                                                               OutsideSql Properties
     //                                                               =====================
