@@ -9,6 +9,8 @@
 # o propertiesMap -- The properties that depends on the database.
 # o variousMap    -- The various settings about JDBC task.
 #
+# *The line that starts with '#' means comment-out.
+#
 map:{
     ; driver   = {Please write your setting! at './dfprop/databaseInfoMap.dfprop'}
     ; url      = ...

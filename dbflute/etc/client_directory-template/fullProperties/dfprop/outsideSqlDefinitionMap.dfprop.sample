@@ -1,4 +1,7 @@
 # /---------------------------------------------------------------------------
+# outsideSqlDefinitionMap: (NotRequired - Default 'map:{}')
+#
+# *The line that starts with '#' means comment-out.
 #
 map:{
     ; generateProcedureParameterBean = true
@@ -7,4 +10,3 @@ map:{
     #; targetProcedureNameList = list:{prefix:SP_}
 }
 # ----------------/
-
