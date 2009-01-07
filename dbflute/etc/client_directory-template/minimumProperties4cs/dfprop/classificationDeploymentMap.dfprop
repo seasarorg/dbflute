@@ -1,0 +1,22 @@
+# /---------------------------------------------------------------------------
+# classificationDeploymentMap: (NotRequired - Default 'map:{}')
+# 
+# The relation between column and classification.
+# 
+# This property uses classification names of classificationDefinitionMap.
+# The table name '$$ALL$$' means all tables are target.
+# The table names and column names are treated as case insensitive.
+# 
+# Example:
+# map:{
+#     ; $$ALL$$       = map:{suffix:_FLG=Flg}
+#     ; MEMBER        = map:{MEMBER_STATUS_CODE=MemberStatus}
+#     ; MEMBER_STATUS = map:{MEMBER_STATUS_CODE=MemberStatus}
+# }
+#
+map:{
+    #; $$ALL$$       = map:{suffix:_FLG=Flg}
+    #; MEMBER        = map:{MEMBER_STATUS_CODE=MemberStatus}
+    #; MEMBER_STATUS = map:{MEMBER_STATUS_CODE=MemberStatus}
+}
+# ----------------/
