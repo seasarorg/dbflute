@@ -1,15 +1,28 @@
 # /---------------------------------------------------------------------------
 # typeMappingMap: (NotRequired - Default 'map:{}')
 #
-# ex) map:{INTEGER=java.lang.Integer;TIMESTAMP=java.util.Date}
-# ex) map:{} // If you don't want to change...
+# If you want to change mappings from default mappings,
+# you can specify your original mappings.
 #
-# Abount '$$AutoMapping$$':
+# About '$$AutoMapping$$':
 # If the database is Oracle, they often use this.
 # For example, if you use this for NUMERIC.
-# Numeric( 1 -  9 , 0) is mapping to INTEGER
-# Numeric(10 - 38 , 0) is mapping to BIGINT
-# Numeric( 1 - 38 , 2) is mapping to NUMERIC
+#   o Numeric( 1 -  9 , 0) is mapping to INTEGER
+#   o Numeric(10 - 38 , 0) is mapping to BIGINT
+#   o Numeric( 1 - 38 , 2) is mapping to NUMERIC
+# 
+# Example:
+# map:{
+#     ; INTEGER = java.lang.Integer
+#     ; TIMESTAMP = java.util.Date
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # If you want to use AutoMapping for Numeric and Decimal, remove the comment-out mark.
+    #; NUMERIC = $$AutoMapping$$ ; DECIMAL = $$AutoMapping$$
+}
 #
 # Default mapping as follows:
 # ------------------------------------------------------
@@ -36,8 +49,5 @@
 # | TIME          | java.sql.Time        | DateTime?   |
 # | TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
 # ------------------------------------------------------
-map:{
-    # If you want to use AutoMapping for Numeric and Decimal, remove the comment-out mark.
-    #; NUMERIC=$$AutoMapping$$ ; DECIMAL=$$AutoMapping$$
-}
+# 
 # ----------------/

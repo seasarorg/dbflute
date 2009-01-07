@@ -237,14 +237,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                    Output Directory
-    //                                                                    ================
-    public String getOutputDirectory() {
-        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return getProperty("java.dir", defaultSourceDirectory);
-    }
-
-    // ===================================================================================
     //                                                                    Generate Package
     //                                                                    ================
     public String getPackageBase() {
@@ -310,6 +302,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     protected DfGeneratedClassPackageDefault getPackageInfo() {
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return languageDependencyInfo.getGeneratedClassPackageInfo();
+    }
+
+    // ===================================================================================
+    //                                                                    Output Directory
+    //                                                                    ================
+    public String getOutputDirectory() {
+        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
+        return getProperty("java.dir", defaultSourceDirectory);
     }
 
     // ===================================================================================
