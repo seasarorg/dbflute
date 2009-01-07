@@ -3,21 +3,16 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-public final class DfInvokeSqlDirectoryProperties extends DfAbstractHelperProperties {
+public final class DfOutsideSqlTestProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
-    public DfInvokeSqlDirectoryProperties(Properties prop) {
+    public DfOutsideSqlTestProperties(Properties prop) {
         super(prop);
     }
 
     // ===============================================================================
     //                                    Properties - invokeSqlDirectoryDefinitionMap
     //                                    ============================================
-    public static final String KEY_invokeSqlDirectoryDefinitionMap = "invokeSqlDirectoryDefinitionMap";
+    public static final String KEY_invokeSqlDirectoryDefinitionMap = "outsideSqlTestDefinitionMap";
     protected Map<String, Object> _invokeSqlDirectoryDefinitionMap;
 
     public Map<String, Object> getInvokeSqlDirectoryDefinitionMap() {

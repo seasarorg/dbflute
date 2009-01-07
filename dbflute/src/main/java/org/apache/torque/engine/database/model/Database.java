@@ -84,7 +84,6 @@ import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
@@ -995,7 +994,7 @@ public class Database {
     public String getConditionBeanPackage() {
         return getProperties().getGeneratedClassPackageProperties().getConditionBeanPackage();
     }
-    
+
     public String getExtendedConditionBeanPackage() {
         return getProperties().getGeneratedClassPackageProperties().getExtendedConditionBeanPackage();
     }
@@ -1254,17 +1253,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                         S2Dao Adjustment Properties
-    //                                                         ===========================
-    public String getExtendedAnnotationReaderFactoryClassName() {
-        return getProperties().getS2DaoAdjustmentProperties().getExtendedAnnotationReaderFactoryClassName();
-    }
-
-    public String getExtendedDaoMetaDataFactoryImplClassName() {
-        return getProperties().getS2DaoAdjustmentProperties().getExtendedDaoMetaDataFactoryImplClassName();
-    }
-
-    // ===================================================================================
     //                                                        Little Adjustment Properties
     //                                                        ============================
     public boolean isAvailableDatabaseDependency() {
@@ -1279,50 +1267,64 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
-    // ===================================================================================
-    //                                                            Making Option Properties
-    //                                                            ========================
     public boolean isMakeDeprecated() {
-        return getProperties().getMakingOptionProperties().isMakeDeprecated();
+        return getProperties().getLittleAdjustmentProperties().isMakeDeprecated();
     }
 
     public boolean isMakeRecentlyDeprecated() {
-        return getProperties().getMakingOptionProperties().isMakeRecentlyDeprecated();
+        return getProperties().getLittleAdjustmentProperties().isMakeRecentlyDeprecated();
     }
 
     public boolean isMakeConditionQueryEqualEmptyString() {
-        return getProperties().getMakingOptionProperties().isMakeConditionQueryEqualEmptyString();
+        return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
     public boolean isMakeEntityTraceRelation() {
-        return getProperties().getMakingOptionProperties().isMakeEntityTraceRelation();
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityTraceRelation();
     }
 
     public boolean isMakeFlatExpansion() {
-        return getProperties().getMakingOptionProperties().isMakeFlatExpansion();
+        return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();
     }
 
     public boolean isMakeDaoInterface() {
-        return getProperties().getMakingOptionProperties().isMakeDaoInterface();
+        return getProperties().getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
-    // ===================================================================================
-    //                                                         Select Parameter Properties
-    //                                                         ===========================
-    protected DfSelectParamProperties getSelectParamProperties() {
-        return getProperties().getSelectParamProperties();
-    }
-
-    public boolean isStatementResultSetTypeValid() {
-        return getSelectParamProperties().isStatementResultSetTypeValid();
+    public boolean isStopGenerateExtendedBhv() {
+        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
 
     public String getStatementResultSetType() {
-        return getSelectParamProperties().getStatementResultSetType();
+        return getProperties().getLittleAdjustmentProperties().getStatementResultSetType();
     }
 
     public String getStatementResultSetConcurrency() {
-        return getSelectParamProperties().getStatementResultSetConcurrency();
+        return getProperties().getLittleAdjustmentProperties().getStatementResultSetConcurrency();
+    }
+
+    public boolean isStopGenerateExtendedDao() {
+        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedDao();
+    }
+
+    public boolean isStopGenerateExtendedEntity() {
+        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedEntity();
+    }
+
+    public String getExtractAcceptStartBrace() {
+        return getProperties().getLittleAdjustmentProperties().getExtractAcceptStartBrace();
+    }
+
+    public String getExtractAcceptEndBrace() {
+        return getProperties().getLittleAdjustmentProperties().getExtractAcceptEndBrace();
+    }
+
+    public String getExtractAcceptDelimiter() {
+        return getProperties().getLittleAdjustmentProperties().getExtractAcceptDelimiter();
+    }
+
+    public String getExtractAcceptEqual() {
+        return getProperties().getLittleAdjustmentProperties().getExtractAcceptEqual();
     }
 
     // ===================================================================================
@@ -1583,37 +1585,6 @@ public class Database {
 
     public String getS2jdbcBaseEntitySuffix() {
         return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
-    }
-
-    // ===================================================================================
-    //                                                                    Other Properties
-    //                                                                    ================
-    public boolean isStopGenerateExtendedBhv() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
-    }
-
-    public boolean isStopGenerateExtendedDao() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedDao();
-    }
-
-    public boolean isStopGenerateExtendedEntity() {
-        return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
-    }
-
-    public String getExtractAcceptStartBrace() {
-        return getProperties().getOtherProperties().getExtractAcceptStartBrace();
-    }
-
-    public String getExtractAcceptEndBrace() {
-        return getProperties().getOtherProperties().getExtractAcceptEndBrace();
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return getProperties().getOtherProperties().getExtractAcceptDelimiter();
-    }
-
-    public String getExtractAcceptEqual() {
-        return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
 
     // ===================================================================================

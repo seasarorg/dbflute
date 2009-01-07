@@ -30,17 +30,14 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfMakingOptionProperties;
+import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
-import org.seasar.dbflute.properties.DfOtherProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlDefinitionProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
-import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
@@ -120,13 +117,6 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                      S2Dao Adjustment
-    //                                      ----------------
-    public DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties() {
-        return getHandler().getS2DaoAdjustmentProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
     //                                         DBFlute Dicon
     //                                         -------------
     public DfDBFluteDiconProperties getDBFluteDiconProperties() {
@@ -188,13 +178,6 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                          Select Param
-    //                                          ------------
-    public DfSelectParamProperties getSelectParamProperties() {
-        return getHandler().getSelectParamProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
     //                                      Additional Table
     //                                     ----------------
     public DfAdditionalTableProperties getAdditionalTableProperties() {
@@ -213,13 +196,6 @@ public final class DfBuildProperties {
     //                                ----------------------
     public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
         return getHandler().getAdditionalForeignKeyProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                         Making Option
-    //                                         -------------
-    public DfMakingOptionProperties getMakingOptionProperties() {
-        return getHandler().getMakingOptionProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -244,10 +220,10 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                                 Other
-    //                                                 -----
-    public DfOtherProperties getOtherProperties() {
-        return getHandler().getOtherProperties(getProperties());
+    //                                  Multiple FK Property
+    //                                  --------------------
+    public DfMultipleFKPropertyProperties getMultipleFKPropertyProperties() {
+        return getHandler().getMultipleFKPropertyProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -283,14 +259,14 @@ public final class DfBuildProperties {
     // -----------------------------------------------------
     //                       invokeSqlDirectoryDefinitionMap
     //                       -------------------------------
-    public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties() {
+    public DfOutsideSqlTestProperties getInvokeSqlDirectoryProperties() {
         return getHandler().getInvokeSqlDirectoryProperties(getProperties());
     }
 
     // -----------------------------------------------------
     //                                  outsideSqlProperties
     //                                  --------------------
-    public DfOutsideSqlProperties getOutsideSqlProperties() {
+    public DfOutsideSqlDefinitionProperties getOutsideSqlProperties() {
         return getHandler().getOutsideSqlProperties(getProperties());
     }
 

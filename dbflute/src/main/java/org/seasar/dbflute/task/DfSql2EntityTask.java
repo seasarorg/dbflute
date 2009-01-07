@@ -63,7 +63,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlDefinitionProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
@@ -114,7 +114,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setEncoding(getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding());
+        runInfo.setEncoding(getProperties().getOutsideSqlProperties().getSqlFileEncoding());
 
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
@@ -700,7 +700,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void doSetupProcedure() throws SQLException {
-        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        final DfOutsideSqlDefinitionProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return;
         }

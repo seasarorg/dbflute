@@ -58,10 +58,14 @@ public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, 
         return resourceParameter;
     }
 
+    public String assistSqlFileEncoding() {
+        return "${database.sqlFileEncoding}";
+    }
+
     public ${glStatementConfig} assistDefaultStatementConfig() {
         return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
     }
-
+    
     public boolean assistInternalDebug() {
         return ${glDBFluteConfig}.getInstance().isInternalDebug();
     }

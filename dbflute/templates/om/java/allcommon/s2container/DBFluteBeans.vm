@@ -21,7 +21,7 @@
     <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryExtension}" autowire="byType"/>
 	<bean id="propertyTypeFactoryBuilder" class="${glPackageBaseCommonS2Dao}.${glPropertyTypeFactoryBuilderExtension}" autowire="byType"/>
 	<bean id="latestSqlProvider" class="${glPackageBaseCommonS2Dao}.${glSqlLogRegistryLatestSqlProvider}" autowire="byType"/>
-	<bean id="annotationReaderFactory" class="${database.extendedAnnotationReaderFactoryClassName}" autowire="byType"/>
+	<bean id="annotationReaderFactory" class="org.seasar.dao.impl.AnnotationReaderFactoryImpl" autowire="byType"/>
 	<bean id="valueTypeFactory" class="org.seasar.dao.impl.ValueTypeFactoryImpl" autowire="byType"/>
     <bean id="daoNamingConvention" class="org.seasar.dao.impl.DaoNamingConventionImpl" autowire="byType"/>
 	<bean id="beanEnhancer" class="org.seasar.dao.impl.NullBeanEnhancer" autowire="byType"/>

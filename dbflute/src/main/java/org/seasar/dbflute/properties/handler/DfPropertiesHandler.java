@@ -14,17 +14,14 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfMakingOptionProperties;
+import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
-import org.seasar.dbflute.properties.DfOtherProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlDefinitionProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
-import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
@@ -68,18 +65,6 @@ public final class DfPropertiesHandler {
             _basicProperties = new DfBasicProperties(prop);
         }
         return _basicProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                      S2Dao Adjustment
-    //                                      ----------------
-    protected DfS2DaoAdjustmentProperties _s2daoAdjustmentPropertiess;
-
-    public DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties(Properties prop) {
-        if (_s2daoAdjustmentPropertiess == null) {
-            _s2daoAdjustmentPropertiess = new DfS2DaoAdjustmentProperties(prop);
-        }
-        return _s2daoAdjustmentPropertiess;
     }
 
     // -----------------------------------------------------
@@ -155,18 +140,6 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                          Select Param
-    //                                          ------------
-    protected DfSelectParamProperties _selectParamProperties;
-
-    public DfSelectParamProperties getSelectParamProperties(Properties prop) {
-        if (_selectParamProperties == null) {
-            _selectParamProperties = new DfSelectParamProperties(prop);
-        }
-        return _selectParamProperties;
-    }
-
-    // -----------------------------------------------------
     //                                     Sequence Identity
     //                                     -----------------
     protected DfSequenceIdentityProperties _sequenceIdentityProperties;
@@ -227,30 +200,6 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                      Other Adjustment
-    //                                      ----------------
-    protected DfOtherProperties _otherProperties;
-
-    public DfOtherProperties getOtherProperties(Properties prop) {
-        if (_otherProperties == null) {
-            _otherProperties = new DfOtherProperties(prop);
-        }
-        return _otherProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                      Source Reduction
-    //                                      ----------------
-    protected DfMakingOptionProperties _makingOptionProperties;
-
-    public DfMakingOptionProperties getMakingOptionProperties(Properties prop) {
-        if (_makingOptionProperties == null) {
-            _makingOptionProperties = new DfMakingOptionProperties(prop);
-        }
-        return _makingOptionProperties;
-    }
-
-    // -----------------------------------------------------
     //                                         Include Query
     //                                         -------------
     protected DfIncludeQueryProperties _includeQueryProperties;
@@ -263,7 +212,7 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                      Sql Log Registry
+    //                                      SQL Log Registry
     //                                      ----------------
     protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
 
@@ -277,11 +226,11 @@ public final class DfPropertiesHandler {
     // -----------------------------------------------------
     //                                            OutsideSql
     //                                            ----------
-    protected DfOutsideSqlProperties _outsideSqlProperties;
+    protected DfOutsideSqlDefinitionProperties _outsideSqlProperties;
 
-    public DfOutsideSqlProperties getOutsideSqlProperties(Properties prop) {
+    public DfOutsideSqlDefinitionProperties getOutsideSqlProperties(Properties prop) {
         if (_outsideSqlProperties == null) {
-            _outsideSqlProperties = new DfOutsideSqlProperties(prop);
+            _outsideSqlProperties = new DfOutsideSqlDefinitionProperties(prop);
         }
         return _outsideSqlProperties;
     }
@@ -311,13 +260,13 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                  Invoke Sql Directory
+    //                                  Invoke SQL Directory
     //                                  --------------------
-    protected DfInvokeSqlDirectoryProperties _invokeSqlDirectoryProperties;
+    protected DfOutsideSqlTestProperties _invokeSqlDirectoryProperties;
 
-    public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties(Properties prop) {
+    public DfOutsideSqlTestProperties getInvokeSqlDirectoryProperties(Properties prop) {
         if (_invokeSqlDirectoryProperties == null) {
-            _invokeSqlDirectoryProperties = new DfInvokeSqlDirectoryProperties(prop);
+            _invokeSqlDirectoryProperties = new DfOutsideSqlTestProperties(prop);
         }
         return _invokeSqlDirectoryProperties;
     }
@@ -332,6 +281,18 @@ public final class DfPropertiesHandler {
             _typeMappingProperties = new DfTypeMappingProperties(prop);
         }
         return _typeMappingProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                  Multiple FK Property
+    //                                  --------------------
+    protected DfMultipleFKPropertyProperties _multipleFKPropertyProperties;
+    
+    public DfMultipleFKPropertyProperties getMultipleFKPropertyProperties(Properties prop) {
+        if (_multipleFKPropertyProperties == null) {
+            _multipleFKPropertyProperties = new DfMultipleFKPropertyProperties(prop);
+        }
+        return _multipleFKPropertyProperties;
     }
 
     // -----------------------------------------------------

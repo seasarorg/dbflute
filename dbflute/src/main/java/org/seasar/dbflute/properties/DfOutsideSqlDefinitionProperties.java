@@ -4,19 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute
  * @since 0.7.5 (2008/06/25 Wednesday)
  */
-public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
+public final class DfOutsideSqlDefinitionProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOutsideSqlProperties(Properties prop) {
+    public DfOutsideSqlDefinitionProperties(Properties prop) {
         super(prop);
     }
 
@@ -46,8 +45,8 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (value != null && value.trim().length() > 0 && !value.trim().equalsIgnoreCase("null")) {
             return value;
         }
-        DfS2DaoAdjustmentProperties prop = getS2DaoAdjustmentProperties();
-        if (prop.hasDaoSqlFileEncoding()) {
+        DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.hasDaoSqlFileEncoding()) { // for compatible!
             return prop.getDaoSqlFileEncoding();
         }
         return "UTF-8";
@@ -417,8 +416,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected boolean isMakeDaoInterface() {
-        final DfMakingOptionProperties prop = DfBuildProperties.getInstance().getMakingOptionProperties();
-        return prop.isMakeDaoInterface();
+        return getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
     // ===================================================================================

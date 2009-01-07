@@ -70,7 +70,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfMakingOptionProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
@@ -1167,7 +1167,7 @@ public class Column {
     //                                                                       Include Query
     //                                                                       =============
     protected boolean hasQueryRestrictionByClassification() {
-        final DfMakingOptionProperties prop = getTable().getProperties().getMakingOptionProperties();
+        final DfLittleAdjustmentProperties prop = getTable().getProperties().getLittleAdjustmentProperties();
         return !prop.isMakeConditionQueryClassificationRestriction() && hasClassification();
     }
 

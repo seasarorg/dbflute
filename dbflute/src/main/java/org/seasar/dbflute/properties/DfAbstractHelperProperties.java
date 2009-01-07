@@ -388,10 +388,6 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getLittleAdjustmentProperties(getProperties());
     }
 
-    protected DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties() {
-        return DfPropertiesHandler.getInstance().getS2DaoAdjustmentProperties(getProperties());
-    }
-
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============

@@ -61,7 +61,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
     @Override
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
-        runInfo.setEncoding(getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding());
+        runInfo.setEncoding(getProperties().getOutsideSqlProperties().getSqlFileEncoding());
     }
 
     @Override

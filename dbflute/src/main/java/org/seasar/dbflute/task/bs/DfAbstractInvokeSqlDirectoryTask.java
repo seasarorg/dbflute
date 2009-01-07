@@ -23,7 +23,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 
 /**
  * @author jflute
@@ -94,7 +94,7 @@ public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
         return getMyProperties().isInvokeSqlDirectoryRollbackOnly();
     }
 
-    protected DfInvokeSqlDirectoryProperties getMyProperties() {
+    protected DfOutsideSqlTestProperties getMyProperties() {
         return DfBuildProperties.getInstance().getInvokeSqlDirectoryProperties();
     }
 }

@@ -16,7 +16,7 @@ public class DfOutsideSqlPropertiesTest extends DfDBFluteTestCase {
     @Test
     public void test_resolveSqlPackageFileSeparatorWithFlatDirectory_contains() {
         // ## Arrange ##
-        final DfOutsideSqlProperties prop = new DfOutsideSqlProperties(new Properties());
+        final DfOutsideSqlDefinitionProperties prop = new DfOutsideSqlDefinitionProperties(new Properties());
 
         // ## Act ##
         final String actual = prop.resolveSqlPackageFileSeparatorWithFlatDirectory("abc.def.ghi.dbflute", "def.ghi");
@@ -29,7 +29,7 @@ public class DfOutsideSqlPropertiesTest extends DfDBFluteTestCase {
     @Test
     public void test_resolveFileSeparatorWithFlatDirectory_startsWith() {
         // ## Arrange ##
-        final DfOutsideSqlProperties prop = new DfOutsideSqlProperties(new Properties());
+        final DfOutsideSqlDefinitionProperties prop = new DfOutsideSqlDefinitionProperties(new Properties());
 
         // ## Act ##
         final String actual = prop.resolveSqlPackageFileSeparatorWithFlatDirectory("abc.def.ghi.dbflute", "abc.def");
@@ -42,7 +42,7 @@ public class DfOutsideSqlPropertiesTest extends DfDBFluteTestCase {
     @Test
     public void test_resolveFileSeparatorWithFlatDirectory_endsWith() {
         // ## Arrange ##
-        final DfOutsideSqlProperties prop = new DfOutsideSqlProperties(new Properties());
+        final DfOutsideSqlDefinitionProperties prop = new DfOutsideSqlDefinitionProperties(new Properties());
 
         // ## Act ##
         final String actual = prop

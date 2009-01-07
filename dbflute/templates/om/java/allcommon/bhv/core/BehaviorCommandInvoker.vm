@@ -98,7 +98,8 @@ public class ${glBehaviorCommandInvoker} {
     }
 
     protected String getSqlFileEncoding() {
-        return "${database.sqlFileEncoding}"; // This value is set when generating.
+        assertInvokerAssistant();
+        return _invokerAssistant.assistSqlFileEncoding();
     }
 
     // ===================================================================================
