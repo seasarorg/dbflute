@@ -85,13 +85,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                             Non PrimaryKey Writable
-    //                                                             =======================
-    public boolean isAvailableNonPrimaryKeyWritable() {
-        return isProperty("isAvailableNonPrimaryKeyWritable", false);
-    }
-
-    // ===================================================================================
     //                                                     Adding Schema to Table SQL Name
     //                                                     ===============================
     public boolean isAvailableAddingSchemaToTableSqlName() {
@@ -103,6 +96,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                 ===================
     public boolean isAvailableDatabaseDependency() {
         return isProperty("isAvailableDatabaseDependency", false);
+    }
+
+    // ===================================================================================
+    //                                                             Non PrimaryKey Writable
+    //                                                             =======================
+    public boolean isAvailableNonPrimaryKeyWritable() {
+        return isProperty("isAvailableNonPrimaryKeyWritable", false);
     }
 
     // ===================================================================================

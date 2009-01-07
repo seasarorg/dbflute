@@ -33,6 +33,79 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                             Procedure ParameterBean
+    //                                                             =======================
+    public boolean isGenerateProcedureParameterBean() {
+        String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
+    public boolean isTargetProcedureCatalog(String procedureCatalog) {
+        final List<String> targetProcedureList = getTargetProcedureCatalogList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
+            return true;
+        }
+        if (procedureCatalog == null || procedureCatalog.trim().length() == 0) {
+            if (targetProcedureList.contains("$$DEFAULT$$")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        for (String catalogHint : targetProcedureList) {
+            if (isHitByTheHint(procedureCatalog, catalogHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getTargetProcedureCatalogList() {
+        return getOutsideSqlPropertyAsList("targetProcedureCatalogList");
+    }
+
+    public boolean isTargetProcedureSchema(String procedureSchema) {
+        final List<String> targetProcedureList = getTargetProcedureSchemaList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
+            return true;
+        }
+        if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+            if (targetProcedureList.contains("$$DEFAULT$$")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        for (String schemaHint : targetProcedureList) {
+            if (isHitByTheHint(procedureSchema, schemaHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getTargetProcedureSchemaList() {
+        return getOutsideSqlPropertyAsList("targetProcedureSchemaList");
+    }
+
+    public boolean isTargetProcedureName(String procedureName) {
+        final List<String> targetProcedureList = getTargetProcedureNameList();
+        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
+            return true;
+        }
+        for (String procedureNameHint : targetProcedureList) {
+            if (isHitByTheHint(procedureName, procedureNameHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getTargetProcedureNameList() {
+        return getOutsideSqlPropertyAsList("targetProcedureNameList");
+    }
+
+    // ===================================================================================
     //                                                                     SqlFileEncoding
     //                                                                     ===============
     public boolean hasSqlFileEncoding() {
@@ -150,42 +223,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                      DefaultPackage
-    //                                                                      ==============
-    public boolean isDefaultPackageValid() { // C# only
-        return getDefaultPackage() != null && getDefaultPackage().trim().length() > 0
-                && !getDefaultPackage().trim().equalsIgnoreCase("null");
-    }
-
-    public String getDefaultPackage() { // C# only
-        return (String) getOutsideSqlDefinitionMap().get("defaultPackage");
-    }
-
-    // ===================================================================================
-    //                                                             OmitResourcePathPackage
-    //                                                             =======================
-    public boolean isOmitResourcePathPackageValid() { // C# only
-        return getOmitResourcePathPackage() != null && getOmitResourcePathPackage().trim().length() > 0
-                && !getOmitResourcePathPackage().trim().equalsIgnoreCase("null");
-    }
-
-    public String getOmitResourcePathPackage() { // C# only
-        return (String) getOutsideSqlDefinitionMap().get("omitResourcePathPackage");
-    }
-
-    // ===================================================================================
-    //                                                           OmitFileSystemPathPackage
-    //                                                           =========================
-    public boolean isOmitFileSystemPathPackageValid() { // C# only
-        return getOmitFileSystemPathPackage() != null && getOmitFileSystemPathPackage().trim().length() > 0
-                && !getOmitFileSystemPathPackage().trim().equalsIgnoreCase("null");
-    }
-
-    public String getOmitFileSystemPathPackage() { // C# only
-        return (String) getOutsideSqlDefinitionMap().get("omitFileSystemPathPackage");
-    }
-
-    // ===================================================================================
     //                                                                     OutputDirectory
     //                                                                     ===============
     public String getSql2EntityOutputDirectory() {
@@ -195,79 +232,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         } else {
             return value;
         }
-    }
-
-    // ===================================================================================
-    //                                                             Procedure ParameterBean
-    //                                                             =======================
-    public boolean isGenerateProcedureParameterBean() {
-        String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
-        return value != null && value.trim().equalsIgnoreCase("true");
-    }
-
-    public boolean isTargetProcedureCatalog(String procedureCatalog) {
-        final List<String> targetProcedureList = getTargetProcedureCatalogList();
-        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
-            return true;
-        }
-        if (procedureCatalog == null || procedureCatalog.trim().length() == 0) {
-            if (targetProcedureList.contains("$$DEFAULT$$")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        for (String catalogHint : targetProcedureList) {
-            if (isHitByTheHint(procedureCatalog, catalogHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected List<String> getTargetProcedureCatalogList() {
-        return getOutsideSqlPropertyAsList("targetProcedureCatalogList");
-    }
-
-    public boolean isTargetProcedureSchema(String procedureSchema) {
-        final List<String> targetProcedureList = getTargetProcedureSchemaList();
-        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
-            return true;
-        }
-        if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-            if (targetProcedureList.contains("$$DEFAULT$$")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        for (String schemaHint : targetProcedureList) {
-            if (isHitByTheHint(procedureSchema, schemaHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected List<String> getTargetProcedureSchemaList() {
-        return getOutsideSqlPropertyAsList("targetProcedureSchemaList");
-    }
-
-    public boolean isTargetProcedureName(String procedureName) {
-        final List<String> targetProcedureList = getTargetProcedureNameList();
-        if (targetProcedureList == null || targetProcedureList.isEmpty()) {
-            return true;
-        }
-        for (String procedureNameHint : targetProcedureList) {
-            if (isHitByTheHint(procedureName, procedureNameHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected List<String> getTargetProcedureNameList() {
-        return getOutsideSqlPropertyAsList("targetProcedureNameList");
     }
 
     // ===================================================================================
@@ -410,6 +374,42 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
 
     protected boolean isMakeDaoInterface() {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
+    }
+
+    // ===================================================================================
+    //                                                                      DefaultPackage
+    //                                                                      ==============
+    public boolean isDefaultPackageValid() { // C# only
+        return getDefaultPackage() != null && getDefaultPackage().trim().length() > 0
+                && !getDefaultPackage().trim().equalsIgnoreCase("null");
+    }
+
+    public String getDefaultPackage() { // C# only
+        return (String) getOutsideSqlDefinitionMap().get("defaultPackage");
+    }
+
+    // ===================================================================================
+    //                                                             OmitResourcePathPackage
+    //                                                             =======================
+    public boolean isOmitResourcePathPackageValid() { // C# only
+        return getOmitResourcePathPackage() != null && getOmitResourcePathPackage().trim().length() > 0
+                && !getOmitResourcePathPackage().trim().equalsIgnoreCase("null");
+    }
+
+    public String getOmitResourcePathPackage() { // C# only
+        return (String) getOutsideSqlDefinitionMap().get("omitResourcePathPackage");
+    }
+
+    // ===================================================================================
+    //                                                           OmitFileSystemPathPackage
+    //                                                           =========================
+    public boolean isOmitFileSystemPathPackageValid() { // C# only
+        return getOmitFileSystemPathPackage() != null && getOmitFileSystemPathPackage().trim().length() > 0
+                && !getOmitFileSystemPathPackage().trim().equalsIgnoreCase("null");
+    }
+
+    public String getOmitFileSystemPathPackage() { // C# only
+        return (String) getOutsideSqlDefinitionMap().get("omitFileSystemPathPackage");
     }
 
     // ===================================================================================

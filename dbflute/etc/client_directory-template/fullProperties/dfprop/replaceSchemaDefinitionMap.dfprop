@@ -1,7 +1,7 @@
 # /---------------------------------------------------------------------------
 # replaceSchemaDefinitionMap: (Default 'map:{}')
 #
-# Various settings about replace-schema.
+# The various settings about replace-schema.
 # 
 # Example:
 # map:{
