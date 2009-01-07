@@ -10,7 +10,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
+import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
@@ -166,13 +166,13 @@ public final class DfPropertiesHandler {
     // -----------------------------------------------------
     //                                         DBFlute Dicon
     //                                         -------------
-    protected DfDBFluteDiconProperties _dbfluteDiconProperties;
+    protected DfDependencyInjectionProperties _dependencyInjectionProperties;
 
-    public DfDBFluteDiconProperties getDBFluteDiconProperties(Properties prop) {
-        if (_dbfluteDiconProperties == null) {
-            _dbfluteDiconProperties = new DfDBFluteDiconProperties(prop);
+    public DfDependencyInjectionProperties getDependencyInjectionProperties(Properties prop) {
+        if (_dependencyInjectionProperties == null) {
+            _dependencyInjectionProperties = new DfDependencyInjectionProperties(prop);
         }
-        return _dbfluteDiconProperties;
+        return _dependencyInjectionProperties;
     }
 
     // -----------------------------------------------------

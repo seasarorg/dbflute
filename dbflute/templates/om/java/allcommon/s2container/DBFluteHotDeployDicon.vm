@@ -7,7 +7,7 @@
     <include path="${includePath}"/>
 #end
 
-    <include path="${glJdbcDiconResourceName}"/>
+    <include path="${glJ2eeDiconResourceName}"/>
 #foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
     <include path="${includePath}"/>
 #end

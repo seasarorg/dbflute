@@ -51,13 +51,11 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                                 Dicon
     ##                                                 -----
-    #set ($glDaoDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDBFluteDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDaoDiconFileName = "${database.daoDiconFileName}")
+    #set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
     #set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
     #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
     #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
-    #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
+    #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
     #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
     ## -----------------------------------------------------
@@ -1642,7 +1640,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                   allcommon S2Container
     ##                                   ---------------------
-    #if ($database.isTargetLanguageJava())
       $database.info("parseAllcommonS2Container() {")
       #if ($database.isTargetContainerSeasar())
         #if ($database.isAvailableHotDeploy())
@@ -1691,19 +1688,6 @@ targetdatabase = $targetDatabase
         #end
       #end
       $database.info("}")
-    #else
-      #if (!$database.isTargetLanguageCSharp())
-        $database.info("parseDBFluteDicon() {")
-        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-          #set ($path = "${dbfluteDiconPackageName}" )
-          $database.makeDirectory($path)
-
-          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-          $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
-        #end
-      #end
-    #end
 
     ## -------------------------------------------------------
     ##                                      allcommon selector

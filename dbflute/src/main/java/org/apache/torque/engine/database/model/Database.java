@@ -933,82 +933,61 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                    Dicon Properties
-    //                                                                    ================
-    public String getDaoDiconNamespace() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconNamespace();
-    }
-
-    public String getDaoDiconPackageName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
-    }
-
-    public String getDBFluteDiconPackageName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
+    //                                                                Dependency Injection
+    //                                                                ====================
+    // Seasar
+    public String getDBFluteDiconNamespace() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiconNamespace();
     }
 
     public List<String> getDBFluteDiconPackageNameList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
-    }
-
-    public List<String> getDaoDiconPackageNameList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiconPackageNameList();
     }
 
     public String getDBFluteCreatorDiconFileName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteCreatorDiconFileName();
+        return getProperties().getDependencyInjectionProperties().getDBFluteCreatorDiconFileName();
     }
 
     public String getDBFluteCustomizerDiconFileName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteCustomizerDiconFileName();
+        return getProperties().getDependencyInjectionProperties().getDBFluteCustomizerDiconFileName();
     }
 
     public String getDBFluteDiconFileName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiconFileName();
     }
 
-    public String getDaoDiconFileName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
-    }
-
-    public String getJdbcDiconResourceName() {
-        return getProperties().getDBFluteDiconProperties().getJdbcDiconResourceName();
+    public String getJ2eeDiconResourceName() {
+        return getProperties().getDependencyInjectionProperties().getJ2eeDiconResourceName();
     }
 
     public String getRequiredTxComponentName() {
-        return getProperties().getDBFluteDiconProperties().getRequiredTxComponentName();
+        return getProperties().getDependencyInjectionProperties().getRequiredTxComponentName();
     }
 
     public String getRequiresNewTxComponentName() {
-        return getProperties().getDBFluteDiconProperties().getRequiresNewTxComponentName();
+        return getProperties().getDependencyInjectionProperties().getRequiresNewTxComponentName();
     }
 
     public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
-    }
-
-    public List<String> getDaoDiconBeforeJ2eeIncludePathList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
     }
 
     public List<String> getDBFluteDiconOtherIncludePathList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
     }
 
-    public List<String> getDaoDiconOtherIncludePathList() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
-    }
-
+    // Spring
     public String getDBFluteBeansFileName() {
-        return getProperties().getDBFluteDiconProperties().getDBFluteBeansFileName();
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
     }
 
+    // Quill
     public boolean isQuillDataSourceNameValid() {
-        return getProperties().getDBFluteDiconProperties().isQuillDataSourceNameValid();
+        return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
     }
 
     public String getQuillDataSourceName() {
-        return getProperties().getDBFluteDiconProperties().getQuillDataSourceName();
+        return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
     }
 
     // ===================================================================================

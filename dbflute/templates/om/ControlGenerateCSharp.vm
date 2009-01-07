@@ -51,13 +51,11 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                                 Dicon
     ##                                                 -----
-    #set ($glDaoDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDBFluteDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDaoDiconFileName = "${database.daoDiconFileName}")
+    #set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
     #set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
     #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
     #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
-    #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
+    #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
     #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
     ## -----------------------------------------------------
@@ -1518,72 +1516,6 @@ targetdatabase = $targetDatabase
       $database.info("    parse('BuriDef');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBuriDef}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
-
-    ## -------------------------------------------------------
-    ##                                   allcommon s2container
-    ##                                   ---------------------
-    #if ($database.isTargetLanguageJava())
-      $database.info("parseAllcommonS2Container() {")
-      #if ($database.isTargetContainerSeasar())
-        #if ($database.isAvailableHotDeploy())
-          #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
-          $database.makeDirectory($path)
-
-          $database.info("    parse('BehaviorCreator');")
-          #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
-
-          #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-            #set ($path = "${dbfluteDiconPackageName}" )
-            $database.makeDirectory($path)
-
-            #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-            $database.info("    ${path}")
-            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteHotDeployDicon.${glTemplateFileExtension}", $path, "", "")
-
-            #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
-            $database.info("    ${path}")
-            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCreatorDicon.${glTemplateFileExtension}", $path, "", "")
-
-            #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
-            $database.info("    ${path}")
-            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCustomizerDicon.${glTemplateFileExtension}", $path, "", "")
-          #end
-        #else
-          #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-            #set ($path = "${dbfluteDiconPackageName}" )
-            $database.makeDirectory($path)
-
-            #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-            $database.info("    ${path}")
-            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteNormalDicon.${glTemplateFileExtension}", $path, "", "")
-          #end
-        #end
-      #end
-      #if ($database.isTargetContainerSpring())
-        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-          #set ($path = "${dbfluteDiconPackageName}" )
-          $database.makeDirectory($path)
-
-          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteBeansFileName}" )
-          $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteBeans.${glTemplateFileExtension}", $path, "", "")
-        #end
-      #end
-      $database.info("}")
-    #else
-      #if (!$database.isTargetLanguageCSharp())
-        $database.info("parseDBFluteDicon() {")
-        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-          #set ($path = "${dbfluteDiconPackageName}" )
-          $database.makeDirectory($path)
-
-          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-          $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
-        #end
-      #end
     #end
 
     ## -------------------------------------------------------

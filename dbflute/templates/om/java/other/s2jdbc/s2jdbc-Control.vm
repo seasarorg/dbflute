@@ -50,13 +50,11 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                                 Dicon
     ##                                                 -----
-    #set ($glDaoDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDBFluteDiconNamespace = "${database.daoDiconNamespace}")
-    #set ($glDaoDiconFileName = "${database.daoDiconFileName}")
+    #set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
     #set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
     #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
     #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
-    #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
+    #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
     #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
     ## ===================================================================================
