@@ -31,21 +31,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return _littleAdjustmentMap;
     }
 
-    public String getProperty(String key) {
-        Map<String, Object> map = getLittleAdjustmentMap();
-        Object obj = map.get(key);
-        if (obj != null) {
-            if (!(obj instanceof String)) {
-                String msg = "The key's value should be string:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
-                throw new IllegalStateException(msg);
-            }
-            String value = (String) obj;
-            return value;
-        }
-        return null;
-    }
-
     public String getProperty(String key, String defaultValue) {
         Map<String, Object> map = getLittleAdjustmentMap();
         Object obj = map.get(key);
@@ -63,21 +48,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             }
         }
         return stringProp("torque." + key, defaultValue);
-    }
-
-    public Boolean isProperty(String key) {
-        Map<String, Object> map = getLittleAdjustmentMap();
-        Object obj = map.get(key);
-        if (obj != null) {
-            if (!(obj instanceof String)) {
-                String msg = "The key's value should be boolean:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
-                throw new IllegalStateException(msg);
-            }
-            String value = (String) obj;
-            return value.trim().equalsIgnoreCase("true");
-        }
-        return null;
     }
 
     public boolean isProperty(String key, boolean defaultValue) {

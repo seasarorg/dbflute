@@ -15,7 +15,7 @@ public class DfGeneratedClassPackagePropertiesTest extends DfDBFluteTestCase {
         Properties prop = new Properties();
         prop.setProperty("torque.packageBase", "test.base");
         prop.setProperty("torque.conditionBeanPackage", "test.cbean");
-        DfGeneratedClassPackageProperties packageProperties = new DfGeneratedClassPackageProperties(prop);
+        DfBasicProperties packageProperties = new DfBasicProperties(prop);
 
         // ## Act ##
         String conditionBeanPackage = packageProperties.getConditionBeanPackage();
@@ -31,7 +31,7 @@ public class DfGeneratedClassPackagePropertiesTest extends DfDBFluteTestCase {
         prop.setProperty("torque.packageBase", "test.base");
         prop.setProperty("torque.conditionBeanPackage", "test.cbean");
         prop.setProperty("torque.extendedConditionBeanPackage", "extended.cbean");
-        DfGeneratedClassPackageProperties packageProperties = new DfGeneratedClassPackageProperties(prop);
+        DfBasicProperties packageProperties = new DfBasicProperties(prop);
 
         // ## Act ##
         String conditionBeanPackage = packageProperties.getConditionBeanPackage();
@@ -48,7 +48,7 @@ public class DfGeneratedClassPackagePropertiesTest extends DfDBFluteTestCase {
         Properties prop = new Properties();
         prop.setProperty("torque.packageBase", "test.base");
         prop.setProperty("torque.extendedConditionBeanPackage", "extended.cbean");
-        DfGeneratedClassPackageProperties packageProperties = new DfGeneratedClassPackageProperties(prop);
+        DfBasicProperties packageProperties = new DfBasicProperties(prop);
 
         // ## Act ##
         String extendedConditionBeanPackage = packageProperties.getExtendedConditionBeanPackage();
@@ -63,7 +63,7 @@ public class DfGeneratedClassPackagePropertiesTest extends DfDBFluteTestCase {
         Properties prop = new Properties();
         prop.setProperty("torque.packageBase", "test.base");
         prop.setProperty("torque.conditionBeanPackage", "test.cbean");
-        DfGeneratedClassPackageProperties packageProperties = new DfGeneratedClassPackageProperties(prop);
+        DfBasicProperties packageProperties = new DfBasicProperties(prop);
 
         // ## Act ##
         String conditionBeanPackage = packageProperties.getConditionBeanPackage();

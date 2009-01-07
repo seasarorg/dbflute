@@ -576,7 +576,7 @@ public class Database {
 
     protected DfOldClassHandler createOldClassHandler() {
         return new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(), getProperties()
-                .getGeneratedClassPackageProperties(), getProperties().getLittleAdjustmentProperties(), getTableList());
+                .getLittleAdjustmentProperties(), getTableList());
     }
 
     // ===================================================================================
@@ -886,6 +886,53 @@ public class Database {
     }
 
     // ===================================================================================
+    //                                                                    Generate Package
+    //                                                                    ================
+    public String getPackageBase() {
+        return getProperties().getBasicProperties().getPackageBase();
+    }
+
+    public String getBaseCommonPackage() {
+        return getProperties().getBasicProperties().getBaseCommonPackage();
+    }
+
+    public String getBaseBehaviorPackage() {
+        return getProperties().getBasicProperties().getBaseBehaviorPackage();
+    }
+
+    public String getBaseDaoPackage() {
+        return getProperties().getBasicProperties().getBaseDaoPackage();
+    }
+
+    public String getBaseEntityPackage() {
+        return getProperties().getBasicProperties().getBaseEntityPackage();
+    }
+
+    public String getDBMetaPackage() {
+        return getProperties().getBasicProperties().getDBMetaPackage();
+    }
+
+    public String getConditionBeanPackage() {
+        return getProperties().getBasicProperties().getConditionBeanPackage();
+    }
+
+    public String getExtendedConditionBeanPackage() {
+        return getProperties().getBasicProperties().getExtendedConditionBeanPackage();
+    }
+
+    public String getExtendedBehaviorPackage() {
+        return getProperties().getBasicProperties().getExtendedBehaviorPackage();
+    }
+
+    public String getExtendedDaoPackage() {
+        return getProperties().getBasicProperties().getExtendedDaoPackage();
+    }
+
+    public String getExtendedEntityPackage() {
+        return getProperties().getBasicProperties().getExtendedEntityPackage();
+    }
+
+    // ===================================================================================
     //                                                                    Dicon Properties
     //                                                                    ================
     public String getDaoDiconNamespace() {
@@ -962,53 +1009,6 @@ public class Database {
 
     public String getQuillDataSourceName() {
         return getProperties().getDBFluteDiconProperties().getQuillDataSourceName();
-    }
-
-    // ===================================================================================
-    //                                                  Generated Class Package Properties
-    //                                                  ==================================
-    public String getPackageBase() {
-        return getProperties().getGeneratedClassPackageProperties().getPackageBase();
-    }
-
-    public String getBaseCommonPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getBaseCommonPackage();
-    }
-
-    public String getBaseBehaviorPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getBaseBehaviorPackage();
-    }
-
-    public String getBaseDaoPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getBaseDaoPackage();
-    }
-
-    public String getBaseEntityPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getBaseEntityPackage();
-    }
-
-    public String getDBMetaPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getDBMetaPackage();
-    }
-
-    public String getConditionBeanPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getConditionBeanPackage();
-    }
-
-    public String getExtendedConditionBeanPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getExtendedConditionBeanPackage();
-    }
-
-    public String getExtendedBehaviorPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getExtendedBehaviorPackage();
-    }
-
-    public String getExtendedDaoPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getExtendedDaoPackage();
-    }
-
-    public String getExtendedEntityPackage() {
-        return getProperties().getGeneratedClassPackageProperties().getExtendedEntityPackage();
     }
 
     // ===================================================================================

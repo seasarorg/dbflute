@@ -131,8 +131,7 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
     protected String filterDiconForTopNamespace(String realDiconDefault) {
         if (getBasicProperties().isTargetLanguageCSharp()) {
-            final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
-            final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
+            final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
             final String topNamespace;
             if (baseCommonPackage.indexOf(".") >= 0) {
                 topNamespace = baseCommonPackage.substring(0, baseCommonPackage.indexOf("."));

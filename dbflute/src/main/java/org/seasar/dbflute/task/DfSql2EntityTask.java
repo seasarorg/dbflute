@@ -61,7 +61,6 @@ import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
@@ -438,9 +437,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             protected void resolveSuperClassSimplePagingBean(final DfParameterBeanMetaData pmbMetaData) {
                 if (pmbMetaData.getSuperClassName().equalsIgnoreCase("SPB")) {
-                    final DfGeneratedClassPackageProperties pkgProp = getProperties()
-                            .getGeneratedClassPackageProperties();
-                    final String baseCommonPackage = pkgProp.getBaseCommonPackage();
+                    final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
                     final String projectPrefix = getBasicProperties().getProjectPrefix();
                     final DfBasicProperties basicProperties = getProperties().getBasicProperties();
                     final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();

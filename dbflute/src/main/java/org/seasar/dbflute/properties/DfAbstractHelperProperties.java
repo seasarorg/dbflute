@@ -376,10 +376,6 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getBasicProperties(getProperties());
     }
 
-    protected DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
-        return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
-    }
-
     protected DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
         return DfPropertiesHandler.getInstance().getAdditionalForeignKeyProperties(getProperties());
     }

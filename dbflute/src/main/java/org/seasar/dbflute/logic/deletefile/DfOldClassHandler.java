@@ -13,7 +13,6 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.velocity.DfGenerator;
@@ -35,7 +34,6 @@ public class DfOldClassHandler {
     //                                                                           =========
     protected DfGenerator _generator;
     protected DfBasicProperties _basicProperties;
-    protected DfGeneratedClassPackageProperties _packageProperties;
     protected DfLittleAdjustmentProperties _littleAdjustmentProperties;
     protected DfGeneratedClassPackageDefault _generatedClassPackageDefault;
     protected List<Table> _tableList;
@@ -45,11 +43,9 @@ public class DfOldClassHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public DfOldClassHandler(DfGenerator generator, DfBasicProperties basicProperties,
-            DfGeneratedClassPackageProperties packageProperties,
             DfLittleAdjustmentProperties littleAdjustmentProperties, List<Table> tableList) {
         _generator = generator;
         _basicProperties = basicProperties;
-        _packageProperties = packageProperties;
         _littleAdjustmentProperties = littleAdjustmentProperties;
         _generatedClassPackageDefault = basicProperties.getLanguageDependencyInfo().getGeneratedClassPackageInfo();
         _tableList = tableList;
@@ -95,7 +91,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseBehaviorPackage() {
-        return _packageProperties.getBaseBehaviorPackage();
+        return _basicProperties.getBaseBehaviorPackage();
     }
 
     protected List<String> _deletedOldTableBaseDaoList;
@@ -114,7 +110,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseDaoPackage() {
-        return _packageProperties.getBaseDaoPackage();
+        return _basicProperties.getBaseDaoPackage();
     }
 
     protected List<String> _deletedOldTableBaseEntityList;
@@ -133,7 +129,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseEntityPackage() {
-        return _packageProperties.getBaseEntityPackage();
+        return _basicProperties.getBaseEntityPackage();
     }
 
     public void deleteOldTableClass_for_DBMeta() {
@@ -149,7 +145,7 @@ public class DfOldClassHandler {
     }
 
     protected String getDBMetaPackage() {
-        return _packageProperties.getDBMetaPackage();
+        return _basicProperties.getDBMetaPackage();
     }
 
     public void deleteOldTableClass_for_BaseConditionBean() {
@@ -165,7 +161,7 @@ public class DfOldClassHandler {
     }
 
     protected String getConditionBeanPackage() {
-        return _packageProperties.getConditionBeanPackage();
+        return _basicProperties.getConditionBeanPackage();
     }
 
     public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
@@ -260,7 +256,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedBehaviorPackage() {
-        return _packageProperties.getExtendedBehaviorPackage();
+        return _basicProperties.getExtendedBehaviorPackage();
     }
 
     public void deleteOldTableClass_for_ExtendedDao() {
@@ -283,7 +279,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedDaoPackage() {
-        return _packageProperties.getExtendedDaoPackage();
+        return _basicProperties.getExtendedDaoPackage();
     }
 
     public void deleteOldTableClass_for_ExtendedEntity() {
@@ -306,7 +302,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedEntityPackage() {
-        return _packageProperties.getExtendedEntityPackage();
+        return _basicProperties.getExtendedEntityPackage();
     }
 
     protected void showDeleteOldTableFile(List<String> deletedClassNameList) {

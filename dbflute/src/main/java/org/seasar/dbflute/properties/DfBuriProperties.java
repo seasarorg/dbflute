@@ -302,8 +302,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         _log.info("...Setting up implicit foreign key for Buri.");
         final DfAdditionalForeignKeyProperties fkprop = getAdditionalForeignKeyProperties();
         final Map<String, Map<String, String>> additionalForeignKeyMap = fkprop.getAdditionalForeignKeyMap();
-        final DfGeneratedClassPackageProperties pkgprop = getGeneratedClassPackageProperties();
-        final String entityPackage = pkgprop.getExtendedEntityPackage();
+        final String entityPackage = getBasicProperties().getExtendedEntityPackage();
         final Map<String, List<String>> targetProcessMap = getTargetProcessMap();
         final Set<String> tableNameSet = targetProcessMap.keySet();
         for (String current : tableNameSet) {

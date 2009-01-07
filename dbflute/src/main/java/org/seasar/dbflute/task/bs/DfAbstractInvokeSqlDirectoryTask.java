@@ -18,12 +18,10 @@ package org.seasar.dbflute.task.bs;
 import java.io.File;
 import java.util.List;
 
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 
 /**
  * @author jflute
@@ -78,23 +76,11 @@ public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
         return new DfSqlFileGetter().getSqlFileList(getSqlDirectory());
     }
 
-    protected String getSqlDirectory() {
-        return getMyProperties().getInvokeSqlDirectorySqlDirectory();
-    }
+    protected abstract String getSqlDirectory();
 
-    protected boolean isAutoCommit() {
-        return getMyProperties().isInvokeSqlDirectoryAutoCommit();
-    }
+    protected abstract boolean isAutoCommit();
 
-    protected boolean isErrorContinue() {
-        return getMyProperties().isInvokeSqlDirectoryErrorContinue();
-    }
+    protected abstract boolean isErrorContinue();
 
-    protected boolean isRollbackOnly() {
-        return getMyProperties().isInvokeSqlDirectoryRollbackOnly();
-    }
-
-    protected DfOutsideSqlTestProperties getMyProperties() {
-        return DfBuildProperties.getInstance().getInvokeSqlDirectoryProperties();
-    }
+    protected abstract boolean isRollbackOnly();
 }

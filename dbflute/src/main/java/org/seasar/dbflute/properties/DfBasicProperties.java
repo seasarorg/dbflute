@@ -15,6 +15,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
+import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 
 /**
  * Basic properties.
@@ -40,6 +41,57 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                      Basic Info Map
+    //                                                                      ==============
+    public static final String KEY_basicInfoMap = "basicInfoMap";
+    protected Map<String, Object> _basicInfoMap;
+
+    public Map<String, Object> getBasicInfoMap() {
+        if (_basicInfoMap == null) {
+            _basicInfoMap = mapProp("torque." + KEY_basicInfoMap, DEFAULT_EMPTY_MAP);
+        }
+        return _basicInfoMap;
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        Map<String, Object> map = getBasicInfoMap();
+        Object obj = map.get(key);
+        if (obj != null) {
+            if (!(obj instanceof String)) {
+                String msg = "The key's value should be string:";
+                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                throw new IllegalStateException(msg);
+            }
+            String value = (String) obj;
+            if (value.trim().length() > 0) {
+                return value;
+            } else {
+                return defaultValue;
+            }
+        }
+        return stringProp("torque." + key, defaultValue);
+    }
+
+    public boolean isProperty(String key, boolean defaultValue) {
+        Map<String, Object> map = getBasicInfoMap();
+        Object obj = map.get(key);
+        if (obj != null) {
+            if (!(obj instanceof String)) {
+                String msg = "The key's value should be boolean:";
+                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                throw new IllegalStateException(msg);
+            }
+            String value = (String) obj;
+            if (value.trim().length() > 0) {
+                return value.trim().equalsIgnoreCase("true");
+            } else {
+                return defaultValue;
+            }
+        }
+        return booleanProp("torque." + key, defaultValue);
+    }
+
+    // ===================================================================================
     //                                                                             Project
     //                                                                             =======
     public String getProjectName() {
@@ -50,7 +102,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                            Database
     //                                                                            ========
     public String getDatabaseName() {
-        return stringProp("torque.database", "");
+        return getProperty("database", "");
     }
 
     public boolean isDatabasePostgreSQL() {
@@ -76,24 +128,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
     }
-    
+
     public boolean isDatabaseMsAccess() {
         return getDatabaseName().equalsIgnoreCase("msaccess");
-    }
-
-    // ===================================================================================
-    //                                                                    Output Directory
-    //                                                                    ================
-    public String getOutputDirectory() {
-        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return stringProp("torque.java.dir", defaultSourceDirectory); // 'java.dir' is legacy of Apache Torque.
     }
 
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========
     public String getTargetLanguage() {
-        return stringProp("torque.targetLanguage", DEFAULT_targetLanguage);
+        return getProperty("targetLanguage", DEFAULT_targetLanguage);
     }
 
     public String getResourceDirectory() {
@@ -137,7 +181,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getTargetLanguageVersion() {
-        return stringProp("torque.targetLanguageVersion", isAvailableGenerics() ? "5.0" : "1.4");
+        return getProperty("targetLanguageVersion", "5.0");
     }
 
     public boolean isJavaVersionGreaterEqualTiger() {
@@ -154,7 +198,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           Container
     //                                                                           =========
     public String getTargetContainerName() {
-        final String containerName = stringProp("torque.targetContainer", "seasar");
+        String containerName = getProperty("targetContainer", "seasar");
         checkContainer(containerName);
         return containerName;
     }
@@ -175,107 +219,123 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                           Extension
-    //                                                                           =========
-    public String getTemplateFileExtension() {
-        return getLanguageDependencyInfo().getTemplateFileExtension();
+    //                                                                            Encoding
+    //                                                                            ========
+    public String getTemplateFileEncoding() { // It's closet!
+        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
     }
 
-    public String getClassFileExtension() {
-        return getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
+    public String getSourceFileEncoding() { // It's closet!
+        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
+    }
+
+    public String getProejctSchemaXMLEncoding() { // It's closet!
+        return getProperty("projectSchemaXMLEncoding", DEFAULT_projectSchemaXMLEncoding);
     }
 
     // ===================================================================================
-    //                                                                            Encoding
-    //                                                                            ========
-    public String getTemplateFileEncoding() {
-        return stringProp("torque.templateFileEncoding", DEFAULT_templateFileEncoding);
+    //                                                                           Extension
+    //                                                                           =========
+    public String getTemplateFileExtension() { // It's not property!
+        return getLanguageDependencyInfo().getTemplateFileExtension();
     }
 
-    public String getSourceFileEncoding() {
-        return stringProp("torque.sourceFileEncoding", DEFAULT_sourceFileEncoding);
+    public String getClassFileExtension() { // It's not property!
+        return getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
     }
     
-    public String getProejctSchemaXMLEncoding() {
-        return stringProp("torque.projectSchemaXMLEncoding", DEFAULT_projectSchemaXMLEncoding);
+    // ===================================================================================
+    //                                                                    Output Directory
+    //                                                                    ================
+    public String getOutputDirectory() {
+        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
+        return getProperty("java.dir", defaultSourceDirectory);
     }
 
+    // ===================================================================================
+    //                                                                    Generate Package
+    //                                                                    ================
+    public String getPackageBase() {
+        return getProperty("packageBase", "");
+    }
+
+    public String getBaseCommonPackage() {
+        return filterBase(getProperty("baseCommonPackage", getPackageInfo().getBaseCommonPackage()));
+    }
+
+    public String getBaseBehaviorPackage() {
+        return filterBase(getProperty("baseBehaviorPackage", getPackageInfo().getBaseBehaviorPackage()));
+    }
+
+    public String getBaseDaoPackage() {
+        return filterBase(getProperty("baseDaoPackage", getPackageInfo().getBaseDaoPackage()));
+    }
+
+    public String getBaseEntityPackage() {
+        return filterBase(getProperty("baseEntityPackage", getPackageInfo().getBaseEntityPackage()));
+    }
+
+    public String getDBMetaPackage() {
+        return getBaseEntityPackage() + "." + getPackageInfo().getDBMetaSimplePackageName();
+    }
+
+    public String getConditionBeanPackage() {
+        return filterBase(getProperty("conditionBeanPackage", getPackageInfo().getConditionBeanPackage()));
+    }
+
+    public String getExtendedConditionBeanPackage() {
+        String pkg = getProperty("extendedConditionBeanPackage", null);
+        if (pkg != null) {
+            return filterBase(pkg);
+        }
+        return getConditionBeanPackage();
+    }
+    
+    protected boolean hasConditionBeanPackage() {
+        return getProperty("conditionBeanPackage", null) != null;
+    }
+
+    public String getExtendedBehaviorPackage() {
+        return filterBase(getProperty("extendedBehaviorPackage", getPackageInfo().getExtendedBehaviorPackage()));
+    }
+
+    public String getExtendedDaoPackage() {
+        return filterBase(getProperty("extendedDaoPackage", getPackageInfo().getExtendedDaoPackage()));
+    }
+
+    public String getExtendedEntityPackage() {
+        return filterBase(getProperty("extendedEntityPackage", getPackageInfo().getExtendedEntityPackage()));
+    }
+
+    protected String filterBase(String packageString) {
+        if (getPackageBase().trim().length() > 0) {
+            return getPackageBase() + "." + packageString;
+        } else {
+            return packageString;
+        }
+    }
+
+    protected DfGeneratedClassPackageDefault getPackageInfo() {
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        return languageDependencyInfo.getGeneratedClassPackageInfo();
+    }
+    
     // ===================================================================================
     //                                                                        Class Author
     //                                                                        ============
     public String getClassAuthor() {
-        return stringProp("torque.classAuthor", "DBFlute(AutoGenerator)");
+        return getProperty("classAuthor", "DBFlute(AutoGenerator)");
     }
 
     // ===================================================================================
     //                                                                              Naming
     //                                                                              ======
     public boolean isJavaNameOfTableSameAsDbName() {
-        return booleanProp("torque.isJavaNameOfTableSameAsDbName", false);
+        return isProperty("isJavaNameOfTableSameAsDbName", false);
     }
 
     public boolean isJavaNameOfColumnSameAsDbName() {
-        return booleanProp("torque.isJavaNameOfColumnSameAsDbName", false);
-    }
-
-    // ===================================================================================
-    //                                                                            Generics
-    //                                                                            ========
-    protected boolean isAvailableGenerics() {
-        return true;
-    }
-
-    public String filterGenericsString(String genericsString) {
-        if (isAvailableGenerics()) {
-            return "<" + genericsString + ">";
-        } else {
-            return "";
-        }
-    }
-
-    public String filterGenericsDowncast(String genericsDowncast) {
-        if (isAvailableGenerics()) {
-            return "(" + genericsDowncast + ")";
-        } else {
-            return "";
-        }
-    }
-
-    public String filterGenericsParamOutput(String variableName, String description) {
-        return filterGenericsGeneralOutput("@param " + variableName + " " + description);
-    }
-
-    public String filterGenericsGeneralOutput(String genericsGeneralOutput) {
-        if (isAvailableGenerics()) {
-            return genericsGeneralOutput;
-        } else {
-            return "";
-        }
-    }
-
-    public String filterGenericsGeneralOutputAfterNewLineOutput(String genericsGeneralOutput) {
-        if (isAvailableGenerics()) {
-            return getLineSeparator() + filterGenericsGeneralOutput(genericsGeneralOutput);
-        } else {
-            return "";
-        }
-    }
-
-    public String outputOverrideAnnotation() {
-        return filterGenericsGeneralOutput("@Override()");
-    }
-
-    public String outputOverrideAnnotationAfterNewLineOutput() {
-        return filterGenericsGeneralOutputAfterNewLineOutput("    @Override()");
-    }
-
-    public String outputSuppressWarningsAfterLineSeparator() {
-        return filterGenericsGeneralOutputAfterNewLineOutput("@SuppressWarnings(\"unchecked\")");
-    }
-
-    protected String getLineSeparator() {
-        // return System.getProperty("line.separator");
-        return "\n";// For to resolve environment dependency!
+        return isProperty("isJavaNameOfColumnSameAsDbName", false);
     }
 
     // ===================================================================================
@@ -368,7 +428,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return resultList;
     }
-    
+
     // -----------------------------------------------------
     //                                Additional Schema List
     //                                ----------------------
@@ -634,5 +694,46 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Generic Helper
+    //                                                                      ==============
+    // It's not property!
+    public String filterGenericsString(String genericsString) {
+        return "<" + genericsString + ">";
+    }
+
+    public String filterGenericsDowncast(String genericsDowncast) {
+        return "(" + genericsDowncast + ")";
+    }
+
+    public String filterGenericsParamOutput(String variableName, String description) {
+        return filterGenericsGeneralOutput("@param " + variableName + " " + description);
+    }
+
+    public String filterGenericsGeneralOutput(String genericsGeneralOutput) {
+        return genericsGeneralOutput;
+    }
+
+    public String filterGenericsGeneralOutputAfterNewLineOutput(String genericsGeneralOutput) {
+        return getLineSeparator() + filterGenericsGeneralOutput(genericsGeneralOutput);
+    }
+
+    public String outputOverrideAnnotation() {
+        return filterGenericsGeneralOutput("@Override()");
+    }
+
+    public String outputOverrideAnnotationAfterNewLineOutput() {
+        return filterGenericsGeneralOutputAfterNewLineOutput("    @Override()");
+    }
+
+    public String outputSuppressWarningsAfterLineSeparator() {
+        return filterGenericsGeneralOutputAfterNewLineOutput("@SuppressWarnings(\"unchecked\")");
+    }
+
+    protected String getLineSeparator() {
+        // return System.getProperty("line.separator");
+        return "\n";// For to resolve environment dependency!
     }
 }

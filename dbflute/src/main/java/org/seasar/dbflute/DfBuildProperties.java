@@ -28,9 +28,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
@@ -121,13 +119,6 @@ public final class DfBuildProperties {
     //                                         -------------
     public DfDBFluteDiconProperties getDBFluteDiconProperties() {
         return getHandler().getDBFluteDiconProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                               Generated Class Package
-    //                               -----------------------
-    public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
-        return getHandler().getGeneratedClassPackageProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -250,29 +241,22 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                            ReplaceSchemaDefinitionMap
-    //                            --------------------------
-    public DfReplaceSchemaProperties getReplaceSchemaProperties() {
-        return getHandler().getReplaceSchemaProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                       invokeSqlDirectoryDefinitionMap
-    //                       -------------------------------
-    public DfOutsideSqlTestProperties getInvokeSqlDirectoryProperties() {
-        return getHandler().getInvokeSqlDirectoryProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                  outsideSqlProperties
-    //                                  --------------------
+    //                                            OutsideSql
+    //                                            ----------
     public DfOutsideSqlProperties getOutsideSqlProperties() {
         return getHandler().getOutsideSqlProperties(getProperties());
     }
 
     // -----------------------------------------------------
-    //                                    documentProperties
-    //                                    ------------------
+    //                                         ReplaceSchema
+    //                                         -------------
+    public DfReplaceSchemaProperties getReplaceSchemaProperties() {
+        return getHandler().getReplaceSchemaProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                              Document
+    //                                              --------
     public DfDocumentProperties getDocumentProperties() {
         return getHandler().getDocumentProperties(getProperties());
     }

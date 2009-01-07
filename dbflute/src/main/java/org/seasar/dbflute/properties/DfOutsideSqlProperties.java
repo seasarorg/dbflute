@@ -145,8 +145,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected String resolvePackageBaseMarkIfNeeds(String sqlPackage) {
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
-        String packageBase = packageProperties.getPackageBase();
+        String packageBase = getBasicProperties().getPackageBase();
         return DfStringUtil.replace(sqlPackage, "$$PACKAGE_BASE$$", packageBase);
     }
 
@@ -299,8 +298,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
-        String defaultPackage = packageProperties.getBaseEntityPackage() + "." + getCustomizePackageName();
+        String defaultPackage = getBasicProperties().getBaseEntityPackage() + "." + getCustomizePackageName();
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -322,8 +320,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
-        String defaultPackage = packageProperties.getExtendedEntityPackage() + "." + getCustomizePackageName();
+        String defaultPackage = getBasicProperties().getExtendedEntityPackage() + "." + getCustomizePackageName();
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -341,20 +338,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public String getBaseCursorPackage() {
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         if (isMakeDaoInterface()) {
-            return packageProperties.getBaseDaoPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getBaseDaoPackage() + "." + getCursorPackageName();
         } else {
-            return packageProperties.getBaseBehaviorPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getBaseBehaviorPackage() + "." + getCursorPackageName();
         }
     }
 
     public String getExtendedCursorPackage() {
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         if (isMakeDaoInterface()) {
-            return packageProperties.getExtendedDaoPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getExtendedDaoPackage() + "." + getCursorPackageName();
         } else {
-            return packageProperties.getExtendedBehaviorPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getExtendedBehaviorPackage() + "." + getCursorPackageName();
         }
     }
 
@@ -372,12 +367,11 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             return specifiedPackage;
         }
 
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         final String defaultPackage;
         if (isMakeDaoInterface()) {
-            defaultPackage = packageProperties.getBaseDaoPackage() + "." + getPmbeanPackageName();
+            defaultPackage = getBasicProperties().getBaseDaoPackage() + "." + getPmbeanPackageName();
         } else {
-            defaultPackage = packageProperties.getBaseBehaviorPackage() + "." + getPmbeanPackageName();
+            defaultPackage = getBasicProperties().getBaseBehaviorPackage() + "." + getPmbeanPackageName();
         }
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
@@ -392,12 +386,11 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
-        DfGeneratedClassPackageProperties packageProperties = getGeneratedClassPackageProperties();
         final String defaultPackage;
         if (isMakeDaoInterface()) {
-            defaultPackage = packageProperties.getExtendedDaoPackage() + "." + getPmbeanPackageName();
+            defaultPackage = getBasicProperties().getExtendedDaoPackage() + "." + getPmbeanPackageName();
         } else {
-            defaultPackage = packageProperties.getExtendedBehaviorPackage() + "." + getPmbeanPackageName();
+            defaultPackage = getBasicProperties().getExtendedBehaviorPackage() + "." + getPmbeanPackageName();
         }
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;

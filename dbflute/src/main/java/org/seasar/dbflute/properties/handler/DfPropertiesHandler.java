@@ -12,9 +12,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlTestProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
@@ -77,18 +75,6 @@ public final class DfPropertiesHandler {
             _dbfluteDiconProperties = new DfDBFluteDiconProperties(prop);
         }
         return _dbfluteDiconProperties;
-    }
-
-    // -----------------------------------------------------
-    //                               Generated Class Package
-    //                               -----------------------
-    protected DfGeneratedClassPackageProperties _generatedClassPackageProperties;
-
-    public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties(Properties prop) {
-        if (_generatedClassPackageProperties == null) {
-            _generatedClassPackageProperties = new DfGeneratedClassPackageProperties(prop);
-        }
-        return _generatedClassPackageProperties;
     }
 
     // -----------------------------------------------------
@@ -257,18 +243,6 @@ public final class DfPropertiesHandler {
             _replaceSchemaPropertiess = new DfReplaceSchemaProperties(prop);
         }
         return _replaceSchemaPropertiess;
-    }
-
-    // -----------------------------------------------------
-    //                                  Invoke SQL Directory
-    //                                  --------------------
-    protected DfOutsideSqlTestProperties _invokeSqlDirectoryProperties;
-
-    public DfOutsideSqlTestProperties getInvokeSqlDirectoryProperties(Properties prop) {
-        if (_invokeSqlDirectoryProperties == null) {
-            _invokeSqlDirectoryProperties = new DfOutsideSqlTestProperties(prop);
-        }
-        return _invokeSqlDirectoryProperties;
     }
 
     // -----------------------------------------------------

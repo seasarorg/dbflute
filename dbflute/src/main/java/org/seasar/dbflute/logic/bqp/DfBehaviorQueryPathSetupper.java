@@ -41,7 +41,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
@@ -78,8 +77,7 @@ public class DfBehaviorQueryPathSetupper {
     public void setupBehaviorQueryPath(List<File> sqlFileList) {
         final String exbhvName;
         {
-            final DfGeneratedClassPackageProperties prop = getProperties().getGeneratedClassPackageProperties();
-            String exbhvPackage = prop.getExtendedBehaviorPackage();
+            String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
             if (exbhvPackage.contains(".")) {
                 exbhvPackage = exbhvPackage.substring(exbhvPackage.lastIndexOf(".") + ".".length());
             }
@@ -141,12 +139,11 @@ public class DfBehaviorQueryPathSetupper {
         if (outputDir.endsWith("/")) {
             outputDir = outputDir.substring(0, outputDir.length() - "/".length());
         }
-        final DfGeneratedClassPackageProperties prop = getProperties().getGeneratedClassPackageProperties();
         final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
                 .getClassFileExtension();
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String basePrefix = getBasicProperties().getBasePrefix();
-        final String bsbhvPackage = prop.getBaseBehaviorPackage();
+        final String bsbhvPackage = getBasicProperties().getBaseBehaviorPackage();
 
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getLittleAdjustmentProperties());
         packagePathHandler.setFileSeparatorSlash(true);

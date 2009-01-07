@@ -285,7 +285,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                filter
     //                                                ------
     protected void filterCommonColumnSetupValue(Map<String, Object> map) {
-        final String baseCommonPackage = getGeneratedClassPackageProperties().getBaseCommonPackage();
+        final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
