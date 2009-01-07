@@ -195,7 +195,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected void setupFromDatabaseByTopSql(String sql) {
         final ClassificationTopSqlExecutor executor = new ClassificationTopSqlExecutor();
         final List<Map<String, String>> resultList = executor.executeTopSql(
-                getDatabaseInfoProperties().getConnection(), sql);
+                getDatabaseProperties().getConnection(), sql);
 
         for (Map<String, String> map : resultList) {
             final String classificationName = map.get("classificationName");
@@ -361,7 +361,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = getDatabaseInfoProperties().getConnection();
+            conn = getDatabaseProperties().getConnection();
             stmt = conn.createStatement();
             _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             _log.debug("The classification sql: " + sql);

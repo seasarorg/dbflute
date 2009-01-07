@@ -118,7 +118,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * @return Object type string-array. (NotNull)
      */
     protected String[] getObjectTypeStringArray() {
-        final List<String> targetList = getProperties().getDatabaseInfoProperties().getObjectTypeTargetList();
+        final List<String> targetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
         return targetList.toArray(new String[targetList.size()]);
     }
 

@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author jflute
  */
-public final class DfDatabaseInfoProperties extends DfAbstractHelperProperties {
+public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -23,7 +23,7 @@ public final class DfDatabaseInfoProperties extends DfAbstractHelperProperties {
      * Constructor.
      * @param prop Properties. (NotNull)
      */
-    public DfDatabaseInfoProperties(Properties prop) {
+    public DfDatabaseProperties(Properties prop) {
         super(prop);
     }
 

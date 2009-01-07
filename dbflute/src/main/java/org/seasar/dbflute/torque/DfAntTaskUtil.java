@@ -28,7 +28,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 
 /**
  * Ant task utility.
@@ -170,8 +170,8 @@ public final class DfAntTaskUtil {
         return getProperties().getBasicProperties();
     }
 
-    protected static DfDatabaseInfoProperties getDatabaseInfoProperties() {
-        return getProperties().getDatabaseInfoProperties();
+    protected static DfDatabaseProperties getDatabaseInfoProperties() {
+        return getProperties().getDatabaseProperties();
     }
 
     protected static String getLineSeparator() {

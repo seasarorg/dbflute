@@ -11,7 +11,7 @@ import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
-import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -105,15 +105,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                            Basic Info
-    //                                            ----------
-    protected DfBasicProperties _basicInfoProperties;
+    //                                                 Basic
+    //                                                 -----
+    protected DfBasicProperties _basicProperties;
 
     public DfBasicProperties getBasicProperties(Properties prop) {
-        if (_basicInfoProperties == null) {
-            _basicInfoProperties = new DfBasicProperties(prop);
+        if (_basicProperties == null) {
+            _basicProperties = new DfBasicProperties(prop);
         }
-        return _basicInfoProperties;
+        return _basicProperties;
     }
 
     // -----------------------------------------------------
@@ -153,15 +153,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                         Database Info
-    //                                         -------------
-    protected DfDatabaseInfoProperties _databaseInfoProperties;
+    //                                              Database
+    //                                              --------
+    protected DfDatabaseProperties _databaseProperties;
 
-    public DfDatabaseInfoProperties getDatabaseInfoProperties(Properties prop) {
-        if (_databaseInfoProperties == null) {
-            _databaseInfoProperties = new DfDatabaseInfoProperties(prop);
+    public DfDatabaseProperties getDatabaseProperties(Properties prop) {
+        if (_databaseProperties == null) {
+            _databaseProperties = new DfDatabaseProperties(prop);
         }
-        return _databaseInfoProperties;
+        return _databaseProperties;
     }
 
     // -----------------------------------------------------

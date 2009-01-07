@@ -47,7 +47,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
@@ -553,8 +553,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return getProperties().getBasicProperties();
     }
 
-    protected DfDatabaseInfoProperties getDatabaseInfoProperties() {
-        return getProperties().getDatabaseInfoProperties();
+    protected DfDatabaseProperties getDatabaseInfoProperties() {
+        return getProperties().getDatabaseProperties();
     }
 
     // ===================================================================================

@@ -27,7 +27,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
-import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -145,10 +145,10 @@ public final class DfBuildProperties {
     }
     
     // -----------------------------------------------------
-    //                                         Database Info
-    //                                         -------------
-    public DfDatabaseInfoProperties getDatabaseInfoProperties() {
-        return getHandler().getDatabaseInfoProperties(getProperties());
+    //                                              Database
+    //                                              --------
+    public DfDatabaseProperties getDatabaseProperties() {
+        return getHandler().getDatabaseProperties(getProperties());
     }
 
     // -----------------------------------------------------

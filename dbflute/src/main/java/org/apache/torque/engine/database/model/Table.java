@@ -72,7 +72,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
@@ -439,7 +439,7 @@ public class Table {
 
     protected boolean isOnAdditionalSchema() {
         if (_schema != null && _schema.trim().length() > 0) {
-            DfDatabaseInfoProperties databaseInfoProperties = getProperties().getDatabaseInfoProperties();
+            DfDatabaseProperties databaseInfoProperties = getProperties().getDatabaseProperties();
             final List<String> additionalSchemaList = databaseInfoProperties.getAdditionalSchemaList();
             return additionalSchemaList.contains(_schema);
         }
