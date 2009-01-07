@@ -1890,9 +1890,6 @@ public class Table {
 
     public String getSequenceReturnType() {
         final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
-        if (sequenceIdentityProperties.hasSequenceReturnType()) {
-            return sequenceIdentityProperties.getSequenceReturnType();
-        }
         final String sequenceReturnType = sequenceIdentityProperties.getSequenceReturnType();
         if (hasTwoOrMorePrimaryKeys()) {
             return sequenceReturnType;
@@ -1944,11 +1941,7 @@ public class Table {
     }
 
     public boolean isAvailableSequenceAssignedIdAnnotation() {
-        if (isBuriTarget()) {
-            return true;
-        }
-        final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
-        return sequenceIdentityProperties.isAvailableSequenceAssignedIdAnnotation();
+        return isBuriTarget();
     }
 
     /**

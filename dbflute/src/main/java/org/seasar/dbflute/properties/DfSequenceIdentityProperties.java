@@ -34,8 +34,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
-        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(
-                getSequenceDefinitionMap());
+        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(getSequenceDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }
 
@@ -88,24 +87,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                   Sequence Assigned
-    //                                                                   =================
-    public boolean isAvailableSequenceAssignedIdAnnotation() {
-        return booleanProp("torque.isAvailableSequenceAssignedIdAnnotation", false);
-    }
-
-    // ===================================================================================
     //                                                                Sequence Return Type
     //                                                                ====================
-    // Deprecated at the future...
-    public boolean hasSequenceReturnType() {
-        final String value = stringProp("torque.sequenceReturnType", "");
-        return value != null && value.trim().length() != 0;
-    }
-
-    public String getSequenceReturnType() {
-        final String defaultSequenceType = getBasicProperties().getLanguageDependencyInfo().getDefaultSequenceType();
-        return stringProp("torque.sequenceReturnType", defaultSequenceType);
+    public String getSequenceReturnType() { // It's not property!
+        return getBasicProperties().getLanguageDependencyInfo().getDefaultSequenceType();
     }
 
     // ===================================================================================
@@ -122,8 +107,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
-        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(
-                getIdentityDefinitionMap());
+        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(getIdentityDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }
 }
