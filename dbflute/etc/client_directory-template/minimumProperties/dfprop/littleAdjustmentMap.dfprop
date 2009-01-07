@@ -1,0 +1,103 @@
+# /---------------------------------------------------------------------------
+# littleAdjustmentMap: (Default 'map:{}')
+#
+# The various settings about a little adjustment.
+# 
+# o isDeleteOldTableClass (NotRequired - Default 'false')
+# o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
+# o isAvailableDatabaseDependency (NotRequired - Default 'false')
+# o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
+# o isMakeDeprecated (NotRequired - Default 'false')
+# o isMakeRecentlyDeprecated (NotRequired - Default 'true')
+# o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
+# o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
+# 
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isDeleteOldTableClass (NotRequired - Default 'false')
+    #   [true]
+    #     Delete old table class when generate and sql2entity.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isDeleteOldTableClass = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
+    #   [true]
+    #     Add schema to table SQL name. (The table name on query is SCHEMA.TABLE)
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isAvailableAddingSchemaToTableSqlName = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isAvailableDatabaseDependency (NotRequired - Default 'false')
+    #   [true]
+    #     Generate the method that depends on the database.
+    #     For example, cb.lockWithRR() at DB2.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isAvailableDatabaseDependency = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
+    #   [true]
+    #     Generate writable methods at non-primary-key table.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isAvailableNonPrimaryKeyWritable = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isMakeDeprecated (NotRequired - Default 'false')
+    #   [true]
+    #     Make deprecated method and class and so on...
+    #     *You should set this property 'false'!
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isMakeDeprecated = false
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
+    #   [true]
+    #     Make RECENTLY deprecated method and class and so on...
+    #     *You should set this property 'false'!
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isMakeRecentlyDeprecated = false
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
+    #  ex) Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
+    # 
+    # @CSharpOnly
+    #; flatDirectoryPackage = Aaa.Bbb.DBFlute
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
+    #  ex) Aaa --> Directory: source/Bbb/DBFlute/AllCommon
+    # 
+    # @CSharpOnly
+    #; omitDirectoryPackage = Aaa
+    # - - - - - - - - - -/
+}
+# ----------------/

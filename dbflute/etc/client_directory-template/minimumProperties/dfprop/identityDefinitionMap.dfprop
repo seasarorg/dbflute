@@ -1,0 +1,25 @@
+# /---------------------------------------------------------------------------
+# sequenceDefinitionMap: (Default 'map:{}')
+# 
+# The relation mappings between identity and column of table.
+# Basically you don't need this property because DBFlute
+# can get the information about identity from JDBC automatically.
+# The table names and column names are treated as case insensitive.
+# 
+# Example:
+# map:{
+#     ; PURCHASE     = PURCHASE_ID
+#     ; MEMBER       = MEMBER_ID
+#     ; MEMBER_LOGIN = MEMBER_LOGIN_ID
+#     ; PRODUCT      = PRODUCT_ID
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    #; PURCHASE     = PURCHASE_ID
+    #; MEMBER       = MEMBER_ID
+    #; MEMBER_LOGIN = MEMBER_LOGIN_ID
+    #; PRODUCT      = PRODUCT_ID
+}
+# ----------------/

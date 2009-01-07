@@ -1,0 +1,78 @@
+# /---------------------------------------------------------------------------
+# outsideSqlDefinitionMap: (NotRequired - Default 'map:{}')
+#
+# The various settings about outside SQL. 
+# 
+# o generateProcedureParameterBean (NotRequired - Default 'false')
+# o targetProcedureCatalogList (NotRequired - Default 'list:{}')
+# o targetProcedureSchemaList (NotRequired - Default 'list:{}')
+# o targetProcedureNameList (NotRequired - Default 'list:{}')
+# o sqlFileEncoding (NotRequired - Default 'UTF-8')
+# o sqlDirectory (NotRequired - Default java.dir & '../src/main/resources')
+# o sqlPackage (NotRequired - Default '')
+# 
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o generateProcedureParameterBean (NotRequired - Default 'false')
+    #   [true]
+    #     Generate the parameter bean for procedure.
+    #     If you call the procedure from DBFlute, you should specify 'true'!
+    #
+    #   [false]
+    #     Non.
+    #
+    ; generateProcedureParameterBean = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o targetProcedureCatalogList (NotRequired - Default 'list:{}')
+    #  You can specify target catalog of generated parameter bean for procedure.
+    #  This property is valid only when generateProcedureParameterBean is valid.
+    #
+    #; targetProcedureCatalogList = list:{ABC}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o targetProcedureSchemaList (NotRequired - Default 'list:{}')
+    #  You can specify target schema of generated parameter bean for procedure.
+    #  This property is valid only when generateProcedureParameterBean is valid.
+    #
+    #; targetProcedureSchemaList = list:{suffix:PLEDB}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o targetProcedureNameList (NotRequired - Default 'list:{}')
+    #  You can specify target name of generated parameter bean for procedure.
+    #  This property is valid only when generateProcedureParameterBean is valid.
+    #
+    #; targetProcedureNameList = list:{prefix:SP_}
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o sqlFileEncoding (NotRequired - Default 'UTF-8')
+    #  The encoding of SQL file for outside SQL.
+    #  Basically you don't need this.
+    #
+    #; sqlFileEncoding = UTF-8
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o sqlDirectory (NotRequired - Default java.dir & '../src/main/resources')
+    #  The directory of SQL file for outside SQL.
+    #  Basically you don't need this.
+    #
+    #; sqlDirectory = ../src/main/resources
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o sqlPackage (NotRequired - Default 'UTF-8')
+    #  The package of SQL file for outside SQL.
+    #  Basically you don't need this.
+    #  You can use variable '$$PACKAGE_BASE$$' that means 'packageBase'.
+    #
+    #; sqlPackage = $$PACKAGE_BASE$$
+    # - - - - - - - - - -/
+}
+# ----------------/

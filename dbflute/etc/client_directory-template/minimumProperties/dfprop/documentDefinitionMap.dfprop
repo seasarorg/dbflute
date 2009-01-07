@@ -1,0 +1,55 @@
+# /---------------------------------------------------------------------------
+# documentDefinitionMap: (NotRequired - Default 'map:{}')
+#
+# o aliasDelimiterInDbComment (NotRequired - Default 'map:{}')
+# o entityJavaDocDbCommentValid (NotRequired - Default 'false')
+# o dataXlsTemplateRecordLimit (NotRequired - Default '')
+# o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+# 
+# Example:
+# map:{
+#     ; aliasDelimiterInDbComment = :
+#     ; entityJavaDocDbCommentValid = true
+#     ; dataXlsTemplateRecordLimit = 10
+#     ; dataXlsTemplateContainsCommonColumn = false
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o aliasDelimiterInDbComment (NotRequired - Default 'map:{}')
+    #  If the alias exists in its DB comment like as follows:
+    #    MEMBER_NAME : The name of member
+    #    (For example, the column name is MB_NM)
+    #  You should specify this property as follows:
+    #    ex) aliasDelimiterInDbComment = :
+    # 
+    #; aliasDelimiterInDbComment = :
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o entityJavaDocDbCommentValid (NotRequired - Default 'false')
+    #  Does it allow DB comment to be on java-doc?
+    # 
+    #; entityJavaDocDbCommentValid = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o dataXlsTemplateRecordLimit (NotRequired - Default '')
+    #  Does it output Data Excel Template?
+    #  If it's yes, you should specify the limit of output records.
+    # 
+    #; dataXlsTemplateRecordLimit = 10
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+    #  Does Data Excel Template contain common columns?
+    #  Basically you don't need this
+    #  because common column is resolved on replace-schema.
+    # 
+    #; dataXlsTemplateContainsCommonColumn = false
+    # - - - - - - - - - -/
+}
+# ----------------/

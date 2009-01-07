@@ -68,9 +68,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Target database name. */
-    protected String _targetDatabase;
-
     /** DB driver. */
     protected String _driver;
 
@@ -575,11 +572,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                            Accessor
     //                                                                            ========
     public String getTargetDatabase() {
-        return _targetDatabase;
-    }
-
-    public void setTargetDatabase(String v) {
-        _targetDatabase = v;
+        return getBasicProperties().getDatabaseName();
     }
 
     public void setEnvironmentType(String environmentType) {

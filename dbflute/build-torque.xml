@@ -175,8 +175,6 @@
       controlTemplate="${torque.template.om}"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
       <fileset dir="${torque.schema.dir}"
@@ -192,8 +190,6 @@
       controlTemplate="${torque.template.om}"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}">
       <fileset dir="${torque.schema.dir}"
@@ -236,28 +232,6 @@
         excludes="${torque.schema.doc.excludes}"
       />
     </torque-doc>
-  </target>
-
-  <!-- ================================================================== -->
-  <!-- J A V A D O C                                                      -->
-  <!-- ================================================================== -->
-
-  <target
-    name="javadocs"
-    description="==> generates the API documentation">
-
-    <mkdir dir="${torque.javadoc.dir}"/>
-
-    <javadoc
-      author="true"
-      destdir="${torque.javadoc.dir}"
-      packagenames="${torque.targetPackage}.*"
-      private="true"
-      sourcepath="${torque.java.dir}"
-      use="true"
-      version="true">
-      <classpath refid="torque-classpath"/>
-    </javadoc>
   </target>
 
   <!-- ******************************************************************************* -->
@@ -317,7 +291,6 @@
       controlTemplate="${torque.template.sql2entity}"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.sql2entity.generation"
-      targetDatabase="${torque.database}"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}"
     >
