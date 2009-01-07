@@ -933,23 +933,35 @@ public class Table {
     //                                               Arrange
     //                                               -------
     /**
-     * Returns an comma string containing all the foreign table name.
-     * 
+     * Returns an comma string containing all the foreign table name. <br />
+     * And contains one-to-one table.
      * @return Foreign table as comma string.
      */
     public String getForeignTableNameCommaString() {
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
-        final int size = foreignKeyList.size();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < foreignKeyList.size(); i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
             if (tableSet.contains(name)) {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ").append(fk.getForeignTableName());
+            sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
+        }
+        List<ForeignKey> referrerList = _referrers;
+        for (int i = 0; i < referrerList.size(); i++) {
+            final ForeignKey fk = referrerList.get(i);
+            if (!fk.isOneToOne()) {
+                continue;
+            }
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name).append("(AsOne)");
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -957,7 +969,6 @@ public class Table {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // For SchemaHTML
         final StringBuilder sb = new StringBuilder();
-
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
@@ -979,7 +990,6 @@ public class Table {
 
     /**
      * Returns an comma string containing all the foreign property name.
-     * 
      * @return Foreign property-name as comma string.
      */
     public String getForeignPropertyNameCommaString() {
@@ -1398,6 +1408,21 @@ public class Table {
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
+            if (fk.isOneToOne()) {
+                continue;
+            }
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name);
+        }
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            if (!fk.isOneToOne()) {
+                continue;
+            }
             final String name = fk.getTable().getName();
             if (tableSet.contains(name)) {
                 continue;
@@ -1409,7 +1434,7 @@ public class Table {
         return sb.toString();
     }
 
-    public String getReferrerTableNameCommaStringWithHtmlHref() {// For SchemaHTML
+    public String getReferrerTableNameCommaStringWithHtmlHref() { // For SchemaHTML
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> referrerList = getReferrerList();
