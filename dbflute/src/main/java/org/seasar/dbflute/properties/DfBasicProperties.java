@@ -313,13 +313,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                        Class Author
-    //                                                                        ============
-    public String getClassAuthor() {
-        return getProperty("classAuthor", "DBFlute(AutoGenerator)");
-    }
-
-    // ===================================================================================
     //                                                                              Naming
     //                                                                              ======
     public boolean isJavaNameOfTableSameAsDbName() {
@@ -337,7 +330,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("projectPrefix", "");
     }
 
-    public String getBasePrefix() {
+    public String getBasePrefix() { // It's not property!
         return "Bs";
     }
 
@@ -346,10 +339,28 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                        Class Author
+    //                                                                        ============
+    public String getClassAuthor() {
+        return getProperty("classAuthor", "DBFlute(AutoGenerator)");
+    }
+
+    // ===================================================================================
     //                                                                           HotDeploy
     //                                                                           =========
-    public boolean isAvailableHotDeploy() { // It's closet! And seasar only!
+    public boolean isAvailableHotDeploy() { // It's closet! And the Seasar only!
         return isProperty("isAvailableHotDeploy", false);
+    }
+
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    public String getUpdateDateFieldName() {
+        return getProperty("updateDateFieldName", "");
+    }
+
+    public String getVersionNoFieldName() {
+        return getProperty("versionNoFieldName", "version_no");
     }
 
     // ===================================================================================

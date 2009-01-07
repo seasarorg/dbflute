@@ -17,7 +17,6 @@ import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
-import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -234,18 +233,6 @@ public final class DfPropertiesHandler {
             _multipleFKPropertyProperties = new DfMultipleFKPropertyProperties(prop);
         }
         return _multipleFKPropertyProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                       Optimistic Lock
-    //                                       ---------------
-    protected DfOptimisticLockProperties _optimisticLockProperties;
-
-    public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
-        if (_optimisticLockProperties == null) {
-            _optimisticLockProperties = new DfOptimisticLockProperties(prop);
-        }
-        return _optimisticLockProperties;
     }
 
     // -----------------------------------------------------

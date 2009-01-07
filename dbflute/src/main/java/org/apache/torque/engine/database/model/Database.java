@@ -1027,21 +1027,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                          Optimistic Lock Properties
-    //                                                          ==========================
-    public String getUpdateDateFieldName() {
-        return getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
-    }
-
-    public boolean isUpdateDateExceptTable(final String tableName) {
-        return getProperties().getOptimisticLockProperties().isUpdateDateExceptTable(tableName);
-    }
-
-    public String getVersionNoFieldName() {
-        return getProperties().getOptimisticLockProperties().getVersionNoFieldName();
-    }
-
-    // ===================================================================================
     //                                                            Common Column Properties
     //                                                            ========================
     public Map<String, Object> getCommonColumnMap() {

@@ -2061,10 +2061,7 @@ public class Table {
      * @return Determination.
      */
     public boolean isUseUpdateDate() {
-        if (getDatabase().isUpdateDateExceptTable(getName())) {
-            return false;
-        }
-        final String updateDateColumnName = getDatabase().getUpdateDateFieldName();
+        final String updateDateColumnName = getProperties().getBasicProperties().getUpdateDateFieldName();
         if ("".equals(updateDateColumnName)) {
             return false;
         }
@@ -2079,7 +2076,7 @@ public class Table {
         if (!isUseUpdateDate()) {
             return null;
         }
-        final String fieldName = getDatabase().getUpdateDateFieldName();
+        final String fieldName = getProperties().getBasicProperties().getUpdateDateFieldName();
         if (fieldName != null && fieldName.trim().length() != 0) {
             final Column column = getColumn(fieldName);
             return column;
@@ -2124,29 +2121,19 @@ public class Table {
         if (!isUseUpdateDate()) {
             return "";
         }
-        final Column column = getColumn(getDatabase().getUpdateDateFieldName());
+        final Column column = getColumn(getProperties().getBasicProperties().getUpdateDateFieldName());
         return column.getJavaNative();
     }
 
     // ===================================================================================
     //                                                                           VersionNo
     //                                                                           =========
-    protected static final String DEF_VERSION_NO = "version_no";
-
-    protected boolean hasDefaultVersionNoColumn() {
-        return getColumn(DEF_VERSION_NO) != null;
-    }
-
     /**
      * Determine whether this table uses a version-no column.
-     * 
      * @return Determination.
      */
     public boolean isUseVersionNo() {
-        final String versionNoColumnName = getDatabase().getVersionNoFieldName();
-        if ("".equals(versionNoColumnName)) {
-            return hasDefaultVersionNoColumn();
-        }
+        final String versionNoColumnName = getProperties().getBasicProperties().getVersionNoFieldName();
         final Column column = getColumn(versionNoColumnName);
         if (column == null) {
             return false;
@@ -2158,12 +2145,8 @@ public class Table {
         if (!isUseVersionNo()) {
             return null;
         }
-        final String versionNoColumnName = getDatabase().getVersionNoFieldName();
-        if ("".equals(versionNoColumnName) && hasDefaultVersionNoColumn()) {
-            return getColumn(DEF_VERSION_NO);
-        } else {
-            return getColumn(versionNoColumnName);
-        }
+        final String versionNoColumnName = getProperties().getBasicProperties().getVersionNoFieldName();
+        return getColumn(versionNoColumnName);
     }
 
     public String getVersionNoColumnName() {
