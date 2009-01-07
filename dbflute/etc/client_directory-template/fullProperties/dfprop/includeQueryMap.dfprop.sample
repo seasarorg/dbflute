@@ -37,10 +37,10 @@ map:{
     ; String = map:{
         # If you don't need these operand for string,
         # remove their comment-out mark '#'.
-        # ; GreaterThan = map:{}
-        # ; LessThan = map:{}
-        # ; GreaterEqual = map:{}
-        # ; LessEqual = map:{}
+        #; GreaterThan = map:{}
+        #; LessThan = map:{}
+        #; GreaterEqual = map:{}
+        #; LessEqual = map:{}
     }
     ; Number = map:{
         ; NotEqual = map:{}

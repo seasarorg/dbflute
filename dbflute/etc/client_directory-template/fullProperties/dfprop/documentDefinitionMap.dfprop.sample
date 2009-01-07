@@ -1,16 +1,16 @@
 # /---------------------------------------------------------------------------
-# [Document Definition]
-#   documentDefinitionMap: (NotRequired - Default 'map:{}')
+# documentDefinitionMap: (NotRequired - Default 'map:{}')
 #
-#     ex) map:{
-#             ; aliasDelimiterInDbComment = :
-#             ; entityJavaDocDbCommentValid = true
-#         }
+# Example:
+# map:{
+#     ; aliasDelimiterInDbComment = :
+#     ; entityJavaDocDbCommentValid = true
+# }
 #
 map:{
-    ; aliasDelimiterInDbComment = :
-    # ; entityJavaDocDbCommentValid = true
-    # ; dataXlsTemplateRecordLimit = 10
-    # ; dataXlsTemplateContainsCommonColumn = false
+    #; aliasDelimiterInDbComment = :
+    #; entityJavaDocDbCommentValid = true
+    #; dataXlsTemplateRecordLimit = 10
+    #; dataXlsTemplateContainsCommonColumn = false
 }
 # ----------------/
