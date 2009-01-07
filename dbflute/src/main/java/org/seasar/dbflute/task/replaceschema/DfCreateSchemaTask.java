@@ -111,7 +111,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected DfSchemaInitializerFactory createSchemaInitializerFactory(boolean onceMore) {
-        return new DfSchemaInitializerFactory(getDataSource(), getBasicProperties(), getMyProperties(), onceMore);
+        return new DfSchemaInitializerFactory(getDataSource(), getBasicProperties(), getDatabaseInfoProperties(),
+                getMyProperties(), onceMore);
     }
 
     // --------------------------------------------

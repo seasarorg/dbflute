@@ -777,7 +777,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
         final DfProcedureHandler handler = new DfProcedureHandler();
         final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
-        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
         for (String additionalSchema : additionalSchemaList) {
             final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData, additionalSchema);
             for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
@@ -861,7 +861,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final StringBuilder sb = new StringBuilder();
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
-            final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+            final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
             if (additionalSchemaList.contains(procedureSchema)) {
                 sb.append(procedureSchema).append(".");
             }

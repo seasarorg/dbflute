@@ -47,6 +47,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
@@ -165,20 +166,19 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void initializeDatabaseInfo() {
-        _driver = getBasicProperties().getDatabaseDriver();
-        _url = getBasicProperties().getDatabaseUri();
-        _userId = getBasicProperties().getDatabaseUser();
-        _schema = getBasicProperties().getDatabaseSchema();
-        _password = getBasicProperties().getDatabasePassword();
-        _connectionProperties = getBasicProperties().getDatabaseConnectionProperties();
+        _driver = getDatabaseInfoProperties().getDatabaseDriver();
+        _url = getDatabaseInfoProperties().getDatabaseUri();
+        _userId = getDatabaseInfoProperties().getDatabaseUser();
+        _schema = getDatabaseInfoProperties().getDatabaseSchema();
+        _password = getDatabaseInfoProperties().getDatabasePassword();
+        _connectionProperties = getDatabaseInfoProperties().getDatabaseConnectionProperties();
     }
 
     abstract protected void doExecute();
 
     /**
      * Get performance view.
-     *
-     * @param mil The value of millisecound.
+     * @param mil The value of millisecond.
      * @return Performance view. (ex. 1m23s456ms) (NotNull)
      */
     protected String getPerformanceView(long mil) {
@@ -551,6 +551,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfDatabaseInfoProperties getDatabaseInfoProperties() {
+        return getProperties().getDatabaseInfoProperties();
     }
 
     // ===================================================================================

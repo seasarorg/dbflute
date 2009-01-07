@@ -54,21 +54,21 @@ public class DfAbstractMetaDataHandler {
 
     protected List<String> getTableExceptList() {
         if (_tableExceptList == null) {
-            _tableExceptList = getProperties().getBasicProperties().getTableExceptList();
+            _tableExceptList = getProperties().getDatabaseInfoProperties().getTableExceptList();
         }
         return _tableExceptList;
     }
 
     protected List<String> getTableTargetList() {
         if (_tableTargetList == null) {
-            _tableTargetList = getProperties().getBasicProperties().getTableTargetList();
+            _tableTargetList = getProperties().getDatabaseInfoProperties().getTableTargetList();
         }
         return _tableTargetList;
     }
 
     protected List<String> getSimpleColumnExceptList() {
         if (_simpleColumnExceptList == null) {
-            _simpleColumnExceptList = getProperties().getBasicProperties().getSimpleColumnExceptList();
+            _simpleColumnExceptList = getProperties().getDatabaseInfoProperties().getSimpleColumnExceptList();
         }
         return _simpleColumnExceptList;
     }

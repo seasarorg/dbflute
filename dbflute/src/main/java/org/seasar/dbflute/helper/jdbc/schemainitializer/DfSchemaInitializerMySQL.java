@@ -58,7 +58,7 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
         sb.append(lineSeparator);
         sb.append("  from information_schema.tables");
         sb.append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        final String schema = DfBuildProperties.getInstance().getDatabaseInfoProperties().getDatabaseSchema();
         if (schema != null) {
             sb.append(" where table_schema = '" + schema + "' and table_type = 'BASE TABLE';");
         } else {
@@ -83,7 +83,7 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
         sb.append(lineSeparator);
         sb.append("  from information_schema.table_constraints");
         sb.append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        final String schema = DfBuildProperties.getInstance().getDatabaseInfoProperties().getDatabaseSchema();
         if (schema != null) {
             sb.append(" where table_schema = '" + schema + "' and constraint_type='foreign key';");
         } else {
@@ -109,7 +109,7 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
         sb.append("            else concat('DROP TABLE IF EXISTS ', table_name, ';')").append(lineSeparator);
         sb.append("       end as \"sql\"").append(lineSeparator);
         sb.append("  from information_schema.tables").append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        final String schema = DfBuildProperties.getInstance().getDatabaseInfoProperties().getDatabaseSchema();
         if (schema != null) {
             sb.append(" where table_schema = '" + schema + "' and table_type in ('BASE TABLE', 'VIEW');");
         } else {

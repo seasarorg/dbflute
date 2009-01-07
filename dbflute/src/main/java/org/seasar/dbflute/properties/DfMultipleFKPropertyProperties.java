@@ -24,7 +24,7 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
     protected Map<String, Map<String, Map<String, String>>> _multipleFKPropertyMap;
 
     @SuppressWarnings("unchecked")
-    public Map<String, Map<String, Map<String, String>>> getMultipleFKPropertyMap() {
+    public Map<String, Map<String, Map<String, String>>> getMultipleFKPropertyMap() { // It's closet!
         if (_multipleFKPropertyMap == null) {
             final Object obj = mapProp("torque." + KEY_multipleFKPropertyMap, DEFAULT_EMPTY_MAP);
             _multipleFKPropertyMap = (Map<String, Map<String, Map<String, String>>>) obj;

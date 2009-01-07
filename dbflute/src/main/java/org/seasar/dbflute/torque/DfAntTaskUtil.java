@@ -28,6 +28,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
 
 /**
  * Ant task utility.
@@ -110,7 +111,7 @@ public final class DfAntTaskUtil {
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "driver = " + getDatabaseInfoProperties().getDatabaseDriver() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Runtime Exception]" + getLineSeparator();
         msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
@@ -130,7 +131,7 @@ public final class DfAntTaskUtil {
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getBasicProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "driver = " + getDatabaseInfoProperties().getDatabaseDriver() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Error]" + getLineSeparator();
         msg = msg + "error class   = " + e.getClass() + getLineSeparator();
@@ -167,6 +168,10 @@ public final class DfAntTaskUtil {
 
     protected static DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected static DfDatabaseInfoProperties getDatabaseInfoProperties() {
+        return getProperties().getDatabaseInfoProperties();
     }
 
     protected static String getLineSeparator() {

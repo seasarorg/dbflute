@@ -11,6 +11,7 @@ import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
+import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -54,100 +55,17 @@ public final class DfPropertiesHandler {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    protected DfBasicProperties _basicProperties;
-
-    public DfBasicProperties getBasicProperties(Properties prop) {
-        if (_basicProperties == null) {
-            _basicProperties = new DfBasicProperties(prop);
-        }
-        return _basicProperties;
-    }
 
     // -----------------------------------------------------
-    //                                         DBFlute Dicon
-    //                                         -------------
-    protected DfDBFluteDiconProperties _dbfluteDiconProperties;
+    //                                Additional Foreign Key
+    //                                ----------------------
+    protected DfAdditionalForeignKeyProperties _additionalForeignKeyProperties;
 
-    public DfDBFluteDiconProperties getDBFluteDiconProperties(Properties prop) {
-        if (_dbfluteDiconProperties == null) {
-            _dbfluteDiconProperties = new DfDBFluteDiconProperties(prop);
+    public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties(Properties prop) {
+        if (_additionalForeignKeyProperties == null) {
+            _additionalForeignKeyProperties = new DfAdditionalForeignKeyProperties(prop);
         }
-        return _dbfluteDiconProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                         Common Column
-    //                                         -------------
-    protected DfCommonColumnProperties _commonColumnProperties;
-
-    public DfCommonColumnProperties getCommonColumnProperties(Properties prop) {
-        if (_commonColumnProperties == null) {
-            _commonColumnProperties = new DfCommonColumnProperties(prop);
-        }
-        return _commonColumnProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                       Behavior Filter
-    //                                       ---------------
-    protected DfBehaviorFilterProperties _behaviorFilterProperties;
-
-    public DfBehaviorFilterProperties getBehaviorFilterProperties(Properties prop) {
-        if (_behaviorFilterProperties == null) {
-            _behaviorFilterProperties = new DfBehaviorFilterProperties(prop);
-        }
-        return _behaviorFilterProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                                  Buri
-    //                                                  ----
-    protected DfBuriProperties _buriProperties;
-
-    public DfBuriProperties getBuriProperties(Properties prop) {
-        if (_buriProperties == null) {
-            _buriProperties = new DfBuriProperties(prop);
-        }
-        return _buriProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                       Optimistic Lock
-    //                                       ---------------
-    protected DfOptimisticLockProperties _optimisticLockProperties;
-
-    public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
-        if (_optimisticLockProperties == null) {
-            _optimisticLockProperties = new DfOptimisticLockProperties(prop);
-        }
-        return _optimisticLockProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                     Sequence Identity
-    //                                     -----------------
-    protected DfSequenceIdentityProperties _sequenceIdentityProperties;
-
-    public DfSequenceIdentityProperties getSequenceIdentityProperties(Properties prop) {
-        if (_sequenceIdentityProperties == null) {
-            _sequenceIdentityProperties = new DfSequenceIdentityProperties(prop);
-        }
-        return _sequenceIdentityProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                      Additional Table
-    //                                      ----------------
-    protected DfAdditionalTableProperties _additionalTableProperties;
-
-    public DfAdditionalTableProperties getAdditionalTableProperties(Properties prop) {
-        if (_additionalTableProperties == null) {
-            _additionalTableProperties = new DfAdditionalTableProperties(prop);
-        }
-        return _additionalTableProperties;
+        return _additionalForeignKeyProperties;
     }
 
     // -----------------------------------------------------
@@ -163,22 +81,22 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                Additional Foreign Key
-    //                                ----------------------
-    protected DfAdditionalForeignKeyProperties _additionalForeignKeyProperties;
+    //                                      Additional Table
+    //                                      ----------------
+    protected DfAdditionalTableProperties _additionalTableProperties;
 
-    public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties(Properties prop) {
-        if (_additionalForeignKeyProperties == null) {
-            _additionalForeignKeyProperties = new DfAdditionalForeignKeyProperties(prop);
+    public DfAdditionalTableProperties getAdditionalTableProperties(Properties prop) {
+        if (_additionalTableProperties == null) {
+            _additionalTableProperties = new DfAdditionalTableProperties(prop);
         }
-        return _additionalForeignKeyProperties;
+        return _additionalTableProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                   All Class Copyright
     //                                   -------------------
     protected DfAllClassCopyrightProperties _allClassCopyrightProperties;
-    
+
     public DfAllClassCopyrightProperties getAllClassCopyrightProperties(Properties prop) {
         if (_allClassCopyrightProperties == null) {
             _allClassCopyrightProperties = new DfAllClassCopyrightProperties(prop);
@@ -187,51 +105,75 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                     Little Adjustment
-    //                                     -----------------
-    protected DfLittleAdjustmentProperties _littleAdjustmentPropertiess;
-
-    public DfLittleAdjustmentProperties getLittleAdjustmentProperties(Properties prop) {
-        if (_littleAdjustmentPropertiess == null) {
-            _littleAdjustmentPropertiess = new DfLittleAdjustmentProperties(prop);
-        }
-        return _littleAdjustmentPropertiess;
-    }
-
-    // -----------------------------------------------------
-    //                                         Include Query
-    //                                         -------------
-    protected DfIncludeQueryProperties _includeQueryProperties;
-
-    public DfIncludeQueryProperties getIncludeQueryProperties(Properties prop) {
-        if (_includeQueryProperties == null) {
-            _includeQueryProperties = new DfIncludeQueryProperties(prop);
-        }
-        return _includeQueryProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                      SQL Log Registry
-    //                                      ----------------
-    protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
-
-    public DfSqlLogRegistryProperties getSqlLogRegistryProperties(Properties prop) {
-        if (_sqlLogRegistryProperties == null) {
-            _sqlLogRegistryProperties = new DfSqlLogRegistryProperties(prop);
-        }
-        return _sqlLogRegistryProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                            OutsideSql
+    //                                            Basic Info
     //                                            ----------
-    protected DfOutsideSqlProperties _outsideSqlProperties;
+    protected DfBasicProperties _basicInfoProperties;
 
-    public DfOutsideSqlProperties getOutsideSqlProperties(Properties prop) {
-        if (_outsideSqlProperties == null) {
-            _outsideSqlProperties = new DfOutsideSqlProperties(prop);
+    public DfBasicProperties getBasicProperties(Properties prop) {
+        if (_basicInfoProperties == null) {
+            _basicInfoProperties = new DfBasicProperties(prop);
         }
-        return _outsideSqlProperties;
+        return _basicInfoProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                                  Buri
+    //                                                  ----
+    protected DfBuriProperties _buriProperties;
+
+    public DfBuriProperties getBuriProperties(Properties prop) {
+        if (_buriProperties == null) {
+            _buriProperties = new DfBuriProperties(prop);
+        }
+        return _buriProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                       Behavior Filter
+    //                                       ---------------
+    protected DfBehaviorFilterProperties _behaviorFilterProperties;
+
+    public DfBehaviorFilterProperties getBehaviorFilterProperties(Properties prop) {
+        if (_behaviorFilterProperties == null) {
+            _behaviorFilterProperties = new DfBehaviorFilterProperties(prop);
+        }
+        return _behaviorFilterProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                         Common Column
+    //                                         -------------
+    protected DfCommonColumnProperties _commonColumnProperties;
+
+    public DfCommonColumnProperties getCommonColumnProperties(Properties prop) {
+        if (_commonColumnProperties == null) {
+            _commonColumnProperties = new DfCommonColumnProperties(prop);
+        }
+        return _commonColumnProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                         Database Info
+    //                                         -------------
+    protected DfDatabaseInfoProperties _databaseInfoProperties;
+
+    public DfDatabaseInfoProperties getDatabaseInfoProperties(Properties prop) {
+        if (_databaseInfoProperties == null) {
+            _databaseInfoProperties = new DfDatabaseInfoProperties(prop);
+        }
+        return _databaseInfoProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                         DBFlute Dicon
+    //                                         -------------
+    protected DfDBFluteDiconProperties _dbfluteDiconProperties;
+
+    public DfDBFluteDiconProperties getDBFluteDiconProperties(Properties prop) {
+        if (_dbfluteDiconProperties == null) {
+            _dbfluteDiconProperties = new DfDBFluteDiconProperties(prop);
+        }
+        return _dbfluteDiconProperties;
     }
 
     // -----------------------------------------------------
@@ -247,39 +189,75 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                         ReplaceSchema
-    //                                         -------------
-    protected DfReplaceSchemaProperties _replaceSchemaPropertiess;
+    //                                              Flex DTO
+    //                                              --------
+    protected DfFlexDtoProperties _flexDtoProperties;
 
-    public DfReplaceSchemaProperties getReplaceSchemaProperties(Properties prop) {
-        if (_replaceSchemaPropertiess == null) {
-            _replaceSchemaPropertiess = new DfReplaceSchemaProperties(prop);
+    public DfFlexDtoProperties getFlexDtoProperties(Properties prop) {
+        if (_flexDtoProperties == null) {
+            _flexDtoProperties = new DfFlexDtoProperties(prop);
         }
-        return _replaceSchemaPropertiess;
+        return _flexDtoProperties;
     }
 
     // -----------------------------------------------------
-    //                                          Type Mapping
-    //                                          ------------
-    protected DfTypeMappingProperties _typeMappingProperties;
+    //                                         Include Query
+    //                                         -------------
+    protected DfIncludeQueryProperties _includeQueryProperties;
 
-    public DfTypeMappingProperties getTypeMappingProperties(Properties prop) {
-        if (_typeMappingProperties == null) {
-            _typeMappingProperties = new DfTypeMappingProperties(prop);
+    public DfIncludeQueryProperties getIncludeQueryProperties(Properties prop) {
+        if (_includeQueryProperties == null) {
+            _includeQueryProperties = new DfIncludeQueryProperties(prop);
         }
-        return _typeMappingProperties;
+        return _includeQueryProperties;
     }
-    
+
+    // -----------------------------------------------------
+    //                                     Little Adjustment
+    //                                     -----------------
+    protected DfLittleAdjustmentProperties _littleAdjustmentPropertiess;
+
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties(Properties prop) {
+        if (_littleAdjustmentPropertiess == null) {
+            _littleAdjustmentPropertiess = new DfLittleAdjustmentProperties(prop);
+        }
+        return _littleAdjustmentPropertiess;
+    }
+
     // -----------------------------------------------------
     //                                  Multiple FK Property
     //                                  --------------------
     protected DfMultipleFKPropertyProperties _multipleFKPropertyProperties;
-    
+
     public DfMultipleFKPropertyProperties getMultipleFKPropertyProperties(Properties prop) {
         if (_multipleFKPropertyProperties == null) {
             _multipleFKPropertyProperties = new DfMultipleFKPropertyProperties(prop);
         }
         return _multipleFKPropertyProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                       Optimistic Lock
+    //                                       ---------------
+    protected DfOptimisticLockProperties _optimisticLockProperties;
+
+    public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
+        if (_optimisticLockProperties == null) {
+            _optimisticLockProperties = new DfOptimisticLockProperties(prop);
+        }
+        return _optimisticLockProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                            OutsideSql
+    //                                            ----------
+    protected DfOutsideSqlProperties _outsideSqlProperties;
+
+    public DfOutsideSqlProperties getOutsideSqlProperties(Properties prop) {
+        if (_outsideSqlProperties == null) {
+            _outsideSqlProperties = new DfOutsideSqlProperties(prop);
+        }
+        return _outsideSqlProperties;
     }
 
     // -----------------------------------------------------
@@ -295,27 +273,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                            Simple DTO
-    //                                            ----------
-    protected DfSimpleDtoProperties _simpleDtoProperties;
+    //                                         ReplaceSchema
+    //                                         -------------
+    protected DfReplaceSchemaProperties _replaceSchemaPropertiess;
 
-    public DfSimpleDtoProperties getSimpleDtoProperties(Properties prop) {
-        if (_simpleDtoProperties == null) {
-            _simpleDtoProperties = new DfSimpleDtoProperties(prop);
+    public DfReplaceSchemaProperties getReplaceSchemaProperties(Properties prop) {
+        if (_replaceSchemaPropertiess == null) {
+            _replaceSchemaPropertiess = new DfReplaceSchemaProperties(prop);
         }
-        return _simpleDtoProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                              Flex DTO
-    //                                              --------
-    protected DfFlexDtoProperties _flexDtoProperties;
-
-    public DfFlexDtoProperties getFlexDtoProperties(Properties prop) {
-        if (_flexDtoProperties == null) {
-            _flexDtoProperties = new DfFlexDtoProperties(prop);
-        }
-        return _flexDtoProperties;
+        return _replaceSchemaPropertiess;
     }
 
     // -----------------------------------------------------
@@ -328,5 +294,53 @@ public final class DfPropertiesHandler {
             _s2jdbcProperties = new DfS2jdbcProperties(prop);
         }
         return _s2jdbcProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                     Sequence Identity
+    //                                     -----------------
+    protected DfSequenceIdentityProperties _sequenceIdentityProperties;
+
+    public DfSequenceIdentityProperties getSequenceIdentityProperties(Properties prop) {
+        if (_sequenceIdentityProperties == null) {
+            _sequenceIdentityProperties = new DfSequenceIdentityProperties(prop);
+        }
+        return _sequenceIdentityProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                            Simple DTO
+    //                                            ----------
+    protected DfSimpleDtoProperties _simpleDtoProperties;
+
+    public DfSimpleDtoProperties getSimpleDtoProperties(Properties prop) {
+        if (_simpleDtoProperties == null) {
+            _simpleDtoProperties = new DfSimpleDtoProperties(prop);
+        }
+        return _simpleDtoProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                      SQL Log Registry
+    //                                      ----------------
+    protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
+
+    public DfSqlLogRegistryProperties getSqlLogRegistryProperties(Properties prop) {
+        if (_sqlLogRegistryProperties == null) {
+            _sqlLogRegistryProperties = new DfSqlLogRegistryProperties(prop);
+        }
+        return _sqlLogRegistryProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                          Type Mapping
+    //                                          ------------
+    protected DfTypeMappingProperties _typeMappingProperties;
+
+    public DfTypeMappingProperties getTypeMappingProperties(Properties prop) {
+        if (_typeMappingProperties == null) {
+            _typeMappingProperties = new DfTypeMappingProperties(prop);
+        }
+        return _typeMappingProperties;
     }
 }

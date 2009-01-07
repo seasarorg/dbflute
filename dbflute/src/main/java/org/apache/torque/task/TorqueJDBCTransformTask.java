@@ -384,7 +384,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void logAdditionalSchemas() {
-        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
         if (additionalSchemaList.isEmpty()) {
             return;
         }
@@ -392,7 +392,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void logObjectTypes() {
-        final List<String> objectTypeTargetList = getBasicProperties().getObjectTypeTargetList();
+        final List<String> objectTypeTargetList = getDatabaseInfoProperties().getObjectTypeTargetList();
         String typeString = "";
         int i = 0;
         for (String objectType : objectTypeTargetList) {
@@ -464,7 +464,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
-        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
         for (String additionalSchema : additionalSchemaList) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
@@ -607,7 +607,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (schema == null || schema.trim().length() == 0) {
             return false;
         }
-        final List<String> additionalSchemaList = getBasicProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
         return additionalSchemaList.contains(schema);
     }
 

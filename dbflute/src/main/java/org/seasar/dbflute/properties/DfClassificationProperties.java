@@ -193,9 +193,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                     Definition Helper
     //                                     -----------------
     protected void setupFromDatabaseByTopSql(String sql) {
-        final DfBasicProperties basicProperties = getBasicProperties();
         final ClassificationTopSqlExecutor executor = new ClassificationTopSqlExecutor();
-        final List<Map<String, String>> resultList = executor.executeTopSql(basicProperties.getConnection(), sql);
+        final List<Map<String, String>> resultList = executor.executeTopSql(
+                getDatabaseInfoProperties().getConnection(), sql);
 
         for (Map<String, String> map : resultList) {
             final String classificationName = map.get("classificationName");
@@ -361,7 +361,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = getBasicProperties().getConnection();
+            conn = getDatabaseInfoProperties().getConnection();
             stmt = conn.createStatement();
             _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             _log.debug("The classification sql: " + sql);
@@ -650,7 +650,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         return sb.toString();
     }
-    
+
     public String buildClassificationCodeNameAliasVariables(Map<String, String> classificationMap) {
         final StringBuilder sb = new StringBuilder();
         final String code = classificationMap.get("code");

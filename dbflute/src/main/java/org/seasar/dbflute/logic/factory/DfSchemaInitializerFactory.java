@@ -11,19 +11,23 @@ import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseInfoProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
 public class DfSchemaInitializerFactory {
 
     protected DataSource _dataSource;
     protected DfBasicProperties _basicProperties;
+    protected DfDatabaseInfoProperties _databaseInfoProperties;
     protected DfReplaceSchemaProperties _replaceSchemaProperties;
     protected boolean _onceMore;
 
     public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
-            DfReplaceSchemaProperties replaceSchemaProperties, boolean onceMore) {
+            DfDatabaseInfoProperties databaseInfoProperties, DfReplaceSchemaProperties replaceSchemaProperties,
+            boolean onceMore) {
         _dataSource = dataSource;
         _basicProperties = basicProperties;
+        _databaseInfoProperties = databaseInfoProperties;
         _replaceSchemaProperties = replaceSchemaProperties;
         _onceMore = onceMore;
     }
@@ -77,7 +81,7 @@ public class DfSchemaInitializerFactory {
     protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
         initializer.setDataSource(_dataSource);
         if (!_onceMore) {// Normal
-            initializer.setSchema(_basicProperties.getDatabaseSchema());
+            initializer.setSchema(_databaseInfoProperties.getDatabaseSchema());
             return;
         }
         final String schema = getOnceMoreSchema();
