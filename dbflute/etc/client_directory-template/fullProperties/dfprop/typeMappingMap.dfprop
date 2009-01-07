@@ -23,6 +23,7 @@ map:{
     # If you want to use AutoMapping for Numeric and Decimal, remove the comment-out mark.
     #; NUMERIC = $$AutoMapping$$ ; DECIMAL = $$AutoMapping$$
 }
+# ----------------/
 #
 # Default mapping as follows:
 # ------------------------------------------------------
@@ -49,5 +50,3 @@ map:{
 # | TIME          | java.sql.Time        | DateTime?   |
 # | TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
 # ------------------------------------------------------
-# 
-# ----------------/
