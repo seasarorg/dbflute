@@ -2,6 +2,6 @@
 
 set ANT_OPTS=-Xmx256M
 
-set MY_PROJECT_NAME=minimumProperties
+set MY_PROJECT_NAME=dfclient
 
-rem set DBFLUTE_HOME=..\mydbflute\dbflute-x.x.x
+set DBFLUTE_HOME=..\mydbflute\dbflute-0.8.8.1
