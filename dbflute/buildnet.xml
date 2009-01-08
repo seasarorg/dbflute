@@ -68,9 +68,9 @@
     <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
     <delete file="${dbflute.zip.dirfile}"/>
   	
-    <delete file="etc/client_directory-template/minimumProperties4cs.zip"/>
-    <zip zipfile="etc/client_directory-template/minimumProperties4cs.zip">
-        <zipfileset prefix="minimumProperties4cs" dir="etc/client_directory-template/minimumProperties4cs"/>
+    <delete file="etc/client-template/minimumProperties4cs.zip"/>
+    <zip zipfile="etc/client-template/minimumProperties4cs.zip">
+        <zipfileset prefix="minimumProperties4cs" dir="etc/client-template/minimumProperties4cs"/>
     </zip>
 
     <zip zipfile="${dbflute.zip.dirfile}">
@@ -78,7 +78,7 @@
             <include name="*.cmd"/>
             <include name="*.sh"/>
         </zipfileset>
-        <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template">
+        <zipfileset prefix="etc/client-template" dir="etc/client-template">
             <include name="minimumProperties4cs.zip"/>
         </zipfileset>
         <zipfileset prefix="lib/forExecute" dir="dist">
