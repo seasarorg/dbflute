@@ -3,7 +3,7 @@
 #
 # The various settings about outside SQL. 
 # 
-# o generateProcedureParameterBean (NotRequired - Default 'false')
+# o isGenerateProcedureParameterBean (NotRequired - Default 'false')
 # o targetProcedureCatalogList (NotRequired - Default 'list:{}')
 # o targetProcedureSchemaList (NotRequired - Default 'list:{}')
 # o targetProcedureNameList (NotRequired - Default 'list:{}')
@@ -15,7 +15,7 @@
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o generateProcedureParameterBean (NotRequired - Default 'false')
+    # o isGenerateProcedureParameterBean (NotRequired - Default 'false')
     #   [true]
     #     Generate the parameter bean for procedure.
     #     If you call the procedure from DBFlute, you should specify 'true'!
@@ -23,7 +23,7 @@ map:{
     #   [false]
     #     Non.
     #
-    ; generateProcedureParameterBean = false
+    ; isGenerateProcedureParameterBean = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -3,7 +3,6 @@
 #
 # The various settings about a little adjustment.
 # 
-# o isDeleteOldTableClass (NotRequired - Default 'false')
 # o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
 # o isAvailableDatabaseDependency (NotRequired - Default 'false')
 # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
@@ -11,21 +10,11 @@
 # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
 # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
 # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
+# o isDeleteOldTableClass (NotRequired - Default 'true')
 # 
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDeleteOldTableClass (NotRequired - Default 'false')
-    #   [true]
-    #     Delete old table class when generate and sql2entity.
-    #
-    #   [false]
-    #     Non.
-    #
-    #; isDeleteOldTableClass = true
-    # - - - - - - - - - -/
-    
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
     #   [true]
@@ -34,7 +23,7 @@ map:{
     #   [false]
     #     Non.
     #
-    #; isAvailableAddingSchemaToTableSqlName = true
+    #; isAvailableAddingSchemaToTableSqlName = false
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +35,7 @@ map:{
     #   [false]
     #     Non.
     #
-    #; isAvailableDatabaseDependency = true
+    #; isAvailableDatabaseDependency = false
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,14 +46,14 @@ map:{
     #   [false]
     #     Non.
     #
-    #; isAvailableNonPrimaryKeyWritable = true
+    #; isAvailableNonPrimaryKeyWritable = false
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isMakeDeprecated (NotRequired - Default 'false')
     #   [true]
     #     Make deprecated method and class and so on...
-    #     *You should set this property 'false'!
+    #     *You should specify this property 'false'!
     #
     #   [false]
     #     Non.
@@ -76,12 +65,12 @@ map:{
     # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
     #   [true]
     #     Make RECENTLY deprecated method and class and so on...
-    #     *You should set this property 'false'!
+    #     *You should specify this property 'false'!
     #
     #   [false]
     #     Non.
     #
-    #; isMakeRecentlyDeprecated = false
+    #; isMakeRecentlyDeprecated = true
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,6 +87,17 @@ map:{
     # 
     # @CSharpOnly
     #; omitDirectoryPackage = Aaa
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isDeleteOldTableClass (NotRequired - Default 'true')
+    #   [true]
+    #     Delete old table class when generate and sql2entity.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isDeleteOldTableClass = true
     # - - - - - - - - - -/
 }
 # ----------------/

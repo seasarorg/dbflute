@@ -20,8 +20,8 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    # If you want to use AutoMapping for Numeric and Decimal, remove the comment-out mark.
-    #; NUMERIC = $$AutoMapping$$ ; DECIMAL = $$AutoMapping$$
+    # AutoMapping for Numeric and Decimal
+    ; NUMERIC = $$AutoMapping$$ ; DECIMAL = $$AutoMapping$$
 }
 # ----------------/
 #

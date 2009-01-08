@@ -70,21 +70,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                              Delete Old Table Class
-    //                                                              ======================
-    public boolean isDeleteOldTableClass() {
-        return isProperty("isDeleteOldTableClass", false);
-    }
-
-    // ===================================================================================
-    //                                                          Skip Generate If Same File
-    //                                                          ==========================
-    public boolean isSkipGenerateIfSameFile() { // It's closet!
-        // The default value is true since 0.7.8.
-        return isProperty("isSkipGenerateIfSameFile", true);
-    }
-
-    // ===================================================================================
     //                                                     Adding Schema to Table SQL Name
     //                                                     ===============================
     public boolean isAvailableAddingSchemaToTableSqlName() {
@@ -326,5 +311,21 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         final String defaultEncoding = "UTF-8";
         final String property = stringProp("torque.daoSqlFileEncoding", defaultEncoding);
         return !property.equals("null") ? property : defaultEncoding;
+    }
+
+    // ===================================================================================
+    //                                                              Delete Old Table Class
+    //                                                              ======================
+    public boolean isDeleteOldTableClass() {
+        // The default value is true since 0.8.8.1.
+        return isProperty("isDeleteOldTableClass", true);
+    }
+
+    // ===================================================================================
+    //                                                          Skip Generate If Same File
+    //                                                          ==========================
+    public boolean isSkipGenerateIfSameFile() { // It's closet!
+        // The default value is true since 0.7.8.
+        return isProperty("isSkipGenerateIfSameFile", true);
     }
 }
