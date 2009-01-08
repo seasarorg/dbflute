@@ -81,24 +81,18 @@
     <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
     <delete file="${dbflute.zip.dirfile}"/>
   	
-    <delete file="etc/client-template/fullProperties.zip"/>
-    <zip zipfile="etc/client-template/fullProperties.zip">
-        <zipfileset prefix="fullProperties" dir="etc/client-template/fullProperties"/>
+    <delete file="etc/client-template/dbflute_dfclient.zip"/>
+    <zip zipfile="etc/client-template/dbflute_dfclient.zip">
+        <zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
     </zip>
   	
-    <delete file="etc/client-template/minimumProperties.zip"/>
-    <zip zipfile="etc/client-template/minimumProperties.zip">
-        <zipfileset prefix="minimumProperties" dir="etc/client-template/minimumProperties"/>
-    </zip>
-
     <zip zipfile="${dbflute.zip.dirfile}">
         <zipfileset prefix="etc/cmd" dir="etc/cmd">
             <include name="*.cmd"/>
             <include name="*.sh"/>
         </zipfileset>
         <zipfileset prefix="etc/client-template" dir="etc/client-template">
-            <include name="fullProperties.zip"/>
-            <include name="minimumProperties.zip"/>
+            <include name="dbflute_dfclient.zip"/>
         </zipfileset>
         <zipfileset prefix="lib/forExecute" dir="dist">
             <include name="${dbflute.jar.file}"/>

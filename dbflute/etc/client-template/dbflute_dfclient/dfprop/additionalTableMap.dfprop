@@ -1,7 +1,10 @@
 ´# /---------------------------------------------------------------------------
 # additionalTableMap: (NotRequired - Default 'map:{}')
 # 
-# This property is valid at only JDBC task.
+# This property is valid at only JDBC task and is Final Weapon.
+# Basically you don't need this because DBFlute can get the meta information
+# of tables from your actual database through JDBC!
+# 
 # The size and primaryKey and autoIncrement of column is NOT required. 
 # 
 # Specification:     
