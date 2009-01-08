@@ -87,7 +87,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                            ========================
     public boolean isEntityJavaDocDbCommentValid() {
         String value = (String) getDocumentDefinitionMap().get("entityJavaDocDbCommentValid");
-        return value != null && value.trim().length() > 0 && value.equalsIgnoreCase("true");
+        if (value == null) {
+            value = (String) getDocumentDefinitionMap().get("isEntityJavaDocDbCommentValid");
+        }
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
     public String resolveLineSeparatorForSchemaHtml(String comment) {
@@ -161,8 +164,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDataXlsTemplateContainsCommonColumn() {
-        final String value = (String) getDocumentDefinitionMap().get("dataXlsTemplateContainsCommonColumn");
-        return value != null && value.trim().length() > 0 && value.trim().equalsIgnoreCase("true");
+        String value = (String) getDocumentDefinitionMap().get("dataXlsTemplateContainsCommonColumn");
+        if (value == null) {
+            value = (String) getDocumentDefinitionMap().get("isDataXlsTemplateContainsCommonColumn");
+        }
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
     public File getDataXlsTemplateFile() {

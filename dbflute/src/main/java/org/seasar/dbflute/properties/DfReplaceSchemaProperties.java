@@ -128,14 +128,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                    Other Properties
     //                                                                    ================
     public boolean isLoggingInsertSql() {
-        String propString = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
-        if (propString == null) {
-            propString = (String) getReplaceSchemaDefinitionMap().get("isLoggingInsertSql");
-            if (propString == null) {
+        String value = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
+        if (value == null) {
+            value = (String) getReplaceSchemaDefinitionMap().get("isLoggingInsertSql");
+            if (value == null) {
                 return true;
             }
         }
-        return propString.equalsIgnoreCase("true");
+        return value.equalsIgnoreCase("true");
     }
 
     public boolean isAutoCommit() {

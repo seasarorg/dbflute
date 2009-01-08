@@ -4,14 +4,14 @@
 # The various settings about replace-schema.
 # 
 # o dataLoadingType (NotRequired - Default 'ut')
-# o loggingInsertSql (NotRequired - Default 'true')
+# o isLoggingInsertSql (NotRequired - Default 'true')
 # o skipSheet (NotRequired - Default '')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
 # 
 # Example:
 # map:{
 #     ; dataLoadingType = ut
-#     ; loggingInsertSql = true
+#     ; isLoggingInsertSql = true
 #     ; skipSheet = P.+
 #     ; filterVariablesMap = map:{abc=AAA}
 # }
@@ -28,10 +28,10 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	# o loggingInsertSql (NotRequired - Default 'true')
+	# o isLoggingInsertSql (NotRequired - Default 'true')
 	#  Does it show insert values on log?
 	#
-    ; loggingInsertSql = true
+    ; isLoggingInsertSql = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

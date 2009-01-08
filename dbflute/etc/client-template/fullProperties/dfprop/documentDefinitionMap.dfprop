@@ -2,16 +2,16 @@
 # documentDefinitionMap: (NotRequired - Default 'map:{}')
 #
 # o aliasDelimiterInDbComment (NotRequired - Default 'map:{}')
-# o entityJavaDocDbCommentValid (NotRequired - Default 'false')
+# o isEntityJavaDocDbCommentValid (NotRequired - Default 'false')
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
-# o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+# o isDataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
 # 
 # Example:
 # map:{
 #     ; aliasDelimiterInDbComment = :
-#     ; entityJavaDocDbCommentValid = true
+#     ; isEntityJavaDocDbCommentValid = true
 #     ; dataXlsTemplateRecordLimit = 10
-#     ; dataXlsTemplateContainsCommonColumn = false
+#     ; isDataXlsTemplateContainsCommonColumn = false
 # }
 #
 # *The line that starts with '#' means comment-out.
@@ -29,10 +29,10 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o entityJavaDocDbCommentValid (NotRequired - Default 'false')
+    # o isEntityJavaDocDbCommentValid (NotRequired - Default 'false')
     #  Does it allow DB comment to be on java-doc?
     # 
-    #; entityJavaDocDbCommentValid = true
+    #; isEntityJavaDocDbCommentValid = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,12 +44,12 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+    # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
     #  Does Data Excel Template contain common columns?
     #  Basically you don't need this
     #  because common column is resolved on replace-schema.
     # 
-    #; dataXlsTemplateContainsCommonColumn = false
+    #; isDataXlsTemplateContainsCommonColumn = false
     # - - - - - - - - - -/
 }
 # ----------------/

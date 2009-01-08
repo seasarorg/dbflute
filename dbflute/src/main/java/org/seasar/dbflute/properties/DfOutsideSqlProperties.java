@@ -37,6 +37,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                             =======================
     public boolean isGenerateProcedureParameterBean() {
         String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
+        if (value == null) {
+            value = (String) getOutsideSqlDefinitionMap().get("isGenerateProcedureParameterBean");
+        }
         return value != null && value.trim().equalsIgnoreCase("true");
     }
 

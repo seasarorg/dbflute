@@ -3,7 +3,7 @@
 #
 # The various settings about outside SQL. 
 # 
-# o generateProcedureParameterBean (NotRequired - Default 'false')
+# o isGenerateProcedureParameterBean (NotRequired - Default 'false')
 # o targetProcedureCatalogList (NotRequired - Default 'list:{}')
 # o targetProcedureSchemaList (NotRequired - Default 'list:{}')
 # o targetProcedureNameList (NotRequired - Default 'list:{}')
@@ -15,15 +15,15 @@
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o generateProcedureParameterBean (NotRequired - Default 'false')
+    # o isGenerateProcedureParameterBean (NotRequired - Default 'false')
     #   [true]
-    #     Generate the parameter bean for procedure.
+    #     Does it generate the parameter bean for procedure?
     #     If you call the procedure from DBFlute, you should specify 'true'!
     #
     #   [false]
     #     Non.
     #
-    ; generateProcedureParameterBean = false
+    ; isGenerateProcedureParameterBean = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,23 +31,23 @@ map:{
     #  You can specify target catalog of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #
-    #; targetProcedureCatalogList = list:{ABC}
+    #; targetProcedureCatalogList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetProcedureSchemaList (NotRequired - Default 'list:{}')
     #  You can specify target schema of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
-    #
-    #; targetProcedureSchemaList = list:{suffix:PLEDB}
+    #  ex) list:{PROCEDUREDB}
+    #; targetProcedureSchemaList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetProcedureNameList (NotRequired - Default 'list:{}')
     #  You can specify target name of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
-    #
-    #; targetProcedureNameList = list:{prefix:SP_}
+    #  ex) list:{prefix:SP_}
+    #; targetProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
