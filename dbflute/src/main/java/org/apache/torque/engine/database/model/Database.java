@@ -551,7 +551,7 @@ public class Database {
                 return getTable(tableName) != null;
             }
         });
-        getProperties().getLittleAdjustmentProperties().checkDirectoryPackage();
+        getProperties().getBasicProperties().checkDirectoryPackage();
     }
 
     // ===================================================================================
@@ -834,6 +834,26 @@ public class Database {
 
     public String getBaseSuffixForEntity() {
         return "";
+    }
+
+    // -----------------------------------------------------
+    //                                             Flat/Omit
+    //                                             ---------
+    // CSharp Only
+    public boolean isFlatDirectoryPackageValid() {
+        return getProperties().getBasicProperties().isFlatDirectoryPackageValid();
+    }
+
+    public String getFlatDirectoryPackage() {
+        return getProperties().getBasicProperties().getFlatDirectoryPackage();
+    }
+
+    public boolean isOmitDirectoryPackageValid() {
+        return getProperties().getBasicProperties().isOmitDirectoryPackageValid();
+    }
+
+    public String getOmitDirectoryPackage() {
+        return getProperties().getBasicProperties().getOmitDirectoryPackage();
     }
 
     // -----------------------------------------------------
@@ -1387,22 +1407,6 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getOmitFileSystemPathPackage();
     }
 
-    public boolean isOmitDirectoryPackageValid() {
-        return getProperties().getLittleAdjustmentProperties().isOmitDirectoryPackageValid();
-    }
-
-    public String getOmitDirectoryPackage() {
-        return getProperties().getLittleAdjustmentProperties().getOmitDirectoryPackage();
-    }
-
-    public boolean isFlatDirectoryPackageValid() {
-        return getProperties().getLittleAdjustmentProperties().isFlatDirectoryPackageValid();
-    }
-
-    public String getFlatDirectoryPackage() {
-        return getProperties().getLittleAdjustmentProperties().getFlatDirectoryPackage();
-    }
-
     public boolean isSql2EntityPlainEntity() {
         return false;
     }
@@ -1726,7 +1730,7 @@ public class Database {
     }
 
     public String getPackageAsPath(String pckge) {
-        final DfPackagePathHandler handler = new DfPackagePathHandler(getProperties().getLittleAdjustmentProperties());
+        final DfPackagePathHandler handler = new DfPackagePathHandler(getBasicProperties());
         return handler.getPackageAsPath(pckge);
     }
 

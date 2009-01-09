@@ -1,8 +1,11 @@
 # /---------------------------------------------------------------------------
 # databaseInfoMap: (Required)
+#
+# The database information for the tasks of DBFlute.
+# You should specify before your first generating.
 # 
 # o driver   -- The class name of JDBC-Driver.
-# o url      -- The url for connecting database.
+# o url      -- The URL for connecting database.
 # o schema   -- The schema name.
 # o user     -- The database user name.
 # o password -- The database password.

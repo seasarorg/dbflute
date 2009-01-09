@@ -2079,7 +2079,7 @@ public class Table {
      * @return Determination.
      */
     public boolean isUseUpdateDate() {
-        final String updateDateColumnName = getProperties().getBasicProperties().getUpdateDateFieldName();
+        final String updateDateColumnName = getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
         if ("".equals(updateDateColumnName)) {
             return false;
         }
@@ -2094,7 +2094,7 @@ public class Table {
         if (!isUseUpdateDate()) {
             return null;
         }
-        final String fieldName = getProperties().getBasicProperties().getUpdateDateFieldName();
+        final String fieldName = getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
         if (fieldName != null && fieldName.trim().length() != 0) {
             final Column column = getColumn(fieldName);
             return column;
@@ -2139,7 +2139,7 @@ public class Table {
         if (!isUseUpdateDate()) {
             return "";
         }
-        final Column column = getColumn(getProperties().getBasicProperties().getUpdateDateFieldName());
+        final Column column = getColumn(getProperties().getOptimisticLockProperties().getUpdateDateFieldName());
         return column.getJavaNative();
     }
 
@@ -2151,7 +2151,7 @@ public class Table {
      * @return Determination.
      */
     public boolean isUseVersionNo() {
-        final String versionNoColumnName = getProperties().getBasicProperties().getVersionNoFieldName();
+        final String versionNoColumnName = getProperties().getOptimisticLockProperties().getVersionNoFieldName();
         final Column column = getColumn(versionNoColumnName);
         if (column == null) {
             return false;
@@ -2163,7 +2163,7 @@ public class Table {
         if (!isUseVersionNo()) {
             return null;
         }
-        final String versionNoColumnName = getProperties().getBasicProperties().getVersionNoFieldName();
+        final String versionNoColumnName = getProperties().getOptimisticLockProperties().getVersionNoFieldName();
         return getColumn(versionNoColumnName);
     }
 

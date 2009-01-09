@@ -9,14 +9,16 @@ import org.seasar.dbflute.properties.DfAllClassCopyrightProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
+import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -116,18 +118,6 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                                  Buri
-    //                                                  ----
-    protected DfBuriProperties _buriProperties;
-
-    public DfBuriProperties getBuriProperties(Properties prop) {
-        if (_buriProperties == null) {
-            _buriProperties = new DfBuriProperties(prop);
-        }
-        return _buriProperties;
-    }
-
-    // -----------------------------------------------------
     //                                       Behavior Filter
     //                                       ---------------
     protected DfBehaviorFilterProperties _behaviorFilterProperties;
@@ -137,6 +127,30 @@ public final class DfPropertiesHandler {
             _behaviorFilterProperties = new DfBehaviorFilterProperties(prop);
         }
         return _behaviorFilterProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                                  Buri
+    //                                                  ----
+    protected DfBuriProperties _buriProperties;
+    
+    public DfBuriProperties getBuriProperties(Properties prop) {
+        if (_buriProperties == null) {
+            _buriProperties = new DfBuriProperties(prop);
+        }
+        return _buriProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                        Classification
+    //                                        --------------
+    protected DfClassificationProperties _classificationProperties;
+
+    public DfClassificationProperties getClassificationProperties(Properties prop) {
+        if (_classificationProperties == null) {
+            _classificationProperties = new DfClassificationProperties(prop);
+        }
+        return _classificationProperties;
     }
 
     // -----------------------------------------------------
@@ -233,6 +247,18 @@ public final class DfPropertiesHandler {
             _multipleFKPropertyProperties = new DfMultipleFKPropertyProperties(prop);
         }
         return _multipleFKPropertyProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                            OutsideSql
+    //                                            ----------
+    protected DfOptimisticLockProperties _optimisticLockProperties;
+    
+    public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
+        if (_optimisticLockProperties == null) {
+            _optimisticLockProperties = new DfOptimisticLockProperties(prop);
+        }
+        return _optimisticLockProperties;
     }
 
     // -----------------------------------------------------

@@ -2,22 +2,22 @@
 # basicInfoMap: (Required)
 #
 # The basic information for the tasks of DBFlute.
-# You should specify the required properties mainly.
+# You should specify before your first generating.
 # 
-# You should specify before your first generating:
+# Core Properties:
 # o database: (Required)
 # o targetLanguage: (Required)
 # o targetContainer: (Required)
 # o packageBase: (Required)
+# 
+# Adjustment Properties:
 # o java.dir: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
 # o isJavaNameOfTableSameAsDbName: (NotRequired - Default 'false')
 # o isJavaNameOfColumnSameAsDbName: (NotRequired - Default 'false')
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
-# 
-# You can specify after your first generating:
-# o updateDateFieldName: (NotRequired - Default '')
-# o versionNoFieldName: (NotRequired - Default 'VERSION_NO')
+# o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
+# o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -166,18 +166,19 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o updateDateFieldName: (NotRequired - Default '')
-    #  The column name of update date for optimistic lock. 
+    # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
+    #  ex) Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
     # 
-    #; updateDateFieldName = UPDATE_DATE
+    # @CSharpOnly
+    #; flatDirectoryPackage = Aaa.Bbb.DBFlute
     # - - - - - - - - - -/
-
+    
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o versionNoFieldName: (NotRequired - Default 'VERSION_NO')
-    #  The column name of version no for optimistic lock.
-    #  Basically you don't need this if your database have the column 'version_no'.
+    # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
+    #  ex) Aaa --> Directory: source/Bbb/DBFlute/AllCommon
     # 
-    #; versionNoFieldName = VERSION_NO
+    # @CSharpOnly
+    #; omitDirectoryPackage = Aaa
     # - - - - - - - - - -/
 }
 # ----------------/

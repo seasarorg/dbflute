@@ -176,7 +176,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                               Resolve SqlPackage Path
     //                               -----------------------
     protected String resolveSqlPackageFileSeparator(String sqlPackage) {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final DfBasicProperties prop = getBasicProperties();
         if (!prop.isFlatDirectoryPackageValid()) {
             return replaceDotToSeparator(sqlPackage);
         }

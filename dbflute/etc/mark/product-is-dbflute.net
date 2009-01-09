@@ -1,1 +1,10 @@
 It's mark file!
+
+[Product Name]
+DBFlute.NET
+
+[Product Version]
+@version@
+
+[Deploy Date]
+@datetime@

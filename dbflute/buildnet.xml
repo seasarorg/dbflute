@@ -4,6 +4,7 @@
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
   <property name="version" value="0.8.8.1"/>
+  <property name="internal.version" value="${version}"/>
   <property name="deploy.base" value="../../dbflute.net"/>
   <property name="workspace.base" value=".."/>
 
@@ -73,6 +74,14 @@
         <zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
     </zip>
 
+    <delete file="etc/mark/product-is-dbflute.net-*"/>
+    <copy filtering="" file="etc/mark/product-is-dbflute.net" tofile="etc/mark/product-is-dbflute.net-${version}">
+	  <filterset>
+	    <filter token="version" value="${internal.version}" />
+	    <filter token="datetime" value="${now.date}" />
+	  </filterset>
+    </copy>
+
     <zip zipfile="${dbflute.zip.dirfile}">
         <zipfileset prefix="etc/cmd" dir="etc/cmd">
             <include name="*.cmd"/>
@@ -114,7 +123,7 @@
             <include name="build-torque.xml"/>
         </zipfileset>
         <zipfileset prefix="" dir="etc/mark">
-            <include name="product-is-dbflute.net"/>
+            <include name="product-is-dbflute.net-${version}"/>
         </zipfileset>
     </zip>
   </target>

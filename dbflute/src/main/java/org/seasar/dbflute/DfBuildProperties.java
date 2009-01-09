@@ -33,6 +33,7 @@ import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
+import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -142,26 +143,12 @@ public final class DfBuildProperties {
     public DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
         return getHandler().getAllClassCopyrightProperties(getProperties());
     }
-    
-    // -----------------------------------------------------
-    //                                              Database
-    //                                              --------
-    public DfDatabaseProperties getDatabaseProperties() {
-        return getHandler().getDatabaseProperties(getProperties());
-    }
 
     // -----------------------------------------------------
-    //                                         DBFlute Dicon
-    //                                         -------------
-    public DfDependencyInjectionProperties getDependencyInjectionProperties() {
-        return getHandler().getDependencyInjectionProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                 Sequence and Identity
-    //                                 ---------------------
-    public DfSequenceIdentityProperties getSequenceIdentityProperties() {
-        return getHandler().getSequenceIdentityProperties(getProperties());
+    //                                       Behavior Filter
+    //                                       ---------------
+    public DfBehaviorFilterProperties getBehaviorFilterProperties() {
+        return getHandler().getBehaviorFilterProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -172,6 +159,13 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
+    //                                        Classification
+    //                                        --------------
+    public DfClassificationProperties getClassificationProperties() {
+        return getHandler().getClassificationProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
     //                                         Common Column
     //                                         -------------
     public DfCommonColumnProperties getCommonColumnProperties() {
@@ -179,22 +173,31 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                       Behavior Filter
-    //                                       ---------------
-    public DfBehaviorFilterProperties getBehaviorFilterProperties() {
-        return getHandler().getBehaviorFilterProperties(getProperties());
+    //                                              Database
+    //                                              --------
+    public DfDatabaseProperties getDatabaseProperties() {
+        return getHandler().getDatabaseProperties(getProperties());
     }
 
     // -----------------------------------------------------
-    //                                        Classification
-    //                                        --------------
-    protected DfClassificationProperties _classificationProperties;
+    //                                  Dependency Injection
+    //                                  --------------------
+    public DfDependencyInjectionProperties getDependencyInjectionProperties() {
+        return getHandler().getDependencyInjectionProperties(getProperties());
+    }
 
-    public DfClassificationProperties getClassificationProperties() {
-        if (_classificationProperties == null) {
-            _classificationProperties = new DfClassificationProperties(_buildProperties);
-        }
-        return _classificationProperties;
+    // -----------------------------------------------------
+    //                                              Document
+    //                                              --------
+    public DfDocumentProperties getDocumentProperties() {
+        return getHandler().getDocumentProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                              Flex DTO
+    //                                              --------
+    public DfFlexDtoProperties getFlexDtoProperties() {
+        return getHandler().getFlexDtoProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -202,13 +205,6 @@ public final class DfBuildProperties {
     //                                         -------------
     public DfIncludeQueryProperties getIncludeQueryProperties() {
         return getHandler().getIncludeQueryProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                      Sql Log Registry
-    //                                      ----------------
-    public DfSqlLogRegistryProperties getSqlLogRegistryProperties() {
-        return getHandler().getSqlLogRegistryProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -226,26 +222,10 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                          Table Except
-    //                                          ------------
-    public DfTypeMappingProperties getTypeMappingProperties() {
-        return getHandler().getTypeMappingProperties(getProperties());
-    }
-
-    public DfRefreshProperties getRefreshProperties() {
-        return getHandler().getRefreshProperties(getProperties());
-    }
-
-    public DfSimpleDtoProperties getSimpleDtoProperties() {
-        return getHandler().getSimpleDtoProperties(getProperties());
-    }
-
-    public DfFlexDtoProperties getFlexDtoProperties() {
-        return getHandler().getFlexDtoProperties(getProperties());
-    }
-
-    public DfS2jdbcProperties getS2jdbcProperties() {
-        return getHandler().getS2JdbcProperties(getProperties());
+    //                                       Optimistic Lock
+    //                                       ---------------
+    public DfOptimisticLockProperties getOptimisticLockProperties() {
+        return getHandler().getOptimisticLockProperties(getProperties());
     }
 
     // -----------------------------------------------------
@@ -256,6 +236,13 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
+    //                                               Refresh
+    //                                               -------
+    public DfRefreshProperties getRefreshProperties() {
+        return getHandler().getRefreshProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
     //                                         ReplaceSchema
     //                                         -------------
     public DfReplaceSchemaProperties getReplaceSchemaProperties() {
@@ -263,9 +250,38 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                              Document
-    //                                              --------
-    public DfDocumentProperties getDocumentProperties() {
-        return getHandler().getDocumentProperties(getProperties());
+    //                                                S2JDBC
+    //                                                ------
+    public DfS2jdbcProperties getS2jdbcProperties() {
+        return getHandler().getS2JdbcProperties(getProperties());
     }
+
+    // -----------------------------------------------------
+    //                                 Sequence and Identity
+    //                                 ---------------------
+    public DfSequenceIdentityProperties getSequenceIdentityProperties() {
+        return getHandler().getSequenceIdentityProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                            Simple DTO
+    //                                            ----------
+    public DfSimpleDtoProperties getSimpleDtoProperties() {
+        return getHandler().getSimpleDtoProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                      SQL Log Registry
+    //                                      ----------------
+    public DfSqlLogRegistryProperties getSqlLogRegistryProperties() {
+        return getHandler().getSqlLogRegistryProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                          Type Mapping
+    //                                          ------------
+    public DfTypeMappingProperties getTypeMappingProperties() {
+        return getHandler().getTypeMappingProperties(getProperties());
+    }
+
 }

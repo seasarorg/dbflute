@@ -8,8 +8,6 @@
 # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
 # o isMakeDeprecated (NotRequired - Default 'false')
 # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
-# o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
-# o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
 # o isDeleteOldTableClass (NotRequired - Default 'true')
 # 
 # *The line that starts with '#' means comment-out.
@@ -71,22 +69,6 @@ map:{
     #     Non.
     #
     #; isMakeRecentlyDeprecated = true
-    # - - - - - - - - - -/
-    
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
-    #  ex) Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
-    # 
-    # @CSharpOnly
-    #; flatDirectoryPackage = Aaa.Bbb.DBFlute
-    # - - - - - - - - - -/
-    
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
-    #  ex) Aaa --> Directory: source/Bbb/DBFlute/AllCommon
-    # 
-    # @CSharpOnly
-    #; omitDirectoryPackage = Aaa
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

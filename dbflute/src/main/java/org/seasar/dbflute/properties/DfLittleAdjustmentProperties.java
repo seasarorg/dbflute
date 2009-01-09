@@ -3,7 +3,6 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -203,50 +202,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public String getExtractAcceptEqual() { // It's closet!
         return getProperty("extractAcceptEqual", "@=");
-    }
-
-    // ===================================================================================
-    //                                                         Flat/Omit Directory Package
-    //                                                         ===========================
-    // CSharp Only
-    public boolean isFlatDirectoryPackageValid() {
-        final String str = getFlatDirectoryPackage();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
-    }
-
-    /**
-     * Get the package for flat directory. Normally, this property is only for C#.
-     * @return The package for flat directory. (Nullable)
-     */
-    public String getFlatDirectoryPackage() {
-        return getProperty("flatDirectoryPackage", null);
-    }
-
-    public boolean isOmitDirectoryPackageValid() {
-        final String str = getOmitDirectoryPackage();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
-    }
-
-    /**
-     * Get the package for omit directory. Normally, this property is only for C#.
-     * @return The package for omit directory. (Nullable)
-     */
-    public String getOmitDirectoryPackage() {
-        return getProperty("omitDirectoryPackage", null);
-    }
-
-    public void checkDirectoryPackage() {
-        final String flatDirectoryPackage = getFlatDirectoryPackage();
-        final String omitDirectoryPackage = getOmitDirectoryPackage();
-        if (flatDirectoryPackage == null && omitDirectoryPackage == null) {
-            return;
-        }
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        if (!languageDependencyInfo.isFlatOrOmitDirectorySupported()) {
-            String msg = "The language does not support flatDirectoryPackage or omitDirectoryPackage:";
-            msg = msg + " language=" + getBasicProperties().getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
     }
 
     // ===================================================================================

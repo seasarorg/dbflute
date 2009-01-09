@@ -145,7 +145,7 @@ public class DfBehaviorQueryPathSetupper {
         final String basePrefix = getBasicProperties().getBasePrefix();
         final String bsbhvPackage = getBasicProperties().getBaseBehaviorPackage();
 
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getLittleAdjustmentProperties());
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         packagePathHandler.setFileSeparatorSlash(true);
         final String bsbhvPathBase = outputDir + "/" + packagePathHandler.getPackageAsPath(bsbhvPackage);
 

@@ -5,7 +5,7 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -23,25 +23,25 @@ public class DfPackagePathHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfLittleAdjustmentProperties _littleAdjustmentProperties;
+    protected DfBasicProperties _basicProperties;
     protected boolean _fileSeparatorSlash;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPackagePathHandler(DfLittleAdjustmentProperties littleAdjustmentProperties) {
-        _littleAdjustmentProperties = littleAdjustmentProperties;
+    public DfPackagePathHandler(DfBasicProperties basicProperties) {
+        _basicProperties = basicProperties;
     }
 
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
     public String getPackageAsPath(String pckge) {
-        final String omitDirectoryPackage = _littleAdjustmentProperties.getOmitDirectoryPackage();
+        final String omitDirectoryPackage = _basicProperties.getOmitDirectoryPackage();
         if (omitDirectoryPackage != null && omitDirectoryPackage.trim().length() > 0) {
             pckge = removeOmitPackage(pckge, omitDirectoryPackage);
         }
-        final String flatDirectoryPackage = _littleAdjustmentProperties.getFlatDirectoryPackage();
+        final String flatDirectoryPackage = _basicProperties.getFlatDirectoryPackage();
         if (flatDirectoryPackage == null || flatDirectoryPackage.trim().length() == 0) {
             return resolvePackageAsPath(pckge);
         }

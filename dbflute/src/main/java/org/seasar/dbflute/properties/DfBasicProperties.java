@@ -346,21 +346,54 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                         Flat/Omit Directory Package
+    //                                                         ===========================
+    // CSharp Only
+    public boolean isFlatDirectoryPackageValid() {
+        final String str = getFlatDirectoryPackage();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
+    /**
+     * Get the package for flat directory. Normally, this property is only for C#.
+     * @return The package for flat directory. (Nullable)
+     */
+    public String getFlatDirectoryPackage() {
+        return getProperty("flatDirectoryPackage", null);
+    }
+
+    public boolean isOmitDirectoryPackageValid() {
+        final String str = getOmitDirectoryPackage();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
+    /**
+     * Get the package for omit directory. Normally, this property is only for C#.
+     * @return The package for omit directory. (Nullable)
+     */
+    public String getOmitDirectoryPackage() {
+        return getProperty("omitDirectoryPackage", null);
+    }
+
+    public void checkDirectoryPackage() {
+        final String flatDirectoryPackage = getFlatDirectoryPackage();
+        final String omitDirectoryPackage = getOmitDirectoryPackage();
+        if (flatDirectoryPackage == null && omitDirectoryPackage == null) {
+            return;
+        }
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        if (!languageDependencyInfo.isFlatOrOmitDirectorySupported()) {
+            String msg = "The language does not support flatDirectoryPackage or omitDirectoryPackage:";
+            msg = msg + " language=" + getBasicProperties().getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
     //                                                                           HotDeploy
     //                                                                           =========
     public boolean isAvailableHotDeploy() { // It's closet! And the Seasar only!
         return isProperty("isAvailableHotDeploy", false);
-    }
-
-    // ===================================================================================
-    //                                                                     Optimistic Lock
-    //                                                                     ===============
-    public String getUpdateDateFieldName() {
-        return getProperty("updateDateFieldName", "");
-    }
-
-    public String getVersionNoFieldName() {
-        return getProperty("versionNoFieldName", "version_no");
     }
 
     // ===================================================================================

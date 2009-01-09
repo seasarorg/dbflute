@@ -242,7 +242,7 @@ public class DfOldClassHandler {
         }
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedBehaviorPackage();
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldTableBaseBehaviorList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -265,7 +265,7 @@ public class DfOldClassHandler {
         }
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedDaoPackage();
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldTableBaseDaoList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -288,7 +288,7 @@ public class DfOldClassHandler {
         }
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedEntityPackage();
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldTableBaseEntityList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -313,8 +313,7 @@ public class DfOldClassHandler {
 
     protected DfOldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
             String classSuffix, NotDeleteTableClassNameSetupper notDeleteTableClassNameSetupper) {
-        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, new DfPackagePathHandler(
-                _littleAdjustmentProperties));
+        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, createPackagePathHandler());
         deletor.setPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
         deletor.setClassSuffix(classSuffix);
@@ -447,7 +446,7 @@ public class DfOldClassHandler {
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedEntityPackage() + "." + customizePackageName;
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldCustomizeBaseEntityList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -467,7 +466,7 @@ public class DfOldClassHandler {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldCustomizeBaseCursorList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -487,7 +486,7 @@ public class DfOldClassHandler {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldCustomizeBaseCursorHandlerList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -507,7 +506,7 @@ public class DfOldClassHandler {
         final String parameterBeanPackageName = _generatedClassPackageDefault.getParameterBeanSimplePackageName();
         final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedDaoPackage() + "." + parameterBeanPackageName;
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_littleAdjustmentProperties);
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
         for (String baseClassName : _deletedOldCustomizeBaseParameterBeanList) {
             final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
@@ -523,7 +522,7 @@ public class DfOldClassHandler {
     protected DfOldTableClassDeletor createOldCustomizeClassDeletor(String packagePath, String classPrefix,
             String classSuffix, Set<String> notDeleteClassNameSet) {
         final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, new DfPackagePathHandler(
-                _littleAdjustmentProperties));
+                _basicProperties));
         deletor.setPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
         deletor.setClassSuffix(classSuffix);
@@ -539,6 +538,10 @@ public class DfOldClassHandler {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected DfPackagePathHandler createPackagePathHandler() {
+        return new DfPackagePathHandler(_basicProperties);
+    }
+
     protected String getProjectPrefix() {
         return _basicProperties.getProjectPrefix();
     }
