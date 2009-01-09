@@ -86,7 +86,7 @@
     <zip zipfile="etc/client-template/dbflute_dfclient.zip">
         <zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
     </zip>
-  	
+
     <tstamp>
       <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
     </tstamp>

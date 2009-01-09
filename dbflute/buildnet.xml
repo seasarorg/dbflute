@@ -74,6 +74,10 @@
         <zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
     </zip>
 
+    <tstamp>
+      <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+    </tstamp>
+
     <delete file="etc/mark/product-is-dbflute.net-*"/>
     <copy filtering="" file="etc/mark/product-is-dbflute.net" tofile="etc/mark/product-is-dbflute.net-${version}">
 	  <filterset>
