@@ -10,7 +10,7 @@ import java.util.Calendar;
 
 import org.seasar.extension.jdbc.ValueType;
 
-import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
 
 /**
  * @author ${database.ClassAuthor}
@@ -88,12 +88,12 @@ public class ${glInternalBindVariableUtil} {
     }
 
     protected static String getLogDateFormat() {
-        String logDateFormat = ${glDBFluteConfig}.getInstance().getLogDateFormat();
+        String logDateFormat = ${glResourceContext}.getLogDateFormat();
         return logDateFormat != null ? logDateFormat : "yyyy-MM-dd";
     }
 
     protected static String getLogTimestampFormat() {
-        String logTimestampFormat = ${glDBFluteConfig}.getInstance().getLogTimestampFormat();
+        String logTimestampFormat = ${glResourceContext}.getLogTimestampFormat();
         return logTimestampFormat != null ? logTimestampFormat : "yyyy-MM-dd HH:mm:ss";
     }
 	
