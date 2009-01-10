@@ -184,7 +184,7 @@ public class DfBehaviorQueryPathSetupper {
             final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
             final File bsbhvFile = bsbhvFileMap.get(behaviorName);
             if (bsbhvFile == null) {
-                throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap);
+                throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
             }
             Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
             if (resourceElementMap == null) {
@@ -199,7 +199,7 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
-            Map<String, String> behaviorQueryElementMap) {
+            Map<String, String> behaviorQueryElementMap, String bsbhvPathBase) {
         final String path = behaviorQueryElementMap.get("path");
         final String behaviorName = behaviorQueryElementMap.get("behaviorName");
         String msg = "Look! Read the message below." + getLineSeparator();
@@ -210,9 +210,11 @@ public class DfBehaviorQueryPathSetupper {
         msg = msg + "Please confirm the existence of the behavior." + getLineSeparator();
         msg = msg + "And confirm your SQL file name." + getLineSeparator();
         msg = msg + getLineSeparator();
+        msg = msg + "[Your SQL File]" + getLineSeparator() + path + getLineSeparator();
+        msg = msg + getLineSeparator();
         msg = msg + "[Not Found Behavior]" + getLineSeparator() + behaviorName + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Your SQL File]" + getLineSeparator() + path + getLineSeparator();
+        msg = msg + "[Behavior Directory]" + getLineSeparator() + bsbhvPathBase + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Behavior List]" + getLineSeparator() + bsbhvFileMap.keySet() + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();

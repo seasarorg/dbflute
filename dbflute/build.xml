@@ -4,7 +4,7 @@
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
   <property name="version" value="0.8.8.2"/>
-  <property name="internal.version" value="${version}"/>
+  <property name="internal.version" value="${version}-SNAPSHOT"/>
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
@@ -14,6 +14,7 @@
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+  <property name="dbflute.framework.dir" value="${workspace.base}/dbflute-framework"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
   <property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
   <property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
@@ -147,6 +148,13 @@
     <delete dir="${dbflute.deploy.dir}"/>
     <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-mac-limit-framework" depends="expand-dist" description="==> reflect to basic example">
+    <copy todir="${dbflute.framework.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.framework.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect-mac-main" depends="expand-dist" description="==> reflect to main examples">
