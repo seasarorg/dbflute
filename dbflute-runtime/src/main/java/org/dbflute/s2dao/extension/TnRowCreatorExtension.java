@@ -13,7 +13,7 @@ import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.dbflute.util.DfSystemUtil;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 
 
@@ -61,7 +61,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
         final Set columnNameSet = propertyCache.keySet();
         String columnName = null;
-        PropertyType pt = null;
+        TnPropertyType pt = null;
         String propertyName = null;
         final Object row;
         final DBMeta dbmeta;
@@ -76,7 +76,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (dbmeta != null) {
                 for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
                     columnName = (String) ite.next();
-                    pt = (PropertyType) propertyCache.get(columnName);
+                    pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
                         final ValueType valueType = pt.getValueType();
@@ -89,7 +89,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             } else {
                 for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
                     columnName = (String) ite.next();
-                    pt = (PropertyType) propertyCache.get(columnName);
+                    pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
                     registerValue(rs, row, pt, columnName);
                 }

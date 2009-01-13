@@ -21,7 +21,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyTypeFactory;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
@@ -29,7 +29,7 @@ import org.dbflute.s2dao.metadata.PropertyType;
 public class TnDtoMetaDataImpl implements TnDtoMetaData {
 
     protected Class<?> beanClass;
-    protected StringKeyMap<PropertyType> propertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
+    protected StringKeyMap<TnPropertyType> propertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
     protected TnBeanAnnotationReader beanAnnotationReader;
     protected TnPropertyTypeFactory propertyTypeFactory;
 
@@ -48,12 +48,12 @@ public class TnDtoMetaDataImpl implements TnDtoMetaData {
         this.beanClass = beanClass;
     }
 
-    public Map<String, PropertyType> getPropertyTypeMap() {
+    public Map<String, TnPropertyType> getPropertyTypeMap() {
         return propertyTypeMap;
     }
 
-    public PropertyType getPropertyType(String propertyName) {
-        PropertyType propertyType = (PropertyType) propertyTypeMap.get(propertyName);
+    public TnPropertyType getPropertyType(String propertyName) {
+        TnPropertyType propertyType = (TnPropertyType) propertyTypeMap.get(propertyName);
         if (propertyType == null) {
             String msg = "The propertyName was not found in the map:";
             msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + propertyTypeMap;
@@ -67,14 +67,14 @@ public class TnDtoMetaDataImpl implements TnDtoMetaData {
     }
 
     protected void setupPropertyType() {
-        PropertyType[] propertyTypes = propertyTypeFactory.createDtoPropertyTypes();
+        TnPropertyType[] propertyTypes = propertyTypeFactory.createDtoPropertyTypes();
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             addPropertyType(pt);
         }
     }
 
-    protected void addPropertyType(PropertyType propertyType) {
+    protected void addPropertyType(TnPropertyType propertyType) {
         propertyTypeMap.put(propertyType.getPropertyName(), propertyType);
     }
 

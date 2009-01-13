@@ -12,7 +12,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
@@ -43,8 +43,8 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
     public Object handle(ResultSet rs) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
         Set<String> columnNames = null; // Set<String(columnName)>
-        Map<String, PropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
-        Map<String, Map<String, PropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
+        Map<String, TnPropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
+        Map<String, Map<String, TnPropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
         TnRelationRowCache relRowCache = null;
 
         final List<Object> list = new ArrayList<Object>();
@@ -131,10 +131,10 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             final ValueType valueType;
             String columnName = rpt.getMyKey(i);
             if (columnNames.contains(columnName)) {
-                final PropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
+                final TnPropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
                 valueType = pt.getValueType();
             } else {
-                final PropertyType pt = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
+                final TnPropertyType pt = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
                 columnName = pt.getColumnName() + buildRelationNoSuffix(rpt);
                 if (columnNames.contains(columnName)) {
                     valueType = pt.getValueType();

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.dbflute.s2dao.beans.factory.BeanDescFactory;
@@ -40,11 +40,11 @@ public class TnIdentifierGeneratorFactory {
         generatorClasses.put(name, clazz);
     }
 
-    public static TnIdentifierGenerator createIdentifierGenerator(PropertyType propertyType) {
+    public static TnIdentifierGenerator createIdentifierGenerator(TnPropertyType propertyType) {
         return createIdentifierGenerator(propertyType, null);
     }
 
-    public static TnIdentifierGenerator createIdentifierGenerator(PropertyType propertyType, String annotation) {
+    public static TnIdentifierGenerator createIdentifierGenerator(TnPropertyType propertyType, String annotation) {
         if (propertyType == null) {
             String msg = "The argument[propertyType] should not be null: annotation=" + annotation;
             throw new IllegalArgumentException(msg);
@@ -69,8 +69,8 @@ public class TnIdentifierGeneratorFactory {
         return ClassUtil.forName(name);
     }
 
-    protected static TnIdentifierGenerator createIdentifierGenerator(Class<?> clazz, PropertyType propertyType) {
-        Constructor<?> constructor = ClassUtil.getConstructor(clazz, new Class<?>[] { PropertyType.class });
+    protected static TnIdentifierGenerator createIdentifierGenerator(Class<?> clazz, TnPropertyType propertyType) {
+        Constructor<?> constructor = ClassUtil.getConstructor(clazz, new Class<?>[] { TnPropertyType.class });
         return (TnIdentifierGenerator) ConstructorUtil.newInstance(constructor, new Object[] { propertyType });
     }
 

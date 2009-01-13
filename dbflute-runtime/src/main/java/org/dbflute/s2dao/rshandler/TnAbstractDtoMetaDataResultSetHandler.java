@@ -9,7 +9,7 @@ import java.util.Set;
 import org.dbflute.helper.StringSet;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
 
@@ -45,7 +45,7 @@ public abstract class TnAbstractDtoMetaDataResultSetHandler implements ResultSet
      * @return The map of row property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, PropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
         return rowCreator.createPropertyCache(columnNames, dtoMetaData);
     }
 
@@ -55,7 +55,7 @@ public abstract class TnAbstractDtoMetaDataResultSetHandler implements ResultSet
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    protected Object createRow(ResultSet rs, Map<String, PropertyType> propertyCache) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache) throws SQLException {
         final Class beanClass = dtoMetaData.getBeanClass();
         return rowCreator.createRow(rs, propertyCache, beanClass);
     }

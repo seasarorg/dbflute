@@ -22,7 +22,7 @@ import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.PropertyDesc;
 
@@ -63,8 +63,8 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         }
     }
 
-    public PropertyType[] createBeanPropertyTypes(String tableName) {
-        final List<PropertyType> list = new ArrayList<PropertyType>();
+    public TnPropertyType[] createBeanPropertyTypes(String tableName) {
+        final List<TnPropertyType> list = new ArrayList<TnPropertyType>();
         final BeanDesc beanDesc = getBeanDesc();
         for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
             final PropertyDesc pd = beanDesc.getPropertyDesc(i);
@@ -79,12 +79,12 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
                 continue;
             }
 
-            final PropertyType pt = createPropertyType(pd);
+            final TnPropertyType pt = createPropertyType(pd);
             pt.setPrimaryKey(isPrimaryKey(pd));
             pt.setPersistent(isPersistent(pt));
             list.add(pt);
         }
-        return list.toArray(new PropertyType[list.size()]);
+        return list.toArray(new TnPropertyType[list.size()]);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     @Override
-    protected boolean isPersistent(PropertyType propertyType) {
+    protected boolean isPersistent(TnPropertyType propertyType) {
         final String propertyName = propertyType.getPropertyName();
         final PropertyDesc propertyDesc = propertyType.getPropertyDesc();
         if ((hasDBMeta() && _dbmeta.hasColumn(propertyName)) || hasColumnAnnotation(propertyDesc)) {

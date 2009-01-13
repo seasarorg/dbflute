@@ -10,7 +10,7 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -47,7 +47,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @throws SQLException
      */
     @Override
-    protected Map<String, PropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -61,7 +61,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @throws SQLException
      */
     @Override
-    protected Object createRow(ResultSet rs, Map<String, PropertyType> propertyCache) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -74,7 +74,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, PropertyType>> createRelationPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> columnNames) throws SQLException {
         return relationRowCreator.createPropertyCache(columnNames, beanMetaData);
     }
 
@@ -88,7 +88,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @throws SQLException
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues, Map<String, Map<String, PropertyType>> relationPropertyCache)
+            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
             throws SQLException {
         return relationRowCreator.createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache);
     }

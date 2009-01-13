@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
 
 /**
@@ -30,13 +30,13 @@ public interface TnBeanMetaData extends TnDtoMetaData {
 
     public String getTableName();
 
-    public PropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException;
+    public TnPropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException;
 
     public String getVersionNoPropertyName();
 
     public boolean hasVersionNoPropertyType();
 
-    public PropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException;
+    public TnPropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException;
 
     public String getTimestampPropertyName();
 
@@ -44,9 +44,9 @@ public interface TnBeanMetaData extends TnDtoMetaData {
 
     public String convertFullColumnName(String alias);
 
-    public PropertyType getPropertyTypeByAliasName(String aliasName) throws ColumnNotFoundRuntimeException;
+    public TnPropertyType getPropertyTypeByAliasName(String aliasName) throws ColumnNotFoundRuntimeException;
 
-    public PropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException;
+    public TnPropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException;
 
     public boolean hasPropertyTypeByColumnName(String columnName);
 

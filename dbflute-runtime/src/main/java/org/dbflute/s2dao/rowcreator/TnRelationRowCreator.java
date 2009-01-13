@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
@@ -39,7 +39,7 @@ public interface TnRelationRowCreator {
      * @throws SQLException
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues, Map<String, Map<String, PropertyType>> relationPropertyCache)
+            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
             throws SQLException;
 
     /**
@@ -48,7 +48,7 @@ public interface TnRelationRowCreator {
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    Map<String, Map<String, PropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
+    Map<String, Map<String, TnPropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
             throws SQLException;
 
 }

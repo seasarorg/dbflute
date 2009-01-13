@@ -11,7 +11,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.exception.EntityAlreadyUpdatedException;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.util.DfTypeUtil;
@@ -32,7 +32,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
     protected ValueType[] bindVariableValueTypes;
     protected Timestamp timestamp;
     protected Integer versionNo;
-    protected PropertyType[] propertyTypes;
+    protected TnPropertyType[] propertyTypes;
     protected boolean optimisticLockHandling;
     protected boolean versionNoAutoIncrementOnMemory;
 
@@ -40,7 +40,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public InternalAbstractAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData, PropertyType[] propertyTypes) {
+            StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory);
         this.beanMetaData = beanMetaData;
         this.propertyTypes = propertyTypes;
@@ -120,7 +120,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
@@ -143,7 +143,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
                 setTimestamp(new Timestamp(new Date().getTime()));
                 varList.add(getTimestamp());
@@ -179,19 +179,19 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
         TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            PropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));
+            TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
-            PropertyType pt = bmd.getVersionNoPropertyType();
+            TnPropertyType pt = bmd.getVersionNoPropertyType();
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
-            PropertyType pt = bmd.getTimestampPropertyType();
+            TnPropertyType pt = bmd.getTimestampPropertyType();
             PropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
@@ -251,11 +251,11 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
         this.versionNo = versionNo;
     }
 
-    protected PropertyType[] getPropertyTypes() {
+    protected TnPropertyType[] getPropertyTypes() {
         return propertyTypes;
     }
 
-    protected void setPropertyTypes(PropertyType[] propertyTypes) {
+    protected void setPropertyTypes(TnPropertyType[] propertyTypes) {
         this.propertyTypes = propertyTypes;
     }
 

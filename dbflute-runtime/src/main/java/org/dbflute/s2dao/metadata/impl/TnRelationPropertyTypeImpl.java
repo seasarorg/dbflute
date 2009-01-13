@@ -17,13 +17,13 @@ package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
  * @author jflute
  */
-public class TnRelationPropertyTypeImpl extends PropertyTypeImpl implements TnRelationPropertyType {
+public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements TnRelationPropertyType {
 
     protected int relationNo;
 

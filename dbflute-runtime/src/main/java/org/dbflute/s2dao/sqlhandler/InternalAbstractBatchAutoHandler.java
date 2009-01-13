@@ -13,7 +13,7 @@ import org.dbflute.DBDef;
 import org.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -34,7 +34,7 @@ public abstract class InternalAbstractBatchAutoHandler extends InternalAbstractA
     //                                                                         Constructor
     //                                                                         ===========
     public InternalAbstractBatchAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData, PropertyType[] propertyTypes) {
+            StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 

@@ -15,12 +15,12 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
  */
-public interface TnRelationPropertyType extends PropertyType {
+public interface TnRelationPropertyType extends TnPropertyType {
 
     public int getRelationNo();
 

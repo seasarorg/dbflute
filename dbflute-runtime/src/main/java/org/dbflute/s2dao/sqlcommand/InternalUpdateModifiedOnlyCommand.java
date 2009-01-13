@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 
@@ -26,13 +26,13 @@ public class InternalUpdateModifiedOnlyCommand extends InternalUpdateAutoDynamic
     //                                                                 No.1 Point Override
     //                                                                 ===================
     @Override
-    protected PropertyType[] createUpdatePropertyTypes(final TnBeanMetaData bmd, final Object bean, final String[] propertyNames) {
+    protected TnPropertyType[] createUpdatePropertyTypes(final TnBeanMetaData bmd, final Object bean, final String[] propertyNames) {
         final Set<?> modifiedPropertyNames = getBeanMetaData().getModifiedPropertyNames(bean);
-        final List<PropertyType> types = new ArrayList<PropertyType>();
+        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyNames.length; ++i) {
-            final PropertyType pt = bmd.getPropertyType(propertyNames[i]);
+            final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey() == false) {
                 final String propertyName = pt.getPropertyName();
                 if (propertyName.equalsIgnoreCase(timestampPropertyName)
@@ -42,7 +42,7 @@ public class InternalUpdateModifiedOnlyCommand extends InternalUpdateAutoDynamic
                 }
             }
         }
-        final PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
+        final TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
         return propertyTypes;
     }
 }

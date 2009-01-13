@@ -17,7 +17,7 @@ package org.dbflute.s2dao.metadata;
 
 import java.util.Map;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
@@ -26,9 +26,9 @@ public interface TnDtoMetaData {
 
     public Class<?> getBeanClass();
 
-    public Map<String, PropertyType> getPropertyTypeMap();
+    public Map<String, TnPropertyType> getPropertyTypeMap();
 
-    public PropertyType getPropertyType(String propertyName);
+    public TnPropertyType getPropertyType(String propertyName);
 
     public boolean hasPropertyType(String propertyName);
 }

@@ -2,7 +2,7 @@ package org.dbflute.s2dao.sqlhandler;
 
 import javax.sql.DataSource;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -17,7 +17,7 @@ public class InternalInsertAutoHandler extends InternalAbstractAutoHandler {
     //                                                                         ===========
     public InternalInsertAutoHandler(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            PropertyType[] propertyTypes) {
+            TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
         setOptimisticLockHandling(false);
     }

@@ -29,7 +29,7 @@ import org.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
@@ -42,9 +42,9 @@ import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaData {
 
     private String tableName;
-    private Map<String, PropertyType> columnNamePropertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
+    private Map<String, TnPropertyType> columnNamePropertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
     private List<TnRelationPropertyType> relationPropertyTypes = new ArrayList<TnRelationPropertyType>();
-    private PropertyType[] primaryKeys;
+    private TnPropertyType[] primaryKeys;
     private List<TnIdentifierGenerator> identifierGenerators = new ArrayList<TnIdentifierGenerator>();
     private Map<String, TnIdentifierGenerator> identifierGeneratorsByPropertyName = new HashMap<String, TnIdentifierGenerator>();
     private String versionNoPropertyName;
@@ -66,11 +66,11 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         return tableName;
     }
 
-    public PropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException {
+    public TnPropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException {
         return getPropertyType(getVersionNoPropertyName());
     }
 
-    public PropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException {
+    public TnPropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException {
         return getPropertyType(getTimestampPropertyName());
     }
 
@@ -90,15 +90,15 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         this.timestampPropertyName = timestampPropertyName;
     }
 
-    public PropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException {
-        PropertyType propertyType = (PropertyType) columnNamePropertyTypeMap.get(columnName);
+    public TnPropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException {
+        TnPropertyType propertyType = (TnPropertyType) columnNamePropertyTypeMap.get(columnName);
         if (propertyType == null) {
             throw new ColumnNotFoundRuntimeException(tableName, columnName);
         }
         return propertyType;
     }
 
-    public PropertyType getPropertyTypeByAliasName(String alias) {
+    public TnPropertyType getPropertyTypeByAliasName(String alias) {
         if (hasPropertyTypeByColumnName(alias)) {
             return getPropertyTypeByColumnName(alias);
         }
@@ -209,9 +209,9 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     protected void setupProperty() {
-        PropertyType[] propertyTypes = propertyTypeFactory.createBeanPropertyTypes(tableName);
+        TnPropertyType[] propertyTypes = propertyTypeFactory.createBeanPropertyTypes(tableName);
         for (int i = 0; i < propertyTypes.length; i++) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             addPropertyType(pt);
             columnNamePropertyTypeMap.put(pt.getColumnName(), pt);
         }
@@ -224,19 +224,19 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     protected void setupPrimaryKey() {
-        List<PropertyType> keys = new ArrayList<PropertyType>();
+        List<TnPropertyType> keys = new ArrayList<TnPropertyType>();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             if (pt.isPrimaryKey()) {
                 keys.add(pt);
                 setupIdentifierGenerator(pt);
             }
         }
-        primaryKeys = (PropertyType[]) keys.toArray(new PropertyType[keys.size()]);
+        primaryKeys = (TnPropertyType[]) keys.toArray(new TnPropertyType[keys.size()]);
     }
 
-    protected void setupIdentifierGenerator(PropertyType propertyType) {
+    protected void setupIdentifierGenerator(TnPropertyType propertyType) {
         PropertyDesc pd = propertyType.getPropertyDesc();
         String propertyName = propertyType.getPropertyName();
         String idType = beanAnnotationReader.getId(pd);

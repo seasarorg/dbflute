@@ -10,7 +10,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalInsertAutoHandler;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -37,7 +37,7 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
     public Object execute(Object[] args) {
         final Object bean = args[0];
         final TnBeanMetaData bmd = getBeanMetaData();
-        final PropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
+        final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
         final String sql = createInsertSql(bmd, propertyTypes);
         final InternalInsertAutoHandler handler = new InternalInsertAutoHandler(getDataSource(), getStatementFactory(),
                 bmd, propertyTypes);
@@ -47,13 +47,13 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
         return new Integer(rows);
     }
 
-    protected String createInsertSql(TnBeanMetaData bmd, PropertyType[] propertyTypes) {
+    protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
         StringBuffer buf = new StringBuffer(100);
         buf.append("insert into ");
         buf.append(bmd.getTableName());
         buf.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             final String columnName = pt.getColumnName();
             if (i > 0) {
                 buf.append(", ");
@@ -71,17 +71,17 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
         return buf.toString();
     }
 
-    protected PropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
+    protected TnPropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
         if (0 == propertyNames.length) {
             String msg = "The property name was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        List<PropertyType> types = new ArrayList<PropertyType>();
+        List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
 
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = bmd.getPropertyType(propertyNames[i]);
+            TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
                 final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
                 if (!generator.isSelfGenerate()) {
@@ -102,7 +102,7 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
             String msg = "The target property type was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
+        TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
         return propertyTypes;
     }
 

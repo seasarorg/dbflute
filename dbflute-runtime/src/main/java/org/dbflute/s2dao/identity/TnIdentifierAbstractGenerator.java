@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.beans.PropertyDesc;
@@ -26,13 +26,13 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected PropertyType propertyType;
+    protected TnPropertyType propertyType;
     protected ResultSetHandler resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnIdentifierAbstractGenerator(PropertyType propertyType) {
+    public TnIdentifierAbstractGenerator(TnPropertyType propertyType) {
         this.propertyType = propertyType;
         resultSetHandler = new InternalIdentifierResultSetHandler(propertyType.getValueType());
     }

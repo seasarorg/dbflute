@@ -26,7 +26,7 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.util.ClassUtil;
@@ -47,7 +47,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    public Object createRow(ResultSet rs, Map<String, PropertyType> propertyCache, Class<?> beanClass)
+    public Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache, Class<?> beanClass)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
@@ -56,7 +56,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
         final Set<String> columnNameSet = propertyCache.keySet();
         for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
             final String columnName = ite.next();
-            final PropertyType pt = (PropertyType) propertyCache.get(columnName);
+            final TnPropertyType pt = (TnPropertyType) propertyCache.get(columnName);
             registerValue(rs, row, pt, columnName);
         }
         return row;
@@ -66,7 +66,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
         return ClassUtil.newInstance(beanClass);
     }
 
-    protected void registerValue(ResultSet rs, Object row, PropertyType pt, String name) throws SQLException {
+    protected void registerValue(ResultSet rs, Object row, TnPropertyType pt, String name) throws SQLException {
         final ValueType valueType = pt.getValueType();
         final Object value = valueType.getValue(rs, name);
         final PropertyDesc pd = pt.getPropertyDesc();
@@ -85,22 +85,22 @@ public class TnRowCreatorImpl implements TnRowCreator {
      * @return The map of property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    public Map<String, PropertyType> createPropertyCache(Set<String> columnNames, TnBeanMetaData beanMetaData)
+    public Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnBeanMetaData beanMetaData)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final Map<String, PropertyType> proprertyCache = newPropertyCache();
+        final Map<String, TnPropertyType> proprertyCache = newPropertyCache();
         setupPropertyCache(proprertyCache, columnNames, beanMetaData);
         return proprertyCache;
     }
 
-    protected void setupPropertyCache(Map<String, PropertyType> proprertyCache, Set<String> columnNames,
+    protected void setupPropertyCache(Map<String, TnPropertyType> proprertyCache, Set<String> columnNames,
             TnBeanMetaData beanMetaData) throws SQLException {
-        Map<String, PropertyType> propertyTypeMap = beanMetaData.getPropertyTypeMap();
+        Map<String, TnPropertyType> propertyTypeMap = beanMetaData.getPropertyTypeMap();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             if (!isTargetProperty(pt)) {
                 continue;
             }
@@ -108,8 +108,8 @@ public class TnRowCreatorImpl implements TnRowCreator {
         }
     }
 
-    protected void setupPropertyCacheElement(Map<String, PropertyType> proprertyCache, Set<String> columnNames,
-            PropertyType pt) throws SQLException {
+    protected void setupPropertyCacheElement(Map<String, TnPropertyType> proprertyCache, Set<String> columnNames,
+            TnPropertyType pt) throws SQLException {
         if (columnNames.contains(pt.getColumnName())) {
             proprertyCache.put(pt.getColumnName(), pt);
         } else if (columnNames.contains(pt.getPropertyName())) {
@@ -119,8 +119,8 @@ public class TnRowCreatorImpl implements TnRowCreator {
         }
     }
 
-    protected void setupPropertyCacheNotPersistentElement(Map<String, PropertyType> proprertyCache,
-            Set<String> columnNames, PropertyType pt) throws SQLException {
+    protected void setupPropertyCacheNotPersistentElement(Map<String, TnPropertyType> proprertyCache,
+            Set<String> columnNames, TnPropertyType pt) throws SQLException {
         for (Iterator<String> iter = columnNames.iterator(); iter.hasNext();) {
             String columnName = (String) iter.next();
             String columnName2 = StringUtil.replace(columnName, "_", "");
@@ -140,22 +140,22 @@ public class TnRowCreatorImpl implements TnRowCreator {
      * @return The map of property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    public Map<String, PropertyType> createPropertyCache(Set<String> columnNames, TnDtoMetaData dtoMetaData)
+    public Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnDtoMetaData dtoMetaData)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final Map<String, PropertyType> proprertyCache = newPropertyCache();
+        final Map<String, TnPropertyType> proprertyCache = newPropertyCache();
         setupPropertyCache(proprertyCache, columnNames, dtoMetaData);
         return proprertyCache;
     }
 
-    protected void setupPropertyCache(Map<String, PropertyType> proprertyCache, Set<String> columnNames,
+    protected void setupPropertyCache(Map<String, TnPropertyType> proprertyCache, Set<String> columnNames,
             TnDtoMetaData dtoMetaData) throws SQLException {
-        Map<String, PropertyType> propertyTypeMap = dtoMetaData.getPropertyTypeMap();
+        Map<String, TnPropertyType> propertyTypeMap = dtoMetaData.getPropertyTypeMap();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             if (!isTargetProperty(pt)) {
                 continue;
             }
@@ -175,14 +175,14 @@ public class TnRowCreatorImpl implements TnRowCreator {
     // -----------------------------------------------------
     //                                                Common
     //                                                ------
-    protected Map<String, PropertyType> newPropertyCache() {
-        return new HashMap<String, PropertyType>();
+    protected Map<String, TnPropertyType> newPropertyCache() {
+        return new HashMap<String, TnPropertyType>();
     }
 
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
-    protected boolean isTargetProperty(PropertyType pt) throws SQLException {
+    protected boolean isTargetProperty(TnPropertyType pt) throws SQLException {
         // If the property is not writable, the property is out of target!
         return pt.getPropertyDesc().isWritable();
     }

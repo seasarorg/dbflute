@@ -11,7 +11,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -21,7 +21,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
 	// ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private PropertyType[] propertyTypes;
+    private TnPropertyType[] propertyTypes;
     protected boolean optimisticLockHandling;
     protected boolean versionNoAutoIncrementOnMemory;
 
@@ -55,11 +55,11 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         return new EntityAlreadyUpdatedException(bean, rows);
     }
 
-    protected PropertyType[] getPropertyTypes() {
+    protected TnPropertyType[] getPropertyTypes() {
         return propertyTypes;
     }
 
-    protected void setPropertyTypes(PropertyType[] propertyTypes) {
+    protected void setPropertyTypes(TnPropertyType[] propertyTypes) {
         this.propertyTypes = propertyTypes;
     }
 
@@ -68,17 +68,17 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     protected abstract void setupPropertyTypes(String[] propertyNames);
 
     protected void setupInsertPropertyTypes(String[] propertyNames) {
-        List<PropertyType> types = new ArrayList<PropertyType>();
+        List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
+            TnPropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (isInsertTarget(pt)) {
                 types.add(pt);
             }
         }
-        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
+        propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
     }
 
-    protected boolean isInsertTarget(PropertyType propertyType) {
+    protected boolean isInsertTarget(TnPropertyType propertyType) {
         if (propertyType.isPrimaryKey()) {
             String name = propertyType.getPropertyName();
             final TnIdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
@@ -88,9 +88,9 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     }
 
     protected void setupUpdatePropertyTypes(String[] propertyNames) {
-        List<PropertyType> types = new ArrayList<PropertyType>();
+        List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
+            TnPropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
                 continue;
             }
@@ -101,7 +101,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             msg = msg + " propertyNames=" + Arrays.asList(propertyNames);
             throw new IllegalStateException(msg);
         }
-        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
+        propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
     }
 
     protected void setupDeletePropertyTypes(String[] propertyNames) {
@@ -116,7 +116,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         sb.append(bmd.getTableName());
         sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
                 sb.append(pt.getColumnName());
                 sb.append(", ");
@@ -125,7 +125,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         sb.setLength(sb.length() - 2);
         sb.append(") values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
                 sb.append("?, ");
             }
@@ -143,7 +143,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         sb.append(" set ");
         String versionNoPropertyName = getBeanMetaData().getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName) && !versionNoAutoIncrementOnMemory) {
                 sb.append(pt.getColumnName()).append(" = ").append(pt.getColumnName()).append(" + 1, ");
                 continue;
@@ -181,11 +181,11 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         }
         sb.setLength(sb.length() - 5);
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
-            PropertyType pt = bmd.getVersionNoPropertyType();
+            TnPropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
-            PropertyType pt = bmd.getTimestampPropertyType();
+            TnPropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
     }

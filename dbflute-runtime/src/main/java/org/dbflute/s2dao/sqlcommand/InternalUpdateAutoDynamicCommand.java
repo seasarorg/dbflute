@@ -6,7 +6,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.XLog;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalUpdateAutoHandler;
@@ -44,7 +44,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     public Object execute(Object[] args) {
         final Object bean = args[0];
         final TnBeanMetaData bmd = getBeanMetaData();
-        final PropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames());
+        final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames());
         if (propertyTypes.length == 0) {
             if (isLogEnabled()) {
                 log(createNoUpdateLogMessage(bean, bmd));
@@ -64,19 +64,19 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         return new Integer(i);
     }
 
-    protected InternalUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, PropertyType[] propertyTypes) {
+    protected InternalUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
         InternalUpdateAutoHandler handler = new InternalUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setOptimisticLockHandling(optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         return handler;
     }
 
-    protected PropertyType[] createUpdatePropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
-        final List<PropertyType> types = new ArrayList<PropertyType>();
+    protected TnPropertyType[] createUpdatePropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
+        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = bmd.getPropertyType(propertyNames[i]);
+            TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey() == false) {
                 String propertyName = pt.getPropertyName();
                 if (propertyName.equalsIgnoreCase(timestampPropertyName)
@@ -91,7 +91,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             msg = msg + " propertyNames=" + propertyNames;
             throw new IllegalStateException(msg);
         }
-        PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
+        TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
         return propertyTypes;
     }
 
@@ -123,7 +123,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
      * @param bean A bean for update for handling version no and so on. (NotNull)
      * @return The update SQL. (NotNull)
      */
-    protected String createUpdateSql(TnBeanMetaData bmd, PropertyType[] propertyTypes, Object bean) {
+    protected String createUpdateSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes, Object bean) {
         if (bmd.getPrimaryKeySize() == 0) {
             String msg = "The table '" + bmd.getTableName() + "' does not have primary keys!";
             throw new IllegalStateException(msg);
@@ -134,7 +134,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         sb.append(" set ");
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
-            PropertyType pt = propertyTypes[i];
+            TnPropertyType pt = propertyTypes[i];
             final String columnName = pt.getColumnName();
             if (i > 0) {
                 sb.append(", ");
@@ -158,11 +158,11 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         sb.setLength(sb.length() - 5);
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
-            PropertyType pt = bmd.getVersionNoPropertyType();
+            TnPropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
-            PropertyType pt = bmd.getTimestampPropertyType();
+            TnPropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
         }
         return sb.toString();

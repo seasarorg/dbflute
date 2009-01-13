@@ -11,14 +11,14 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
 
@@ -197,7 +197,7 @@ public class InternalProcedureHandler extends InternalBasicSelectHandler {
     //                                                              ======================
     protected static abstract class InternalAbstractMapResultSetHandler implements ResultSetHandler {
 
-        protected Map<String, Object> createRow(ResultSet rs, PropertyType[] propertyTypes) throws SQLException {
+        protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
             Map<String, Object> row = StringKeyMap.createAsFlexible();
             for (int i = 0; i < propertyTypes.length; ++i) {
                 Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
@@ -206,13 +206,13 @@ public class InternalProcedureHandler extends InternalBasicSelectHandler {
             return row;
         }
 
-        protected PropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
+        protected TnPropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
             int count = rsmd.getColumnCount();
-            PropertyType[] propertyTypes = new PropertyType[count];
+            TnPropertyType[] propertyTypes = new TnPropertyType[count];
             for (int i = 0; i < count; ++i) {
                 String propertyName = rsmd.getColumnLabel(i + 1);
                 ValueType valueType = ValueTypes.getValueType(rsmd.getColumnType(i + 1));
-                propertyTypes[i] = new PropertyTypeImpl(propertyName, valueType);
+                propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
             }
             return propertyTypes;
         }
@@ -221,7 +221,7 @@ public class InternalProcedureHandler extends InternalBasicSelectHandler {
     protected static class InternalMapListResultSetHandler extends InternalAbstractMapResultSetHandler {
 
         public Object handle(ResultSet resultSet) throws SQLException {
-            PropertyType[] propertyTypes = createPropertyTypes(resultSet.getMetaData());
+            TnPropertyType[] propertyTypes = createPropertyTypes(resultSet.getMetaData());
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
             while (resultSet.next()) {
                 list.add(createRow(resultSet, propertyTypes));

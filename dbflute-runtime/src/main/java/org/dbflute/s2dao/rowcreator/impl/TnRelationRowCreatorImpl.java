@@ -25,7 +25,7 @@ import java.util.Set;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.util.ClassUtil;
@@ -48,7 +48,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * @throws SQLException
      */
     public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues, Map<String, Map<String, PropertyType>> relationPropertyCache)
+            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
@@ -60,7 +60,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
             Set<String> columnNames, Map<String, Object> relKeyValues,
-            Map<String, Map<String, PropertyType>> relationPropertyCache) throws SQLException {
+            Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
@@ -117,7 +117,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             }
 
             final String yourKey = rpt.getYourKey(i);
-            final PropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
+            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
             final PropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
             continue;
@@ -125,11 +125,11 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
-        final Map<String, PropertyType> propertyCacheElement = res.extractPropertyCacheElement();
+        final Map<String, TnPropertyType> propertyCacheElement = res.extractPropertyCacheElement();
         final Set<String> columnNameCacheElementKeySet = propertyCacheElement.keySet();
         for (final Iterator<String> ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
             final String columnName = (String) ite.next();
-            final PropertyType pt = (PropertyType) propertyCacheElement.get(columnName);
+            final TnPropertyType pt = (TnPropertyType) propertyCacheElement.get(columnName);
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) {
                 res.clearRowInstance();
@@ -167,7 +167,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
-        final PropertyType pt = res.getCurrentPropertyType();
+        final TnPropertyType pt = res.getCurrentPropertyType();
         Object value = null;
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
@@ -180,7 +180,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         }
     }
 
-    protected void registerRelationValidValue(TnRelationRowCreationResource res, PropertyType pt, Object value)
+    protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
             throws SQLException {
         res.incrementValidValueCount();
         final PropertyDesc pd = pt.getPropertyDesc();
@@ -237,12 +237,12 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    public Map<String, Map<String, PropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
+    public Map<String, Map<String, TnPropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final Map<String, Map<String, PropertyType>> relationPropertyCache = newRelationPropertyCache();
+        final Map<String, Map<String, TnPropertyType>> relationPropertyCache = newRelationPropertyCache();
         for (int i = 0; i < bmd.getRelationPropertyTypeSize(); ++i) {
             final TnRelationPropertyType rpt = bmd.getRelationPropertyType(i);
             final String baseSuffix = "";
@@ -258,7 +258,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Set<String> columnNames, Map<String, Map<String, PropertyType>> relationPropertyCache, String baseSuffix,
+            Set<String> columnNames, Map<String, Map<String, TnPropertyType>> relationPropertyCache, String baseSuffix,
             String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
         res.setRelationPropertyType(rpt);
@@ -284,10 +284,10 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        Map<String, PropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
+        Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             res.setCurrentPropertyType(pt);
             if (!isTargetProperty(res)) {
                 continue;
@@ -343,8 +343,8 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     // -----------------------------------------------------
     //                                                Common
     //                                                ------
-    protected Map<String, Map<String, PropertyType>> newRelationPropertyCache() {
-        return new HashMap<String, Map<String, PropertyType>>();
+    protected Map<String, Map<String, TnPropertyType>> newRelationPropertyCache() {
+        return new HashMap<String, Map<String, TnPropertyType>>();
     }
 
     // ===================================================================================
@@ -370,7 +370,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
-        final PropertyType pt = res.getCurrentPropertyType();
+        final TnPropertyType pt = res.getCurrentPropertyType();
         return pt.getPropertyDesc().isWritable();
     }
 

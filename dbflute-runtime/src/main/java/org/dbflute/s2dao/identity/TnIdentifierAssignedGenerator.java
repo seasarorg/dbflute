@@ -2,7 +2,7 @@ package org.dbflute.s2dao.identity;
 
 import javax.sql.DataSource;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -12,7 +12,7 @@ public class TnIdentifierAssignedGenerator extends TnIdentifierAbstractGenerator
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnIdentifierAssignedGenerator(PropertyType propertyType) {
+    public TnIdentifierAssignedGenerator(TnPropertyType propertyType) {
         super(propertyType);
     }
 

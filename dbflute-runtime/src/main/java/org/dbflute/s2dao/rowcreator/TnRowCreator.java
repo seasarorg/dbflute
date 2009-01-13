@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
@@ -36,7 +36,7 @@ public interface TnRowCreator {
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    Object createRow(ResultSet rs, Map<String, PropertyType> columnPropertyTypeMap, Class<?> beanClass)
+    Object createRow(ResultSet rs, Map<String, TnPropertyType> columnPropertyTypeMap, Class<?> beanClass)
             throws SQLException;
 
     /**
@@ -45,7 +45,7 @@ public interface TnRowCreator {
      * @return The map of row property cache. The key is String(columnName) and the value is PropertyType. (NotNull)
      * @throws SQLException
      */
-    Map<String, PropertyType> createPropertyCache(Set<String> columnNames, TnBeanMetaData beanMetaData)
+    Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnBeanMetaData beanMetaData)
             throws SQLException;
 
     /**
@@ -54,6 +54,6 @@ public interface TnRowCreator {
      * @return The map of property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    Map<String, PropertyType> createPropertyCache(Set<String> columnNames, TnDtoMetaData dtoMetaData)
+    Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnDtoMetaData dtoMetaData)
             throws SQLException;
 }

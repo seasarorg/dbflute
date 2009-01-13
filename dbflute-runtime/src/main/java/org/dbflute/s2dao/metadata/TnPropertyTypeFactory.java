@@ -15,14 +15,14 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * @author jflute
  */
 public interface TnPropertyTypeFactory {
 
-    PropertyType[] createDtoPropertyTypes();
-    PropertyType[] createBeanPropertyTypes(String tableName);
+    TnPropertyType[] createDtoPropertyTypes();
+    TnPropertyType[] createBeanPropertyTypes(String tableName);
 
 }

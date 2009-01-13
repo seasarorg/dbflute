@@ -21,9 +21,9 @@ import java.util.List;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.dbflute.s2dao.beans.factory.BeanDescFactory;
@@ -44,15 +44,15 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         this.valueTypeFactory = valueTypeFactory;
     }
 
-    public PropertyType[] createDtoPropertyTypes() {
-        List<PropertyType> list = new ArrayList<PropertyType>();
+    public TnPropertyType[] createDtoPropertyTypes() {
+        List<TnPropertyType> list = new ArrayList<TnPropertyType>();
         BeanDesc beanDesc = getBeanDesc();
         for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
             PropertyDesc pd = beanDesc.getPropertyDesc(i);
-            PropertyType pt = createPropertyType(pd);
+            TnPropertyType pt = createPropertyType(pd);
             list.add(pt);
         }
-        return (PropertyType[]) list.toArray(new PropertyType[list.size()]);
+        return (TnPropertyType[]) list.toArray(new TnPropertyType[list.size()]);
     }
 
     /**
@@ -84,12 +84,12 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         return beanAnnotationReader.getId(propertyDesc) != null;
     }
 
-    protected abstract boolean isPersistent(PropertyType propertyType);
+    protected abstract boolean isPersistent(TnPropertyType propertyType);
 
-    protected PropertyType createPropertyType(PropertyDesc propertyDesc) {
+    protected TnPropertyType createPropertyType(PropertyDesc propertyDesc) {
         final String columnName = getColumnName(propertyDesc);
         final ValueType valueType = getValueType(propertyDesc);
-        return new PropertyTypeImpl(propertyDesc, valueType, columnName);
+        return new TnPropertyTypeImpl(propertyDesc, valueType, columnName);
     }
 
     protected String getColumnName(PropertyDesc propertyDesc) {

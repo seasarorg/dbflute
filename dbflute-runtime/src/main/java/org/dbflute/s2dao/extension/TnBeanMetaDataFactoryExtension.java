@@ -12,7 +12,7 @@ import org.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
@@ -117,7 +117,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // The attributes 'identifierGenerators' and 'identifierGeneratorsByPropertyName'
             // of super class are unused. It prepares original atributes here.
             @Override
-            protected void setupIdentifierGenerator(PropertyType propertyType) {
+            protected void setupIdentifierGenerator(TnPropertyType propertyType) {
                 final PropertyDesc pd = propertyType.getPropertyDesc();
                 final String propertyName = propertyType.getPropertyName();
                 final String idType = beanAnnotationReader.getId(pd);
@@ -126,7 +126,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
                 _internalIdentifierGeneratorsByPropertyName.put(propertyName, generator);
             }
 
-            protected TnIdentifierGenerator createInternalIdentifierGenerator(PropertyType propertyType, String idType) {
+            protected TnIdentifierGenerator createInternalIdentifierGenerator(TnPropertyType propertyType, String idType) {
                 return TnIdentifierGeneratorFactory.createIdentifierGenerator(propertyType, idType);
             }
 

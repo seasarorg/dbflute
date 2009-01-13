@@ -14,7 +14,7 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.beans.PropertyDesc;
 
@@ -67,7 +67,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
 
             final String yourKey = rpt.getYourKey(i);
-            final PropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
+            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
             final PropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
             continue;
@@ -92,7 +92,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
         for (final Iterator ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
             final String columnName = (String) ite.next();
-            final PropertyType pt = (PropertyType) propertyCacheElement.get(columnName);
+            final TnPropertyType pt = (TnPropertyType) propertyCacheElement.get(columnName);
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) {
                 res.clearRowInstance();
@@ -112,7 +112,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     
     @Override
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
-        final PropertyType pt = res.getCurrentPropertyType();
+        final TnPropertyType pt = res.getCurrentPropertyType();
         Object value = null;
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
@@ -156,10 +156,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        Map<String, PropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
+        Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             res.setCurrentPropertyType(pt);
             if (!isTargetProperty(res)) {
                 continue;
@@ -182,7 +182,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
-        final PropertyType pt = res.getCurrentPropertyType();
+        final TnPropertyType pt = res.getCurrentPropertyType();
         if (!pt.getPropertyDesc().hasWriteMethod()) {
             return false;
         }

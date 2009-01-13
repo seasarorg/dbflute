@@ -10,7 +10,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 
 
 /**
@@ -134,10 +134,10 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
 
     protected String[] getPersistentPropertyNames(TnBeanMetaData bmd) {
         final List<String> nameList = new ArrayList<String>();
-        Map<String, PropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
+        Map<String, TnPropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
         Set<String> keySet = propertyTypeMap.keySet();
         for (String key : keySet) {
-            PropertyType pt = propertyTypeMap.get(key);
+            TnPropertyType pt = propertyTypeMap.get(key);
             if (pt.isPersistent()) {
                 nameList.add(pt.getPropertyName());
             }

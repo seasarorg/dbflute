@@ -22,7 +22,7 @@ import org.seasar.extension.jdbc.ValueType;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public interface PropertyType {
+public interface TnPropertyType {
 
     PropertyDesc getPropertyDesc();
 

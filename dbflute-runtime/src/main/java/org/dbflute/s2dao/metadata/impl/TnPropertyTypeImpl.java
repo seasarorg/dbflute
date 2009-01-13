@@ -16,7 +16,7 @@
 package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
@@ -24,7 +24,7 @@ import org.seasar.extension.jdbc.types.ValueTypes;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class PropertyTypeImpl implements PropertyType {
+public class TnPropertyTypeImpl implements TnPropertyType {
 
     private PropertyDesc propertyDesc;
 
@@ -38,26 +38,26 @@ public class PropertyTypeImpl implements PropertyType {
 
     private boolean persistent = true;
 
-    public PropertyTypeImpl(PropertyDesc propertyDesc) {
+    public TnPropertyTypeImpl(PropertyDesc propertyDesc) {
         this(propertyDesc, ValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
 
-    public PropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType) {
+    public TnPropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType) {
         this(propertyDesc, valueType, propertyDesc.getPropertyName());
     }
 
-    public PropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType, String columnName) {
         this.propertyDesc = propertyDesc;
         this.propertyName = propertyDesc.getPropertyName();
         this.valueType = valueType;
         this.columnName = columnName;
     }
 
-    public PropertyTypeImpl(String propertyName, ValueType valueType) {
+    public TnPropertyTypeImpl(String propertyName, ValueType valueType) {
         this(propertyName, valueType, propertyName);
     }
 
-    public PropertyTypeImpl(String propertyName, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(String propertyName, ValueType valueType, String columnName) {
         this.propertyName = propertyName;
         this.valueType = valueType;
         this.columnName = columnName;
