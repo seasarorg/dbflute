@@ -17,8 +17,8 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
-import org.dbflute.util.SimpleAssertUtil;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfAssertUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
 
@@ -1541,7 +1541,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
-        return SimpleStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
     
     protected String getLineSeparator() {
@@ -1552,13 +1552,13 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                         Assert Object
     //                                         -------------
     protected void assertObjectNotNull(String variableName, Object value) {
-        SimpleAssertUtil.assertObjectNotNull(variableName, value);
+        DfAssertUtil.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        SimpleAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

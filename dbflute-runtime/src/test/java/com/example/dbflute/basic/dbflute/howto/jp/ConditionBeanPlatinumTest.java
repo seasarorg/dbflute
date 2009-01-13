@@ -14,7 +14,7 @@ import org.dbflute.cbean.SubQuery;
 import org.dbflute.cbean.UnionQuery;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberAddressCB;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
@@ -462,7 +462,7 @@ public class ConditionBeanPlatinumTest extends ContainerTestCase {
         log("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
         String displaySql = cb.toDisplaySql();
         String newLine = getLineSeparator();
-        log(newLine + SimpleStringUtil.replace(displaySql, " union ", newLine + " union "));
+        log(newLine + DfStringUtil.replace(displaySql, " union ", newLine + " union "));
         log("* * * * * * * * * */");
     }
 

@@ -19,7 +19,7 @@ import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.exception.RequiredOptionNotFoundException;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.dbflute.util.TraceViewUtil;
 
@@ -1917,11 +1917,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        return SimpleStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-        return SimpleStringUtil.initCap(str);
+        return DfStringUtil.initCap(str);
     }
 
     protected String getLineSeparator() {

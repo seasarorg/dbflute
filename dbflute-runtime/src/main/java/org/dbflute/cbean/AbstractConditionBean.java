@@ -14,7 +14,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
 
@@ -966,7 +966,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             throw new DerivedReferrerEntityPropertyNotFoundException(msg);
         }
         protected String replaceString(String text, String fromText, String toText) {
-            return SimpleStringUtil.replace(text, fromText, toText);
+            return DfStringUtil.replace(text, fromText, toText);
         }
         protected String getLineSeparator() {
             return SimpleSystemUtil.getLineSeparator();
@@ -1127,7 +1127,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(String str) {
-        return SimpleStringUtil.initCap(str);
+        return DfStringUtil.initCap(str);
     }
     
     protected String getLineSeparator() {

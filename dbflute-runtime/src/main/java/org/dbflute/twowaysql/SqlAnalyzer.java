@@ -16,7 +16,7 @@ import org.dbflute.twowaysql.node.IfNode;
 import org.dbflute.twowaysql.node.Node;
 import org.dbflute.twowaysql.node.PrefixSqlNode;
 import org.dbflute.twowaysql.node.SqlNode;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
 /**
@@ -271,7 +271,7 @@ public class SqlAnalyzer {
     }
 
     protected final String replaceString(String text, String fromText, String toText) {
-        return SimpleStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
 
     // -----------------------------------------------------
@@ -289,11 +289,11 @@ public class SqlAnalyzer {
         }
 
         public static final String replace(String text, String fromText, String toText) {
-            return SimpleStringUtil.replace(text, fromText, toText);
+            return DfStringUtil.replace(text, fromText, toText);
         }
 
         public static String[] split(String str, String delimiter) {
-            return SimpleStringUtil.split(str, delimiter);
+            return DfStringUtil.split(str, delimiter);
         }
     }
 

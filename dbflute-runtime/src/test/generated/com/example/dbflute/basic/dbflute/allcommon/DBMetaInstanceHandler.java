@@ -10,7 +10,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.util.SimpleAssertUtil;
+import org.dbflute.util.DfAssertUtil;
 
 
 /**
@@ -189,13 +189,13 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
     //                                         Assert Object
     //                                         -------------
     protected static void assertObjectNotNull(String variableName, Object value) {
-        SimpleAssertUtil.assertObjectNotNull(variableName, value);
+        DfAssertUtil.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
     protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        SimpleAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

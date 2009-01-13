@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class SimpleStringUtil {
+public class DfStringUtil {
 
     protected static final String[] EMPTY_STRINGS = new String[0];
 

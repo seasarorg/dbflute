@@ -11,8 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.util.SimpleResourceUtil;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfResourceUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
 
@@ -309,11 +309,11 @@ public class OutsideSqlContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected boolean isExistResource(String path) {
-        return SimpleResourceUtil.isExist(path);
+        return DfResourceUtil.isExist(path);
     }
 
     protected String readText(final String path, String sqlFileEncoding) {
-        final InputStream ins = SimpleResourceUtil.getResourceStream(path);
+        final InputStream ins = DfResourceUtil.getResourceStream(path);
         final Reader reader = createInputStreamReader(ins, sqlFileEncoding);
         return readText(reader);
     }
@@ -350,7 +350,7 @@ public class OutsideSqlContext {
     }
 
     protected static String replaceString(String text, String fromText, String toText) {
-        return SimpleStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
     
     protected static String getLineSeparator() {

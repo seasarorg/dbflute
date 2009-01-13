@@ -23,7 +23,7 @@ import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.exception.BindVariableCommentNotFoundPropertyException;
 import org.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
@@ -219,7 +219,7 @@ public class ValueAndTypeSetupper {
     }
 
     protected String initCap(String name) {
-        return SimpleStringUtil.initCap(name);
+        return DfStringUtil.initCap(name);
     }
 
     protected Object invokeGetter(Method method, Object target) {

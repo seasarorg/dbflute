@@ -11,7 +11,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
@@ -134,7 +134,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        return SimpleStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
 
     protected String getLineSeparator() {

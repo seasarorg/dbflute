@@ -5,7 +5,7 @@ import org.dbflute.cbean.coption.parts.SplitOptionParts;
 import org.dbflute.cbean.coption.parts.ToSingleByteOptionParts;
 import org.dbflute.cbean.coption.parts.ToUpperLowerCaseOptionParts;
 import org.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * The class of simple-string-option.
@@ -151,7 +151,7 @@ public class SimpleStringOption implements ConditionOption {
     //                                                                        General Helper
     //                                                                        ==============
     protected String replace(String text, String fromText, String toText) {
-	    return SimpleStringUtil.replace(text, fromText, toText);
+	    return DfStringUtil.replace(text, fromText, toText);
     }
 
     // =====================================================================================

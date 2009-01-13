@@ -4,7 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
@@ -52,7 +52,7 @@ public class TnIdentifierGeneratorFactory {
         if (annotation == null) {
             return new TnIdentifierAssignedGenerator(propertyType);
         }
-        String[] array = SimpleStringUtil.split(annotation, "=, ");
+        String[] array = DfStringUtil.split(annotation, "=, ");
         Class<?> clazz = getGeneratorClass(array[0]);
         TnIdentifierGenerator generator = createIdentifierGenerator(clazz, propertyType);
         for (int i = 1; i < array.length; i += 2) {

@@ -3,7 +3,7 @@ package org.dbflute.util;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class SimpleAssertUtil {
+public class DfAssertUtil {
 
     // ===================================================================================
     //                                                                              Object

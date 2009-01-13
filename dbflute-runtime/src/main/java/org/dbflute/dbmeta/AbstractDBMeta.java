@@ -23,8 +23,8 @@ import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.helper.mapstring.MapStringBuilder;
 import org.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
-import org.dbflute.util.SimpleAssertUtil;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfAssertUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
 
@@ -1165,15 +1165,15 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       String Handling
     //                                       ---------------
     protected final String replaceString(String text, String fromText, String toText) {
-	    return SimpleStringUtil.replace(text, fromText, toText);
+	    return DfStringUtil.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-	    return SimpleStringUtil.initCap(str);
+	    return DfStringUtil.initCap(str);
     }
 
     protected String initUncap(String str) {
-	    return SimpleStringUtil.initUncap(str);
+	    return DfStringUtil.initUncap(str);
     }
 
     protected String getLineSeparator() {
@@ -1247,7 +1247,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      * @param value Value. (NotNull)
      */
     protected void assertObjectNotNull(String variableName, Object value) {
-        SimpleAssertUtil.assertObjectNotNull(variableName, value);
+        DfAssertUtil.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
@@ -1259,6 +1259,6 @@ public abstract class AbstractDBMeta implements DBMeta {
      * @param value Value. (NotNull)
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        SimpleAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

@@ -25,7 +25,7 @@ import java.util.Set;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
@@ -164,7 +164,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
             } else if (columnNames.contains(pt.getPropertyName())) {
                 proprertyCache.put(pt.getPropertyName(), pt);
             } else {
-                String possibleName = SimpleStringUtil.fromPropertyNameToColumnName(pt.getPropertyName());
+                String possibleName = DfStringUtil.fromPropertyNameToColumnName(pt.getPropertyName());
                 if (columnNames.contains(possibleName)) {
                     proprertyCache.put(possibleName, pt);
                 }

@@ -8,7 +8,7 @@ import java.net.URLConnection;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class SimpleResourceUtil {
+public class DfResourceUtil {
 
     // ===================================================================================
     //                                                                       Resource Path

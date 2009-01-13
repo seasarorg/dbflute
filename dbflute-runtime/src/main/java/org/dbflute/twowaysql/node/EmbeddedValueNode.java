@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.dbflute.twowaysql.context.CommandContext;
-import org.dbflute.util.SimpleStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -41,7 +41,7 @@ public class EmbeddedValueNode extends AbstractNode {
     public EmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
-        this._names = SimpleStringUtil.split(expression, ".");
+        this._names = DfStringUtil.split(expression, ".");
         this._specifiedSql = specifiedSql;
         this._blockNullParameter = blockNullParameter;
     }
