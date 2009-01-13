@@ -15,48 +15,28 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import org.seasar.framework.exception.SRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class PropertyNotFoundRuntimeException extends SRuntimeException {
+public class PropertyNotFoundRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = -5177019197796206774L;
+    private static final long serialVersionUID = 1L;
 
-    private Class targetClass;
+    private Class<?> targetClass;
 
     private String propertyName;
 
-    /**
-     * {@link PropertyNotFoundRuntimeException}を返します。
-     * 
-     * @param componentClass
-     * @param propertyName
-     */
-    public PropertyNotFoundRuntimeException(Class componentClass,
-            String propertyName) {
-        super("ESSR0065",
-                new Object[] { componentClass.getName(), propertyName });
+    public PropertyNotFoundRuntimeException(Class<?> componentClass, String propertyName) {
+        super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
         this.targetClass = componentClass;
         this.propertyName = propertyName;
     }
 
-    /**
-     * ターゲットの{@link Class}を返します。
-     * 
-     * @return ターゲットの{@link Class}
-     */
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    /**
-     * プロパティ名を返します。
-     * 
-     * @return
-     */
     public String getPropertyName() {
         return propertyName;
     }

@@ -15,37 +15,23 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import java.lang.reflect.Method;
-
-import org.seasar.framework.exception.SRuntimeException;
-import org.seasar.framework.util.MethodUtil;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class MethodNotFoundRuntimeException extends SRuntimeException {
+public class MethodNotFoundRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = -3508955801981550317L;
+    private static final long serialVersionUID = 1L;
 
-    private Class targetClass;
+    private Class<?> targetClass;
 
     private String methodName;
 
-    private Class[] methodArgClasses;
+    private Class<?>[] methodArgClasses;
 
-    /**
-     * {@link MethodNotFoundRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param methodName
-     * @param methodArgs
-     */
-    public MethodNotFoundRuntimeException(Class targetClass, String methodName,
-            Object[] methodArgs) {
-
-        super("ESSR0049", new Object[] { targetClass.getName(),
-                MethodUtil.getSignature(methodName, methodArgs) });
+    public MethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Object[] methodArgs) {
+        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
+                + getSignature(methodArgs));
         this.targetClass = targetClass;
         this.methodName = methodName;
         if (methodArgs != null) {
@@ -56,51 +42,59 @@ public class MethodNotFoundRuntimeException extends SRuntimeException {
                 }
             }
         }
-
     }
 
-    /**
-     * {@link MethodNotFoundRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param methodName
-     * @param methodArgClasses
-     */
-    public MethodNotFoundRuntimeException(Class targetClass, String methodName,
-            Class[] methodArgClasses) {
-
-        super("ESSR0049", new Object[] { targetClass.getName(),
-                MethodUtil.getSignature(methodName, methodArgClasses) });
+    public MethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
+        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
+                + getSignature(methodArgClasses));
         this.targetClass = targetClass;
         this.methodName = methodName;
         this.methodArgClasses = methodArgClasses;
     }
 
-    /**
-     * ターゲットの{@link Class}を返します。
-     * 
-     * @return ターゲットの{@link Class}
-     */
-    public Class getTargetClass() {
+    private static String getSignature(Object[] methodArgs) {
+        StringBuffer buf = new StringBuffer(100);
+        if (methodArgs != null) {
+            for (int i = 0; i < methodArgs.length; ++i) {
+                if (i > 0) {
+                    buf.append(", ");
+                }
+                if (methodArgs[i] != null) {
+                    buf.append(methodArgs[i].getClass().getName());
+                } else {
+                    buf.append("null");
+                }
+            }
+        }
+        return buf.toString();
+    }
+
+    private static String getSignature(Class<?>[] paramTypes) {
+        StringBuffer buf = new StringBuffer(100);
+        if (paramTypes != null) {
+            for (int i = 0; i < paramTypes.length; ++i) {
+                if (i > 0) {
+                    buf.append(", ");
+                }
+                if (paramTypes[i] != null) {
+                    buf.append(paramTypes[i].getName());
+                } else {
+                    buf.append("null");
+                }
+            }
+        }
+        return buf.toString();
+    }
+
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    /**
-     * メソッド名を返します。
-     * 
-     * @return メソッド名
-     */
     public String getMethodName() {
         return methodName;
     }
 
-    /**
-     * メソッドの引数の{@link Class}の配列を返します。
-     * 
-     * @return メソッドの引数の{@link Class}の配列
-     */
-    public Class[] getMethodArgClasses() {
+    public Class<?>[] getMethodArgClasses() {
         return methodArgClasses;
     }
-
 }

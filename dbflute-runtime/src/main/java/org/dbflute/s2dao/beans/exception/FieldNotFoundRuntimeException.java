@@ -28,7 +28,7 @@ public class FieldNotFoundRuntimeException extends RuntimeException {
     private String fieldName;
 
     public FieldNotFoundRuntimeException(Class<?> targetClass, String fieldName) {
-        super("The field was not found: targetClass=" + targetClass.getClass() + " fieldName=" + fieldName);
+        super("The field was not found: class=" + targetClass.getName() + " field=" + fieldName);
         this.targetClass = targetClass;
         this.fieldName = fieldName;
     }

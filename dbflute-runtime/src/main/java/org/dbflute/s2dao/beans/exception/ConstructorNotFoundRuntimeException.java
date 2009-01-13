@@ -41,18 +41,6 @@ public class ConstructorNotFoundRuntimeException extends RuntimeException {
         this.paramTypes = paramTypes;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
-    }
-
-    public Object[] getMethodArgs() {
-        return methodArgs;
-    }
-
-    public Class<?>[] getParamTypes() {
-        return paramTypes;
-    }
-
     private static String getSignature(Object[] methodArgs) {
         StringBuffer buf = new StringBuffer(100);
         if (methodArgs != null) {
@@ -85,5 +73,17 @@ public class ConstructorNotFoundRuntimeException extends RuntimeException {
             }
         }
         return buf.toString();
+    }
+
+    public Class<?> getTargetClass() {
+        return targetClass;
+    }
+
+    public Object[] getMethodArgs() {
+        return methodArgs;
+    }
+
+    public Class<?>[] getParamTypes() {
+        return paramTypes;
     }
 }

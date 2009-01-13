@@ -28,16 +28,25 @@ import org.dbflute.s2dao.beans.ParameterizedClassDesc;
  */
 public class ParameterizedClassDescFactory {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     protected static final String PROVIDER_CLASS_NAME = ParameterizedClassDescFactory.class.getName() + "Provider";
     protected static final Provider provider = createProvider();
 
-    public static Map getTypeVariables(Class beanClass) {
+    // ===================================================================================
+    //                                                                      Type Variables
+    //                                                                      ==============
+    public static Map getTypeVariables(Class<?> beanClass) {
         if (provider == null) {
             return Collections.EMPTY_MAP;
         }
         return provider.getTypeVariables(beanClass);
     }
 
+    // ===================================================================================
+    //                                                     Parameterized Class Description
+    //                                                     ===============================
     public static ParameterizedClassDesc createParameterizedClassDesc(final Field field, final Map map) {
         if (provider == null) {
             return null;
@@ -62,7 +71,7 @@ public class ParameterizedClassDescFactory {
 
     protected static Provider createProvider() {
         try {
-            final Class clazz = Class.forName(PROVIDER_CLASS_NAME);
+            final Class<?> clazz = Class.forName(PROVIDER_CLASS_NAME);
             return (Provider) clazz.newInstance();
         } catch (final Exception e) {
             return null;
@@ -71,7 +80,7 @@ public class ParameterizedClassDescFactory {
 
     public interface Provider {
 
-        Map getTypeVariables(Class beanClass);
+        Map getTypeVariables(Class<?> beanClass);
 
         ParameterizedClassDesc createParameterizedClassDesc(Field field, Map map);
 

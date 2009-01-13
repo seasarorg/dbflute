@@ -16,44 +16,44 @@
 package org.dbflute.s2dao.beans.factory;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.impl.BeanDescImpl;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
-import org.seasar.framework.util.MapUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class BeanDescFactory {
-
+    
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static volatile boolean initialized;
 
-    private static Map beanDescCache = MapUtil.createHashMap(1024);
+    private static Map<Class<?>, BeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, BeanDesc>(1024);
 
     static {
         initialize();
     }
 
-    /**
-     * インスタンスを構築します。
-     */
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     protected BeanDescFactory() {
     }
 
-    /**
-     * {@link BeanDesc}を返します。
-     * 
-     * @param clazz
-     * @return {@link BeanDesc}
-     */
-    public static BeanDesc getBeanDesc(Class clazz) {
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    public static BeanDesc getBeanDesc(Class<?> clazz) {
         if (!initialized) {
             initialize();
         }
-        BeanDesc beanDesc = (BeanDesc) beanDescCache.get(clazz);
+        BeanDesc beanDesc = beanDescCache.get(clazz);
         if (beanDesc == null) {
             beanDesc = new BeanDescImpl(clazz);
             beanDescCache.put(clazz, beanDesc);
@@ -61,9 +61,6 @@ public class BeanDescFactory {
         return beanDesc;
     }
 
-    /**
-     * 初期化を行ないます。
-     */
     public static void initialize() {
         DisposableUtil.add(new Disposable() {
             public void dispose() {
@@ -73,9 +70,6 @@ public class BeanDescFactory {
         initialized = true;
     }
 
-    /**
-     * キャッシュをクリアします。
-     */
     public static void clear() {
         beanDescCache.clear();
         initialized = false;

@@ -15,42 +15,28 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import org.seasar.framework.exception.SRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class IllegalPropertyRuntimeException extends SRuntimeException {
+public class IllegalPropertyRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = 3584516316082904020L;
+    private static final long serialVersionUID = 1L;
 
-    private Class targetClass;
+    private Class<?> targetClass;
 
     private String propertyName;
 
-    public IllegalPropertyRuntimeException(Class targetClass,
-            String propertyName, Throwable cause) {
-        super("ESSR0059", new Object[] { targetClass.getName(), propertyName,
-                cause }, cause);
+    public IllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
+        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
         this.targetClass = targetClass;
         this.propertyName = propertyName;
     }
 
-    /**
-     * ターゲットの{@link Class}を返します。
-     * 
-     * @return ターゲットの{@link Class}
-     */
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    /**
-     * プロパティ名を返します。
-     * 
-     * @return プロパティ名
-     */
     public String getPropertyName() {
         return propertyName;
     }

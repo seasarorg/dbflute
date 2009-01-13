@@ -28,7 +28,7 @@ public class ConverterRuntimeException extends RuntimeException {
     private Object value;
 
     public ConverterRuntimeException(String propertyName, Object value, Throwable cause) {
-        super("Failed to convert: propertyName=" + propertyName + " value=" + value, cause);
+        super("Failed to convert: property=" + propertyName + " value=" + value, cause);
         this.propertyName = propertyName;
         this.value = value;
     }
