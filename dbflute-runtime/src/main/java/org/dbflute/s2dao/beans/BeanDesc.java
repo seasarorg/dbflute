@@ -53,23 +53,23 @@ public interface BeanDesc {
 
     Object newInstance(Object[] args) throws ConstructorNotFoundRuntimeException;
 
-    Constructor getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException;
+    Constructor<?> getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException;
 
-    Constructor getConstructor(Class[] paramTypes);
+    Constructor<?> getConstructor(Class<?>[] paramTypes);
 
-    String[] getConstructorParameterNames(final Class[] paramTypes);
+    String[] getConstructorParameterNames(final Class<?>[] paramTypes);
 
-    String[] getConstructorParameterNames(Constructor constructor);
+    String[] getConstructorParameterNames(Constructor<?> constructor);
 
     Object invoke(Object target, String methodName, Object[] args) throws MethodNotFoundRuntimeException;
 
     Method getMethod(String methodName) throws MethodNotFoundRuntimeException;
 
-    Method getMethod(String methodName, Class[] paramTypes) throws MethodNotFoundRuntimeException;
+    Method getMethod(String methodName, Class<?>[] paramTypes) throws MethodNotFoundRuntimeException;
 
     Method getMethodNoException(String methodName);
 
-    Method getMethodNoException(String methodName, Class[] paramTypes);
+    Method getMethodNoException(String methodName, Class<?>[] paramTypes);
 
     Method[] getMethods(String methodName) throws MethodNotFoundRuntimeException;
 
@@ -77,10 +77,10 @@ public interface BeanDesc {
 
     String[] getMethodNames();
 
-    String[] getMethodParameterNames(String methodName, final Class[] paramTypes)
+    String[] getMethodParameterNames(String methodName, final Class<?>[] paramTypes)
             throws MethodNotFoundRuntimeException, IllegalDiiguRuntimeException;
 
-    String[] getMethodParameterNamesNoException(String methodName, final Class[] paramTypes)
+    String[] getMethodParameterNamesNoException(String methodName, final Class<?>[] paramTypes)
             throws MethodNotFoundRuntimeException;
 
     String[] getMethodParameterNames(Method method) throws MethodNotFoundRuntimeException, IllegalDiiguRuntimeException;
