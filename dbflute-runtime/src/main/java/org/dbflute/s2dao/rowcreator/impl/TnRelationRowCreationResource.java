@@ -23,7 +23,7 @@ import java.util.Stack;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 /**
  * @author jflute

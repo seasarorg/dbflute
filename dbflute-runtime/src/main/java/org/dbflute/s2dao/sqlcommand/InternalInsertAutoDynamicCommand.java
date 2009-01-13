@@ -10,7 +10,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalInsertAutoHandler;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)

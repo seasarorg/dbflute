@@ -29,11 +29,11 @@ import org.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * It draws upon S2Dao.

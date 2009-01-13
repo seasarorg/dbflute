@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
  * @author jflute

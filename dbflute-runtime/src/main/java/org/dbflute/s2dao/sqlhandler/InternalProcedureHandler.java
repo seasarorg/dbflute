@@ -11,14 +11,14 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
 

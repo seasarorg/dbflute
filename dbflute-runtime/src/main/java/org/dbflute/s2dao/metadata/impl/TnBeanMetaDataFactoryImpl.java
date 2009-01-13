@@ -33,9 +33,9 @@ import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.extension.jdbc.util.DataSourceUtil;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * @author jflute

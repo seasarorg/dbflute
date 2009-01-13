@@ -25,9 +25,9 @@ import org.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * @author jflute

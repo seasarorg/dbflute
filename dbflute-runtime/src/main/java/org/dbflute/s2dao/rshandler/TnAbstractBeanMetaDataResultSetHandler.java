@@ -10,7 +10,7 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)

@@ -22,9 +22,9 @@ import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
  * @author jflute

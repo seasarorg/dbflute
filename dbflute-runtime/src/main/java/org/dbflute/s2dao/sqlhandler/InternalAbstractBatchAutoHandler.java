@@ -13,7 +13,7 @@ import org.dbflute.DBDef;
 import org.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;

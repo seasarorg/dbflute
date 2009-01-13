@@ -9,7 +9,7 @@ import java.util.Set;
 import org.dbflute.helper.StringSet;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
 

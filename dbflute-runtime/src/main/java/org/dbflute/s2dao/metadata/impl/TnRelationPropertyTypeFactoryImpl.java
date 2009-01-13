@@ -25,9 +25,9 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * @author jflute

@@ -17,8 +17,8 @@ package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
  * @author jflute

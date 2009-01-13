@@ -21,7 +21,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyTypeFactory;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 /**
  * @author jflute

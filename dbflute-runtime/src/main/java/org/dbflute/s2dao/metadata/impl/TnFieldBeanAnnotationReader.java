@@ -18,9 +18,9 @@ package org.dbflute.s2dao.metadata.impl;
 import java.lang.reflect.Field;
 
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.FieldUtil;
 
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {

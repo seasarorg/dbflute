@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dbflute.util.DfStringUtil;
-import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.ConstructorUtil;
 

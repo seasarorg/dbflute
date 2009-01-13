@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
 
 /**

@@ -15,22 +15,30 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.seasar.extension.jdbc.ValueType;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public interface TnRelationPropertyType extends PropertyType {
+public interface PropertyType {
 
-    public int getRelationNo();
+    PropertyDesc getPropertyDesc();
 
-    public int getKeySize();
+    ValueType getValueType();
 
-    public String getMyKey(int index);
+    String getPropertyName();
 
-    public String getYourKey(int index);
+    String getColumnName();
 
-    public boolean isYourKey(String columnName);
+    void setColumnName(String columnName);
 
-    public TnBeanMetaData getBeanMetaData();
+    boolean isPrimaryKey();
+
+    void setPrimaryKey(boolean primaryKey);
+
+    boolean isPersistent();
+
+    void setPersistent(boolean persistent);
 }

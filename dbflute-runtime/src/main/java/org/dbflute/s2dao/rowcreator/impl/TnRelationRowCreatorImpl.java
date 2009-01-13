@@ -25,9 +25,9 @@ import java.util.Set;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.util.ClassUtil;
 
 /**

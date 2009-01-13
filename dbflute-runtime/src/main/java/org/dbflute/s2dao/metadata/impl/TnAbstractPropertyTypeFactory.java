@@ -21,12 +21,12 @@ import java.util.List;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.impl.PropertyTypeImpl;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.metadata.impl.PropertyTypeImpl;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * @author jflute

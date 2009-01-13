@@ -14,8 +14,8 @@ import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * @author DBFlute(AutoGenerator)

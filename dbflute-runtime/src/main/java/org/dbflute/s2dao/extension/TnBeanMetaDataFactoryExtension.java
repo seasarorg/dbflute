@@ -12,8 +12,8 @@ import org.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
-import org.seasar.extension.jdbc.PropertyType;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.metadata.PropertyType;
+import org.dbflute.s2dao.beans.PropertyDesc;
 
 /**
  * BeanMetaDataFactoryImpl for DBFlute.

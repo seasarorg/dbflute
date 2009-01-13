@@ -11,12 +11,12 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.exception.EntityAlreadyUpdatedException;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.util.DfTypeUtil;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
 
 
 /**

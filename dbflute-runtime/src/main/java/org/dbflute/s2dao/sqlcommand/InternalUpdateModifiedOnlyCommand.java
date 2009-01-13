@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 

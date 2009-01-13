@@ -10,7 +10,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 
 /**

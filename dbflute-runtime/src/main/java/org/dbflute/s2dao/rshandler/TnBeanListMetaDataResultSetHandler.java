@@ -11,13 +11,13 @@ import java.util.Set;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.metadata.PropertyType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.beans.PropertyDesc;
 
 /**
  * @author DBFlute(AutoGenerator)

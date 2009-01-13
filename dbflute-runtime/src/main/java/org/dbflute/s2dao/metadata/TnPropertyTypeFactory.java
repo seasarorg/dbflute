@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.seasar.extension.jdbc.PropertyType;
+import org.dbflute.s2dao.metadata.PropertyType;
 
 /**
  * @author jflute
