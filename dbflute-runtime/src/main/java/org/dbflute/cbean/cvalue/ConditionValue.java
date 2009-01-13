@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import org.dbflute.cbean.coption.InScopeOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
-import org.dbflute.util.SimpleTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 
 /**
@@ -983,7 +983,7 @@ public class ConditionValue {
             return value;
         }
         if (value instanceof java.util.Date || value instanceof java.util.Calendar) {
-            return SimpleTypeUtil.toSqlDate(value);
+            return DfTypeUtil.toSqlDate(value);
         } else {
             return value;
         }

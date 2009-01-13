@@ -17,7 +17,7 @@ import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.resource.TnSqlLogRegistry;
 import org.dbflute.twowaysql.CompleteSqlBuilder;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 
@@ -288,7 +288,7 @@ public class TnBasicHandler {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

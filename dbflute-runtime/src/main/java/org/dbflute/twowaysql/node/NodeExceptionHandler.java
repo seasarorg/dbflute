@@ -17,7 +17,7 @@ package org.dbflute.twowaysql.node;
 
 import org.dbflute.exception.BindVariableParameterNullValueException;
 import org.dbflute.exception.EmbeddedValueParameterNullValueException;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -114,6 +114,6 @@ public class NodeExceptionHandler {
     }
 
     protected static String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

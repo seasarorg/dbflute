@@ -3,7 +3,7 @@ package com.example.dbflute.basic.dbflute.bsbhv.cursor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.util.SimpleTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 
 /**
@@ -135,7 +135,7 @@ public class BsPurchaseSummaryMemberCursor {
     }
 
     protected Object extractValueAsNumber(Class<?> type, String name) throws SQLException {
-        return SimpleTypeUtil.toNumber(type, extractValueAsObject(name));
+        return DfTypeUtil.toNumber(type, extractValueAsObject(name));
     }
 
     protected Object extractValueAsDate(Class<?> type, String name) throws SQLException {
@@ -151,7 +151,7 @@ public class BsPurchaseSummaryMemberCursor {
     }
 
     protected java.util.Date toDate(Object object) {
-        return SimpleTypeUtil.toDate(object);
+        return DfTypeUtil.toDate(object);
     }
 
     protected Object extractValueAsObject(String name) throws SQLException {

@@ -19,7 +19,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.util.DfAssertUtil;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -1545,7 +1545,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
     
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // -----------------------------------------------------

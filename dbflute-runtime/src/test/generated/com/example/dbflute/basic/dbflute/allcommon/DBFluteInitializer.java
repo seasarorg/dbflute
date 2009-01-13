@@ -4,7 +4,7 @@ import javax.sql.XADataSource;
 
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.resource.TnSqlLogRegistry;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
 
@@ -91,6 +91,6 @@ public class DBFluteInitializer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

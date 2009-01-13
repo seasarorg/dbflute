@@ -23,8 +23,8 @@ import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.dbflute.util.SimpleSystemUtil;
-import org.dbflute.util.SimpleTypeUtil;
+import org.dbflute.util.DfSystemUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.TraceViewUtil;
 
 /**
@@ -681,11 +681,11 @@ public class BehaviorCommandInvoker {
     //                                                                      Convert Helper
     //                                                                      ==============
     protected Object convertPrimitiveWrapper(Class<?> retType, Object ret) {
-        return SimpleTypeUtil.toWrapper(retType, ret);
+        return DfTypeUtil.toWrapper(retType, ret);
     }
 
     protected Object convertNumber(Class<?> retType, Object ret) {
-        return SimpleTypeUtil.toNumber(retType, ret);
+        return DfTypeUtil.toNumber(retType, ret);
     }
 
     // ===================================================================================
@@ -718,7 +718,7 @@ public class BehaviorCommandInvoker {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

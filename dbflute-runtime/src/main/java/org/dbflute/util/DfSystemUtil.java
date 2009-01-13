@@ -3,7 +3,7 @@ package org.dbflute.util;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class SimpleSystemUtil {
+public class DfSystemUtil {
 
     // ===================================================================================
     //                                                                      Line Separator

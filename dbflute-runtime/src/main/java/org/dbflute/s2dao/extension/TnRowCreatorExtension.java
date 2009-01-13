@@ -12,7 +12,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 
@@ -240,7 +240,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

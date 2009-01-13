@@ -8,7 +8,7 @@ import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.exception.EntityAlreadyExistsException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.outsidesql.OutsideSqlContext;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -258,6 +258,6 @@ public class SQLExceptionHandler {
     }
 
     protected String ln() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

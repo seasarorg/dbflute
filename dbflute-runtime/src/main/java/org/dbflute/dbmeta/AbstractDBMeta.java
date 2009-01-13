@@ -25,7 +25,7 @@ import org.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
 import org.dbflute.util.DfAssertUtil;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -1177,7 +1177,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected String getLineSeparator() {
-	    return SimpleSystemUtil.getLineSeparator();
+	    return DfSystemUtil.getLineSeparator();
     }
 		
     // -----------------------------------------------------

@@ -11,7 +11,7 @@ import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
@@ -183,6 +183,6 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     }
 
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

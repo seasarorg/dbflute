@@ -3,7 +3,7 @@ package org.dbflute.cbean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.twowaysql.SqlAnalyzer;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -174,6 +174,6 @@ public class ConditionBeanContext {
      * @return The value of line separator. (NotNull)
      */
     protected static String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

@@ -3,7 +3,7 @@ package org.dbflute.cbean.sqlclause;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -174,7 +174,7 @@ public class OrderByElement implements Serializable {
     }
 
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // =====================================================================================

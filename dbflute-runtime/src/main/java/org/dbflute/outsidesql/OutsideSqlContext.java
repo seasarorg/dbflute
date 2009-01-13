@@ -13,7 +13,7 @@ import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -354,7 +354,7 @@ public class OutsideSqlContext {
     }
     
     protected static String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

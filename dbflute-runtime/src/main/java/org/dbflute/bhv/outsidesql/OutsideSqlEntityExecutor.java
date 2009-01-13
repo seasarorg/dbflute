@@ -9,7 +9,7 @@ import org.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -162,6 +162,6 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @return The value of line separator. (NotNull)
      */
     protected static String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author DBFlute(AutoGenerator)
  */
 public class DfResourceUtil {

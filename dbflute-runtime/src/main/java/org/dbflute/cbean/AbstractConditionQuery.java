@@ -20,7 +20,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.exception.RequiredOptionNotFoundException;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.dbflute.util.TraceViewUtil;
 
 
@@ -1925,7 +1925,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {

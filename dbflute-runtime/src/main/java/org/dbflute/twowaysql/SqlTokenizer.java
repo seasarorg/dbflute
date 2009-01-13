@@ -1,7 +1,7 @@
 package org.dbflute.twowaysql;
 
 import org.dbflute.exception.EndCommentNotFoundException;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -241,7 +241,7 @@ public class SqlTokenizer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

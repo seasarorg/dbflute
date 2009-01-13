@@ -40,7 +40,7 @@ import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingSimpleFacade;
 import org.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -919,7 +919,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @return The value of line separator. (NotNull)
      */
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     @SuppressWarnings("unchecked")

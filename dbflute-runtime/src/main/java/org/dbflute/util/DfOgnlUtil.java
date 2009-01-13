@@ -25,6 +25,7 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.exception.OgnlRuntimeException;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class DfOgnlUtil {

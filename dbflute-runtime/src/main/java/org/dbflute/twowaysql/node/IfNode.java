@@ -19,7 +19,7 @@ import org.dbflute.exception.IfCommentNotBooleanResultException;
 import org.dbflute.exception.IfCommentWrongExpressionException;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 import org.seasar.framework.util.OgnlUtil;
 
 /**
@@ -136,6 +136,6 @@ public class IfNode extends ContainerNode {
     }
     
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

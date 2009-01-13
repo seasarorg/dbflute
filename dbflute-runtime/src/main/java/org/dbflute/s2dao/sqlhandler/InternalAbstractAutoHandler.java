@@ -14,7 +14,7 @@ import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.extension.jdbc.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.util.SimpleTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
 
@@ -155,7 +155,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
                 if (value == null) {
                     continue;// because of 'VERSION_NO = VERSION_NO + 1'
                 }
-                int intValue = SimpleTypeUtil.toPrimitiveInt(value) + 1;
+                int intValue = DfTypeUtil.toPrimitiveInt(value) + 1;
                 setVersionNo(new Integer(intValue));
                 varList.add(getVersionNo());
             } else {

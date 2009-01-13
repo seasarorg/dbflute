@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {Refers to S2Container's utility and Extends it}
  * @author DBFlute(AutoGenerator)
  */
-public class SimpleTypeUtil {
+public class DfTypeUtil {
 
     // ===================================================================================
     //                                                                          Convert To

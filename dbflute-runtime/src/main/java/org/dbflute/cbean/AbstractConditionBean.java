@@ -15,7 +15,7 @@ import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -709,7 +709,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         }
 
         protected String getLineSeparator() {
-            return SimpleSystemUtil.getLineSeparator();
+            return DfSystemUtil.getLineSeparator();
         }
     }
     
@@ -969,7 +969,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             return DfStringUtil.replace(text, fromText, toText);
         }
         protected String getLineSeparator() {
-            return SimpleSystemUtil.getLineSeparator();
+            return DfSystemUtil.getLineSeparator();
         }
     }
 
@@ -1131,7 +1131,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
     
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

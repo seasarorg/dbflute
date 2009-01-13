@@ -17,7 +17,7 @@ import org.dbflute.twowaysql.node.Node;
 import org.dbflute.twowaysql.node.PrefixSqlNode;
 import org.dbflute.twowaysql.node.SqlNode;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.SimpleSystemUtil;
+import org.dbflute.util.DfSystemUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -267,7 +267,7 @@ public class SqlAnalyzer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return SimpleSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 
     protected final String replaceString(String text, String fromText, String toText) {
