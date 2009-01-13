@@ -21,9 +21,6 @@ import ognl.ClassResolver;
 import ognl.Ognl;
 import ognl.OgnlException;
 
-import org.seasar.framework.container.S2Container;
-import org.seasar.framework.exception.OgnlRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
@@ -47,8 +44,7 @@ public class DfOgnlUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static Object getValue(Object exp, Map ctx, Object root, String path, int lineNumber)
-            throws OgnlRuntimeException {
+    public static Object getValue(Object exp, Map ctx, Object root, String path, int lineNumber) {
         try {
             Map newCtx = addClassResolverIfNecessary(ctx, root);
             if (newCtx != null) {
@@ -56,10 +52,62 @@ public class DfOgnlUtil {
             } else {
                 return Ognl.getValue(exp, root);
             }
-        } catch (OgnlException ex) {
-            throw new OgnlRuntimeException(ex.getReason() == null ? ex : ex.getReason(), path, lineNumber);
-        } catch (Exception ex) {
-            throw new OgnlRuntimeException(ex, path, lineNumber);
+        } catch (OgnlException e) {
+            throwOgnlGetValueException(exp, path, lineNumber, ctx, e);
+            return null; // Unreachable!
+        } catch (Exception e) {
+            throwOgnlGetValueException(exp, path, lineNumber, ctx, e);
+            return null; // Unreachable!
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static void throwOgnlGetValueException(Object expression, String path, int lineNumber, Map ctx,
+            OgnlException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The Ognl.getValue() threw the exception!!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Expression]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Path]" + ln() + path + ln();
+        msg = msg + ln();
+        msg = msg + "[Line Number]" + ln() + lineNumber + ln();
+        msg = msg + ln();
+        msg = msg + "[Context]" + ln() + ctx + ln();
+        msg = msg + ln();
+        msg = msg + "[Reason]" + ln() + e.getReason() + ln();
+        msg = msg + ln();
+        msg = msg + "[Cause Exception]" + ln() + e.getMessage() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new OgnlGetValueException(msg, e);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static void throwOgnlGetValueException(Object expression, String path, int lineNumber, Map ctx,
+            Exception e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The Ognl.getValue() threw the exception!!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Expression]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Path]" + ln() + path + ln();
+        msg = msg + ln();
+        msg = msg + "[Line Number]" + ln() + lineNumber + ln();
+        msg = msg + ln();
+        msg = msg + "[Context]" + ln() + ctx + ln();
+        msg = msg + ln();
+        msg = msg + "[Cause Exception]" + ln() + e.getMessage() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new OgnlGetValueException(msg, e);
+    }
+
+    public static class OgnlGetValueException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public OgnlGetValueException(String msg, Throwable e) {
+            super(msg, e);
         }
     }
 
@@ -67,28 +115,54 @@ public class DfOgnlUtil {
         return parseExpression(expression, null, 0);
     }
 
-    public static Object parseExpression(String expression, String path, int lineNumber) throws OgnlRuntimeException {
+    public static Object parseExpression(String expression, String path, int lineNumber) {
         try {
             return Ognl.parseExpression(expression);
-        } catch (Exception ex) {
-            throw new OgnlRuntimeException(ex, path, lineNumber);
+        } catch (Exception e) {
+            throwOgnlParseExpressionException(expression, path, lineNumber, e);
+            return null; // Unreachable!
+        }
+    }
+
+    protected static void throwOgnlParseExpressionException(String expression, String path, int lineNumber, Exception e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The Ognl.parseExpression() threw the exception!!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Expression]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Path]" + ln() + path + ln();
+        msg = msg + ln();
+        msg = msg + "[Line Number]" + ln() + lineNumber + ln();
+        msg = msg + ln();
+        msg = msg + "[Cause Exception]" + ln() + e.getMessage() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new OgnlParseExpressionException(msg, e);
+    }
+
+    public static class OgnlParseExpressionException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public OgnlParseExpressionException(String msg, Throwable e) {
+            super(msg, e);
         }
     }
 
     @SuppressWarnings("unchecked")
     static Map addClassResolverIfNecessary(Map ctx, Object root) {
-        if (root instanceof S2Container) {
-            S2Container container = (S2Container) root;
-            ClassLoader classLoader = container.getClassLoader();
-            if (classLoader != null) {
-                ClassResolverImpl classResolver = new ClassResolverImpl(classLoader);
-                if (ctx == null) {
-                    ctx = Ognl.createDefaultContext(root, classResolver);
-                } else {
-                    ctx = Ognl.addDefaultContext(root, classResolver, ctx);
-                }
-            }
-        }
+        // Is it necessary???
+        //        if (root instanceof S2Container) {
+        //            S2Container container = (S2Container) root;
+        //            ClassLoader classLoader = container.getClassLoader();
+        //            if (classLoader != null) {
+        //                ClassResolverImpl classResolver = new ClassResolverImpl(classLoader);
+        //                if (ctx == null) {
+        //                    ctx = Ognl.createDefaultContext(root, classResolver);
+        //                } else {
+        //                    ctx = Ognl.addDefaultContext(root, classResolver, ctx);
+        //                }
+        //            }
+        //        }
         return ctx;
     }
 
@@ -112,5 +186,12 @@ public class DfOgnlUtil {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected static String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }

@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.dbflute.twowaysql.context.CommandContext;
-import org.seasar.framework.util.OgnlUtil;
+import org.dbflute.util.DfOgnlUtil;
 
 /**
  * @author jflute
@@ -32,7 +32,7 @@ public class ParenBindVariableNode extends AbstractNode {
 
     public ParenBindVariableNode(String expression) {
         this.expression = expression;
-        this.parsedExpression = OgnlUtil.parseExpression(expression);
+        this.parsedExpression = DfOgnlUtil.parseExpression(expression);
     }
 
     public String getExpression() {
@@ -40,7 +40,7 @@ public class ParenBindVariableNode extends AbstractNode {
     }
 
     public void accept(CommandContext ctx) {
-        Object var = OgnlUtil.getValue(parsedExpression, ctx);
+        Object var = DfOgnlUtil.getValue(parsedExpression, ctx);
         if (var instanceof List) {
             bindArray(ctx, ((List<?>) var).toArray());
         } else if (var == null) {

@@ -144,21 +144,21 @@ public class SqlTokenizer {
     }
 
     protected void throwEndCommentNotFoundException(String expression) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The end comment was Not Found!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[End Comment Expected Place]" + getLineSeparator() + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + sql + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The end comment was Not Found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the parameter comment logic." + ln();
+        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[End Comment Expected Place]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + sql + ln();
+        msg = msg + "* * * * * * * * * */";
         throw new EndCommentNotFoundException(msg);
     }
 
@@ -240,7 +240,7 @@ public class SqlTokenizer {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 

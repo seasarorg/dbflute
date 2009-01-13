@@ -10,7 +10,6 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalInsertAutoHandler;
-import org.seasar.framework.exception.SRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
 
 /**
@@ -73,9 +72,9 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
     }
 
     protected PropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
-
         if (0 == propertyNames.length) {
-            throw new SRuntimeException("EDAO0024", new Object[] { bean.getClass().getName() });
+            String msg = "The property name was not found in the bean: " + bean;
+            throw new IllegalStateException(msg);
         }
         List<PropertyType> types = new ArrayList<PropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
@@ -100,7 +99,8 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
             types.add(pt);
         }
         if (types.isEmpty()) {
-            throw new SRuntimeException("EDAO0014");
+            String msg = "The target property type was not found in the bean: " + bean;
+            throw new IllegalStateException(msg);
         }
         PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
         return propertyTypes;

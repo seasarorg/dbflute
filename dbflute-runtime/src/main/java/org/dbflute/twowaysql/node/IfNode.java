@@ -18,9 +18,9 @@ package org.dbflute.twowaysql.node;
 import org.dbflute.exception.IfCommentNotBooleanResultException;
 import org.dbflute.exception.IfCommentWrongExpressionException;
 import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.util.DfOgnlUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
-import org.seasar.framework.util.OgnlUtil;
 
 /**
  * @author jflute
@@ -34,7 +34,7 @@ public class IfNode extends ContainerNode {
 
     public IfNode(String expression, String specifiedSql) {
         this._expression = expression;
-        this._parsedExpression = OgnlUtil.parseExpression(expression);
+        this._parsedExpression = DfOgnlUtil.parseExpression(expression);
         this._specifiedSql = specifiedSql;
     }
 
@@ -53,15 +53,15 @@ public class IfNode extends ContainerNode {
     public void accept(CommandContext ctx) {
         Object result = null;
         try {
-            result = OgnlUtil.getValue(_parsedExpression, ctx);
+            result = DfOgnlUtil.getValue(_parsedExpression, ctx);
         } catch (RuntimeException e) {
             if (!_expression.contains("pmb.")) {
                 throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
             }
             final String replaced = replace(_expression, "pmb.", "pmb.parameterMap.");
-            final Object secondParsedExpression = OgnlUtil.parseExpression(replaced);
+            final Object secondParsedExpression = DfOgnlUtil.parseExpression(replaced);
             try {
-                result = OgnlUtil.getValue(secondParsedExpression, ctx);
+                result = DfOgnlUtil.getValue(secondParsedExpression, ctx);
             } catch (RuntimeException ignored) {
                 throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
             }

@@ -16,8 +16,8 @@
 package org.dbflute.s2dao.rshandler;
 
 /**
- * @author higa
- * 
+ * {Refers to S2Dao's utility and Extends it}
+ * @author jflute
  */
 public final class TnRelationKey {
 

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * {Refers to S2Dao's utility and Extends it}
  * @author jflute
  */
 public class TnRelationRowCache {
