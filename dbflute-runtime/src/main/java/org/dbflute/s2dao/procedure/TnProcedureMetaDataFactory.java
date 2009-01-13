@@ -2,7 +2,9 @@ package org.dbflute.s2dao.procedure;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -10,7 +12,6 @@ import java.util.Stack;
 import org.dbflute.DBDef;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.dao.util.TypeUtil;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
@@ -21,13 +22,13 @@ import org.seasar.framework.beans.factory.BeanDescFactory;
  */
 public class TnProcedureMetaDataFactory {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected TnValueTypeFactory valueTypeFactory;
     protected InternalFieldProcedureAnnotationReader annotationReader = new InternalFieldProcedureAnnotationReader();
-	
-	// ===================================================================================
+
+    // ===================================================================================
     //                                                                                Main
     //                                                                                ====
     public TnProcedureMetaData createProcedureMetaData(final String procedureName, final Class<?> pmbType) {
@@ -46,7 +47,7 @@ public class TnProcedureMetaDataFactory {
         for (Class<?> clazz = pmbType; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
             stack.push(clazz);
         }
-        for ( ; !stack.isEmpty() ;) {
+        for (; !stack.isEmpty();) {
             final Class<?> clazz = stack.pop();
             registerParameterType(metaData, pmbDesc, clazz.getDeclaredFields());
         }
@@ -139,33 +140,49 @@ public class TnProcedureMetaDataFactory {
         }
         return valueTypeFactory.getValueTypeByClass(type);
     }
-    
+
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
-	    return ResourceContext.isCurrentDBDef(currentDBDef);
+        return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
     protected boolean isInstanceField(final Field field) {
         final int mod = field.getModifiers();
         return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
     }
+
     protected boolean isDtoType(final Class<?> clazz) {
-        return !TypeUtil.isSimpleType(clazz) && !isContainerType(clazz);
+        return !isSimpleType(clazz) && !isContainerType(clazz);
     }
+
+    protected boolean isSimpleType(Class<?> clazz) {
+        if (clazz == null) {
+            throw new NullPointerException("clazz");
+        }
+        return clazz == String.class || clazz.isPrimitive() || clazz == Boolean.class || clazz == Character.class
+                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
+                || Calendar.class.isAssignableFrom(clazz) || clazz == byte[].class;
+    }
+
     protected boolean isContainerType(final Class<?> clazz) {
-        if (clazz == null) { throw new NullPointerException("clazz"); }
+        if (clazz == null) {
+            throw new NullPointerException("clazz");
+        }
         return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz) || clazz.isArray();
     }
+
     public void setValueTypeFactory(final TnValueTypeFactory valueTypeFactory) {
         this.valueTypeFactory = valueTypeFactory;
     }
-    
+
     protected static class InternalFieldProcedureAnnotationReader {
         protected String PROCEDURE_PARAMETER_SUFFIX;
         protected String VALUE_TYPE_SUFFIX;
+
         public InternalFieldProcedureAnnotationReader() {
             PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
             VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
         }
+
         public String getProcedureParameter(BeanDesc dtoDesc, Field field) {
             String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
             String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
@@ -176,6 +193,7 @@ public class TnProcedureMetaDataFactory {
                 return null;
             }
         }
+
         public String getValueType(BeanDesc dtoDesc, Field field) {
             String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
             String annotationName = fieldName + VALUE_TYPE_SUFFIX;
@@ -186,9 +204,11 @@ public class TnProcedureMetaDataFactory {
                 return null;
             }
         }
+
         protected String removeInstanceVariablePrefix(String fieldName) {
             return fieldName.startsWith("_") ? fieldName.substring("_".length()) : fieldName;
         }
+
         protected Object getValue(Field field, Object target) {
             try {
                 return field.get(target);

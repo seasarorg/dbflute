@@ -25,8 +25,7 @@ import java.util.Set;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.dao.util.DaoNamingConventionUtil;
-import org.seasar.dao.util.PropertyDescUtil;
+import org.dbflute.util.SimpleStringUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
@@ -165,7 +164,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
             } else if (columnNames.contains(pt.getPropertyName())) {
                 proprertyCache.put(pt.getPropertyName(), pt);
             } else {
-                String possibleName = DaoNamingConventionUtil.fromPropertyNameToColumnName(pt.getPropertyName());
+                String possibleName = SimpleStringUtil.fromPropertyNameToColumnName(pt.getPropertyName());
                 if (columnNames.contains(possibleName)) {
                     proprertyCache.put(possibleName, pt);
                 }
@@ -184,11 +183,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
     //                                                                     Extension Point
     //                                                                     ===============
     protected boolean isTargetProperty(PropertyType pt) throws SQLException {
-        // - - - - - - - - - - - - - - - - - - - - - - - -
-        // Extension Point!
-        //  --> 該当のPropertyを処理対象とするか否か。
-        // - - - - - - - - - - - - - - - - - - - - - - - -
         // If the property is not writable, the property is out of target!
-        return PropertyDescUtil.isWritable(pt.getPropertyDesc());
+        return pt.getPropertyDesc().isWritable();
     }
 }

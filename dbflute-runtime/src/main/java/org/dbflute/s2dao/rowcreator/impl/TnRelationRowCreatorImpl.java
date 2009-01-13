@@ -25,7 +25,6 @@ import java.util.Set;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
-import org.seasar.dao.util.PropertyDescUtil;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
@@ -367,13 +366,12 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     //                                                                     Extension Point
     //                                                                     ===============
     protected boolean isTargetRelation(TnRelationRowCreationResource res) throws SQLException {
-        // - - - - - - - - - - - - - - - - - - - - - - - -
         return true;
     }
 
     protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
         final PropertyType pt = res.getCurrentPropertyType();
-        return PropertyDescUtil.isWritable(pt.getPropertyDesc());
+        return pt.getPropertyDesc().isWritable();
     }
 
     protected boolean isCreateDeadLink() {
