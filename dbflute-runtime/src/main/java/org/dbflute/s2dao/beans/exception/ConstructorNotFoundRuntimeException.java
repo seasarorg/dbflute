@@ -15,76 +15,41 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import org.seasar.framework.exception.SRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class ConstructorNotFoundRuntimeException extends SRuntimeException {
+public class ConstructorNotFoundRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = 8584662068396978822L;
+    private static final long serialVersionUID = 1L;
 
-    private Class targetClass;
+    private Class<?> targetClass;
 
     private Object[] methodArgs;
 
-    private Class[] paramTypes;
+    private Class<?>[] paramTypes;
 
-    /**
-     * {@link ConstructorNotFoundRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param methodArgs
-     */
-    public ConstructorNotFoundRuntimeException(Class targetClass,
-            Object[] methodArgs) {
-        super("ESSR0048", new Object[] { targetClass.getName(),
-                getSignature(methodArgs) });
-
+    public ConstructorNotFoundRuntimeException(Class<?> targetClass, Object[] methodArgs) {
+        super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(methodArgs));
         this.targetClass = targetClass;
         this.methodArgs = methodArgs;
     }
 
-    /**
-     * {@link ConstructorNotFoundRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param paramTypes
-     */
-    public ConstructorNotFoundRuntimeException(Class targetClass,
-            Class[] paramTypes) {
-        super("ESSR0048", new Object[] { targetClass.getName(),
-                getSignature(paramTypes) });
-
+    public ConstructorNotFoundRuntimeException(Class<?> targetClass, Class<?>[] paramTypes) {
+        super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(paramTypes));
         this.targetClass = targetClass;
         this.paramTypes = paramTypes;
     }
 
-    /**
-     * ターゲットのクラスを返します。
-     * 
-     * @return ターゲットのクラス
-     */
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    /**
-     * メソッドの引数の配列を返します。
-     * 
-     * @return メソッドの引数の配列
-     */
     public Object[] getMethodArgs() {
         return methodArgs;
     }
 
-    /**
-     * パラメータの型の配列を返します。
-     * 
-     * @return
-     */
-    public Class[] getParamTypes() {
+    public Class<?>[] getParamTypes() {
         return paramTypes;
     }
 
@@ -105,7 +70,7 @@ public class ConstructorNotFoundRuntimeException extends SRuntimeException {
         return buf.toString();
     }
 
-    private static String getSignature(Class[] paramTypes) {
+    private static String getSignature(Class<?>[] paramTypes) {
         StringBuffer buf = new StringBuffer(100);
         if (paramTypes != null) {
             for (int i = 0; i < paramTypes.length; ++i) {

@@ -15,13 +15,11 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import org.seasar.framework.exception.SRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class ConverterRuntimeException extends SRuntimeException {
+public class ConverterRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +28,7 @@ public class ConverterRuntimeException extends SRuntimeException {
     private Object value;
 
     public ConverterRuntimeException(String propertyName, Object value, Throwable cause) {
-        super("ESSR0097", new Object[] { propertyName, value, cause }, cause);
+        super("Failed to convert: propertyName=" + propertyName + " value=" + value, cause);
         this.propertyName = propertyName;
         this.value = value;
     }

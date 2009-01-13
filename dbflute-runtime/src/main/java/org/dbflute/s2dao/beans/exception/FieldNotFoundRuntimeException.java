@@ -15,48 +15,28 @@
  */
 package org.dbflute.s2dao.beans.exception;
 
-import java.lang.reflect.Field;
-
-import org.seasar.framework.exception.SRuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class FieldNotFoundRuntimeException extends SRuntimeException {
+public class FieldNotFoundRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = -2715036865146285893L;
+    private static final long serialVersionUID = 1L;
 
-    private Class targetClass;
+    private Class<?> targetClass;
 
     private String fieldName;
 
-    /**
-     * {@link FieldNotFoundRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param fieldName
-     */
-    public FieldNotFoundRuntimeException(Class targetClass, String fieldName) {
-        super("ESSR0070", new Object[] { targetClass.getName(), fieldName });
+    public FieldNotFoundRuntimeException(Class<?> targetClass, String fieldName) {
+        super("The field was not found: targetClass=" + targetClass.getClass() + " fieldName=" + fieldName);
         this.targetClass = targetClass;
         this.fieldName = fieldName;
     }
 
-    /**
-     * ターゲットの{@link Class}を返します。
-     * 
-     * @return ターゲットの{@link Class}
-     */
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    /**
-     * フィールド名を返します。
-     * 
-     * @return
-     */
     public String getFieldName() {
         return fieldName;
     }

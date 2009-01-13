@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 
 import org.dbflute.s2dao.beans.exception.ConstructorNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.FieldNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.IllegalDiiguRuntimeException;
 import org.dbflute.s2dao.beans.exception.MethodNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
 
@@ -57,10 +56,6 @@ public interface BeanDesc {
 
     Constructor<?> getConstructor(Class<?>[] paramTypes);
 
-    String[] getConstructorParameterNames(final Class<?>[] paramTypes);
-
-    String[] getConstructorParameterNames(Constructor<?> constructor);
-
     Object invoke(Object target, String methodName, Object[] args) throws MethodNotFoundRuntimeException;
 
     Method getMethod(String methodName) throws MethodNotFoundRuntimeException;
@@ -76,14 +71,4 @@ public interface BeanDesc {
     boolean hasMethod(String methodName);
 
     String[] getMethodNames();
-
-    String[] getMethodParameterNames(String methodName, final Class<?>[] paramTypes)
-            throws MethodNotFoundRuntimeException, IllegalDiiguRuntimeException;
-
-    String[] getMethodParameterNamesNoException(String methodName, final Class<?>[] paramTypes)
-            throws MethodNotFoundRuntimeException;
-
-    String[] getMethodParameterNames(Method method) throws MethodNotFoundRuntimeException, IllegalDiiguRuntimeException;
-
-    String[] getMethodParameterNamesNoException(Method method) throws MethodNotFoundRuntimeException;
 }

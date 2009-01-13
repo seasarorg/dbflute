@@ -29,13 +29,6 @@ public class IllegalPropertyRuntimeException extends SRuntimeException {
 
     private String propertyName;
 
-    /**
-     * {@link IllegalPropertyRuntimeException}を作成します。
-     * 
-     * @param targetClass
-     * @param propertyName
-     * @param cause
-     */
     public IllegalPropertyRuntimeException(Class targetClass,
             String propertyName, Throwable cause) {
         super("ESSR0059", new Object[] { targetClass.getName(), propertyName,
