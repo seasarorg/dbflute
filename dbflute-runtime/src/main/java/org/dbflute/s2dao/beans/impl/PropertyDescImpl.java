@@ -50,7 +50,7 @@ public class PropertyDescImpl implements PropertyDesc {
 
     private String propertyName;
 
-    private Class propertyType;
+    private Class<?> propertyType;
 
     private Method readMethod;
 
@@ -60,7 +60,7 @@ public class PropertyDescImpl implements PropertyDesc {
 
     private BeanDesc beanDesc;
 
-    private Constructor stringConstructor;
+    private Constructor<?> stringConstructor;
 
     private Method valueOfMethod;
 
@@ -70,13 +70,13 @@ public class PropertyDescImpl implements PropertyDesc {
 
     private ParameterizedClassDesc parameterizedClassDesc;
 
-    public PropertyDescImpl(String propertyName, Class propertyType, Method readMethod, Method writeMethod,
+    public PropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
             BeanDesc beanDesc) {
 
         this(propertyName, propertyType, readMethod, writeMethod, null, beanDesc);
     }
 
-    public PropertyDescImpl(String propertyName, Class propertyType, Method readMethod, Method writeMethod,
+    public PropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
             Field field, BeanDesc beanDesc) {
         if (propertyName == null) {
             String msg = "The argument 'propertyName' should not be null!";
@@ -98,9 +98,9 @@ public class PropertyDescImpl implements PropertyDesc {
     }
 
     private void setupStringConstructor() {
-        Constructor[] cons = propertyType.getConstructors();
+        Constructor<?>[] cons = propertyType.getConstructors();
         for (int i = 0; i < cons.length; ++i) {
-            Constructor con = cons[i];
+            Constructor<?> con = cons[i];
             if (con.getParameterTypes().length == 1 && con.getParameterTypes()[0].equals(String.class)) {
                 stringConstructor = con;
                 break;
@@ -140,7 +140,7 @@ public class PropertyDescImpl implements PropertyDesc {
         return propertyName;
     }
 
-    public final Class getPropertyType() {
+    public final Class<?> getPropertyType() {
         return propertyType;
     }
 
@@ -298,7 +298,7 @@ public class PropertyDescImpl implements PropertyDesc {
         return parameterizedClassDesc;
     }
 
-    public Class getElementClassOfCollection() {
+    public Class<?> getElementClassOfCollection() {
         if (!Collection.class.isAssignableFrom(propertyType) || !isParameterized()) {
             return null;
         }
@@ -309,7 +309,7 @@ public class PropertyDescImpl implements PropertyDesc {
         return pcd.getRawClass();
     }
 
-    public Class getKeyClassOfMap() {
+    public Class<?> getKeyClassOfMap() {
         if (!Map.class.isAssignableFrom(propertyType) || !isParameterized()) {
             return null;
         }
@@ -320,7 +320,7 @@ public class PropertyDescImpl implements PropertyDesc {
         return pcd.getRawClass();
     }
 
-    public Class getValueClassOfMap() {
+    public Class<?> getValueClassOfMap() {
         if (!Map.class.isAssignableFrom(propertyType) || !isParameterized()) {
             return null;
         }
