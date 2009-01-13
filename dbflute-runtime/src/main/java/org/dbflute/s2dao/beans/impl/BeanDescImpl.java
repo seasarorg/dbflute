@@ -56,10 +56,6 @@ public class BeanDescImpl implements BeanDesc {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory
-            .getLog(BeanDescImpl.class);
-
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final Class<?>[] EMPTY_PARAM_TYPES = new Class<?>[0];

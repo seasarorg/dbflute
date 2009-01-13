@@ -22,18 +22,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.s2dao.beans.BeanDesc;
+import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnModifiedPropertySupport;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 
 /**
  * It draws upon S2Dao.

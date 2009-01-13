@@ -22,15 +22,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.s2dao.beans.PropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.beans.PropertyDesc;
 import org.seasar.framework.util.ClassUtil;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * @author jflute
@@ -123,7 +122,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
             Set<String> columnNames, TnPropertyType pt) throws SQLException {
         for (Iterator<String> iter = columnNames.iterator(); iter.hasNext();) {
             String columnName = (String) iter.next();
-            String columnName2 = StringUtil.replace(columnName, "_", "");
+            String columnName2 = DfStringUtil.replace(columnName, "_", "");
             if (columnName2.equalsIgnoreCase(pt.getColumnName())) {
                 proprertyCache.put(columnName, pt);
                 break;
