@@ -3,7 +3,7 @@ package org.dbflute.s2dao.sqlcommand;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.twowaysql.SqlParser;
+import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.node.Node;
@@ -35,8 +35,8 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
         this.rootNode = createInternalSqlParser(sql).parse();
     }
 	
-	protected SqlParser createInternalSqlParser(String sql) {
-	    return new SqlParser(sql, isBlockNullParameter());
+	protected SqlAnalyzer createInternalSqlParser(String sql) {
+	    return new SqlAnalyzer(sql, isBlockNullParameter());
 	}
 
     protected boolean isBlockNullParameter() { // Extension Point!

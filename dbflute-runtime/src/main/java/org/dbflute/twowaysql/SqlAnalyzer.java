@@ -22,7 +22,7 @@ import org.dbflute.util.SimpleSystemUtil;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class SqlParser {
+public class SqlAnalyzer {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,7 +35,7 @@ public class SqlParser {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlParser(String sql, boolean blockNullParameter) {
+    public SqlAnalyzer(String sql, boolean blockNullParameter) {
         sql = sql.trim();
         if (sql.endsWith(";")) {
             sql = sql.substring(0, sql.length() - 1);
@@ -312,7 +312,7 @@ public class SqlParser {
             Object[] args, String logDateFormat, String logTimestampFormat) {
         final CommandContext context;
         {
-            final SqlParser parser = new SqlParser(twoWaySql, false);
+            final SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, false);
             final Node node = parser.parse();
             final CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);

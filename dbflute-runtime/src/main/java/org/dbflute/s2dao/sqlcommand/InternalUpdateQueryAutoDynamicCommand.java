@@ -16,7 +16,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
-import org.dbflute.twowaysql.SqlParser;
+import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.node.Node;
@@ -175,7 +175,7 @@ public class InternalUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlE
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
         CommandContext context;
         {
-            SqlParser parser = new SqlParser(twoWaySql, true);
+            SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, true);
             Node node = parser.parse();
             CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
