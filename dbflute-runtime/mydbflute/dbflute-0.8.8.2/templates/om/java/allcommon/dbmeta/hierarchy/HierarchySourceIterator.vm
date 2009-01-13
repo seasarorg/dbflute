@@ -1,0 +1,15 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
+
+#set ($myClassName = "${glHierarchySourceIterator}")
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+
+    public boolean hasNext();
+
+    public ${glHierarchySourceRow} next();
+
+    public ${glHierarchySourceRow} current();
+}

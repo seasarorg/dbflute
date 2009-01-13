@@ -1,0 +1,12 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
+
+#set ($myClassName = "${glHierarchySourceRowSetupper}")
+
+/**
+ * @author ${database.ClassAuthor}
+ * @param <SOURCE_ROW> The type of source.
+ */
+public interface ${myClassName}<SOURCE_ROW> {
+
+    public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRow} setup(SOURCE_ROW source);
+}

@@ -1,0 +1,123 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContext};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateQueryAutoDynamicCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glQueryUpdateEntityCBCommand} extends ${glAbstractEntityCommand} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The type of condition-bean. (Derived from conditionBean) */
+    protected Class<? extends ${glConditionBean}> _conditionBeanType;
+
+    /** The instance of condition-bean. (Required) */
+    protected ${glConditionBean} _conditionBean;
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "queryUpdate";
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isConditionBean() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    @Override
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final ${glConditionBean} cb = _conditionBean;
+        ${glFetchNarrowingBeanContext}.setFetchNarrowingBeanOnThread(cb);
+        ${glConditionBeanContext}.setConditionBeanOnThread(cb);
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public String buildSqlExecutionKey() {
+        assertStatus("buildSqlExecutionKey");
+        return _tableDbName + ":" + getCommandName() + "(" + _entityType.getSimpleName() + ", " + _conditionBeanType.getSimpleName() + ")";
+    }
+
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                return createQueryUpdateEntityCBExecution(_conditionBeanType);
+            }
+        };
+    }
+
+    protected ${glSqlExecution} createQueryUpdateEntityCBExecution(Class<? extends ${glConditionBean}> cbType) {
+        return new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _statementFactory);
+    }
+
+    public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
+        return new Object[] { _conditionBean, _entity };
+    }
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBean} getConditionBean() {
+        return _conditionBean;
+    }
+
+    public String getOutsideSqlPath() {
+        return null;
+    }
+
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    @Override
+    protected void assertStatus(String methodName) {
+        assertBasicProperty(methodName);
+        assertComponentProperty(methodName);
+        if (_entityType == null) {
+            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
+        }
+        if (_entity == null) {
+            throw new IllegalStateException(buildAssertMessage("_entity", methodName));
+        }
+        if (_conditionBeanType == null) {
+            throw new IllegalStateException(buildAssertMessage("_conditionBeanType", methodName));
+        }
+        if (_conditionBean == null) {
+            throw new IllegalStateException(buildAssertMessage("_conditionBean", methodName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setConditionBeanType(Class<? extends ${glConditionBean}> conditionBeanType) {
+        _conditionBeanType = conditionBeanType;
+    }
+
+    public void setConditionBean(${glConditionBean} conditionBean) {
+        _conditionBean = conditionBean;
+    }
+}

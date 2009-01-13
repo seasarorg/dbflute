@@ -1,0 +1,78 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glFileTokenizingOption} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected String _encoding;
+
+    protected String _delimiter;
+
+    protected boolean _beginFirstLine;
+
+    protected boolean _handleEmptyAsNull;
+
+    // =====================================================================================
+    //                                                                           Easy-to-Use
+    //                                                                           ===========
+    public ${glFileTokenizingOption} delimitateByComma() {
+        _delimiter = ",";
+        return this;
+    }
+
+    public ${glFileTokenizingOption} delimitateByTab() {
+        _delimiter = "\t";
+        return this;
+    }
+
+    public ${glFileTokenizingOption} encodeAsUTF8() {
+        _encoding = "UTF-8";
+        return this;
+    }
+
+    public ${glFileTokenizingOption} encodeAsWindows31J() {
+        _encoding = "Windows-31J";
+        return this;
+    }
+
+    public ${glFileTokenizingOption} beginFirstLine() {
+        _beginFirstLine = true;
+        return this;
+    }
+
+    public ${glFileTokenizingOption} handleEmptyAsNull() {
+        _handleEmptyAsNull = true;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public String getDelimiter() {
+        return _delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        _delimiter = delimiter;
+    }
+
+    public String getEncoding() {
+        return _encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        _encoding = encoding;
+    }
+
+    public boolean isBeginFirstLine() {
+        return _beginFirstLine;
+    }
+
+    public boolean isHandleEmptyAsNull() {
+        return _handleEmptyAsNull;
+    }
+}

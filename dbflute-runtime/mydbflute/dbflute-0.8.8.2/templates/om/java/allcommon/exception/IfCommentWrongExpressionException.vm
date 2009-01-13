@@ -1,0 +1,28 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception of when the IF comment has a wrong expression about outsideSql.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glIfCommentWrongExpressionException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     */
+    public ${glIfCommentWrongExpressionException}(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable.
+     */
+    public ${glIfCommentWrongExpressionException}(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+}

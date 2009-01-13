@@ -1,0 +1,40 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractBatchAutoHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glInternalAbstractBatchAutoStaticCommand} extends ${glInternalAbstractAutoStaticCommand} {
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalAbstractBatchAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);
+    }
+
+	// ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    @Override
+    public Object execute(Object[] args) {
+        final ${glInternalAbstractBatchAutoHandler} handler = createBatchAutoHandler();
+        handler.setOptimisticLockHandling(optimisticLockHandling);
+        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+		handler.setSql(getSql());
+		// The logging message SQL of procedure is unnecessary.
+        // handler.setLoggingMessageSqlArgs(args);
+        return handler.executeBatch(args);
+    }
+
+    protected abstract ${glInternalAbstractBatchAutoHandler} createBatchAutoHandler();
+}

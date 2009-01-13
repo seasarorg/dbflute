@@ -1,0 +1,13 @@
+${database.allClassCopyright}package ${glPackageExtendedParameterBean};
+#set ($myClassName = "${myExtendedParameterBeanClassName}")
+
+/**
+ * The parameter-bean of ${pmbClassName}.
+ * <p>
+ * You can implement your original methods here.
+ * This class is NOT overrided when re-generating.
+ * </p>
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class ${myClassName} extends ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName} {
+}

@@ -1,0 +1,128 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
+
+#set ($myClassName = "${glHierarchyRequestElement}")
+
+import java.util.List;
+
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Top key. */
+    public static final String TOP_KEY = "$top$";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The column of source. */
+    protected ${glHierarchySourceColumn} sourceColumn;
+
+    /** The dbmeta of destination. */
+    protected ${glDBMeta} destinationDBMeta;
+
+    /** The column info of destination. */
+    protected ${glColumnInfo} destinationColumnInfo;
+
+    /** The list of relation info. */
+    protected java.util.List<${glRelationInfo}> relationInfoList = new java.util.ArrayList<${glRelationInfo}>();
+
+    /** the list of relation property name. */
+    protected java.util.List<String> relationPropertyNameList = new java.util.ArrayList<String>();
+
+    /** Relation property key. Default value is TOP_KEY. */
+    protected String relationPropertyKey = TOP_KEY;
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /**
+     * Make mapping between the source column and the destination one.
+     * 
+     * @param sourceColumn The column of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    public void mapping(${glHierarchySourceColumn} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
+        this.sourceColumn = sourceColumn;
+        this.destinationColumnInfo = destinationColumnInfo;
+    }
+
+    /**
+     * Make relatetion by relation info.
+     * 
+     * @param relationInfo Relation info. (NotNull)
+     */
+    public void relation(${glRelationInfo} relationInfo) {
+        addRelationInfoList(relationInfo);
+    }
+
+    protected void addRelationInfoList(${glRelationInfo} relationInfo) {
+        relationInfoList.add(relationInfo);
+        addRelationPropertyNameList(relationInfo.getRelationPropertyName());
+    }
+
+    protected void addRelationPropertyNameList(String relationPropertyName) {
+        relationPropertyNameList.add(relationPropertyName);
+        setupRelationPropertyKey();
+    }
+
+    protected void setupRelationPropertyKey() {
+        final StringBuilder sb = new StringBuilder();
+        for (String relationPropertyName : relationPropertyNameList) {
+            if (sb.length() > 0) {
+                sb.append("_");
+            }
+            sb.append(relationPropertyName);
+        }
+        this.relationPropertyKey = sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glHierarchySourceColumn} getSourceColumnInfo() {
+        return sourceColumn;
+    }
+
+    public void setSourceColumnInfo(${glHierarchySourceColumn} sourceColumn) {
+        this.sourceColumn = sourceColumn;
+    }
+
+    public void setDestinationDBMeta(${glDBMeta} destinationDBMeta) {
+        this.destinationDBMeta = destinationDBMeta;
+    }
+
+    public ${glDBMeta} getDestinationDBMeta() {
+        return destinationDBMeta;
+    }
+
+    public ${glColumnInfo} getDestinationColumnInfo() {
+        return destinationColumnInfo;
+    }
+
+    public java.util.List<${glRelationInfo}> getRelationInfoList() {
+        return relationInfoList;
+    }
+
+    public List<String> getRelationPropertyNameList() {
+        return relationPropertyNameList;
+    }
+
+    public String getRelationPropertyKey() {
+        return relationPropertyKey;
+    }
+
+    public String toString() {
+        return sourceColumn + "," + destinationColumnInfo;
+    }
+}

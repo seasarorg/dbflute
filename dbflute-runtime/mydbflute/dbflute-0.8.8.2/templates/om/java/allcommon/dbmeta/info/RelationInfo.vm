@@ -1,0 +1,25 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
+#set ($myClassName = "${glRelationInfo}")
+
+import java.util.Map;
+
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+
+/**
+ * The class of referrer information.
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+
+    public String getRelationPropertyName();
+
+    public ${glDBMeta} getLocalDBMeta();
+
+    public ${glDBMeta} getTargetDBMeta();
+
+    public Map<${glColumnInfo}, ${glColumnInfo}> getLocalTargetColumnInfoMap();
+
+    public boolean isOneToOne();
+
+    public boolean isReferrer();
+}

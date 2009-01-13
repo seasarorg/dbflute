@@ -1,0 +1,44 @@
+${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
+#set ($myClassName = "${myBaseTypeSafeCursorHandlerClassName}")
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import ${glPackageBaseCommonJdbc}.${glCursorHandler};
+import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
+
+/**
+ * The cursor handler of ${table.name}.
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${myClassName} implements ${glCursorHandler} {
+
+    /**
+     * Handle.
+     * @param rs Result set. (NotNull)
+     * @return Result. (Nullable)
+     * @throws java.sql.SQLException
+     */
+    public Object handle(java.sql.ResultSet rs) throws SQLException {
+        return fetchCursor(createTypeSafeCursor(rs));
+    }
+
+    /**
+     * Create type safe cursor.
+     * @param rs Result set. (NotNull)
+     * @return Type safe cursor. (Nullable)
+     * @throws java.sql.SQLException
+     */
+    protected ${myExtendedTypeSafeCursorClassName} createTypeSafeCursor(ResultSet rs) throws SQLException {
+        final ${myExtendedTypeSafeCursorClassName} cursor = new ${myExtendedTypeSafeCursorClassName}();
+        cursor.accept(rs);
+        return cursor;
+    }
+
+    /**
+     * Fetch cursor.
+     * @param cursor Type safe cursor. (NotNull)
+     * @return Result. (Nullable)
+     * @throws java.sql.SQLException
+     */
+    abstract protected Object fetchCursor(${myExtendedTypeSafeCursorClassName} cursor) throws SQLException;
+}

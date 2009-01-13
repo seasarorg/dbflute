@@ -1,0 +1,97 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClause}PostgreSql")
+
+/**
+ * SqlClause for PostreSQL.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glAbstractSqlClause} {
+
+    /** String of fetch-scope as sql-suffix. */
+    protected String _fetchScopeSqlSuffix = "";
+
+    /** String of lock as sql-suffix. */
+    protected String _lockSqlSuffix = "";
+
+    /**
+     * Constructor.
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+        doFetchPage();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchPage() {
+        _fetchScopeSqlSuffix = " offset " + getPageStartIndex() + " limit " + getFetchSize();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doClearFetchPageClause() {
+        _fetchScopeSqlSuffix = "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glSqlClause} lockForUpdate() {
+        _lockSqlSuffix = " for update";
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
+    @Override
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return "23505".equals(sqlState);
+    }
+}

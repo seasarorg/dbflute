@@ -1,0 +1,158 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+
+#set ($myClassName = "${myBaseObjectClassName}")
+
+/**
+ * The entity of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class ${myClassName} implements java.io.Serializable {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($col in $table.Columns)
+    
+    /** The value of ${col.UncapitalisedJavaName}. */
+    protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+#end
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($col in $table.Columns)
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public ${col.JavaNative} get${col.JavaName}() {
+        return _${col.UncapitalisedJavaName};
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
+        _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+    }
+#end
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+#if ($table.hasPrimaryKey())
+
+    /**
+     * ${database.OverrideComment}
+     * If the primary-key of the other is same as this one, returns true.
+     * 
+     * @param other Other entity.
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        final $myClassName otherEntity = ($myClassName)other;
+  #foreach ($col in $table.PrimaryKey)
+
+        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
+            return false;
+        }
+  #end
+
+        return true;
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from primary-key.
+     * 
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        int result = 0;
+  #foreach ($col in $table.PrimaryKey)
+
+        if (this.get${col.JavaName}() != null) {
+            result = result + get${col.JavaName}().hashCode();
+        }
+  #end
+
+        return result;
+    }
+#else
+
+    /**
+     * ${database.OverrideComment}
+     * If the all-column value of the other is same as this one, returns true.
+     * 
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        final $myClassName otherEntity = ($myClassName)other;
+  #foreach ($col in $table.Columns)
+
+        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
+            return false;
+        }
+  #end
+
+        return true;
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from all-columns.
+     * 
+     * @return Hash-code from all-columns.
+     */
+    public int hashCode() {
+        int result = 0;
+  #foreach ($col in $table.Columns)
+
+        if (this.get${col.JavaName}() != null) {
+            result = result + this.get${col.JavaName}().hashCode();
+        }
+  #end
+
+        return result;
+    }
+#end
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String toString() {
+        final String delimiter = ",";
+        final StringBuffer sb = new StringBuffer();
+#foreach ($col in $table.Columns)
+
+        sb.append(delimiter).append(get${col.JavaName}());
+#end
+
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+}

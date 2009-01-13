@@ -1,0 +1,71 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+#set ($myClassName = "${glDBCurrent}")
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
+
+    /** Singleton instance. */
+    private static final ${myClassName} _instance = new ${myClassName}();
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glDBDef} _currentDBDef;
+    {
+        _currentDBDef = ${glDBDef}.codeOf("${database.defaultDBDef}");
+        if (_currentDBDef == null) {
+            _currentDBDef = ${glDBDef}.Unknown;
+        }
+    }
+	
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    private ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
+    /**
+     * Get instance.
+     * @return Singleton instance. (NotNull)
+     */
+    public static ${myClassName} getInstance() {
+        return _instance;
+    }
+
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    public void initializeCurrentDBDef(${glDBDef} currentDBDef) {
+	    if (_log.isInfoEnabled()) {
+		    _log.info("...Setting currentDBDef: " + currentDBDef);
+		}
+		if (currentDBDef == null) {
+		    String msg = "The argument 'currentDBDef' should not be null!";
+		    throw new IllegalArgumentException(msg);
+		}
+        _currentDBDef = currentDBDef;
+    }
+
+    public ${glDBDef} currentDBDef() {
+        return _currentDBDef;
+    }
+
+    public boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+	    return _currentDBDef.equals(currentDBDef);
+    }
+}

@@ -1,0 +1,55 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
+
+/**
+ * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
+ */
+public interface ${glBehaviorCommand}<RESULT> {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getTableDbName();
+    public String getCommandName();
+    
+    /**
+     * Get the return type of command.
+     * This type is not related to generic type because this is for conversion and check only.
+     * @return The return type of command. (NotNull)
+     */
+    public Class<?> getCommandReturnType();
+
+    public boolean isInitializeOnly();
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isConditionBean();
+    public boolean isOutsideSql();
+    public boolean isProcedure();
+    public boolean isSelect();
+    public boolean isSelectCount();
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution();
+    public void afterExecuting();
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public String buildSqlExecutionKey();
+    public ${glSqlExecutionCreator} createSqlExecutionCreator();
+    public Object[] getSqlExecutionArgument();
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBean} getConditionBean();
+    public String getOutsideSqlPath();
+    public ${glOutsideSqlOption} getOutsideSqlOption();
+}

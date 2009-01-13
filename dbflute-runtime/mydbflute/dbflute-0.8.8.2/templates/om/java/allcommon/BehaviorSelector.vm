@@ -1,0 +1,30 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import ${glPackageBaseCommonBhv}.${glBehaviorReadable};
+
+/**
+ * The interface of behavior-selector.
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glBehaviorSelector} {
+
+    /**
+     * Initialize condition-bean meta data. <br />
+     */
+    public void initializeConditionBeanMetaData();
+	
+    /**
+     * Select behavior.
+	 * @param <BEHAVIOR> The type of behavior.
+     * @param behaviorType Behavior type. (NotNull)
+     * @return Behavior. (NotNull)
+     */
+    public <BEHAVIOR extends ${glBehaviorReadable}> BEHAVIOR select(Class<BEHAVIOR> behaviorType);
+
+    /**
+     * Select behavior-readable.
+     * @param tableFlexibleName Table flexible-name. (NotNull)
+     * @return Behavior-readable. (NotNull)
+     */
+    public ${glBehaviorReadable} byName(String tableFlexibleName);
+}

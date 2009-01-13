@@ -1,0 +1,8 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glFileTokenizingCallback} {
+    public void handleRowResource(${glFileTokenizingRowResource} fileTokenizingRowResource);
+}

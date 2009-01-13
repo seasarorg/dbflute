@@ -1,0 +1,93 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCKey};
+
+#set ($myClassName = "${glConditionKey}IsNull")
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ${glPackageBaseCommonCOption}.${glConditionOption};
+import ${glPackageBaseCommonCValue}.${glConditionValue};
+
+/**
+ * The condition-key of isNull.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionKey} {
+
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${myClassName}.class);
+
+    /**
+     * Constructor.
+     */
+    protected ${myClassName}() {
+        _conditionKey = "isNull";
+        _operand = "is null";
+    }
+
+    /**
+     * Is valid registration?
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param callerName Caller name. (NotNull)
+     * @return Determination.
+     */
+    public boolean isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
+        if (conditionValue.hasIsNull()) {
+            _log.debug("The value has already registered at " + callerName);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method implements super#doAddWhereClause().
+     * 
+     * @param conditionList Condition list. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @param value Condition value. (NotNull)
+     */
+    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValue} value) {
+        if (value.getIsNull() == null) {
+            return;
+        }
+        conditionList.add(buildClauseWithoutValue(columnName));
+    }
+
+    /**
+     * This method implements super#doAddWhereClause().
+     * 
+     * @param conditionList Condition list. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @param value Condition value. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
+        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+    }
+
+    /**
+     * This method implements super#doSetupConditionValue().
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param location Location. (NotNull)
+     */
+    protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
+        conditionValue.setIsNull(DUMMY_OBJECT).setIsNullLocation(location);
+    }
+
+    /**
+     * This method implements super#doSetupConditionValue().
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param location Location. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+    }
+}

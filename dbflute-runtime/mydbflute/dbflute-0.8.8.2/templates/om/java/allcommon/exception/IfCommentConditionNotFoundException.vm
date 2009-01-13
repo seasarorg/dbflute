@@ -1,0 +1,19 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception of when the condition of IF comment is not found about outsideSql.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glIfCommentConditionNotFoundException} extends ${glIfCommentWrongExpressionException} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     */
+    public ${glIfCommentConditionNotFoundException}(String msg) {
+        super(msg);
+    }
+}

@@ -1,0 +1,109 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import ${glPackageBaseCommon}.${glDBDef};
+import ${glPackageBaseCommonBhvCore}.${glResourceContext};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
+
+/**
+ * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
+ */
+public abstract class ${glAbstractOutsideSqlCommand}<RESULT> extends ${glAbstractBehaviorCommand}<RESULT> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                     Basic Information
+    //                                     -----------------
+    /** The path of outside-SQL. (Required) */
+    protected String _outsideSqlPath;
+
+    /** The parameter-bean. (Required to set, but Nullable) */
+    protected Object _parameterBean;
+
+    /** The option of outside-SQL. (Required) */
+    protected ${glOutsideSqlOption} _outsideSqlOption;
+
+    /** The current database definition. (Required) */
+    protected ${glDBDef} _currentDBDef;
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isConditionBean() {
+        return false; // When the command is for outside-SQL, it always be false.
+    }
+
+    public boolean isOutsideSql() {
+        return true;
+    }
+
+    public boolean isSelectCount() {
+        return false; // When the command is for outside-SQL, it always be false.
+    }
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBean} getConditionBean() {
+        return null;
+    }
+
+    public String getOutsideSqlPath() {
+        return _outsideSqlPath;
+    }
+
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
+        return _outsideSqlOption;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected ${glOutsideSqlContext} createOutsideSqlContext() {
+        return new ${glOutsideSqlContext}(${glResourceContext}.dbmetaProvider(), ${glResourceContext}.getOutsideSqlPackage());
+    }
+
+    protected String buildDbmsSuffix() {
+        assertOutsideSqlBasic("buildDbmsSuffix");
+        final String productName = _currentDBDef.code();
+        return (productName != null ? "_" + productName.toLowerCase() : "");
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertOutsideSqlBasic(String methodName) {
+        if (_outsideSqlPath == null) {
+            throw new IllegalStateException(buildAssertMessage("_outsideSqlPath", methodName));
+        }
+        if (_outsideSqlOption == null) {
+            throw new IllegalStateException(buildAssertMessage("_outsideSqlOption", methodName));
+        }
+        if (_currentDBDef == null) {
+            throw new IllegalStateException(buildAssertMessage("_currentDBDef", methodName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setOutsideSqlPath(String outsideSqlPath) {
+        _outsideSqlPath = outsideSqlPath;
+    }
+
+    public void setParameterBean(Object parameterBean) {
+        _parameterBean = parameterBean;
+    }
+
+    public void setOutsideSqlOption(${glOutsideSqlOption} outsideSqlOption) {
+        _outsideSqlOption = outsideSqlOption;
+    }
+
+    public void setCurrentDBDef(${glDBDef} currentDBDef) {
+        _currentDBDef = currentDBDef;
+    }
+}

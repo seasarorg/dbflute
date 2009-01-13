@@ -1,0 +1,135 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
+
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+
+import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicHandler}.SQLExceptionHandler;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalStatementFactory} implements StatementFactory {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalStatementFactory}.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glStatementConfig} defaultStatementConfig;
+    protected boolean internalDebug;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalStatementFactory}() {
+    }
+
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
+    public PreparedStatement createPreparedStatement(Connection conn, String sql) {
+        try {
+            final ${glStatementConfig} config = findStatementConfigOnThread();;
+            final int resultSetType;
+            if (config != null && config.hasResultSetType()) {
+                resultSetType = config.getResultSetType();
+            } else if (defaultStatementConfig != null && defaultStatementConfig.hasResultSetType()) {
+                resultSetType = defaultStatementConfig.getResultSetType();
+            } else {
+                resultSetType = ${database.statementResultSetType};
+            }
+            final int resultSetConcurrency = ${database.statementResultSetConcurrency};
+            if (internalDebug) {
+                _log.debug("...Creating prepareStatement(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
+            }
+            final PreparedStatement ps = conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
+            if (config != null && config.hasStatementOptions()) {
+                if (internalDebug) {
+                    _log.debug("...Setting statement config as request: " + config);
+                }
+                reflectStatementOptions(config, ps);
+            } else {
+                reflectDefaultOptionsToStatementIfNeeds(ps);
+            }
+            return ps;
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+    public CallableStatement createCallableStatement(Connection conn, String sql) {
+        return prepareCall(conn, sql);
+    }
+    protected ${glStatementConfig} findStatementConfigOnThread() {
+        final ${glStatementConfig} config;
+        if (${glConditionBeanContext}.isExistConditionBeanOnThread()) {
+            final ${glConditionBean} cb = ${glConditionBeanContext}.getConditionBeanOnThread();
+            config = cb.getStatementConfig();
+        } else if (${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContext} context = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
+            config = context.getStatementConfig();
+        } else {
+            config = null;
+        }
+        return config;
+    }
+    protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
+        if (defaultStatementConfig != null && defaultStatementConfig.hasStatementOptions()) {
+            if (internalDebug) {
+                _log.debug("...Setting statement config as default: " + defaultStatementConfig);
+            }
+            reflectStatementOptions(defaultStatementConfig, ps);
+            return;
+        }
+    }
+    protected void reflectStatementOptions(${glStatementConfig} config, PreparedStatement ps) {
+        try {
+            if (config.hasQueryTimeout()) {
+                ps.setQueryTimeout(config.getQueryTimeout());
+            }
+            if (config.hasFetchSize()) {
+                ps.setFetchSize(config.getFetchSize());
+            }
+            if (config.hasMaxRows()) {
+                ps.setMaxRows(config.getMaxRows());
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+        }
+    }
+    protected CallableStatement prepareCall(Connection conn, String sql) {
+        try {
+            return conn.prepareCall(sql);
+        } catch (SQLException e) {
+            handleSQLException(e, null);
+            return null;// Unreachable!
+        }
+    }
+    protected void handleSQLException(SQLException e, Statement statement) {
+        new SQLExceptionHandler().handleSQLException(e, statement);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDefaultStatementConfig(${glStatementConfig} defaultStatementConfig) {
+        this.defaultStatementConfig = defaultStatementConfig;
+    }
+
+    public void setInternalDebug(boolean internalDebug) {
+        this.internalDebug = internalDebug;
+    }
+}

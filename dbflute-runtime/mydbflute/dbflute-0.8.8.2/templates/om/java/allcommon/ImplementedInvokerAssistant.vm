@@ -1,0 +1,113 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import org.seasar.framework.util.Disposable;
+import org.seasar.framework.util.DisposableUtil;
+
+import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
+import ${glPackageBaseCommonBhvCore}.${glInvokerAssistant};
+import ${glPackageBaseCommonBhvCore}.${glResourceParameter};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, Disposable {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final ${glDBMetaProvider} _dbmetaProvider = createDBMetaProvider();
+    protected final ${glSqlClauseCreator} _sqlClauseCreator = createSqlClauseCreator();
+    protected ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+    protected boolean _disposable;
+
+    // ===================================================================================
+    //                                                                            Creation
+    //                                                                            ========
+    protected ${glSqlClauseCreator} createSqlClauseCreator() {
+        return new ${glImplementedSqlClauseCreator}();
+    }
+
+    protected ${glDBMetaProvider} createDBMetaProvider() {
+        return new ${glDBMetaInstanceHandler}();
+    }
+
+    // ===================================================================================
+    //                                                                 Assistant Main Work
+    //                                                                 ===================
+    public ${glDBDef} assistCurrentDBDef() {
+        return ${glDBCurrent}.getInstance().currentDBDef();
+    }
+
+    public ${glDBMetaProvider} assistDBMetaProvider() {
+        return _dbmetaProvider;
+    }
+
+    public ${glSqlClauseCreator} assistSqlClauseCreator() {
+        return _sqlClauseCreator;
+    }
+
+    public ${glResourceParameter} assistResourceParameter() {
+        ${glResourceParameter} resourceParameter = new ${glResourceParameter}();
+        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
+        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
+        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
+        return resourceParameter;
+    }
+
+    public String assistSqlFileEncoding() {
+        return "${database.sqlFileEncoding}";
+    }
+
+    public ${glStatementConfig} assistDefaultStatementConfig() {
+        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+    }
+    
+    public boolean assistInternalDebug() {
+        return ${glDBFluteConfig}.getInstance().isInternalDebug();
+    }
+
+    // ===================================================================================
+    //                                                                             Dispose
+    //                                                                             =======
+    public void toBeDisposable() { // for HotDeploy
+        if (!_disposable) {
+            synchronized (this) {
+                if (!_disposable) {
+                    DisposableUtil.add(this);
+                    _disposable = true;
+                }
+            }
+        }
+    }
+
+    public void dispose() {
+        assertBehaviorCommandInvoker();
+        _behaviorCommandInvoker.clearExecutionCache();
+        _disposable = false;
+    }
+
+    public boolean isDisposable() {
+        return _disposable;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertBehaviorCommandInvoker() {
+        if (_behaviorCommandInvoker == null) {
+            String msg = "The attribute 'behaviorCommandInvoker' should not be null!";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setBehaviorCommandInvoker(${glBehaviorCommandInvoker} behaviorCommandInvoker) {
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+    }
+}

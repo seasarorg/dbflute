@@ -1,0 +1,377 @@
+${database.allClassCopyright}package ${glPackageBaseCB};
+#set ($myClassName = "${myBaseConditionBeanClassName}")
+
+import java.util.Map;
+
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
+import ${glPackageBaseCommonCBean}.${glAbstractConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionQuery};
+import ${glPackageBaseCommonCBean}.${glSubQuery};
+import ${glPackageBaseCommonCBean}.${glUnionQuery};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+import ${glPackageCB}.*;
+import ${glPackageCQ}.*;
+#if ($table.hasForeignKeyOrReferrerAsOne())
+import ${glPackageNss}.*;
+#end
+
+/**
+ * The base condition-bean of ${table.name}.
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glAbstractConditionBean} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
+    protected ${myConditionQueryClassName} _conditionQuery;
+
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
+    @Override
+    protected ${glSqlClause} createSqlClause() {
+        return new ${glImplementedSqlClauseCreator}().createSqlClause(this);
+    }
+    
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    @Override
+    protected ${glDBMetaProvider} getDBMetaProvider() {
+        return _dbmetaProvider;
+    }
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    public String getTableDbName() {
+        return "${table.name}";
+    }
+
+    public String getTableSqlName() {
+        return "${table.tableSqlName}";
+    }
+
+    // ===================================================================================
+    //                                                                      PrimaryKey Map
+    //                                                                      ==============
+    public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
+#if ($table.hasPrimaryKey())
+        assertPrimaryKeyMap(primaryKeyMap);
+#foreach ($col in $table.primaryKey)
+        {
+            Object obj = primaryKeyMap.get("${col.name}");
+            if (obj instanceof ${col.javaNative}) {
+                query().set${col.javaName}_Equal((${col.javaNative})obj);
+            } else {
+#if ($col.isJavaNativeStringObject())
+                checkTypeString(obj, "${col.uncapitalisedJavaName}", "${col.javaNative}");
+                query().set${col.javaName}_Equal((String)obj);
+            }
+        }
+#else
+#if ($col.isJavaNativeDateObject())
+                query().set${col.javaName}_Equal(new ${col.javaNative}(parseDateStringAsMillis(obj, "${col.uncapitalisedJavaName}", "${col.JavaNative}")));
+            }
+        }
+#else
+#if (${col.isJavaNativeBinaryObject()})
+                query().set${col.javaName}_Equal(null);// Binary as String is out of target.
+            }
+        }
+#else
+                query().set${col.javaName}_Equal(new ${col.javaNative}((String)obj));
+            }
+        }
+#end
+#end
+#end
+#end
+#else
+
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
+#end
+
+    }
+
+    // ===================================================================================
+    //                                                                     OrderBy Setting
+    //                                                                     ===============
+    public ${glConditionBean} addOrderBy_PK_Asc() {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.primaryKey)
+        query().addOrderBy_${col.JavaName}_Asc();
+#end
+        return this;
+#else
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
+#end
+    }
+
+    public ${glConditionBean} addOrderBy_PK_Desc() {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.primaryKey)
+        query().addOrderBy_${col.JavaName}_Desc();
+#end
+        return this;
+#else
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
+#end
+    }
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    public ${myConditionQueryClassName} query() {
+        return getConditionQuery();
+    }
+
+    public ${myConditionQueryClassName} getConditionQuery() {
+        if (_conditionQuery == null) {
+            _conditionQuery = new ${myConditionQueryClassName}(null, getSqlClause(), getSqlClause().getLocalTableAliasName(), 0);
+        }
+        return _conditionQuery;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return The conditionQuery of the local table as interface. (NotNull)
+     */
+    public ${glConditionQuery} localCQ() {
+        return getConditionQuery();
+    }
+
+    // ===================================================================================
+    //                                                                               Union
+    //                                                                               =====
+    /**
+     * Set up 'union'.
+     * <pre>
+     * cb.query().union(new ${glUnionQuery}&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} unionCB) {
+     *         unionCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param unionQuery The query of 'union'. (NotNull)
+     */
+    public void union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(); unionQuery.query(cb);
+        final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionQuery(cq);
+    }
+
+    /**
+     * Set up 'union all'.
+     * <pre>
+     * cb.query().unionAll(new ${glUnionQuery}&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} unionCB) {
+     *         unionCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param unionQuery The query of 'union'. (NotNull)
+     */
+    public void unionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+        final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(); unionQuery.query(cb);
+        final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
+    }
+
+    public boolean hasUnionQueryOrUnionAllQuery() {
+        return query().hasUnionQueryOrUnionAllQuery();
+    }
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseDB2())
+
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                     Isolation Level
+    //                                                                     ===============
+    // *Database Dependency
+    public void lockWithRR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRR(); } }
+    public void lockWithRS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRS(); } }
+    public void lockWithCS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithCS(); } }
+    public void lockWithUR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithUR(); } }
+
+    protected boolean helpIsSqlClauseDb2() {
+        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2;
+    }
+
+    protected ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2 helpGettingSqlClauseDb2() {
+        return (${glPackageBaseCommonSqlClause}.${glSqlClause}Db2)getSqlClause();
+    }
+#end
+#end
+
+    // ===================================================================================
+    //                                                                        Setup Select
+    //                                                                        ============
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($nestSelectSetuppperClassName = "${fk.foreignTableNestSelectSetupperClassName}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+        doSetupSelect(new SsCall() { public ${glConditionQuery} qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
+        { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
+
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        doSetupSelect(new SsCall() { public ${glConditionQuery} qf() { return query().query${tmpPropertyNameInitCap}(); } });
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+#end
+#end
+
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    protected Specification _specification;
+    public Specification specify() {
+        if (_specification == null) { _specification = new Specification(this, new SpQyCall<${myConditionQueryClassName}>() {
+            public boolean has() { return true; } public ${myConditionQueryClassName} qy() { return query(); } }, _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, getDBMetaProvider()); }
+        return _specification;
+    }
+
+    public static class Specification extends AbstractSpecification<${myConditionQueryClassName}> {
+        protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}.Specification _${tmpPropertyName};
+#end
+#end
+        public Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
+                           , boolean forDeriveReferrer, boolean forScalarSelect, boolean forScalarSubQuery
+                           , ${glDBMetaProvider} dbmetaProvider)
+        { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect, forScalarSubQuery, dbmetaProvider); _myQyCall = qyCall; }
+#foreach ($col in $table.columns)
+        public void column${col.javaName}() { doColumn("${col.name}"); }
+#end
+        protected void doSpecifyRequiredColumn() {
+#foreach ($col in $table.primaryKey)
+            column${col.javaName}();// PK
+#end
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                column${col.javaName}();// FK
+#end
+#end
+            }
+#end
+        }
+        protected String getTableDbName() { return "$table.name"; }
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}.Specification specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
+                    public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+#else
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+#end
+                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _dbmetaProvider);
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}.Specification specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}.Specification(_baseCB, new SpQyCall<${tmpCQClassName}>() {
+                    public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _dbmetaProvider);
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#end
+#foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), new RAQSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
+                public void setup(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) {
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } }, _dbmetaProvider);
+        }
+#end
+#end
+    }
+
+    // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+    @Override
+    protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
+    @Override
+    protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
+
+    // ===================================================================================
+    //                                                                            Internal
+    //                                                                            ========
+    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
+    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
+    protected String getSubQueryClassNameInternally() { return ${glSubQuery}.class.getName(); }
+}

@@ -1,0 +1,5 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+public interface ${glScalarQuery}<CB extends ${glConditionBean}> {
+    public void query(CB cb);
+}

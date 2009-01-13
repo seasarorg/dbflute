@@ -1,0 +1,11 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLine};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glLineToken} {
+
+    public java.util.List${database.filterGenericsString('String')} tokenize(String lineString, ${glLineTokenizingOption} lineTokenizingOption);
+
+    public String make(java.util.List${database.filterGenericsString('String')} valueList, ${glLineMakingOption} lineMakingOption);
+}

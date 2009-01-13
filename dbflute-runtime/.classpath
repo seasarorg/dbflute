@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/classes" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="src/test/resources"/>
+	<classpathentry kind="src" path="src/test/generated"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/geronimo-servlet_2.4_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-j2ee_1.4_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-jsp_2.0_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/junit-3.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-ejb_3.0_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-jta_1.1_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.4.ga.jar"/>
+	<classpathentry kind="lib" path="lib/junit-addons-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="lib/ognl-2.6.9-patch-20070908.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.0-FINAL.jar"/>
+	<classpathentry kind="lib" path="lib/h2-2008-05-31.jar"/>
+	<classpathentry kind="lib" path="lib/s2-extension-2.4.26.jar" sourcepath="lib/sources/s2-extension-2.4.26-sources.jar"/>
+	<classpathentry kind="lib" path="lib/s2-framework-2.4.26.jar" sourcepath="lib/sources/s2-framework-2.4.26-sources.jar"/>
+	<classpathentry kind="lib" path="lib/s2-tiger-2.4.26.jar" sourcepath="lib/sources/s2-tiger-2.4.26-sources.jar"/>
+	<classpathentry kind="lib" path="lib/s2-dao-1.0.49.jar" sourcepath="lib/sources/s2-dao-1.0.49-sources.jar"/>
+	<classpathentry kind="output" path="target/test-classes"/>
+</classpath>

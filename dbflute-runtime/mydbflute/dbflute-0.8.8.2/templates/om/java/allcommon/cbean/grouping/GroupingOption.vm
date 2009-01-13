@@ -1,0 +1,48 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The class of option for grouping.
+ * @param  <ENTITY> The type of entity.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glGroupingOption}<ENTITY> {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected int _elementCount;
+
+    protected ${glGroupingRowEndDeterminer}<ENTITY> _groupingRowEndDeterminer;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor. You should set the determiner of grouping row end after you create the instance.
+     */
+    public ${glGroupingOption}() {
+    }
+
+    /**
+     * Constructor.
+     * @param elementCount The count of row element in a group.
+     */
+    public ${glGroupingOption}(int elementCount) {
+        _elementCount = elementCount;
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public int getElementCount() {
+        return this._elementCount;
+    }
+
+    public ${glGroupingRowEndDeterminer}<ENTITY> getGroupingRowEndDeterminer() {
+        return this._groupingRowEndDeterminer;
+    }
+
+    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminer}<ENTITY> groupingRowEndDeterminer) {
+        this._groupingRowEndDeterminer = groupingRowEndDeterminer;
+    }
+}
