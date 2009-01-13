@@ -1,19 +1,17 @@
 package org.dbflute.s2dao.sqlcommand;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.dbflute.exception.EntityAlreadyUpdatedException;
-import org.seasar.dao.PrimaryKeyNotFoundRuntimeException;
-import org.seasar.extension.jdbc.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.seasar.framework.exception.SRuntimeException;
-
+import org.seasar.extension.jdbc.PropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -99,7 +97,9 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             types.add(pt);
         }
         if (types.size() == 0) {
-            throw new SRuntimeException("EDAO0020");
+            String msg = "The property type that is not primary key was not found:";
+            msg = msg + " propertyNames=" + Arrays.asList(propertyNames);
+            throw new IllegalStateException(msg);
         }
         propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
     }
@@ -167,7 +167,9 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     protected void checkPrimaryKey() {
         TnBeanMetaData bmd = getBeanMetaData();
         if (bmd.getPrimaryKeySize() == 0) {
-            throw new PrimaryKeyNotFoundRuntimeException(bmd.getBeanClass());
+            String msg = "The primary key was not found:";
+            msg = msg + " bean=" + bmd.getBeanClass();
+            throw new IllegalStateException(msg);
         }
     }
 

@@ -4,12 +4,11 @@ import javax.sql.DataSource;
 
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.jdbc.StatementFactory;
-import org.seasar.dao.SqlCommand;
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public abstract class TnAbstractSqlCommand implements SqlCommand, SqlExecution {
+public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution {
 
 	// ===================================================================================
     //                                                                           Attribute

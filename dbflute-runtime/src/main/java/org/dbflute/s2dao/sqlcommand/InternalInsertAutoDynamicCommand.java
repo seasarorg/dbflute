@@ -6,18 +6,17 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.bhv.core.SqlExecution;
-import org.seasar.dao.SqlCommand;
-import org.seasar.extension.jdbc.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalInsertAutoHandler;
 import org.seasar.framework.exception.SRuntimeException;
+import org.seasar.extension.jdbc.PropertyType;
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalInsertAutoDynamicCommand implements SqlCommand, SqlExecution {
+public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                         Constructor

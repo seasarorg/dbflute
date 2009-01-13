@@ -15,42 +15,39 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.dao.impl.RelationKey;
-import org.seasar.dao.impl.RelationRowCache;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.framework.beans.PropertyDesc;
 
-
 /**
  * @author DBFlute(AutoGenerator)
  */
-@SuppressWarnings("unchecked")
 public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataResultSetHandler {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-	 * @param beanMetaData Bean meta data. (NotNull)
+     * @param beanMetaData Bean meta data. (NotNull)
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanListMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
+    public TnBeanListMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
+            TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
-	
-	// ===================================================================================
+
+    // ===================================================================================
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
-        Set columnNames = null; // Set<String(columnName)>
-        Map propertyCache = null; // Map<String(columnName), PropertyType>
-        Map relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
-        RelationRowCache relRowCache = null;
+        Set<String> columnNames = null; // Set<String(columnName)>
+        Map<String, PropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
+        Map<String, Map<String, PropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
+        TnRelationRowCache relRowCache = null;
 
-        final List list = new ArrayList();
+        final List<Object> list = new ArrayList<Object>();
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
         final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
@@ -66,9 +63,9 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         }
 
         while (rs.next()) {
-			if (columnNames == null) {
-			    columnNames = createColumnNames(rs.getMetaData());
-			}
+            if (columnNames == null) {
+                columnNames = createColumnNames(rs.getMetaData());
+            }
             if (propertyCache == null) {
                 propertyCache = createPropertyCache(columnNames);
             }
@@ -77,7 +74,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             final Object row = createRow(rs, propertyCache);
 
             // If it has condition-bean that has no relation to get
-            // or it has outside-sql context that is specified-outside-sql,
+            // or it has outside SQL context that is specified outside SQL,
             // they are unnecessary to do relation loop!
             if (skipRelationLoop) {
                 postCreateRow(row);
@@ -89,7 +86,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                 relationPropertyCache = createRelationPropertyCache(columnNames);
             }
             if (relRowCache == null) {
-                relRowCache = new RelationRowCache(relSize);
+                relRowCache = new TnRelationRowCache(relSize);
             }
             for (int i = 0; i < relSize; ++i) {
                 final TnRelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
@@ -102,8 +99,8 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                     continue;
                 }
 
-                final Map relKeyValues = new HashMap();
-                final RelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues);
+                final Map<String, Object> relKeyValues = new HashMap<String, Object>();
+                final TnRelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues);
                 Object relationRow = null;
                 if (relKey != null) {
                     relationRow = relRowCache.getRelationRow(i, relKey);
@@ -126,8 +123,9 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         return list;
     }
 
-    protected RelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames, Map<String, Object> relKeyValues) throws SQLException {
-        final List keyList = new ArrayList();
+    protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
+            Map<String, Object> relKeyValues) throws SQLException {
+        final List<Object> keyList = new ArrayList<Object>();
         final TnBeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final ValueType valueType;
@@ -153,12 +151,12 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         }
         if (keyList.size() > 0) {
             Object[] keys = keyList.toArray();
-            return new RelationKey(keys);
+            return new TnRelationKey(keys);
         } else {
             return null;
         }
     }
-    
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

@@ -3,18 +3,17 @@ package org.dbflute.s2dao.sqlcommand;
 import javax.sql.DataSource;
 
 import org.dbflute.bhv.core.SqlExecution;
-import org.seasar.dao.SqlCommand;
-import org.seasar.extension.jdbc.ResultSetHandler;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.sqlhandler.InternalProcedureHandler;
+import org.seasar.extension.jdbc.ResultSetHandler;
 
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalProcedureCommand implements SqlCommand, SqlExecution {
+public class InternalProcedureCommand implements TnSqlCommand, SqlExecution {
 
 	// ===================================================================================
     //                                                                           Attribute

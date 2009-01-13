@@ -6,7 +6,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.XLog;
-import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -88,7 +87,9 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             }
         }
         if (types.isEmpty()) {
-            throw new NoUpdatePropertyTypeRuntimeException();
+            String msg = "The property type for update was not found:";
+            msg = msg + " propertyNames=" + propertyNames;
+            throw new IllegalStateException(msg);
         }
         PropertyType[] propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
         return propertyTypes;

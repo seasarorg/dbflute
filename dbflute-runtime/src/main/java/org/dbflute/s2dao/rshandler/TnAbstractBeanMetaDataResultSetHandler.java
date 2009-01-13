@@ -15,7 +15,6 @@ import org.seasar.extension.jdbc.PropertyType;
 /**
  * @author DBFlute(AutoGenerator)
  */
-@SuppressWarnings("unchecked")
 public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractDtoMetaDataResultSetHandler {
 
     // ===================================================================================
@@ -47,7 +46,8 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @return The map of row property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    protected Map createPropertyCache(Set columnNames) throws SQLException {
+    @Override
+    protected Map<String, PropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -60,11 +60,12 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @return Created row. (NotNull)
      * @throws SQLException
      */
+    @Override
     protected Object createRow(ResultSet rs, Map<String, PropertyType> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
-        final Class beanClass = beanMetaData.getBeanClass();
+        final Class<?> beanClass = beanMetaData.getBeanClass();
         return rowCreator.createRow(rs, propertyCache, beanClass);
     }
 
@@ -73,7 +74,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    protected Map createRelationPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, Map<String, PropertyType>> createRelationPropertyCache(Set<String> columnNames) throws SQLException {
         return relationRowCreator.createPropertyCache(columnNames, beanMetaData);
     }
 
@@ -81,7 +82,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param columnNames The set of column name. (NotNull)
-     * @param relKeyValues The map of rel key values. (Nullable)
+     * @param relKeyValues The map of relation key values. (Nullable)
      * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
@@ -100,7 +101,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
             ((Entity) row).clearModifiedPropertyNames();
         } else { // Basically Unreachable
             final TnBeanMetaData bmd = getBeanMetaData();
-            final Set names = bmd.getModifiedPropertyNames(row);
+            final Set<String> names = bmd.getModifiedPropertyNames(row);
             names.clear();
         }
     }

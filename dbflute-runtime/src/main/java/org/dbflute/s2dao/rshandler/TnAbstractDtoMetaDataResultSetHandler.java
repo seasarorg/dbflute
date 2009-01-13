@@ -45,7 +45,7 @@ public abstract class TnAbstractDtoMetaDataResultSetHandler implements ResultSet
      * @return The map of row property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    protected Map createPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, PropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
         return rowCreator.createPropertyCache(columnNames, dtoMetaData);
     }
 

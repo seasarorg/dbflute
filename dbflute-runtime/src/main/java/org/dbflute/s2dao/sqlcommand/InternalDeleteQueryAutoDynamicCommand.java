@@ -11,13 +11,12 @@ import org.dbflute.twowaysql.context.TnCommandContext;
 import org.dbflute.twowaysql.context.TnCommandContextCreator;
 import org.dbflute.twowaysql.node.TnNode;
 import org.dbflute.util.SimpleSystemUtil;
-import org.seasar.dao.SqlCommand;
 
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalDeleteQueryAutoDynamicCommand implements SqlCommand, SqlExecution {
+public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
