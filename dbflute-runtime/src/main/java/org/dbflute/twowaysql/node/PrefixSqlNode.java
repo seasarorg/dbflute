@@ -13,32 +13,37 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.twowaysql.context;
+package org.dbflute.twowaysql.node;
+
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
  */
-public interface TnCommandContext {
+public class PrefixSqlNode extends AbstractNode {
 
-    public Object getArg(String name);
+    private String prefix;
 
-    public Class<?> getArgType(String name);
+    private String sql;
 
-    public void addArg(String name, Object arg, Class<?> argType);
+    public PrefixSqlNode(String prefix, String sql) {
+        this.prefix = prefix;
+        this.sql = sql;
+    }
 
-    public String getSql();
+    public String getPrefix() {
+        return prefix;
+    }
 
-    public Object[] getBindVariables();
+    public String getSql() {
+        return sql;
+    }
 
-    public Class<?>[] getBindVariableTypes();
+    public void accept(CommandContext ctx) {
+        if (ctx.isEnabled()) {
+            ctx.addSql(prefix);
+        }
+        ctx.addSql(sql);
+    }
 
-    public TnCommandContext addSql(String sql);
-
-    public TnCommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType);
-
-    public TnCommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes);
-
-    public boolean isEnabled();
-
-    public void setEnabled(boolean enabled);
 }

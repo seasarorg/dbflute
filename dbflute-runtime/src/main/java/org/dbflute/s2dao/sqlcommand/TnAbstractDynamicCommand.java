@@ -4,8 +4,8 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.twowaysql.SqlParser;
-import org.dbflute.twowaysql.context.TnCommandContext;
-import org.dbflute.twowaysql.context.TnCommandContextCreator;
+import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.node.Node;
 
 /**
@@ -43,18 +43,18 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
         return false;
     }
 
-    public TnCommandContext apply(Object[] args) { // It is necessary to be public!
-        final TnCommandContext ctx = createCommandContext(args);
+    public CommandContext apply(Object[] args) { // It is necessary to be public!
+        final CommandContext ctx = createCommandContext(args);
         rootNode.accept(ctx);
         return ctx;
     }
 
-    protected TnCommandContext createCommandContext(Object[] args) {
+    protected CommandContext createCommandContext(Object[] args) {
 	    return createCommandContextCreator().createCommandContext(args);
     }
 
-	protected TnCommandContextCreator createCommandContextCreator() {
-	    return new TnCommandContextCreator(argNames, argTypes);
+	protected CommandContextCreator createCommandContextCreator() {
+	    return new CommandContextCreator(argNames, argTypes);
 	}
 	
 	// ===================================================================================

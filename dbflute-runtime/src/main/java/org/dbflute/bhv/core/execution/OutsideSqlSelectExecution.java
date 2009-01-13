@@ -9,7 +9,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.SimpleStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -98,7 +98,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         outsideSqlCommand.setArgTypes(getArgTypes());
         outsideSqlCommand.setSql(staticSql);
 
-        final TnCommandContext ctx = outsideSqlCommand.apply(args);
+        final CommandContext ctx = outsideSqlCommand.apply(args);
         final List<Object> bindVariableList = new ArrayList<Object>();
         final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
@@ -115,7 +115,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsStatic(Object[] args, OutsideSqlContext outsideSqlContext) {
-        final TnCommandContext ctx = apply(args);
+        final CommandContext ctx = apply(args);
         final InternalBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = ctx.getBindVariables();
         selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
@@ -156,7 +156,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         return bindVariableTypesArray;
     }
 
-    protected void addBindVariableInfo(TnCommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
         final Object[] bindVariables = ctx.getBindVariables();
         addBindVariableList(bindVariableList, bindVariables);
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();

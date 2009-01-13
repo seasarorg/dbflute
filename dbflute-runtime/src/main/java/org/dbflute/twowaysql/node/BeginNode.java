@@ -15,20 +15,20 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
-import org.dbflute.twowaysql.context.impl.TnCommandContextImpl;
+import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.twowaysql.context.impl.CommandContextImpl;
 
 /**
  * @author jflute
  */
-public class TnBeginNode extends TnContainerNode {
+public class BeginNode extends ContainerNode {
 
-    public TnBeginNode() {
+    public BeginNode() {
     }
 
     @Override
-    public void accept(TnCommandContext ctx) {
-        TnCommandContext childCtx = new TnCommandContextImpl(ctx);
+    public void accept(CommandContext ctx) {
+        CommandContext childCtx = new CommandContextImpl(ctx);
         super.accept(childCtx);
         if (childCtx.isEnabled()) {
             ctx.addSql(childCtx.getSql(), childCtx.getBindVariables(), childCtx.getBindVariableTypes());

@@ -18,7 +18,7 @@ package org.dbflute.twowaysql.node;
 /**
  * @author jflute
  */
-public class TnValueAndType {
+public class ValueAndType {
 
     public Object _targetValue;
     public Class<?> _targetType;

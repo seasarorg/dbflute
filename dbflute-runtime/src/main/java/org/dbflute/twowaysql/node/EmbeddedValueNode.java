@@ -18,13 +18,13 @@ package org.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.SimpleStringUtil;
 
 /**
  * @author jflute
  */
-public class TnEmbeddedValueNode extends AbstractNode {
+public class EmbeddedValueNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,7 +38,7 @@ public class TnEmbeddedValueNode extends AbstractNode {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnEmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
+    public EmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
         this._names = SimpleStringUtil.split(expression, ".");
@@ -49,10 +49,10 @@ public class TnEmbeddedValueNode extends AbstractNode {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         final Object value = ctx.getArg(_names[0]);
         final Class<?> clazz = ctx.getArgType(_names[0]);
-        final TnValueAndType valueAndType = new TnValueAndType();
+        final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
         setupValueAndType(valueAndType);
@@ -93,14 +93,14 @@ public class TnEmbeddedValueNode extends AbstractNode {
         }
     }
 
-    protected void setupValueAndType(TnValueAndType valueAndType) {
-        final TnValueAndTypeSetupper valueAndTypeSetuper = new TnValueAndTypeSetupper(_expression, _names,
+    protected void setupValueAndType(ValueAndType valueAndType) {
+        final ValueAndTypeSetupper valueAndTypeSetuper = new ValueAndTypeSetupper(_expression, _names,
                 _specifiedSql, false);
         valueAndTypeSetuper.setupValueAndType(valueAndType);
     }
 
-    protected void throwBindOrEmbeddedParameterNullValueException(TnValueAndType valueAndType) {
-        TnNodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression,
+    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
+        NodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression,
                 valueAndType.getTargetType(), _specifiedSql, false);
     }
 
@@ -108,7 +108,7 @@ public class TnEmbeddedValueNode extends AbstractNode {
         return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
     }
 
-    protected void embedArray(TnCommandContext ctx, Object array) {
+    protected void embedArray(CommandContext ctx, Object array) {
         if (array == null) {
             return;
         }
@@ -144,10 +144,10 @@ public class TnEmbeddedValueNode extends AbstractNode {
     }
 
     protected void throwBindOrEmbeddedParameterEmptyListException() {
-        TnNodeExceptionHandler.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+        NodeExceptionHandler.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
     }
 
     protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-        TnNodeExceptionHandler.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+        NodeExceptionHandler.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
     }
 }

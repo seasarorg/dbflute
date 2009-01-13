@@ -10,7 +10,7 @@ import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.SimpleStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -70,7 +70,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
             dynamicSqlFactory.setArgNames(getArgNames());
             dynamicSqlFactory.setArgTypes(getArgTypes());
             dynamicSqlFactory.setSql(cb.getSqlClause().getClause());
-            final TnCommandContext ctx = dynamicSqlFactory.apply(args);
+            final CommandContext ctx = dynamicSqlFactory.apply(args);
             realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
@@ -111,7 +111,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
         return bindVariableTypesArray;
     }
 
-    protected void addBindVariableInfo(TnCommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
         final Object[] bindVariables = ctx.getBindVariables();
         addBindVariableList(bindVariableList, bindVariables);
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();

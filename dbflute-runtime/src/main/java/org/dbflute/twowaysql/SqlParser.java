@@ -4,18 +4,18 @@ import java.util.Stack;
 
 import org.dbflute.exception.EndCommentNotFoundException;
 import org.dbflute.exception.IfCommentConditionNotFoundException;
-import org.dbflute.twowaysql.context.TnCommandContext;
-import org.dbflute.twowaysql.context.TnCommandContextCreator;
+import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.node.AbstractNode;
-import org.dbflute.twowaysql.node.TnBeginNode;
-import org.dbflute.twowaysql.node.TnBindVariableNode;
-import org.dbflute.twowaysql.node.TnContainerNode;
+import org.dbflute.twowaysql.node.BeginNode;
+import org.dbflute.twowaysql.node.BindVariableNode;
+import org.dbflute.twowaysql.node.ContainerNode;
 import org.dbflute.twowaysql.node.ElseNode;
-import org.dbflute.twowaysql.node.TnEmbeddedValueNode;
+import org.dbflute.twowaysql.node.EmbeddedValueNode;
 import org.dbflute.twowaysql.node.IfNode;
 import org.dbflute.twowaysql.node.Node;
-import org.dbflute.twowaysql.node.TnPrefixSqlNode;
-import org.dbflute.twowaysql.node.TnSqlNode;
+import org.dbflute.twowaysql.node.PrefixSqlNode;
+import org.dbflute.twowaysql.node.SqlNode;
 import org.dbflute.util.SimpleStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 
@@ -49,7 +49,7 @@ public class SqlParser {
     //                                                                               Parse
     //                                                                               =====
     public Node parse() {
-        push(new TnContainerNode());
+        push(new ContainerNode());
         while (SqlTokenizer.EOF != tokenizer.next()) {
             parseToken();
         }
@@ -87,17 +87,17 @@ public class SqlParser {
             st.skipWhitespace();
             if (sql.startsWith(",")) {
                 if (sql.startsWith(", ")) {
-                    node.addChild(new TnPrefixSqlNode(", ", sql.substring(2)));
+                    node.addChild(new PrefixSqlNode(", ", sql.substring(2)));
                 } else {
-                    node.addChild(new TnPrefixSqlNode(",", sql.substring(1)));
+                    node.addChild(new PrefixSqlNode(",", sql.substring(1)));
                 }
             } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) {
-                node.addChild(new TnPrefixSqlNode(st.getBefore(), st.getAfter()));
+                node.addChild(new PrefixSqlNode(st.getBefore(), st.getAfter()));
             } else {
-                node.addChild(new TnSqlNode(sql));
+                node.addChild(new SqlNode(sql));
             }
         } else {
-            node.addChild(new TnSqlNode(sql));
+            node.addChild(new SqlNode(sql));
         }
     }
 
@@ -118,7 +118,7 @@ public class SqlParser {
             // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             String before = tokenizer.getBefore();
-            peek().addChild(new TnSqlNode(before.substring(before.lastIndexOf("/*"))));
+            peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
@@ -127,7 +127,7 @@ public class SqlParser {
         if (MyStringUtil.isEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
-        final TnContainerNode ifNode = createIfNode(condition);
+        final ContainerNode ifNode = createIfNode(condition);
         peek().addChild(ifNode);
         push(ifNode);
         parseEnd();
@@ -153,7 +153,7 @@ public class SqlParser {
     }
 
     protected void parseBegin() {
-        TnBeginNode beginNode = new TnBeginNode();
+        BeginNode beginNode = new BeginNode();
         peek().addChild(beginNode);
         push(beginNode);
         parseEnd();
@@ -252,14 +252,14 @@ public class SqlParser {
     }
 
     protected AbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
-        return new TnBindVariableNode(expr, testValue, specifiedSql, blockNullParameter);
+        return new BindVariableNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
     protected AbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
-        return new TnEmbeddedValueNode(expr, testValue, specifiedSql, blockNullParameter);
+        return new EmbeddedValueNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
-    protected TnContainerNode createIfNode(String expr) { // Extension!
+    protected ContainerNode createIfNode(String expr) { // Extension!
         return new IfNode(expr, specifiedSql);
     }
 
@@ -310,11 +310,11 @@ public class SqlParser {
 
     public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes,
             Object[] args, String logDateFormat, String logTimestampFormat) {
-        final TnCommandContext context;
+        final CommandContext context;
         {
             final SqlParser parser = new SqlParser(twoWaySql, false);
             final Node node = parser.parse();
-            final TnCommandContextCreator creator = new TnCommandContextCreator(argNames, argTypes);
+            final CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }

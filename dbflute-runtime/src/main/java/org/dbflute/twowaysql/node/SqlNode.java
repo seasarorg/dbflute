@@ -15,16 +15,16 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
  */
-public class TnSqlNode extends AbstractNode {
+public class SqlNode extends AbstractNode {
 
     private String sql;
 
-    public TnSqlNode(String sql) {
+    public SqlNode(String sql) {
         this.sql = sql;
     }
 
@@ -32,7 +32,7 @@ public class TnSqlNode extends AbstractNode {
         return sql;
     }
 
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         ctx.addSql(sql);
     }
 

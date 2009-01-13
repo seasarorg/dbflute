@@ -7,8 +7,8 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.dbflute.twowaysql.SqlParser;
-import org.dbflute.twowaysql.context.TnCommandContext;
-import org.dbflute.twowaysql.context.TnCommandContextCreator;
+import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.node.Node;
 import org.dbflute.util.SimpleSystemUtil;
 
@@ -40,7 +40,7 @@ public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlE
         String[] argNames = new String[]{"dto"};
         Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
-        TnCommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setLoggingMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
@@ -62,7 +62,7 @@ public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlE
         return (ConditionBean) fisrtArg;
     }
     
-    protected TnCommandContextHandler createCommandContextHandler(TnCommandContext context) {
+    protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
         return new TnCommandContextHandler(dataSource, statementFactory, context);
     }
 
@@ -70,12 +70,12 @@ public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlE
         return cb.getSqlClause().getClauseQueryDelete();
     }
     
-    protected TnCommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
-        TnCommandContext context;
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+        CommandContext context;
         {
             SqlParser parser = new SqlParser(twoWaySql, true);
             Node node = parser.parse();
-            TnCommandContextCreator creator = new TnCommandContextCreator(argNames, argTypes);
+            CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }

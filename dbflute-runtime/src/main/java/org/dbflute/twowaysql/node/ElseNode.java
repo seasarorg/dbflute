@@ -15,17 +15,17 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
  */
-public class ElseNode extends TnContainerNode {
+public class ElseNode extends ContainerNode {
 
     public ElseNode() {
     }
 
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         super.accept(ctx);
         ctx.setEnabled(true);
     }

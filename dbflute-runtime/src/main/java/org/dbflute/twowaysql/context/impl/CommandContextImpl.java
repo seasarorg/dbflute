@@ -21,13 +21,13 @@ import java.util.List;
 import ognl.OgnlRuntime;
 
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.twowaysql.context.TnCommandContext;
-import org.dbflute.twowaysql.context.TnCommandContextPropertyAccessor;
+import org.dbflute.twowaysql.context.CommandContext;
+import org.dbflute.twowaysql.context.CommandContextPropertyAccessor;
 
 /**
  * @author jflute
  */
-public class TnCommandContextImpl implements TnCommandContext {
+public class CommandContextImpl implements CommandContext {
 
     private StringKeyMap<Object> args = StringKeyMap.createAsCaseInsensitiveConcurrent();
     private StringKeyMap<Class<?>> argTypes = StringKeyMap.createAsCaseInsensitiveConcurrent();
@@ -35,16 +35,16 @@ public class TnCommandContextImpl implements TnCommandContext {
     private List<Object> bindVariables = new ArrayList<Object>();
     private List<Class<?>> bindVariableTypes = new ArrayList<Class<?>>();
     private boolean enabled = true;
-    private TnCommandContext parent;
+    private CommandContext parent;
 
     static {
-        OgnlRuntime.setPropertyAccessor(TnCommandContext.class, new TnCommandContextPropertyAccessor());
+        OgnlRuntime.setPropertyAccessor(CommandContext.class, new CommandContextPropertyAccessor());
     }
 
-    public TnCommandContextImpl() {
+    public CommandContextImpl() {
     }
 
-    public TnCommandContextImpl(TnCommandContext parent) {
+    public CommandContextImpl(CommandContext parent) {
         this.parent = parent;
         enabled = false;
     }
@@ -94,19 +94,19 @@ public class TnCommandContextImpl implements TnCommandContext {
         return (Class<?>[]) bindVariableTypes.toArray(new Class[bindVariableTypes.size()]);
     }
 
-    public TnCommandContext addSql(String sql) {
+    public CommandContext addSql(String sql) {
         sqlBuf.append(sql);
         return this;
     }
 
-    public TnCommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType) {
+    public CommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType) {
         sqlBuf.append(sql);
         bindVariables.add(bindVariable);
         bindVariableTypes.add(bindVariableType);
         return this;
     }
 
-    public TnCommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes) {
+    public CommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes) {
         sqlBuf.append(sql);
         for (int i = 0; i < bindVariables.length; ++i) {
             this.bindVariables.add(bindVariables[i]);

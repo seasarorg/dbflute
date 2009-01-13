@@ -15,7 +15,7 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
@@ -28,5 +28,5 @@ public interface Node {
 
     public void addChild(Node node);
 
-    public void accept(TnCommandContext ctx);
+    public void accept(CommandContext ctx);
 }

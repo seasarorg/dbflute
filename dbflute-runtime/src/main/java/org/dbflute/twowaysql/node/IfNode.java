@@ -17,7 +17,7 @@ package org.dbflute.twowaysql.node;
 
 import org.dbflute.exception.IfCommentNotBooleanResultException;
 import org.dbflute.exception.IfCommentWrongExpressionException;
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.SimpleStringUtil;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.framework.util.OgnlUtil;
@@ -25,7 +25,7 @@ import org.seasar.framework.util.OgnlUtil;
 /**
  * @author jflute
  */
-public class IfNode extends TnContainerNode {
+public class IfNode extends ContainerNode {
     
     private String _expression;
     private Object _parsedExpression;
@@ -50,7 +50,7 @@ public class IfNode extends TnContainerNode {
         this._elseNode = elseNode;
     }
 
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         Object result = null;
         try {
             result = OgnlUtil.getValue(_parsedExpression, ctx);

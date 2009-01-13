@@ -32,21 +32,21 @@ import org.seasar.framework.beans.factory.BeanDescFactory;
 /**
  * @author jflute
  */
-public class TnValueAndTypeSetupper {
+public class ValueAndTypeSetupper {
 
     protected String _expression;
     protected String[] _names;
     protected String _specifiedSql;
     protected boolean _bind;
 
-    public TnValueAndTypeSetupper(String expression, String[] names, String specifiedSql, boolean bind) {
+    public ValueAndTypeSetupper(String expression, String[] names, String specifiedSql, boolean bind) {
         this._expression = expression;
         this._names = names;
         this._specifiedSql = specifiedSql;
         this._bind = bind;
     }
 
-    protected void setupValueAndType(TnValueAndType valueAndType) {
+    protected void setupValueAndType(ValueAndType valueAndType) {
         Object value = valueAndType.getTargetValue();
         Class<?> clazz = valueAndType.getTargetType();
 

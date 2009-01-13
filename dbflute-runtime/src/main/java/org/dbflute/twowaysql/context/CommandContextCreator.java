@@ -1,11 +1,11 @@
 package org.dbflute.twowaysql.context;
 
-import org.dbflute.twowaysql.context.impl.TnCommandContextImpl;
+import org.dbflute.twowaysql.context.impl.CommandContextImpl;
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class TnCommandContextCreator {
+public class CommandContextCreator {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -16,7 +16,7 @@ public class TnCommandContextCreator {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnCommandContextCreator(String[] argNames, Class<?>[] argTypes) {
+    public CommandContextCreator(String[] argNames, Class<?>[] argTypes) {
         this.argNames = (argNames != null ? argNames : new String[0]);
         this.argTypes = (argTypes != null ? argTypes : new Class[0]);
     }
@@ -24,8 +24,8 @@ public class TnCommandContextCreator {
     // ===================================================================================
     //                                                                              Create
     //                                                                              ======
-    public TnCommandContext createCommandContext(Object[] args) {
-        final TnCommandContext ctx = new TnCommandContextImpl();
+    public CommandContext createCommandContext(Object[] args) {
+        final CommandContext ctx = new CommandContextImpl();
         if (args != null) {
             for (int i = 0; i < args.length; ++i) {
                 Class<?> argType = null;

@@ -18,19 +18,19 @@ package org.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.seasar.framework.util.OgnlUtil;
 
 /**
  * @author jflute
  */
-public class TnParenBindVariableNode extends AbstractNode {
+public class ParenBindVariableNode extends AbstractNode {
 
     private String expression;
 
     private Object parsedExpression;
 
-    public TnParenBindVariableNode(String expression) {
+    public ParenBindVariableNode(String expression) {
         this.expression = expression;
         this.parsedExpression = OgnlUtil.parseExpression(expression);
     }
@@ -39,7 +39,7 @@ public class TnParenBindVariableNode extends AbstractNode {
         return expression;
     }
 
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         Object var = OgnlUtil.getValue(parsedExpression, ctx);
         if (var instanceof List) {
             bindArray(ctx, ((List<?>) var).toArray());
@@ -53,7 +53,7 @@ public class TnParenBindVariableNode extends AbstractNode {
 
     }
 
-    private void bindArray(TnCommandContext ctx, Object array) {
+    private void bindArray(CommandContext ctx, Object array) {
         int length = Array.getLength(array);
         if (length == 0) {
             return;

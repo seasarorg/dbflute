@@ -23,11 +23,11 @@ import ognl.OgnlException;
 /**
  * @author jflute
  */
-public class TnCommandContextPropertyAccessor extends ObjectPropertyAccessor {
+public class CommandContextPropertyAccessor extends ObjectPropertyAccessor {
 
     @SuppressWarnings("unchecked")
     public Object getProperty(Map cx, Object target, Object name) throws OgnlException {
-        TnCommandContext ctx = (TnCommandContext) target;
+        CommandContext ctx = (CommandContext) target;
         String argName = name.toString();
         return ctx.getArg(argName);
     }

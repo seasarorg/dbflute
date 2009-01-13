@@ -15,17 +15,17 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
  */
-public class TnContainerNode extends AbstractNode {
+public class ContainerNode extends AbstractNode {
 
-    public TnContainerNode() {
+    public ContainerNode() {
     }
 
-    public void accept(TnCommandContext ctx) {
+    public void accept(CommandContext ctx) {
         for (int i = 0; i < getChildSize(); ++i) {
             getChild(i).accept(ctx);
         }

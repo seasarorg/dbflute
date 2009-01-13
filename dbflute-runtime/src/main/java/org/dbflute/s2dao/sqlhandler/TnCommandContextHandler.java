@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.twowaysql.context.TnCommandContext;
+import org.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -16,12 +16,12 @@ public class TnCommandContextHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnCommandContext commandContext;
+    protected CommandContext commandContext;
     
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, TnCommandContext commandContext) {
+    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, CommandContext commandContext) {
         super(dataSource, statementFactory);
         this.commandContext = commandContext;
         setSql(commandContext.getSql());
@@ -39,7 +39,7 @@ public class TnCommandContextHandler extends TnBasicHandler {
         }
     }
 
-    protected int execute(Connection connection, TnCommandContext context) {
+    protected int execute(Connection connection, CommandContext context) {
         logSql(context.getBindVariables(), getArgTypes(context.getBindVariables()));
         PreparedStatement ps = prepareStatement(connection);
         int ret = -1;

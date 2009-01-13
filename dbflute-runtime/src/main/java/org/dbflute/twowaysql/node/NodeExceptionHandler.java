@@ -22,7 +22,7 @@ import org.dbflute.util.SimpleSystemUtil;
 /**
  * @author jflute
  */
-public class TnNodeExceptionHandler {
+public class NodeExceptionHandler {
 
     public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class<?> targetType,
             String specifiedSql, boolean bind) {
