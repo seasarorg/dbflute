@@ -1,15 +1,20 @@
 package org.dbflute.exception;
 
-import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
-
 /**
  * The exception of when the entity has already been updated by other thread.
  * @author DBFlute(AutoGenerator)
  */
-public class EntityAlreadyUpdatedException extends NotSingleRowUpdatedRuntimeException {
+public class EntityAlreadyUpdatedException extends SQLFailureException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private Object bean;
+
+    private int rows;
     
     // ===================================================================================
     //                                                                         Constructor
@@ -20,14 +25,19 @@ public class EntityAlreadyUpdatedException extends NotSingleRowUpdatedRuntimeExc
      * @param rows Rows.
      */
     public EntityAlreadyUpdatedException(Object bean, int rows) {
-        super(bean, rows);
+        super("The entity already been updated: rows=" + rows + ", bean=" + bean, null);
+        this.bean = bean;
+        this.rows = rows;
+    }
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Object getBean() {
+        return bean;
     }
 
-    /**
-     * Constructor.
-     * @param e NotSingleRowUpdatedRuntimeException. (NotNull)
-     */
-    public EntityAlreadyUpdatedException(NotSingleRowUpdatedRuntimeException e) {
-        super(e.getBean(), e.getRows());
+    public int getRows() {
+        return rows;
     }
 }

@@ -23,6 +23,5 @@
 	<classpathentry kind="lib" path="lib/s2-extension-2.4.26.jar" sourcepath="lib/sources/s2-extension-2.4.26-sources.jar"/>
 	<classpathentry kind="lib" path="lib/s2-framework-2.4.26.jar" sourcepath="lib/sources/s2-framework-2.4.26-sources.jar"/>
 	<classpathentry kind="lib" path="lib/s2-tiger-2.4.26.jar" sourcepath="lib/sources/s2-tiger-2.4.26-sources.jar"/>
-	<classpathentry kind="lib" path="lib/s2-dao-1.0.49.jar" sourcepath="lib/sources/s2-dao-1.0.49-sources.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
