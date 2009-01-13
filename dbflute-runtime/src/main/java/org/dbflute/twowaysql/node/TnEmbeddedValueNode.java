@@ -25,13 +25,19 @@ import org.dbflute.util.SimpleStringUtil;
  * @author jflute
  */
 public class TnEmbeddedValueNode extends TnAbstractNode {
-    
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _expression;
     protected String _testValue;
     protected String[] _names;
     protected String _specifiedSql;
     protected boolean _blockNullParameter;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnEmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
@@ -40,6 +46,9 @@ public class TnEmbeddedValueNode extends TnAbstractNode {
         this._blockNullParameter = blockNullParameter;
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(TnCommandContext ctx) {
         final Object value = ctx.getArg(_names[0]);
         final Class<?> clazz = ctx.getArgType(_names[0]);
@@ -57,7 +66,9 @@ public class TnEmbeddedValueNode extends TnAbstractNode {
             // [UnderReview]: Should I make an original exception instead of this exception?
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
-                throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
+                String msg = "The value of expression for embedded comment should not contain a question mark '?':";
+                msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
+                throw new IllegalStateException(msg);
             }
             ctx.addSql(valueAndType.getTargetValue().toString());
         } else {
@@ -70,7 +81,9 @@ public class TnEmbeddedValueNode extends TnAbstractNode {
                 // [UnderReview]: Should I make an original exception instead of this exception?
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
-                    throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
+                    String msg = "The value of expression for embedded comment should not contain a question mark '?':";
+                    msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
+                    throw new IllegalStateException(msg);
                 }
                 ctx.addSql(valueAndType.getTargetValue().toString());
             }
