@@ -24,7 +24,7 @@ import org.dbflute.util.SimpleStringUtil;
 /**
  * @author jflute
  */
-public class TnEmbeddedValueNode extends TnAbstractNode {
+public class TnEmbeddedValueNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                           Attribute

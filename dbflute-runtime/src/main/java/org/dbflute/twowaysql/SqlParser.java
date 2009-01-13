@@ -6,14 +6,14 @@ import org.dbflute.exception.EndCommentNotFoundException;
 import org.dbflute.exception.IfCommentConditionNotFoundException;
 import org.dbflute.twowaysql.context.TnCommandContext;
 import org.dbflute.twowaysql.context.TnCommandContextCreator;
-import org.dbflute.twowaysql.node.TnAbstractNode;
+import org.dbflute.twowaysql.node.AbstractNode;
 import org.dbflute.twowaysql.node.TnBeginNode;
 import org.dbflute.twowaysql.node.TnBindVariableNode;
 import org.dbflute.twowaysql.node.TnContainerNode;
-import org.dbflute.twowaysql.node.TnElseNode;
+import org.dbflute.twowaysql.node.ElseNode;
 import org.dbflute.twowaysql.node.TnEmbeddedValueNode;
-import org.dbflute.twowaysql.node.TnIfNode;
-import org.dbflute.twowaysql.node.TnNode;
+import org.dbflute.twowaysql.node.IfNode;
+import org.dbflute.twowaysql.node.Node;
 import org.dbflute.twowaysql.node.TnPrefixSqlNode;
 import org.dbflute.twowaysql.node.TnSqlNode;
 import org.dbflute.util.SimpleStringUtil;
@@ -22,35 +22,35 @@ import org.dbflute.util.SimpleSystemUtil;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class TnSqlParser {
+public class SqlParser {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String specifiedSql;
     protected boolean blockNullParameter;
-    protected TnSqlTokenizer tokenizer;
-    protected Stack<TnNode> nodeStack = new Stack<TnNode>();
+    protected SqlTokenizer tokenizer;
+    protected Stack<Node> nodeStack = new Stack<Node>();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnSqlParser(String sql, boolean blockNullParameter) {
+    public SqlParser(String sql, boolean blockNullParameter) {
         sql = sql.trim();
         if (sql.endsWith(";")) {
             sql = sql.substring(0, sql.length() - 1);
         }
         specifiedSql = sql;
         this.blockNullParameter = blockNullParameter;
-        tokenizer = new TnSqlTokenizer(sql);
+        tokenizer = new SqlTokenizer(sql);
     }
 
     // ===================================================================================
     //                                                                               Parse
     //                                                                               =====
-    public TnNode parse() {
+    public Node parse() {
         push(new TnContainerNode());
-        while (TnSqlTokenizer.EOF != tokenizer.next()) {
+        while (SqlTokenizer.EOF != tokenizer.next()) {
             parseToken();
         }
         return pop();
@@ -58,16 +58,16 @@ public class TnSqlParser {
 
     protected void parseToken() {
         switch (tokenizer.getTokenType()) {
-        case TnSqlTokenizer.SQL:
+        case SqlTokenizer.SQL:
             parseSql();
             break;
-        case TnSqlTokenizer.COMMENT:
+        case SqlTokenizer.COMMENT:
             parseComment();
             break;
-        case TnSqlTokenizer.ELSE:
+        case SqlTokenizer.ELSE:
             parseElse();
             break;
-        case TnSqlTokenizer.BIND_VARIABLE:
+        case SqlTokenizer.BIND_VARIABLE:
             parseBindVariable();
             break;
         }
@@ -78,10 +78,10 @@ public class TnSqlParser {
         if (isElseMode()) {
             sql = MyStringUtil.replace(sql, "--", "");
         }
-        TnNode node = peek();
-        if ((node instanceof TnIfNode || node instanceof TnElseNode) && node.getChildSize() == 0) {
+        Node node = peek();
+        if ((node instanceof IfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
 
-            TnSqlTokenizer st = new TnSqlTokenizer(sql);
+            SqlTokenizer st = new SqlTokenizer(sql);
             st.skipWhitespace();
             String token = st.skipToken();
             st.skipWhitespace();
@@ -160,8 +160,8 @@ public class TnSqlParser {
     }
 
     protected void parseEnd() {
-        while (TnSqlTokenizer.EOF != tokenizer.next()) {
-            if (tokenizer.getTokenType() == TnSqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
+        while (SqlTokenizer.EOF != tokenizer.next()) {
+            if (tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
                 pop();
                 return;
             }
@@ -188,12 +188,12 @@ public class TnSqlParser {
     }
 
     protected void parseElse() {
-        final TnNode parent = peek();
-        if (!(parent instanceof TnIfNode)) {
+        final Node parent = peek();
+        if (!(parent instanceof IfNode)) {
             return;
         }
-        final TnIfNode ifNode = (TnIfNode) pop();
-        final TnElseNode elseNode = new TnElseNode();
+        final IfNode ifNode = (IfNode) pop();
+        final ElseNode elseNode = new ElseNode();
         ifNode.setElseNode(elseNode);
         push(elseNode);
         tokenizer.skipWhitespace();
@@ -214,21 +214,21 @@ public class TnSqlParser {
         peek().addChild(createBindVariableNode(expr, null));// Extension!
     }
 
-    protected TnNode pop() {
-        return (TnNode) nodeStack.pop();
+    protected Node pop() {
+        return (Node) nodeStack.pop();
     }
 
-    protected TnNode peek() {
-        return (TnNode) nodeStack.peek();
+    protected Node peek() {
+        return (Node) nodeStack.peek();
     }
 
-    protected void push(TnNode node) {
+    protected void push(Node node) {
         nodeStack.push(node);
     }
 
     protected boolean isElseMode() {
         for (int i = 0; i < nodeStack.size(); ++i) {
-            if (nodeStack.get(i) instanceof TnElseNode) {
+            if (nodeStack.get(i) instanceof ElseNode) {
                 return true;
             }
         }
@@ -251,16 +251,16 @@ public class TnSqlParser {
         return content != null && "END".equals(content);
     }
 
-    protected TnAbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
+    protected AbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
         return new TnBindVariableNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
-    protected TnAbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
+    protected AbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
         return new TnEmbeddedValueNode(expr, testValue, specifiedSql, blockNullParameter);
     }
 
     protected TnContainerNode createIfNode(String expr) { // Extension!
-        return new TnIfNode(expr, specifiedSql);
+        return new IfNode(expr, specifiedSql);
     }
 
     // ===================================================================================
@@ -312,14 +312,14 @@ public class TnSqlParser {
             Object[] args, String logDateFormat, String logTimestampFormat) {
         final TnCommandContext context;
         {
-            final TnSqlParser parser = new TnSqlParser(twoWaySql, false);
-            final TnNode node = parser.parse();
+            final SqlParser parser = new SqlParser(twoWaySql, false);
+            final Node node = parser.parse();
             final TnCommandContextCreator creator = new TnCommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }
         final String preparedSql = context.getSql();
-        return TnCompleteSqlBuilder.getCompleteSql(preparedSql, context.getBindVariables(), logDateFormat,
+        return CompleteSqlBuilder.getCompleteSql(preparedSql, context.getBindVariables(), logDateFormat,
                 logTimestampFormat);
     }
 }

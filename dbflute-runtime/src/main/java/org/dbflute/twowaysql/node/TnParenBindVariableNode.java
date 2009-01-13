@@ -24,7 +24,7 @@ import org.seasar.framework.util.OgnlUtil;
 /**
  * @author jflute
  */
-public class TnParenBindVariableNode extends TnAbstractNode {
+public class TnParenBindVariableNode extends AbstractNode {
 
     private String expression;
 

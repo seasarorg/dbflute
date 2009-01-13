@@ -2,7 +2,7 @@ package org.dbflute.cbean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.twowaysql.TnSqlParser;
+import org.dbflute.twowaysql.SqlParser;
 import org.dbflute.util.SimpleSystemUtil;
 
 
@@ -163,7 +163,7 @@ public class ConditionBeanContext {
 	                                                   , String logDateFormat
 	                                                   , String logTimestampFormat) {
 		final String twoWaySql = cb.getSqlClause().getClause();
-	    return TnSqlParser.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
+	    return SqlParser.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
 	}
 
     // ===================================================================================

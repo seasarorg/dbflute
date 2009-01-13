@@ -3,10 +3,10 @@ package org.dbflute.s2dao.sqlcommand;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.twowaysql.TnSqlParser;
+import org.dbflute.twowaysql.SqlParser;
 import org.dbflute.twowaysql.context.TnCommandContext;
 import org.dbflute.twowaysql.context.TnCommandContextCreator;
-import org.dbflute.twowaysql.node.TnNode;
+import org.dbflute.twowaysql.node.Node;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -16,7 +16,7 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
 	// ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnNode rootNode;
+    protected Node rootNode;
     protected String[] argNames = new String[0];
     protected Class<?>[] argTypes = new Class[0];
 
@@ -35,8 +35,8 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
         this.rootNode = createInternalSqlParser(sql).parse();
     }
 	
-	protected TnSqlParser createInternalSqlParser(String sql) {
-	    return new TnSqlParser(sql, isBlockNullParameter());
+	protected SqlParser createInternalSqlParser(String sql) {
+	    return new SqlParser(sql, isBlockNullParameter());
 	}
 
     protected boolean isBlockNullParameter() { // Extension Point!

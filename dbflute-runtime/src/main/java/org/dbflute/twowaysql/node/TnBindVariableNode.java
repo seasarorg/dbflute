@@ -24,7 +24,7 @@ import org.dbflute.util.SimpleStringUtil;
 /**
  * @author jflute
  */
-public class TnBindVariableNode extends TnAbstractNode {
+public class TnBindVariableNode extends AbstractNode {
 
     protected String _expression;
     protected String _testValue;

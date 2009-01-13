@@ -6,7 +6,7 @@ import org.dbflute.util.SimpleSystemUtil;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class TnSqlTokenizer {
+public class SqlTokenizer {
 
     // ===================================================================================
     //                                                                          Definition
@@ -30,7 +30,7 @@ public class TnSqlTokenizer {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnSqlTokenizer(String sql) {
+    public SqlTokenizer(String sql) {
         this.sql = sql;
     }
 

@@ -15,18 +15,28 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.context.TnCommandContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author jflute
  */
-public interface TnNode {
+public abstract class AbstractNode implements Node {
 
-    public int getChildSize();
+    private List<Node> children = new ArrayList<Node>();
 
-    public TnNode getChild(int index);
+    public AbstractNode() {
+    }
 
-    public void addChild(TnNode node);
+    public int getChildSize() {
+        return children.size();
+    }
 
-    public void accept(TnCommandContext ctx);
+    public Node getChild(int index) {
+        return (Node) children.get(index);
+    }
+
+    public void addChild(Node node) {
+        children.add(node);
+    }
 }

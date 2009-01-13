@@ -25,14 +25,14 @@ import org.seasar.framework.util.OgnlUtil;
 /**
  * @author jflute
  */
-public class TnIfNode extends TnContainerNode {
+public class IfNode extends TnContainerNode {
     
     private String _expression;
     private Object _parsedExpression;
-    private TnElseNode _elseNode;
+    private ElseNode _elseNode;
     private String _specifiedSql;
 
-    public TnIfNode(String expression, String specifiedSql) {
+    public IfNode(String expression, String specifiedSql) {
         this._expression = expression;
         this._parsedExpression = OgnlUtil.parseExpression(expression);
         this._specifiedSql = specifiedSql;
@@ -42,11 +42,11 @@ public class TnIfNode extends TnContainerNode {
         return _expression;
     }
 
-    public TnElseNode getElseNode() {
+    public ElseNode getElseNode() {
         return _elseNode;
     }
 
-    public void setElseNode(TnElseNode elseNode) {
+    public void setElseNode(ElseNode elseNode) {
         this._elseNode = elseNode;
     }
 

@@ -16,7 +16,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.resource.TnSqlLogRegistry;
-import org.dbflute.twowaysql.TnCompleteSqlBuilder;
+import org.dbflute.twowaysql.CompleteSqlBuilder;
 import org.dbflute.util.SimpleSystemUtil;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -128,7 +128,7 @@ public class TnBasicHandler {
     protected String getCompleteSql(Object[] args) {
         String logDateFormat = ResourceContext.getLogDateFormat();
         String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return TnCompleteSqlBuilder.getCompleteSql(sql, args, logDateFormat, logTimestampFormat);
+        return CompleteSqlBuilder.getCompleteSql(sql, args, logDateFormat, logTimestampFormat);
     }
 
     protected SqlLogHandler getSqlLogHander() {
@@ -148,7 +148,7 @@ public class TnBasicHandler {
     protected String getBindVariableText(Object bindVariable) {
         String logDateFormat = ResourceContext.getLogDateFormat();
         String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return TnCompleteSqlBuilder.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
+        return CompleteSqlBuilder.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================

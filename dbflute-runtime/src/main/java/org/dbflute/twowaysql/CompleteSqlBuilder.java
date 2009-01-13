@@ -15,7 +15,7 @@ import org.dbflute.resource.ResourceContext;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class TnCompleteSqlBuilder {
+public class CompleteSqlBuilder {
 
     // ===================================================================================
     //                                                                          Definition
@@ -25,7 +25,7 @@ public class TnCompleteSqlBuilder {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private TnCompleteSqlBuilder() {
+    private CompleteSqlBuilder() {
     }
 
     // ===================================================================================

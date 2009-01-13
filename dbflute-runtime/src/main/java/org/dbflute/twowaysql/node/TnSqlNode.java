@@ -20,7 +20,7 @@ import org.dbflute.twowaysql.context.TnCommandContext;
 /**
  * @author jflute
  */
-public class TnSqlNode extends TnAbstractNode {
+public class TnSqlNode extends AbstractNode {
 
     private String sql;
 
