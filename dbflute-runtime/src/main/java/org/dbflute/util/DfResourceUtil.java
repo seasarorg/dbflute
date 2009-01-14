@@ -7,8 +7,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.seasar.framework.exception.IORuntimeException;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author DBFlute(AutoGenerator)
@@ -74,7 +72,7 @@ public class DfResourceUtil {
     // ===================================================================================
     //                                                                           Text Read
     //                                                                           =========
-    public static String readText(Reader reader) throws IORuntimeException {
+    public static String readText(Reader reader) {
         BufferedReader in = new BufferedReader(reader);
         StringBuilder out = new StringBuilder(100);
         try {
@@ -88,7 +86,8 @@ public class DfResourceUtil {
                 in.close();
             }
         } catch (IOException e) {
-            throw new IORuntimeException(e);
+            String msg = "The IOException occurred: reader=" + reader;
+            throw new IllegalStateException(msg, e);
         }
         return out.toString();
     }

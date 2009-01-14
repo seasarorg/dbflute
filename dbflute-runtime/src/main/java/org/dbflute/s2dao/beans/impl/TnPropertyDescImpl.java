@@ -24,13 +24,10 @@ import java.sql.Timestamp;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
+import org.dbflute.util.DfReflectionUtil;
 import org.seasar.framework.util.BooleanConversionUtil;
 import org.seasar.framework.util.CalendarConversionUtil;
-import org.seasar.framework.util.ConstructorUtil;
 import org.seasar.framework.util.DateConversionUtil;
-import org.seasar.framework.util.FieldUtil;
-import org.seasar.framework.util.MethodUtil;
-import org.seasar.framework.util.ModifierUtil;
 import org.seasar.framework.util.NumberConversionUtil;
 import org.seasar.framework.util.SqlDateConversionUtil;
 import org.seasar.framework.util.TimeConversionUtil;
@@ -46,7 +43,7 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
     //                                                                          Definition
     //                                                                          ==========
     private static final Object[] EMPTY_ARGS = new Object[0];
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -105,10 +102,10 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
         Method[] methods = propertyType.getMethods();
         for (int i = 0; i < methods.length; ++i) {
             Method method = methods[i];
-            if (MethodUtil.isBridgeMethod(method) || MethodUtil.isSyntheticMethod(method)) {
+            if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
                 continue;
             }
-            if (ModifierUtil.isStatic(method.getModifiers()) && method.getName().equals("valueOf")
+            if (DfReflectionUtil.isStatic(method.getModifiers()) && method.getName().equals("valueOf")
                     && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(String.class)) {
                 valueOfMethod = method;
                 break;
@@ -176,7 +173,7 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
 
     public void setField(Field field) {
         this.field = field;
-        if (field != null && ModifierUtil.isPublic(field)) {
+        if (field != null && DfReflectionUtil.isPublic(field.getModifiers())) {
             readable = true;
             writable = true;
         }
@@ -201,9 +198,9 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
             if (!readable) {
                 throw new IllegalStateException(propertyName + " is not readable.");
             } else if (hasReadMethod()) {
-                return MethodUtil.invoke(readMethod, target, EMPTY_ARGS);
+                return DfReflectionUtil.invoke(readMethod, target, EMPTY_ARGS);
             } else {
-                return FieldUtil.get(field, target);
+                return DfReflectionUtil.getValue(field, target);
             }
         } catch (Throwable t) {
             throw new TnIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
@@ -216,9 +213,9 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
             if (!writable) {
                 throw new IllegalStateException(propertyName + " is not writable.");
             } else if (hasWriteMethod()) {
-                MethodUtil.invoke(writeMethod, target, new Object[] { value });
+                DfReflectionUtil.invoke(writeMethod, target, new Object[] { value });
             } else {
-                FieldUtil.set(field, target, value);
+                DfReflectionUtil.setValue(field, target, value);
             }
         } catch (Throwable t) {
             throw new TnIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
@@ -280,10 +277,10 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
 
     private Object convertWithString(Object arg) {
         if (stringConstructor != null) {
-            return ConstructorUtil.newInstance(stringConstructor, new Object[] { arg });
+            return DfReflectionUtil.newInstance(stringConstructor, new Object[] { arg });
         }
         if (valueOfMethod != null) {
-            return MethodUtil.invoke(valueOfMethod, null, new Object[] { arg });
+            return DfReflectionUtil.invoke(valueOfMethod, null, new Object[] { arg });
         }
         return arg;
     }

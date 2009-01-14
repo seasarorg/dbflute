@@ -27,9 +27,9 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
+import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.util.ClassUtil;
 
 /**
  * @author jflute
@@ -62,7 +62,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
     }
 
     protected Object newBean(Class<?> beanClass) {
-        return ClassUtil.newInstance(beanClass);
+        return DfReflectionUtil.newInstance(beanClass);
     }
 
     protected void registerValue(ResultSet rs, Object row, TnPropertyType pt, String name) throws SQLException {

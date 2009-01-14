@@ -18,9 +18,6 @@ package org.dbflute.s2dao.metadata;
 import java.util.Set;
 
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
-import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
-import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
 
 /**
  * It draws upon S2Dao.
@@ -28,46 +25,45 @@ import org.seasar.framework.beans.PropertyNotFoundRuntimeException;
  */
 public interface TnBeanMetaData extends TnDtoMetaData {
 
-    public String getTableName();
+    String getTableName();
 
-    public TnPropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException;
+    TnPropertyType getVersionNoPropertyType();
 
-    public String getVersionNoPropertyName();
+    String getVersionNoPropertyName();
 
-    public boolean hasVersionNoPropertyType();
+    boolean hasVersionNoPropertyType();
 
-    public TnPropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException;
+    TnPropertyType getTimestampPropertyType();
 
-    public String getTimestampPropertyName();
+    String getTimestampPropertyName();
 
-    public boolean hasTimestampPropertyType();
+    boolean hasTimestampPropertyType();
 
-    public String convertFullColumnName(String alias);
+    String convertFullColumnName(String alias);
 
-    public TnPropertyType getPropertyTypeByAliasName(String aliasName) throws ColumnNotFoundRuntimeException;
+    TnPropertyType getPropertyTypeByAliasName(String aliasName);
 
-    public TnPropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException;
+    TnPropertyType getPropertyTypeByColumnName(String columnName);
 
-    public boolean hasPropertyTypeByColumnName(String columnName);
+    boolean hasPropertyTypeByColumnName(String columnName);
 
-    public boolean hasPropertyTypeByAliasName(String aliasName);
+    boolean hasPropertyTypeByAliasName(String aliasName);
 
-    public int getRelationPropertyTypeSize();
+    int getRelationPropertyTypeSize();
 
-    public TnRelationPropertyType getRelationPropertyType(int index);
+    TnRelationPropertyType getRelationPropertyType(int index);
 
-    public TnRelationPropertyType getRelationPropertyType(String propertyName) throws PropertyNotFoundRuntimeException;
+    TnRelationPropertyType getRelationPropertyType(String propertyName);
 
-    public int getPrimaryKeySize();
+    int getPrimaryKeySize();
 
-    public String getPrimaryKey(int index);
+    String getPrimaryKey(int index);
 
-    public int getIdentifierGeneratorSize();
+    int getIdentifierGeneratorSize();
 
-    public TnIdentifierGenerator getIdentifierGenerator(int index);
+    TnIdentifierGenerator getIdentifierGenerator(int index);
 
-    public TnIdentifierGenerator getIdentifierGenerator(String propertyName);
+    TnIdentifierGenerator getIdentifierGenerator(String propertyName);
 
-    public Set<String> getModifiedPropertyNames(Object bean);
-
+    Set<String> getModifiedPropertyNames(Object bean);
 }

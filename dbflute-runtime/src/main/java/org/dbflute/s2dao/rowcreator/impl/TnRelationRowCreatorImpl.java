@@ -22,13 +22,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
-import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.util.DfReflectionUtil;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.framework.util.ClassUtil;
 
 /**
  * @author jflute
@@ -359,7 +359,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected Object newRelationRow(TnRelationPropertyType rpt) {
-        return ClassUtil.newInstance(rpt.getPropertyDesc().getPropertyType());
+        return DfReflectionUtil.newInstance(rpt.getPropertyDesc().getPropertyType());
     }
 
     // ===================================================================================

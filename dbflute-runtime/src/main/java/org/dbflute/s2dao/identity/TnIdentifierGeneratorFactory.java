@@ -4,13 +4,12 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dbflute.util.DfStringUtil;
-import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
-import org.seasar.framework.util.ClassUtil;
-import org.seasar.framework.util.ConstructorUtil;
+import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.util.DfReflectionUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -66,12 +65,12 @@ public class TnIdentifierGeneratorFactory {
         if (clazz != null) {
             return clazz;
         }
-        return ClassUtil.forName(name);
+        return DfReflectionUtil.forName(name);
     }
 
     protected static TnIdentifierGenerator createIdentifierGenerator(Class<?> clazz, TnPropertyType propertyType) {
-        Constructor<?> constructor = ClassUtil.getConstructor(clazz, new Class<?>[] { TnPropertyType.class });
-        return (TnIdentifierGenerator) ConstructorUtil.newInstance(constructor, new Object[] { propertyType });
+        Constructor<?> constructor = DfReflectionUtil.getConstructor(clazz, new Class<?>[] { TnPropertyType.class });
+        return (TnIdentifierGenerator) DfReflectionUtil.newInstance(constructor, new Object[] { propertyType });
     }
 
     protected static void setProperty(TnIdentifierGenerator generator, String propertyName, String value) {

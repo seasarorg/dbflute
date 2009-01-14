@@ -35,16 +35,13 @@ import org.dbflute.s2dao.beans.exception.TnConstructorNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.TnFieldNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
-import org.seasar.framework.util.ClassUtil;
-import org.seasar.framework.util.ConstructorUtil;
+import org.dbflute.util.DfReflectionUtil;
+import org.dbflute.util.DfStringUtil;
 import org.seasar.framework.util.DoubleConversionUtil;
-import org.seasar.framework.util.FieldUtil;
 import org.seasar.framework.util.FloatConversionUtil;
 import org.seasar.framework.util.IntegerConversionUtil;
 import org.seasar.framework.util.LongConversionUtil;
-import org.seasar.framework.util.MethodUtil;
 import org.seasar.framework.util.ShortConversionUtil;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -63,7 +60,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
     //                                                                           =========
     private Class<?> beanClass;
     private Constructor<?>[] constructors;
-    
+
     private StringKeyMap<TnPropertyDesc> propertyDescMap = StringKeyMap.createAsCaseInsensitive();
     private Map<String, Method[]> methodsMap = new ConcurrentHashMap<String, Method[]>();
     private Map<String, Field> fieldMap = new ConcurrentHashMap<String, Field>();
@@ -347,17 +344,17 @@ public class TnBeanDescImpl implements TnBeanDesc {
     //                                                                          ==========
     public Object newInstance(Object[] args) throws TnConstructorNotFoundRuntimeException {
         Constructor<?> constructor = getSuitableConstructor(args);
-        return ConstructorUtil.newInstance(constructor, args);
+        return DfReflectionUtil.newInstance(constructor, args);
     }
 
     public Object getFieldValue(String fieldName, Object target) throws TnFieldNotFoundRuntimeException {
         Field field = getField(fieldName);
-        return FieldUtil.get(field, target);
+        return DfReflectionUtil.getValue(field, target);
     }
 
     public Object invoke(Object target, String methodName, Object[] args) {
         Method method = getSuitableMethod(methodName, args);
-        return MethodUtil.invoke(method, target, args);
+        return DfReflectionUtil.invoke(method, target, args);
     }
 
     // ===================================================================================
@@ -370,7 +367,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 continue;
             }
             for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || ClassUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
+                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
                     continue;
                 }
                 continue outerLoop;
@@ -387,7 +384,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 continue;
             }
             for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || ClassUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
+                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
                         || adjustNumber(paramTypes, args, j)) {
                     continue;
                 }
@@ -441,7 +438,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
         Method[] methods = beanClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method m = methods[i];
-            if (MethodUtil.isBridgeMethod(m) || MethodUtil.isSyntheticMethod(m)) {
+            if (DfReflectionUtil.isBridgeMethod(m) || DfReflectionUtil.isSyntheticMethod(m)) {
                 continue;
             }
             String methodName = m.getName();
@@ -475,7 +472,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
     }
 
     private static String decapitalizePropertyName(String name) {
-        if (StringUtil.isEmpty(name)) {
+        if (DfStringUtil.isEmpty(name)) {
             return name;
         }
         if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) && Character.isUpperCase(name.charAt(0))) {
@@ -548,7 +545,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 continue;
             }
             for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || ClassUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
+                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
                     continue;
                 }
                 continue outerLoop;
@@ -565,7 +562,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 continue;
             }
             for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || ClassUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
+                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
                         || adjustNumber(paramTypes, args, j)) {
                     continue;
                 }
@@ -581,7 +578,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
         Method[] methods = beanClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
-            if (MethodUtil.isBridgeMethod(method) || MethodUtil.isSyntheticMethod(method)) {
+            if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
                 continue;
             }
             String methodName = method.getName();
@@ -636,11 +633,11 @@ public class TnBeanDescImpl implements TnBeanDesc {
             if (!fieldMap.containsKey(fname)) {
                 field.setAccessible(true);
                 fieldMap.put(fname, field);
-                if (FieldUtil.isInstanceField(field)) {
+                if (DfReflectionUtil.isInstanceField(field)) {
                     if (hasPropertyDesc(fname)) {
                         TnPropertyDesc pd = getPropertyDesc(field.getName());
                         pd.setField(field);
-                    } else if (FieldUtil.isPublicField(field)) {
+                    } else if (DfReflectionUtil.isPublicField(field)) {
                         TnPropertyDesc pd = new TnPropertyDescImpl(field.getName(), field.getType(), null, null, field,
                                 this);
                         propertyDescMap.put(fname, pd);

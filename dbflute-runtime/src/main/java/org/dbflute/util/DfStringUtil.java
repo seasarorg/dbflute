@@ -2,19 +2,29 @@ package org.dbflute.util;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
-import org.seasar.framework.util.Base64Util;
-
 /**
- * @author DBFlute(AutoGenerator)
+ * {Refers to S2Container's utility and Extends it}
+ * @author jflute
  */
 public class DfStringUtil {
 
     protected static final String[] EMPTY_STRINGS = new String[0];
+    
+    // ===================================================================================
+    //                                                                               Empty
+    //                                                                               =====
+    public static final boolean isEmpty(final String text) {
+        return text == null || text.length() == 0;
+    }
 
+    public static final boolean isNotEmpty(final String text) {
+        return !isEmpty(text);
+    }
+    
     // ===================================================================================
     //                                                                             Replace
     //                                                                             =======
@@ -122,7 +132,7 @@ public class DfStringUtil {
         } else if (value instanceof Number) {
             return toString((Number) value, pattern);
         } else if (value instanceof byte[]) {
-            return Base64Util.encode((byte[]) value);
+            return DfBase64Util.encode((byte[]) value);
         } else {
             return value.toString();
         }

@@ -17,11 +17,11 @@ package org.dbflute.s2dao.metadata.impl;
 
 import java.lang.reflect.Field;
 
-import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
-import org.seasar.framework.util.FieldUtil;
+import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
+import org.dbflute.util.DfReflectionUtil;
 
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
 
@@ -58,7 +58,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     public String getTableAnnotation() {
         if (beanDesc.hasField(TABLE)) {
             Field field = beanDesc.getField(TABLE);
-            return (String) FieldUtil.get(field, null);
+            return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
     }
@@ -66,7 +66,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     public String getVersionNoPropertyName() {
         if (beanDesc.hasField(VERSION_NO_PROPERTY)) {
             Field field = beanDesc.getField(VERSION_NO_PROPERTY);
-            return (String) FieldUtil.get(field, null);
+            return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
     }
@@ -74,7 +74,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     public String getTimestampPropertyName() {
         if (beanDesc.hasField(TIMESTAMP_PROPERTY)) {
             Field field = beanDesc.getField(TIMESTAMP_PROPERTY);
-            return (String) FieldUtil.get(field, null);
+            return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
     }
@@ -97,7 +97,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     public int getRelationNo(TnPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         Field field = beanDesc.getField(relnoKey);
-        return FieldUtil.getInt(field, null);
+        return (Integer)DfReflectionUtil.getValue(field, null);
     }
 
     public boolean hasRelationNo(TnPropertyDesc pd) {
@@ -113,7 +113,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     private String getField(String key) {
         if (beanDesc.hasField(key)) {
             Field field = beanDesc.getField(key);
-            return (String) FieldUtil.get(field, null);
+            return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
     }
