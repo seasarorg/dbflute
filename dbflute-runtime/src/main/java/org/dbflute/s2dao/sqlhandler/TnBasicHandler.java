@@ -52,8 +52,8 @@ public class TnBasicHandler {
     //                                                                        Common Logic
     //                                                                        ============
     // -----------------------------------------------------
-    //                                         Args Handling
-    //                                         -------------
+    //                                    Arguments Handling
+    //                                    ------------------
     protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
         if (args == null) {
             return;

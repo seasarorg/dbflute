@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.BigDecimalType;
@@ -66,9 +67,6 @@ import org.seasar.extension.jdbc.types.TimestampType;
 import org.seasar.extension.jdbc.types.UserDefineType;
 import org.seasar.extension.jdbc.types.WaveDashStringType;
 import org.seasar.framework.util.ConstructorUtil;
-import org.seasar.framework.util.Disposable;
-import org.seasar.framework.util.DisposableUtil;
-import org.seasar.framework.util.MapUtil;
 import org.seasar.framework.util.MethodUtil;
 import org.seasar.framework.util.ModifierUtil;
 
@@ -114,16 +112,14 @@ public class ValueTypes {
     private static final ValueType NULL = new NullType();
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
-    private static Map types = new HashMap();
+    private static Map<Class<?>, ValueType> types = new HashMap<Class<?>, ValueType>();
     private static Method isEnumMethod;
 
     private static Constructor<?> enumDefaultValueTypeConstructor;
     private static Constructor<?> enumOrdinalValueTypeConstructor;
     private static Constructor<?> enumStringValueTypeConstructor;
 
-    private static volatile boolean initialized;
-
-    private static Map valueTypeCache = MapUtil.createHashMap(50);
+    private static Map<String, ValueType> valueTypeCache = new ConcurrentHashMap<String, ValueType>(50);
 
     static {
         registerValueType(String.class, STRING);
@@ -163,96 +159,35 @@ public class ValueTypes {
             enumStringValueTypeConstructor = null;
             enumOrdinalValueTypeConstructor = null;
         }
-        initialize();
     }
 
-    /**
-     * インスタンスを構築します。
-     */
     protected ValueTypes() {
     }
 
-    /**
-     * 初期化を行ないます。
-     */
-    public static void initialize() {
-        DisposableUtil.add(new Disposable() {
-            public void dispose() {
-                clear();
-            }
-        });
-        initialized = true;
-    }
-
-    /**
-     * キャッシュをクリアします。
-     */
     public static void clear() {
         valueTypeCache.clear();
-        initialized = false;
     }
 
-    /**
-     * クラスに対する{@link ValueType}を登録します。
-     * 
-     * @param clazz
-     * @param valueType
-     */
     public static void registerValueType(Class<?> clazz, ValueType valueType) {
         types.put(clazz, valueType);
     }
 
-    /**
-     * クラスに対する{@link ValueType}の登録を解除します。
-     * 
-     * @param clazz
-     */
     public static void unregisterValueType(Class<?> clazz) {
         types.remove(clazz);
     }
 
-    /**
-     * enum型に対するデフォルトの{@link ValueType}を設定します。
-     * 
-     * @param enumDefaultValueTypeClass
-     *            enum型に対するデフォルトの{@link ValueType}
-     * @throws NoSuchMethodException
-     *             指定のクラスにClassを唯一の引数とするコンストラクタがない場合
-     */
     public static void setEnumDefaultValueType(Class<?> enumDefaultValueTypeClass) throws NoSuchMethodException {
         enumDefaultValueTypeConstructor = enumDefaultValueTypeClass.getConstructor(new Class[] { Class.class });
     }
 
-    /**
-     * enum型の{@link Enum#ordinal() 序数}に対する{@link ValueType}を設定します。
-     * 
-     * @param enumOrdinalValueTypeClass
-     *            enum型の{@link Enum#ordinal() 序数}に対する{@link ValueType}
-     * @throws NoSuchMethodException
-     *             指定のクラスにClassを唯一の引数とするコンストラクタがない場合
-     */
     public static void setEnumOrdinalValueType(Class<?> enumOrdinalValueTypeClass) throws NoSuchMethodException {
         enumOrdinalValueTypeConstructor = enumOrdinalValueTypeClass.getConstructor(new Class[] { Class.class });
     }
 
-    /**
-     * enum型の{@link Enum#name() 名前}に対する{@link ValueType}を設定します。
-     * 
-     * @param enumStringValueTypeClass
-     *            enum型の{@link Enum#name() 名前}に対する{@link ValueType}
-     * @throws NoSuchMethodException
-     *             指定のクラスにClassを唯一の引数とするコンストラクタがない場合
-     */
     public static void setEnumStringValueType(Class<?> enumStringValueTypeClass) throws NoSuchMethodException {
         enumStringValueTypeConstructor = enumStringValueTypeClass.getConstructor(new Class[] { Class.class });
     }
 
-    /**
-     * {@link ValueType}を返します。
-     * 
-     * @param obj
-     * @return {@link ValueType}
-     */
     public static ValueType getValueType(Object obj) {
         if (obj == null) {
             return OBJECT;
@@ -260,12 +195,6 @@ public class ValueTypes {
         return getValueType(obj.getClass());
     }
 
-    /**
-     * {@link ValueType}を返します。
-     * 
-     * @param clazz
-     * @return {@link ValueType}
-     */
     public static ValueType getValueType(Class<?> clazz) {
         if (clazz == null) {
             return OBJECT;
@@ -292,9 +221,6 @@ public class ValueTypes {
     }
 
     private static ValueType getCachedValueType(Class<?> clazz) {
-        if (!initialized) {
-            initialize();
-        }
         if (Map.class.isAssignableFrom(clazz)) {
             return null;
         }
@@ -332,51 +258,20 @@ public class ValueTypes {
         return null;
     }
 
-    /**
-     * enum型に対するデフォルトの{@link ValueType}を作成して返します。
-     * 
-     * @param clazz
-     *            enum型のクラス
-     * @return enum型用の{@link ValueType}
-     */
     public static ValueType getEnumDefaultValueType(Class<?> clazz) {
         return (ValueType) ConstructorUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    /**
-     * enum型の{@link Enum#name() 名前}に対する{@link ValueType}を作成して返します。
-     * 
-     * @param clazz
-     *            enum型のクラス
-     * @return enum型の{@link Enum#name() 名前}用の{@link ValueType}
-     */
     public static ValueType getEnumStringValueType(Class<?> clazz) {
         return (ValueType) ConstructorUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    /**
-     * enum型の{@link Enum#ordinal() 序数}に対する{@link ValueType}を作成して返します。
-     * 
-     * @param clazz
-     *            enum型のクラス
-     * @return enum型の{@link Enum#ordinal() 序数}用の{@link ValueType}
-     */
     public static ValueType getEnumOrdinalValueType(Class<?> clazz) {
         return (ValueType) ConstructorUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    /**
-     * ユーザ定義型用の{@link ValueType}を作成して返します。
-     * <p>
-     * <code>clazz</code>がユーザ定義型でなければ<code>null</code>を返します。
-     * </p>
-     * 
-     * @param clazz
-     *            ユーザ定義型
-     * @return ユーザ定義型用の{@link ValueType}
-     */
     public static ValueType createUserDefineValueType(Class<?> clazz) {
-        List valueOfMethods = new ArrayList();
+        List<Method> valueOfMethods = new ArrayList<Method>();
         Method valueMethod = null;
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; ++i) {
