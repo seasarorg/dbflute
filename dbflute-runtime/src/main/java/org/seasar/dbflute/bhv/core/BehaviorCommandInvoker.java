@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.sql.DataSource;
-
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -15,14 +13,9 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
-import org.seasar.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
-import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.TraceViewUtil;
@@ -47,9 +40,6 @@ public class BehaviorCommandInvoker {
     //                                      Injection Target
     //                                      ----------------
     protected InvokerAssistant _invokerAssistant;
-    protected DataSource _dataSource;
-    protected TnBeanMetaDataFactory _beanMetaDataFactory;
-    protected TnValueTypeFactory _valueTypeFactory;
 
     // -----------------------------------------------------
     //                                       Execution Cache
@@ -81,21 +71,12 @@ public class BehaviorCommandInvoker {
      * @param behaviorCommand The command of behavior. (NotNull)
      */
     public void injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand) {
-        behaviorCommand.setDataSource(_dataSource);
-        behaviorCommand.setStatementFactory(createStatememtFactory());
-        behaviorCommand.setBeanMetaDataFactory(_beanMetaDataFactory);
-        behaviorCommand.setValueTypeFactory(_valueTypeFactory);
-        behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
-    }
-
-    protected StatementFactory createStatememtFactory() {
         assertInvokerAssistant();
-        final StatementConfig defaultStatementConfig = _invokerAssistant.assistDefaultStatementConfig();
-        final boolean internalDebug = _invokerAssistant.assistInternalDebug();
-        TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
-        factory.setDefaultStatementConfig(defaultStatementConfig);
-        factory.setInternalDebug(internalDebug);
-        return factory;
+        behaviorCommand.setDataSource(_invokerAssistant.assistDataSource());
+        behaviorCommand.setStatementFactory(_invokerAssistant.assistStatementFactory());
+        behaviorCommand.setBeanMetaDataFactory(_invokerAssistant.assistBeanMetaDataFactory());
+        behaviorCommand.setValueTypeFactory(_invokerAssistant.assistValueTypeFactory());
+        behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
     }
 
     protected String getSqlFileEncoding() {
@@ -726,17 +707,5 @@ public class BehaviorCommandInvoker {
     //                                                                            ========
     public void setInvokerAssistant(InvokerAssistant invokerAssistant) {
         _invokerAssistant = invokerAssistant;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
-
-    public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
-        _beanMetaDataFactory = beanMetaDataFactory;
-    }
-
-    public void setValueTypeFactory(TnValueTypeFactory valueTypeFactory) {
-        _valueTypeFactory = valueTypeFactory;
     }
 }

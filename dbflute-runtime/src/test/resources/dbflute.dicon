@@ -14,9 +14,8 @@
     </component>
 
     <!-- The runtime component of DBFlute. -->
-    <component name="behaviorCommandInvoker" class="org.dbflute.bhv.core.BehaviorCommandInvoker"/>
-    <component name="beanMetaDataFactory" class="org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
-    <component name="valueTypeFactory" class="org.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
+    <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
+    <component name="beanMetaDataFactory" class="org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
 
     <component name="memberBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberBhv"/>
     <component name="memberAddressBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberAddressBhv"/>

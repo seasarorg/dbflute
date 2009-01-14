@@ -1,53 +1,67 @@
 package org.seasar.dbflute.bhv.core;
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface InvokerAssistant {
 
     /**
      * @return The current database definition. (NotNull)
      */
-    public DBDef assistCurrentDBDef();
+    DBDef assistCurrentDBDef();
 
+    /**
+     * @return The data source. (NotNull)
+     */
+    DataSource assistDataSource();
+    
     /**
      * @return The provider of DB meta. (NotNull)
      */
-    public DBMetaProvider assistDBMetaProvider();
+    DBMetaProvider assistDBMetaProvider();
 
     /**
      * @return The create of SQL clause. (NotNull)
      */
-    public SqlClauseCreator assistSqlClauseCreator();
-
+    SqlClauseCreator assistSqlClauseCreator();
+    
+    /**
+     * @return The factory of statement. (NotNull)
+     */
+    StatementFactory assistStatementFactory();
+    
+    /**
+     * @return The factory of bean meta data. (NotNull)
+     */
+    TnBeanMetaDataFactory assistBeanMetaDataFactory();
+    
+    /**
+     * @return The factory of value type. (NotNull)
+     */
+    TnValueTypeFactory assistValueTypeFactory();
+    
     /**
      * @return The parameter of resource. (NotNull)
      */
-    public ResourceParameter assistResourceParameter();
+    ResourceParameter assistResourceParameter();
 
     /**
      * @return The encoding of SQL files. (NotNull)
      */
-    public String assistSqlFileEncoding();
-
-    /**
-     * @return The default configure of statement. (NotNull)
-     */
-    public StatementConfig assistDefaultStatementConfig();
-
-    /**
-     * @return Is the internal debug valid? (NotNull)
-     */
-    public boolean assistInternalDebug();
+    String assistSqlFileEncoding();
 
     /**
      * To be disposable.
      */
-    public void toBeDisposable();
+    void toBeDisposable();
 }

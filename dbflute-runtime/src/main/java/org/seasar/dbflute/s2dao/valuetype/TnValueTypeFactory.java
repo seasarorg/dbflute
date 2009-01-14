@@ -26,5 +26,4 @@ public interface TnValueTypeFactory {
     public ValueType getValueTypeByName(String name);
 
     public ValueType getValueTypeByClass(Class<?> clazz);
-
 }

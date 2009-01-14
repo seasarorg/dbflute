@@ -42,9 +42,15 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
  */
 public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
 
-    protected DataSource dataSource;
-    protected TnValueTypeFactory valueTypeFactory;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DataSource _dataSource;
+    protected TnValueTypeFactory _valueTypeFactory;
 
+    // ===================================================================================
+    //                                                                            Creation
+    //                                                                            ========
     public TnBeanMetaData createBeanMetaData(final Class<?> daoInterface, final Class<?> beanClass) {
         return createBeanMetaData(beanClass);
     }
@@ -59,7 +65,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         }
         Connection conn = null;
         try {
-            conn = dataSource.getConnection();
+            conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
         } catch (SQLException e) {
@@ -117,6 +123,9 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return bmd;
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass) {
         return new TnFieldBeanAnnotationReader(beanClass);
     }
@@ -140,7 +149,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
 
     protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder() {
         TnPropertyTypeFactoryBuilderImpl impl = new TnPropertyTypeFactoryBuilderImpl();
-        impl.setValueTypeFactory(valueTypeFactory);
+        impl.setValueTypeFactory(_valueTypeFactory);
         return impl;
     }
 
@@ -171,10 +180,10 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     }
 
     public void setDataSource(final DataSource dataSource) {
-        this.dataSource = dataSource;
+        this._dataSource = dataSource;
     }
 
     public void setValueTypeFactory(TnValueTypeFactory valueTypeFactory) {
-        this.valueTypeFactory = valueTypeFactory;
+        this._valueTypeFactory = valueTypeFactory;
     }
 }
