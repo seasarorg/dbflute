@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.exbhv.MemberBhv;

@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.AccessContext;
-import org.dbflute.BehaviorSelector;
-import org.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.AccessContext;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.extension.unit.S2TestCase;
 
 import com.example.dbflute.basic.dbflute.exbhv.MemberAddressBhv;

@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
@@ -333,7 +333,7 @@ public abstract class AbstractBsMemberStatusCQ extends AbstractConditionQuery {
      * @param memberStatusName The value of memberStatusName as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setMemberStatusName_LikeSearch(String memberStatusName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setMemberStatusName_LikeSearch(String memberStatusName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(memberStatusName), getCValueMemberStatusName(), "MEMBER_STATUS_NAME", "MemberStatusName", "memberStatusName", likeSearchOption);
     }
 
@@ -342,7 +342,7 @@ public abstract class AbstractBsMemberStatusCQ extends AbstractConditionQuery {
      * @param memberStatusName The value of memberStatusName as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setMemberStatusName_NotLikeSearch(String memberStatusName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setMemberStatusName_NotLikeSearch(String memberStatusName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(memberStatusName), getCValueMemberStatusName(), "MEMBER_STATUS_NAME", "MemberStatusName", "memberStatusName", likeSearchOption);
     }
 

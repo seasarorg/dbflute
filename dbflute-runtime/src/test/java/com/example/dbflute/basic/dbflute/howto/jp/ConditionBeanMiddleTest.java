@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.SubQuery;
-import org.dbflute.cbean.UnionQuery;
-import org.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.cbean.MemberLoginCB;

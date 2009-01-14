@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.cbean.*;
@@ -316,7 +316,7 @@ public abstract class AbstractBsVendorCheckCQ extends AbstractConditionQuery {
      * @param typeOfText The value of typeOfText as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setTypeOfText_LikeSearch(String typeOfText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setTypeOfText_LikeSearch(String typeOfText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(typeOfText), getCValueTypeOfText(), "TYPE_OF_TEXT", "TypeOfText", "typeOfText", likeSearchOption);
     }
 
@@ -325,7 +325,7 @@ public abstract class AbstractBsVendorCheckCQ extends AbstractConditionQuery {
      * @param typeOfText The value of typeOfText as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setTypeOfText_NotLikeSearch(String typeOfText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setTypeOfText_NotLikeSearch(String typeOfText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(typeOfText), getCValueTypeOfText(), "TYPE_OF_TEXT", "TypeOfText", "typeOfText", likeSearchOption);
     }
 

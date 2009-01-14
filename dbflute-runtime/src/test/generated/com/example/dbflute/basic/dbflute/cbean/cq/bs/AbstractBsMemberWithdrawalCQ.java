@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.cbean.*;
@@ -180,7 +180,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param withdrawalReasonCode The value of withdrawalReasonCode as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setWithdrawalReasonCode_LikeSearch(String withdrawalReasonCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonCode_LikeSearch(String withdrawalReasonCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(withdrawalReasonCode), getCValueWithdrawalReasonCode(), "WITHDRAWAL_REASON_CODE", "WithdrawalReasonCode", "withdrawalReasonCode", likeSearchOption);
     }
 
@@ -189,7 +189,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param withdrawalReasonCode The value of withdrawalReasonCode as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setWithdrawalReasonCode_NotLikeSearch(String withdrawalReasonCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonCode_NotLikeSearch(String withdrawalReasonCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(withdrawalReasonCode), getCValueWithdrawalReasonCode(), "WITHDRAWAL_REASON_CODE", "WithdrawalReasonCode", "withdrawalReasonCode", likeSearchOption);
     }
 
@@ -264,7 +264,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param withdrawalReasonInputText The value of withdrawalReasonInputText as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setWithdrawalReasonInputText_LikeSearch(String withdrawalReasonInputText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonInputText_LikeSearch(String withdrawalReasonInputText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(withdrawalReasonInputText), getCValueWithdrawalReasonInputText(), "WITHDRAWAL_REASON_INPUT_TEXT", "WithdrawalReasonInputText", "withdrawalReasonInputText", likeSearchOption);
     }
 
@@ -273,7 +273,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param withdrawalReasonInputText The value of withdrawalReasonInputText as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setWithdrawalReasonInputText_NotLikeSearch(String withdrawalReasonInputText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonInputText_NotLikeSearch(String withdrawalReasonInputText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(withdrawalReasonInputText), getCValueWithdrawalReasonInputText(), "WITHDRAWAL_REASON_INPUT_TEXT", "WithdrawalReasonInputText", "withdrawalReasonInputText", likeSearchOption);
     }
 
@@ -341,7 +341,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of withdrawalDatetime. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void setWithdrawalDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void setWithdrawalDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
         registerFromToQuery((fromDate != null ? new java.sql.Timestamp(fromDate.getTime()) : null), (toDate != null ? new java.sql.Timestamp(toDate.getTime()) : null), getCValueWithdrawalDatetime(), "WITHDRAWAL_DATETIME", "WithdrawalDatetime", "withdrawalDatetime", fromToOption);
     }
 
@@ -351,7 +351,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of withdrawalDatetime. (Nullable)
      */
     public void setWithdrawalDatetime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setWithdrawalDatetime_FromTo(fromDate, toDate, new org.dbflute.cbean.coption.DateFromToOption());
+        setWithdrawalDatetime_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 
     protected void regWithdrawalDatetime(ConditionKey key, Object value) {
@@ -408,7 +408,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of registerDatetime. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void setRegisterDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void setRegisterDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
         registerFromToQuery((fromDate != null ? new java.sql.Timestamp(fromDate.getTime()) : null), (toDate != null ? new java.sql.Timestamp(toDate.getTime()) : null), getCValueRegisterDatetime(), "REGISTER_DATETIME", "RegisterDatetime", "registerDatetime", fromToOption);
     }
 
@@ -418,7 +418,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of registerDatetime. (Nullable)
      */
     public void setRegisterDatetime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setRegisterDatetime_FromTo(fromDate, toDate, new org.dbflute.cbean.coption.DateFromToOption());
+        setRegisterDatetime_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 
     protected void regRegisterDatetime(ConditionKey key, Object value) {
@@ -474,7 +474,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param registerProcess The value of registerProcess as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setRegisterProcess_LikeSearch(String registerProcess, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setRegisterProcess_LikeSearch(String registerProcess, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(registerProcess), getCValueRegisterProcess(), "REGISTER_PROCESS", "RegisterProcess", "registerProcess", likeSearchOption);
     }
 
@@ -483,7 +483,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param registerProcess The value of registerProcess as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setRegisterProcess_NotLikeSearch(String registerProcess, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setRegisterProcess_NotLikeSearch(String registerProcess, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(registerProcess), getCValueRegisterProcess(), "REGISTER_PROCESS", "RegisterProcess", "registerProcess", likeSearchOption);
     }
 
@@ -540,7 +540,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param registerUser The value of registerUser as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setRegisterUser_LikeSearch(String registerUser, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setRegisterUser_LikeSearch(String registerUser, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(registerUser), getCValueRegisterUser(), "REGISTER_USER", "RegisterUser", "registerUser", likeSearchOption);
     }
 
@@ -549,7 +549,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param registerUser The value of registerUser as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setRegisterUser_NotLikeSearch(String registerUser, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setRegisterUser_NotLikeSearch(String registerUser, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(registerUser), getCValueRegisterUser(), "REGISTER_USER", "RegisterUser", "registerUser", likeSearchOption);
     }
 
@@ -607,7 +607,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of updateDatetime. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void setUpdateDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void setUpdateDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
         registerFromToQuery((fromDate != null ? new java.sql.Timestamp(fromDate.getTime()) : null), (toDate != null ? new java.sql.Timestamp(toDate.getTime()) : null), getCValueUpdateDatetime(), "UPDATE_DATETIME", "UpdateDatetime", "updateDatetime", fromToOption);
     }
 
@@ -617,7 +617,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param toDate The to-date of updateDatetime. (Nullable)
      */
     public void setUpdateDatetime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setUpdateDatetime_FromTo(fromDate, toDate, new org.dbflute.cbean.coption.DateFromToOption());
+        setUpdateDatetime_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 
     protected void regUpdateDatetime(ConditionKey key, Object value) {
@@ -673,7 +673,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param updateProcess The value of updateProcess as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setUpdateProcess_LikeSearch(String updateProcess, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setUpdateProcess_LikeSearch(String updateProcess, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(updateProcess), getCValueUpdateProcess(), "UPDATE_PROCESS", "UpdateProcess", "updateProcess", likeSearchOption);
     }
 
@@ -682,7 +682,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param updateProcess The value of updateProcess as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setUpdateProcess_NotLikeSearch(String updateProcess, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setUpdateProcess_NotLikeSearch(String updateProcess, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(updateProcess), getCValueUpdateProcess(), "UPDATE_PROCESS", "UpdateProcess", "updateProcess", likeSearchOption);
     }
 
@@ -739,7 +739,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param updateUser The value of updateUser as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setUpdateUser_LikeSearch(String updateUser, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setUpdateUser_LikeSearch(String updateUser, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(updateUser), getCValueUpdateUser(), "UPDATE_USER", "UpdateUser", "updateUser", likeSearchOption);
     }
 
@@ -748,7 +748,7 @@ public abstract class AbstractBsMemberWithdrawalCQ extends AbstractConditionQuer
      * @param updateUser The value of updateUser as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setUpdateUser_NotLikeSearch(String updateUser, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setUpdateUser_NotLikeSearch(String updateUser, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(updateUser), getCValueUpdateUser(), "UPDATE_USER", "UpdateUser", "updateUser", likeSearchOption);
     }
 

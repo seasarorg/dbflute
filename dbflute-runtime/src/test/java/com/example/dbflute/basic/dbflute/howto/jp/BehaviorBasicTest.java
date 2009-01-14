@@ -2,8 +2,8 @@ package com.example.dbflute.basic.dbflute.howto.jp;
 
 import java.util.List;
 
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.exbhv.MemberBhv;

@@ -3,7 +3,7 @@ package com.example.dbflute.basic.dbflute.bsbhv.cursor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 
 /**

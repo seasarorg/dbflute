@@ -2,9 +2,9 @@ package com.example.dbflute.basic.dbflute.allcommon;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.QLog;
-import org.dbflute.XLog;
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.QLog;
+import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
  * @author DBFlute(AutoGenerator)

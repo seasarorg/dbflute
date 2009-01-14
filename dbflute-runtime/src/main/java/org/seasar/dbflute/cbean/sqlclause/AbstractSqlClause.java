@@ -1,0 +1,1564 @@
+package org.seasar.dbflute.cbean.sqlclause;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
+import org.seasar.dbflute.util.DfAssertUtil;
+import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfSystemUtil;
+
+
+/**
+ * The abstract class of SQL clause.
+ * @author DBFlute(AutoGenerator)
+ */
+public abstract class AbstractSqlClause implements SqlClause {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
+    protected static final String SELECT_HINT = "/*$dto.selectHint*/";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /** The name of table for SQL. */
+    protected final String _tableName;
+
+    /** The DB meta of target table. */
+    protected DBMetaProvider _dbmetaProvider;
+
+    // -----------------------------------------------------
+    //                                       Clause Resource
+    //                                       ---------------
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // The resources that are not often used to are lazy-loaded for performance.
+    // - - - - - - - - - -/
+    /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
+    protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
+    
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
+    protected Map<String, Map<String, String>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
+    
+    /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
+    protected Map<String, String> _specifiedDeriveSubQueryMap; // [DBFlute-0.7.4]
+
+    /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
+    protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // Without linked!
+
+    /** The type of select clause. (NotNull) */
+    protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
+
+    /** The previous type of select clause. (Nullable: The default is null) */
+    protected SelectClauseType _previousSelectClauseType;
+
+    /** Outer join map. */
+    protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
+
+    /** The list of where clause. */
+    protected List<String> _whereList = new ArrayList<String>();
+
+    /** Inline where list for BaseTable. */
+    protected List<String> _baseTableInlineWhereList = new ArrayList<String>();
+
+    /** The clause of order-by. (NotNull) */
+    protected final OrderByClause _orderByClause = new OrderByClause();
+
+    /** The list of union clause. (Nullable: This is lazy-loaded) */
+    protected List<UnionQueryInfo> _unionQueryInfoList;
+
+    /** Is order-by effective? Default value is false. */
+    protected boolean _isOrderByEffective = false;
+
+    // -----------------------------------------------------
+    //                                        Fetch Property
+    //                                        --------------
+    /** Fetch start index. (for fetchXxx()) */
+    protected int _fetchStartIndex = 0;
+
+    /** Fetch size. (for fetchXxx()) */
+    protected int _fetchSize = 0;
+
+    /** Fetch page number. (for fetchXxx()) This value should be plus. */
+    protected int _fetchPageNumber = 1;
+
+    /** Is fetch-narrowing effective? Default value is false. */
+    protected boolean _isFetchScopeEffective = false;
+
+    // -----------------------------------------------------
+    //                               AdditionalConditionAsOr
+    //                               -----------------------
+    /** Is additional condition as or effective?*/
+    protected boolean _isAdditionalConditionAsOrEffective = false;
+
+    // -----------------------------------------------------
+    //                               WhereClauseSimpleFilter
+    //                               -----------------------
+    /** The filter for where clause. */
+    protected List<WhereClauseSimpleFilter> _whereClauseSimpleFilterList;
+
+    // -----------------------------------------------------
+    //                                 Selected Foreign Info
+    //                                 ---------------------
+    /** The information of selected foreign table. */
+    protected Map<String, String> _selectedForeignInfo;
+        
+    // -----------------------------------------------------
+    //                                         Optional Info
+    //                                         -------------
+    protected boolean _formatClause = true;
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public AbstractSqlClause(String tableName) {
+        if (tableName == null) {
+            String msg = "Argument[tableName] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _tableName = tableName;
+    }
+
+    public SqlClause provider(DBMetaProvider dbmetaProvider) {
+        _dbmetaProvider = dbmetaProvider;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                              Clause
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Complete Clause
+    //                                       ---------------
+    public String getClause() {
+        StringBuilder sb = new StringBuilder(512);
+        sb.append(getSelectClause());
+        sb.append(" ");
+        sb.append(buildClauseWithoutMainSelect());
+        String sql = sb.toString();
+        sql = filterUnionCountOrScalar(sql);
+        sql = filterSubQueryIndent(sql);
+        return sql;
+    }
+
+    protected String buildClauseWithoutMainSelect() {
+        StringBuilder sb = new StringBuilder(512);
+        sb.append(getFromClause());
+        sb.append(getFromHint());
+        sb.append(" ");
+        sb.append(getWhereClause());
+        String unionClause = buildUnionClause(getSelectClause());
+        
+        // Delete template mark! (At the future this will be unnecessary.)
+        unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");// Required!
+        unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
+        
+        sb.append(unionClause);
+        if (_isOrderByEffective && !_orderByClause.isEmpty()) {
+            sb.append(" ");
+            sb.append(getOrderByClause());
+        }
+        sb.append(" ");
+        sb.append(getSqlSuffix());
+        return sb.toString();
+    }
+    
+    // -----------------------------------------------------
+    //                                       Fragment Clause
+    //                                       ---------------
+    public String getClauseFromWhereWithUnionTemplate() {
+        return buildClauseFromWhereAsTemplate(false);
+    }
+    
+    public String getClauseFromWhereWithWhereUnionTemplate() {
+        return buildClauseFromWhereAsTemplate(true);
+    }
+    
+    protected String buildClauseFromWhereAsTemplate(boolean template) {
+        StringBuilder sb = new StringBuilder(512);
+        sb.append(getFromClause());
+        sb.append(getFromHint());
+        sb.append(" ");
+        sb.append(buildWhereClause(template));
+        sb.append(buildUnionClause(getUnionSelectClauseMark()));
+        return sb.toString();
+    }
+
+    protected String buildUnionClause(String selectClause) {
+        StringBuilder sb = new StringBuilder();
+        if (hasUnionQuery()) {
+            for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+                UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
+                String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+                boolean unionAll = unionQueryInfo.isUnionAll();
+                sb.append(getLineSeparator());
+                sb.append(unionAll ? " union all " : " union ");
+                sb.append(getLineSeparator());
+                sb.append(selectClause).append(" ").append(unionQueryClause);
+            }
+        }
+        return sb.toString();
+    }
+
+    protected String filterUnionCountOrScalar(String sql) {
+        if (!isSelectClauseTypeCountOrScalar() || !hasUnionQuery()) {
+            return sql;
+        }
+        String selectClause = buildSelectClauseCountOrScalar("dfmain");
+        String ln = getLineSeparator();
+        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        String endMark = resolveSubQueryEndMark("dfmain");
+        return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
+    }
+
+    // ===================================================================================
+    //                                                                        Clause Parts
+    //                                                                        ============
+    public String getSelectClause() {
+        // [DBFlute-0.8.6]
+        if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
+            return buildSelectClauseCountOrScalar("dflocal");
+        }
+        // /- - - - - - - - - - - - - - - - - - - - - - - - 
+        // The type of select clause is COLUMNS since here.
+        // - - - - - - - - - -/
+        StringBuilder sb = new StringBuilder();
+        DBMeta dbmeta = findDBMeta(_tableName);
+        List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+
+        // [DBFlute-0.7.4]
+        Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
+        boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+
+        for (ColumnInfo columnInfo : columnInfoList) {
+            String columnName = columnInfo.getColumnDbName();
+
+            // [DBFlute-0.7.4]
+            if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
+                if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
+                    // Here it must be with union query.
+                    // So the primary Key is target for saving unique.
+                    // But if it does not have primary keys, all column is target.
+                    if (dbmeta.hasPrimaryKey()) {
+                        if (!columnInfo.isPrimary()) {
+                            continue;
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+            if (sb.length() > 0) {
+                sb.append(", ");
+            } else {
+                sb.append("select").append(SELECT_HINT).append(" ");
+            }
+            String realColumnName = getLocalTableAliasName() + "." + columnName;
+            sb.append(realColumnName).append(" as ").append(columnName);
+            _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
+        }
+        Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
+        for (String tableAliasName : tableAliasNameSet) {
+            Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+            Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
+
+            // [DBFlute-0.7.4]
+            Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
+            boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
+
+            for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
+                String realColumnName = selectColumnInfo.buildRealColumnName();
+
+                // [DBFlute-0.7.4]
+                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
+                    continue;
+                }
+
+                sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
+                _selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
+            }
+        }
+
+        // [DBFlute-0.7.4]
+        if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
+            Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
+            for (String deriveSubQuery : deriveSubQuerySet) {
+                sb.append(getLineSeparator()).append("     ");
+                sb.append(", ").append(deriveSubQuery);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    protected boolean isSelectClauseTypeCountOrScalar() {
+        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.SUM)) {
+            return true;
+        } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected String buildSelectClauseCountOrScalar(String aliasName) {
+        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+            return buildSelectClauseCount();
+        } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
+            return buildSelectClauseMax(aliasName);
+        } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
+            return buildSelectClauseMin(aliasName);
+        } else if (_selectClauseType.equals(SelectClauseType.SUM)) {
+            return buildSelectClauseSum(aliasName);
+        } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
+            return buildSelectClauseAvg(aliasName);
+        }
+        String msg = "The type of select clause is not for scalar:";
+        msg = msg + " type=" + _selectClauseType;
+        throw new IllegalStateException(msg);
+    }
+
+    protected String buildSelectClauseCount() {
+        return "select count(*)";
+    }
+
+    protected String buildSelectClauseMax(String aliasName) {
+        String columnName = getSpecifiedColumnNameAsOne();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select max(" + aliasName + "." + columnName  + ")";
+    }
+
+    protected String buildSelectClauseMin(String aliasName) {
+        String columnName = getSpecifiedColumnNameAsOne();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select min(" + aliasName + "." + columnName  + ")";
+    }
+
+    protected String buildSelectClauseSum(String aliasName) {
+        String columnName = getSpecifiedColumnNameAsOne();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select sum(" + aliasName + "." + columnName  + ")";
+    }
+
+    protected String buildSelectClauseAvg(String aliasName) {
+        String columnName = getSpecifiedColumnNameAsOne();
+        assertScalarSelectSpecifiedColumnOnlyOne(columnName);
+        return "select avg(" + aliasName + "." + columnName  + ")";
+    }
+
+    protected void assertScalarSelectSpecifiedColumnOnlyOne(String columnName) {
+        if (columnName != null) {
+            return;
+        }
+        String msg = "The specified column exists one";
+        msg = msg + " when the type of select clause is for scalar:";
+        msg = msg + " specifiedSelectColumnMap=" + _specifiedSelectColumnMap;
+        throw new IllegalStateException(msg);
+    }
+
+    public String getSelectHint() {
+        return createSelectHint();
+    }
+
+    public String getFromClause() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getLineSeparator()).append("  ");
+        sb.append("from ");
+        if (_baseTableInlineWhereList.isEmpty()) {
+            sb.append(_tableName).append(" dflocal");
+        } else {
+            sb.append(getInlineViewClause(_tableName, _baseTableInlineWhereList)).append(" dflocal");
+        }
+        sb.append(getFromBaseTableHint());
+        sb.append(getLeftOuterJoinClause());
+        return sb.toString();
+    }
+
+    protected String getLeftOuterJoinClause() {
+        StringBuilder sb = new StringBuilder();
+        for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
+            String aliasName = ite.next();
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+            String joinTableName = joinInfo.getJoinTableName();
+            List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
+            Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
+            assertJoinOnMapNotEmpty(joinOnMap, aliasName);
+
+            sb.append(getLineSeparator()).append("   ");
+            sb.append(" left outer join ");
+            if (inlineWhereClauseList.isEmpty()) {
+                sb.append(joinTableName);
+            } else {
+                sb.append(getInlineViewClause(joinTableName, inlineWhereClauseList));
+            }
+            sb.append(" ").append(aliasName).append(" on ");
+            int count = 0;
+            Set<String> localColumnNameSet = joinOnMap.keySet();
+            for (String localColumnName : localColumnNameSet) {
+                String foreignColumnName = (String)joinOnMap.get(localColumnName);
+                if (count > 0) {
+                    sb.append(" and ");
+                }
+                if (localColumnName.equals("$$fixedCondition$$")) {
+                    sb.append(foreignColumnName);
+                } else {
+                    sb.append(localColumnName).append(" = ").append(foreignColumnName);
+                }
+                ++count;
+            }
+            for (String additionalOnClause : additionalOnClauseList) {
+                sb.append(" and ").append(additionalOnClause);
+            }
+        }
+        return sb.toString();
+    }
+
+    protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(select * from ").append(joinTableName).append(" where ");
+        int count = 0;
+        for (final Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
+            String clauseElement = ite.next();
+            clauseElement = filterWhereClauseSimply(clauseElement);
+            if (count > 0) {
+                sb.append(" and ");
+            }
+            sb.append(clauseElement);
+            ++count;
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    public String getFromBaseTableHint() {
+        return createFromBaseTableHint();
+    }
+
+    public String getFromHint() {
+        return createFromHint();
+    }
+
+    public String getWhereClause() {
+        return buildWhereClause(false);
+    }
+    
+    protected String buildWhereClause(boolean template) {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
+            String clauseElement = (String)ite.next();
+            clauseElement = filterWhereClauseSimply(clauseElement);
+            if (count == 0) {
+                sb.append(getLineSeparator()).append(" ");
+                sb.append("where ").append(template  ? getWhereFirstConditionMark() : "").append(clauseElement);
+            } else {
+                sb.append(getLineSeparator()).append("  ");
+                sb.append(" and ").append(clauseElement);
+            }
+        }
+        if (template && sb.length() == 0) {
+            sb.append(getWhereClauseMark());
+        }
+        return sb.toString();
+    }
+    
+    public String getOrderByClause() {
+        String orderByClause = null;
+        if (hasUnionQuery()) {
+            if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
+                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
+                throw new IllegalStateException(msg);
+            }
+            orderByClause = _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);
+        } else {
+            orderByClause = _orderByClause.getOrderByClause();
+        }
+        if (orderByClause != null && orderByClause.trim().length() > 0) {
+            return getLineSeparator() + " " + orderByClause;
+        } else {
+            return orderByClause;
+        }
+    }
+
+    public String getSqlSuffix() {
+        String sqlSuffix = createSqlSuffix();
+        if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
+            return getLineSeparator() + sqlSuffix;
+        } else {
+            return sqlSuffix;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                SelectedSelectColumn
+    //                                                                ====================
+    /**
+     * Register selected select column.
+     * 
+     * @param foreignTableAliasName The alias name of foreign table. (NotNull)
+     * @param localTableName The table name of local. (NotNull)
+     * @param foreignPropertyName The property name of foreign table. (NotNull)
+     * @param localRelationPath The path of local relation. (Nullable)
+     */
+    public void registerSelectedSelectColumn(String foreignTableAliasName
+                                           , String localTableName
+                                           , String foreignPropertyName
+                                           , String localRelationPath) {
+        _selectedSelectColumnMap.put(foreignTableAliasName, createSelectedSelectColumnInfo(foreignTableAliasName, localTableName, foreignPropertyName, localRelationPath));
+    }
+    
+    protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName
+                                                                                 , String localTableName
+                                                                                 , String foreignPropertyName
+                                                                                 , String localRelationPath) {
+        final DBMeta dbmeta = findDBMeta(localTableName);
+        final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        final int relationNo = foreignInfo.getRelationNo();
+        String nextRelationPath = "_" + relationNo;
+        if (localRelationPath != null) {
+            nextRelationPath = localRelationPath + nextRelationPath;
+        }
+        final Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
+        final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
+        final List<ColumnInfo> columnInfoList = foreignDBMeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final String columnDbName = columnInfo.getColumnDbName();
+            final SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
+            selectColumnInfo.setTableAliasName(foreignTableAliasName);
+            selectColumnInfo.setColumnName(columnDbName);
+            selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
+            resultMap.put(columnDbName, selectColumnInfo);
+        }
+        return resultMap;
+    }
+
+    public static class SelectedSelectColumnInfo {
+        protected String tableAliasName;
+        protected String columnName;
+        protected String columnAliasName;
+        public String buildRealColumnName() {
+            if (tableAliasName != null) {
+                return tableAliasName + "." + columnName;
+            } else {
+                return columnName;
+            }
+        }
+        public String getTableAliasName() {
+            return tableAliasName;
+        }
+        public void setTableAliasName(String tableAliasName) {
+            this.tableAliasName = tableAliasName;
+        }
+        public String getColumnName() {
+            return columnName;
+        }
+        public void setColumnName(String columnName) {
+            this.columnName = columnName;
+        }
+        public String getColumnAliasName() {
+            return columnAliasName;
+        }
+        public void setColumnAliasName(String columnAliasName) {
+            this.columnAliasName = columnAliasName;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           OuterJoin
+    //                                                                           =========
+    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
+        assertAlreadyOuterJoin(aliasName);
+        assertJoinOnMapNotEmpty(joinOnMap, aliasName);
+        final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
+        joinInfo.setAliasName(aliasName);
+        joinInfo.setJoinTableName(joinTableName);
+        joinInfo.setJoinOnMap(joinOnMap);
+        _outerJoinMap.put(aliasName, joinInfo);
+    }
+
+    protected static class LeftOuterJoinInfo {
+        protected String _aliasName;
+        protected String _joinTableName;
+        protected List<String> _inlineWhereClauseList = new ArrayList<String>();
+        protected List<String> _additionalOnClauseList = new ArrayList<String>();
+        protected Map<String, String> _joinOnMap;
+        protected boolean _onClauseInline;
+        public String getAliasName() {
+            return _aliasName;
+        }
+        public void setAliasName(String value) {
+            _aliasName = value;
+        }
+        public String getJoinTableName() {
+            return _joinTableName;
+        }
+        public void setJoinTableName(String value) {
+            _joinTableName = value;
+        }
+        public List<String> getInlineWhereClauseList() {
+            return _inlineWhereClauseList;
+        }
+        public void addInlineWhereClause(String value) {
+            _inlineWhereClauseList.add(value);
+        }
+        public List<String> getAdditionalOnClauseList() {
+            return _additionalOnClauseList;
+        }
+        public void addAdditionalOnClause(String value) {
+            _additionalOnClauseList.add(value);
+        }
+        public Map<String, String> getJoinOnMap() {
+            return _joinOnMap;
+        }
+        public void setJoinOnMap(Map<String, String> value) {
+            _joinOnMap = value;
+        }
+        public boolean isOnClauseInline() {
+            return _onClauseInline;
+        }
+        public void setOnClauseInline(boolean value) {
+            _onClauseInline = value;
+        }
+    }
+
+    protected void assertAlreadyOuterJoin(String aliasName) {
+        if (_outerJoinMap.containsKey(aliasName)) {
+            String msg = "The alias name have already registered in outer join: " + aliasName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertJoinOnMapNotEmpty(Map<String, String> joinOnMap, String aliasName) {
+        if (joinOnMap.isEmpty()) {
+            String msg = "The joinOnMap should not be empty: aliasName=" + aliasName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                               Where
+    //                                                                               =====
+    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
+        key.addWhereClause(_whereList, columnFullName, value);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
+    }
+
+    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value, ConditionOption option) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
+        assertObjectNotNull("option of " + columnFullName, option);
+        key.addWhereClause(_whereList, columnFullName, value, option);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
+    }
+
+    public void registerWhereClause(String clause) {
+        assertStringNotNullAndNotTrimmedEmpty("clause", clause);
+        _whereList.add(clause);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
+    }
+
+    public void exchangeFirstWhereClauseForLastOne() {
+        if (_whereList.size() > 1) {
+            final String first = (String)_whereList.get(0);
+            final String last = (String)_whereList.get(_whereList.size() - 1);
+            _whereList.set(0, last);
+            _whereList.set(_whereList.size() - 1, first);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                         InlineWhere
+    //                                                                         ===========
+    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value) {
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        key.addWhereClause(_baseTableInlineWhereList, columnName, value);
+        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+    }
+
+    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value, ConditionOption option) {
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        assertObjectNotNull("option of " + columnName, option);
+        key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
+        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+    }
+
+    public void registerBaseTableInlineWhereClause(String value) {
+        _baseTableInlineWhereList.add(value);
+    }
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key, ConditionValue value, boolean onClauseInline) {
+        assertNotYetOuterJoin(aliasName);
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+        if (onClauseInline) {
+            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value);
+        } else {
+            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
+        }
+        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+    }
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key, ConditionValue value, ConditionOption option, boolean onClauseInline) {
+        assertNotYetOuterJoin(aliasName);
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+        if (onClauseInline) {
+            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+        } else {
+            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+        }
+    }
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline) {
+        assertNotYetOuterJoin(aliasName);
+        final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+        if (onClauseInline) {
+            joinInfo.addAdditionalOnClause(value);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+        } else {
+            joinInfo.addInlineWhereClause(value);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+        }
+    }
+
+    protected void assertNotYetOuterJoin(String aliasName) {
+        if (!_outerJoinMap.containsKey(aliasName)) {
+            String msg = "The alias name have not registered in outer join yet: " + aliasName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                             AdditionalConditionAsOr
+    //                                                             =======================
+    public void makeAdditionalConditionAsOrEffective() {
+        _isAdditionalConditionAsOrEffective = true;
+    }
+
+    public void ignoreAdditionalConditionAsOr() {
+        _isAdditionalConditionAsOrEffective = false;
+    }
+
+    protected void arrangeWhereListAdditionalConditionAsOr(List<String> whereList) {
+        if (_isAdditionalConditionAsOrEffective) {
+            if (whereList.size() < 2) {
+                String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: " + toString();
+                throw new IllegalStateException(msg);
+            }
+            final String lastWhereClause = (String)whereList.remove(whereList.size() - 1);
+            final String preWhereClause = (String)whereList.remove(whereList.size() - 1);
+            if (preWhereClause.startsWith("(") && preWhereClause.endsWith(")")) {
+                final String plainClause = preWhereClause.substring("(".length(), preWhereClause.length() - ")".length());
+                whereList.add("(" + plainClause + " or " + lastWhereClause + ")");
+            } else {
+                whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             OrderBy
+    //                                                                             =======
+    public OrderByClause getSqlComponentOfOrderByClause() {
+        return _orderByClause;
+    }
+
+    public SqlClause clearOrderBy() {
+        _isOrderByEffective = false;
+        _orderByClause.clear();
+        return this;
+    }
+
+    public SqlClause ignoreOrderBy() {
+        _isOrderByEffective = false;
+        return this;
+    }
+
+    public SqlClause makeOrderByEffective() {
+        if (!_orderByClause.isEmpty()) {
+            _isOrderByEffective = true;
+        }
+        return this;
+    }
+
+    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc) {
+        _isOrderByEffective = true;
+        if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
+            clearOrderBy();
+            registerOrderBy(orderByProperty, registeredOrderByProperty, ascOrDesc);
+        } else {
+            _orderByClause.reverseAll();
+        }
+    }
+
+    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc) {
+        try {
+            _isOrderByEffective = true;
+            final List<String> orderByList = new ArrayList<String>();
+            {
+                final StringTokenizer st = new StringTokenizer(orderByProperty, "/");
+                while (st.hasMoreElements()) {
+                    orderByList.add(st.nextToken());
+                }
+            }
+
+            if (registeredOrderByProperty == null || registeredOrderByProperty.trim().length() ==0) {
+                registeredOrderByProperty = orderByProperty;
+            }
+
+            final List<String> registeredOrderByList = new ArrayList<String>();
+            {
+                final StringTokenizer st = new StringTokenizer(registeredOrderByProperty, "/");
+                while (st.hasMoreElements()) {
+                    registeredOrderByList.add(st.nextToken());
+                }
+            }
+
+            int count = 0;
+            for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext(); ) {
+                String orderBy = ite.next();
+                String registeredOrderBy = (String)registeredOrderByList.get(count);
+
+                _isOrderByEffective = true;
+                String aliasName = null;
+                String columnName = null;
+                String registeredAliasName = null;
+                String registeredColumnName = null;
+
+                if (orderBy.indexOf(".") < 0) {
+                    columnName = orderBy;
+                } else {
+                    aliasName = orderBy.substring(0, orderBy.lastIndexOf("."));
+                    columnName = orderBy.substring(orderBy.lastIndexOf(".") + 1);
+                }
+
+                if (registeredOrderBy.indexOf(".") < 0) {
+                    registeredColumnName = registeredOrderBy;
+                } else {
+                    registeredAliasName = registeredOrderBy.substring(0, registeredOrderBy.lastIndexOf("."));
+                    registeredColumnName = registeredOrderBy.substring(registeredOrderBy.lastIndexOf(".") + 1);
+                }
+
+                OrderByElement element = new OrderByElement();
+                element.setAliasName(aliasName);
+                element.setColumnName(columnName);
+                element.setRegisteredAliasName(registeredAliasName);
+                element.setRegisteredColumnName(registeredColumnName);
+                if (ascOrDesc) {
+                    element.setupAsc();
+                } else {
+                    element.setupDesc();
+                }
+                _orderByClause.addOrderByElement(element);
+
+                count++;
+            }
+        } catch (RuntimeException e) {
+            String msg = "registerOrderBy() threw the exception: orderByProperty=" + orderByProperty;
+            msg = msg + " registeredColumnFullName=" + registeredOrderByProperty;
+            msg = msg + " ascOrDesc=" + ascOrDesc;
+            msg = msg + " sqlClause=" + this.toString();
+            throw new RuntimeException(msg, e);
+        }
+    }
+    
+    public void addNullsFirstToPreviousOrderBy() {
+        _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
+    }
+    
+    public void addNullsLastToPreviousOrderBy() {
+        _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
+    }
+    
+    protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
+        return new OrderByClause.OrderByNullsSetupper() {
+            public String setup(String columnName, String orderByElementClause, boolean nullsFirst) {
+                return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
+            }
+        };
+    }
+    
+    protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
+        return new OrderByClause.OrderByNullsSetupper() {
+            public String setup(String columnName, String orderByElementClause, boolean nullsFirst) {
+                final String thenNumber = nullsFirst ? "1" : "0";
+                final String elseNumber = nullsFirst ? "0" : "1";
+                final String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
+                return caseWhen + ", " + orderByElementClause;
+            }
+        };
+    }
+    
+    // ===================================================================================
+    //                                                                          UnionQuery
+    //                                                                          ==========
+    public void registerUnionQuery(String unionQueryClause, boolean unionAll) {
+        assertStringNotNullAndNotTrimmedEmpty("unionQueryClause", unionQueryClause);
+        UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
+        unionQueryInfo.setUnionQueryClause(unionQueryClause);
+        unionQueryInfo.setUnionAll(unionAll);
+        addUnionQueryInfo(unionQueryInfo);
+    }
+
+    protected void addUnionQueryInfo(UnionQueryInfo unionQueryInfo) {
+        if (_unionQueryInfoList == null) {
+            _unionQueryInfoList = new ArrayList<UnionQueryInfo>(); 
+        }
+        _unionQueryInfoList.add(unionQueryInfo);
+    }
+
+    public boolean hasUnionQuery() {
+        return _unionQueryInfoList != null && !_unionQueryInfoList.isEmpty();
+    }
+
+    protected static class UnionQueryInfo {
+        protected String _unionQueryClause;
+        protected boolean _unionAll;
+        public String getUnionQueryClause() {
+            return _unionQueryClause;
+        }
+        public void setUnionQueryClause(String unionQueryClause) {
+            _unionQueryClause = unionQueryClause;
+        }
+        public boolean isUnionAll() {
+            return _unionAll;
+        }
+        public void setUnionAll(boolean unionAll) {
+            _unionAll = unionAll;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          FetchScope
+    //                                                                          ==========
+    /**
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
+    public SqlClause fetchFirst(int fetchSize) {
+        _isFetchScopeEffective = true;
+        if (fetchSize <= 0) {
+            String msg = "Argument[fetchSize] should be plus: " + fetchSize;
+            throw new IllegalArgumentException(msg);
+        }
+        _fetchStartIndex = 0;
+        _fetchSize = fetchSize;
+        _fetchPageNumber = 1;
+        doClearFetchPageClause();
+        doFetchFirst();
+        return this;
+    }
+
+    /**
+     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+     * @param fetchSize Fetch size. (NotMinus)
+     * @return this. (NotNull)
+     */
+    public SqlClause fetchScope(int fetchStartIndex, int fetchSize) {
+        _isFetchScopeEffective = true;
+        if (fetchStartIndex < 0) {
+            String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
+            throw new IllegalArgumentException(msg);
+        }
+        if (fetchSize <= 0) {
+            String msg = "Argument[fetchSize] should be plus: " + fetchSize;
+            throw new IllegalArgumentException(msg);
+        }
+        _fetchStartIndex = fetchStartIndex;
+        _fetchSize = fetchSize;
+        return fetchPage(1);
+    }
+
+    /**
+     * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
+     * @return this. (NotNull)
+     */
+    public SqlClause fetchPage(int fetchPageNumber) {
+        _isFetchScopeEffective = true;
+        if (fetchPageNumber <= 0) {
+            fetchPageNumber = 1;
+        }
+        if (_fetchSize <= 0) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Fetch size should not be minus or zero!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. " + getLineSeparator();
+            msg = msg + "Please confirm your program. Does it really invoke 'fetchPage()' with 'fetchFirst()' or 'fetchScope()'?" + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.fetchPage(3);" + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.fetchFirst(20); // The size of page" + getLineSeparator();
+            msg = msg + "      cb.fetchPage(3);   // The number of target page" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Actual Parameter Value]" + getLineSeparator();
+            msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+        _fetchPageNumber = fetchPageNumber;
+        if (_fetchPageNumber == 1 && _fetchStartIndex == 0) {
+            return fetchFirst(_fetchSize);
+        }
+        doClearFetchPageClause();
+        doFetchPage();
+        return this;
+    }
+
+    abstract protected void doFetchFirst();
+    abstract protected void doFetchPage();
+    abstract protected void doClearFetchPageClause();
+
+    public int getFetchStartIndex() {
+        return _fetchStartIndex;
+    }
+
+    public int getFetchSize() {
+        return _fetchSize;
+    }
+
+    public int getFetchPageNumber() {
+        return _fetchPageNumber;
+    }
+
+    /**
+     * @return Page start index. 0 origin. (NotMinus)
+     */
+    public int getPageStartIndex() {
+        if (_fetchPageNumber <= 0) {
+            String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        return _fetchStartIndex + (_fetchSize * (_fetchPageNumber - 1));
+    }
+
+    /**
+     * @return Page end index. 0 origin. (NotMinus)
+     */
+    public int getPageEndIndex() {
+        if (_fetchPageNumber <= 0) {
+            String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
+    }
+
+    public boolean isFetchScopeEffective() {
+        return _isFetchScopeEffective;
+    }
+
+    public SqlClause ignoreFetchScope() {
+        _isFetchScopeEffective = false;
+        doClearFetchPageClause();
+        return this;
+    }
+
+    public SqlClause makeFetchScopeEffective() {
+        if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
+            fetchPage(getFetchPageNumber());
+        }
+        return this;
+    }
+    
+    public boolean isFetchStartIndexSupported() {
+        return true; // Default
+    }
+
+    public boolean isFetchSizeSupported() {
+        return true; // Default
+    }
+
+    abstract protected String createSelectHint();
+    abstract protected String createFromBaseTableHint();
+    abstract protected String createFromHint();
+    abstract protected String createSqlSuffix();
+
+    // ===================================================================================
+    //                                                                     Fetch Narrowing
+    //                                                                     ===============
+    /**
+     * The implementation.
+     * @return Fetch-narrowing start-index.
+     */
+    public int getFetchNarrowingSkipStartIndex() {
+        return getPageStartIndex();
+    }
+
+    /**
+     * The implementation.
+     * @return Fetch-narrowing size.
+     */
+    public int getFetchNarrowingLoopCount() {
+        return getFetchSize();
+    }
+
+    /**
+     * The implementation.
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingEffective() {
+        return _isFetchScopeEffective;
+    }
+
+    // ===================================================================================
+    //                                                                            Resolver
+    //                                                                            ========
+    public String resolveJoinAliasName(String relationPath, int cqNestNo) {
+        return resolveNestLevelExpression("dfrelation" + relationPath, cqNestNo);
+    }
+
+    public String resolveNestLevelExpression(String name, int cqNestNo) {
+        // if (cqNestNo > 1) {
+        //     return name + "_n" + cqNestNo;
+        // } else {
+        //     return name;
+        // }
+        return name;
+    }
+
+    public int resolveRelationNo(String localTableName, String foreignPropertyName) {
+        final DBMeta dbmeta = findDBMeta(localTableName);
+        final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        return foreignInfo.getRelationNo();
+    }
+
+    // ===================================================================================
+    //                                                                    Table Alias Info
+    //                                                                    ================
+    public String getLocalTableAliasName() {
+        return "dflocal";
+    }
+    
+    public String getForeignTableAliasPrefix() {
+        return "dfrelation";
+    }
+
+    // ===================================================================================
+    //                                                                       Template Mark
+    //                                                                       =============
+    public String getWhereClauseMark() {
+        return "#df:whereClause#";
+    }
+    
+    public String getWhereFirstConditionMark() {
+        return "#df:whereFirstCondition#";
+    }
+    
+    public String getUnionSelectClauseMark() {
+        return "#df:unionSelectClause#";
+    }
+    
+    public String getUnionWhereClauseMark() {
+        return "#df:unionWhereClause#";
+    }
+    
+    public String getUnionWhereFirstConditionMark() {
+        return "#df:unionWhereFirstCondition#";
+    }
+    
+    // =====================================================================================
+    //                                                            Where Clause Simple Filter
+    //                                                            ==========================
+    public void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
+        if (_whereClauseSimpleFilterList == null) {
+            _whereClauseSimpleFilterList = new ArrayList<WhereClauseSimpleFilter>();
+        }
+        _whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
+    }
+
+    protected String filterWhereClauseSimply(String clauseElement) {
+        if (_whereClauseSimpleFilterList == null || _whereClauseSimpleFilterList.isEmpty()) {
+            return clauseElement;
+        }
+        for (final Iterator<WhereClauseSimpleFilter> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
+            final WhereClauseSimpleFilter filter = ite.next();
+            if (filter == null) {
+                String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
+                throw new IllegalStateException(msg);
+            }
+            clauseElement = filter.filterClauseElement(clauseElement);
+        }
+        return clauseElement;
+    }
+    
+    // =====================================================================================
+    //                                                                 Selected Foreign Info
+    //                                                                 =====================
+    public boolean isSelectedForeignInfoEmpty() {
+        if (_selectedForeignInfo == null) {
+            return true;
+        }
+        return _selectedForeignInfo.isEmpty();
+    }
+
+    public boolean hasSelectedForeignInfo(String relationPath) {
+        if (_selectedForeignInfo == null) {
+            return false;
+        }
+        return _selectedForeignInfo.containsKey(relationPath);
+    }
+
+    public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName) {
+        if (_selectedForeignInfo == null) {
+            _selectedForeignInfo = new HashMap<String, String>();
+        }
+        _selectedForeignInfo.put(relationPath, foreignPropertyName);
+    }
+
+    // ===================================================================================
+    //                                                                    Sub Query Indent
+    //                                                                    ================
+    public String resolveSubQueryBeginMark(String subQueryIdentity) {
+        return getSubQueryBeginMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    public String resolveSubQueryEndMark(String subQueryIdentity) {
+        return getSubQueryEndMarkPrefix() + subQueryIdentity + getSubQueryIdentityTerminal();
+    }
+
+    protected String getSubQueryBeginMarkPrefix() {
+        return "--df:SubQueryBegin#";
+    }
+
+    protected String getSubQueryEndMarkPrefix() {
+        return "--df:SubQueryEnd#";
+    }
+    
+    protected String getSubQueryIdentityTerminal() {
+        return "#IdentityTerminal#";
+    }
+
+    public String filterSubQueryIndent(String sql) {
+        return filterSubQueryIndent(sql, "", sql);
+    }
+
+    protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
+        final String lineSeparator = getLineSeparator();
+        if (!sql.contains(getSubQueryBeginMarkPrefix())) {
+            return sql;
+        }
+        final String[] lines = sql.split(lineSeparator);
+        final String beginMarkPrefix = getSubQueryBeginMarkPrefix();
+        final String endMarkPrefix = getSubQueryEndMarkPrefix();
+        final String identityTerminal = getSubQueryIdentityTerminal();
+        final int terminalLength = identityTerminal.length();
+        StringBuilder mainSb = new StringBuilder();
+        StringBuilder subSb = null;
+        boolean throughBegin = false;
+        boolean throughBeginFirst = false;
+        String subQueryIdentity = null;
+        String indent = null;
+        for (String line : lines) {
+            if (!throughBegin) {
+                if (line.contains(beginMarkPrefix)) {
+                    throughBegin = true;
+                    subSb = new StringBuilder();
+                    final int markIndex = line.indexOf(beginMarkPrefix);
+                    final int terminalIndex = line.indexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
+                    subQueryIdentity = line.substring(markIndex + beginMarkPrefix.length(), terminalIndex);
+                    subSb.append(clause);
+                    indent = buildSpaceBar(markIndex - preIndent.length());
+                } else {
+                    mainSb.append(line).append(getLineSeparator());
+                }
+            } else {
+                // - - - - - - - -
+                // In begin to end
+                // - - - - - - - -
+                if (line.contains(endMarkPrefix + subQueryIdentity)) { // The end
+                    final int markIndex = line.indexOf(endMarkPrefix);
+                    final int terminalIndex = line.indexOf(identityTerminal);
+                    if (terminalIndex < 0) {
+                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        throw new SubQueryIndentFailureException(msg);
+                    }
+                    final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
+                    subSb.append(clause).append(getLineSeparator());
+                    final String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
+                    mainSb.append(currentSql);
+                    throughBegin = false;
+                    throughBeginFirst = false;
+                } else {
+                    if (!throughBeginFirst) {
+                        subSb.append(line.trim()).append(getLineSeparator());
+                        throughBeginFirst = true;
+                    } else {
+                        subSb.append(indent).append(line).append(getLineSeparator());
+                    }
+                }
+            }
+        }
+        final String filteredSql = mainSb.toString();
+        
+        if (throughBegin) {
+            String msg = "End Mark Not Found!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        if (filteredSql.contains(beginMarkPrefix)) {
+            String msg = "Any begin marks are not filtered!";
+            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
+            msg = msg + subQueryIdentity + getLineSeparator();
+            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
+            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
+            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            throw new SubQueryIndentFailureException(msg);
+        }
+        return filteredSql;
+    }
+    
+    protected String buildSpaceBar(int size) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+    
+    public static class SubQueryIndentFailureException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public SubQueryIndentFailureException(String msg) {
+            super(msg);
+        }
+    }
+
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                       Specification
+    //                                                                       =============
+    public void specifySelectColumn(String tableAliasName, String columnName) {
+        if (_specifiedSelectColumnMap == null) {
+            _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>();
+        }
+        if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
+            _specifiedSelectColumnMap.put(tableAliasName, new LinkedHashMap<String, String>());
+        }
+        Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        elementMap.put(columnName, null); // The value is dummy for extension at the future.
+        _specifiedSelectColumnMap.put(tableAliasName, elementMap);
+    }
+
+    public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {
+        if (_specifiedDeriveSubQueryMap == null) {
+            _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
+        }
+        _specifiedDeriveSubQueryMap.put(aliasName, deriveSubQuery);
+    }
+
+    public boolean hasSpecifiedDeriveSubQuery(String aliasName) {
+        if (_specifiedDeriveSubQueryMap == null) { return false; }
+        return _specifiedDeriveSubQueryMap.containsKey(aliasName);
+    }
+
+    public String getSpecifiedColumnNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet().iterator().next());
+            if (elementMap != null && elementMap.size() == 1) {
+                return elementMap.keySet().iterator().next();
+            }
+        }
+        return null;
+    }
+
+    public void clearSpecifiedSelectColumn() {
+        if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
+    }
+
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+        if (columnParameterMap.isEmpty()) {
+            return null;
+        }
+        final String aliasName = getLocalTableAliasName();
+        final DBMeta dbmeta = findDBMeta(_tableName);
+        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The target table of queryUpdate() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+
+        final StringBuilder sb = new StringBuilder();
+        String ln = getLineSeparator();
+        sb.append("update ").append(_tableName).append(ln);
+        int index = 0;
+        // It is guaranteed that the map has one or more elements.
+        for (String columnName : columnParameterMap.keySet()) {
+            final String parameter = columnParameterMap.get(columnName); 
+            if (index == 0) {
+                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+            } else {
+                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+            }
+            ++index;
+        }
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("where "));
+            sb.append(" ").append(subQuery);
+            return sb.toString();
+        }
+    }
+
+    public String getClauseQueryDelete() {
+        final String aliasName = getLocalTableAliasName();
+        final DBMeta dbmeta = findDBMeta(_tableName);
+        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The target table of queryDelete() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
+        
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        
+        if (isUpdateSubQueryUseLocalTableSupported()) {
+            final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
+            final StringBuilder sb = new StringBuilder();
+            String ln = getLineSeparator();
+            sb.append("delete from ").append(_tableName).append(ln);
+            sb.append(" where ").append(primaryKeyName);
+            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            return sb.toString();
+        } else {
+            String subQuery = filterSubQueryIndent(fromWhereClause);
+            subQuery = replaceString(subQuery, aliasName + ".", "");
+            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = subQuery.substring(subQuery.indexOf("from "));
+            return "delete " + subQuery;
+        }
+    }
+
+    protected boolean isUpdateSubQueryUseLocalTableSupported() {
+        return true;
+    }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                                   Unique Constraint
+    //                                                                   =================
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return false;
+    }
+
+    // [DBFlute-0.8.6]
+    // ===================================================================================
+    //                                                                  Select Clause Type
+    //                                                                  ==================
+    public void classifySelectClauseType(SelectClauseType selectClauseType) {
+        changeSelectClauseType(selectClauseType);
+    }
+
+    protected void changeSelectClauseType(SelectClauseType selectClauseType) {
+        savePreviousSelectClauseType();
+        _selectClauseType = selectClauseType;
+    }
+
+    protected void savePreviousSelectClauseType() {
+        _previousSelectClauseType = _selectClauseType;
+    }
+
+    public void rollbackSelectClauseType() {
+        _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected DBMeta findDBMeta(String tableName) {
+        if (_dbmetaProvider == null) {
+            String msg = "The DB meta provider should not be null when using findDBMeta(): ";
+            msg = msg + " tableName=" + tableName;
+            throw new IllegalStateException(msg);
+        }
+        return _dbmetaProvider.provideDBMetaChecked(tableName);
+    }
+    
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replaceString(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
+    }
+    
+    protected String getLineSeparator() {
+        return DfSystemUtil.getLineSeparator();
+    }
+
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    protected void assertObjectNotNull(String variableName, Object value) {
+        DfAssertUtil.assertObjectNotNull(variableName, value);
+    }
+
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+    }
+}

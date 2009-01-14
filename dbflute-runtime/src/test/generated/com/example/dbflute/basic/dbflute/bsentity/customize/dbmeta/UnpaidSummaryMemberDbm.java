@@ -3,10 +3,10 @@ package com.example.dbflute.basic.dbflute.bsentity.customize.dbmeta;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.Entity;
-import org.dbflute.dbmeta.AbstractDBMeta;
-import org.dbflute.dbmeta.info.*;
-import org.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.AbstractDBMeta;
+import org.seasar.dbflute.dbmeta.info.*;
+import org.seasar.dbflute.helper.StringKeyMap;
 
 import com.example.dbflute.basic.dbflute.exentity.customize.UnpaidSummaryMember;
 

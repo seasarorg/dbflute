@@ -4,9 +4,9 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.s2dao.extension.TnSqlLogRegistry;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBFluteConfig;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;

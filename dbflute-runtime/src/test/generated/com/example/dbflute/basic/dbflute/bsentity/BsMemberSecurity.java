@@ -2,7 +2,7 @@ package com.example.dbflute.basic.dbflute.bsentity;
 
 import java.util.*;
 
-import org.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DBMeta;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.allcommon.EntityDefinedCommonColumn;

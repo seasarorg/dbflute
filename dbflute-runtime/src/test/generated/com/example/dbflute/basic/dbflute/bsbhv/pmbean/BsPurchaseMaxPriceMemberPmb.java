@@ -5,7 +5,7 @@ package com.example.dbflute.basic.dbflute.bsbhv.pmbean;
  * The parameter-bean of PurchaseMaxPriceMemberPmb.
  * @author DBFlute(AutoGenerator)
  */
-public class BsPurchaseMaxPriceMemberPmb extends org.dbflute.cbean.SimplePagingBean  {
+public class BsPurchaseMaxPriceMemberPmb extends org.seasar.dbflute.cbean.SimplePagingBean  {
 
     // ===================================================================================
     //                                                                           Attribute

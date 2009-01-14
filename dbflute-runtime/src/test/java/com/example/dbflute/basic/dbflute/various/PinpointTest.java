@@ -3,11 +3,11 @@ package com.example.dbflute.basic.dbflute.various;
 import java.util.Date;
 import java.util.List;
 
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.ScalarQuery;
-import org.dbflute.cbean.SubQuery;
-import org.dbflute.cbean.UnionQuery;
-import org.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.ScalarQuery;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 import com.example.dbflute.basic.dbflute.bsentity.dbmeta.MemberDbm;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;

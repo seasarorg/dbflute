@@ -1,10 +1,10 @@
 package com.example.dbflute.basic.dbflute.cbean.cq.ciq;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.coption.ConditionOption;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 
 import com.example.dbflute.basic.dbflute.cbean.*;
 import com.example.dbflute.basic.dbflute.cbean.cq.bs.*;

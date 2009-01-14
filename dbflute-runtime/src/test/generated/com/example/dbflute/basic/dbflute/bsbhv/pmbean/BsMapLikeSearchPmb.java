@@ -14,7 +14,7 @@ public class BsMapLikeSearchPmb  {
     protected java.util.Map<String, Object> _conditionMap;
 
     /** The value of likeSearchOption for conditionMap. */
-    protected org.dbflute.cbean.coption.LikeSearchOption _conditionMapInternalLikeSearchOption;
+    protected org.seasar.dbflute.cbean.coption.LikeSearchOption _conditionMapInternalLikeSearchOption;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -82,7 +82,7 @@ public class BsMapLikeSearchPmb  {
      * @param conditionMap The value of conditionMap. (Nullable)
      * @param conditionMapOption The option of likeSearch for conditionMap. (Nullable)
      */
-    public void setConditionMap(java.util.Map<String, Object> conditionMap, org.dbflute.cbean.coption.LikeSearchOption conditionMapOption) {
+    public void setConditionMap(java.util.Map<String, Object> conditionMap, org.seasar.dbflute.cbean.coption.LikeSearchOption conditionMapOption) {
         _conditionMap = conditionMap;
         _conditionMapInternalLikeSearchOption = conditionMapOption;
     }
@@ -91,7 +91,7 @@ public class BsMapLikeSearchPmb  {
      * Get the internal option of likeSearch for conditionMap. {Internal Method: Don't Invoke This!}
      * @return The internal option of likeSearch for conditionMap. (Nullable)
      */
-    public org.dbflute.cbean.coption.LikeSearchOption getConditionMapInternalLikeSearchOption() {
+    public org.seasar.dbflute.cbean.coption.LikeSearchOption getConditionMapInternalLikeSearchOption() {
         return _conditionMapInternalLikeSearchOption;
     }
 

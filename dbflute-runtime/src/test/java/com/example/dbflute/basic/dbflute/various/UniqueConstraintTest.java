@@ -4,8 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.exception.EntityAlreadyExistsException;
-import org.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.EntityAlreadyExistsException;
+import org.seasar.dbflute.exception.SQLFailureException;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.exbhv.MemberBhv;

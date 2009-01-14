@@ -2,7 +2,7 @@ package com.example.dbflute.basic.dbflute.bsbhv.cursor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.jdbc.CursorHandler;
+import org.seasar.dbflute.jdbc.CursorHandler;
 
 import com.example.dbflute.basic.dbflute.exbhv.cursor.PurchaseSummaryMemberCursor;
 

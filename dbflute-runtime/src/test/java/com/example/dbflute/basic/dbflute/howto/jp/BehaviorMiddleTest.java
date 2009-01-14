@@ -4,12 +4,12 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ScalarQuery;
-import org.dbflute.cbean.coption.LikeSearchOption;
-import org.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ScalarQuery;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.cbean.PurchaseCB;

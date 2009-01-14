@@ -3,17 +3,17 @@ package com.example.dbflute.basic.dbflute.bsbhv;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.*;
-import org.dbflute.bhv.ValueLabelSetupper;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingHandler;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.*;
+import org.seasar.dbflute.bhv.ValueLabelSetupper;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 import com.example.dbflute.basic.dbflute.exentity.*;
 import com.example.dbflute.basic.dbflute.allcommon.DBCurrent;
@@ -53,7 +53,7 @@ import com.example.dbflute.basic.dbflute.cbean.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorWritable {
+public abstract class BsVendorCheckBhv extends org.seasar.dbflute.bhv.AbstractBehaviorWritable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -123,7 +123,7 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of VendorCheck. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public VendorCheck selectEntity(final VendorCheckCB cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<VendorCheck, VendorCheckCB>() {
@@ -134,8 +134,8 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of VendorCheck. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public VendorCheck selectEntityWithDeletedCheck(final VendorCheckCB cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<VendorCheck, VendorCheckCB>() {
@@ -238,7 +238,7 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
     /**
      * Insert the entity.
      * @param vendorCheck The entity of insert target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(VendorCheck vendorCheck) {
         assertEntityNotNull(vendorCheck);
@@ -253,9 +253,9 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
     /**
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param vendorCheck The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final VendorCheck vendorCheck) {
         helpUpdateInternally(vendorCheck, new InternalUpdateCallback<VendorCheck>() {
@@ -275,9 +275,9 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
     /**
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param vendorCheck The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final VendorCheck vendorCheck) {
         helpInsertOrUpdateInternally(vendorCheck, new InternalInsertOrUpdateCallback<VendorCheck, VendorCheckCB>() {
@@ -301,8 +301,8 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
     /**
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param vendorCheck The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(VendorCheck vendorCheck) {
         helpDeleteInternally(vendorCheck, new InternalDeleteCallback<VendorCheck>() {
@@ -332,7 +332,7 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param vendorCheckList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdate(List<VendorCheck> vendorCheckList) {
         assertObjectNotNull("vendorCheckList", vendorCheckList);
@@ -344,7 +344,7 @@ public abstract class BsVendorCheckBhv extends org.dbflute.bhv.AbstractBehaviorW
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param vendorCheckList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDelete(List<VendorCheck> vendorCheckList) {
         assertObjectNotNull("vendorCheckList", vendorCheckList);

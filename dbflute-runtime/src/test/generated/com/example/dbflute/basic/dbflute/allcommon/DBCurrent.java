@@ -2,7 +2,7 @@ package com.example.dbflute.basic.dbflute.allcommon;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.DBDef;
+import org.seasar.dbflute.DBDef;
 
 
 /**

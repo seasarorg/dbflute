@@ -1,14 +1,14 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
-import org.dbflute.DBDef;
-import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.bhv.core.InvokerAssistant;
-import org.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.resource.ResourceParameter;
-import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
-import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.resource.ResourceParameter;
+import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 

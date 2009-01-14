@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.cbean.*;
@@ -98,7 +98,7 @@ public abstract class AbstractBsWithdrawalReasonCQ extends AbstractConditionQuer
      * @param withdrawalReasonCode The value of withdrawalReasonCode as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setWithdrawalReasonCode_LikeSearch(String withdrawalReasonCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonCode_LikeSearch(String withdrawalReasonCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(withdrawalReasonCode), getCValueWithdrawalReasonCode(), "WITHDRAWAL_REASON_CODE", "WithdrawalReasonCode", "withdrawalReasonCode", likeSearchOption);
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractBsWithdrawalReasonCQ extends AbstractConditionQuer
      * @param withdrawalReasonCode The value of withdrawalReasonCode as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setWithdrawalReasonCode_NotLikeSearch(String withdrawalReasonCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonCode_NotLikeSearch(String withdrawalReasonCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(withdrawalReasonCode), getCValueWithdrawalReasonCode(), "WITHDRAWAL_REASON_CODE", "WithdrawalReasonCode", "withdrawalReasonCode", likeSearchOption);
     }
 
@@ -242,7 +242,7 @@ public abstract class AbstractBsWithdrawalReasonCQ extends AbstractConditionQuer
      * @param withdrawalReasonText The value of withdrawalReasonText as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setWithdrawalReasonText_LikeSearch(String withdrawalReasonText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonText_LikeSearch(String withdrawalReasonText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(withdrawalReasonText), getCValueWithdrawalReasonText(), "WITHDRAWAL_REASON_TEXT", "WithdrawalReasonText", "withdrawalReasonText", likeSearchOption);
     }
 
@@ -251,7 +251,7 @@ public abstract class AbstractBsWithdrawalReasonCQ extends AbstractConditionQuer
      * @param withdrawalReasonText The value of withdrawalReasonText as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setWithdrawalReasonText_NotLikeSearch(String withdrawalReasonText, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setWithdrawalReasonText_NotLikeSearch(String withdrawalReasonText, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(withdrawalReasonText), getCValueWithdrawalReasonText(), "WITHDRAWAL_REASON_TEXT", "WithdrawalReasonText", "withdrawalReasonText", likeSearchOption);
     }
 

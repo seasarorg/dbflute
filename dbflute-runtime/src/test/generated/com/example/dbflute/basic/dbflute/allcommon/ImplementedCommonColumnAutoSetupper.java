@@ -2,8 +2,8 @@ package com.example.dbflute.basic.dbflute.allcommon;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.Entity;
-import org.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 
 
 /**
@@ -43,13 +43,13 @@ public class ImplementedCommonColumnAutoSetupper implements CommonColumnAutoSetu
             _log.debug(msg);
         }
 
-        final java.sql.Timestamp registerDatetime = org.dbflute.AccessContext.getAccessTimestampOnThread();
+        final java.sql.Timestamp registerDatetime = org.seasar.dbflute.AccessContext.getAccessTimestampOnThread();
         entity.setRegisterDatetime(registerDatetime);
 
-        final String registerUser = org.dbflute.AccessContext.getAccessUserOnThread();
+        final String registerUser = org.seasar.dbflute.AccessContext.getAccessUserOnThread();
         entity.setRegisterUser(registerUser);
 
-        final String registerProcess = org.dbflute.AccessContext.getAccessProcessOnThread();
+        final String registerProcess = org.seasar.dbflute.AccessContext.getAccessProcessOnThread();
         entity.setRegisterProcess(registerProcess);
 
         final java.sql.Timestamp updateDatetime = entity.getRegisterDatetime();
@@ -80,13 +80,13 @@ public class ImplementedCommonColumnAutoSetupper implements CommonColumnAutoSetu
             _log.debug(msg);
         }
 
-        final java.sql.Timestamp updateDatetime = org.dbflute.AccessContext.getAccessTimestampOnThread();
+        final java.sql.Timestamp updateDatetime = org.seasar.dbflute.AccessContext.getAccessTimestampOnThread();
         entity.setUpdateDatetime(updateDatetime);
 
-        final String updateUser = org.dbflute.AccessContext.getAccessUserOnThread();
+        final String updateUser = org.seasar.dbflute.AccessContext.getAccessUserOnThread();
         entity.setUpdateUser(updateUser);
 
-        final String updateProcess = org.dbflute.AccessContext.getAccessProcessOnThread();
+        final String updateProcess = org.seasar.dbflute.AccessContext.getAccessProcessOnThread();
         entity.setUpdateProcess(updateProcess);
     }
 }

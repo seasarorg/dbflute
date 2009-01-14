@@ -2,13 +2,13 @@ package com.example.dbflute.basic.dbflute.cbean.bs;
 
 import java.util.Map;
 
-import org.dbflute.cbean.AbstractConditionBean;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.SubQuery;
-import org.dbflute.cbean.UnionQuery;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.AbstractConditionBean;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBFluteConfig;
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;

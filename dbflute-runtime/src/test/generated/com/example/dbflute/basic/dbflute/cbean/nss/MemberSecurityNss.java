@@ -1,6 +1,6 @@
 package com.example.dbflute.basic.dbflute.cbean.nss;
 
-import org.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.ConditionQuery;
 
 import com.example.dbflute.basic.dbflute.cbean.cq.MemberSecurityCQ;
 

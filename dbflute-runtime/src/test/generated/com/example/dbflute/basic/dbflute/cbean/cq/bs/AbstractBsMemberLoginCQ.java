@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
@@ -246,7 +246,7 @@ public abstract class AbstractBsMemberLoginCQ extends AbstractConditionQuery {
      * @param toDate The to-date of loginDatetime. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void setLoginDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void setLoginDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
         registerFromToQuery((fromDate != null ? new java.sql.Timestamp(fromDate.getTime()) : null), (toDate != null ? new java.sql.Timestamp(toDate.getTime()) : null), getCValueLoginDatetime(), "LOGIN_DATETIME", "LoginDatetime", "loginDatetime", fromToOption);
     }
 
@@ -256,7 +256,7 @@ public abstract class AbstractBsMemberLoginCQ extends AbstractConditionQuery {
      * @param toDate The to-date of loginDatetime. (Nullable)
      */
     public void setLoginDatetime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setLoginDatetime_FromTo(fromDate, toDate, new org.dbflute.cbean.coption.DateFromToOption());
+        setLoginDatetime_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 
     protected void regLoginDatetime(ConditionKey key, Object value) {
@@ -352,7 +352,7 @@ public abstract class AbstractBsMemberLoginCQ extends AbstractConditionQuery {
      * @param loginMemberStatusCode The value of loginMemberStatusCode as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setLoginMemberStatusCode_LikeSearch(String loginMemberStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setLoginMemberStatusCode_LikeSearch(String loginMemberStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(loginMemberStatusCode), getCValueLoginMemberStatusCode(), "LOGIN_MEMBER_STATUS_CODE", "LoginMemberStatusCode", "loginMemberStatusCode", likeSearchOption);
     }
 
@@ -361,7 +361,7 @@ public abstract class AbstractBsMemberLoginCQ extends AbstractConditionQuery {
      * @param loginMemberStatusCode The value of loginMemberStatusCode as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setLoginMemberStatusCode_NotLikeSearch(String loginMemberStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setLoginMemberStatusCode_NotLikeSearch(String loginMemberStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(loginMemberStatusCode), getCValueLoginMemberStatusCode(), "LOGIN_MEMBER_STATUS_CODE", "LoginMemberStatusCode", "loginMemberStatusCode", likeSearchOption);
     }
 

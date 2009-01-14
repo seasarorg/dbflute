@@ -4,9 +4,9 @@ import javax.sql.XADataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.s2dao.extension.TnSqlLogRegistry;
-import org.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
 /**

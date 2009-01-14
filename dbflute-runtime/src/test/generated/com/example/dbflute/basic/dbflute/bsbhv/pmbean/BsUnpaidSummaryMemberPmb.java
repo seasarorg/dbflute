@@ -5,7 +5,7 @@ package com.example.dbflute.basic.dbflute.bsbhv.pmbean;
  * The parameter-bean of UnpaidSummaryMemberPmb.
  * @author DBFlute(AutoGenerator)
  */
-public class BsUnpaidSummaryMemberPmb extends org.dbflute.cbean.SimplePagingBean  {
+public class BsUnpaidSummaryMemberPmb extends org.seasar.dbflute.cbean.SimplePagingBean  {
 
     // ===================================================================================
     //                                                                           Attribute

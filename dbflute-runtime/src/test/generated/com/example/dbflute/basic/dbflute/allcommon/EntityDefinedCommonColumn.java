@@ -1,6 +1,6 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
-import org.dbflute.Entity;
+import org.seasar.dbflute.Entity;
 
 /**
  * The interface of entity defined common column.

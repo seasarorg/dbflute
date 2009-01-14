@@ -1,12 +1,12 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
-import org.dbflute.BehaviorSelector;
-import org.dbflute.Entity;
-import org.dbflute.bhv.BehaviorReadable;
-import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.BehaviorReadable;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.framework.util.DisposableUtil;
 
 import com.example.dbflute.basic.dbflute.bsentity.dbmeta.MemberDbm;

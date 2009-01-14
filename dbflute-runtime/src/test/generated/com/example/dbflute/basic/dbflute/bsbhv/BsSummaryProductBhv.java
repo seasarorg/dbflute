@@ -3,19 +3,19 @@ package com.example.dbflute.basic.dbflute.bsbhv;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.*;
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.bhv.LoadReferrerOption;
-import org.dbflute.bhv.ValueLabelSetupper;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingHandler;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.*;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.bhv.LoadReferrerOption;
+import org.seasar.dbflute.bhv.ValueLabelSetupper;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 import com.example.dbflute.basic.dbflute.exbhv.*;
 import com.example.dbflute.basic.dbflute.exentity.*;
@@ -56,7 +56,7 @@ import com.example.dbflute.basic.dbflute.cbean.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehaviorWritable {
+public abstract class BsSummaryProductBhv extends org.seasar.dbflute.bhv.AbstractBehaviorWritable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -123,7 +123,7 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of SummaryProduct. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public SummaryProduct selectEntity(final SummaryProductCB cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<SummaryProduct, SummaryProductCB>() {
@@ -134,8 +134,8 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of SummaryProduct. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public SummaryProduct selectEntityWithDeletedCheck(final SummaryProductCB cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<SummaryProduct, SummaryProductCB>() {
@@ -285,7 +285,7 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
     /**
      * Insert the entity.
      * @param summaryProduct The entity of insert target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(SummaryProduct summaryProduct) {
         assertEntityNotNull(summaryProduct);
@@ -300,9 +300,9 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
     /**
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param summaryProduct The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final SummaryProduct summaryProduct) {
         helpUpdateInternally(summaryProduct, new InternalUpdateCallback<SummaryProduct>() {
@@ -322,9 +322,9 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
     /**
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param summaryProduct The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final SummaryProduct summaryProduct) {
         helpInsertOrUpdateInternally(summaryProduct, new InternalInsertOrUpdateCallback<SummaryProduct, SummaryProductCB>() {
@@ -348,8 +348,8 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
     /**
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param summaryProduct The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(SummaryProduct summaryProduct) {
         helpDeleteInternally(summaryProduct, new InternalDeleteCallback<SummaryProduct>() {
@@ -379,7 +379,7 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param summaryProductList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdate(List<SummaryProduct> summaryProductList) {
         assertObjectNotNull("summaryProductList", summaryProductList);
@@ -391,7 +391,7 @@ public abstract class BsSummaryProductBhv extends org.dbflute.bhv.AbstractBehavi
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param summaryProductList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDelete(List<SummaryProduct> summaryProductList) {
         assertObjectNotNull("summaryProductList", summaryProductList);

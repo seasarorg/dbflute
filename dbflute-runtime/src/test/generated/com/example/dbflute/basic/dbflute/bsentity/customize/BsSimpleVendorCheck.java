@@ -2,8 +2,8 @@ package com.example.dbflute.basic.dbflute.bsentity.customize;
 
 import java.util.*;
 
-import org.dbflute.Entity;
-import org.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.DBMeta;
 
 
 /**

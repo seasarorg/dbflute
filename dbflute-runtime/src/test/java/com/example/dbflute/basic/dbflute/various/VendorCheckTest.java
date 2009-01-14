@@ -7,11 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.coption.LikeSearchOption;
-import org.dbflute.exception.BatchEntityAlreadyUpdatedException;
-import org.dbflute.exception.EntityAlreadyDeletedException;
-import org.dbflute.exception.EntityAlreadyUpdatedException;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
 import com.example.dbflute.basic.dbflute.cbean.VendorCheckCB;

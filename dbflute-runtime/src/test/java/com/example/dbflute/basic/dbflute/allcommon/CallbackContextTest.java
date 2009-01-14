@@ -3,8 +3,8 @@ package com.example.dbflute.basic.dbflute.allcommon;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.CallbackContext;
-import org.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.extension.jdbc.SqlLogRegistryLocator;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;

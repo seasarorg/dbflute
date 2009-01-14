@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.cbean.*;
@@ -240,7 +240,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param productName The value of productName as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setProductName_LikeSearch(String productName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductName_LikeSearch(String productName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(productName), getCValueProductName(), "PRODUCT_NAME", "ProductName", "productName", likeSearchOption);
     }
 
@@ -249,7 +249,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param productName The value of productName as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setProductName_NotLikeSearch(String productName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductName_NotLikeSearch(String productName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(productName), getCValueProductName(), "PRODUCT_NAME", "ProductName", "productName", likeSearchOption);
     }
 
@@ -316,7 +316,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param productStatusCode The value of productStatusCode as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setProductStatusCode_LikeSearch(String productStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusCode_LikeSearch(String productStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(productStatusCode), getCValueProductStatusCode(), "PRODUCT_STATUS_CODE", "ProductStatusCode", "productStatusCode", likeSearchOption);
     }
 
@@ -325,7 +325,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param productStatusCode The value of productStatusCode as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setProductStatusCode_NotLikeSearch(String productStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusCode_NotLikeSearch(String productStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(productStatusCode), getCValueProductStatusCode(), "PRODUCT_STATUS_CODE", "ProductStatusCode", "productStatusCode", likeSearchOption);
     }
 
@@ -401,7 +401,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param toDate The to-date of latestPurchaseDatetime. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void setLatestPurchaseDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void setLatestPurchaseDatetime_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
         registerFromToQuery((fromDate != null ? new java.sql.Timestamp(fromDate.getTime()) : null), (toDate != null ? new java.sql.Timestamp(toDate.getTime()) : null), getCValueLatestPurchaseDatetime(), "LATEST_PURCHASE_DATETIME", "LatestPurchaseDatetime", "latestPurchaseDatetime", fromToOption);
     }
 
@@ -411,7 +411,7 @@ public abstract class AbstractBsSummaryProductCQ extends AbstractConditionQuery 
      * @param toDate The to-date of latestPurchaseDatetime. (Nullable)
      */
     public void setLatestPurchaseDatetime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setLatestPurchaseDatetime_FromTo(fromDate, toDate, new org.dbflute.cbean.coption.DateFromToOption());
+        setLatestPurchaseDatetime_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 
     /**

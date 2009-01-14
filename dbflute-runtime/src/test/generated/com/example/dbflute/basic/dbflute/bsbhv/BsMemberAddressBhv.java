@@ -3,17 +3,17 @@ package com.example.dbflute.basic.dbflute.bsbhv;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.*;
-import org.dbflute.bhv.ValueLabelSetupper;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingHandler;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.*;
+import org.seasar.dbflute.bhv.ValueLabelSetupper;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 import com.example.dbflute.basic.dbflute.exentity.*;
 import com.example.dbflute.basic.dbflute.allcommon.DBCurrent;
@@ -53,7 +53,7 @@ import com.example.dbflute.basic.dbflute.cbean.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehaviorWritable {
+public abstract class BsMemberAddressBhv extends org.seasar.dbflute.bhv.AbstractBehaviorWritable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -120,7 +120,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of MemberAddress. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public MemberAddress selectEntity(final MemberAddressCB cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<MemberAddress, MemberAddressCB>() {
@@ -131,8 +131,8 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of MemberAddress. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public MemberAddress selectEntityWithDeletedCheck(final MemberAddressCB cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<MemberAddress, MemberAddressCB>() {
@@ -244,7 +244,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Insert the entity.
      * @param memberAddress The entity of insert target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(MemberAddress memberAddress) {
         assertEntityNotNull(memberAddress);
@@ -259,9 +259,9 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param memberAddress The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final MemberAddress memberAddress) {
         helpUpdateInternally(memberAddress, new InternalUpdateCallback<MemberAddress>() {
@@ -276,9 +276,9 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
      * @param memberAddress The entity of update target. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final MemberAddress memberAddress) {
         helpUpdateNonstrictInternally(memberAddress, new InternalUpdateNonstrictCallback<MemberAddress>() {
@@ -293,9 +293,9 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param memberAddress The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final MemberAddress memberAddress) {
         helpInsertOrUpdateInternally(memberAddress, new InternalInsertOrUpdateCallback<MemberAddress, MemberAddressCB>() {
@@ -314,9 +314,9 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
      * @param memberAddress The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(MemberAddress memberAddress) {
         helpInsertOrUpdateInternally(memberAddress, new InternalInsertOrUpdateNonstrictCallback<MemberAddress>() {
@@ -333,8 +333,8 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param memberAddress The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(MemberAddress memberAddress) {
         helpDeleteInternally(memberAddress, new InternalDeleteCallback<MemberAddress>() {
@@ -349,8 +349,8 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
      * @param memberAddress Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(MemberAddress memberAddress) {
         helpDeleteNonstrictInternally(memberAddress, new InternalDeleteNonstrictCallback<MemberAddress>() {
@@ -360,7 +360,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
     /**
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
      * @param memberAddress Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(MemberAddress memberAddress) {
         helpDeleteNonstrictIgnoreDeletedInternally(memberAddress, new InternalDeleteNonstrictIgnoreDeletedCallback<MemberAddress>() {
@@ -385,7 +385,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param memberAddressList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
      */
     public int[] batchUpdate(List<MemberAddress> memberAddressList) {
         assertObjectNotNull("memberAddressList", memberAddressList);
@@ -397,7 +397,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param memberAddressList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<MemberAddress> memberAddressList) {
         assertObjectNotNull("memberAddressList", memberAddressList);
@@ -409,7 +409,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param memberAddressList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
      */
     public int[] batchDelete(List<MemberAddress> memberAddressList) {
         assertObjectNotNull("memberAddressList", memberAddressList);
@@ -421,7 +421,7 @@ public abstract class BsMemberAddressBhv extends org.dbflute.bhv.AbstractBehavio
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param memberAddressList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDeleteNonstrict(List<MemberAddress> memberAddressList) {
         assertObjectNotNull("memberAddressList", memberAddressList);

@@ -2,9 +2,9 @@ package com.example.dbflute.basic.dbflute.allcommon.dbmeta;
 
 import java.lang.reflect.Method;
 
-import org.dbflute.Entity;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.framework.util.MethodUtil;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;

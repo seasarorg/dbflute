@@ -2,8 +2,8 @@ package com.example.dbflute.basic.dbflute.various;
 
 import java.util.List;
 
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.cbean.ListResultBean;
 
 import com.example.dbflute.basic.dbflute.cbean.ProductStatusCB;
 import com.example.dbflute.basic.dbflute.cbean.PurchaseCB;

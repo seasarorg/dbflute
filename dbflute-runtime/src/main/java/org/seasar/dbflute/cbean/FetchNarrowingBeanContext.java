@@ -1,0 +1,73 @@
+package org.seasar.dbflute.cbean;
+
+/**
+ * Fetch-Narrowing-Bean context. (referring to s2pager)
+ * 
+ * @author DBFlute(AutoGenerator)
+ */
+public class FetchNarrowingBeanContext {
+
+    /** The thread-local for this. */
+    private static ThreadLocal<FetchNarrowingBean> _threadLocal = new ThreadLocal<FetchNarrowingBean>();
+
+    /**
+     * Get fetch-narrowing-bean on thread.
+     * @return Condition-bean context. (Nullable)
+     */
+    public static FetchNarrowingBean getFetchNarrowingBeanOnThread() {
+        return (FetchNarrowingBean)_threadLocal.get();
+    }
+
+    /**
+     * Set fetch-narrowing-bean on thread.
+     * @param cb Condition-bean. (NotNull)
+     */
+    public static void setFetchNarrowingBeanOnThread(FetchNarrowingBean cb) {
+        if (cb == null) {
+            String msg = "The argument[cb] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _threadLocal.set(cb);
+    }
+
+    /**
+     * Is existing fetch-narrowing-bean on thread?
+     * @return Determination.
+     */
+    public static boolean isExistFetchNarrowingBeanOnThread() {
+        return (_threadLocal.get() != null);
+    }
+
+    /**
+     * Clear fetch-narrowing-bean on thread.
+     */
+    public static void clearFetchNarrowingBeanOnThread() {
+        _threadLocal.set(null);
+    }
+
+    /**
+     * Is the argument fetch-narrowing-bean?
+     * @param dtoInstance Dto instance.
+     * @return Determination.
+     */
+    public static boolean isTheArgumentFetchNarrowingBean(final Object dtoInstance) {
+        if (dtoInstance instanceof FetchNarrowingBean) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Is the type fetch-narrowing-bean?
+     * @param dtoClass DtoClass.
+     * @return Determination.
+     */
+    public static boolean isTheTypeFetchNarrowingBean(final Class<?> dtoClass) {
+        if (FetchNarrowingBean.class.isAssignableFrom(dtoClass)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}

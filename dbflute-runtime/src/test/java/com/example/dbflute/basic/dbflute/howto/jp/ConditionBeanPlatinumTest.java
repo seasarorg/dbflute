@@ -7,14 +7,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.SubQuery;
-import org.dbflute.cbean.UnionQuery;
-import org.dbflute.cbean.coption.LikeSearchOption;
-import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.util.DfStringUtil;
 
 import com.example.dbflute.basic.dbflute.cbean.MemberAddressCB;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;

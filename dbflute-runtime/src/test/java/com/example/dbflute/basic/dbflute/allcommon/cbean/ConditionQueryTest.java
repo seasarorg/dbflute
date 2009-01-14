@@ -1,7 +1,7 @@
 package com.example.dbflute.basic.dbflute.allcommon.cbean;
 
 
-import org.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 
 import com.example.dbflute.basic.dbflute.bsentity.dbmeta.MemberDbm;
 import com.example.dbflute.basic.dbflute.bsentity.dbmeta.MemberStatusDbm;

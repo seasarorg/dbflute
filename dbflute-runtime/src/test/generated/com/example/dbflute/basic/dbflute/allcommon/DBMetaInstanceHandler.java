@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.exception.DBMetaNotFoundException;
-import org.dbflute.helper.StringKeyMap;
-import org.dbflute.util.DfAssertUtil;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.DBMetaNotFoundException;
+import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.util.DfAssertUtil;
 
 /**
  * The handler of the instance of DB meta.
@@ -94,7 +94,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
      * </pre>
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     public static DBMeta findDBMeta(String tableFlexibleName) {
         DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
@@ -171,7 +171,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     public DBMeta provideDBMetaChecked(String tableFlexibleName) {
         return findDBMeta(tableFlexibleName);

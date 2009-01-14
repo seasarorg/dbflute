@@ -3,17 +3,17 @@ package com.example.dbflute.basic.dbflute.bsbhv;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.*;
-import org.dbflute.bhv.ValueLabelSetupper;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingHandler;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.*;
+import org.seasar.dbflute.bhv.ValueLabelSetupper;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 import com.example.dbflute.basic.dbflute.exentity.*;
 import com.example.dbflute.basic.dbflute.allcommon.DBCurrent;
@@ -53,7 +53,7 @@ import com.example.dbflute.basic.dbflute.cbean.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWritable {
+public abstract class BsPurchaseBhv extends org.seasar.dbflute.bhv.AbstractBehaviorWritable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -120,7 +120,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of Purchase. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public Purchase selectEntity(final PurchaseCB cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<Purchase, PurchaseCB>() {
@@ -131,8 +131,8 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of Purchase. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public Purchase selectEntityWithDeletedCheck(final PurchaseCB cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<Purchase, PurchaseCB>() {
@@ -262,7 +262,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Insert the entity.
      * @param purchase The entity of insert target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(Purchase purchase) {
         assertEntityNotNull(purchase);
@@ -277,9 +277,9 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param purchase The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final Purchase purchase) {
         helpUpdateInternally(purchase, new InternalUpdateCallback<Purchase>() {
@@ -294,9 +294,9 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
      * @param purchase The entity of update target. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final Purchase purchase) {
         helpUpdateNonstrictInternally(purchase, new InternalUpdateNonstrictCallback<Purchase>() {
@@ -311,9 +311,9 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param purchase The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final Purchase purchase) {
         helpInsertOrUpdateInternally(purchase, new InternalInsertOrUpdateCallback<Purchase, PurchaseCB>() {
@@ -332,9 +332,9 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
      * @param purchase The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(Purchase purchase) {
         helpInsertOrUpdateInternally(purchase, new InternalInsertOrUpdateNonstrictCallback<Purchase>() {
@@ -351,8 +351,8 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param purchase The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @exception org.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(Purchase purchase) {
         helpDeleteInternally(purchase, new InternalDeleteCallback<Purchase>() {
@@ -367,8 +367,8 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
      * @param purchase Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(Purchase purchase) {
         helpDeleteNonstrictInternally(purchase, new InternalDeleteNonstrictCallback<Purchase>() {
@@ -378,7 +378,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
     /**
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
      * @param purchase Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(Purchase purchase) {
         helpDeleteNonstrictIgnoreDeletedInternally(purchase, new InternalDeleteNonstrictIgnoreDeletedCallback<Purchase>() {
@@ -403,7 +403,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param purchaseList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
      */
     public int[] batchUpdate(List<Purchase> purchaseList) {
         assertObjectNotNull("purchaseList", purchaseList);
@@ -415,7 +415,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param purchaseList The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<Purchase> purchaseList) {
         assertObjectNotNull("purchaseList", purchaseList);
@@ -427,7 +427,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param purchaseList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
      */
     public int[] batchDelete(List<Purchase> purchaseList) {
         assertObjectNotNull("purchaseList", purchaseList);
@@ -439,7 +439,7 @@ public abstract class BsPurchaseBhv extends org.dbflute.bhv.AbstractBehaviorWrit
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param purchaseList The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDeleteNonstrict(List<Purchase> purchaseList) {
         assertObjectNotNull("purchaseList", purchaseList);

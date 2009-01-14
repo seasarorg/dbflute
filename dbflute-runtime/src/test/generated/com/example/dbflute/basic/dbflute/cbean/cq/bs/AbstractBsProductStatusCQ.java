@@ -2,11 +2,11 @@ package com.example.dbflute.basic.dbflute.cbean.cq.bs;
 
 import java.util.Collection;
 
-import org.dbflute.cbean.*;
-import org.dbflute.cbean.ckey.*;
-import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.cbean.*;
@@ -98,7 +98,7 @@ public abstract class AbstractBsProductStatusCQ extends AbstractConditionQuery {
      * @param productStatusCode The value of productStatusCode as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setProductStatusCode_LikeSearch(String productStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusCode_LikeSearch(String productStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(productStatusCode), getCValueProductStatusCode(), "PRODUCT_STATUS_CODE", "ProductStatusCode", "productStatusCode", likeSearchOption);
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractBsProductStatusCQ extends AbstractConditionQuery {
      * @param productStatusCode The value of productStatusCode as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setProductStatusCode_NotLikeSearch(String productStatusCode, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusCode_NotLikeSearch(String productStatusCode, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(productStatusCode), getCValueProductStatusCode(), "PRODUCT_STATUS_CODE", "ProductStatusCode", "productStatusCode", likeSearchOption);
     }
 
@@ -310,7 +310,7 @@ public abstract class AbstractBsProductStatusCQ extends AbstractConditionQuery {
      * @param productStatusName The value of productStatusName as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void setProductStatusName_LikeSearch(String productStatusName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusName_LikeSearch(String productStatusName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(productStatusName), getCValueProductStatusName(), "PRODUCT_STATUS_NAME", "ProductStatusName", "productStatusName", likeSearchOption);
     }
 
@@ -319,7 +319,7 @@ public abstract class AbstractBsProductStatusCQ extends AbstractConditionQuery {
      * @param productStatusName The value of productStatusName as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void setProductStatusName_NotLikeSearch(String productStatusName, org.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
+    public void setProductStatusName_NotLikeSearch(String productStatusName, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(productStatusName), getCValueProductStatusName(), "PRODUCT_STATUS_NAME", "ProductStatusName", "productStatusName", likeSearchOption);
     }
 

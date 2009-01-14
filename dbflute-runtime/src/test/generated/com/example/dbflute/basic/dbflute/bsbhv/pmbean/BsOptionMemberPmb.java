@@ -17,7 +17,7 @@ public class BsOptionMemberPmb  {
     protected String _memberName;
 
     /** The value of likeSearchOption for memberName. */
-    protected org.dbflute.cbean.coption.LikeSearchOption _memberNameInternalLikeSearchOption;
+    protected org.seasar.dbflute.cbean.coption.LikeSearchOption _memberNameInternalLikeSearchOption;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -102,7 +102,7 @@ public class BsOptionMemberPmb  {
      * @param memberName The value of memberName. (Nullable)
      * @param memberNameOption The option of likeSearch for memberName. (Nullable)
      */
-    public void setMemberName(String memberName, org.dbflute.cbean.coption.LikeSearchOption memberNameOption) {
+    public void setMemberName(String memberName, org.seasar.dbflute.cbean.coption.LikeSearchOption memberNameOption) {
         _memberName = memberName;
         _memberNameInternalLikeSearchOption = memberNameOption;
     }
@@ -111,7 +111,7 @@ public class BsOptionMemberPmb  {
      * Get the internal option of likeSearch for memberName. {Internal Method: Don't Invoke This!}
      * @return The internal option of likeSearch for memberName. (Nullable)
      */
-    public org.dbflute.cbean.coption.LikeSearchOption getMemberNameInternalLikeSearchOption() {
+    public org.seasar.dbflute.cbean.coption.LikeSearchOption getMemberNameInternalLikeSearchOption() {
         return _memberNameInternalLikeSearchOption;
     }
 
