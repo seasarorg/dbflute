@@ -160,6 +160,7 @@ public class Column {
     //                                              Internal
     //                                              --------
     private String _sql2EntityTableName;
+    private String _sql2EntityJavaNative;
 
     // ==============================================================================
     //                                                                    Constructor
@@ -389,6 +390,11 @@ public class Column {
     // -----------------------------------------------------
     //                                             Java Type
     //                                             ---------
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+    // Unused at Generate task.
+    // Generate task instead uses JavaNative.
+    // Basically the value is same as this property 'javaType'.
+    // = = = = = = = = = =/ 
     /**
      * Get type to use in Java sources
      */
@@ -992,6 +998,14 @@ public class Column {
     public void setSql2EntityTableName(String sql2EntityTableName) {
         _sql2EntityTableName = sql2EntityTableName;
     }
+    
+    public String getSql2EntityJavaNative() {
+        return _sql2EntityJavaNative;
+    }
+    
+    public void setSql2EntityJavaNative(String sql2EntityJavaNative) {
+        _sql2EntityJavaNative = sql2EntityJavaNative;
+    }
 
     // ===================================================================================
     //                                                                      Checked Getter
@@ -1064,6 +1078,9 @@ public class Column {
      * @return Java native type used by torque. (NotNull)
      */
     public String getJavaNative() {
+        if (_sql2EntityJavaNative != null && _sql2EntityJavaNative.trim().length() > 0) {
+            return _sql2EntityJavaNative;
+        }
         return TypeMap.findJavaNativeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
     }
 

@@ -42,6 +42,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.collection.DfStringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
@@ -232,10 +233,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
-
+                        
+                        final DfStringKeyMap<String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
+                            final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
+                            
                             String sql2EntityTableName = null;
                             try {
                                 sql2EntityTableName = md.getTableName(i);
@@ -245,6 +249,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 msg = msg + " " + ignored.getMessage();
                                 _log.info(msg);
                             }
+                            metaInfo.setSql2EntityTableName(sql2EntityTableName);
+                            
                             String columnName = md.getColumnLabel(i);
                             if (columnName == null || columnName.trim().length() == 0) {
                                 columnName = md.getColumnName(i);
@@ -256,21 +262,26 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 msg = msg + "sql=" + sql;
                                 throw new IllegalArgumentException(msg);
                             }
+                            metaInfo.setColumnName(columnName);
+                            
                             final int columnType = md.getColumnType(i);
+                            metaInfo.setJdbcType(columnType);
+                            
                             final String columnTypeName = md.getColumnTypeName(i);
+                            metaInfo.setDbTypeName(columnTypeName);
+                            
                             int columnSize = md.getPrecision(i);
-                            if (columnSize <= 0) {// Example: sum(COLUMN)
+                            if (columnSize <= 0) { // Example: sum(COLUMN)
                                 columnSize = md.getColumnDisplaySize(i);
                             }
-                            int scale = md.getScale(i);
-
-                            final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
-                            metaInfo.setSql2EntityTableName(sql2EntityTableName);
-                            metaInfo.setColumnName(columnName);
-                            metaInfo.setJdbcType(columnType);
-                            metaInfo.setDbTypeName(columnTypeName);
                             metaInfo.setColumnSize(columnSize);
+                            
+                            final int scale = md.getScale(i);
                             metaInfo.setDecimalDigits(scale);
+                            
+                            final String sql2entityJavaNative = columnJavaNativeMap.get(columnName); 
+                            metaInfo.setSql2EntityJavaNative(sql2entityJavaNative);
+                            
                             columnJdbcTypeMap.put(columnName, metaInfo);
                         }
 
@@ -348,6 +359,27 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     }
                 }
             }
+            
+            protected DfStringKeyMap<String> createColumnJavaNativeMap(String sql) {
+                final List<String> entityPropertyTypeList = getEntityPropertyTypeList(sql);
+                final DfStringKeyMap<String> columnJavaNativeMap = DfStringKeyMap.createAsFlexible();
+                for (String element : entityPropertyTypeList) {
+                    final String nameDelimiter = " ";
+                    final int nameDelimiterLength = nameDelimiter.length();
+                    element = element.trim();
+                    final int nameIndex = element.lastIndexOf(nameDelimiter);
+                    if (nameIndex <= 0) {
+                        String msg = "The customize entity element should be [typeName columnName].";
+                        msg = msg + " But: element=" + element;
+                        msg = msg + " srcFile=" + _srcFile;
+                        throw new IllegalStateException(msg);
+                    }
+                    final String typeName = resolvePackageName(element.substring(0, nameIndex).trim());
+                    final String columnName = element.substring(nameIndex + nameDelimiterLength).trim();
+                    columnJavaNativeMap.put(columnName, typeName);
+                }
+                return columnJavaNativeMap;
+            }
 
             protected boolean isTargetEntityMakingSql(String sql) {
                 final String entityName = getEntityName(sql);
@@ -394,7 +426,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
                 pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
-                final List<String> parameterBeanElement = getParameterBeanProperties(sql);
+                final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
                 for (String element : parameterBeanElement) {
                     final String nameDelimiter = " ";
                     final int nameDelimiterLength = nameDelimiter.length();
@@ -548,12 +580,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String targetString = getTargetString(sql, "+");
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
+    
+    protected List<String> getEntityPropertyTypeList(final String sql) {
+        return getTargetList(sql, "##");
+    }
 
     protected String getParameterBeanClassDefinition(final String sql) {
         return getTargetString(sql, "!");
     }
 
-    protected List<String> getParameterBeanProperties(final String sql) {
+    protected List<String> getParameterBeanPropertyTypeList(final String sql) {
         return getTargetList(sql, "!!");
     }
 
@@ -935,6 +971,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupDbType(columnJdbcTypeMap, columnName, column);
                 setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
                 setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, column);
+                setupSql2EntitySecondJavaNative(columnJdbcTypeMap, columnName, column);
 
                 tbl.addColumn(column);
                 _log.info("   " + (column.isPrimaryKey() ? "*" : " ") + columnName + " --> " + column.getName() + " : "
@@ -1022,18 +1059,25 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column col) {
+            String columnName, final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();
-        col.setColumnSize(columnSize + "," + decimalDigits);
+        column.setColumnSize(columnSize + "," + decimalDigits);
     }
 
     protected void setupSql2EntitySecondTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column col) {
+            String columnName, final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final String sql2EntityTableName = metaInfo.getSql2EntityTableName();
-        col.setSql2EntityTableName(sql2EntityTableName);
+        column.setSql2EntityTableName(sql2EntityTableName);
+    }
+    
+    protected void setupSql2EntitySecondJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+            String columnName, final Column column) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final String sql2EntityJavaNative = metaInfo.getSql2EntityJavaNative();
+        column.setSql2EntityJavaNative(sql2EntityJavaNative);
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {

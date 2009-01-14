@@ -36,6 +36,7 @@ public class DfColumnMetaInfo {
     protected String columnComment;
     protected String defaultValue;
     protected String sql2entityTableName;
+    protected String sql2entityJavaNative;
 
     // ===================================================================================
     //                                                                              Accept
@@ -133,5 +134,13 @@ public class DfColumnMetaInfo {
 
     public void setSql2EntityTableName(String sql2entityTableName) {
         this.sql2entityTableName = sql2entityTableName;
+    }
+
+    public String getSql2EntityJavaNative() {
+        return sql2entityJavaNative;
+    }
+
+    public void setSql2EntityJavaNative(String sql2entityJavaNative) {
+        this.sql2entityJavaNative = sql2entityJavaNative;
     }
 }
