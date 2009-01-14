@@ -5,7 +5,7 @@ import javax.sql.XADataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.resource.TnSqlLogRegistry;
+import org.dbflute.resource.S2SqlLogRegistry;
 import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
@@ -54,7 +54,7 @@ public class DBFluteInitializer {
             final StringBuilder sb = new StringBuilder();
             sb.append("{SqlLog Information}").append(getLineSeparator());
             sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-            if (TnSqlLogRegistry.setupSqlLogRegistry()) {
+            if (S2SqlLogRegistry.setupSqlLogRegistry()) {
                 sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
                 sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
             } else {
@@ -62,9 +62,9 @@ public class DBFluteInitializer {
             }
            _log.info(sb);
         } else {
-            final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
+            final Object sqlLogRegistry = S2SqlLogRegistry.findContainerSqlLogRegistry();
             if (sqlLogRegistry != null) {
-                TnSqlLogRegistry.closeRegistration();
+                S2SqlLogRegistry.closeRegistration();
             }
         }
     }

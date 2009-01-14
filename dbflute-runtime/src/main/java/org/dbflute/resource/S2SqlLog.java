@@ -3,7 +3,7 @@ package org.dbflute.resource;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class TnSqlLog {
+public class S2SqlLog {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -16,7 +16,7 @@ public class TnSqlLog {
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnSqlLog(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+    public S2SqlLog(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
         this.rawSql = rawSql;
         this.completeSql = completeSql;
         this.bindArgs = bindArgs;

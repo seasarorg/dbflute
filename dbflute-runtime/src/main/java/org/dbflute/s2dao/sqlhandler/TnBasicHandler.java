@@ -102,7 +102,7 @@ public class TnBasicHandler {
         final SqlLogHandler sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
         final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
-        final boolean existsSqlLogRegistry = sqlLogRegistry != null;
+        final boolean existsSqlLogRegistry = TnSqlLogRegistry.exists();
         if (isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
             if (isLogEnabled()) {
