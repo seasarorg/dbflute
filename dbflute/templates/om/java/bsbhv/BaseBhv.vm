@@ -4,29 +4,30 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 import java.util.Map;
 
-import ${glPackageBaseCommon}.*;
-#if ($table.isAvailableNonPrimaryKeyWritable())
-import ${glPackageBaseCommonBhvCoreCommand}.${glInsertEntityCommand};
-#end
+import org.dbflute.*;
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
-import ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOption};
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupper};
+import org.dbflute.bhv.ConditionBeanSetupper;
+import org.dbflute.bhv.LoadReferrerOption;
 #end
-import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupper};
+import org.dbflute.bhv.ValueLabelSetupper;
+#if ($table.isAvailableNonPrimaryKeyWritable())
+import org.dbflute.bhv.core.command.InsertEntityCommand;
+#end
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.ListResultBean;
+import org.dbflute.cbean.PagingBean;
+import org.dbflute.cbean.PagingHandler;
+import org.dbflute.cbean.PagingInvoker;
+import org.dbflute.cbean.PagingResultBean;
+import org.dbflute.cbean.ResultBeanBuilder;
+import org.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArranger};
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequest};
-import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequest};
+import org.dbflute.dbmeta.hierarchy.HierarchyArranger;
+import org.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
+import org.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
-import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glListResultBean};
-import ${glPackageBaseCommonCBean}.${glResultBeanBuilder};
-import ${glPackageBaseCommonCBean}.${glPagingHandler};
-import ${glPackageBaseCommonCBean}.${glPagingInvoker};
-import ${glPackageBaseCommonCBean}.${glPagingBean};
-import ${glPackageBaseCommonCBean}.${glPagingResultBean};
-import ${glPackageBaseCommonDBMeta}.${glDBMeta};
-import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import org.dbflute.jdbc.StatementConfig;
+
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end
@@ -36,9 +37,9 @@ import ${glPackageCB}.*;
 
 #set ($myExtendClassName = "")
 #if ($table.isWritable())
-  #set ($myExtendClassName = "${glAbstractBehaviorWritable}")
+  #set ($myExtendClassName = "AbstractBehaviorWritable")
 #else
-  #set ($myExtendClassName = "${glAbstractBehaviorReadable}")
+  #set ($myExtendClassName = "AbstractBehaviorReadable")
 #end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
@@ -75,7 +76,7 @@ import ${glPackageCB}.*;
  * </pre>
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
+public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -93,7 +94,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                              DBMeta
     //                                                                              ======
     /** @return The instance of DBMeta. (NotNull) */
-    public ${glDBMeta} getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+    public DBMeta getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
 
     /** @return The instance of DBMeta as my table type. (NotNull) */
     public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
@@ -101,8 +102,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
-    public ${glEntity} newEntity() { return newMyEntity(); }
-    public ${glConditionBean} newConditionBean() { return newMyConditionBean(); }
+    public Entity newEntity() { return newMyEntity(); }
+    public ConditionBean newConditionBean() { return newMyConditionBean(); }
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
     public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
@@ -110,7 +111,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                       Current DBDef
     //                                                                       =============
     @Override
-    protected ${glDBDef} getCurrentDBDef() {
+    protected DBDef getCurrentDBDef() {
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
@@ -118,7 +119,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                             Default StatementConfig
     //                                                             =======================
     @Override
-    protected ${glStatementConfig} getDefaultStatementConfig() {
+    protected StatementConfig getDefaultStatementConfig() {
         return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
     }
     
@@ -142,7 +143,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -153,8 +154,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -166,8 +167,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Select the entity with deleted check. {by primary-key value}
      * @param primaryKey The keys of primary.
      * @return The selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -186,7 +187,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull)
      */
-    public ${glListResultBean}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
+    public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
         return new ${glResultBeanBuilder}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
@@ -199,7 +200,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected page. (NotNull)
      */
-    public ${glPagingResultBean}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
+    public PagingResultBean<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
         final ${glPagingInvoker}<${myExtendedObjectClassName}> invoker = new ${glPagingInvoker}<${myExtendedObjectClassName}>(getTableDbName());
         final ${glPagingHandler}<${myExtendedObjectClassName}> handler = new ${glPagingHandler}<${myExtendedObjectClassName}>() {
@@ -283,18 +284,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
-    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${referrerCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
-    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadReferrerOption<${referrerEntityClassName}, ${referrerCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
@@ -352,7 +353,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Insert the entity.
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
+     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -360,7 +361,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doCreate(${glEntity} ${myEntityVariableName}) {
+    protected void doCreate(Entity ${myEntityVariableName}) {
         insert((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
@@ -368,12 +369,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
@@ -381,7 +382,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doModify(${glEntity} entity) {
+    protected void doModify(Entity entity) {
         update((${myExtendedObjectClassName})entity);
     }
 #if ($table.hasOptimisticLock())
@@ -389,9 +390,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -400,7 +401,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     @Override
-    protected void doModifyNonstrict(${glEntity} entity) {
+    protected void doModifyNonstrict(Entity entity) {
 #if ($table.hasOptimisticLock())
         updateNonstrict((${myExtendedObjectClassName})entity);
 #else
@@ -412,12 +413,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -429,7 +430,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doCreateOrUpdate(${glEntity} ${myEntityVariableName}) {
+    protected void doCreateOrUpdate(Entity ${myEntityVariableName}) {
         insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
 #if ($table.hasOptimisticLock())
@@ -437,9 +438,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyExistsException} When the entity already exists. (Unique Constraint Violation)
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -450,7 +451,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     @Override
-    protected void doCreateOrUpdateNonstrict(${glEntity} entity) {
+    protected void doCreateOrUpdateNonstrict(Entity entity) {
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
         insertOrUpdateNonstrict((${myExtendedObjectClassName})entity);
 #else
@@ -462,11 +463,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
@@ -474,7 +475,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected void doRemove(${glEntity} ${myEntityVariableName}) {
+    protected void doRemove(Entity ${myEntityVariableName}) {
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
 #if ($table.hasOptimisticLock())
@@ -482,8 +483,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -493,7 +494,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
@@ -520,9 +521,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException} When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -536,7 +537,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
@@ -550,9 +551,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
 #if ($table.hasOptimisticLock())
-     * @exception ${glPackageBaseCommonException}.${glBatchEntityAlreadyUpdatedException} When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
      */
     public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -566,7 +567,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
@@ -613,7 +614,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Copy-insert.
      * @param primaryKey Primary-keys. (NotNull)
      * @return Inserted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception org.dbflute.exception.EntityAlreadyDeletedException
      */
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -730,12 +731,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateSelectCount(${myConditionBeanClassName} cb) {
         return invoke(createSelectCountCBCommand(cb));
     }
-    protected int doCallReadCount(${glConditionBean} cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
+    protected int doCallReadCount(ConditionBean cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
         return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class));
     }
     @SuppressWarnings("unchecked")
-    protected List<${glEntity}> doCallReadList(${glConditionBean} cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
+    protected List<Entity> doCallReadList(ConditionBean cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
     protected ${table.sequenceReturnType} delegateSelectNextVal() { return invoke(createSelectNextValCommand(${table.sequenceReturnType}.class)); }
 #end
@@ -747,11 +748,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateInsert(${myExtendedObjectClassName} e) {
         if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e));
     }
-    protected int doCallCreate(${glEntity} entity) {return delegateInsert(downcast(entity)); }
+    protected int doCallCreate(Entity entity) {return delegateInsert(downcast(entity)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e) {
         if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e));
     }
-    protected int doCallModify(${glEntity} entity) { return delegateUpdate(downcast(entity)); }
+    protected int doCallModify(Entity entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) {
         if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e));
@@ -760,7 +761,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected int delegateDelete(${myExtendedObjectClassName} e) {
         if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e));
     }
-    protected int doCallRemove(${glEntity} entity) { return delegateDelete(downcast(entity)); }
+    protected int doCallRemove(Entity entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) {
         if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e));
@@ -772,13 +773,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doCreateList(List<${glEntity}> ls) { return delegateInsertList((List)ls); }
+    protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
         return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doModifyList(List<${glEntity}> ls) { return delegateUpdateList((List)ls); }
+    protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
@@ -790,7 +791,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls)));
     }
     @SuppressWarnings("unchecked")
-    protected int[] doRemoveList(List<${glEntity}> ls) { return delegateDeleteList((List)ls); }
+    protected int[] doRemoveList(List<Entity> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
         if (ls.isEmpty()) { return new int[]{}; }
@@ -803,7 +804,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(e); // If this table use identity, the entity does not have primary-key.
         return invoke(createInsertEntityCommand(e));
     }
-    protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntity} entity) {
+    protected ${glInsertEntityCommand} createInsertEntityCommand(Entity entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
         final ${glInsertEntityCommand} cmd = new ${glInsertEntityCommand}();
         cmd.setTableDbName(getTableDbName());
@@ -821,7 +822,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                     ===============
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
-    protected void filterEntityOfInsert(${glEntity} targetEntity) {
+    protected void filterEntityOfInsert(Entity targetEntity) {
         super.filterEntityOfInsert(targetEntity);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
@@ -831,7 +832,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
-    protected void filterEntityOfUpdate(${glEntity} targetEntity) {
+    protected void filterEntityOfUpdate(Entity targetEntity) {
         super.filterEntityOfUpdate(targetEntity);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
@@ -871,7 +872,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                Optimistic Lock Info
     //                                                                ====================
     @Override
-    protected boolean hasVersionNoValue(${glEntity} entity) {
+    protected boolean hasVersionNoValue(Entity entity) {
 #if ($table.isUseVersionNo())
         return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
 #else
@@ -880,7 +881,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     @Override
-    protected boolean hasUpdateDateValue(${glEntity} entity) {
+    protected boolean hasUpdateDateValue(Entity entity) {
 #if ($table.isUseUpdateDate())
         return downcast(entity).get${table.updateDateJavaName}() != null;
 #else
@@ -891,7 +892,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
-    protected ${myExtendedObjectClassName} downcast(${glEntity} entity) {
+    protected ${myExtendedObjectClassName} downcast(Entity entity) {
         return helpDowncastInternally(entity, ${myExtendedObjectClassName}.class);
     }
 }
