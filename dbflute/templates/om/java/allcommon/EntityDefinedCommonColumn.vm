@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import org.dbflute.Entity;
+import org.seasar.dbflute.Entity;
 
 /**
  * The interface of entity defined common columns.

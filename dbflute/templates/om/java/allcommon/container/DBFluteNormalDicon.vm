@@ -23,10 +23,9 @@
     </component>
 
     <!-- The runtime component of DBFlute. -->
-    <component name="behaviorCommandInvoker" class="org.dbflute.bhv.core.BehaviorCommandInvoker"/>
-    <component name="beanMetaDataFactory" class="org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
-    <component name="valueTypeFactory" class="org.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
-    <component name="latestSqlProvider" class="org.dbflute.resource.SqlLogRegistryLatestSqlProvider"/>
+    <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
+    <component name="beanMetaDataFactory" class="org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
+    <component name="valueTypeFactory" class="org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
 
 #foreach ($table in $database.tables)
 #if ($database.isMakeDaoInterface())

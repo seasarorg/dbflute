@@ -6,10 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.BehaviorSelector;
-import org.dbflute.bhv.BehaviorReadable;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.util.TraceViewUtil;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.BehaviorReadable;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.util.TraceViewUtil;
 
 #if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;

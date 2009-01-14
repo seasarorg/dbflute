@@ -4,29 +4,29 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.*;
+import org.seasar.dbflute.*;
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.bhv.LoadReferrerOption;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.bhv.LoadReferrerOption;
 #end
-import org.dbflute.bhv.ValueLabelSetupper;
+import org.seasar.dbflute.bhv.ValueLabelSetupper;
 #if ($table.isAvailableNonPrimaryKeyWritable())
-import org.dbflute.bhv.core.command.InsertEntityCommand;
+import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 #end
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingHandler;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.PagingResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
-import org.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
-import org.dbflute.dbmeta.hierarchy.HierarchyArranger;
-import org.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
-import org.dbflute.dbmeta.hierarchy.HierarchyRequest;
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
-import org.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
@@ -76,7 +76,7 @@ import ${glPackageCB}.*;
  * </pre>
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName} {
+public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendClassName} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -143,7 +143,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (Nullalble)
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -154,8 +154,8 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -167,8 +167,8 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Select the entity with deleted check. {by primary-key value}
      * @param primaryKey The keys of primary.
      * @return The selected entity. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -353,7 +353,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
     /**
      * Insert the entity.
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -369,12 +369,12 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
@@ -390,9 +390,9 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -413,12 +413,12 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -438,9 +438,9 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
     /**
      * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -463,11 +463,11 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception org.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
 #else
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
@@ -483,8 +483,8 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
     /**
      * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -494,7 +494,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
     /**
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
@@ -521,9 +521,9 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
 #if ($table.hasOptimisticLock())
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -537,7 +537,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
@@ -551,9 +551,9 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
 #if ($table.hasOptimisticLock())
-     * @exception org.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
 #else
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
      */
     public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -567,7 +567,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
@@ -614,7 +614,7 @@ public abstract class ${myClassName} extends org.dbflute.bhv.${myExtendClassName
      * Copy-insert.
      * @param primaryKey Primary-keys. (NotNull)
      * @return Inserted count.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException
      */
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
