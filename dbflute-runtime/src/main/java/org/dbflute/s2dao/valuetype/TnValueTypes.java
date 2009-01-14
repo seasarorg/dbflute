@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;

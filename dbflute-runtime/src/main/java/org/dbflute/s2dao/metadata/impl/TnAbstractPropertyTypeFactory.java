@@ -18,13 +18,13 @@ package org.dbflute.s2dao.metadata.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnPropertyTypeFactory;
-import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**

@@ -21,7 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.s2dao.valuetype.TnValueType;
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.util.DfReflectionUtil;
 
 /**

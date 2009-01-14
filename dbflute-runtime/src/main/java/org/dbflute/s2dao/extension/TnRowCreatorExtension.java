@@ -9,11 +9,11 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
-import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfSystemUtil;
 
 

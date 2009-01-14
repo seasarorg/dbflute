@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.resource.ResourceContext;
-import org.dbflute.s2dao.valuetype.TnValueType;
 
 /**
  * @author DBFlute(AutoGenerator)

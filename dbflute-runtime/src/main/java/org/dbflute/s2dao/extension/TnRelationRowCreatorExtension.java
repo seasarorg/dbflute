@@ -10,13 +10,13 @@ import java.util.Stack;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
-import org.dbflute.s2dao.valuetype.TnValueType;
 
 
 /**

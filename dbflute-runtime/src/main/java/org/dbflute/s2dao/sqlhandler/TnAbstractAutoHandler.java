@@ -12,10 +12,10 @@ import javax.sql.DataSource;
 
 import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfTypeUtil;
 
 /**

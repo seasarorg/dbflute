@@ -14,11 +14,11 @@ import javax.sql.DataSource;
 
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
-import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 

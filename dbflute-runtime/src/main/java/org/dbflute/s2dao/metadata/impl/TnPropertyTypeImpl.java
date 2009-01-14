@@ -15,9 +15,9 @@
  */
 package org.dbflute.s2dao.metadata.impl;
 
+import org.dbflute.jdbc.TnValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**

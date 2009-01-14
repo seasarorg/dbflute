@@ -19,6 +19,8 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.dbflute.jdbc.TnValueType;
+
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute

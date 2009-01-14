@@ -2,7 +2,7 @@ package org.dbflute.s2dao.procedure;
 
 import java.lang.reflect.Field;
 
-import org.dbflute.s2dao.valuetype.TnValueType;
+import org.dbflute.jdbc.TnValueType;
 
 /**
  * @author DBFlute(AutoGenerator)

@@ -15,6 +15,8 @@
  */
 package org.dbflute.s2dao.valuetype;
 
+import org.dbflute.jdbc.TnValueType;
+
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
