@@ -5,17 +5,12 @@
 <components namespace="dbflute">
     <include path="j2ee.dicon"/>
 
-    <!-- The client component of DBFlute. (Basically internal components except for behaviorSelector) -->
+    <!-- The component of DBFlute. (Basically internal components except for behaviorSelector) -->
     <component class="com.example.dbflute.basic.dbflute.allcommon.DBFluteInitializer"/>
     <component name="invokerAssistant" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedInvokerAssistant"/>
     <component name="commonColumnAutoSetupper" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedCommonColumnAutoSetupper"/>
-    <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedBehaviorSelector">
-        <destroyMethod name="destroy"/>
-    </component>
-
-    <!-- The runtime component of DBFlute. -->
+    <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedBehaviorSelector"/>
     <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
-    <component name="beanMetaDataFactory" class="org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
 
     <component name="memberBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberBhv"/>
     <component name="memberAddressBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberAddressBhv"/>
