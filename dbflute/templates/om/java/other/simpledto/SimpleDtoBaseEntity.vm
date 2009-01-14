@@ -40,7 +40,7 @@ import ${myExtendedEntityPackageName}.*;
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public abstract class $myClassName implements java.io.Serializable {
 
     // ===================================================================================

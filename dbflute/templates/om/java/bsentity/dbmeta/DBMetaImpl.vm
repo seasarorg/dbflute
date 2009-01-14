@@ -4,11 +4,11 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.Map;
 
-import ${glPackageBaseCommon}.${glEntity};
-import ${glPackageBaseCommonDBMeta}.${glAbstractDBMeta};
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.AbstractDBMeta;
+import org.seasar.dbflute.dbmeta.info.*;
+import org.seasar.dbflute.helper.${glStringKeyMap};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
-import ${glPackageBaseCommonDBMetaInfo}.*;
-import ${glPackageBaseCommonHelper}.${glStringKeyMap};
 
 /**
  * The DB meta of ${table.name}. (Singleton)

@@ -39,7 +39,7 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
  *     ${table.versionNoColumnName}
  * </pre>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} {
 
     // ===================================================================================

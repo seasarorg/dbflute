@@ -5,10 +5,10 @@ ${database.allClassCopyright}package ${myExtendedEntityPackageName};
  * The entity of ${table.name}.
  * <p>
  * You can implement your original methods here.
- * This class is NOT overrided when re-generating.
+ * This class remains when re-generating.
  * </p>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class $myClassName extends ${myBaseEntityPackageName}.${myBaseObjectClassName} {
 
     /** Serial version UID. (Default) */

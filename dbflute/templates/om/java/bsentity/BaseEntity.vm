@@ -12,11 +12,11 @@ import ${glPackageBaseCommon}.${glCDef};
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #else
-import ${glPackageBaseCommon}.${glEntity};
+import org.seasar.dbflute.Entity;
 #end
-import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$isSql2Entity)
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 #end
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;

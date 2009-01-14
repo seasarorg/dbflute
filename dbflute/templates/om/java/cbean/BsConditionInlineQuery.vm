@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageCIQ};
-
 #set ($myClassName = "${myConditionInlineQueryClassName}")
 #set ($myCQClassName = "${myBaseConditionQueryClassName}")
-import ${glPackageBaseCommonCBean}.*;
-import ${glPackageBaseCommonCKey}.*;
-import ${glPackageBaseCommonCOption}.${glConditionOption};
-import ${glPackageBaseCommonCValue}.${glConditionValue};
-import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+
+import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import ${glPackageCB}.*;
 import ${glPackageBaseCQ}.*;
 import ${glPackageCQ}.*;

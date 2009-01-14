@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ${glPackageBaseCommonJdbc}.${glCursorHandler};
+import org.seasar.dbflute.jdbc.CursorHandler;
 import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**

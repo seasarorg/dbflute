@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-import ${glPackageBaseCommonCBeanOutsidesql}.${glProcedurePmb};
+import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #end
 
 /**

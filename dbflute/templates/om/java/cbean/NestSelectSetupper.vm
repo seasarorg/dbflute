@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageNss};
 #set ($myClassName = "${myNestSelectSetupperClassName}")
 
 #if ($table.hasForeignKeyOrReferrerAsOne())
-import ${glPackageBaseCommonCBean}.${glConditionQuery};
+import org.seasar.dbflute.cbean.ConditionQuery;
 #end
 import ${glPackageCQ}.${myConditionQueryClassName};
 

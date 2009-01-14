@@ -3,16 +3,16 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.AbstractConditionBean;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
-import ${glPackageBaseCommonCBean}.${glAbstractConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonCBean}.${glConditionQuery};
-import ${glPackageBaseCommonCBean}.${glSubQuery};
-import ${glPackageBaseCommonCBean}.${glUnionQuery};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 #if ($table.hasForeignKeyOrReferrerAsOne())

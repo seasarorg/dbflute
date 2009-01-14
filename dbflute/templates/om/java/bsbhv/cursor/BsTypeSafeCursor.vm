@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The cursor of ${table.name}.
