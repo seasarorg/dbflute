@@ -9,13 +9,13 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class S2SqlLogRegistry {
+public class TnSqlLogRegistry {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(S2SqlLogRegistry.class);
+    private static final Log _log = LogFactory.getLog(TnSqlLogRegistry.class);
 
     // ===================================================================================
     //                                                                          Definition

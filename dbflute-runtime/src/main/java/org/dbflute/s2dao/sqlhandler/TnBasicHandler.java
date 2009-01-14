@@ -16,7 +16,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
-import org.dbflute.s2dao.extension.S2SqlLogRegistry;
+import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.twowaysql.CompleteSqlBuilder;
 import org.dbflute.util.DfSystemUtil;
@@ -101,7 +101,7 @@ public class TnBasicHandler {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final SqlLogHandler sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
-        final boolean existsSqlLogRegistry = S2SqlLogRegistry.exists();
+        final boolean existsSqlLogRegistry = TnSqlLogRegistry.exists();
         if (isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
             if (isLogEnabled()) {
@@ -111,8 +111,8 @@ public class TnBasicHandler {
                 sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
-                final Object sqlLogRegistry = S2SqlLogRegistry.findContainerSqlLogRegistry();
-                S2SqlLogRegistry.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
+                final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
+                TnSqlLogRegistry.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
             }
         }
     }

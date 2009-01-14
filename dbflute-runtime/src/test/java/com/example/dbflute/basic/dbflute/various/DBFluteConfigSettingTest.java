@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.dbflute.cbean.ListResultBean;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.s2dao.extension.S2SqlLogRegistry;
+import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBFluteConfig;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
@@ -135,7 +135,7 @@ public class DBFluteConfigSettingTest extends ContainerTestCase {
         memberBhv.selectCount(cb);
         
         // ## Act ##
-        String displaySql = S2SqlLogRegistry.peekCompleteSql();
+        String displaySql = TnSqlLogRegistry.peekCompleteSql();
         
         // ## Assert ##
         log(displaySql);
