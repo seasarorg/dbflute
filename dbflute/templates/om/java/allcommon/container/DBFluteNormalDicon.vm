@@ -14,28 +14,19 @@
     <include path="buri/dicon/buriSimple.dicon"/>
 #end
 
-    <!-- The core component of DBFlute. (Basically internal components except for behaviorSelector) -->
-    <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
-    <component name="behaviorCommandInvoker" class="${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker}"/>
-    <component name="invokerAssistant" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}"/>
-    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
-    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelector}">
+    <!-- The client component of DBFlute. (Basically internal components except for behaviorSelector) -->
+    <component class="com.example.dbflute.basic.dbflute.allcommon.DBFluteInitializer"/>
+    <component name="invokerAssistant" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedInvokerAssistant"/>
+    <component name="commonColumnAutoSetupper" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedCommonColumnAutoSetupper"/>
+    <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedBehaviorSelector">
         <destroyMethod name="destroy"/>
     </component>
 
-    <!-- The component of S2Dao. -->
-    <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryExtension}"/>
-    <component class="${glPackageBaseCommonS2Dao}.${glPropertyTypeFactoryBuilderExtension}"/>
-    <component class="${glPackageBaseCommonS2Dao}.${glSqlLogRegistryLatestSqlProvider}"/>
-    <component class="org.seasar.dao.impl.AnnotationReaderFactoryImpl"/>
-    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
-    <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
-    <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
-    <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
-    <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
-    <component class="org.seasar.dao.impl.DefaultTableNaming"/>
-    <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
-    <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
+    <!-- The runtime component of DBFlute. -->
+    <component name="behaviorCommandInvoker" class="org.dbflute.bhv.core.BehaviorCommandInvoker"/>
+    <component name="beanMetaDataFactory" class="org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension"/>
+    <component name="valueTypeFactory" class="org.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
+    <component name="latestSqlProvider" class="org.dbflute.resource.SqlLogRegistryLatestSqlProvider"/>
 
     <!-- The special value type. -->
 	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />

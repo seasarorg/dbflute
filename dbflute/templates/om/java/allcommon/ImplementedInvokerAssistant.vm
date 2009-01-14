@@ -7,14 +7,14 @@ import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glImplementedInvokerAssistant} implements InvokerAssistant, Disposable {
+public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -77,18 +77,25 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant, Dispo
         if (!_disposable) {
             synchronized (this) {
                 if (!_disposable) {
-                    DisposableUtil.add(this);
+                    // Register for BehaviorCommandInvoker
+                    DisposableUtil.add(new Disposable() {
+                        public void dispose() {
+                            if (_behaviorCommandInvoker != null) {
+                                _behaviorCommandInvoker.clearExecutionCache();
+                            }
+                            _disposable = false;
+                        }
+                    });
+                    // Register for BeanDescFactory
+                    DisposableUtil.add(new Disposable() {
+                        public void dispose() {
+                            TnBeanDescFactory.clear();
+                        }
+                    });
                     _disposable = true;
                 }
             }
         }
-    }
-
-    public void dispose() {
-        assertBehaviorCommandInvoker();
-        _behaviorCommandInvoker.clearExecutionCache();
-        BeanDescFactory.clear();
-        _disposable = false;
     }
 
     public boolean isDisposable() {

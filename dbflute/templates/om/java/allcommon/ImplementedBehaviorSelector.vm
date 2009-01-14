@@ -10,8 +10,14 @@ import org.dbflute.BehaviorSelector;
 import org.dbflute.bhv.BehaviorReadable;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.util.TraceViewUtil;
-import org.seasar.framework.container.ComponentNotFoundRuntimeException;
+
+#if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.ComponentNotFoundRuntimeException;
+#end
+#if ($database.isTargetContainerSpring())
+import org.springframework.context.ApplicationContext;
+#end
 
 /**
  * The implementation of behavior-selector.
@@ -22,7 +28,7 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
+    /** Log instance. */
     private static final Log _log = LogFactory.getLog(ImplementedBehaviorSelector.class);
 
     // ===================================================================================
@@ -31,8 +37,14 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     /** The cache of behavior. (It's the generic hell!) */
     protected Map<Class<? extends BehaviorReadable>, BehaviorReadable> _behaviorCache = new ConcurrentHashMap<Class<? extends BehaviorReadable>, BehaviorReadable>();
 
+#if ($database.isTargetContainerSeasar())
     /** The container of Seasar. */
     protected S2Container _container;
+#end
+#if ($database.isTargetContainerSpring())
+    /** The container of Spring. */
+    protected ApplicationContext _container;
+#end
 
     // ===================================================================================
     //                                                                           Component
@@ -41,19 +53,24 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     public <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) {
         assertObjectNotNull("componentType", componentType);
         assertObjectNotNull("_container", _container);
+#if ($database.isTargetContainerSeasar())
         try {
-            return (COMPONENT) _container.getComponent(componentType);
-        } catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
-            final COMPONENT component;
-            try {
-                // for HotDeploy Mode
-                component = (COMPONENT) _container.getRoot().getComponent(componentType);
-            } catch (ComponentNotFoundRuntimeException ignored) {
-                throw e;
-            }
-            _container = _container.getRoot(); // Change container.
-            return component;
-        }
+		    return (COMPONENT)_container.getComponent(componentType);
+		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
+		    final COMPONENT component;
+		    try {
+		        // for HotDeploy Mode
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
+		    } catch (ComponentNotFoundRuntimeException ignored) {
+		        throw e;
+		    }
+		    _container = _container.getRoot(); // Change container.
+		    return component;
+		}
+#end
+#if ($database.isTargetContainerSpring())
+		return (COMPONENT)_container.getBean(initUncap(componentType.getSimpleName()));
+#end
     }
 
     // ===================================================================================
@@ -194,7 +211,14 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+#if ($database.isTargetContainerSeasar())
     public void setContainer(S2Container container) {
         this._container = container;
     }
+#end
+#if ($database.isTargetContainerSpring())
+    public void setContainer(ApplicationContext container) {
+        this._container = container;
+    }
+#end
 }
