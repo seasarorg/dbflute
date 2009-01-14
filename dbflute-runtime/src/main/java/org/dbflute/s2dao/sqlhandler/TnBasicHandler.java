@@ -16,7 +16,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
-import org.dbflute.resource.S2SqlLogRegistry;
+import org.dbflute.s2dao.extension.S2SqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.twowaysql.CompleteSqlBuilder;
 import org.dbflute.util.DfSystemUtil;

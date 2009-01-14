@@ -5,7 +5,7 @@ import javax.sql.XADataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.resource.S2SqlLogRegistry;
+import org.dbflute.s2dao.extension.S2SqlLogRegistry;
 import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 

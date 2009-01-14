@@ -1,4 +1,4 @@
-package org.dbflute.resource;
+package org.dbflute.s2dao.extension;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
