@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -27,33 +27,36 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class SqlDateType extends TnAbstractValueType {
+public class FloatType extends TnAbstractValueType {
 
-    public SqlDateType() {
-        super(Types.DATE);
+    /**
+     * インスタンスを構築します。
+     */
+    public FloatType() {
+        super(Types.FLOAT);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getDate(index);
+        return DfTypeUtil.toFloat(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getDate(columnName);
+        return DfTypeUtil.toFloat(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getDate(index);
+        return DfTypeUtil.toFloat(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getDate(parameterName);
+        return DfTypeUtil.toFloat(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setDate(index, toSqlDate(value));
+            ps.setFloat(index, DfTypeUtil.toPrimitiveFloat(value));
         }
     }
 
@@ -61,18 +64,16 @@ public class SqlDateType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setDate(parameterName, toSqlDate(value));
+            cs.setFloat(parameterName, DfTypeUtil.toPrimitiveFloat(value));
         }
-    }
-
-    protected java.sql.Date toSqlDate(Object value) {
-        return DfTypeUtil.toSqlDate(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(toSqlDate(value));
+        Float var = DfTypeUtil.toFloat(value);
+        return DfTypeUtil.toText(var);
     }
+
 }

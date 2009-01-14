@@ -13,13 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -28,52 +27,50 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class TimeType extends TnAbstractValueType {
+public class ByteType extends TnAbstractValueType {
 
-    public TimeType() {
-        super(Types.TIME);
+    public ByteType() {
+        super(Types.SMALLINT);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getTime(index);
+    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
+        return DfTypeUtil.toByte(resultSet.getObject(index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getTime(columnName);
+    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
+        return DfTypeUtil.toByte(resultSet.getObject(columnName));
     }
 
-    public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getTime(index);
+    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
+        return DfTypeUtil.toByte(cs.getObject(index));
     }
 
-    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getTime(parameterName);
+    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
+        return DfTypeUtil.toByte(cs.getObject(parameterName));
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setTime(index, toTime(value));
+            ps.setByte(index, DfTypeUtil.toPrimitiveByte(value));
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
+            throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setTime(parameterName, toTime(value));
+            cs.setByte(parameterName, DfTypeUtil.toPrimitiveByte(value));
         }
-    }
-
-    protected Time toTime(Object value) {
-        return DfTypeUtil.toTime(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(toTime(value));
+        Byte var = DfTypeUtil.toByte(value);
+        return DfTypeUtil.toText(var);
     }
 }

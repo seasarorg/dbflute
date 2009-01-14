@@ -22,7 +22,7 @@ import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.dbflute.s2dao.valuetype.basic.TimeType;
+import org.dbflute.s2dao.valuetype.registered.TimeType;
 import org.dbflute.util.DfTypeUtil;
 
 /**

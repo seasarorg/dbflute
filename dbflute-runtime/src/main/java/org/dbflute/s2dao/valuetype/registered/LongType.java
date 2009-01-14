@@ -13,9 +13,8 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,42 +27,41 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class BigIntegerType extends TnAbstractValueType {
+public class LongType extends TnAbstractValueType {
 
-    public BigIntegerType() {
+    public LongType() {
         super(Types.BIGINT);
     }
 
-    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
-        return DfTypeUtil.toBigInteger(resultSet.getBigDecimal(index));
+    public Object getValue(ResultSet resultSet, int index) throws SQLException {
+        return DfTypeUtil.toLong(resultSet.getObject(index));
     }
 
-    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
-        return DfTypeUtil.toBigInteger(resultSet.getBigDecimal(columnName));
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+        return DfTypeUtil.toLong(resultSet.getObject(columnName));
     }
 
-    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
-        return DfTypeUtil.toBigInteger(cs.getBigDecimal(index));
+    public Object getValue(CallableStatement cs, int index) throws SQLException {
+        return DfTypeUtil.toLong(cs.getObject(index));
     }
 
-    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
-        return DfTypeUtil.toBigInteger(cs.getBigDecimal(parameterName));
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
+        return DfTypeUtil.toLong(cs.getObject(parameterName));
     }
 
-    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setBigDecimal(index, DfTypeUtil.toBigDecimal(value));
+            ps.setLong(index, DfTypeUtil.toPrimitiveLong(value));
         }
     }
 
-    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
-            throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setBigDecimal(parameterName, DfTypeUtil.toBigDecimal(value));
+            cs.setLong(parameterName, DfTypeUtil.toPrimitiveLong(value));
         }
     }
 
@@ -71,7 +69,8 @@ public class BigIntegerType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        BigDecimal var = DfTypeUtil.toBigDecimal(value);
+        Long var = DfTypeUtil.toLong(value);
         return DfTypeUtil.toText(var);
     }
+
 }

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -27,47 +27,29 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class CharacterType extends TnAbstractValueType {
+public class StringType extends TnAbstractValueType {
 
-    public CharacterType() {
-        super(Types.CHAR);
+    public StringType() {
+        super(Types.VARCHAR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toCharacter(resultSet.getString(index));
+        return resultSet.getString(index);
     }
 
-    public Object getValue(ResultSet resultSet, String columnName)
-            throws SQLException {
-        return toCharacter(resultSet.getString(columnName));
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+        return resultSet.getString(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toCharacter(cs.getString(index));
+        return cs.getString(index);
     }
 
-    public Object getValue(CallableStatement cs, String parameterName)
-            throws SQLException {
-        return toCharacter(cs.getString(parameterName));
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
+        return cs.getString(parameterName);
     }
 
-    private Character toCharacter(final String value) {
-        if (value == null) {
-            return null;
-        }
-        final char[] chars = value.toCharArray();
-        if (chars.length == 1) {
-            return new Character(chars[0]);
-        }
-        if (chars.length == 0) {
-            return null;
-        }
-        throw new IllegalStateException("length of String should be 1."
-                + " actual is [" + value + "]");
-    }
-
-    public void bindValue(PreparedStatement ps, int index, Object value)
-            throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -75,8 +57,7 @@ public class CharacterType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName,
-            Object value) throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
@@ -91,5 +72,4 @@ public class CharacterType extends TnAbstractValueType {
         String var = DfTypeUtil.toString(value);
         return DfTypeUtil.toText(var);
     }
-
 }

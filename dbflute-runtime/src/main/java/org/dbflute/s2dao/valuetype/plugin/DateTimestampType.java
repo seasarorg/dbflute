@@ -20,7 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.dbflute.s2dao.valuetype.basic.TimestampType;
+import org.dbflute.s2dao.valuetype.registered.TimestampType;
 import org.dbflute.util.DfTypeUtil;
 
 /**

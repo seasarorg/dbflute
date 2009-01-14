@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.dbflute.s2dao.valuetype.basic.SqlDateType;
+import org.dbflute.s2dao.valuetype.registered.SqlDateType;
 import org.dbflute.util.DfTypeUtil;
 
 /**

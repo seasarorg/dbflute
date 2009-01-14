@@ -13,8 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,33 +28,33 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class IntegerType extends TnAbstractValueType {
+public class BigDecimalType extends TnAbstractValueType {
 
-    public IntegerType() {
-        super(Types.INTEGER);
+    public BigDecimalType() {
+        super(Types.DECIMAL);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toInteger(resultSet.getObject(index));
+        return resultSet.getBigDecimal(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toInteger(resultSet.getObject(columnName));
+        return resultSet.getBigDecimal(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toInteger(cs.getObject(index));
+        return cs.getBigDecimal(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toInteger(cs.getObject(parameterName));
+        return cs.getBigDecimal(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setInt(index, DfTypeUtil.toPrimitiveInt(value));
+            ps.setBigDecimal(index, DfTypeUtil.toBigDecimal(value));
         }
     }
 
@@ -61,7 +62,7 @@ public class IntegerType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setInt(parameterName, DfTypeUtil.toPrimitiveInt(value));
+            cs.setBigDecimal(parameterName, DfTypeUtil.toBigDecimal(value));
         }
     }
 
@@ -69,7 +70,7 @@ public class IntegerType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Integer var = DfTypeUtil.toInteger(value);
+        BigDecimal var = DfTypeUtil.toBigDecimal(value);
         return DfTypeUtil.toText(var);
     }
 

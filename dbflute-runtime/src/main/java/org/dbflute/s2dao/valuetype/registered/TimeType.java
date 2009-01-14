@@ -13,12 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -27,35 +28,33 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class BooleanType extends TnAbstractValueType {
+public class TimeType extends TnAbstractValueType {
 
-    public BooleanType() {
-        super(Types.BOOLEAN);
+    public TimeType() {
+        super(Types.TIME);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(resultSet.getObject(index));
+        return resultSet.getTime(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-
-        return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
+        return resultSet.getTime(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(cs.getObject(index));
+        return cs.getTime(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-
-        return DfTypeUtil.toBoolean(cs.getObject(parameterName));
+        return cs.getTime(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setBoolean(index, DfTypeUtil.toPrimitiveBoolean(value));
+            ps.setTime(index, toTime(value));
         }
     }
 
@@ -63,15 +62,18 @@ public class BooleanType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setBoolean(parameterName, DfTypeUtil.toPrimitiveBoolean(value));
+            cs.setTime(parameterName, toTime(value));
         }
+    }
+
+    protected Time toTime(Object value) {
+        return DfTypeUtil.toTime(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Boolean var = DfTypeUtil.toBoolean(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(toTime(value));
     }
 }

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -27,33 +27,33 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class StringType extends TnAbstractValueType {
+public class IntegerType extends TnAbstractValueType {
 
-    public StringType() {
-        super(Types.VARCHAR);
+    public IntegerType() {
+        super(Types.INTEGER);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getString(index);
+        return DfTypeUtil.toInteger(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getString(columnName);
+        return DfTypeUtil.toInteger(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getString(index);
+        return DfTypeUtil.toInteger(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getString(parameterName);
+        return DfTypeUtil.toInteger(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setString(index, DfTypeUtil.toString(value));
+            ps.setInt(index, DfTypeUtil.toPrimitiveInt(value));
         }
     }
 
@@ -61,7 +61,7 @@ public class StringType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setString(parameterName, DfTypeUtil.toString(value));
+            cs.setInt(parameterName, DfTypeUtil.toPrimitiveInt(value));
         }
     }
 
@@ -69,7 +69,8 @@ public class StringType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        String var = DfTypeUtil.toString(value);
+        Integer var = DfTypeUtil.toInteger(value);
         return DfTypeUtil.toText(var);
     }
+
 }

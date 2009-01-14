@@ -13,12 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -27,36 +28,33 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class FloatType extends TnAbstractValueType {
+public class TimestampType extends TnAbstractValueType {
 
-    /**
-     * インスタンスを構築します。
-     */
-    public FloatType() {
-        super(Types.FLOAT);
+    public TimestampType() {
+        super(Types.TIMESTAMP);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toFloat(resultSet.getObject(index));
+        return resultSet.getTimestamp(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toFloat(resultSet.getObject(columnName));
+        return resultSet.getTimestamp(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toFloat(cs.getObject(index));
+        return cs.getTimestamp(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toFloat(cs.getObject(parameterName));
+        return cs.getTimestamp(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setFloat(index, DfTypeUtil.toPrimitiveFloat(value));
+            ps.setTimestamp(index, toTimestamp(value));
         }
     }
 
@@ -64,16 +62,18 @@ public class FloatType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setFloat(parameterName, DfTypeUtil.toPrimitiveFloat(value));
+            cs.setTimestamp(parameterName, toTimestamp(value));
         }
+    }
+
+    protected Timestamp toTimestamp(Object value) {
+        return DfTypeUtil.toTimestamp(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Float var = DfTypeUtil.toFloat(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(toTimestamp(value));
     }
-
 }

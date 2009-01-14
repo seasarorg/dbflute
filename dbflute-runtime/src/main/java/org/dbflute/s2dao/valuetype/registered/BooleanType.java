@@ -13,13 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -28,33 +27,35 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class TimestampType extends TnAbstractValueType {
+public class BooleanType extends TnAbstractValueType {
 
-    public TimestampType() {
-        super(Types.TIMESTAMP);
+    public BooleanType() {
+        super(Types.BOOLEAN);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getTimestamp(index);
+        return DfTypeUtil.toBoolean(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getTimestamp(columnName);
+
+        return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getTimestamp(index);
+        return DfTypeUtil.toBoolean(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getTimestamp(parameterName);
+
+        return DfTypeUtil.toBoolean(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setTimestamp(index, toTimestamp(value));
+            ps.setBoolean(index, DfTypeUtil.toPrimitiveBoolean(value));
         }
     }
 
@@ -62,18 +63,15 @@ public class TimestampType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setTimestamp(parameterName, toTimestamp(value));
+            cs.setBoolean(parameterName, DfTypeUtil.toPrimitiveBoolean(value));
         }
-    }
-
-    protected Timestamp toTimestamp(Object value) {
-        return DfTypeUtil.toTimestamp(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(toTimestamp(value));
+        Boolean var = DfTypeUtil.toBoolean(value);
+        return DfTypeUtil.toText(var);
     }
 }

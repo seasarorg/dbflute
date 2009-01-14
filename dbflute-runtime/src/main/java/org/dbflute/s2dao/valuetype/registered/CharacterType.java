@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.s2dao.valuetype.registered;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -27,41 +27,60 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class ShortType extends TnAbstractValueType {
+public class CharacterType extends TnAbstractValueType {
 
-    public ShortType() {
-        super(Types.SMALLINT);
+    public CharacterType() {
+        super(Types.CHAR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toShort(resultSet.getObject(index));
+        return toCharacter(resultSet.getString(index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toShort(resultSet.getObject(columnName));
+    public Object getValue(ResultSet resultSet, String columnName)
+            throws SQLException {
+        return toCharacter(resultSet.getString(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toShort(cs.getObject(index));
+        return toCharacter(cs.getString(index));
     }
 
-    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toShort(cs.getObject(parameterName));
+    public Object getValue(CallableStatement cs, String parameterName)
+            throws SQLException {
+        return toCharacter(cs.getString(parameterName));
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    private Character toCharacter(final String value) {
+        if (value == null) {
+            return null;
+        }
+        final char[] chars = value.toCharArray();
+        if (chars.length == 1) {
+            return new Character(chars[0]);
+        }
+        if (chars.length == 0) {
+            return null;
+        }
+        throw new IllegalStateException("length of String should be 1."
+                + " actual is [" + value + "]");
+    }
+
+    public void bindValue(PreparedStatement ps, int index, Object value)
+            throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setShort(index, DfTypeUtil.toPrimitiveShort(value));
+            ps.setString(index, DfTypeUtil.toString(value));
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName,
+            Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setShort(parameterName, DfTypeUtil.toPrimitiveShort(value));
+            cs.setString(parameterName, DfTypeUtil.toString(value));
         }
     }
 
@@ -69,7 +88,8 @@ public class ShortType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Short var = DfTypeUtil.toShort(value);
+        String var = DfTypeUtil.toString(value);
         return DfTypeUtil.toText(var);
     }
+
 }
