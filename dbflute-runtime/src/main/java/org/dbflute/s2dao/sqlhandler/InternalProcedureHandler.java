@@ -18,7 +18,7 @@ import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
 
@@ -211,7 +211,7 @@ public class InternalProcedureHandler extends InternalBasicSelectHandler {
             TnPropertyType[] propertyTypes = new TnPropertyType[count];
             for (int i = 0; i < count; ++i) {
                 String propertyName = rsmd.getColumnLabel(i + 1);
-                ValueType valueType = ValueTypes.getValueType(rsmd.getColumnType(i + 1));
+                ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
                 propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
             }
             return propertyTypes;

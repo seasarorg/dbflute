@@ -17,7 +17,7 @@ package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ValueType;
 
 /**
@@ -39,7 +39,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     private boolean persistent = true;
 
     public TnPropertyTypeImpl(TnPropertyDesc propertyDesc) {
-        this(propertyDesc, ValueTypes.OBJECT, propertyDesc.getPropertyName());
+        this(propertyDesc, TnValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
 
     public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType) {

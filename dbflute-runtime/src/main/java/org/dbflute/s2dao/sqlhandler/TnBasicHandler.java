@@ -16,7 +16,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.resource.TnSqlLogRegistry;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.twowaysql.CompleteSqlBuilder;
 import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.jdbc.ValueType;
@@ -69,11 +69,11 @@ public class TnBasicHandler {
     }
 
     protected ValueType findValueType(Object arg, Class<?> argType) {
-        ValueType valueType = ValueTypes.getValueType(arg);
+        ValueType valueType = TnValueTypes.getValueType(arg);
         if (valueType != null) {
             return valueType;
         }
-        valueType = ValueTypes.getValueType(argType);
+        valueType = TnValueTypes.getValueType(argType);
         if (valueType != null) {
             return valueType;
         }

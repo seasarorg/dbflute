@@ -8,7 +8,7 @@ import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
@@ -96,7 +96,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
                     // Register for ValueTypes
                     DisposableUtil.add(new Disposable() {
                         public void dispose() {
-                            ValueTypes.clear();
+                            TnValueTypes.clear();
                         }
                     });
                     _disposable = true;

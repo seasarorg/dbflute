@@ -14,7 +14,7 @@ import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ValueType;
 
 /**
@@ -131,11 +131,11 @@ public class TnProcedureMetaDataFactory {
         final Class<?> type = field.getType();
         if (List.class.isAssignableFrom(type)) {// is for out parameter cursor.
             if (isCurrentDBDef(DBDef.Oracle)) {
-                return ValueTypes.ORACLE_RESULT_SET;
+                return TnValueTypes.ORACLE_RESULT_SET;
             } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
-                return ValueTypes.POSTGRE_RESULT_SET;
+                return TnValueTypes.POSTGRE_RESULT_SET;
             } else {
-                return ValueTypes.SERIALIZABLE_BYTE_ARRAY;
+                return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
             }
         }
         return valueTypeFactory.getValueTypeByClass(type);

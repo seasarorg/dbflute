@@ -74,7 +74,7 @@ import org.seasar.framework.util.ModifierUtil;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class ValueTypes {
+public class TnValueTypes {
 
     public final static ValueType STRING = new StringType();
     public final static ValueType CLOB = new StringClobType();
@@ -161,7 +161,7 @@ public class ValueTypes {
         }
     }
 
-    protected ValueTypes() {
+    protected TnValueTypes() {
     }
 
     public static void clear() {

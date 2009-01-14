@@ -17,7 +17,7 @@ import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
 import org.dbflute.s2dao.sqlcommand.InternalUpdateDynamicCommand;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
 
@@ -74,12 +74,12 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected ResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = ValueTypes.getValueType(objectType);
+        final ValueType valueType = TnValueTypes.getValueType(objectType);
         return new InternalObjectResultSetHandler(valueType);
     }
 
     protected ResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = ValueTypes.getValueType(objectType);
+        final ValueType valueType = TnValueTypes.getValueType(objectType);
         return createObjectListResultSetHandler(valueType);
     }
 
