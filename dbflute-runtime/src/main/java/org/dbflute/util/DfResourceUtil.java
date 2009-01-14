@@ -1,9 +1,13 @@
 package org.dbflute.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+
+import org.seasar.framework.exception.IORuntimeException;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -66,7 +70,29 @@ public class DfResourceUtil {
     public static boolean isExist(String path) {
         return getResourceUrl(path) != null;
     }
-
+    
+    // ===================================================================================
+    //                                                                           Text Read
+    //                                                                           =========
+    public static String readText(Reader reader) throws IORuntimeException {
+        BufferedReader in = new BufferedReader(reader);
+        StringBuilder out = new StringBuilder(100);
+        try {
+            try {
+                char[] buf = new char[8192];
+                int n;
+                while ((n = in.read(buf)) >= 0) {
+                    out.append(buf, 0, n);
+                }
+            } finally {
+                in.close();
+            }
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+        return out.toString();
+    }
+    
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

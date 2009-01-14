@@ -20,7 +20,7 @@
     <component name="latestSqlProvider" class="org.dbflute.resource.SqlLogRegistryLatestSqlProvider"/>
 
     <!-- The special value type. -->
-	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
+	<component name="dbfluteStringClobType" class="org.dbflute.s2dao.valuetype.TnStringClobType" />
 	<component name="dbfluteBytesOidType" class="org.dbflute.s2dao.valuetype.TnBytesOidType" />
 
     <component name="memberBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberBhv"/>
