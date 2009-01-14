@@ -19,7 +19,7 @@ import org.dbflute.s2dao.sqlcommand.InternalUpdateDynamicCommand;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -67,27 +67,27 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                      ResultSetHandler
     //                                      ----------------
-    protected ResultSetHandler createBeanListMetaDataResultSetHandler(TnBeanMetaData bmd) {
+    protected TnResultSetHandler createBeanListMetaDataResultSetHandler(TnBeanMetaData bmd) {
         final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
         final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
         return new TnBeanListMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
 
-    protected ResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
+    protected TnResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
         final TnValueType valueType = TnValueTypes.getValueType(objectType);
         return new InternalObjectResultSetHandler(valueType);
     }
 
-    protected ResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
+    protected TnResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
         final TnValueType valueType = TnValueTypes.getValueType(objectType);
         return createObjectListResultSetHandler(valueType);
     }
 
-    protected ResultSetHandler createObjectListResultSetHandler(TnValueType valueType) {
+    protected TnResultSetHandler createObjectListResultSetHandler(TnValueType valueType) {
         return new InternalObjectListResultSetHandler(valueType);
     }
 
-    protected static class InternalObjectResultSetHandler implements ResultSetHandler {
+    protected static class InternalObjectResultSetHandler implements TnResultSetHandler {
         private TnValueType valueType;
         public InternalObjectResultSetHandler(TnValueType valueType) {
             this.valueType = valueType;
@@ -100,7 +100,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
     }
 
-    protected static class InternalObjectListResultSetHandler implements ResultSetHandler {
+    protected static class InternalObjectListResultSetHandler implements TnResultSetHandler {
         private TnValueType valueType;
         public InternalObjectListResultSetHandler(TnValueType valueType) {
             this.valueType = valueType;
@@ -114,7 +114,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
     }
 
-    protected static class InternalNullResultSetHandler implements ResultSetHandler {
+    protected static class InternalNullResultSetHandler implements TnResultSetHandler {
         public Object handle(ResultSet rs) throws SQLException {
             return null;
         }

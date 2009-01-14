@@ -21,7 +21,7 @@ import java.sql.SQLException;
 /**
  * @author jflute
  */
-public interface ResultSetHandler {
+public interface TnResultSetHandler {
 
     Object handle(ResultSet resultSet) throws SQLException;
 }

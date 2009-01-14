@@ -14,7 +14,7 @@ import org.dbflute.resource.SQLExceptionHandler;
  * The wrapper of fetch narrowing result set.
  * @author DBFlute(AutoGenerator)
  */
-public class FetchNarrowingResultSetWrapper extends ResultSetWrapper {
+public class TnPagingResultSet extends ResultSetWrapper {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -56,7 +56,7 @@ public class FetchNarrowingResultSetWrapper extends ResultSetWrapper {
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public FetchNarrowingResultSetWrapper(ResultSet resultSet, FetchNarrowingBean fetchNarrowingBean
+    public TnPagingResultSet(ResultSet resultSet, FetchNarrowingBean fetchNarrowingBean
                                          , boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
         super(resultSet);
 

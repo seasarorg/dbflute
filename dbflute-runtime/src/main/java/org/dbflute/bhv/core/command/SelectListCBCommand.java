@@ -9,7 +9,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -64,7 +64,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 TnBeanMetaData bmd = createBeanMetaData();
-                ResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
+                TnResultSetHandler handler = createBeanListMetaDataResultSetHandler(bmd);
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };

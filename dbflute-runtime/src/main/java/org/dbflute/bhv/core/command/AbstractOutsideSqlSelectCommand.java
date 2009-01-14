@@ -7,7 +7,7 @@ import org.dbflute.cbean.FetchNarrowingBean;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -114,7 +114,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - - - -
         // Create ResultSetHandler.
         // - - - - - - - - - - - - -
-        final ResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
+        final TnResultSetHandler handler = createOutsideSqlSelectResultSetHandler();
 
         // - - - - - - - - - - -
         // Create SqlExecution.
@@ -122,7 +122,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
     }
 
-    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
+    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(TnResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
         final OutsideSqlSelectExecution cmd = new OutsideSqlSelectExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
@@ -138,7 +138,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
-    protected abstract ResultSetHandler createOutsideSqlSelectResultSetHandler();
+    protected abstract TnResultSetHandler createOutsideSqlSelectResultSetHandler();
 
     protected abstract Object getResultTypeSpecification();
 

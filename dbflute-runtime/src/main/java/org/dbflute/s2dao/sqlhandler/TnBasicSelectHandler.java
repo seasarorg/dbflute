@@ -9,10 +9,10 @@ import javax.sql.DataSource;
 
 import org.dbflute.cbean.FetchNarrowingBean;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
-import org.dbflute.s2dao.jdbc.FetchNarrowingResultSetWrapper;
+import org.dbflute.s2dao.jdbc.TnPagingResultSet;
 
 
 /**
@@ -23,13 +23,13 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private ResultSetHandler resultSetHandler;
+    private TnResultSetHandler resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBasicSelectHandler(DataSource dataSource, String sql,
-            ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
+            TnResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
         setSql(sql);
         setResultSetHandler(resultSetHandler);
@@ -88,12 +88,12 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         if (!isUseFetchNarrowingResultSetWrapper(cb)) {
             return resultSet;
         }
-        final FetchNarrowingResultSetWrapper wrapper;
+        final TnPagingResultSet wrapper;
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-            wrapper = new FetchNarrowingResultSetWrapper(resultSet, cb, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
+            wrapper = new TnPagingResultSet(resultSet, cb, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
         } else {
-            wrapper = new FetchNarrowingResultSetWrapper(resultSet, cb, false, false);
+            wrapper = new TnPagingResultSet(resultSet, cb, false, false);
         }
         return wrapper;
     }
@@ -120,11 +120,11 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public ResultSetHandler getResultSetHandler() {
+    public TnResultSetHandler getResultSetHandler() {
         return resultSetHandler;
     }
 
-    public void setResultSetHandler(ResultSetHandler resultSetHandler) {
+    public void setResultSetHandler(TnResultSetHandler resultSetHandler) {
         this.resultSetHandler = resultSetHandler;
     }
 }

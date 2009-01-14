@@ -4,7 +4,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -53,7 +53,7 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
-                ResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
+                TnResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };

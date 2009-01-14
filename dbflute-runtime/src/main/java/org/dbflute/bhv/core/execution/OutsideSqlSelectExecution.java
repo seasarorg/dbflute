@@ -12,7 +12,7 @@ import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
@@ -28,7 +28,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     //                                                                           Attribute
     //                                                                           =========
     /** The handler of resultSet. */
-    protected ResultSetHandler resultSetHandler;
+    protected TnResultSetHandler resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -39,7 +39,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
      */
-    public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
+    public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory, TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
     }
@@ -133,7 +133,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     // ===================================================================================
     //                                                                      Select Handler
     //                                                                      ==============
-    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
+    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
         return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
     }
 

@@ -4,7 +4,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.execution.SelectCBExecution;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -49,11 +49,11 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
         return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
     }
 
-    protected SqlExecution createSelectCBExecution(Class<? extends ConditionBean> cbType, ResultSetHandler handler) {
+    protected SqlExecution createSelectCBExecution(Class<? extends ConditionBean> cbType, TnResultSetHandler handler) {
         return createSelectCBExecution(handler, new String[] { "dto" }, new Class<?>[] { cbType });
     }
 
-    protected SelectCBExecution createSelectCBExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes) {
+    protected SelectCBExecution createSelectCBExecution(TnResultSetHandler handler, String[] argNames, Class<?>[] argTypes) {
         final SelectCBExecution cmd = new SelectCBExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);

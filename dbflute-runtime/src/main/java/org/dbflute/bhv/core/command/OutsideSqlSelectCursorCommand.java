@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.dbflute.jdbc.CursorHandler;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -34,8 +34,8 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     //                                                                     Extension Point
     //                                                                     ===============
     @Override
-    protected ResultSetHandler createOutsideSqlSelectResultSetHandler() {
-        return new ResultSetHandler() {
+    protected TnResultSetHandler createOutsideSqlSelectResultSetHandler() {
+        return new TnResultSetHandler() {
             public Object handle(ResultSet rs) throws SQLException {
                 return _cursorHandler.handle(rs);
             }

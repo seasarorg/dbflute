@@ -7,7 +7,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.sqlhandler.TnProcedureHandler;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -19,14 +19,14 @@ public class InternalProcedureCommand implements TnSqlCommand, SqlExecution {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource dataSource;
-    protected ResultSetHandler resultSetHandler;
+    protected TnResultSetHandler resultSetHandler;
     protected StatementFactory statementFactory;
     protected TnProcedureMetaData procedureMetaData;
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalProcedureCommand(DataSource dataSource, ResultSetHandler resultSetHandler,
+    public InternalProcedureCommand(DataSource dataSource, TnResultSetHandler resultSetHandler,
             StatementFactory statementFactory, TnProcedureMetaData procedureMetaData) {
         this.dataSource = dataSource;
         this.resultSetHandler = resultSetHandler;

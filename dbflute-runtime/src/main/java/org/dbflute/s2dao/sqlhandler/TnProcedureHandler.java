@@ -20,7 +20,7 @@ import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -36,7 +36,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public TnProcedureHandler(final DataSource dataSource, final String sql,
-            final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
+            final TnResultSetHandler resultSetHandler, final StatementFactory statementFactory,
             final TnProcedureMetaData procedureMetaData) {
         super(dataSource, sql, resultSetHandler, statementFactory);
         this.procedureMetaData = procedureMetaData;
@@ -57,7 +57,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
             if (cs.execute()) {
                 final ResultSet resultSet = cs.getResultSet();
                 if (resultSet != null) {
-                    final ResultSetHandler handler = createReturnResultSetHandler(resultSet);
+                    final TnResultSetHandler handler = createReturnResultSetHandler(resultSet);
                     try {
                         returnValue = handler.handle(resultSet);
                     } finally {
@@ -76,7 +76,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         }
     }
 
-    protected ResultSetHandler createReturnResultSetHandler(ResultSet resultSet) {
+    protected TnResultSetHandler createReturnResultSetHandler(ResultSet resultSet) {
         return new InternalMapListResultSetHandler();
     }
 
@@ -157,7 +157,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
                 Object value = valueType.getValue(cs, i + 1);
                 if (value instanceof ResultSet) {
                     final ResultSet resultSet = (ResultSet) value;
-                    final ResultSetHandler handler = createOutParameterResultSetHandler(ppt, resultSet);
+                    final TnResultSetHandler handler = createOutParameterResultSetHandler(ppt, resultSet);
                     try {
                         value = handler.handle(resultSet);
                     } finally {
@@ -188,14 +188,14 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         throw new IllegalArgumentException("args");
     }
 
-    protected ResultSetHandler createOutParameterResultSetHandler(TnProcedureParameterType ppt, ResultSet resultSet) {
+    protected TnResultSetHandler createOutParameterResultSetHandler(TnProcedureParameterType ppt, ResultSet resultSet) {
         return new InternalMapListResultSetHandler();
     }
 
 	// ===================================================================================
     //                                                              Map Result Set Handler
     //                                                              ======================
-    protected static abstract class InternalAbstractMapResultSetHandler implements ResultSetHandler {
+    protected static abstract class InternalAbstractMapResultSetHandler implements TnResultSetHandler {
 
         protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
             Map<String, Object> row = StringKeyMap.createAsFlexible();

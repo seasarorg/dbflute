@@ -6,7 +6,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -18,7 +18,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
     //                                                                           Attribute
     //                                                                           =========
     /** The handler of resultSet. */
-    protected ResultSetHandler resultSetHandler;
+    protected TnResultSetHandler resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -29,7 +29,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
      */
-    public BasicSelectExecution(DataSource dataSource, StatementFactory statementFactory, ResultSetHandler resultSetHandler) {
+    public BasicSelectExecution(DataSource dataSource, StatementFactory statementFactory, TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
     }
@@ -52,7 +52,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
     // ===================================================================================
     //                                                                      Select Handler
     //                                                                      ==============
-    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
+    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
         return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
     }
 

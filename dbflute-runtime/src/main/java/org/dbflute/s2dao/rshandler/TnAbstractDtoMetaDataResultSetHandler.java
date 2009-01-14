@@ -10,14 +10,14 @@ import org.dbflute.helper.StringSet;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
  * @author DBFlute(AutoGenerator)
  */
 @SuppressWarnings("unchecked")
-public abstract class TnAbstractDtoMetaDataResultSetHandler implements ResultSetHandler {
+public abstract class TnAbstractDtoMetaDataResultSetHandler implements TnResultSetHandler {
 
 	// ===================================================================================
     //                                                                           Attribute

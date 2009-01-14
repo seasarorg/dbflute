@@ -6,7 +6,7 @@ import org.dbflute.bhv.core.execution.BasicSelectExecution;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.s2dao.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
@@ -79,13 +79,13 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
-                ResultSetHandler handler = createObjectResultSetHandler(_resultType);
+                TnResultSetHandler handler = createObjectResultSetHandler(_resultType);
                 return createSelectNextValExecution(handler);
             }
         };
     }
 
-    protected SqlExecution createSelectNextValExecution(ResultSetHandler handler) {
+    protected SqlExecution createSelectNextValExecution(TnResultSetHandler handler) {
         assertStatus("createSelectNextValExecution");
         final DBMeta dbmeta = findDBMeta();
         if (!dbmeta.hasSequence()) {
@@ -102,7 +102,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return createBasicSelectExecution(handler, new String[]{}, new Class<?>[]{}, nextValSql);
     }
 
-    protected BasicSelectExecution createBasicSelectExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
+    protected BasicSelectExecution createBasicSelectExecution(TnResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
         final BasicSelectExecution cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
