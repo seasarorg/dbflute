@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.dbflute.DBDef;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
@@ -95,7 +95,7 @@ public class TnProcedureMetaDataFactory {
         }
         final Integer index = extractParameterIndex(procedureParameter, field);
         ppt.setParameterIndex(index);
-        final TnValueType valueType = getValueType(dtoDesc, field);
+        final ValueType valueType = getValueType(dtoDesc, field);
         ppt.setValueType(valueType);
         return ppt;
     }
@@ -123,7 +123,7 @@ public class TnProcedureMetaDataFactory {
         return null;
     }
 
-    protected TnValueType getValueType(final TnBeanDesc dtoDesc, final Field field) {
+    protected ValueType getValueType(final TnBeanDesc dtoDesc, final Field field) {
         final String name = annotationReader.getValueType(dtoDesc, field);
         if (name != null) {
             return valueTypeFactory.getValueTypeByName(name);

@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 /**
@@ -26,7 +26,7 @@ public interface TnPropertyType {
 
     TnPropertyDesc getPropertyDesc();
 
-    TnValueType getValueType();
+    ValueType getValueType();
 
     String getPropertyName();
 

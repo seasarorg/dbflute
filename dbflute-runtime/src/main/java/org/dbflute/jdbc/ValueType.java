@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public interface TnValueType {
+public interface ValueType {
 
     Object getValue(ResultSet resultSet, int index) throws SQLException;
 

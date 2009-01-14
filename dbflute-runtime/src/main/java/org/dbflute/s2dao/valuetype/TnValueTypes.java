@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
@@ -69,46 +69,46 @@ public class TnValueTypes {
     //                                                                          Definition
     //                                                                          ==========
     // Basic
-    public final static TnValueType STRING = new StringType();
-    public final static TnValueType CHARACTER = new CharacterType();
-    public final static TnValueType BYTE = new ByteType();
-    public final static TnValueType SHORT = new ShortType();
-    public final static TnValueType INTEGER = new IntegerType();
-    public final static TnValueType LONG = new LongType();
-    public final static TnValueType FLOAT = new FloatType();
-    public final static TnValueType DOUBLE = new DoubleType();
-    public final static TnValueType BIGDECIMAL = new BigDecimalType();
-    public final static TnValueType BIGINTEGER = new BigIntegerType();
-    public final static TnValueType TIME = new TimeType();
-    public final static TnValueType SQLDATE = new SqlDateType();
-    public final static TnValueType TIMESTAMP = new TimestampType();
-    public final static TnValueType BINARY = new BinaryType();
-    public final static TnValueType BINARY_STREAM = new BinaryStreamType();
-    public final static TnValueType BOOLEAN = new BooleanType();
-    public final static TnValueType OBJECT = new ObjectType();
+    public final static ValueType STRING = new StringType();
+    public final static ValueType CHARACTER = new CharacterType();
+    public final static ValueType BYTE = new ByteType();
+    public final static ValueType SHORT = new ShortType();
+    public final static ValueType INTEGER = new IntegerType();
+    public final static ValueType LONG = new LongType();
+    public final static ValueType FLOAT = new FloatType();
+    public final static ValueType DOUBLE = new DoubleType();
+    public final static ValueType BIGDECIMAL = new BigDecimalType();
+    public final static ValueType BIGINTEGER = new BigIntegerType();
+    public final static ValueType TIME = new TimeType();
+    public final static ValueType SQLDATE = new SqlDateType();
+    public final static ValueType TIMESTAMP = new TimestampType();
+    public final static ValueType BINARY = new BinaryType();
+    public final static ValueType BINARY_STREAM = new BinaryStreamType();
+    public final static ValueType BOOLEAN = new BooleanType();
+    public final static ValueType OBJECT = new ObjectType();
 
     // Plug-in
-    public final static TnValueType ORACLE_RESULT_SET = new OracleResultSetType();
-    public final static TnValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
-    public final static TnValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
+    public final static ValueType ORACLE_RESULT_SET = new OracleResultSetType();
+    public final static ValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
+    public final static ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
     // Internal
-    private static final TnValueType NULL = new NullType();
+    private static final ValueType NULL = new NullType();
     
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, TnValueType> types = new HashMap<Class<?>, TnValueType>();
-    private static Map<String, TnValueType> pluginValueTypeMap = new HashMap<String, TnValueType>();
+    private static Map<Class<?>, ValueType> types = new HashMap<Class<?>, ValueType>();
+    private static Map<String, ValueType> pluginValueTypeMap = new HashMap<String, ValueType>();
     private static Method isEnumMethod;
 
     private static Constructor<?> enumDefaultValueTypeConstructor;
     private static Constructor<?> enumOrdinalValueTypeConstructor;
     private static Constructor<?> enumStringValueTypeConstructor;
 
-    private static Map<String, TnValueType> valueTypeCache = new ConcurrentHashMap<String, TnValueType>(50);
+    private static Map<String, ValueType> valueTypeCache = new ConcurrentHashMap<String, ValueType>(50);
 
     static {
         registerValueType(String.class, STRING);
@@ -160,7 +160,7 @@ public class TnValueTypes {
         valueTypeCache.clear();
     }
 
-    public static void registerValueType(Class<?> clazz, TnValueType valueType) {
+    public static void registerValueType(Class<?> clazz, ValueType valueType) {
         types.put(clazz, valueType);
     }
 
@@ -180,31 +180,31 @@ public class TnValueTypes {
         enumStringValueTypeConstructor = enumStringValueTypeClass.getConstructor(new Class[] { Class.class });
     }
 
-    public static TnValueType getValueType(Object obj) {
+    public static ValueType getValueType(Object obj) {
         if (obj == null) {
             return OBJECT;
         }
         return getValueType(obj.getClass());
     }
 
-    public static TnValueType getValueType(Class<?> clazz) {
+    public static ValueType getValueType(Class<?> clazz) {
         if (clazz == null) {
             return OBJECT;
         }
         for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            TnValueType valueType = getValueType0(c);
+            ValueType valueType = getValueType0(c);
             if (valueType != null) {
                 return valueType;
             }
         }
-        TnValueType valueType = getCachedValueType(clazz);
+        ValueType valueType = getCachedValueType(clazz);
         if (valueType != null) {
             return valueType;
         }
         return OBJECT;
     }
 
-    private static TnValueType getValueType0(Class<?> clazz) {
+    private static ValueType getValueType0(Class<?> clazz) {
         return types.get(clazz);
     }
 
@@ -212,11 +212,11 @@ public class TnValueTypes {
         return getCachedValueType(clazz) != null;
     }
 
-    private static TnValueType getCachedValueType(Class<?> clazz) {
+    private static ValueType getCachedValueType(Class<?> clazz) {
         if (Map.class.isAssignableFrom(clazz)) {
             return null;
         }
-        TnValueType valueType = (TnValueType) valueTypeCache.get(clazz.getName());
+        ValueType valueType = (ValueType) valueTypeCache.get(clazz.getName());
         if (valueType == NULL) {
             return null;
         }
@@ -250,19 +250,19 @@ public class TnValueTypes {
         return null;
     }
 
-    public static TnValueType getEnumDefaultValueType(Class<?> clazz) {
-        return (TnValueType) DfReflectionUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
+    public static ValueType getEnumDefaultValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    public static TnValueType getEnumStringValueType(Class<?> clazz) {
-        return (TnValueType) DfReflectionUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
+    public static ValueType getEnumStringValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    public static TnValueType getEnumOrdinalValueType(Class<?> clazz) {
-        return (TnValueType) DfReflectionUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
+    public static ValueType getEnumOrdinalValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
     }
 
-    public static TnValueType createUserDefineValueType(Class<?> clazz) {
+    public static ValueType createUserDefineValueType(Class<?> clazz) {
         List<Method> valueOfMethods = new ArrayList<Method>();
         Method valueMethod = null;
         Method[] methods = clazz.getMethods();
@@ -288,7 +288,7 @@ public class TnValueTypes {
             Method valueOfMethod = (Method) valueOfMethods.get(i);
             if (valueOfMethod.getParameterTypes()[0] == valueMethod.getReturnType()) {
                 Class<?> baseClass = valueMethod.getReturnType();
-                TnValueType baseValueType = getValueType0(baseClass);
+                ValueType baseValueType = getValueType0(baseClass);
                 if (baseValueType == null) {
                     return null;
                 }
@@ -338,7 +338,7 @@ public class TnValueTypes {
         }
     }
 
-    public static TnValueType getValueType(int sqltype) {
+    public static ValueType getValueType(int sqltype) {
         return getValueType(getType(sqltype));
     }
 
@@ -349,7 +349,7 @@ public class TnValueTypes {
      * @param valueTypeName The name of value type. (NotNull)
      * @param valueType The value type. (NotNull)
      */
-    public static void registerPluginValueType(String valueTypeName, TnValueType valueType) {
+    public static void registerPluginValueType(String valueTypeName, ValueType valueType) {
         assertObjectNotNull("valueTypeName", valueTypeName);
         assertObjectNotNull("valueType", valueType);
         pluginValueTypeMap.put(valueTypeName, valueType);
@@ -359,7 +359,7 @@ public class TnValueTypes {
      * @param valueTypeName The name of value type. (NotNull)
      * @return The value type. (Nullable)
      */
-    public static TnValueType getPluginValueType(String valueTypeName) {
+    public static ValueType getPluginValueType(String valueTypeName) {
         assertObjectNotNull("valueTypeName", valueTypeName);
         return pluginValueTypeMap.get(valueTypeName);
     }
@@ -376,7 +376,7 @@ public class TnValueTypes {
                 || Calendar.class.isAssignableFrom(clazz) || clazz == BYTE_ARRAY_CLASS || hasCachedValueType(clazz);
     }
 
-    private static class NullType implements TnValueType {
+    private static class NullType implements ValueType {
 
         public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
             throw new SQLException("not supported");

@@ -13,7 +13,7 @@ import org.dbflute.DBDef;
 import org.dbflute.QLog;
 import org.dbflute.jdbc.SqlLogHandler;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.resource.TnSqlLogRegistry;
@@ -59,7 +59,7 @@ public class TnBasicHandler {
             return;
         }
         for (int i = 0; i < args.length; ++i) {
-            final TnValueType valueType = findValueType(args[i], argTypes[i]);
+            final ValueType valueType = findValueType(args[i], argTypes[i]);
             try {
                 valueType.bindValue(ps, i + 1, args[i]);
             } catch (SQLException e) {
@@ -68,8 +68,8 @@ public class TnBasicHandler {
         }
     }
 
-    protected TnValueType findValueType(Object arg, Class<?> argType) {
-        TnValueType valueType = TnValueTypes.getValueType(arg);
+    protected ValueType findValueType(Object arg, Class<?> argType) {
+        ValueType valueType = TnValueTypes.getValueType(arg);
         if (valueType != null) {
             return valueType;
         }

@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -128,7 +128,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         final List<Object> keyList = new ArrayList<Object>();
         final TnBeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final TnValueType valueType;
+            final ValueType valueType;
             String columnName = rpt.getMyKey(i);
             if (columnNames.contains(columnName)) {
                 final TnPropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);

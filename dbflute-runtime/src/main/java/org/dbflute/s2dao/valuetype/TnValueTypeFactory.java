@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.valuetype;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -23,8 +23,8 @@ import org.dbflute.jdbc.TnValueType;
  */
 public interface TnValueTypeFactory {
 
-    public TnValueType getValueTypeByName(String name);
+    public ValueType getValueTypeByName(String name);
 
-    public TnValueType getValueTypeByClass(Class<?> clazz);
+    public ValueType getValueTypeByClass(Class<?> clazz);
 
 }

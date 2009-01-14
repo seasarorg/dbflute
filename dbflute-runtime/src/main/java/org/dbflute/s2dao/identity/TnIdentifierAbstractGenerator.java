@@ -10,7 +10,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -69,8 +69,8 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                  Result Set Handler
     //                                                                  ==================
     protected static class InternalIdentifierResultSetHandler implements TnResultSetHandler {
-        private TnValueType valueType;
-        public InternalIdentifierResultSetHandler(TnValueType valueType) {
+        private ValueType valueType;
+        public InternalIdentifierResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {

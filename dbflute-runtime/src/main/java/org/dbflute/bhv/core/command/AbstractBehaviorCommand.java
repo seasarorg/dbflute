@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandComponentSetup;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -74,22 +74,22 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected TnResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
-        final TnValueType valueType = TnValueTypes.getValueType(objectType);
+        final ValueType valueType = TnValueTypes.getValueType(objectType);
         return new InternalObjectResultSetHandler(valueType);
     }
 
     protected TnResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
-        final TnValueType valueType = TnValueTypes.getValueType(objectType);
+        final ValueType valueType = TnValueTypes.getValueType(objectType);
         return createObjectListResultSetHandler(valueType);
     }
 
-    protected TnResultSetHandler createObjectListResultSetHandler(TnValueType valueType) {
+    protected TnResultSetHandler createObjectListResultSetHandler(ValueType valueType) {
         return new InternalObjectListResultSetHandler(valueType);
     }
 
     protected static class InternalObjectResultSetHandler implements TnResultSetHandler {
-        private TnValueType valueType;
-        public InternalObjectResultSetHandler(TnValueType valueType) {
+        private ValueType valueType;
+        public InternalObjectResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {
@@ -101,8 +101,8 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected static class InternalObjectListResultSetHandler implements TnResultSetHandler {
-        private TnValueType valueType;
-        public InternalObjectListResultSetHandler(TnValueType valueType) {
+        private ValueType valueType;
+        public InternalObjectListResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {

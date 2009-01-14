@@ -18,7 +18,7 @@ package org.dbflute.s2dao.metadata.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
@@ -88,7 +88,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
 
     protected TnPropertyType createPropertyType(TnPropertyDesc propertyDesc) {
         final String columnName = getColumnName(propertyDesc);
-        final TnValueType valueType = getValueType(propertyDesc);
+        final ValueType valueType = getValueType(propertyDesc);
         return new TnPropertyTypeImpl(propertyDesc, valueType, columnName);
     }
 
@@ -98,7 +98,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         return name != null ? name : propertyName;
     }
 
-    protected TnValueType getValueType(TnPropertyDesc propertyDesc) {
+    protected ValueType getValueType(TnPropertyDesc propertyDesc) {
         final String name = beanAnnotationReader.getValueType(propertyDesc);
         if (name != null) {
             return valueTypeFactory.getValueTypeByName(name);

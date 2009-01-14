@@ -19,13 +19,13 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public abstract class TnAbstractValueType implements TnValueType {
+public abstract class TnAbstractValueType implements ValueType {
 
     private int sqlType;
 

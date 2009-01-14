@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnPropertyType;
@@ -79,7 +79,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final TnValueType valueType = pt.getValueType();
+                        final ValueType valueType = pt.getValueType();
                         final Object value = valueType.getValue(rs, columnName);
                         dbmeta.setupEntityProperty(propertyName, row, value);
                     } else {

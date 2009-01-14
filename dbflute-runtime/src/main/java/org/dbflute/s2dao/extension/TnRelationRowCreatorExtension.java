@@ -10,7 +10,7 @@ import java.util.Stack;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
@@ -117,7 +117,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
         } else {
-            final TnValueType valueType = pt.getValueType();
+            final ValueType valueType = pt.getValueType();
             value = valueType.getValue(res.getResultSet(), columnName);
         }
         

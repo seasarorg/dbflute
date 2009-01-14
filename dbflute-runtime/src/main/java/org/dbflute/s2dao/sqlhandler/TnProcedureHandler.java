@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
@@ -115,7 +115,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         if (dto == null) { return; }
         int i = 0;
         for (TnProcedureParameterType ppt : procedureMetaData.parameterTypes()) {
-            final TnValueType valueType = ppt.getValueType();
+            final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 valueType.registerOutParameter(cs, i + 1);
             }
@@ -152,7 +152,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         }
         int i = 0;
         for (TnProcedureParameterType ppt : procedureMetaData.parameterTypes()) {
-            final TnValueType valueType = ppt.getValueType();
+            final ValueType valueType = ppt.getValueType();
             if (ppt.isOutType()) {
                 Object value = valueType.getValue(cs, i + 1);
                 if (value instanceof ResultSet) {
@@ -211,7 +211,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
             TnPropertyType[] propertyTypes = new TnPropertyType[count];
             for (int i = 0; i < count; ++i) {
                 String propertyName = rsmd.getColumnLabel(i + 1);
-                TnValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
+                ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
                 propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
             }
             return propertyTypes;

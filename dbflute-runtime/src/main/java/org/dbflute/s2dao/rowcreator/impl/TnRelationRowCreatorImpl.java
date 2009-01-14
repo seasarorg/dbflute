@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
@@ -172,7 +172,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
         } else {
-            final TnValueType valueType = pt.getValueType();
+            final ValueType valueType = pt.getValueType();
             value = valueType.getValue(res.getResultSet(), columnName);
         }
         if (value != null) {

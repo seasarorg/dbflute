@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.resource.ResourceContext;
 
 /**
@@ -36,11 +36,11 @@ public class CompleteSqlBuilder {
         if (args == null || args.length == 0) {
             return sql;
         }
-        return getCompleteSql(sql, args, new TnValueType[args.length], logDateFormat, logTimestampFormat);
+        return getCompleteSql(sql, args, new ValueType[args.length], logDateFormat, logTimestampFormat);
     }
 
     public static String getCompleteSql(String sql, Object[] args
-                                        , TnValueType[] valueTypes
+                                        , ValueType[] valueTypes
                                         , String logDateFormat
                                         , String logTimestampFormat) {
         if (args == null || args.length == 0) {
@@ -105,14 +105,14 @@ public class CompleteSqlBuilder {
 	static {
 	    Method method = null;
 	    try {
-	        method = TnValueType.class.getMethod("toText", TOTEXT_ARGUMENT_TYPES);
+	        method = ValueType.class.getMethod("toText", TOTEXT_ARGUMENT_TYPES);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         }
 		TOTEXT_METHOD = method;
 	}
 
-    public static String getBindVariableText(Object bindVariable, TnValueType valueType
+    public static String getBindVariableText(Object bindVariable, ValueType valueType
                                              , String logDateFormat
                                              , String logTimestampFormat) {
         if (valueType != null && TOTEXT_METHOD != null ) {

@@ -21,21 +21,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.util.DfReflectionUtil;
 
 /**
  * @author jflute
  */
-public class UserDefineType implements TnValueType {
+public class UserDefineType implements ValueType {
 
-    private TnValueType baseValueType;
+    private ValueType baseValueType;
 
     private Method valueOfMethod;
 
     private Method valueMethod;
 
-    public UserDefineType(TnValueType baseValueType, Method valueOfMethod, Method valueMethod) {
+    public UserDefineType(ValueType baseValueType, Method valueOfMethod, Method valueMethod) {
         this.baseValueType = baseValueType;
         this.valueOfMethod = valueOfMethod;
         this.valueMethod = valueMethod;

@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.valuetype.impl;
 
-import org.dbflute.jdbc.TnValueType;
+import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
@@ -42,11 +42,11 @@ public class TnValueTypeFactoryImpl implements TnValueTypeFactory {
     // ===================================================================================
     //                                                                   ValueType Getting
     //                                                                   =================
-    public TnValueType getValueTypeByName(String valueTypeName) {
+    public ValueType getValueTypeByName(String valueTypeName) {
         return TnValueTypes.getPluginValueType(valueTypeName);
     }
 
-    public TnValueType getValueTypeByClass(Class<?> clazz) {
+    public ValueType getValueTypeByClass(Class<?> clazz) {
         return TnValueTypes.getValueType(clazz);
     }
 }
