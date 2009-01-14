@@ -28,10 +28,6 @@
     <component name="valueTypeFactory" class="org.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
     <component name="latestSqlProvider" class="org.dbflute.resource.SqlLogRegistryLatestSqlProvider"/>
 
-    <!-- The special value type. -->
-	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
-	<component name="dbfluteBytesOidType" class="${glPackageBaseCommonS2DaoInternalValueType}.${glInternalBytesOidType}" />
-
 #foreach ($table in $database.tables)
 #if ($database.isMakeDaoInterface())
     <!-- ${table.name} -->
