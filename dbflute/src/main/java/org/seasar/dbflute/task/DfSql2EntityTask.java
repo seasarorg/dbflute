@@ -257,11 +257,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 throw new IllegalArgumentException(msg);
                             }
                             final int columnType = md.getColumnType(i);
+                            final String columnTypeName = md.getColumnTypeName(i);
                             int columnSize = md.getPrecision(i);
                             if (columnSize <= 0) {// Example: sum(COLUMN)
                                 columnSize = md.getColumnDisplaySize(i);
                             }
-                            final String columnTypeName = md.getColumnTypeName(i);
                             int scale = md.getScale(i);
 
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
