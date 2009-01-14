@@ -17,11 +17,16 @@ package org.dbflute.s2dao.metadata.impl;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.dbflute.resource.SQLExceptionHandler;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -31,11 +36,6 @@ import org.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.extension.jdbc.util.DataSourceUtil;
-import org.dbflute.s2dao.beans.TnBeanDesc;
-import org.dbflute.s2dao.beans.TnPropertyDesc;
-import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author jflute
@@ -57,12 +57,20 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         if (beanClass == null) {
             throw new NullPointerException("beanClass");
         }
-        final Connection con = DataSourceUtil.getConnection(dataSource);
+        Connection conn = null;
         try {
-            final DatabaseMetaData metaData = ConnectionUtil.getMetaData(con);
+            final DatabaseMetaData metaData = conn.getMetaData();
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
+        } catch (SQLException e) {
+            new SQLExceptionHandler().handleSQLException(e, null);
+            return null; // Unreachable!
         } finally {
-            ConnectionUtil.close(con);
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
     }
 

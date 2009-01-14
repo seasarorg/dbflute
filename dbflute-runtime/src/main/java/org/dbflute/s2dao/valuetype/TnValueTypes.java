@@ -139,9 +139,6 @@ public class TnValueTypes {
         // registerValueType(Object.class, OBJECT);
         try {
             isEnumMethod = Class.class.getMethod("isEnum", (Class[]) null);
-            setEnumDefaultValueType(Class.forName("org.seasar.extension.jdbc.types.EnumOrdinalType"));
-            setEnumOrdinalValueType(Class.forName("org.seasar.extension.jdbc.types.EnumOrdinalType"));
-            setEnumStringValueType(Class.forName("org.seasar.extension.jdbc.types.EnumType"));
         } catch (Throwable ignore) {
             isEnumMethod = null;
             enumStringValueTypeConstructor = null;

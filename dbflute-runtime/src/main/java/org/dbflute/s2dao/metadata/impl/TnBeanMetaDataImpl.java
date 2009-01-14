@@ -33,7 +33,6 @@ import org.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
-import org.seasar.extension.jdbc.ColumnNotFoundRuntimeException;
 
 /**
  * It draws upon S2Dao.
@@ -90,10 +89,11 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         this.timestampPropertyName = timestampPropertyName;
     }
 
-    public TnPropertyType getPropertyTypeByColumnName(String columnName) throws ColumnNotFoundRuntimeException {
+    public TnPropertyType getPropertyTypeByColumnName(String columnName) {
         TnPropertyType propertyType = (TnPropertyType) columnNamePropertyTypeMap.get(columnName);
         if (propertyType == null) {
-            throw new ColumnNotFoundRuntimeException(tableName, columnName);
+            String msg = "The column was not found in the table: table=" + tableName + " column=" + columnName;
+            throw new IllegalStateException(msg);
         }
         return propertyType;
     }
@@ -104,7 +104,8 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         }
         int index = alias.lastIndexOf('_');
         if (index < 0) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg);
         }
         String columnName = alias.substring(0, index);
         String relnoStr = alias.substring(index + 1);
@@ -112,11 +113,13 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         try {
             relno = Integer.parseInt(relnoStr);
         } catch (Throwable t) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg, t);
         }
         TnRelationPropertyType rpt = getRelationPropertyType(relno);
         if (!rpt.getBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg);
         }
         return rpt.getBeanMetaData().getPropertyTypeByColumnName(columnName);
     }
@@ -162,7 +165,8 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         }
         int index = alias.lastIndexOf('_');
         if (index < 0) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg);
         }
         String columnName = alias.substring(0, index);
         String relnoStr = alias.substring(index + 1);
@@ -170,11 +174,13 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         try {
             relno = Integer.parseInt(relnoStr);
         } catch (Throwable t) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg, t);
         }
         TnRelationPropertyType rpt = getRelationPropertyType(relno);
         if (!rpt.getBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
-            throw new ColumnNotFoundRuntimeException(tableName, alias);
+            String msg = "The alias was not found in the table: table=" + tableName + " alias=" + alias;
+            throw new IllegalStateException(msg);
         }
         return rpt.getPropertyName() + "." + columnName;
     }
@@ -187,7 +193,8 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         return (TnRelationPropertyType) relationPropertyTypes.get(index);
     }
 
-    public TnRelationPropertyType getRelationPropertyType(String propertyName) throws TnPropertyNotFoundRuntimeException {
+    public TnRelationPropertyType getRelationPropertyType(String propertyName)
+            throws TnPropertyNotFoundRuntimeException {
 
         for (int i = 0; i < getRelationPropertyTypeSize(); i++) {
             TnRelationPropertyType rpt = (TnRelationPropertyType) relationPropertyTypes.get(i);
@@ -240,8 +247,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         TnPropertyDesc pd = propertyType.getPropertyDesc();
         String propertyName = propertyType.getPropertyName();
         String idType = beanAnnotationReader.getId(pd);
-        TnIdentifierGenerator generator = TnIdentifierGeneratorFactory.createIdentifierGenerator(propertyType,
-                idType);
+        TnIdentifierGenerator generator = TnIdentifierGeneratorFactory.createIdentifierGenerator(propertyType, idType);
         identifierGenerators.add(generator);
         identifierGeneratorsByPropertyName.put(propertyName, generator);
     }
@@ -252,7 +258,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         }
         relationPropertyTypes.set(rpt.getRelationNo(), rpt);
     }
-    
+
     public int getPrimaryKeySize() {
         return primaryKeys.length;
     }

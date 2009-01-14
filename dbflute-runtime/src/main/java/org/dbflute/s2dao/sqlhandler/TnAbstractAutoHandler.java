@@ -17,8 +17,6 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfTypeUtil;
-import org.seasar.extension.jdbc.ValueType;
-
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -30,7 +28,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     //                                                                           =========
     protected TnBeanMetaData beanMetaData;
     protected Object[] bindVariables;
-    protected ValueType[] bindVariableValueTypes;
+    protected TnValueType[] bindVariableValueTypes;
     protected Timestamp timestamp;
     protected Integer versionNo;
     protected TnPropertyType[] propertyTypes;
@@ -82,12 +80,12 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         return ret;
     }
 
-    protected void bindArgs(PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
+    protected void bindArgs(PreparedStatement ps, Object[] args, TnValueType[] valueTypes) {
         if (args == null) {
             return;
         }
         for (int i = 0; i < args.length; ++i) {
-            ValueType valueType = valueTypes[i];
+            TnValueType valueType = valueTypes[i];
             try {
                 valueType.bindValue(ps, i + 1, args[i]);
             } catch (SQLException e) {
@@ -134,7 +132,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
             varValueTypeList.add(pt.getValueType());
         }
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((TnValueType[])varValueTypeList.toArray(new TnValueType[varValueTypeList.size()]));
     }
 
     protected void setupUpdateBindVariables(Object bean) {
@@ -166,7 +164,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         }
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((TnValueType[]) varValueTypeList.toArray(new TnValueType[varValueTypeList.size()]));
     }
 
     protected void setupDeleteBindVariables(Object bean) {
@@ -174,7 +172,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         final List<TnValueType> varValueTypeList = new ArrayList<TnValueType>();
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((TnValueType[])varValueTypeList.toArray(new TnValueType[varValueTypeList.size()]));
     }
 
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<TnValueType> varValueTypeList, Object bean) {
@@ -228,11 +226,11 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         this.bindVariables = bindVariables;
     }
 
-    protected ValueType[] getBindVariableValueTypes() {
+    protected TnValueType[] getBindVariableValueTypes() {
         return bindVariableValueTypes;
     }
 
-    protected void setBindVariableValueTypes(ValueType[] bindVariableValueTypes) {
+    protected void setBindVariableValueTypes(TnValueType[] bindVariableValueTypes) {
         this.bindVariableValueTypes = bindVariableValueTypes;
     }
 
