@@ -17,7 +17,6 @@ import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.s2dao.valuetype.TnValueType;
 
-
 /**
  * @author DBFlute(AutoGenerator)
  */
