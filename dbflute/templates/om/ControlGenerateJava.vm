@@ -68,7 +68,7 @@ targetdatabase = $targetDatabase
     #set ($glBuriDef = "${glProjectPrefix}BuriDef")
     #set ($glCallbackContext = "${glProjectPrefix}CallbackContext")
     #set ($glCacheAbstractSelector = "${glProjectPrefix}CacheAbstractSelector")
-    #set ($glCacheBehaviorSelector = "${glProjectPrefix}CacheBehaviorSelector")
+    #set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
     #set ($glCDef = "${glProjectPrefix}CDef")
     #set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
     #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
@@ -476,14 +476,6 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
-    $database.info("    parse('CacheAbstractSelector');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCacheAbstractSelector}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/CacheAbstractSelector.${glTemplateFileExtension}",$path ,"", "")
-
-    $database.info("    parse('CacheBehaviorSelector');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCacheBehaviorSelector}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/CacheBehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
-
     #if ($database.hasClassificationDefinitionMap())
       $database.info("parseAllcommonClassification() {")
 
@@ -514,8 +506,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
 
-    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMeta}))
-    $database.makeDirectory($path)
+    $database.info("    parse('ImplementedBehaviorSelector');")
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedBehaviorSelector}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedBehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
 
     $database.info("    parse('ImplementedCommonColumnAutoSetupper');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
