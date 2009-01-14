@@ -37,11 +37,7 @@ import org.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfStringUtil;
-import org.seasar.framework.util.DoubleConversionUtil;
-import org.seasar.framework.util.FloatConversionUtil;
-import org.seasar.framework.util.IntegerConversionUtil;
-import org.seasar.framework.util.LongConversionUtil;
-import org.seasar.framework.util.ShortConversionUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -398,36 +394,36 @@ public class TnBeanDescImpl implements TnBeanDesc {
     private static boolean adjustNumber(Class<?>[] paramTypes, Object[] args, int index) {
         if (paramTypes[index].isPrimitive()) {
             if (paramTypes[index] == int.class) {
-                args[index] = IntegerConversionUtil.toInteger(args[index]);
+                args[index] = DfTypeUtil.toInteger(args[index]);
                 return true;
             } else if (paramTypes[index] == double.class) {
-                args[index] = DoubleConversionUtil.toDouble(args[index]);
+                args[index] = DfTypeUtil.toDouble(args[index]);
                 return true;
             } else if (paramTypes[index] == long.class) {
-                args[index] = LongConversionUtil.toLong(args[index]);
+                args[index] = DfTypeUtil.toLong(args[index]);
                 return true;
             } else if (paramTypes[index] == short.class) {
-                args[index] = ShortConversionUtil.toShort(args[index]);
+                args[index] = DfTypeUtil.toShort(args[index]);
                 return true;
             } else if (paramTypes[index] == float.class) {
-                args[index] = FloatConversionUtil.toFloat(args[index]);
+                args[index] = DfTypeUtil.toFloat(args[index]);
                 return true;
             }
         } else {
             if (paramTypes[index] == Integer.class) {
-                args[index] = IntegerConversionUtil.toInteger(args[index]);
+                args[index] = DfTypeUtil.toInteger(args[index]);
                 return true;
             } else if (paramTypes[index] == Double.class) {
-                args[index] = DoubleConversionUtil.toDouble(args[index]);
+                args[index] = DfTypeUtil.toDouble(args[index]);
                 return true;
             } else if (paramTypes[index] == Long.class) {
-                args[index] = LongConversionUtil.toLong(args[index]);
+                args[index] = DfTypeUtil.toLong(args[index]);
                 return true;
             } else if (paramTypes[index] == Short.class) {
-                args[index] = ShortConversionUtil.toShort(args[index]);
+                args[index] = DfTypeUtil.toShort(args[index]);
                 return true;
             } else if (paramTypes[index] == Float.class) {
-                args[index] = FloatConversionUtil.toFloat(args[index]);
+                args[index] = DfTypeUtil.toFloat(args[index]);
                 return true;
             }
         }

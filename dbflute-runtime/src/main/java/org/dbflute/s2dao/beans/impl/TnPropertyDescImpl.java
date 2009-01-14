@@ -25,13 +25,7 @@ import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
 import org.dbflute.util.DfReflectionUtil;
-import org.seasar.framework.util.BooleanConversionUtil;
-import org.seasar.framework.util.CalendarConversionUtil;
-import org.seasar.framework.util.DateConversionUtil;
-import org.seasar.framework.util.NumberConversionUtil;
-import org.seasar.framework.util.SqlDateConversionUtil;
-import org.seasar.framework.util.TimeConversionUtil;
-import org.seasar.framework.util.TimestampConversionUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -243,34 +237,34 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
         } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
             return convertDate(arg);
         } else if (Boolean.class.isAssignableFrom(propertyType)) {
-            return BooleanConversionUtil.toBoolean(arg);
+            return DfTypeUtil.toBoolean(arg);
         } else if (arg != null && arg.getClass() != String.class && String.class == propertyType) {
             return arg.toString();
         } else if (arg instanceof String && !String.class.equals(propertyType)) {
             return convertWithString(arg);
         } else if (java.util.Calendar.class.isAssignableFrom(propertyType)) {
-            return CalendarConversionUtil.toCalendar(arg);
+            return DfTypeUtil.toCalendar(arg);
         }
         return arg;
     }
 
     private Object convertPrimitiveWrapper(Object arg) {
-        return NumberConversionUtil.convertPrimitiveWrapper(propertyType, arg);
+        return DfTypeUtil.convertPrimitiveWrapper(propertyType, arg);
     }
 
     private Object convertNumber(Object arg) {
-        return NumberConversionUtil.convertNumber(propertyType, arg);
+        return DfTypeUtil.toNumber(propertyType, arg);
     }
 
     private Object convertDate(Object arg) {
         if (propertyType == java.util.Date.class) {
-            return DateConversionUtil.toDate(arg);
+            return DfTypeUtil.toDate(arg);
         } else if (propertyType == Timestamp.class) {
-            return TimestampConversionUtil.toTimestamp(arg);
+            return DfTypeUtil.toTimestamp(arg);
         } else if (propertyType == java.sql.Date.class) {
-            return SqlDateConversionUtil.toDate(arg);
+            return DfTypeUtil.toDate(arg);
         } else if (propertyType == Time.class) {
-            return TimeConversionUtil.toTime(arg);
+            return DfTypeUtil.toTime(arg);
         }
         return arg;
     }

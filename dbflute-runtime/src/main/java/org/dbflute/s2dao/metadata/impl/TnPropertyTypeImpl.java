@@ -17,8 +17,8 @@ package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.s2dao.valuetype.ValueTypes;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 
 /**
  * {Refers to S2Container's utility and Extends it}

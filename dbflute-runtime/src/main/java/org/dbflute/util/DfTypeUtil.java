@@ -2,17 +2,19 @@ package org.dbflute.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DecimalFormatSymbols;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Date;
 import java.util.Calendar;
-import java.util.StringTokenizer;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -274,7 +276,7 @@ public class DfTypeUtil {
         }
         return new Float(normalize(s));
     }
-    
+
     // -----------------------------------------------------
     //                                                 Short
     //                                                 -----
@@ -419,7 +421,124 @@ public class DfTypeUtil {
         }
         return null;
     }
-        
+
+    public static String getDateY4Pattern(Locale locale) {
+        String pattern = getDatePattern(locale);
+        if (pattern.indexOf("yyyy") < 0) {
+            pattern = DfStringUtil.replace(pattern, "yy", "yyyy");
+        }
+        return pattern;
+    }
+
+    public static String getDatePattern(Locale locale) {
+        SimpleDateFormat df = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, locale);
+        String pattern = df.toPattern();
+        int index = pattern.indexOf(' ');
+        if (index > 0) {
+            pattern = pattern.substring(0, index);
+        }
+        if (pattern.indexOf("MM") < 0) {
+            pattern = DfStringUtil.replace(pattern, "M", "MM");
+        }
+        if (pattern.indexOf("dd") < 0) {
+            pattern = DfStringUtil.replace(pattern, "d", "dd");
+        }
+        return pattern;
+    }
+
+    // -----------------------------------------------------
+    //                                             Timestamp
+    //                                             ---------
+    public static Timestamp toTimestamp(Object o) {
+        return toTimestamp(o, null);
+    }
+
+    public static Timestamp toTimestamp(Object o, String pattern) {
+        if (o instanceof Timestamp) {
+            return (Timestamp) o;
+        }
+        Date date = toDate(o, pattern);
+        if (date != null) {
+            return new Timestamp(date.getTime());
+        }
+        return null;
+    }
+
+    public static String getPattern(Locale locale) {
+        return getDateY4Pattern(locale) + " " + getTimePattern(locale);
+    }
+
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
+    public static Time toTime(Object o) {
+        return toTime(o, null);
+    }
+
+    public static Time toTime(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        } else if (o instanceof String) {
+            return toTime((String) o, pattern);
+        } else if (o instanceof Time) {
+            return (Time) o;
+        } else if (o instanceof Calendar) {
+            return new Time(((Calendar) o).getTime().getTime());
+        } else {
+            return toTime(o.toString(), pattern);
+        }
+    }
+
+    public static Time toTime(String s, String pattern) {
+        return toTime(s, pattern, Locale.getDefault());
+    }
+
+    public static Time toTime(String s, String pattern, Locale locale) {
+        if (DfStringUtil.isEmpty(s)) {
+            return null;
+        }
+        SimpleDateFormat sdf = getTimeDateFormat(s, pattern, locale);
+        try {
+            return new Time(sdf.parse(s).getTime());
+        } catch (ParseException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static SimpleDateFormat getTimeDateFormat(String s, String pattern, Locale locale) {
+        if (pattern != null) {
+            return new SimpleDateFormat(pattern);
+        }
+        return getTimeDateFormat(s, locale);
+    }
+
+    public static SimpleDateFormat getTimeDateFormat(String s, Locale locale) {
+        String pattern = getTimePattern(locale);
+        if (s.length() == pattern.length()) {
+            return new SimpleDateFormat(pattern);
+        }
+        String shortPattern = convertTimeShortPattern(pattern);
+        if (s.length() == shortPattern.length()) {
+            return new SimpleDateFormat(shortPattern);
+        }
+        return new SimpleDateFormat(pattern);
+    }
+
+    public static String getTimePattern(Locale locale) {
+        return "HH:mm:ss";
+    }
+
+    public static String convertTimeShortPattern(String pattern) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < pattern.length(); ++i) {
+            char c = pattern.charAt(i);
+            if (c == 'h' || c == 'H' || c == 'm' || c == 's') {
+                buf.append(c);
+            }
+        }
+        return buf.toString();
+    }
+
     // -----------------------------------------------------
     //                                                Number
     //                                                ------
@@ -450,34 +569,124 @@ public class DfTypeUtil {
     public static Object toWrapper(Class<?> type, Object o) {
         if (type == int.class) {
             Integer i = toInteger(o);
-            if (i != null) { return i; }
+            if (i != null) {
+                return i;
+            }
             return new Integer(0);
         } else if (type == double.class) {
             Double d = toDouble(o);
-            if (d != null) { return d; }
+            if (d != null) {
+                return d;
+            }
             return new Double(0);
         } else if (type == long.class) {
             Long l = toLong(o);
-            if (l != null) { return l; }
+            if (l != null) {
+                return l;
+            }
             return new Long(0);
         } else if (type == float.class) {
             Float f = toFloat(o);
-            if (f != null) { return f; }
+            if (f != null) {
+                return f;
+            }
             return new Float(0);
         } else if (type == short.class) {
             Short s = toShort(o);
-            if (s != null) { return s; }
+            if (s != null) {
+                return s;
+            }
             return new Short((short) 0);
         } else if (type == boolean.class) {
             Boolean b = toBoolean(o);
-            if (b != null) { return b; }
+            if (b != null) {
+                return b;
+            }
             return Boolean.FALSE;
         } else if (type == byte.class) {
             Byte b = toByte(o);
-            if (b != null) { return b; }
+            if (b != null) {
+                return b;
+            }
             return new Byte((byte) 0);
         }
         return o;
+    }
+
+    public static Object convertPrimitiveWrapper(Class<?> type, Object o) {
+        if (type == int.class) {
+            Integer i = toInteger(o);
+            if (i != null) {
+                return i;
+            }
+            return new Integer(0);
+        } else if (type == double.class) {
+            Double d = toDouble(o);
+            if (d != null) {
+                return d;
+            }
+            return new Double(0);
+        } else if (type == long.class) {
+            Long l = toLong(o);
+            if (l != null) {
+                return l;
+            }
+            return new Long(0);
+        } else if (type == float.class) {
+            Float f = toFloat(o);
+            if (f != null) {
+                return f;
+            }
+            return new Float(0);
+        } else if (type == short.class) {
+            Short s = toShort(o);
+            if (s != null) {
+                return s;
+            }
+            return new Short((short) 0);
+        } else if (type == boolean.class) {
+            Boolean b = toBoolean(o);
+            if (b != null) {
+                return b;
+            }
+            return Boolean.FALSE;
+        } else if (type == byte.class) {
+            Byte b = toByte(o);
+            if (b != null) {
+                return b;
+            }
+            return new Byte((byte) 0);
+        }
+        return o;
+    }
+
+    // -----------------------------------------------------
+    //                                              Calendar
+    //                                              --------
+    public static Calendar toCalendar(Object o) {
+        return toCalendar(o, null);
+    }
+
+    public static Calendar toCalendar(Object o, String pattern) {
+        if (o instanceof Calendar) {
+            return (Calendar) o;
+        }
+        java.util.Date date = toDate(o, pattern);
+        if (date != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            return cal;
+        }
+        return null;
+    }
+
+    public static Calendar localize(Calendar calendar) {
+        if (calendar == null) {
+            throw new NullPointerException("calendar");
+        }
+        Calendar localCalendar = Calendar.getInstance();
+        localCalendar.setTimeInMillis(calendar.getTimeInMillis());
+        return localCalendar;
     }
 
     // ===================================================================================
@@ -587,6 +796,7 @@ public class DfTypeUtil {
     //                                  DecimalFormatSymbols
     //                                  --------------------
     protected static Map<Locale, DecimalFormatSymbols> symbolsCache = new ConcurrentHashMap<Locale, DecimalFormatSymbols>();
+
     protected static DecimalFormatSymbols getDecimalFormatSymbols() {
         return getDecimalFormatSymbols(Locale.getDefault());
     }
@@ -604,19 +814,18 @@ public class DfTypeUtil {
     //                                                String
     //                                                ------
     protected static String replace(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null) {
+        if (text == null || fromText == null || toText == null) {
             return null;
-		}
+        }
         StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         do {
             pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
+            if (pos == 0) {
                 sb.append(toText);
                 pos2 = fromText.length();
-            } else
-            if(pos > 0) {
+            } else if (pos > 0) {
                 sb.append(text.substring(pos2, pos));
                 sb.append(toText);
                 pos2 = pos + fromText.length();
@@ -624,10 +833,11 @@ public class DfTypeUtil {
                 sb.append(text.substring(pos2));
                 return sb.toString();
             }
-        } while(true);
+        } while (true);
     }
 
     protected static final String[] EMPTY_STRINGS = new String[0];
+
     protected static String[] split(final String str, final String delimiter) {
         if (str == null || str.trim().length() == 0) {
             return EMPTY_STRINGS;

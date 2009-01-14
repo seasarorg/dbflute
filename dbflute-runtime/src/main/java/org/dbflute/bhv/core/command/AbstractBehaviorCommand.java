@@ -17,10 +17,9 @@ import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
 import org.dbflute.s2dao.sqlcommand.InternalUpdateDynamicCommand;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
+import org.dbflute.s2dao.valuetype.ValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
-
 
 /**
  * @author DBFlute(AutoGenerator)

@@ -9,9 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.seasar.framework.exception.InvocationTargetRuntimeException;
-import org.seasar.framework.util.MethodUtil;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
@@ -195,7 +192,9 @@ public class DfReflectionUtil {
             if (t instanceof Error) {
                 throw (Error) t;
             }
-            throw new InvocationTargetRuntimeException(method.getDeclaringClass(), ex);
+            String msg = "The InvocationTargetException occurred: ";
+            msg = msg + " method=" + method + " target=" + target + " args=" + Arrays.asList(args);
+            throw new IllegalStateException(msg, t);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the method:";
             msg = msg + " method =" + method + " args=" + Arrays.asList(args);
@@ -207,14 +206,14 @@ public class DfReflectionUtil {
         if (IS_BRIDGE_METHOD == null) {
             return false;
         }
-        return ((Boolean) MethodUtil.invoke(IS_BRIDGE_METHOD, method, null)).booleanValue();
+        return ((Boolean) invoke(IS_BRIDGE_METHOD, method, null)).booleanValue();
     }
 
     public static boolean isSyntheticMethod(final Method method) {
         if (IS_SYNTHETIC_METHOD == null) {
             return false;
         }
-        return ((Boolean) MethodUtil.invoke(IS_SYNTHETIC_METHOD, method, null)).booleanValue();
+        return ((Boolean) invoke(IS_SYNTHETIC_METHOD, method, null)).booleanValue();
     }
 
     // ===================================================================================

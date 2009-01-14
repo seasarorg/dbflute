@@ -11,11 +11,11 @@ import java.util.Stack;
 
 import org.dbflute.DBDef;
 import org.dbflute.resource.ResourceContext;
-import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
+import org.dbflute.s2dao.valuetype.ValueTypes;
+import org.seasar.extension.jdbc.ValueType;
 
 /**
  * @author DBFlute(AutoGenerator)

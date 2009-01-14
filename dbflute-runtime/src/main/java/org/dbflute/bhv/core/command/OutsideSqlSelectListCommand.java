@@ -3,9 +3,9 @@ package org.dbflute.bhv.core.command;
 import java.util.List;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.s2dao.valuetype.ValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 
 /**
  * The behavior command for OutsideSql.selectList().
