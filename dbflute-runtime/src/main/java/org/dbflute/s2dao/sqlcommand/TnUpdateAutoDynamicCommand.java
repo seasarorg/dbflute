@@ -15,7 +15,7 @@ import org.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
+public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
 	// ===================================================================================
     //                                                                          Definition
@@ -34,7 +34,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 

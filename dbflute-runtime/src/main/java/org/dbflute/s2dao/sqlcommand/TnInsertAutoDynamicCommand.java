@@ -15,7 +15,7 @@ import org.dbflute.s2dao.metadata.TnPropertyType;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -28,7 +28,7 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalInsertAutoDynamicCommand() {
+    public TnInsertAutoDynamicCommand() {
     }
 
     // ===================================================================================

@@ -6,7 +6,7 @@ import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureMetaDataFactory;
-import org.dbflute.s2dao.sqlcommand.InternalProcedureCommand;
+import org.dbflute.s2dao.sqlcommand.TnProcedureCommand;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
@@ -109,10 +109,10 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         return new TnProcedureMetaDataFactory();
     }
 
-    protected InternalProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
+    protected TnProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
         // Because a procedure command does not use result set handler.
         final TnResultSetHandler resultSetHandler = new InternalNullResultSetHandler(); 
-        return new InternalProcedureCommand(_dataSource, resultSetHandler, _statementFactory, metaData);
+        return new TnProcedureCommand(_dataSource, resultSetHandler, _statementFactory, metaData);
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

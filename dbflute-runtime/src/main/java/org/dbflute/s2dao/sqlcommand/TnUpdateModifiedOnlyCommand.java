@@ -13,12 +13,12 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateModifiedOnlyCommand extends InternalUpdateAutoDynamicCommand {
+public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateModifiedOnlyCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateModifiedOnlyCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 

@@ -15,7 +15,7 @@ import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
-import org.dbflute.s2dao.sqlcommand.InternalUpdateDynamicCommand;
+import org.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
@@ -54,8 +54,8 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                   UpdateDynamicCommnd
     //                                   -------------------
-    protected InternalUpdateDynamicCommand createUpdateDynamicCommand(String[] argNames, Class<?>[] argTypes, String sql) {
-        final InternalUpdateDynamicCommand cmd = new InternalUpdateDynamicCommand(_dataSource, _statementFactory);
+    protected TnUpdateDynamicCommand createUpdateDynamicCommand(String[] argNames, Class<?>[] argTypes, String sql) {
+        final TnUpdateDynamicCommand cmd = new TnUpdateDynamicCommand(_dataSource, _statementFactory);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         if (sql != null) {

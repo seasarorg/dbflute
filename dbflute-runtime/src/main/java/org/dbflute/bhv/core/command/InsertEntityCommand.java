@@ -7,7 +7,7 @@ import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlcommand.InternalInsertAutoDynamicCommand;
+import org.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
 
 
 /**
@@ -44,8 +44,8 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         return createInsertAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected InternalInsertAutoDynamicCommand createInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final InternalInsertAutoDynamicCommand cmd = new InternalInsertAutoDynamicCommand();
+    protected TnInsertAutoDynamicCommand createInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnInsertAutoDynamicCommand cmd = new TnInsertAutoDynamicCommand();
         cmd.setBeanMetaData(bmd);
         cmd.setDataSource(_dataSource);
         cmd.setPropertyNames(propertyNames);

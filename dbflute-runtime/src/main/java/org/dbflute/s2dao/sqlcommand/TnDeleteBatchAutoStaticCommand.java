@@ -11,12 +11,12 @@ import org.dbflute.s2dao.sqlhandler.TnDeleteBatchAutoHandler;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
+public class TnDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalDeleteBatchAutoStaticCommand(DataSource dataSource,
+    public TnDeleteBatchAutoStaticCommand(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData, String[] propertyNames, boolean optimisticLockHandling) {
         super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, false);
     }

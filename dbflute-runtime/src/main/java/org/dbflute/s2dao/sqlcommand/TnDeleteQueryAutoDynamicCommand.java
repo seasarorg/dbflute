@@ -16,7 +16,7 @@ import org.dbflute.util.DfSystemUtil;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -27,7 +27,7 @@ public class InternalDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlE
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalDeleteQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnDeleteQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         this.dataSource = dataSource;
         this.statementFactory = statementFactory;
     }

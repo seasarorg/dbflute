@@ -3,7 +3,7 @@ package org.dbflute.bhv.core.command;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlcommand.InternalInsertBatchAutoStaticCommand;
+import org.dbflute.s2dao.sqlcommand.TnInsertBatchAutoStaticCommand;
 
 
 /**
@@ -36,7 +36,7 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
         return createInsertBatchAutoStaticCommand(bmd, propertyNames);
     }
 
-    protected InternalInsertBatchAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        return new InternalInsertBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames);
+    protected TnInsertBatchAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        return new TnInsertBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames);
     }
 }

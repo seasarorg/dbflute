@@ -6,7 +6,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.s2dao.sqlcommand.InternalUpdateQueryAutoDynamicCommand;
+import org.dbflute.s2dao.sqlcommand.TnUpdateQueryAutoDynamicCommand;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -66,7 +66,7 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     }
 
     protected SqlExecution createQueryUpdateEntityCBExecution(Class<? extends ConditionBean> cbType) {
-        return new InternalUpdateQueryAutoDynamicCommand(_dataSource, _statementFactory);
+        return new TnUpdateQueryAutoDynamicCommand(_dataSource, _statementFactory);
     }
 
     public Object[] getSqlExecutionArgument() {

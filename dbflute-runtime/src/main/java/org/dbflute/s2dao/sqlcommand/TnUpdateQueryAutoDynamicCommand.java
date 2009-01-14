@@ -25,7 +25,7 @@ import org.dbflute.util.DfSystemUtil;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,7 +36,7 @@ public class InternalUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlE
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         this.dataSource = dataSource;
         this.statementFactory = statementFactory;
     }

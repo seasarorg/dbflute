@@ -3,7 +3,7 @@ package org.dbflute.bhv.core.command;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlcommand.InternalUpdateBatchAutoStaticCommand;
+import org.dbflute.s2dao.sqlcommand.TnUpdateBatchAutoStaticCommand;
 
 
 /**
@@ -36,9 +36,9 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
         return createUpdateBatchAutoStaticCommand(bmd, propertyNames);
     }
 
-    protected InternalUpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
+    protected TnUpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
         boolean opt = isOptimisticLockHandling();
-        return new InternalUpdateBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, opt, opt);
+        return new TnUpdateBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, opt, opt);
     }
 
     protected boolean isOptimisticLockHandling() {

@@ -9,12 +9,12 @@ import org.dbflute.twowaysql.context.CommandContext;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateDynamicCommand extends TnAbstractDynamicCommand {
+public class TnUpdateDynamicCommand extends TnAbstractDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 

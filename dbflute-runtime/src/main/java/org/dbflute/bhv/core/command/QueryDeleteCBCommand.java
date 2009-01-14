@@ -6,7 +6,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.dbflute.s2dao.sqlcommand.InternalDeleteQueryAutoDynamicCommand;
+import org.dbflute.s2dao.sqlcommand.TnDeleteQueryAutoDynamicCommand;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -87,7 +87,7 @@ public class QueryDeleteCBCommand extends AbstractBehaviorCommand<Integer> {
     }
 
     protected SqlExecution createQueryDeleteCBExecution(Class<? extends ConditionBean> cbType) {
-        return new InternalDeleteQueryAutoDynamicCommand(_dataSource, _statementFactory);
+        return new TnDeleteQueryAutoDynamicCommand(_dataSource, _statementFactory);
     }
 
     public Object[] getSqlExecutionArgument() {

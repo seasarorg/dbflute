@@ -3,7 +3,7 @@ package org.dbflute.bhv.core.command;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlcommand.InternalDeleteAutoStaticCommand;
+import org.dbflute.s2dao.sqlcommand.TnDeleteAutoStaticCommand;
 
 
 /**
@@ -36,8 +36,8 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
         return createDeleteAutoStaticCommand(bmd, propertyNames);
     }
 
-    protected InternalDeleteAutoStaticCommand createDeleteAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        return new InternalDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, isOptimisticLockHandling());
+    protected TnDeleteAutoStaticCommand createDeleteAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        return new TnDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, isOptimisticLockHandling());
     }
 
     protected boolean isOptimisticLockHandling() {

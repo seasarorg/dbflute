@@ -12,12 +12,12 @@ import org.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
+public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateBatchAutoStaticCommand(DataSource dataSource,
+    public TnUpdateBatchAutoStaticCommand(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);

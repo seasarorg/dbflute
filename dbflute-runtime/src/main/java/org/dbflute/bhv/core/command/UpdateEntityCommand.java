@@ -3,7 +3,7 @@ package org.dbflute.bhv.core.command;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlcommand.InternalUpdateModifiedOnlyCommand;
+import org.dbflute.s2dao.sqlcommand.TnUpdateModifiedOnlyCommand;
 
 
 /**
@@ -36,8 +36,8 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
         return createUpdateModifiedOnlyCommand(bmd, propertyNames);
     }
 
-    protected InternalUpdateModifiedOnlyCommand createUpdateModifiedOnlyCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final InternalUpdateModifiedOnlyCommand cmd = new InternalUpdateModifiedOnlyCommand(_dataSource, _statementFactory);
+    protected TnUpdateModifiedOnlyCommand createUpdateModifiedOnlyCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnUpdateModifiedOnlyCommand cmd = new TnUpdateModifiedOnlyCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);// Extension Point!
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());

@@ -13,7 +13,7 @@ import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalProcedureCommand implements TnSqlCommand, SqlExecution {
+public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
 
 	// ===================================================================================
     //                                                                           Attribute
@@ -26,7 +26,7 @@ public class InternalProcedureCommand implements TnSqlCommand, SqlExecution {
 	// ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalProcedureCommand(DataSource dataSource, TnResultSetHandler resultSetHandler,
+    public TnProcedureCommand(DataSource dataSource, TnResultSetHandler resultSetHandler,
             StatementFactory statementFactory, TnProcedureMetaData procedureMetaData) {
         this.dataSource = dataSource;
         this.resultSetHandler = resultSetHandler;
