@@ -18,6 +18,7 @@ package org.dbflute.s2dao.beans;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.dbflute.s2dao.beans.exception.ConstructorNotFoundRuntimeException;
 import org.dbflute.s2dao.beans.exception.FieldNotFoundRuntimeException;
@@ -29,35 +30,42 @@ import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
  * @author jflute
  */
 public interface BeanDesc {
-
+    
+    // ===================================================================================
+    //                                                                                Bean
+    //                                                                                ====
     Class<?> getBeanClass();
-
+    
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    Constructor<?> getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException;
+    
+    Constructor<?> getConstructor(Class<?>[] paramTypes);
+    
+    
+    // ===================================================================================
+    //                                                                            Property
+    //                                                                            ========
     boolean hasPropertyDesc(String propertyName);
 
     PropertyDesc getPropertyDesc(String propertyName) throws PropertyNotFoundRuntimeException;
 
-    PropertyDesc getPropertyDesc(int index);
-
     int getPropertyDescSize();
-
+    
+    List<String> getProppertyNameList();
+    
+    // ===================================================================================
+    //                                                                               Field
+    //                                                                               =====
     boolean hasField(String fieldName);
 
     Field getField(String fieldName) throws FieldNotFoundRuntimeException;
 
-    Field getField(int index);
-
-    Object getFieldValue(String fieldName, Object target) throws FieldNotFoundRuntimeException;
-
     int getFieldSize();
-
-    Object newInstance(Object[] args) throws ConstructorNotFoundRuntimeException;
-
-    Constructor<?> getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException;
-
-    Constructor<?> getConstructor(Class<?>[] paramTypes);
-
-    Object invoke(Object target, String methodName, Object[] args) throws MethodNotFoundRuntimeException;
-
+    // ===================================================================================
+    //                                                                              Method
+    //                                                                              ======
     Method getMethod(String methodName) throws MethodNotFoundRuntimeException;
 
     Method getMethod(String methodName, Class<?>[] paramTypes) throws MethodNotFoundRuntimeException;
@@ -71,4 +79,11 @@ public interface BeanDesc {
     boolean hasMethod(String methodName);
 
     String[] getMethodNames();
+    
+    // ===================================================================================
+    //                                                                          Reflection
+    //                                                                          ==========
+    Object newInstance(Object[] args) throws ConstructorNotFoundRuntimeException;
+    Object invoke(Object target, String methodName, Object[] args) throws MethodNotFoundRuntimeException;
+    Object getFieldValue(String fieldName, Object target) throws FieldNotFoundRuntimeException;
 }

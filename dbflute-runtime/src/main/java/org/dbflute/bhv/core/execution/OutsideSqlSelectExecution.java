@@ -78,8 +78,9 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Resolve embedded comment for parsing bind variable comment in embedded comment.
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
-                final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
+            final List<String> proppertyNameList = beanDesc.getProppertyNameList();
+            for (String proppertyName : proppertyNameList) {
+                final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
                 final Class<?> propertyType = propertyDesc.getPropertyType();
                 if (!propertyType.equals(String.class)) {
                     continue;

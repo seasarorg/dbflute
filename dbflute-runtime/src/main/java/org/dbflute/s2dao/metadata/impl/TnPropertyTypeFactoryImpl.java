@@ -66,8 +66,9 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     public TnPropertyType[] createBeanPropertyTypes(String tableName) {
         final List<TnPropertyType> list = new ArrayList<TnPropertyType>();
         final BeanDesc beanDesc = getBeanDesc();
-        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
-            final PropertyDesc pd = beanDesc.getPropertyDesc(i);
+        final List<String> proppertyNameList = beanDesc.getProppertyNameList();
+        for (String proppertyName : proppertyNameList) {
+            final PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
 
             // Read-only property is unnecessary!
             if (!pd.hasWriteMethod()) {

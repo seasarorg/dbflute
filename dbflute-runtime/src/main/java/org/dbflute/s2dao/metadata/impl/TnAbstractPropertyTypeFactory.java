@@ -47,8 +47,9 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     public TnPropertyType[] createDtoPropertyTypes() {
         List<TnPropertyType> list = new ArrayList<TnPropertyType>();
         BeanDesc beanDesc = getBeanDesc();
-        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
-            PropertyDesc pd = beanDesc.getPropertyDesc(i);
+        List<String> proppertyNameList = beanDesc.getProppertyNameList();
+        for (String proppertyName : proppertyNameList) {
+            PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
             TnPropertyType pt = createPropertyType(pd);
             list.add(pt);
         }

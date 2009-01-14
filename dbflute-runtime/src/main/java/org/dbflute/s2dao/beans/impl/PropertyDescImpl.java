@@ -20,14 +20,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Map;
 
 import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.ParameterizedClassDesc;
 import org.dbflute.s2dao.beans.PropertyDesc;
 import org.dbflute.s2dao.beans.exception.IllegalPropertyRuntimeException;
-import org.dbflute.s2dao.beans.factory.ParameterizedClassDescFactory;
 import org.seasar.framework.util.BooleanConversionUtil;
 import org.seasar.framework.util.CalendarConversionUtil;
 import org.seasar.framework.util.ConstructorUtil;
@@ -46,30 +42,28 @@ import org.seasar.framework.util.TimestampConversionUtil;
  */
 public class PropertyDescImpl implements PropertyDesc {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Object[] EMPTY_ARGS = new Object[0];
-
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String propertyName;
-
     private Class<?> propertyType;
-
     private Method readMethod;
-
     private Method writeMethod;
-
     private Field field;
-
     private BeanDesc beanDesc;
-
     private Constructor<?> stringConstructor;
-
     private Method valueOfMethod;
-
     private boolean readable = false;
-
     private boolean writable = false;
 
-    private ParameterizedClassDesc parameterizedClassDesc;
-
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public PropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
             BeanDesc beanDesc) {
 
@@ -94,7 +88,6 @@ public class PropertyDescImpl implements PropertyDesc {
         this.beanDesc = beanDesc;
         setupStringConstructor();
         setupValueOfMethod();
-        setUpParameterizedClassDesc();
     }
 
     private void setupStringConstructor() {
@@ -123,19 +116,16 @@ public class PropertyDescImpl implements PropertyDesc {
         }
     }
 
-    private void setUpParameterizedClassDesc() {
-        final Map typeVariables = ((BeanDescImpl) beanDesc).getTypeVariables();
-        if (field != null) {
-            parameterizedClassDesc = ParameterizedClassDescFactory.createParameterizedClassDesc(field, typeVariables);
-        } else if (readMethod != null) {
-            parameterizedClassDesc = ParameterizedClassDescFactory.createParameterizedClassDesc(readMethod,
-                    typeVariables);
-        } else if (writeMethod != null) {
-            parameterizedClassDesc = ParameterizedClassDescFactory.createParameterizedClassDesc(writeMethod, 0,
-                    typeVariables);
-        }
+    // ===================================================================================
+    //                                                                                Bean
+    //                                                                                ====
+    public BeanDesc getBeanDesc() {
+        return beanDesc;
     }
 
+    // ===================================================================================
+    //                                                                            Property
+    //                                                                            ========
     public final String getPropertyName() {
         return propertyName;
     }
@@ -144,6 +134,9 @@ public class PropertyDescImpl implements PropertyDesc {
         return propertyType;
     }
 
+    // ===================================================================================
+    //                                                                              Method
+    //                                                                              ======
     public final Method getReadMethod() {
         return readMethod;
     }
@@ -174,6 +167,9 @@ public class PropertyDescImpl implements PropertyDesc {
         return writeMethod != null;
     }
 
+    // ===================================================================================
+    //                                                                               Field
+    //                                                                               =====
     public Field getField() {
         return field;
     }
@@ -186,6 +182,9 @@ public class PropertyDescImpl implements PropertyDesc {
         }
     }
 
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     public boolean isReadable() {
         return readable;
     }
@@ -194,6 +193,9 @@ public class PropertyDescImpl implements PropertyDesc {
         return writable;
     }
 
+    // ===================================================================================
+    //                                                                               Value
+    //                                                                               =====
     public final Object getValue(Object target) {
         try {
             if (!readable) {
@@ -221,10 +223,6 @@ public class PropertyDescImpl implements PropertyDesc {
         } catch (Throwable t) {
             throw new IllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
         }
-    }
-
-    public BeanDesc getBeanDesc() {
-        return beanDesc;
     }
 
     public final String toString() {
@@ -289,46 +287,4 @@ public class PropertyDescImpl implements PropertyDesc {
         }
         return arg;
     }
-
-    public boolean isParameterized() {
-        return parameterizedClassDesc != null && parameterizedClassDesc.isParameterizedClass();
-    }
-
-    public ParameterizedClassDesc getParameterizedClassDesc() {
-        return parameterizedClassDesc;
-    }
-
-    public Class<?> getElementClassOfCollection() {
-        if (!Collection.class.isAssignableFrom(propertyType) || !isParameterized()) {
-            return null;
-        }
-        final ParameterizedClassDesc pcd = parameterizedClassDesc.getArguments()[0];
-        if (pcd == null) {
-            return null;
-        }
-        return pcd.getRawClass();
-    }
-
-    public Class<?> getKeyClassOfMap() {
-        if (!Map.class.isAssignableFrom(propertyType) || !isParameterized()) {
-            return null;
-        }
-        final ParameterizedClassDesc pcd = parameterizedClassDesc.getArguments()[0];
-        if (pcd == null) {
-            return null;
-        }
-        return pcd.getRawClass();
-    }
-
-    public Class<?> getValueClassOfMap() {
-        if (!Map.class.isAssignableFrom(propertyType) || !isParameterized()) {
-            return null;
-        }
-        final ParameterizedClassDesc pcd = parameterizedClassDesc.getArguments()[1];
-        if (pcd == null) {
-            return null;
-        }
-        return pcd.getRawClass();
-    }
-
 }

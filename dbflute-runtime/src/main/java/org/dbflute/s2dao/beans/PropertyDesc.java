@@ -26,6 +26,8 @@ import org.dbflute.s2dao.beans.exception.IllegalPropertyRuntimeException;
  */
 public interface PropertyDesc {
 
+    BeanDesc getBeanDesc();
+    
     String getPropertyName();
 
     Class<?> getPropertyType();
@@ -55,17 +57,4 @@ public interface PropertyDesc {
     void setValue(Object target, Object value) throws IllegalPropertyRuntimeException, IllegalStateException;
 
     Object convertIfNeed(Object value);
-
-    BeanDesc getBeanDesc();
-
-    boolean isParameterized();
-
-    ParameterizedClassDesc getParameterizedClassDesc();
-
-    Class<?> getElementClassOfCollection();
-
-    Class<?> getKeyClassOfMap();
-
-    Class<?> getValueClassOfMap();
-
 }

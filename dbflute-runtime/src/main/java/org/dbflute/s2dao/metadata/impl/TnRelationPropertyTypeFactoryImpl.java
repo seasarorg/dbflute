@@ -58,10 +58,11 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
     }
 
     public TnRelationPropertyType[] createRelationPropertyTypes() {
-        List<TnRelationPropertyType> list = new ArrayList<TnRelationPropertyType>();
-        BeanDesc beanDesc = getBeanDesc();
-        for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
-            PropertyDesc pd = beanDesc.getPropertyDesc(i);
+        final List<TnRelationPropertyType> list = new ArrayList<TnRelationPropertyType>();
+        final BeanDesc beanDesc = getBeanDesc();
+        final List<String> proppertyNameList = beanDesc.getProppertyNameList();
+        for (String proppertyName : proppertyNameList) {
+            final PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
             if (isStopRelationCreation || !isRelationProperty(pd)) {
                 continue;
             }
