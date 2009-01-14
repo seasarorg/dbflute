@@ -7,7 +7,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.sqlhandler.TnProcedureHandler;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

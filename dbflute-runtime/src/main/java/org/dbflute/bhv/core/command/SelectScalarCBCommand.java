@@ -5,7 +5,7 @@ import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

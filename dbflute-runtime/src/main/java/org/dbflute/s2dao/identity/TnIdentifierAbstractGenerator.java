@@ -12,10 +12,10 @@ import javax.sql.DataSource;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.s2dao.valuetype.TnValueType;
-import org.seasar.extension.jdbc.ResultSetHandler;
 
 
 /**

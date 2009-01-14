@@ -20,7 +20,7 @@ import org.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 /**
  * @author DBFlute(AutoGenerator)

@@ -6,7 +6,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

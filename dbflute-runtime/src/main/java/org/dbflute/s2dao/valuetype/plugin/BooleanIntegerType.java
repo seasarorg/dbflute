@@ -23,7 +23,6 @@ import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.dbflute.util.DfTypeUtil;
-import org.seasar.framework.util.BooleanConversionUtil;
 
 /**
  * @author jflute
@@ -47,7 +46,7 @@ public class BooleanIntegerType extends TnAbstractValueType {
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return BooleanConversionUtil.toBoolean(cs.getObject(parameterName));
+        return DfTypeUtil.toBoolean(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {

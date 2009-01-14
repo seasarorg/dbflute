@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.cbean.FetchNarrowingBean;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.jdbc.FetchNarrowingResultSetWrapper;

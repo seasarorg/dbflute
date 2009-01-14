@@ -13,7 +13,7 @@ import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

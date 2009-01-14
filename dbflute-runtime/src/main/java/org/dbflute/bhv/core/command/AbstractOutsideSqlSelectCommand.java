@@ -7,7 +7,7 @@ import org.dbflute.cbean.FetchNarrowingBean;
 import org.dbflute.cbean.FetchNarrowingBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

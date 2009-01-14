@@ -18,9 +18,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.seasar.framework.util.DecimalFormatUtil;
-import org.seasar.framework.util.StringUtil;
-
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
@@ -283,10 +280,10 @@ public class DfTypeUtil {
     }
 
     private static double toPrimitiveDouble(String s) {
-        if (StringUtil.isEmpty(s)) {
+        if (DfStringUtil.isEmpty(s)) {
             return 0;
         }
-        return Double.parseDouble(DecimalFormatUtil.normalize(s));
+        return Double.parseDouble(normalize(s));
     }
 
     // -----------------------------------------------------
@@ -344,10 +341,10 @@ public class DfTypeUtil {
     }
 
     private static float toPrimitiveFloat(String s) {
-        if (StringUtil.isEmpty(s)) {
+        if (DfStringUtil.isEmpty(s)) {
             return 0;
         }
-        return Float.parseFloat(DecimalFormatUtil.normalize(s));
+        return Float.parseFloat(normalize(s));
     }
 
     // -----------------------------------------------------
@@ -409,10 +406,10 @@ public class DfTypeUtil {
     }
 
     private static short toPrimitiveShort(String s) {
-        if (StringUtil.isEmpty(s)) {
+        if (DfStringUtil.isEmpty(s)) {
             return 0;
         }
-        return Short.parseShort(DecimalFormatUtil.normalize(s));
+        return Short.parseShort(normalize(s));
     }
 
     // -----------------------------------------------------
@@ -495,10 +492,10 @@ public class DfTypeUtil {
     }
 
     private static byte toPrimitiveByte(String s) {
-        if (StringUtil.isEmpty(s)) {
+        if (DfStringUtil.isEmpty(s)) {
             return 0;
         }
-        return Byte.parseByte(DecimalFormatUtil.normalize(s));
+        return Byte.parseByte(normalize(s));
     }
 
     // -----------------------------------------------------

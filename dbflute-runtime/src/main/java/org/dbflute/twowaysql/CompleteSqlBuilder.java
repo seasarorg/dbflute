@@ -1,16 +1,15 @@
 package org.dbflute.twowaysql;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.seasar.extension.jdbc.ValueType;
-
 import org.dbflute.resource.ResourceContext;
+import org.dbflute.s2dao.valuetype.TnValueType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -37,11 +36,11 @@ public class CompleteSqlBuilder {
         if (args == null || args.length == 0) {
             return sql;
         }
-        return getCompleteSql(sql, args, new ValueType[args.length], logDateFormat, logTimestampFormat);
+        return getCompleteSql(sql, args, new TnValueType[args.length], logDateFormat, logTimestampFormat);
     }
 
     public static String getCompleteSql(String sql, Object[] args
-                                        , ValueType[] valueTypes
+                                        , TnValueType[] valueTypes
                                         , String logDateFormat
                                         , String logTimestampFormat) {
         if (args == null || args.length == 0) {
@@ -106,16 +105,16 @@ public class CompleteSqlBuilder {
 	static {
 	    Method method = null;
 	    try {
-	        method = ValueType.class.getMethod("toText", TOTEXT_ARGUMENT_TYPES);
+	        method = TnValueType.class.getMethod("toText", TOTEXT_ARGUMENT_TYPES);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         }
 		TOTEXT_METHOD = method;
 	}
 
-    public static String getBindVariableText(Object bindVariable, ValueType valueType
-                                           , String logDateFormat
-                                           , String logTimestampFormat) {
+    public static String getBindVariableText(Object bindVariable, TnValueType valueType
+                                             , String logDateFormat
+                                             , String logTimestampFormat) {
         if (valueType != null && TOTEXT_METHOD != null ) {
             try {
                 return (String)TOTEXT_METHOD.invoke(valueType, new Object[]{bindVariable});
@@ -141,8 +140,8 @@ public class CompleteSqlBuilder {
     }
 
     public static String getBindVariableText(Object bindVariable
-                                           , String logDateFormat
-                                           , String logTimestampFormat) {
+                                             , String logDateFormat
+                                             , String logTimestampFormat) {
         if (bindVariable instanceof String) {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {

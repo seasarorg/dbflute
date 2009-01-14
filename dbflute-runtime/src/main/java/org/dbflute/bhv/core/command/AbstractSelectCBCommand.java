@@ -4,7 +4,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.execution.SelectCBExecution;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**

@@ -6,7 +6,7 @@ import org.dbflute.bhv.core.execution.BasicSelectExecution;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.extension.jdbc.ResultSetHandler;
+import org.dbflute.s2dao.jdbc.ResultSetHandler;
 
 
 /**
