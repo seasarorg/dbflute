@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.io.Reader;
 import java.io.StringReader;

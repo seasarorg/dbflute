@@ -18,8 +18,8 @@ package org.dbflute.s2dao.valuetype.impl;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.dbflute.s2dao.valuetype.additional.TnBytesOidType;
-import org.dbflute.s2dao.valuetype.additional.TnStringClobType;
+import org.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
+import org.dbflute.s2dao.valuetype.plugin.TnStringClobType;
 
 /**
  * @author jflute

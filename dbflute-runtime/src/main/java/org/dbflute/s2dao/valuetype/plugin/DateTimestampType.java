@@ -13,22 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.util.Calendar;
 import java.util.Date;
 
-import org.dbflute.s2dao.valuetype.basic.TimeType;
+import org.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class DateTimeType extends TimeType {
+public class DateTimestampType extends TimestampType {
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
         return toDate(super.getValue(resultSet, index));
@@ -50,14 +48,5 @@ public class DateTimeType extends TimeType {
 
     protected Date toDate(Object value) {
         return DfTypeUtil.toDate(value);
-    }
-
-    protected Time toTime(Object value) {
-        Calendar base = Calendar.getInstance();
-        base.setTime(toDate(value));
-        base.set(Calendar.YEAR, 1970);
-        base.set(Calendar.MONTH, Calendar.JANUARY);
-        base.set(Calendar.DATE, 1);
-        return new Time(base.getTimeInMillis());
     }
 }

@@ -34,10 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.dbflute.s2dao.valuetype.additional.BytesType;
-import org.dbflute.s2dao.valuetype.additional.OracleResultSetType;
-import org.dbflute.s2dao.valuetype.additional.PostgreResultSetType;
-import org.dbflute.s2dao.valuetype.additional.SerializableType;
 import org.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.dbflute.s2dao.valuetype.basic.BigIntegerType;
 import org.dbflute.s2dao.valuetype.basic.BinaryStreamType;
@@ -56,6 +52,10 @@ import org.dbflute.s2dao.valuetype.basic.StringType;
 import org.dbflute.s2dao.valuetype.basic.TimeType;
 import org.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.dbflute.s2dao.valuetype.basic.UserDefineType;
+import org.dbflute.s2dao.valuetype.plugin.BytesType;
+import org.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
+import org.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
+import org.dbflute.s2dao.valuetype.plugin.SerializableType;
 import org.dbflute.util.DfReflectionUtil;
 
 /**
@@ -86,11 +86,12 @@ public class TnValueTypes {
     public final static TnValueType BOOLEAN = new BooleanType();
     public final static TnValueType OBJECT = new ObjectType();
 
-    // Additional
+    // Plug-in
     public final static TnValueType ORACLE_RESULT_SET = new OracleResultSetType();
     public final static TnValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
     public final static TnValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
+    // Internal
     private static final TnValueType NULL = new NullType();
     
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();

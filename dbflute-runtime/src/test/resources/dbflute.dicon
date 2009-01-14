@@ -19,10 +19,6 @@
     <component name="valueTypeFactory" class="org.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl"/>
     <component name="latestSqlProvider" class="org.dbflute.resource.SqlLogRegistryLatestSqlProvider"/>
 
-    <!-- The special value type. -->
-	<component name="dbfluteStringClobType" class="org.dbflute.s2dao.valuetype.TnStringClobType" />
-	<component name="dbfluteBytesOidType" class="org.dbflute.s2dao.valuetype.TnBytesOidType" />
-
     <component name="memberBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberBhv"/>
     <component name="memberAddressBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberAddressBhv"/>
     <component name="memberLoginBhv" class="com.example.dbflute.basic.dbflute.exbhv.MemberLoginBhv"/>

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -23,58 +23,42 @@ import java.sql.Types;
 
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.dbflute.util.DfTypeUtil;
-import org.seasar.framework.util.BooleanConversionUtil;
 
 /**
  * @author jflute
  */
-public class BooleanIntegerType extends TnAbstractValueType {
+public class PostgreResultSetType extends TnAbstractValueType {
 
-    public BooleanIntegerType() {
-        super(Types.INTEGER);
+    public PostgreResultSetType() {
+        super(Types.OTHER);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(resultSet.getObject(index));
+        throw new SQLException("not supported");
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
+        throw new SQLException("not supported");
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(cs.getObject(index));
+        return cs.getObject(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return BooleanConversionUtil.toBoolean(cs.getObject(parameterName));
+        return cs.getObject(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        if (value == null) {
-            setNull(ps, index);
-        } else {
-            ps.setInt(index, toInt(value));
-        }
+        throw new SQLException("not supported");
     }
 
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        if (value == null) {
-            setNull(cs, parameterName);
-        } else {
-            cs.setInt(parameterName, toInt(value));
-        }
+        throw new SQLException("not supported");
     }
 
     public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        int var = toInt(value);
-        return DfTypeUtil.toText(new Integer(var));
+        return DfTypeUtil.nullText();
     }
 
-    protected int toInt(Object value) {
-        return DfTypeUtil.toPrimitiveBoolean(value) ? 1 : 0;
-    }
 }

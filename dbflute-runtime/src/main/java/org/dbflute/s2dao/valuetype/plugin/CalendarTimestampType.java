@@ -13,20 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-import org.dbflute.s2dao.valuetype.basic.SqlDateType;
+import org.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class CalendarSqlDateType extends SqlDateType {
+public class CalendarTimestampType extends TimestampType {
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
         return toCalendar(super.getValue(resultSet, index));
@@ -48,18 +48,5 @@ public class CalendarSqlDateType extends SqlDateType {
 
     protected Calendar toCalendar(Object value) {
         return DfTypeUtil.toCalendar(value);
-    }
-
-    protected java.sql.Date toSqlDate(Object value) {
-        Calendar calendar = DfTypeUtil.localize(toCalendar(value));
-        Calendar base = Calendar.getInstance();
-        base.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-        base.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-        base.set(Calendar.DATE, calendar.get(Calendar.DATE));
-        base.set(Calendar.HOUR_OF_DAY, 0);
-        base.set(Calendar.MINUTE, 0);
-        base.set(Calendar.SECOND, 0);
-        base.set(Calendar.MILLISECOND, 0);
-        return new java.sql.Date(base.getTimeInMillis());
     }
 }

@@ -13,52 +13,57 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
 
-import org.dbflute.s2dao.valuetype.basic.SqlDateType;
+import org.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class DateSqlDateType extends SqlDateType {
+public class OracleResultSetType extends TnAbstractValueType {
+
+    protected static int CURSOR = -10;
+
+    public OracleResultSetType() {
+        super(CURSOR);
+    }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toDate(super.getValue(resultSet, index));
+        throw new SQLException("not supported");
     }
 
     public Object getValue(ResultSet resultSet, String columnName)
             throws SQLException {
-        return toDate(super.getValue(resultSet, columnName));
+        throw new SQLException("not supported");
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toDate(super.getValue(cs, index));
+        return cs.getObject(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName)
             throws SQLException {
-        return toDate(super.getValue(cs, parameterName));
+        return cs.getObject(parameterName);
     }
 
-    protected Date toDate(Object value) {
-        return DfTypeUtil.toDate(value);
+    public void bindValue(PreparedStatement ps, int index, Object value)
+            throws SQLException {
+        throw new SQLException("not supported");
     }
 
-    protected java.sql.Date toSqlDate(Object value) {
-        Calendar base = Calendar.getInstance();
-        base.setTime(toDate(value));
-        base.set(Calendar.HOUR_OF_DAY, 0);
-        base.set(Calendar.MINUTE, 0);
-        base.set(Calendar.SECOND, 0);
-        base.set(Calendar.MILLISECOND, 0);
-        return new java.sql.Date(base.getTimeInMillis());
+    public void bindValue(CallableStatement cs, String parameterName,
+            Object value) throws SQLException {
+        throw new SQLException("not supported");
+    }
+
+    public String toText(Object value) {
+        return DfTypeUtil.nullText();
     }
 
 }

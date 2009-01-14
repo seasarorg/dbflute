@@ -1,4 +1,4 @@
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

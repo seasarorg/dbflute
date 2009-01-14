@@ -13,21 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.additional;
+package org.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.util.Calendar;
 
-import org.dbflute.s2dao.valuetype.basic.TimeType;
+import org.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class CalendarTimeType extends TimeType {
+public class CalendarSqlDateType extends SqlDateType {
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
         return toCalendar(super.getValue(resultSet, index));
@@ -51,16 +50,16 @@ public class CalendarTimeType extends TimeType {
         return DfTypeUtil.toCalendar(value);
     }
 
-    protected Time toTime(Object value) {
+    protected java.sql.Date toSqlDate(Object value) {
         Calendar calendar = DfTypeUtil.localize(toCalendar(value));
         Calendar base = Calendar.getInstance();
-        base.set(Calendar.YEAR, 1970);
-        base.set(Calendar.MONTH, Calendar.JANUARY);
-        base.set(Calendar.DATE, 1);
-        base.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
-        base.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
-        base.set(Calendar.SECOND, calendar.get(Calendar.SECOND));
-        base.set(Calendar.MILLISECOND, calendar.get(Calendar.MILLISECOND));
-        return new Time(base.getTimeInMillis());
+        base.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+        base.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+        base.set(Calendar.DATE, calendar.get(Calendar.DATE));
+        base.set(Calendar.HOUR_OF_DAY, 0);
+        base.set(Calendar.MINUTE, 0);
+        base.set(Calendar.SECOND, 0);
+        base.set(Calendar.MILLISECOND, 0);
+        return new java.sql.Date(base.getTimeInMillis());
     }
 }
