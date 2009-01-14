@@ -17,7 +17,7 @@ public class TnSqlLogRegistry {
 	// ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String PKG_ORG_SEASAR = "org.seasar";
+    protected static final String PKG_ORG_SEASAR = "org.seasar.";
 	protected static final String NAME_SqlLogRegistryLocator = PKG_ORG_SEASAR + "extension.jdbc.SqlLogRegistryLocator";
 	protected static final String NAME_getInstance = "getInstance";
 	protected static final String NAME_setInstance = "setInstance";

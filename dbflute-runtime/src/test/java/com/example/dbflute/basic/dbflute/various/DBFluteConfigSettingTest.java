@@ -5,8 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.dbflute.cbean.ListResultBean;
-import org.dbflute.jdbc.LatestSqlProvider;
 import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.resource.TnSqlLogRegistry;
 
 import com.example.dbflute.basic.dbflute.allcommon.DBFluteConfig;
 import com.example.dbflute.basic.dbflute.cbean.MemberCB;
@@ -24,7 +24,6 @@ public class DBFluteConfigSettingTest extends ContainerTestCase {
     //                                                                           Attribute
     //                                                                           =========
     protected MemberBhv memberBhv;
-    protected LatestSqlProvider latestSqlProvider;
 
     // ===================================================================================
     //                                                                              Set up
@@ -136,13 +135,11 @@ public class DBFluteConfigSettingTest extends ContainerTestCase {
         memberBhv.selectCount(cb);
         
         // ## Act ##
-        String displaySql = latestSqlProvider.getDisplaySql();
+        String displaySql = TnSqlLogRegistry.peekCompleteSql();
         
         // ## Assert ##
         log(displaySql);
         assertNotNull(displaySql);
-        latestSqlProvider.clearSqlCache();
-        assertNull(latestSqlProvider.getDisplaySql(), latestSqlProvider.getDisplaySql());
     }
 
     // ===================================================================================

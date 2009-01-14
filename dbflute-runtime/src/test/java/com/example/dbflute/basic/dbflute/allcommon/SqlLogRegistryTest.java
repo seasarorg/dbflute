@@ -1,6 +1,5 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
-import org.dbflute.jdbc.LatestSqlProvider;
 import org.seasar.extension.jdbc.SqlLog;
 import org.seasar.extension.jdbc.SqlLogRegistry;
 import org.seasar.extension.jdbc.SqlLogRegistryLocator;
@@ -20,7 +19,6 @@ public class SqlLogRegistryTest extends ContainerTestCase {
     //                                                                           Attribute
     //                                                                           =========
     private MemberBhv memberBhv;
-    protected LatestSqlProvider latestSqlProvider;
     
     // ===================================================================================
     //                                                                       SqlLogRegistr
@@ -100,22 +98,5 @@ public class SqlLogRegistryTest extends ContainerTestCase {
             secondSql = completeSql;
         }
         assertNotSame(firstSql, secondSql);
-    }
-    
-    /**
-     * デフォルトではLatestSqlProviderも利用不可なはず。
-     */
-    public void test_LatestSqlProvider_Tx() {
-        // ## Arrange ##
-        MemberCB cb = new MemberCB();
-        cb.query().setMemberName_PrefixSearch("S");
-        memberBhv.selectList(cb);
-        
-        // ## Act ##
-        String displaySql = latestSqlProvider.getDisplaySql();
-        
-        // ## Assert ##
-        log(displaySql);
-        assertNull(displaySql);
     }
 }
